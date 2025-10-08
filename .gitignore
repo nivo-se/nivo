@@ -92,3 +92,6 @@ yarn-error.log*
 .supabase/
 .vercel
 node_modules
+# Allow checked-in frontend shared library utilities
+!frontend/src/lib/
+!frontend/src/lib/**

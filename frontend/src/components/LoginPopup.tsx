@@ -17,7 +17,7 @@ import {
   EyeOff
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
+import { supabase, supabaseConfig } from '../lib/supabase'
 
 interface LoginPopupProps {
   isOpen: boolean
@@ -37,12 +37,20 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const { signIn, signUp } = useAuth()
+  const authEnabled = supabaseConfig.isConfigured
+  const authDisabledMessage = 'Authentication is not available in this preview environment.'
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     setSuccess(null)
+
+    if (!authEnabled) {
+      setError(authDisabledMessage)
+      setLoading(false)
+      return
+    }
 
     if (!email || !password) {
       setError('Please fill in all fields')
@@ -69,6 +77,12 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
     setLoading(true)
     setError(null)
     setSuccess(null)
+
+    if (!authEnabled) {
+      setError(authDisabledMessage)
+      setLoading(false)
+      return
+    }
 
     if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields')
@@ -102,7 +116,13 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
   const handleAppleSignIn = async () => {
     setLoading(true)
     setError(null)
-    
+
+    if (!authEnabled) {
+      setError(authDisabledMessage)
+      setLoading(false)
+      return
+    }
+
     try {
       // This will be implemented once we configure Apple OAuth in Supabase
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -166,7 +186,13 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
-            
+
+            {!authEnabled && (
+              <Alert variant="destructive">
+                <AlertDescription>{authDisabledMessage}</AlertDescription>
+              </Alert>
+            )}
+
             <TabsContent value="signin" className="space-y-4">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -182,6 +208,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 h-11"
+                      disabled={!authEnabled || loading}
                       required
                     />
                   </div>
@@ -200,12 +227,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10 h-11"
+                      disabled={!authEnabled || loading}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                      disabled={!authEnabled || loading}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -224,7 +253,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                   </Alert>
                 )}
 
-                <Button type="submit" className="w-full h-11" disabled={loading}>
+                <Button type="submit" className="w-full h-11" disabled={loading || !authEnabled}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -252,7 +281,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                 variant="outline"
                 className="w-full h-11 border-gray-300 hover:bg-gray-50"
                 onClick={handleAppleSignIn}
-                disabled={loading}
+                disabled={loading || !authEnabled}
               >
                 <Apple className="mr-2 h-4 w-4" />
                 Continue with Apple
@@ -274,6 +303,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 h-11"
+                      disabled={!authEnabled || loading}
                       required
                     />
                   </div>
@@ -292,12 +322,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10 h-11"
+                      disabled={!authEnabled || loading}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                      disabled={!authEnabled || loading}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -317,12 +349,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="pl-10 pr-10 h-11"
+                      disabled={!authEnabled || loading}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                      disabled={!authEnabled || loading}
                     >
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -341,7 +375,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                   </Alert>
                 )}
 
-                <Button type="submit" className="w-full h-11" disabled={loading}>
+                <Button type="submit" className="w-full h-11" disabled={loading || !authEnabled}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -369,7 +403,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onSuccess }) =
                 variant="outline"
                 className="w-full h-11 border-gray-300 hover:bg-gray-50"
                 onClick={handleAppleSignIn}
-                disabled={loading}
+                disabled={loading || !authEnabled}
               >
                 <Apple className="mr-2 h-4 w-4" />
                 Continue with Apple

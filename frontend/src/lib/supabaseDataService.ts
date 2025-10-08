@@ -95,9 +95,10 @@ class SupabaseDataService {
   ): Promise<SearchResults> {
     try {
       // First get companies from master_analytics (has company names and details)
+      // Note: Only query columns that actually exist in the Supabase table
       let query = supabase
         .from('master_analytics')
-        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin, company_size_category, employee_size_category, profitability_category, growth_category, digital_presence, analysis_year', { count: 'exact' })
+        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin', { count: 'exact' })
 
       // Apply filters
       if (filters.name) {
@@ -204,11 +205,11 @@ class SupabaseDataService {
           NetProfit_margin: company.NetProfit_margin,
           year: latestYear, // Use latest year from company_accounts_by_id
           historicalData: Array.isArray(historicalData) ? historicalData : [], // Ensure historicalData is always an array
-          company_size_category: company.company_size_category,
-          employee_size_category: company.employee_size_category,
-          profitability_category: company.profitability_category,
-          growth_category: company.growth_category,
-          digital_presence: company.digital_presence
+          company_size_category: null, // Not in Supabase table
+          employee_size_category: null,
+          profitability_category: null,
+          growth_category: null,
+          digital_presence: !!(company.homepage)
         }
       }))
 
@@ -241,7 +242,7 @@ class SupabaseDataService {
     try {
       const { data, error } = await supabase
         .from('master_analytics')
-        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin, company_size_category, employee_size_category, profitability_category, growth_category, digital_presence, analysis_year')
+        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin')
         .eq('OrgNr', orgNr)
         .single()
 
@@ -271,12 +272,12 @@ class SupabaseDataService {
         Revenue_growth: data.Revenue_growth,
         EBIT_margin: data.EBIT_margin,
         NetProfit_margin: data.NetProfit_margin,
-        year: data.analysis_year, // Use analysis_year from master_analytics
-        company_size_category: data.company_size_category,
-        employee_size_category: data.employee_size_category,
-        profitability_category: data.profitability_category,
-        growth_category: data.growth_category,
-        digital_presence: data.digital_presence
+        year: null, // analysis_year not in Supabase table
+        company_size_category: null,
+        employee_size_category: null,
+        profitability_category: null,
+        growth_category: null,
+        digital_presence: !!(data.homepage)
       }
     } catch (error) {
       console.error('Error fetching company:', error)
@@ -453,7 +454,7 @@ class SupabaseDataService {
     try {
       const { data, error } = await supabase
         .from('master_analytics')
-        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin, company_size_category, employee_size_category, profitability_category, growth_category, digital_presence, analysis_year')
+        .select('OrgNr, name, address, city, incorporation_date, email, homepage, segment, segment_name, employees, SDI, DR, ORS, Revenue_growth, EBIT_margin, NetProfit_margin')
         .in('OrgNr', orgNrs)
 
       if (error) {
@@ -482,12 +483,12 @@ class SupabaseDataService {
         Revenue_growth: company.Revenue_growth,
         EBIT_margin: company.EBIT_margin,
         NetProfit_margin: company.NetProfit_margin,
-        year: company.analysis_year,
-        company_size_category: company.company_size_category,
-        employee_size_category: company.employee_size_category,
-        profitability_category: company.profitability_category,
-        growth_category: company.growth_category,
-        digital_presence: company.digital_presence
+        year: null, // analysis_year not in table
+        company_size_category: null,
+        employee_size_category: null,
+        profitability_category: null,
+        growth_category: null,
+        digital_presence: !!(company.homepage)
       }))
     } catch (error) {
       console.error('Error fetching companies by OrgNrs:', error)

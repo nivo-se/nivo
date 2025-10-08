@@ -17,7 +17,8 @@ import {
   RotateCcw,
   ChevronUp
 } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, supabaseConfig } from '../lib/supabase'
+import { getLocalIndustrySummaries } from '../lib/sampleData'
 
 interface Industry {
   code: string
@@ -45,13 +46,27 @@ const CollapsibleIndustryFilter: React.FC<CollapsibleIndustryFilterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [isExpanded, setIsExpanded] = useState(false)
+  const supabaseEnabled = supabaseConfig.isConfigured
 
   // Load industries from our new classification system
   useEffect(() => {
     const loadIndustries = async () => {
       try {
         setLoading(true)
-        
+
+        if (!supabaseEnabled) {
+          const fallbackIndustries = getLocalIndustrySummaries().map(summary => ({
+            code: summary.code,
+            name: summary.name,
+            category: summary.category,
+            companyCount: summary.companyCount
+          }))
+
+          setIndustries(fallbackIndustries)
+          setFilteredIndustries(fallbackIndustries)
+          return
+        }
+
         // Get industry categories from our new classification
         const { data: industryData, error: industryError } = await supabase
           .from('industry_classification')
@@ -90,7 +105,7 @@ const CollapsibleIndustryFilter: React.FC<CollapsibleIndustryFilterProps> = ({
     }
 
     loadIndustries()
-  }, [])
+  }, [supabaseEnabled])
 
   // Filter industries based on search term
   useEffect(() => {

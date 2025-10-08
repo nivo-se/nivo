@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { supabase, supabaseConfig } from '../lib/supabase'
 
 interface AuthContextType {
   user: User | null
@@ -33,6 +33,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [isApproved, setIsApproved] = useState(false)
+  const authEnabled = supabaseConfig.isConfigured
+
+  const createAuthDisabledError = (): AuthError => ({
+    name: 'AuthNotConfigured',
+    message: 'Authentication is not configured for this environment.',
+    status: 503
+  } as AuthError)
 
   // Check user role and approval status
   const checkUserStatus = async (userId: string, userEmail?: string) => {
@@ -79,6 +86,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
+      if (!authEnabled) {
+        setUser(null)
+        setSession(null)
+        setUserRole('admin')
+        setIsApproved(true)
+        setLoading(false)
+        return
+      }
+
       const { data: { session }, error } = await supabase.auth.getSession()
       if (error) {
         console.error('Error getting session:', error)
@@ -100,6 +116,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     getInitialSession()
+
+    if (!authEnabled) {
+      return
+    }
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -124,9 +144,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [authEnabled])
 
   const signUp = async (email: string, password: string) => {
+    if (!authEnabled) {
+      return { error: createAuthDisabledError() }
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -146,6 +170,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signIn = async (email: string, password: string) => {
+    if (!authEnabled) {
+      return { error: createAuthDisabledError() }
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -154,6 +182,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signOut = async () => {
+    if (!authEnabled) {
+      return { error: createAuthDisabledError() }
+    }
+
     try {
       const { error } = await supabase.auth.signOut()
       if (error) {

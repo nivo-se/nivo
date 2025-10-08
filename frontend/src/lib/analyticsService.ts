@@ -97,14 +97,14 @@ export class AnalyticsService {
       let totalWithDigitalPresence = 0
       let sampleForAverages: any[] = []
 
-      // Try to get financial data count - use KPI data as proxy since revenue/profit are mostly null
+      // Get financial data count - now using actual revenue column (100% coverage since Oct 2025)
       try {
         const { count, error } = await supabase
           .from('master_analytics')
           .select('*', { count: 'exact', head: true })
-          .not('Revenue_growth', 'is', null)
+          .not('revenue', 'is', null)
         totalWithFinancials = count || 0
-        console.log('Companies with financial data (using KPI data):', totalWithFinancials)
+        console.log('Companies with financial data (revenue column):', totalWithFinancials)
       } catch (error) {
         console.log('Financial data query failed:', error)
       }

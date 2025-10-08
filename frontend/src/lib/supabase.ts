@@ -4,18 +4,39 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Check if Supabase is configured
+const isConfigured = !!(supabaseUrl && supabaseAnonKey && 
+  supabaseUrl.length > 0 && 
+  !supabaseUrl.includes('placeholder') &&
+  supabaseAnonKey.length > 0)
+
+if (!isConfigured) {
+  console.warn('Supabase environment variables not configured. Some features may be limited.')
 }
 
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-})
+// Export configuration info
+export const supabaseConfig = {
+  url: supabaseUrl || null,
+  anonKey: supabaseAnonKey || null,
+  isConfigured
+}
+
+// Create Supabase client (even if not configured, to prevent errors)
+export const supabase = isConfigured 
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    })
+  : createClient('https://placeholder.supabase.co', 'placeholder-key', {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
+      }
+    })
 
 // Database types (we'll expand these as we add more tables)
 export interface Database {

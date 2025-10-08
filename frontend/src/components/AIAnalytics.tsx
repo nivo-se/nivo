@@ -790,103 +790,18 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
             }}
           />
           
-          {/* Display AI Analysis Results */}
-          {analysisResults.length > 0 && (
-            <div className="mt-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Brain className="h-5 w-5 mr-2" />
-                    AI Analysis Results
-                  </CardTitle>
-                  <CardDescription>
-                    Results from OpenAI analysis of selected companies
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {analysisResults.map((analysis, index) => (
-                      <div key={analysis.company.OrgNr} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h3 className="font-semibold text-lg">{analysis.company.name}</h3>
-                            <p className="text-sm text-gray-600">{analysis.company.OrgNr}</p>
-                          </div>
-                          <Badge variant={analysis.aiAnalysis?.recommendation === 'Köp' ? 'default' : 
-                                         analysis.aiAnalysis?.recommendation === 'Håll' ? 'secondary' : 'destructive'}>
-                            {analysis.aiAnalysis?.recommendation || 'Håll'}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-medium mb-2">Executive Summary</h4>
-                            <p className="text-sm text-gray-700">{analysis.aiAnalysis?.executiveSummary || 'No summary available'}</p>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-medium mb-2">Financial Health</h4>
-                            <div className="flex items-center gap-2">
-                              <Progress value={(analysis.aiAnalysis?.financialHealth || 0) * 10} className="flex-1" />
-                              <span className="text-sm font-medium">{analysis.aiAnalysis?.financialHealth || 0}/10</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                          <div>
-                            <h4 className="font-medium mb-2">Strengths</h4>
-                            <ul className="text-sm text-gray-700 space-y-1">
-                              {(analysis.aiAnalysis?.strengths || []).map((strength, i) => (
-                                <li key={i}>• {strength}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-medium mb-2">Opportunities</h4>
-                            <ul className="text-sm text-gray-700 space-y-1">
-                              {(analysis.aiAnalysis?.opportunities || []).map((opportunity, i) => (
-                                <li key={i}>• {opportunity}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        
-                        {(analysis.aiAnalysis?.targetPrice || 0) > 0 && (
-                          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium">Target Price:</span>
-                              <span className="text-lg font-bold text-green-600">
-                                {(analysis.aiAnalysis?.targetPrice || 0).toLocaleString('sv-SE')} TSEK
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center mt-1">
-                              <span className="text-sm text-gray-600">Confidence:</span>
-                              <span className="text-sm font-medium">{analysis.aiAnalysis?.confidence || 0}%</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {/* AI Analysis Results will appear here after successful analysis */}
         </TabsContent>
         
         <TabsContent value="simulated" className="mt-6">
-
-      {/* List Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Välj lista för AI-analys</CardTitle>
-          <CardDescription>
-            Välj en sparad företagslista för att köra omfattande AI-analys
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          <Card>
+            <CardHeader>
+              <CardTitle>Simulated Analysis (Removed)</CardTitle>
+              <CardDescription>
+                This section has been removed. Use the AI Workflow tab for real analysis.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
           <Select 
             value={selectedList?.id || ''} 
             onValueChange={(value) => {

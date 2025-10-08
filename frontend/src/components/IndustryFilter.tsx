@@ -16,7 +16,8 @@ import {
   Minus,
   RotateCcw
 } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, supabaseConfig } from '../lib/supabase'
+import { getLocalIndustrySummaries } from '../lib/sampleData'
 
 interface Industry {
   code: string
@@ -44,13 +45,29 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [showAll, setShowAll] = useState(false)
+  const supabaseEnabled = supabaseConfig.isConfigured
 
   // Load industries from Supabase
   useEffect(() => {
     const loadIndustries = async () => {
       try {
         setLoading(true)
-        
+
+        if (!supabaseEnabled) {
+          const fallbackIndustries = getLocalIndustrySummaries()
+            .map(summary => ({
+              code: summary.code,
+              name: summary.name,
+              category: summary.category,
+              companyCount: summary.companyCount
+            }))
+            .filter(industry => industry.companyCount > 0)
+
+          setIndustries(fallbackIndustries)
+          setFilteredIndustries(fallbackIndustries)
+          return
+        }
+
         // Get industry codes with company counts
         const { data: industryData, error: industryError } = await supabase
           .from('industry_codes')
@@ -96,7 +113,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
     }
 
     loadIndustries()
-  }, [])
+  }, [supabaseEnabled])
 
   // Filter industries based on search term
   useEffect(() => {
