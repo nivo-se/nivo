@@ -1,92 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
+@font-face {
+  font-family: 'Zapf Humanist 601 Demi BT';
+  src: local('Zapf Humanist 601 Demi BT Regular'),
+       url('/fonts/zapf/ZapfHumanist601DemiBT-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
 
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-
-    --primary: 215 25% 25%;
-    --primary-foreground: 60 9.1% 97.8%;
-
-    --secondary: 210 15% 15%;
-    --secondary-foreground: 60 9.1% 97.8%;
-
-    --muted: 210 10% 95%;
-    --muted-foreground: 215 15% 45%;
-
-    --accent: 220 13% 18%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 220 14% 40%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
-
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
-
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
-
-    --primary: 60 9.1% 97.8%;
-    --primary-foreground: 24 9.8% 10%;
-
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
-
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
-
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 24 5.7% 82.9%;
-  }
+@font-face {
+  font-family: 'Zapf Humanist 601 Demi BT';
+  src: local('Zapf Humanist 601 Demi BT Demi'),
+       url('/fonts/zapf/ZapfHumanist601DemiBT-Demi.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
 }
 
 @layer base {
+  :root {
+    --font-zapf: 'Zapf Humanist 601 Demi BT', 'Poppins', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial';
+    --font-poppins: 'Poppins', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial';
+
+    --nivo-c-primary: #596152; /* Gray Olive */
+    --nivo-c-text: #2E2A2B; /* Jet Black */
+    --nivo-c-bg: #E6E6E6; /* Platinum */
+
+    --background: 0 0% 90.2%;
+    --foreground: 345 4.5% 17.3%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 345 4.5% 17.3%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 345 4.5% 17.3%;
+
+    --primary: 92 8.4% 35.1%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 345 4.5% 17.3%;
+
+    --muted: 0 0% 82%;
+    --muted-foreground: 345 4.5% 35%;
+
+    --accent: 0 0% 100%;
+    --accent-foreground: 345 4.5% 17.3%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 96%;
+
+    --border: 92 8% 70%;
+    --input: 92 8% 70%;
+    --ring: 92 20% 40%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 345 4.5% 17.3%;
+    --sidebar-primary: 92 8.4% 35.1%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100%;
+    --sidebar-accent-foreground: 345 4.5% 17.3%;
+    --sidebar-border: 92 8% 70%;
+    --sidebar-ring: 92 20% 40%;
+  }
+
+  .dark {
+    --nivo-c-primary: #889781;
+    --nivo-c-text: #F2F2F2;
+    --nivo-c-bg: #1A1617;
+
+    --background: 345 6% 10%;
+    --foreground: 0 0% 96%;
+
+    --card: 345 6% 16%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 345 6% 16%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 92 8.4% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 345 6% 14%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 345 6% 18%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 92 8.4% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 40%;
+    --destructive-foreground: 0 0% 96%;
+
+    --border: 345 6% 22%;
+    --input: 345 6% 22%;
+    --ring: 92 20% 50%;
+
+    --sidebar-background: 345 6% 10%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 92 8.4% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 345 6% 16%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 345 6% 22%;
+    --sidebar-ring: 92 20% 50%;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply font-sans bg-platinum text-jetBlack antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading text-jetBlack tracking-tight;
+  }
+
+  a {
+    @apply text-grayOlive transition-colors;
+  }
+
+  .dark a {
+    @apply text-platinum;
   }
 }
 
@@ -94,15 +144,41 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .text-pretty {
     text-wrap: pretty;
+  }
+
+  .grid-gap-nivo {
+    gap: clamp(1.5rem, 1rem + 1vw, 2.5rem);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-grayOlive px-6 py-3 text-base font-medium text-white transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grayOlive/40 focus-visible:ring-offset-2 focus-visible:ring-offset-platinum hover:opacity-90;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-grayOlive bg-transparent px-6 py-3 text-base font-medium text-grayOlive transition-colors duration-200 hover:bg-grayOlive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grayOlive/30 focus-visible:ring-offset-2 focus-visible:ring-offset-platinum;
+  }
+
+  .link-primary {
+    @apply inline-flex items-center gap-2 text-base font-medium text-grayOlive underline-offset-4 transition-colors hover:text-grayOlive/80 hover:underline;
+  }
+
+  .card-elevated {
+    @apply rounded-xl border border-grayOlive/15 bg-white p-6 text-jetBlack shadow-lg shadow-grayOlive/10;
+  }
+
+  .surface-muted {
+    @apply rounded-xl bg-platinum/60 p-6 text-jetBlack;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-md bg-white/40 border border-white/20 shadow-sm;
+    @apply backdrop-blur-md bg-white/70 border border-white/30 shadow-sm;
   }
 
   .text-wrap-balance {
@@ -112,7 +188,7 @@
   .scroll-reveal {
     @apply opacity-0 translate-y-4 transition-all duration-700;
   }
-  
+
   .scroll-reveal.revealed {
     @apply opacity-100 translate-y-0;
   }
@@ -175,12 +251,10 @@
   }
 }
 
-/* Smooth scrolling for all elements */
 html {
   scroll-behavior: smooth;
 }
 
-/* Performance optimizations */
 .will-change-transform {
   will-change: transform;
 }
@@ -189,7 +263,6 @@ html {
   will-change: opacity;
 }
 
-/* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -200,12 +273,12 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(46, 42, 43, 0.15);
   border-radius: 4px;
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(230, 230, 230, 0.25);
 }
 
 .no-scrollbar::-webkit-scrollbar {

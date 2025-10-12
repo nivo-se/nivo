@@ -35,29 +35,29 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className, id }
   ];
 
   return (
-    <section id={id} className={cn('py-20 bg-gray-50', className)}>
+    <section id={id} className={cn('py-20 bg-platinum/70', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Vårt Tillvägagångssätt</h2>
+            <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-8 text-center">Vårt Tillvägagångssätt</h2>
           </FadeIn>
         </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 grid-gap-nivo max-w-7xl mx-auto">
           {approachAreas.map((area, index) => {
-            const IconComponent = area.icon === 'target' ? Target : 
+            const IconComponent = area.icon === 'target' ? Target :
                                  area.icon === 'settings' ? Settings :
                                  area.icon === 'network' ? Network : TrendingUp;
-            
+
             return (
               <FadeIn key={index} delay={150 + index * 100}>
-                <Card className="border-0 shadow-sm h-full hover:shadow-md transition-shadow">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="w-6 h-6 text-gray-800" />
+                <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+                  <CardContent className="p-6 text-center space-y-4">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-grayOlive/15">
+                      <IconComponent className="h-6 w-6 text-grayOlive" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-3 font-serif">{area.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{area.description}</p>
+                    <h3 className="text-xl font-heading font-semibold text-jetBlack">{area.title}</h3>
+                    <p className="text-sm leading-relaxed text-jetBlack/75">{area.description}</p>
                   </CardContent>
                 </Card>
               </FadeIn>

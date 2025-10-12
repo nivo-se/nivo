@@ -2,12 +2,12 @@
 import type { Config } from "tailwindcss";
 
 export default {
-	darkMode: ["class"],
-	content: [
-		"./pages/**/*.{ts,tsx}",
-		"./components/**/*.{ts,tsx}",
-		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
+        darkMode: "class",
+        content: [
+                "./pages/**/*.{ts,tsx}",
+                "./components/**/*.{ts,tsx}",
+                "./app/**/*.{ts,tsx}",
+                "./src/**/*.{ts,tsx}",
 	],
 	prefix: "",
 	theme: {
@@ -19,16 +19,21 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				sans: ['SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
-				serif: ['GT Sectra', 'Georgia', 'serif'],
-			},
-			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+                        fontFamily: {
+                                heading: ['var(--font-zapf)', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial'],
+                                sans: ['var(--font-poppins)', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial'],
+                        },
+                        colors: {
+                                transparent: 'transparent',
+                                current: 'currentColor',
+                                grayOlive: '#596152',
+                                jetBlack: '#2E2A2B',
+                                platinum: '#E6E6E6',
+                                border: 'hsl(var(--border))',
+                                input: 'hsl(var(--input))',
+                                ring: 'hsl(var(--ring))',
+                                background: 'hsl(var(--background))',
+                                foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
