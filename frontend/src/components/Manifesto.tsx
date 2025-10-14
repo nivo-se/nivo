@@ -15,7 +15,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ className, id }) => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
           <FadeIn delay={100} direction="up">
-            <span className="text-sm md:text-base font-medium text-grayOlive mb-2 inline-block">Om oss</span>
+            <span className="text-sm md:text-base font-medium text-grayOlive mb-2 inline-block text-center block">Om oss</span>
           </FadeIn>
           <TextReveal delay={200} duration={1000}>
             <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-10 text-center">Med djup erfarenhet driver Nivo hållbar tillväxt</h2>

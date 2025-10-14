@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
           </FadeIn>
           
           <FadeIn delay={400} duration={900} direction="up">
-            <p className="text-lg md:text-xl font-serif font-medium text-white/90 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl font-heading font-medium text-white/90 mb-8 leading-relaxed">
               Förvärv som skapar värde – tillväxt som består.
             </p>
           </FadeIn>

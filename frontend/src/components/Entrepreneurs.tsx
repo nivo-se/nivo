@@ -16,7 +16,7 @@ const Entrepreneurs: React.FC<EntrepreneursProps> = ({ className, id }) => {
           <FadeIn delay={100}>
             <div className="text-center mb-16">
               <TextReveal delay={200} duration={1000}>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-semibold tracking-tight text-jetBlack mb-8">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-semibold tracking-tight text-jetBlack mb-8">
                   Vi utvecklar företag till sin fulla potential
                 </h2>
               </TextReveal>

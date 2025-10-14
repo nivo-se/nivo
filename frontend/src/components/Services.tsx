@@ -36,10 +36,10 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
 
   return (
     <section id={id} className={cn('py-20 bg-white', className)}>
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6 py-8">
         <StaggeredContainer
           staggerDelay={150}
-          className="grid md:grid-cols-2 grid-gap-nivo max-w-6xl mx-auto"
+          className="grid md:grid-cols-2 grid-gap-nivo max-w-6xl mx-auto px-4"
         >
           {services.map((service, index) => {
             const IconComponent = service.icon;
