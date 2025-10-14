@@ -47,15 +47,25 @@ const WorkingDashboard: React.FC = () => {
   // Check if user is admin
   const isAdmin = userRole === 'admin' || user?.email === 'jesper@rgcapital.se'
 
-  const menuItems = [
+  interface MenuItem {
+    id: string
+    label: string
+    icon: any
+    disabled?: boolean
+  }
+
+  const menuItems: MenuItem[] = [
     { id: 'overview', label: 'Översikt', icon: BarChart3 },
     { id: 'companies', label: 'Företagssökning', icon: Search },
     { id: 'analytics', label: 'Analys', icon: Building2 },
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
-    { id: 'export', label: 'Export', icon: Download },
-    { id: 'scraper', label: 'Dataskraper', icon: Database },
-    ...(isAdmin ? [{ id: 'admin', label: 'Adminpanel', icon: Shield }] : []),
+    { id: 'export', label: 'Exportera', icon: Download },
+    { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
   ]
+
+  // Add admin item at the bottom if user is admin
+  const adminItems: MenuItem[] = isAdmin ? [{ id: 'admin', label: 'Admin', icon: Shield }] : []
+  const allMenuItems = [...menuItems, ...adminItems]
 
   const handleSignOut = async () => {
     try {
@@ -326,24 +336,31 @@ const WorkingDashboard: React.FC = () => {
         `}>
           <div className="p-4">
             <nav className="space-y-2">
-              {menuItems.map((item) => {
+              {allMenuItems.map((item) => {
                 const Icon = item.icon
+                const isDisabled = item.disabled
                 return (
                   <Button
                     key={item.id}
                     variant={currentPage === item.id ? 'default' : 'ghost'}
+                    disabled={isDisabled}
                     className={`w-full justify-start ${
-                      currentPage === item.id 
-                        ? 'bg-[#596152] text-white hover:bg-[#596152]/90' 
-                        : 'text-[#2E2A2B] hover:bg-[#596152]/10'
+                      isDisabled
+                        ? 'text-gray-400 cursor-not-allowed opacity-50'
+                        : currentPage === item.id 
+                          ? 'bg-[#596152] text-white hover:bg-[#596152]/90' 
+                          : 'text-[#2E2A2B] hover:bg-[#596152]/10'
                     }`}
                     onClick={() => {
-                      setCurrentPage(item.id)
-                      setSidebarOpen(false)
+                      if (!isDisabled) {
+                        setCurrentPage(item.id)
+                        setSidebarOpen(false)
+                      }
                     }}
                   >
                     <Icon className="h-4 w-4 mr-3" />
                     {item.label}
+                    {isDisabled && <span className="ml-auto text-xs">(Under utveckling)</span>}
                   </Button>
                 )
               })}

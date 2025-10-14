@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { LogIn, LogOut, User } from 'lucide-react';
-import LoginPopup from './LoginPopup';
 
 interface HeaderProps {
   className?: string;
@@ -13,7 +12,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -51,23 +49,35 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
-          ? 'py-3 bg-platinum/95 backdrop-blur-md border-b border-grayOlive/20 shadow-sm'
-          : 'py-6 bg-transparent',
+        isScrolled 
+          ? 'py-3 bg-white/90 backdrop-blur-md border-b border-gray-200/20 shadow-sm'
+          : 'py-5 bg-transparent',
         className
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <NavLink
-          to="/"
+        <NavLink 
+          to="/" 
           className={cn(
-            "text-xl font-heading font-semibold tracking-tight transition-all duration-300",
-            isScrolled ? 'text-jetBlack hover:text-grayOlive' : 'text-white hover:text-platinum'
+            "flex items-center space-x-2 transition-all duration-300 hover:opacity-80",
+            isScrolled ? "text-foreground" : "text-white"
           )}
         >
-          Nivo
+          <img 
+            src="/nivo-wordmark-white.svg" 
+            alt="Nivo Logo" 
+            className="h-8 w-auto"
+            onError={(e) => {
+              // Fallback to text if logo doesn't exist
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+          <span className="text-xl font-serif font-medium tracking-tight hidden">
+            Nivo
+          </span>
         </NavLink>
-
+        
         <div className="hidden md:flex items-center space-x-8">
           <NavLinks scrollToSection={scrollToSection} isScrolled={isScrolled} />
           
@@ -76,25 +86,25 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             {user ? (
               <>
                 <NavLink to="/dashboard">
-                  <Button
-                    variant="ghost"
+                  <Button 
+                    variant="ghost" 
                     size="sm"
                     className={cn(
                       "flex items-center space-x-1",
-                      isScrolled ? "text-grayOlive" : "text-white hover:text-platinum"
+                      isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
                     )}
                   >
                     <User className="h-4 w-4" />
                     <span>Dashboard</span>
                   </Button>
                 </NavLink>
-                <Button
-                  variant="ghost"
+                <Button 
+                  variant="ghost" 
                   size="sm"
                   onClick={handleSignOut}
                   className={cn(
                     "flex items-center space-x-1",
-                    isScrolled ? "text-grayOlive" : "text-white hover:text-platinum"
+                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
                   )}
                 >
                   <LogOut className="h-4 w-4" />
@@ -102,18 +112,19 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                 </Button>
               </>
             ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsLoginPopupOpen(true)}
-                className={cn(
-                  "flex items-center space-x-1",
-                  isScrolled ? "text-grayOlive" : "text-white hover:text-platinum"
-                )}
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </Button>
+              <NavLink to="/auth">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className={cn(
+                    "flex items-center space-x-1",
+                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                  )}
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign In</span>
+                </Button>
+              </NavLink>
             )}
           </div>
         </div>
@@ -127,31 +138,31 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             "block w-6 transition-all duration-300",
             isMobileMenuOpen ? "opacity-0" : "opacity-100"
           )}>
-            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-jetBlack" : "bg-white")} />
-            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-jetBlack" : "bg-white")} />
-            <span className={cn("block w-4 h-0.5", isScrolled ? "bg-jetBlack" : "bg-white")} />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
+            <span className={cn("block w-4 h-0.5", isScrolled ? "bg-foreground" : "bg-white")} />
           </span>
         </button>
       </div>
-
-      <div
+      
+      <div 
         className={cn(
-          "fixed inset-0 bg-platinum z-40 flex flex-col pt-24 px-6 transition-transform duration-500 ease-in-out transform md:hidden",
+          "fixed inset-0 bg-white z-40 flex flex-col pt-24 px-6 transition-transform duration-500 ease-in-out transform md:hidden",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <button
+        <button 
           className="absolute top-5 right-5 p-2"
           onClick={() => setIsMobileMenuOpen(false)}
           aria-label="Close menu"
         >
-          <span className="block w-6 h-0.5 bg-jetBlack transform rotate-45 translate-y-0.5" />
-          <span className="block w-6 h-0.5 bg-jetBlack transform -rotate-45" />
+          <span className="block w-6 h-0.5 bg-foreground transform rotate-45 translate-y-0.5" />
+          <span className="block w-6 h-0.5 bg-foreground transform -rotate-45" />
         </button>
-
-        <nav className="flex flex-col space-y-6 text-lg text-jetBlack">
-          <button
-            className="text-left transition-colors hover:text-grayOlive"
+        
+        <nav className="flex flex-col space-y-6 text-lg">
+          <button 
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
               scrollToSection('about-nivo');
               setIsMobileMenuOpen(false);
@@ -159,8 +170,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           >
             Om oss
           </button>
-          <button
-            className="text-left transition-colors hover:text-grayOlive"
+          <button 
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
               scrollToSection('services');
               setIsMobileMenuOpen(false);
@@ -168,8 +179,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           >
             Tjänster
           </button>
-          <button
-            className="text-left transition-colors hover:text-grayOlive"
+          <button 
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
               scrollToSection('team');
               setIsMobileMenuOpen(false);
@@ -177,8 +188,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           >
             Team
           </button>
-          <button
-            className="text-left transition-colors hover:text-grayOlive"
+          <button 
+            className="text-left hover:text-accent transition-colors"
             onClick={() => {
               scrollToSection('contact');
               setIsMobileMenuOpen(false);
@@ -186,18 +197,41 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           >
             Kontakt
           </button>
+          
+          {/* Mobile Auth Options */}
+          {user ? (
+            <>
+              <NavLink 
+                to="/dashboard" 
+                className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User className="h-4 w-4" />
+                <span>Dashboard</span>
+              </NavLink>
+              <button 
+                className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+                onClick={() => {
+                  handleSignOut();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </button>
+            </>
+          ) : (
+            <NavLink 
+              to="/auth" 
+              className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Sign In</span>
+            </NavLink>
+          )}
         </nav>
       </div>
-      
-      {/* Login Popup */}
-      <LoginPopup
-        isOpen={isLoginPopupOpen}
-        onClose={() => setIsLoginPopupOpen(false)}
-        onSuccess={() => {
-          // Optionally redirect to dashboard after successful login
-          window.location.href = '/dashboard';
-        }}
-      />
     </header>
   );
 };
@@ -209,37 +243,37 @@ interface NavLinksProps {
 
 const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
   <>
-    <button
+    <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "text-grayOlive hover:text-jetBlack" : "text-white hover:text-platinum"
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
       onClick={() => scrollToSection('about-nivo')}
     >
       Om oss
     </button>
-    <button
+    <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "text-grayOlive hover:text-jetBlack" : "text-white hover:text-platinum"
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
       onClick={() => scrollToSection('services')}
     >
       Tjänster
     </button>
-    <button
+    <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "text-grayOlive hover:text-jetBlack" : "text-white hover:text-platinum"
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
       onClick={() => scrollToSection('team')}
     >
       Team
     </button>
-    <button
+    <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "text-grayOlive hover:text-jetBlack" : "text-white hover:text-platinum"
+        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
       )}
       onClick={() => scrollToSection('contact')}
     >

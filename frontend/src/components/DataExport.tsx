@@ -90,7 +90,7 @@ const DataExport: React.FC = () => {
 
   const handleExport = async () => {
     if (!exportOptions.selectedListId) {
-      alert('Please select a saved list to export')
+      alert('Välj en sparad lista att exportera')
       return
     }
 
@@ -99,7 +99,7 @@ const DataExport: React.FC = () => {
       
       const selectedList = savedLists.find(list => list.id === exportOptions.selectedListId)
       if (!selectedList) {
-        alert('Selected list not found')
+        alert('Vald lista hittades inte')
         return
       }
       
@@ -164,15 +164,15 @@ const DataExport: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>
+        return <Badge variant="secondary">Väntar</Badge>
       case 'processing':
-        return <Badge variant="default">Processing</Badge>
+        return <Badge variant="default">Bearbetar</Badge>
       case 'completed':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Completed</Badge>
+        return <Badge variant="default" className="bg-green-100 text-green-800">Klar</Badge>
       case 'failed':
-        return <Badge variant="destructive">Failed</Badge>
+        return <Badge variant="destructive">Misslyckades</Badge>
       default:
-        return <Badge variant="secondary">Unknown</Badge>
+        return <Badge variant="secondary">Okänd</Badge>
     }
   }
 
@@ -187,15 +187,15 @@ const DataExport: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Data Export</h2>
-        <p className="text-gray-600">Export data from your saved company lists in various formats</p>
+        <h2 className="text-2xl font-bold">Dataexport</h2>
+        <p className="text-gray-600">Exportera data från dina sparade företagslistor i olika format</p>
       </div>
 
       <Tabs defaultValue="export" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="export">Export Data</TabsTrigger>
-          <TabsTrigger value="jobs">Export Jobs</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled Exports</TabsTrigger>
+          <TabsTrigger value="export">Exportera data</TabsTrigger>
+          <TabsTrigger value="jobs">Exportjobb</TabsTrigger>
+          <TabsTrigger value="scheduled">Schemalagda export</TabsTrigger>
         </TabsList>
 
         <TabsContent value="export" className="space-y-4">
@@ -205,14 +205,14 @@ const DataExport: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Database className="h-5 w-5 mr-2" />
-                  Export Configuration
+                  Exportkonfiguration
                 </CardTitle>
-                <CardDescription>Configure your data export settings</CardDescription>
+                <CardDescription>Konfigurera dina dataexportinställningar</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Format Selection */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Export Format</label>
+                  <label className="text-sm font-medium mb-2 block">Exportformat</label>
                   <Select value={exportOptions.format} onValueChange={(value: any) => 
                     setExportOptions(prev => ({ ...prev, format: value }))
                   }>
@@ -244,13 +244,13 @@ const DataExport: React.FC = () => {
 
                 {/* Saved List Selection */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Select Saved List</label>
+                  <label className="text-sm font-medium mb-2 block">Välj sparad lista</label>
                   {savedLists.length === 0 ? (
                     <div className="flex items-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
                       <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
                       <div>
-                        <p className="text-sm font-medium text-yellow-800">No saved lists found</p>
-                        <p className="text-xs text-yellow-600">Create and save company lists in the search or analytics sections first.</p>
+                        <p className="text-sm font-medium text-yellow-800">Inga sparade listor hittades</p>
+                        <p className="text-xs text-yellow-600">Skapa och spara företagslistor i sök- eller analyssektionerna först.</p>
                       </div>
                     </div>
                   ) : (
@@ -258,7 +258,7 @@ const DataExport: React.FC = () => {
                       setExportOptions(prev => ({ ...prev, selectedListId: value }))
                     }>
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose a saved list..." />
+                        <SelectValue placeholder="Välj en sparad lista..." />
                       </SelectTrigger>
                       <SelectContent>
                         {savedLists.map((list) => (
@@ -268,7 +268,7 @@ const DataExport: React.FC = () => {
                               <div>
                                 <div className="font-medium">{list.name}</div>
                                 <div className="text-xs text-gray-500">
-                                  {list.companies.length} companies • {new Date(list.updatedAt).toLocaleDateString()}
+                                  {list.companies.length} företag • {new Date(list.updatedAt).toLocaleDateString()}
                                 </div>
                               </div>
                             </div>
@@ -281,7 +281,7 @@ const DataExport: React.FC = () => {
 
                 {/* Data Options */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Include Data</label>
+                  <label className="text-sm font-medium mb-2 block">Inkludera data</label>
                   <div className="space-y-2">
                     <label className="flex items-center">
                       <input
@@ -290,7 +290,7 @@ const DataExport: React.FC = () => {
                         onChange={(e) => setExportOptions(prev => ({ ...prev, includeKPIs: e.target.checked }))}
                         className="mr-2"
                       />
-                      <span className="text-sm">KPIs & Calculated Metrics</span>
+                      <span className="text-sm">KPI:er & Beräknade mått</span>
                     </label>
                     <label className="flex items-center">
                       <input
@@ -299,7 +299,7 @@ const DataExport: React.FC = () => {
                         onChange={(e) => setExportOptions(prev => ({ ...prev, includeFinancials: e.target.checked }))}
                         className="mr-2"
                       />
-                      <span className="text-sm">Financial Data</span>
+                      <span className="text-sm">Finansiell data</span>
                     </label>
                     <label className="flex items-center">
                       <input
@@ -308,7 +308,7 @@ const DataExport: React.FC = () => {
                         onChange={(e) => setExportOptions(prev => ({ ...prev, includeContactInfo: e.target.checked }))}
                         className="mr-2"
                       />
-                      <span className="text-sm">Contact Information</span>
+                      <span className="text-sm">Kontaktinformation</span>
                     </label>
                   </div>
                 </div>
@@ -321,9 +321,9 @@ const DataExport: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <BarChart3 className="h-5 w-5 mr-2" />
-                  Export Preview
+                  Exportförhandsvisning
                 </CardTitle>
-                <CardDescription>Review your export settings</CardDescription>
+                <CardDescription>Granska dina exportinställningar</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {exportOptions.selectedListId ? (
@@ -333,11 +333,11 @@ const DataExport: React.FC = () => {
                       return selectedList ? (
                         <div className="space-y-3">
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Selected list:</span>
+                            <span className="text-sm text-gray-600">Vald lista:</span>
                             <span className="font-medium">{selectedList.name}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Records to export:</span>
+                            <span className="text-sm text-gray-600">Poster att exportera:</span>
                             <span className="font-medium">{recordCount.toLocaleString()}</span>
                           </div>
                           <div className="flex justify-between">
@@ -345,7 +345,7 @@ const DataExport: React.FC = () => {
                             <span className="font-medium capitalize">{exportOptions.format}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Estimated size:</span>
+                            <span className="text-sm text-gray-600">Uppskattad storlek:</span>
                             <span className="font-medium">
                               {formatFileSize(recordCount * (exportOptions.includeKPIs ? 2 : 1) * 100)}
                             </span>
@@ -362,7 +362,7 @@ const DataExport: React.FC = () => {
                 ) : (
                   <div className="text-center py-4">
                     <List className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-500">Select a saved list to see export preview</p>
+                    <p className="text-sm text-gray-500">Välj en sparad lista för att se exportförhandsvisning</p>
                   </div>
                 )}
 
@@ -375,19 +375,19 @@ const DataExport: React.FC = () => {
                     {isExporting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Exporting...
+                        Exporterar...
                       </>
                     ) : (
                       <>
                         <Download className="h-4 w-4 mr-2" />
-                        {exportOptions.selectedListId ? 'Start Export' : 'Select a List First'}
+                        {exportOptions.selectedListId ? 'Starta export' : 'Välj en lista först'}
                       </>
                     )}
                   </Button>
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  Large exports may take several minutes to process. You'll be notified when ready.
+                  Stora export kan ta flera minuter att bearbeta. Du kommer att bli meddelad när det är klart.
                 </div>
               </CardContent>
             </Card>
@@ -397,15 +397,15 @@ const DataExport: React.FC = () => {
         <TabsContent value="jobs" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Export Jobs</CardTitle>
-              <CardDescription>Track your export requests and download completed files</CardDescription>
+              <CardTitle>Exportjobb</CardTitle>
+              <CardDescription>Spåra dina exportförfrågningar och ladda ner slutförda filer</CardDescription>
             </CardHeader>
             <CardContent>
               {exportJobs.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No export jobs yet</p>
-                  <p className="text-sm">Start an export to see your jobs here</p>
+                  <p>Inga exportjobb ännu</p>
+                  <p className="text-sm">Starta en export för att se dina jobb här</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -418,7 +418,7 @@ const DataExport: React.FC = () => {
                             {job.listName} export ({job.format.toUpperCase()})
                           </div>
                           <div className="text-sm text-gray-600">
-                            {job.recordCount.toLocaleString()} records • {new Date(job.createdAt).toLocaleString()}
+                            {job.recordCount.toLocaleString()} poster • {new Date(job.createdAt).toLocaleString()}
                           </div>
                         </div>
                       </div>
@@ -427,7 +427,7 @@ const DataExport: React.FC = () => {
                         {job.status === 'completed' && job.downloadUrl && (
                           <Button size="sm" variant="outline">
                             <Download className="h-4 w-4 mr-1" />
-                            Download
+                            Ladda ner
                           </Button>
                         )}
                       </div>
@@ -442,14 +442,14 @@ const DataExport: React.FC = () => {
         <TabsContent value="scheduled" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Scheduled Exports</CardTitle>
-              <CardDescription>Set up automated exports on a schedule</CardDescription>
+              <CardTitle>Schemalagda export</CardTitle>
+              <CardDescription>Ställ in automatiserade export enligt schema</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8 text-gray-500">
                 <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Scheduled exports coming soon</p>
-                <p className="text-sm">Set up automated exports to run daily, weekly, or monthly</p>
+                <p>Schemalagda export kommer snart</p>
+                <p className="text-sm">Ställ in automatiserade export som körs dagligen, veckovis eller månadsvis</p>
               </div>
             </CardContent>
           </Card>
