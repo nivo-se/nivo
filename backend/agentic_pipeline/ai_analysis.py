@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import textwrap
 import time
@@ -15,6 +16,11 @@ from typing import Any, Iterable, Optional, Sequence
 import pandas as pd
 from openai import OpenAI
 from supabase import Client, create_client
+
+from .screening_prompt import SCREENING_SYSTEM_PROMPT, get_screening_prompt, get_batch_screening_prompt
+from .web_enrichment import enrich_companies_for_analysis, EnrichmentDataFormatter
+
+logger = logging.getLogger(__name__)
 
 
 def _default_context_fields() -> list[str]:
@@ -168,6 +174,35 @@ def _default_analysis_schema() -> dict[str, Any]:
     }
 
 
+def _screening_analysis_schema() -> dict[str, Any]:
+    """Simplified schema for rapid screening analysis."""
+    return {
+        "name": "ScreeningAnalysis",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "screening_score": {
+                    "type": "number",
+                    "description": "Overall screening score from 1-100 based on financial health, growth, and market position.",
+                    "minimum": 1,
+                    "maximum": 100,
+                },
+                "risk_flag": {
+                    "type": "string",
+                    "description": "Risk level: Low, Medium, or High",
+                    "enum": ["Low", "Medium", "High"],
+                },
+                "brief_summary": {
+                    "type": "string",
+                    "description": "2-3 sentences highlighting key strengths and weaknesses.",
+                },
+            },
+            "required": ["screening_score", "risk_flag", "brief_summary"],
+        },
+    }
+
+
 def _iso(dt: Optional[datetime]) -> Optional[str]:
     return dt.isoformat() if dt else None
 
@@ -179,6 +214,7 @@ class AIAnalysisRun:
     id: str
     model_version: str
     started_at: datetime
+    analysis_mode: str = "deep"
     initiated_by: Optional[str] = None
     status: str = "running"
     filters: Optional[dict[str, Any]] = None
@@ -191,6 +227,7 @@ class AIAnalysisRun:
             "initiated_by": self.initiated_by,
             "status": self.status,
             "model_version": self.model_version,
+            "analysis_mode": self.analysis_mode,
             "filters_json": self.filters or {},
             "started_at": _iso(self.started_at),
             "completed_at": _iso(self.completed_at),
@@ -250,6 +287,50 @@ class CompanyAnalysisRecord:
     metrics: list[AnalysisMetric]
     audit: AnalysisAuditRecord
     raw_json: dict[str, Any]
+
+
+@dataclass(slots=True)
+class ScreeningResult:
+    """Screening analysis result for a single company."""
+
+    run_id: str
+    orgnr: Optional[str]
+    company_name: Optional[str]
+    screening_score: Optional[float]
+    risk_flag: Optional[str]
+    brief_summary: Optional[str]
+    analysis_generated_at: datetime
+    audit: AnalysisAuditRecord
+    raw_json: dict[str, Any]
+
+
+@dataclass(slots=True)
+class AIAnalysisBatch:
+    run: AIAnalysisRun
+    companies: list[CompanyAnalysisRecord]
+    errors: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class ScreeningBatch:
+    run: AIAnalysisRun
+    results: list[ScreeningResult]
+    errors: list[str] = field(default_factory=list)
+
+    def results_dataframe(self) -> pd.DataFrame:
+        rows = [
+            {
+                "run_id": result.run_id,
+                "orgnr": result.orgnr,
+                "company_name": result.company_name,
+                "screening_score": result.screening_score,
+                "risk_flag": result.risk_flag,
+                "brief_summary": result.brief_summary,
+                "analysis_generated_at": _iso(result.analysis_generated_at),
+            }
+            for result in self.results
+        ]
+        return pd.DataFrame(rows)
 
 
 @dataclass(slots=True)
@@ -349,12 +430,14 @@ class AIAnalysisConfig:
     sections_table: str = "ai_analysis_sections"
     metrics_table: str = "ai_analysis_metrics"
     audit_table: str = "ai_analysis_audit"
+    screening_table: str = "ai_screening_results"
     output_dir: Path = Path("outputs/agentic_ai")
     output_prefix: str = "ai_analysis"
     write_to_disk: bool = True
     sleep_between_requests: float = 0.5
     prompt_cost_per_1k: float = 0.15
     completion_cost_per_1k: float = 0.6
+    batch_size: int = 5  # For screening batch processing
 
     def ensure_output_dir(self) -> None:
         if self.write_to_disk:
@@ -474,6 +557,43 @@ class SupabaseAnalysisWriter:
         if audit_rows:
             self._table(self.config.audit_table).upsert(audit_rows).execute()
 
+    def upsert_screening_results(self, results: Sequence[ScreeningResult]) -> None:
+        """Persist screening results to Supabase."""
+        if not results:
+            return
+        screening_rows = [
+            {
+                "run_id": result.run_id,
+                "orgnr": result.orgnr,
+                "company_name": result.company_name,
+                "screening_score": result.screening_score,
+                "risk_flag": result.risk_flag,
+                "brief_summary": result.brief_summary,
+                "created_at": _iso(result.analysis_generated_at),
+            }
+            for result in results
+        ]
+        self._table(self.config.screening_table).upsert(screening_rows, on_conflict="run_id,orgnr").execute()
+
+        # Also store audit records for screening
+        audit_rows = [
+            {
+                "run_id": result.run_id,
+                "orgnr": result.orgnr,
+                "module": result.audit.module,
+                "prompt": result.audit.prompt,
+                "response": result.audit.response,
+                "model": result.audit.model,
+                "latency_ms": result.audit.latency_ms,
+                "prompt_tokens": result.audit.prompt_tokens,
+                "completion_tokens": result.audit.completion_tokens,
+                "cost_usd": result.audit.cost_usd,
+            }
+            for result in results
+        ]
+        if audit_rows:
+            self._table(self.config.audit_table).upsert(audit_rows).execute()
+
 
 class AgenticLLMAnalyzer:
     """Runs LLM analysis for a shortlist of target companies."""
@@ -523,9 +643,39 @@ class AgenticLLMAnalyzer:
         analyses: list[CompanyAnalysisRecord] = []
         errors: list[str] = []
 
+        # For deep analysis, enrich companies with external data
+        enrichment_data_map = {}
+        if run.analysis_mode == 'deep':
+            try:
+                companies_for_enrichment = []
+                for _, row in df.iterrows():
+                    orgnr = self._coalesce(row, ["orgnr", "OrgNr", "organization_number"])
+                    company_name = self._coalesce(row, ["company_name", "CompanyName", "legal_name", "name"])
+                    homepage = row.get('homepage') or row.get('website')
+                    
+                    companies_for_enrichment.append({
+                        'orgnr': orgnr,
+                        'name': company_name,
+                        'homepage': homepage
+                    })
+                
+                # Enrich companies (this is async, so we need to handle it properly)
+                import asyncio
+                enrichment_results = asyncio.run(enrich_companies_for_analysis(companies_for_enrichment))
+                
+                # Format enrichment data for each company
+                for orgnr, enrichment_data in enrichment_results.items():
+                    formatted_enrichment = EnrichmentDataFormatter.format_for_ai_analysis(enrichment_data)
+                    enrichment_data_map[orgnr] = formatted_enrichment
+                    
+            except Exception as e:
+                logger.warning(f"Failed to enrich companies for deep analysis: {e}")
+
         for _, row in df.iterrows():
             try:
-                record = self._analyze_row(row, run)
+                orgnr = self._coalesce(row, ["orgnr", "OrgNr", "organization_number"])
+                enrichment_data = enrichment_data_map.get(orgnr)
+                record = self._analyze_row(row, run, enrichment_data)
                 analyses.append(record)
                 if self.supabase_writer is not None:
                     self.supabase_writer.upsert_company_results([record])
@@ -549,6 +699,67 @@ class AgenticLLMAnalyzer:
             self._persist_to_disk(batch)
         return batch
 
+    def run_screening(
+        self,
+        shortlist: pd.DataFrame,
+        *,
+        limit: Optional[int] = None,
+        run_id: Optional[str] = None,
+        initiated_by: Optional[str] = None,
+        filters: Optional[dict[str, Any]] = None,
+    ) -> ScreeningBatch:
+        """Run rapid screening analysis on a list of companies."""
+        if shortlist.empty:
+            raise ValueError("Shortlist is empty; cannot run screening analysis.")
+
+        df = shortlist.copy()
+        if limit is not None:
+            df = df.head(limit)
+
+        run = AIAnalysisRun(
+            id=run_id or str(uuid.uuid4()),
+            initiated_by=initiated_by,
+            model_version="gpt-3.5-turbo",  # Use cheaper model for screening
+            analysis_mode="screening",
+            started_at=datetime.utcnow(),
+            filters=filters,
+        )
+
+        if self.supabase_writer is not None:
+            self.supabase_writer.record_run_start(run)
+
+        results: list[ScreeningResult] = []
+        errors: list[str] = []
+
+        # Process in batches for efficiency
+        for i in range(0, len(df), self.config.batch_size):
+            batch_df = df.iloc[i:i + self.config.batch_size]
+            try:
+                batch_results = self._analyze_screening_batch(batch_df, run)
+                results.extend(batch_results)
+                if self.supabase_writer is not None:
+                    self.supabase_writer.upsert_screening_results(batch_results)
+            except Exception as exc:
+                errors.append(f"Batch {i//self.config.batch_size + 1}: {exc}")
+            
+            if self.config.sleep_between_requests:
+                time.sleep(self.config.sleep_between_requests)
+
+        run.completed_at = datetime.utcnow()
+        if errors:
+            run.status = "completed_with_errors"
+            run.error_message = "; ".join(errors)
+        else:
+            run.status = "completed"
+
+        if self.supabase_writer is not None:
+            self.supabase_writer.record_run_completion(run)
+
+        batch = ScreeningBatch(run=run, results=results, errors=errors)
+        if self.config.write_to_disk and results:
+            self._persist_screening_to_disk(batch)
+        return batch
+
     def _persist_to_disk(self, batch: AIAnalysisBatch) -> None:
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         base_path = self.config.output_dir / f"{timestamp}_{self.config.output_prefix}_{batch.run.id}"
@@ -557,10 +768,130 @@ class AgenticLLMAnalyzer:
         batch.metrics_dataframe().to_csv(base_path.with_suffix("_metrics.csv"), index=False)
         batch.audit_dataframe().to_csv(base_path.with_suffix("_audit.csv"), index=False)
 
-    def _analyze_row(self, row: pd.Series, run: AIAnalysisRun) -> CompanyAnalysisRecord:
+    def _persist_screening_to_disk(self, batch: ScreeningBatch) -> None:
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        base_path = self.config.output_dir / f"{timestamp}_screening_{batch.run.id}"
+        batch.results_dataframe().to_csv(base_path.with_suffix("_results.csv"), index=False)
+
+    def _analyze_screening_batch(self, batch_df: pd.DataFrame, run: AIAnalysisRun) -> list[ScreeningResult]:
+        """Analyze a batch of companies for screening."""
+        # Convert batch to list of company data
+        companies_data = []
+        for _, row in batch_df.iterrows():
+            company_data = {
+                'orgnr': self._coalesce(row, ["orgnr", "OrgNr", "organization_number"]),
+                'name': self._coalesce(row, ["company_name", "CompanyName", "legal_name", "name"]),
+                'industry': row.get('segment_name') or row.get('industry_name', 'Unknown'),
+                'financials': self._extract_financials(row)
+            }
+            companies_data.append(company_data)
+
+        # Use batch screening prompt
+        prompt = get_batch_screening_prompt(companies_data)
+        response_json, raw_text, usage, latency_ms = self._invoke_screening_model(prompt)
+
+        # Parse results
+        results = []
+        for i, result_data in enumerate(response_json):
+            if i < len(companies_data):
+                company_data = companies_data[i]
+                audit = AnalysisAuditRecord(
+                    module="screening_analysis",
+                    prompt=prompt,
+                    response=raw_text,
+                    model="gpt-3.5-turbo",
+                    latency_ms=latency_ms,
+                    prompt_tokens=usage.get("input_tokens", 0) if usage else 0,
+                    completion_tokens=usage.get("output_tokens", 0) if usage else 0,
+                    cost_usd=self._estimate_screening_cost(usage),
+                )
+
+                result = ScreeningResult(
+                    run_id=run.id,
+                    orgnr=company_data['orgnr'],
+                    company_name=company_data['name'],
+                    screening_score=result_data.get("screening_score"),
+                    risk_flag=result_data.get("risk_flag"),
+                    brief_summary=result_data.get("brief_summary"),
+                    analysis_generated_at=datetime.utcnow(),
+                    audit=audit,
+                    raw_json=result_data,
+                )
+                results.append(result)
+
+        return results
+
+    def _extract_financials(self, row: pd.Series) -> dict:
+        """Extract financial data from a row for screening."""
+        financials = {}
+        # Look for revenue, profit, employees data
+        if pd.notna(row.get('revenue')):
+            financials['revenue'] = row.get('revenue')
+        if pd.notna(row.get('profit')):
+            financials['profit'] = row.get('profit')
+        if pd.notna(row.get('employees')):
+            financials['employees'] = row.get('employees')
+        return financials
+
+    def _invoke_screening_model(self, prompt: str) -> tuple[dict[str, Any], str, dict[str, Any], int]:
+        """Invoke the screening model with optimized settings."""
+        start_time = time.perf_counter()
+        response = self.client.responses.create(
+            model="gpt-3.5-turbo",
+            temperature=0.1,  # Lower temperature for more consistent screening
+            max_output_tokens=500,  # Smaller output for screening
+            input=[
+                {
+                    "role": "system",
+                    "content": [{"type": "text", "text": SCREENING_SYSTEM_PROMPT}],
+                },
+                {
+                    "role": "user",
+                    "content": [{"type": "text", "text": prompt}],
+                },
+            ],
+            response_format={"type": "json_schema", "json_schema": _screening_analysis_schema()},
+        )
+        latency_ms = int((time.perf_counter() - start_time) * 1000)
+
+        raw_text = getattr(response, "output_text", None)
+        if not raw_text:
+            try:
+                raw_text = response.output[0].content[0].text  # type: ignore[index]
+            except (AttributeError, IndexError):  # pragma: no cover - defensive fallback
+                raw_text = "[]"
+
+        try:
+            parsed = json.loads(raw_text)
+        except json.JSONDecodeError:
+            parsed = []
+
+        usage_dict: dict[str, Any] = {}
+        usage = getattr(response, "usage", None)
+        if usage:
+            for key in ("input_tokens", "output_tokens", "total_tokens"):
+                value = getattr(usage, key, None)
+                if value is None and isinstance(usage, dict):
+                    value = usage.get(key)
+                if value is not None:
+                    usage_dict[key] = value
+
+        return parsed, raw_text, usage_dict, latency_ms
+
+    def _estimate_screening_cost(self, usage: Optional[dict[str, Any]]) -> Optional[float]:
+        """Estimate cost for screening analysis (using gpt-3.5-turbo rates)."""
+        if not usage:
+            return None
+        prompt_tokens = usage.get("input_tokens") or 0
+        completion_tokens = usage.get("output_tokens") or 0
+        # GPT-3.5-turbo rates: $0.0005/1K input, $0.0015/1K output
+        cost = (prompt_tokens / 1000) * 0.0005 + (completion_tokens / 1000) * 0.0015
+        return round(cost, 4)
+
+    def _analyze_row(self, row: pd.Series, run: AIAnalysisRun, enrichment_data: Optional[str] = None) -> CompanyAnalysisRecord:
         orgnr = self._coalesce(row, ["orgnr", "OrgNr", "organization_number"])
         company_name = self._coalesce(row, ["company_name", "CompanyName", "legal_name", "name"])
-        payload = self._render_context(row)
+        payload = self._render_context(row, enrichment_data)
         response_json, raw_text, usage, latency_ms = self._invoke_model(payload)
 
         sections = [
@@ -620,7 +951,7 @@ class AgenticLLMAnalyzer:
 
         return record
 
-    def _render_context(self, row: pd.Series) -> str:
+    def _render_context(self, row: pd.Series, enrichment_data: Optional[str] = None) -> str:
         context_data: dict[str, Any] = {}
         for field in self.config.context_fields:
             value = row.get(field)
@@ -632,14 +963,20 @@ class AgenticLLMAnalyzer:
                 context_data[field] = value
 
         structured_json = json.dumps(context_data, ensure_ascii=False, indent=2)
-        return textwrap.dedent(
+        
+        base_prompt = textwrap.dedent(
             f"""
             Company profile and engineered metrics (JSON):
             {structured_json}
-
-            Produce a comprehensive acquisition due diligence brief. Include quantitative references where possible.
             """
         ).strip()
+        
+        if enrichment_data:
+            base_prompt += f"\n\nExternal enrichment data:\n{enrichment_data}"
+        
+        base_prompt += "\n\nProduce a comprehensive acquisition due diligence brief. Include quantitative references where possible."
+        
+        return base_prompt
 
     def _invoke_model(self, prompt: str) -> tuple[dict[str, Any], str, dict[str, Any], int]:
         start_time = time.perf_counter()
@@ -712,6 +1049,8 @@ __all__ = [
     "AgenticLLMAnalyzer",
     "AnalysisMetric",
     "AnalysisSection",
+    "ScreeningBatch",
+    "ScreeningResult",
     "SupabaseAnalysisWriter",
 ]
 

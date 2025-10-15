@@ -9,6 +9,7 @@ create table if not exists ai_ops.ai_analysis_runs (
     initiated_by text,
     status text not null default 'pending',
     model_version text not null,
+    analysis_mode text not null default 'deep',
     filters_json jsonb,
     started_at timestamptz not null default now(),
     completed_at timestamptz,
@@ -92,6 +93,24 @@ create table if not exists ai_ops.ai_analysis_audit (
 
 create index if not exists ai_analysis_audit_run_idx
     on ai_ops.ai_analysis_audit (run_id, orgnr, module);
+
+-- Screening results for rapid assessment of company lists.
+create table if not exists ai_ops.ai_screening_results (
+    id uuid primary key default gen_random_uuid(),
+    run_id uuid references ai_ops.ai_analysis_runs(id) on delete cascade,
+    orgnr text not null,
+    company_name text,
+    screening_score numeric,
+    risk_flag text,
+    brief_summary text,
+    created_at timestamptz default now()
+);
+
+create index if not exists ai_screening_results_run_idx
+    on ai_ops.ai_screening_results (run_id, screening_score desc);
+
+create index if not exists ai_screening_results_orgnr_idx
+    on ai_ops.ai_screening_results (orgnr, created_at desc);
 
 -- Convenience view surfaces the latest completed analysis per company.
 create or replace view ai_ops.ai_company_analysis_latest as

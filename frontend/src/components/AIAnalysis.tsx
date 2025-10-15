@@ -22,6 +22,10 @@ import { Checkbox } from './ui/checkbox'
 import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2 } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
 import { AIAnalysisService } from '../lib/aiAnalysisService'
+import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import { Label } from './ui/label'
 
 type Nullable<T> = T | null
 
@@ -58,10 +62,19 @@ interface CompanyResult {
   metrics: MetricResult[]
 }
 
+interface ScreeningResult {
+  orgnr: string
+  companyName: string
+  screeningScore: number | null
+  riskFlag: 'Low' | 'Medium' | 'High' | null
+  briefSummary: string | null
+}
+
 interface RunPayload {
   id: string
   status: string
   modelVersion: string
+  analysisMode: string
   startedAt: string
   completedAt?: string | null
   errorMessage?: string | null
@@ -69,7 +82,7 @@ interface RunPayload {
 
 interface RunResponsePayload {
   run: RunPayload
-  analysis: { companies: CompanyResult[] }
+  analysis: { companies: CompanyResult[] } | { results: ScreeningResult[] }
 }
 
 interface HistoryRow {
@@ -185,6 +198,66 @@ const CompanySelectionList: React.FC<{
     </div>
   </ScrollArea>
 )
+
+const ScreeningResultCard: React.FC<{ 
+  result: ScreeningResult
+  selected: boolean
+  onToggle: (orgnr: string) => void
+}> = ({ result, selected, onToggle }) => {
+  const getScoreColor = (score: number | null) => {
+    if (!score) return 'text-gray-500'
+    if (score >= 80) return 'text-green-600'
+    if (score >= 60) return 'text-yellow-600'
+    return 'text-red-600'
+  }
+
+  const getRiskColor = (risk: string | null) => {
+    switch (risk) {
+      case 'Low': return 'bg-green-100 text-green-800 border-green-200'
+      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'High': return 'bg-red-100 text-red-800 border-red-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  return (
+    <Card className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-purple-500 bg-purple-50' : 'hover:shadow-md'}`}>
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            checked={selected}
+            onCheckedChange={() => onToggle(result.orgnr)}
+            className="mt-1"
+          />
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">{result.companyName}</h3>
+              <Badge variant="outline">{result.orgnr}</Badge>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className={`text-2xl font-bold ${getScoreColor(result.screeningScore)}`}>
+                  {result.screeningScore || 'N/A'}
+                </div>
+                <div className="text-xs text-muted-foreground">Score</div>
+              </div>
+              
+              <div className="flex-1">
+                <Badge className={getRiskColor(result.riskFlag)}>
+                  {result.riskFlag || 'Unknown'} Risk
+                </Badge>
+                <p className="mt-2 text-sm text-foreground">
+                  {result.briefSummary || 'No summary available'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) => (
   <Card>
@@ -322,18 +395,41 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
 )
 
 const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_analytics' }) => {
+  // Saved lists state
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
+  const [selectedListId, setSelectedListId] = useState<string>('')
   const [availableCompanies, setAvailableCompanies] = useState<SupabaseCompany[]>([])
+  
+  // Analysis mode and selection state
+  const [analysisMode, setAnalysisMode] = useState<'screening' | 'deep'>('screening')
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
-  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedForDeepAnalysis, setSelectedForDeepAnalysis] = useState<Set<string>>(new Set())
+  
+  // UI state
   const [instructions, setInstructions] = useState('')
+  const [loadingLists, setLoadingLists] = useState(false)
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [runningAnalysis, setRunningAnalysis] = useState(false)
   const [currentRun, setCurrentRun] = useState<RunResponsePayload | null>(null)
+  const [screeningResults, setScreeningResults] = useState<ScreeningResult[]>([])
   const [history, setHistory] = useState<HistoryRow[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [loadingRunId, setLoadingRunId] = useState<string | null>(null)
 
   const templates = useMemo(() => AIAnalysisService.getAnalysisTemplates(), [])
+
+  const loadSavedLists = async () => {
+    setLoadingLists(true)
+    try {
+      const lists = await SavedListsService.getSavedLists()
+      setSavedLists(lists)
+    } catch (error) {
+      console.error('Failed to load saved lists', error)
+      setSavedLists([])
+    } finally {
+      setLoadingLists(false)
+    }
+  }
 
   const loadHistory = async () => {
     try {
@@ -347,18 +443,17 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     }
   }
 
-  const loadCompanies = async (term?: string) => {
+  const loadCompaniesFromList = async (listId: string) => {
     setLoadingCompanies(true)
     try {
-      const filters = term?.trim()
-        ? {
-            name: term.trim(),
-          }
-        : {}
-      const result = await supabaseDataService.getCompanies(1, 50, filters)
-      setAvailableCompanies(result.companies || [])
+      const selectedList = savedLists.find(list => list.id === listId)
+      if (selectedList) {
+        setAvailableCompanies(selectedList.companies)
+      } else {
+        setAvailableCompanies([])
+      }
     } catch (error) {
-      console.error('Failed to load companies', error)
+      console.error('Failed to load companies from list', error)
       setAvailableCompanies([])
     } finally {
       setLoadingCompanies(false)
@@ -366,9 +461,15 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   }
 
   useEffect(() => {
-    loadCompanies()
+    loadSavedLists()
     loadHistory()
   }, [])
+
+  useEffect(() => {
+    if (selectedListId) {
+      loadCompaniesFromList(selectedListId)
+    }
+  }, [selectedListId, savedLists])
 
   const toggleCompanySelection = (orgnr: string) => {
     setSelectedCompanies((prev) => {
@@ -382,25 +483,43 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     })
   }
 
-  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    await loadCompanies(searchTerm)
+  const toggleScreeningSelection = (orgnr: string) => {
+    setSelectedForDeepAnalysis((prev) => {
+      const next = new Set(prev)
+      if (next.has(orgnr)) {
+        next.delete(orgnr)
+      } else {
+        next.add(orgnr)
+      }
+      return next
+    })
   }
 
   const handleRunAnalysis = async () => {
     setErrorMessage(null)
     setRunningAnalysis(true)
     try {
-      const selected = availableCompanies.filter((company) => selectedCompanies.has(company.OrgNr))
-      if (selected.length === 0) {
-        throw new Error('Välj minst ett företag att analysera')
+      let companiesToAnalyze: SupabaseCompany[] = []
+      
+      if (analysisMode === 'screening') {
+        companiesToAnalyze = availableCompanies.filter((company) => selectedCompanies.has(company.OrgNr))
+      } else {
+        // For deep analysis, use companies selected from screening results
+        companiesToAnalyze = availableCompanies.filter((company) => selectedForDeepAnalysis.has(company.OrgNr))
       }
+      
+      if (companiesToAnalyze.length === 0) {
+        throw new Error(analysisMode === 'screening' 
+          ? 'Välj minst ett företag att screena' 
+          : 'Välj företag från screeningresultat för djupanalys')
+      }
+      
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companies: selected,
-          analysisType: 'comprehensive',
+          companies: companiesToAnalyze,
+          analysisType: analysisMode,
           instructions: instructions.trim() || undefined,
           filters: { dataView: selectedDataView },
         }),
@@ -409,7 +528,15 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       if (!data.success) {
         throw new Error(data.error || 'AI analysis failed')
       }
-      setCurrentRun(data)
+      
+      if (analysisMode === 'screening') {
+        setScreeningResults(data.analysis.results || [])
+        setCurrentRun(null) // Clear any previous deep analysis
+      } else {
+        setCurrentRun(data)
+        setScreeningResults([]) // Clear screening results
+      }
+      
       await loadHistory()
     } catch (error) {
       console.error('AI analysis failed', error)
@@ -439,8 +566,28 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
   const resetSelection = () => {
     setSelectedCompanies(new Set())
+    setSelectedForDeepAnalysis(new Set())
     setInstructions('')
     setErrorMessage(null)
+    setScreeningResults([])
+    setCurrentRun(null)
+  }
+
+  const switchToDeepAnalysis = () => {
+    setAnalysisMode('deep')
+    setSelectedCompanies(new Set())
+  }
+
+  const estimateCost = () => {
+    if (analysisMode === 'screening') {
+      const selectedCount = selectedCompanies.size
+      // GPT-3.5-turbo: ~$0.002 per company for screening
+      return selectedCount * 0.002
+    } else {
+      const selectedCount = selectedForDeepAnalysis.size
+      // GPT-4: ~$0.50 per company for deep analysis
+      return selectedCount * 0.50
+    }
   }
 
   return (
@@ -452,46 +599,106 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             <div>
               <CardTitle>AI-insikter</CardTitle>
               <CardDescription>
-                Välj företag från din lista och starta en fullständig kommersiell, finansiell och integrationsanalys driven av GPT.
+                Välj företag från din sparade lista och starta en tvåstegsanalys: snabb screening följt av djupanalys.
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <form onSubmit={handleSearch} className="flex flex-col gap-3 md:flex-row">
-            <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Sök företag</label>
-              <Input
-                placeholder="Filtrera på namn, stad eller segment"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div className="flex items-end gap-2">
-              <Button type="submit" disabled={loadingCompanies}>
-                {loadingCompanies && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Search
-              </Button>
-              <Button type="button" variant="outline" onClick={() => loadCompanies()} disabled={loadingCompanies}>
-                <RefreshCw className="mr-2 h-4 w-4" /> Reset
-              </Button>
-            </div>
-          </form>
+          {/* Step 1: List Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-muted-foreground">Välj sparad lista</Label>
+            <Select value={selectedListId} onValueChange={setSelectedListId} disabled={loadingLists}>
+              <SelectTrigger>
+                <SelectValue placeholder={loadingLists ? "Laddar listor..." : "Välj en sparad lista"} />
+              </SelectTrigger>
+              <SelectContent>
+                {savedLists.map((list) => (
+                  <SelectItem key={list.id} value={list.id}>
+                    {list.name} ({list.companies.length} företag)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {savedLists.length === 0 && !loadingLists && (
+              <p className="text-sm text-muted-foreground">Inga sparade listor hittades. Skapa en lista först.</p>
+            )}
+          </div>
 
-          <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+          {/* Step 2: Analysis Mode Selection */}
+          {selectedListId && (
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-muted-foreground">Analysläge</Label>
+              <RadioGroup value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'screening' | 'deep')}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="screening" id="screening" />
+                  <Label htmlFor="screening" className="flex-1">
+                    <div>
+                      <div className="font-medium">Screening (Snabb analys)</div>
+                      <div className="text-sm text-muted-foreground">
+                        Snabb bedömning av 30-40 företag för att identifiera de mest lovande
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="deep" id="deep" />
+                  <Label htmlFor="deep" className="flex-1">
+                    <div>
+                      <div className="font-medium">Djupanalys</div>
+                      <div className="text-sm text-muted-foreground">
+                        Detaljerad analys av 5-10 utvalda företag med fullständig due diligence
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
+          {/* Step 3: Company Selection */}
+          {selectedListId && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-muted-foreground">Tillgängliga företag</h3>
-                <span className="text-xs text-muted-foreground">{selectedCompanies.size} valda</span>
+                <h3 className="text-sm font-semibold text-muted-foreground">
+                  {analysisMode === 'screening' ? 'Företag att screena' : 'Företag för djupanalys'}
+                </h3>
+                <span className="text-xs text-muted-foreground">
+                  {analysisMode === 'screening' ? selectedCompanies.size : selectedForDeepAnalysis.size} valda
+                </span>
               </div>
-              <CompanySelectionList
-                companies={availableCompanies}
-                selected={selectedCompanies}
-                loading={loadingCompanies}
-                onToggle={toggleCompanySelection}
-              />
+              {analysisMode === 'screening' ? (
+                <CompanySelectionList
+                  companies={availableCompanies}
+                  selected={selectedCompanies}
+                  loading={loadingCompanies}
+                  onToggle={toggleCompanySelection}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {screeningResults.length === 0 ? (
+                    <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                      Kör screening först för att välja företag för djupanalys
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {screeningResults.map((result) => (
+                        <ScreeningResultCard
+                          key={result.orgnr}
+                          result={result}
+                          selected={selectedForDeepAnalysis.has(result.orgnr)}
+                          onToggle={toggleScreeningSelection}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+          )}
 
+          {/* Step 4: Analysis Configuration */}
+          {selectedListId && (
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Analysmallar</label>
@@ -523,18 +730,42 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">
                   Analyser sparas och kan återbesökas i historikpanelen nedan.
+                  {((analysisMode === 'screening' && selectedCompanies.size > 0) || 
+                    (analysisMode === 'deep' && selectedForDeepAnalysis.size > 0)) && (
+                    <div className="mt-1 text-xs font-medium text-blue-600">
+                      Uppskattad kostnad: ${estimateCost().toFixed(3)}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={resetSelection} disabled={runningAnalysis}>
                     <Undo2 className="mr-2 h-4 w-4" /> Rensa
                   </Button>
-                  <Button type="button" onClick={handleRunAnalysis} disabled={runningAnalysis || selectedCompanies.size === 0}>
-                    {runningAnalysis ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}Kör analys
+                  {analysisMode === 'screening' && screeningResults.length > 0 && (
+                    <Button type="button" variant="secondary" onClick={switchToDeepAnalysis}>
+                      Gå till djupanalys
+                    </Button>
+                  )}
+                  <Button 
+                    type="button" 
+                    onClick={handleRunAnalysis} 
+                    disabled={
+                      runningAnalysis || 
+                      (analysisMode === 'screening' && selectedCompanies.size === 0) ||
+                      (analysisMode === 'deep' && selectedForDeepAnalysis.size === 0)
+                    }
+                  >
+                    {runningAnalysis ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                    )}
+                    {analysisMode === 'screening' ? 'Kör screening' : 'Kör djupanalys'}
                   </Button>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {errorMessage && (
             <div className="flex items-start gap-3 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
@@ -545,13 +776,47 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </CardContent>
       </Card>
 
-      {currentRun && (
+      {/* Screening Results Display */}
+      {screeningResults.length > 0 && analysisMode === 'screening' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Screening Resultat</CardTitle>
+            <CardDescription>
+              Snabb bedömning av {screeningResults.length} företag. Välj de mest lovande för djupanalys.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {screeningResults
+                .sort((a, b) => (b.screeningScore || 0) - (a.screeningScore || 0))
+                .map((result) => (
+                  <ScreeningResultCard
+                    key={result.orgnr}
+                    result={result}
+                    selected={selectedForDeepAnalysis.has(result.orgnr)}
+                    onToggle={toggleScreeningSelection}
+                  />
+                ))}
+            </div>
+            {selectedForDeepAnalysis.size > 0 && (
+              <div className="mt-4 flex justify-end">
+                <Button onClick={switchToDeepAnalysis}>
+                  Fortsätt till djupanalys ({selectedForDeepAnalysis.size} valda)
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Deep Analysis Results Display */}
+      {currentRun && 'companies' in currentRun.analysis && (
         <div className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl">Analyskörning sammanfattning</CardTitle>
+                  <CardTitle className="text-xl">Djupanalys Sammanfattning</CardTitle>
                   <CardDescription>
                     Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
                     {formatDate(currentRun.run.completedAt)}

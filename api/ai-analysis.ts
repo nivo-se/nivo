@@ -11,6 +11,14 @@ interface CompanySelection {
   name?: string
 }
 
+interface AnalysisRequest {
+  companies: CompanySelection[]
+  analysisType: 'screening' | 'deep'
+  instructions?: string
+  filters?: any
+  initiatedBy?: string
+}
+
 interface UsageSummary {
   input_tokens?: number
   output_tokens?: number
@@ -60,10 +68,20 @@ interface CompanyResult {
   audit: AuditResult
 }
 
+interface ScreeningResult {
+  orgnr: string
+  companyName: string
+  screeningScore: number | null
+  riskFlag: 'Low' | 'Medium' | 'High' | null
+  briefSummary: string | null
+  audit: AuditResult
+}
+
 interface RunPayload {
   id: string
   status: string
   modelVersion: string
+  analysisMode: string
   startedAt: string
   completedAt?: string | null
   errorMessage?: string | null
@@ -71,7 +89,7 @@ interface RunPayload {
 
 interface RunResponsePayload {
   run: RunPayload
-  analysis: { companies: CompanyResult[] }
+  analysis: { companies: CompanyResult[] } | { results: ScreeningResult[] }
 }
 
 interface CompanySnapshot {
@@ -86,8 +104,11 @@ interface CompanySnapshot {
 }
 
 const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4.1-mini'
+const MODEL_SCREENING = 'gpt-3.5-turbo'
 const PROMPT_COST_PER_1K = 0.15
 const COMPLETION_COST_PER_1K = 0.6
+const SCREENING_PROMPT_COST_PER_1K = 0.0005
+const SCREENING_COMPLETION_COST_PER_1K = 0.0015
 
 const analysisSchema = {
   name: 'CompanyAnalysisBundle',
@@ -161,6 +182,32 @@ const analysisSchema = {
   },
 }
 
+const screeningSchema = {
+  name: 'ScreeningAnalysis',
+  strict: true,
+  schema: {
+    type: 'object',
+    properties: {
+      screening_score: {
+        type: 'number',
+        description: 'Overall screening score from 1-100 based on financial health, growth, and market position.',
+        minimum: 1,
+        maximum: 100,
+      },
+      risk_flag: {
+        type: 'string',
+        description: 'Risk level: Low, Medium, or High',
+        enum: ['Low', 'Medium', 'High'],
+      },
+      brief_summary: {
+        type: 'string',
+        description: '2-3 sentences highlighting key strengths and weaknesses.',
+      },
+    },
+    required: ['screening_score', 'risk_flag', 'brief_summary'],
+  },
+}
+
 let cachedSupabase: SupabaseClient | null | undefined
 
 function getSupabase(): SupabaseClient | null {
@@ -198,9 +245,13 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
   }
 
-  const { companies, instructions, filters, initiatedBy } = req.body || {}
+  const { companies, analysisType = 'deep', instructions, filters, initiatedBy } = req.body as AnalysisRequest || {}
   if (!Array.isArray(companies) || companies.length === 0) {
     return res.status(400).json({ success: false, error: 'No companies provided' })
+  }
+
+  if (analysisType !== 'screening' && analysisType !== 'deep') {
+    return res.status(400).json({ success: false, error: 'Invalid analysis type. Must be "screening" or "deep"' })
   }
 
   const uniqueSelections: CompanySelection[] = []
@@ -220,34 +271,54 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
   const runId = randomUUID()
   const startedAt = new Date().toISOString()
 
+  const modelVersion = analysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
+  
   await insertRunRecord(supabase, {
     id: runId,
     status: 'running',
-    modelVersion: MODEL_DEFAULT,
+    modelVersion,
+    analysisMode: analysisType,
     startedAt,
     initiatedBy: typeof initiatedBy === 'string' ? initiatedBy : null,
     filters,
   })
 
   const companiesResults: CompanyResult[] = []
+  const screeningResults: ScreeningResult[] = []
   const errors: string[] = []
 
-  for (const selection of uniqueSelections) {
-    const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
-    if (!orgnr) {
-      errors.push('Missing organisation number for selection')
-      continue
+  if (analysisType === 'screening') {
+    // Process screening in batches for efficiency
+    const batchSize = 5
+    for (let i = 0; i < uniqueSelections.length; i += batchSize) {
+      const batch = uniqueSelections.slice(i, i + batchSize)
+      try {
+        const batchResults = await processScreeningBatch(supabase, openai, runId, batch, instructions)
+        screeningResults.push(...batchResults)
+      } catch (error: any) {
+        console.error('Screening batch failed', error)
+        errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error?.message || 'Unknown error'}`)
+      }
     }
-    try {
-      const snapshot = await fetchCompanySnapshot(supabase, orgnr)
-      const prompt = buildPrompt(snapshot, instructions)
-      const { parsed, rawText, usage, latency } = await invokeModel(openai, prompt)
-      const result = buildCompanyResult(orgnr, snapshot.companyName, parsed, usage, latency, prompt, rawText)
-      companiesResults.push(result)
-      await persistCompanyResult(supabase, runId, result)
-    } catch (error: any) {
-      console.error('AI analysis failed', error)
-      errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
+  } else {
+    // Process deep analysis one by one
+    for (const selection of uniqueSelections) {
+      const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
+      if (!orgnr) {
+        errors.push('Missing organisation number for selection')
+        continue
+      }
+      try {
+        const snapshot = await fetchCompanySnapshot(supabase, orgnr)
+        const prompt = buildPrompt(snapshot, instructions)
+        const { parsed, rawText, usage, latency } = await invokeModel(openai, prompt)
+        const result = buildCompanyResult(orgnr, snapshot.companyName, parsed, usage, latency, prompt, rawText)
+        companiesResults.push(result)
+        await persistCompanyResult(supabase, runId, result)
+      } catch (error: any) {
+        console.error('AI analysis failed', error)
+        errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
+      }
     }
   }
 
@@ -259,25 +330,24 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     errorMessage: errors.length > 0 ? errors.join('; ') : null,
   })
 
-  const run: RunResponse = {
+  const runPayload: RunPayload = {
     id: runId,
     status: errors.length > 0 ? 'completed_with_errors' : 'completed',
-    modelVersion: MODEL_DEFAULT,
+    modelVersion,
+    analysisMode: analysisType,
     startedAt,
     completedAt,
     errorMessage: errors.length > 0 ? errors.join('; ') : null,
   }
-
-  const runPayload: RunPayload = {
-    id: run.id,
-    status: run.status,
-    modelVersion: run.modelVersion,
-    startedAt: run.startedAt,
-    completedAt: run.completedAt,
-    errorMessage: run.errorMessage,
+  
+  const response: RunResponsePayload = {
+    run: runPayload,
+    analysis: analysisType === 'screening' 
+      ? { results: screeningResults }
+      : { companies: companiesResults }
   }
   
-  res.status(200).json({ success: true, run: runPayload, analysis: { companies: companiesResults } })
+  res.status(200).json({ success: true, ...response })
 }
 
 async function handleGet(req: VercelRequest, res: VercelResponse) {
@@ -308,12 +378,190 @@ async function handleGet(req: VercelRequest, res: VercelResponse) {
   return res.status(400).json({ success: false, error: 'Specify runId or history query parameter' })
 }
 
+async function processScreeningBatch(
+  supabase: SupabaseClient,
+  openai: OpenAI,
+  runId: string,
+  batch: CompanySelection[],
+  instructions?: string
+): Promise<ScreeningResult[]> {
+  const companiesData = []
+  
+  // Fetch company data for the batch
+  for (const selection of batch) {
+    const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
+    if (!orgnr) continue
+    
+    try {
+      const snapshot = await fetchCompanySnapshot(supabase, orgnr)
+      companiesData.push({
+        orgnr: snapshot.orgnr,
+        name: snapshot.companyName,
+        industry: snapshot.segmentName || snapshot.industry || 'Unknown',
+        financials: snapshot.financials
+      })
+    } catch (error) {
+      console.error(`Failed to fetch data for ${orgnr}:`, error)
+    }
+  }
+  
+  if (companiesData.length === 0) {
+    return []
+  }
+  
+  // Build batch screening prompt
+  const prompt = buildScreeningPrompt(companiesData, instructions)
+  const { parsed, rawText, usage, latency } = await invokeScreeningModel(openai, prompt)
+  
+  // Parse results and create ScreeningResult objects
+  const results: ScreeningResult[] = []
+  for (let i = 0; i < Math.min(parsed.length, companiesData.length); i++) {
+    const resultData = parsed[i]
+    const companyData = companiesData[i]
+    
+    const result: ScreeningResult = {
+      orgnr: companyData.orgnr,
+      companyName: companyData.name,
+      screeningScore: resultData?.screening_score ?? null,
+      riskFlag: resultData?.risk_flag ?? null,
+      briefSummary: resultData?.brief_summary ?? null,
+      audit: {
+        prompt,
+        response: rawText,
+        latency_ms: latency,
+        prompt_tokens: usage.input_tokens || 0,
+        completion_tokens: usage.output_tokens || 0,
+        cost_usd: calculateScreeningCost(usage.input_tokens || 0, usage.output_tokens || 0),
+      }
+    }
+    
+    results.push(result)
+    await persistScreeningResult(supabase, runId, result)
+  }
+  
+  return results
+}
+
+function buildScreeningPrompt(companiesData: any[], instructions?: string): string {
+  let prompt = 'Analyze these companies for M&A potential. For each, provide:\n\n'
+  
+  companiesData.forEach((company, index) => {
+    const financials = company.financials.map((f: any) => 
+      `${f.year}: Rev=${f.revenue || 'N/A'}, Profit=${f.profitAfterTax || 'N/A'}`
+    ).join(', ')
+    
+    prompt += `${index + 1}. ${company.name} (${company.orgnr})\n`
+    prompt += `   Industry: ${company.industry}\n`
+    prompt += `   Financials: ${financials || 'No data'}\n\n`
+  })
+  
+  prompt += 'Respond with JSON array in this exact format:\n'
+  prompt += '[\n'
+  prompt += '  {\n'
+  prompt += '    "orgnr": "<orgnr>",\n'
+  prompt += '    "screening_score": <number 1-100>,\n'
+  prompt += '    "risk_flag": "<Low/Medium/High>",\n'
+  prompt += '    "brief_summary": "<2-3 sentences>"\n'
+  prompt += '  },\n'
+  prompt += '  ...\n'
+  prompt += ']\n'
+  
+  if (instructions) {
+    prompt += `\nAdditional instructions: ${instructions}`
+  }
+  
+  return prompt
+}
+
+async function invokeScreeningModel(openai: OpenAI, prompt: string) {
+  const started = Date.now()
+  const response = await openai.responses.create({
+    model: MODEL_SCREENING,
+    temperature: 0.1,
+    max_output_tokens: 500,
+    input: [
+      { role: 'system', content: [{ type: 'text', text: screeningSystemPrompt }] },
+      { role: 'user', content: [{ type: 'text', text: prompt }] },
+    ],
+    response_format: { type: 'json_schema', json_schema: screeningSchema },
+  })
+  const latency = Date.now() - started
+
+  let rawText = (response as any).output_text as string | undefined
+  if (!rawText) {
+    try {
+      rawText = (response as any)?.output?.[0]?.content?.[0]?.text
+    } catch (error) {
+      rawText = '[]'
+    }
+  }
+
+  let parsed: any = []
+  try {
+    parsed = JSON.parse(rawText || '[]')
+  } catch (error) {
+    parsed = []
+  }
+
+  const usage: UsageSummary = {}
+  const rawUsage: any = (response as any).usage
+  if (rawUsage) {
+    usage.input_tokens = rawUsage.input_tokens || rawUsage.prompt_tokens || 0
+    usage.output_tokens = rawUsage.output_tokens || rawUsage.completion_tokens || 0
+    usage.total_tokens = rawUsage.total_tokens || 0
+  }
+
+  return { parsed, rawText: rawText || '[]', usage, latency }
+}
+
+async function persistScreeningResult(supabase: SupabaseClient, runId: string, result: ScreeningResult) {
+  const screeningRow = {
+    run_id: runId,
+    orgnr: result.orgnr,
+    company_name: result.companyName,
+    screening_score: result.screeningScore,
+    risk_flag: result.riskFlag,
+    brief_summary: result.briefSummary,
+  }
+
+  const { error: screeningError } = await supabase
+    .schema('ai_ops')
+    .from('ai_screening_results')
+    .upsert(screeningRow)
+  if (screeningError) throw screeningError
+
+  const { error: auditError } = await supabase
+    .schema('ai_ops')
+    .from('ai_analysis_audit')
+    .upsert({
+      run_id: runId,
+      orgnr: result.orgnr,
+      module: 'screening_analysis',
+      prompt: result.audit.prompt,
+      response: result.audit.response,
+      model: MODEL_SCREENING,
+      latency_ms: result.audit.latency_ms,
+      prompt_tokens: result.audit.prompt_tokens,
+      completion_tokens: result.audit.completion_tokens,
+      cost_usd: result.audit.cost_usd,
+    })
+  if (auditError) throw auditError
+}
+
+function calculateScreeningCost(promptTokens: number, completionTokens: number): number {
+  const promptCost = (promptTokens / 1000) * SCREENING_PROMPT_COST_PER_1K
+  const completionCost = (completionTokens / 1000) * SCREENING_COMPLETION_COST_PER_1K
+  const total = promptCost + completionCost
+  return Number(total.toFixed(4))
+}
+
 async function insertRunRecord(
   supabase: SupabaseClient,
   payload: {
     id: string
     status: string
     modelVersion: string
+    analysisMode: string
     startedAt: string
     initiatedBy: string | null
     filters?: any
@@ -326,6 +574,7 @@ async function insertRunRecord(
       id: payload.id,
       status: payload.status,
       model_version: payload.modelVersion,
+      analysis_mode: payload.analysisMode,
       started_at: payload.startedAt,
       initiated_by: payload.initiatedBy,
       filters_json: payload.filters || {},
@@ -710,4 +959,14 @@ segment information when relevant.
 
 Respond in professional English even if source data is Swedish. If information is
 missing, acknowledge the gap explicitly and infer carefully using comparable metrics.`
+
+const screeningSystemPrompt = `You are a rapid M&A screening analyst. For each company, provide:
+1. Screening Score (1-100): Based on financial health, growth trajectory, and market position
+2. Risk Flag: (Low/Medium/High) - Key concerns if any
+3. Brief Summary: 2-3 sentences highlighting key strengths/weaknesses
+
+Focus on: Revenue trends, profitability, debt levels, growth consistency.
+Use available financial data (4 years history). Flag missing critical data.
+
+Be concise and direct. Prioritize red flags and high-potential opportunities.`
 
