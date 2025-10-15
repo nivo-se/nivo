@@ -126,7 +126,7 @@ select distinct on (orgnr)
     operational_grade,
     next_steps,
     run_id,
-    created_at
+    ai_company_analysis.created_at
 from ai_ops.ai_company_analysis
 join ai_ops.ai_analysis_runs on ai_analysis_runs.id = ai_company_analysis.run_id
 where ai_analysis_runs.status = 'completed'
