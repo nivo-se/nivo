@@ -299,7 +299,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
         </div>
       </div>
 
-      {company.nextSteps.length > 0 && (
+      {company.nextSteps && company.nextSteps.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-muted-foreground">Recommended next steps</h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">

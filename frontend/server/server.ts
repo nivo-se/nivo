@@ -79,7 +79,17 @@ app.post('/api/ai-analysis', async (req, res) => {
       risks: ['Mock risk 1', 'Mock risk 2', 'Mock risk 3'],
       recommendation: ['Köp', 'Håll', 'Sälj'][Math.floor(Math.random() * 3)],
       targetPrice: Math.floor(Math.random() * 1000) + 100,
-      confidence: Math.floor(Math.random() * 30) + 70 // 70-100
+      confidence: Math.floor(Math.random() * 30) + 70, // 70-100
+      // Add missing properties that the frontend expects
+      nextSteps: [
+        'Mock rekommendation 1: Analysera marknadsmöjligheter',
+        'Mock rekommendation 2: Utvärdera operativa förbättringar',
+        'Mock rekommendation 3: Genomför due diligence'
+      ],
+      financialGrade: Math.floor(Math.random() * 4) + 6, // 6-10
+      commercialGrade: Math.floor(Math.random() * 4) + 6, // 6-10
+      operationalGrade: Math.floor(Math.random() * 4) + 6, // 6-10
+      riskScore: Math.floor(Math.random() * 40) + 20 // 20-60
     }))
 
     return res.status(200).json({
