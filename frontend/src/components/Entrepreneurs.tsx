@@ -10,28 +10,28 @@ interface EntrepreneursProps {
 
 const Entrepreneurs: React.FC<EntrepreneursProps> = ({ className, id }) => {
   return (
-    <section id={id} className={cn('py-20 md:py-32 bg-white', className)}>
+    <section id={id} className={cn('py-20 md:py-32 bg-platinum/60', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <FadeIn delay={100}>
             <div className="text-center mb-16">
               <TextReveal delay={200} duration={1000}>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-medium tracking-tight mb-8">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-semibold tracking-tight text-jetBlack mb-8">
                   Vi utvecklar företag till sin fulla potential
                 </h2>
               </TextReveal>
             </div>
           </FadeIn>
-          
+
           <div className="space-y-8">
             <FadeIn delay={400} duration={900} direction="up">
-              <p className="text-lg md:text-xl leading-relaxed text-muted-foreground">
+              <p className="text-lg md:text-xl leading-relaxed text-jetBlack/80">
                 Entreprenöriella verksamheter är ryggraden i nordiska lokalsamhällen och skapar arbetstillfällen och ekonomisk tillväxt. Många framgångsrika små och medelstora företag når dock en punkt där de behöver nya resurser och expertis för att ta nästa steg i sin utveckling. Med vårt långsiktiga ägarperspektiv, djup operationell kunskap och avancerad AI-kompetens, strävar Nivo efter att vara den partner som möjliggör denna utveckling.
               </p>
             </FadeIn>
-            
+
             <FadeIn delay={600} duration={900} direction="up">
-              <p className="text-lg md:text-xl leading-relaxed text-muted-foreground">
+              <p className="text-lg md:text-xl leading-relaxed text-jetBlack/80">
                 Genom fokuserade förvärv av marknadsledande företag som genererar stabila kassaflöden och bidrar till positiv samhällsutveckling, hjälper vi etablerade nordiska verksamheter att modernisera sina processer och nå sin fulla tillväxtpotential. Vi söker specifikt efter välskötta företag inom sina respektive segment som redan skapar värde och har potential för ytterligare utveckling genom operationell optimering och teknologisk innovation.
               </p>
             </FadeIn>

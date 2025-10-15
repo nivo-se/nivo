@@ -32,14 +32,19 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
       
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <TextReveal delay={200} duration={1000} stagger>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white leading-tight mb-6">
-              Nivo Group
-            </h1>
-          </TextReveal>
+          {/* Logo */}
+          <FadeIn delay={0} duration={1000} direction="up">
+            <div className="flex justify-center mb-8">
+              <img 
+                src="/nivo-logo-white.svg" 
+                alt="Nivo Logo" 
+                className="h-20 md:h-24 lg:h-32 w-auto"
+              />
+            </div>
+          </FadeIn>
           
-          <FadeIn delay={600} duration={900} direction="up">
-            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
+          <FadeIn delay={400} duration={900} direction="up">
+            <p className="text-lg md:text-xl font-heading font-medium text-white/90 mb-8 leading-relaxed">
               Förvärv som skapar värde – tillväxt som består.
             </p>
           </FadeIn>

@@ -28,21 +28,21 @@ const FoundersInSearch: React.FC<FoundersInSearchProps> = ({ className }) => {
   ];
 
   return (
-    <section id="founders" className={cn('py-20 bg-white', className)}>
+    <section id="founders" className={cn('py-20 bg-platinum/70', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center">Grundare vi stödjer</h2>
+            <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-8 text-center">Grundare vi stödjer</h2>
           </FadeIn>
         </div>
-        
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+
+        <div className="grid md:grid-cols-2 grid-gap-nivo max-w-5xl mx-auto">
           {founderTypes.map((type, index) => (
             <FadeIn key={index} delay={150 + index * 50}>
-              <Card className="border-0 shadow-sm h-full">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-medium mb-3 font-serif">{type.title}</h3>
-                  <p className="text-muted-foreground">{type.description}</p>
+              <Card className="h-full">
+                <CardContent className="p-6 space-y-3">
+                  <h3 className="text-xl font-heading font-semibold text-jetBlack">{type.title}</h3>
+                  <p className="text-jetBlack/75">{type.description}</p>
                 </CardContent>
               </Card>
             </FadeIn>

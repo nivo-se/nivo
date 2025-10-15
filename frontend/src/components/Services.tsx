@@ -36,24 +36,24 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
 
   return (
     <section id={id} className={cn('py-20 bg-white', className)}>
-      <div className="container mx-auto px-4 md:px-6">
-        <StaggeredContainer 
-          staggerDelay={150} 
-          className="grid md:grid-cols-2 gap-12 md:gap-16 max-w-6xl mx-auto"
+      <div className="container mx-auto px-4 md:px-6 py-8">
+        <StaggeredContainer
+          staggerDelay={150}
+          className="grid md:grid-cols-2 grid-gap-nivo max-w-6xl mx-auto px-4"
         >
           {services.map((service, index) => {
             const IconComponent = service.icon;
-            
-            return (
-              <Card key={index} className="border-0 shadow-none h-full group hover:transform hover:scale-105 transition-all duration-500">
+
+              return (
+                <Card key={index} className="group h-full border-grayOlive/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl">
                 <CardContent className="p-0">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1 group-hover:bg-gray-200 transition-colors duration-300">
-                      <IconComponent className="w-6 h-6 text-gray-800 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="flex items-start gap-4">
+                    <div className="mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-grayOlive/15 transition-transform duration-300 group-hover:scale-105">
+                      <IconComponent className="h-6 w-6 text-grayOlive" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-3 font-serif group-hover:text-accent transition-colors duration-300">{service.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{service.description}</p>
+                      <h3 className="text-xl font-heading font-semibold text-jetBlack mb-3">{service.title}</h3>
+                      <p className="text-jetBlack/75 leading-relaxed">{service.description}</p>
                     </div>
                   </div>
                 </CardContent>

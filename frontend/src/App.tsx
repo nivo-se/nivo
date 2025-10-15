@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import WorkingDashboard from "./pages/WorkingDashboard";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import StyleGuide from "./pages/StyleGuide";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/styleguide" element={<StyleGuide />} />
                   <Route 
                     path="/dashboard" 
                     element={

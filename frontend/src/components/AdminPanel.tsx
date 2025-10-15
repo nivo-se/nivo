@@ -21,9 +21,6 @@ interface User {
 
 interface SystemMetrics {
   totalUsers: number;
-  totalCompanies: number;
-  totalWithFinancials: number;
-  totalWithKPIs: number;
   pendingUsers: number;
   approvedUsers: number;
   adminUsers: number;
@@ -98,9 +95,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   // Fetch system metrics
   const fetchSystemMetrics = async () => {
     try {
-      // Get dashboard analytics from supabaseDataService
-      const dashboardAnalytics = await supabaseDataService.getDashboardAnalytics();
-      
       // Count users by role
       const pendingUsers = users.filter(user => user.role === 'pending').length;
       const approvedUsers = users.filter(user => user.role === 'approved').length;
@@ -108,9 +102,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       
       setSystemMetrics({
         totalUsers: users.length,
-        totalCompanies: dashboardAnalytics.totalCompanies,
-        totalWithFinancials: dashboardAnalytics.totalWithFinancials,
-        totalWithKPIs: dashboardAnalytics.totalWithKPIs,
         pendingUsers,
         approvedUsers,
         adminUsers,
@@ -147,7 +138,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('User approved successfully!');
+      setSuccess('Användare godkänd framgångsrikt!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -167,7 +158,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('User rejected and removed!');
+      setSuccess('Användare avvisad och borttagen!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -191,7 +182,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('User promoted to admin!');
+      setSuccess('Användare befordrad till admin!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -205,16 +196,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       case 'admin':
         return <Badge variant="default" className="bg-red-500"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
       case 'approved':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
+        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Godkänd</Badge>;
       case 'pending':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Väntar</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">Okänd</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('sv-SE', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -236,7 +227,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading users and fetching email addresses...</span>
+        <span className="ml-2">Laddar användare och hämtar e-postadresser...</span>
       </div>
     );
   }
@@ -246,12 +237,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">User Administration</h2>
-          <p className="text-gray-600">Manage user access and permissions</p>
+          <h2 className="text-2xl font-bold text-gray-900">Användaradministration</h2>
+          <p className="text-gray-600">Hantera användaråtkomst och behörigheter</p>
         </div>
         <Button onClick={fetchUsers} variant="outline">
           <Users className="w-4 h-4 mr-2" />
-          Refresh
+          Uppdatera
         </Button>
       </div>
 
@@ -274,45 +265,45 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Totalt antal användare</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{systemMetrics?.totalUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">Registered users</p>
+            <p className="text-xs text-muted-foreground">Registrerade användare</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Väntande användare</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.totalCompanies?.toLocaleString() || 0}</div>
-            <p className="text-xs text-muted-foreground">In database</p>
+            <div className="text-2xl font-bold">{systemMetrics?.pendingUsers || 0}</div>
+            <p className="text-xs text-muted-foreground">Behöver godkännande</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Financial Data</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Godkända användare</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.totalWithFinancials?.toLocaleString() || 0}</div>
-            <p className="text-xs text-muted-foreground">Companies with financials</p>
+            <div className="text-2xl font-bold">{systemMetrics?.approvedUsers || 0}</div>
+            <p className="text-xs text-muted-foreground">Aktiva användare</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">KPI Analysis</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Administratörer</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.totalWithKPIs?.toLocaleString() || 0}</div>
-            <p className="text-xs text-muted-foreground">Companies with KPIs</p>
+            <div className="text-2xl font-bold">{systemMetrics?.adminUsers || 0}</div>
+            <p className="text-xs text-muted-foreground">Admin-behörighet</p>
           </CardContent>
         </Card>
       </div>
@@ -322,28 +313,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Database className="h-5 w-5 mr-2" />
-            Database Status
+            Databasstatus
           </CardTitle>
-          <CardDescription>Real-time connection and performance metrics</CardDescription>
+          <CardDescription>Realtidsanslutning och prestandamått</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium">Connection Status</h4>
-              <p className="text-sm text-gray-600">Supabase database connection</p>
+              <h4 className="font-medium">Anslutningsstatus</h4>
+              <p className="text-sm text-gray-600">Supabase databasanslutning</p>
             </div>
             <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-green-500" : "bg-red-500"}>
-              {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
+              {systemMetrics?.databaseConnected ? "Ansluten" : "Frånkopplad"}
             </Badge>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <div className="text-lg font-bold text-green-600">Live</div>
-              <div className="text-xs text-gray-600">Real-time Data</div>
+              <div className="text-xs text-gray-600">Realtidsdata</div>
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <div className="text-lg font-bold text-blue-600">Fast</div>
-              <div className="text-xs text-gray-600">Response Time</div>
+              <div className="text-lg font-bold text-blue-600">Snabb</div>
+              <div className="text-xs text-gray-600">Svarstid</div>
             </div>
           </div>
         </CardContent>
@@ -353,34 +344,34 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
+            <CardTitle className="text-sm font-medium">Väntar på godkännande</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{pendingUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Awaiting your approval</p>
+            <p className="text-xs text-muted-foreground">Väntar på ditt godkännande</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Godkända användare</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{approvedUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Active users</p>
+            <p className="text-xs text-muted-foreground">Aktiva användare</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Admins</CardTitle>
+            <CardTitle className="text-sm font-medium">Administratörer</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{adminUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Administrators</p>
+            <p className="text-xs text-muted-foreground">Administratörer</p>
           </CardContent>
         </Card>
       </div>
@@ -391,10 +382,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Clock className="w-5 h-5 mr-2 text-orange-500" />
-              Pending Approval ({pendingUsers.length})
+              Väntar på godkännande ({pendingUsers.length})
             </CardTitle>
             <CardDescription>
-              New users waiting for your approval to access the platform
+              Nya användare som väntar på ditt godkännande för att komma åt plattformen
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -408,7 +399,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     <div>
                       <p className="font-medium">{user.email}</p>
                       <p className="text-sm text-gray-500">
-                        Signed up: {formatDate(user.created_at)}
+                        Registrerad: {formatDate(user.created_at)}
                       </p>
                     </div>
                   </div>
@@ -420,7 +411,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       onClick={() => handleUserClick(user)}
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      View Details
+                      Visa detaljer
                     </Button>
                     <Button
                       size="sm"
@@ -432,7 +423,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       ) : (
                         <>
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
+                          Godkänn
                         </>
                       )}
                     </Button>
@@ -447,7 +438,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       ) : (
                         <>
                           <XCircle className="w-4 h-4 mr-1" />
-                          Reject
+                          Avvisa
                         </>
                       )}
                     </Button>
@@ -464,10 +455,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="w-5 h-5 mr-2" />
-            All Users ({users.length})
+            Alla användare ({users.length})
           </CardTitle>
           <CardDescription>
-            Complete list of all users in the system
+            Komplett lista över alla användare i systemet
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -481,11 +472,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                   <div>
                     <p className="font-medium">{user.email}</p>
                     <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <span>Joined: {formatDate(user.created_at)}</span>
+                      <span>Gick med: {formatDate(user.created_at)}</span>
                       {user.approved_at && (
                         <>
                           <span>•</span>
-                          <span>Approved: {formatDate(user.approved_at)}</span>
+                          <span>Godkänd: {formatDate(user.approved_at)}</span>
                         </>
                       )}
                     </div>
@@ -499,7 +490,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     onClick={() => handleUserClick(user)}
                   >
                     <Eye className="w-4 h-4 mr-1" />
-                    View Details
+                    Visa detaljer
                   </Button>
                   {user.role === 'approved' && (
                     <Button
@@ -513,7 +504,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       ) : (
                         <>
                           <Shield className="w-4 h-4 mr-1" />
-                          Make Admin
+                          Gör till admin
                         </>
                       )}
                     </Button>
@@ -531,10 +522,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Info className="h-5 w-5 mr-2" />
-              User Details
+              Användardetaljer
             </DialogTitle>
             <DialogDescription>
-              Detailed information about the selected user
+              Detaljerad information om den valda användaren
             </DialogDescription>
           </DialogHeader>
           
@@ -543,11 +534,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {/* User Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Email Address</label>
+                  <label className="text-sm font-medium text-gray-500">E-postadress</label>
                   <p className="text-lg font-semibold">{selectedUser.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Role</label>
+                  <label className="text-sm font-medium text-gray-500">Roll</label>
                   <div className="mt-1">
                     {getRoleBadge(selectedUser.role)}
                   </div>
@@ -556,18 +547,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* User ID */}
               <div>
-                <label className="text-sm font-medium text-gray-500">User ID</label>
+                <label className="text-sm font-medium text-gray-500">Användar-ID</label>
                 <p className="text-sm font-mono bg-gray-100 p-2 rounded">{selectedUser.user_id}</p>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Joined Date</label>
+                  <label className="text-sm font-medium text-gray-500">Gick med datum</label>
                   <p className="text-sm">{formatDate(selectedUser.created_at)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Last Updated</label>
+                  <label className="text-sm font-medium text-gray-500">Senast uppdaterad</label>
                   <p className="text-sm">{formatDate(selectedUser.updated_at)}</p>
                 </div>
               </div>
@@ -576,11 +567,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {selectedUser.approved_at && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Approved Date</label>
+                    <label className="text-sm font-medium text-gray-500">Godkänd datum</label>
                     <p className="text-sm">{formatDate(selectedUser.approved_at)}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Approved By</label>
+                    <label className="text-sm font-medium text-gray-500">Godkänd av</label>
                     <p className="text-sm">{selectedUser.approved_by || 'System'}</p>
                   </div>
                 </div>
@@ -588,17 +579,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* Status Summary */}
               <div className="border-t pt-4">
-                <h4 className="font-medium mb-2">Status Summary</h4>
+                <h4 className="font-medium mb-2">Statussammanfattning</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
-                    <span>Account Status:</span>
+                    <span>Kontostatus:</span>
                     <span className="font-medium">
-                      {selectedUser.role === 'pending' ? 'Awaiting Approval' : 
-                       selectedUser.role === 'approved' ? 'Active' : 'Administrator'}
+                      {selectedUser.role === 'pending' ? 'Väntar på godkännande' : 
+                       selectedUser.role === 'approved' ? 'Aktiv' : 'Administratör'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Access Level:</span>
+                    <span>Åtkomstnivå:</span>
                     <span className="font-medium capitalize">{selectedUser.role}</span>
                   </div>
                 </div>

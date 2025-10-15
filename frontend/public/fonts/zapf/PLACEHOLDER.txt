@@ -1,0 +1,2 @@
+Placeholder for licensed Zapf Humanist 601 Demi BT font files.
+Replace with the official .woff2 assets when licensing is complete.

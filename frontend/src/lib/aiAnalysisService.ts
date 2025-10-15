@@ -25,6 +25,16 @@ export interface AIAnalysisResult {
   recommendations: string[]
 }
 
+export type AnalysisTemplate = {
+  id: string
+  name: string
+  query: string
+  description: string
+  analysisType?: 'financial' | 'comprehensive' | 'investment' | 'market' | 'risk'
+  focusAreas?: string[]
+  timeHorizon?: 'short' | 'medium' | 'long'
+}
+
 export class AIAnalysisService {
   // Natural language query processing
   static async analyzeWithAI(request: AIAnalysisRequest): Promise<AIAnalysisResult> {
@@ -306,31 +316,43 @@ export class AIAnalysisService {
   }
 
   // Pre-built analysis templates
-  static getAnalysisTemplates() {
+  static getAnalysisTemplates(): AnalysisTemplate[] {
     return [
       {
-        id: 'high-growth-tech',
-        name: 'High-Growth Tech Companies',
-        query: 'Find tech companies with revenue growth above 20%',
-        description: 'Identify fast-growing technology companies'
+        id: 'investment-ready-tech',
+        name: 'Investment Ready Tech',
+        query: 'Identify SaaS or digital service companies with recurring revenue growth above 25% and solid margins',
+        description: 'Find tech companies with stark skalbarhet',
+        analysisType: 'investment',
+        focusAreas: ['growth', 'profitability', 'digitalization'],
+        timeHorizon: 'medium'
       },
       {
-        id: 'profitable-ecommerce',
-        name: 'Profitable E-commerce Companies',
-        query: 'Show me profitable e-commerce companies in major cities',
-        description: 'Find successful online retail businesses'
+        id: 'resilient-industrials',
+        name: 'Resilient Industrials',
+        query: 'Show industrial companies in Sweden with EBIT margins above 12% and diversified customer base',
+        description: 'Balans mellan motståndskraft och marginaler',
+        analysisType: 'financial',
+        focusAreas: ['profitability', 'risk'],
+        timeHorizon: 'long'
       },
       {
-        id: 'large-manufacturing',
-        name: 'Large Manufacturing Companies',
-        query: 'Find large manufacturing companies with high revenue',
-        description: 'Identify major industrial players'
+        id: 'expansion-ready-retail',
+        name: 'Expansion Ready Retail',
+        query: 'Find retail and ecommerce companies primed for expansion outside Nordic region',
+        description: 'Fokuserar på internationalisering',
+        analysisType: 'market',
+        focusAreas: ['expansion', 'digitalization'],
+        timeHorizon: 'short'
       },
       {
-        id: 'startup-potential',
-        name: 'Startup Potential Analysis',
-        query: 'Find young companies with high growth potential',
-        description: 'Identify promising early-stage companies'
+        id: 'risk-audit',
+        name: 'Risk Audit Focus',
+        query: 'Run a concentrated risk analysis on mid-sized companies with high leverage',
+        description: 'Identifiera riskprofil och mitigering',
+        analysisType: 'risk',
+        focusAreas: ['risk', 'profitability'],
+        timeHorizon: 'short'
       }
     ]
   }

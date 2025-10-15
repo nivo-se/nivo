@@ -20,6 +20,25 @@ console.log('OpenAI API Key available:', !!apiKey)
 
 const openai = new OpenAI({ apiKey: apiKey || 'placeholder' })
 
+const FALLBACK_MODEL = 'gpt-4o-mini'
+
+function resolveModel(preferredModel?: string) {
+  const candidate = preferredModel?.trim()
+
+  if (!candidate) {
+    return FALLBACK_MODEL
+  }
+
+  if (candidate === 'gpt-4o') {
+    console.warn(
+      `Requested OpenAI model "${candidate}" is not supported by the chat completions API. Falling back to ${FALLBACK_MODEL}.`
+    )
+    return FALLBACK_MODEL
+  }
+
+  return candidate
+}
+
 app.post('/api/ai-analysis', async (req, res) => {
   try {
     const { companies } = req.body || {}
@@ -30,7 +49,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o'
+    const model = resolveModel(process.env.OPENAI_MODEL)
 
     const systemPrompt = `Du är en expert finansiell analytiker som specialiserar dig på svenska företag.
 Din uppgift är att analysera företagsdata och ge djupgående insikter på svenska.
@@ -69,7 +88,7 @@ Grundat: ${company.incorporation_date || 'Ej tillgänglig'}
     const timeout = setTimeout(() => controller.abort(), 45000)
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o', // Use a supported model
+      model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }

@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { LogIn, LogOut, User } from 'lucide-react';
-import LoginPopup from './LoginPopup';
 
 interface HeaderProps {
   className?: string;
@@ -13,7 +12,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -61,11 +59,23 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         <NavLink 
           to="/" 
           className={cn(
-            "text-xl font-serif font-medium tracking-tight transition-all duration-300 hover:opacity-80",
+            "flex items-center space-x-2 transition-all duration-300 hover:opacity-80",
             isScrolled ? "text-foreground" : "text-white"
           )}
         >
-          Nivo
+          <img 
+            src="/nivo-wordmark-white.svg" 
+            alt="Nivo Logo" 
+            className="h-8 w-auto"
+            onError={(e) => {
+              // Fallback to text if logo doesn't exist
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+          <span className="text-xl font-serif font-medium tracking-tight hidden">
+            Nivo
+          </span>
         </NavLink>
         
         <div className="hidden md:flex items-center space-x-8">
@@ -102,18 +112,19 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                 </Button>
               </>
             ) : (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setIsLoginPopupOpen(true)}
-                className={cn(
-                  "flex items-center space-x-1",
-                  isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
-                )}
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </Button>
+              <NavLink to="/auth">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className={cn(
+                    "flex items-center space-x-1",
+                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                  )}
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Sign In</span>
+                </Button>
+              </NavLink>
             )}
           </div>
         </div>
@@ -186,18 +197,41 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           >
             Kontakt
           </button>
+          
+          {/* Mobile Auth Options */}
+          {user ? (
+            <>
+              <NavLink 
+                to="/dashboard" 
+                className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User className="h-4 w-4" />
+                <span>Dashboard</span>
+              </NavLink>
+              <button 
+                className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+                onClick={() => {
+                  handleSignOut();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </button>
+            </>
+          ) : (
+            <NavLink 
+              to="/auth" 
+              className="text-left hover:text-accent transition-colors flex items-center space-x-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Sign In</span>
+            </NavLink>
+          )}
         </nav>
       </div>
-      
-      {/* Login Popup */}
-      <LoginPopup
-        isOpen={isLoginPopupOpen}
-        onClose={() => setIsLoginPopupOpen(false)}
-        onSuccess={() => {
-          // Optionally redirect to dashboard after successful login
-          window.location.href = '/dashboard';
-        }}
-      />
     </header>
   );
 };
