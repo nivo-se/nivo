@@ -60,13 +60,18 @@ interface CompanyResult {
   audit: AuditResult
 }
 
-interface RunResponse {
+interface RunPayload {
   id: string
   status: string
   modelVersion: string
   startedAt: string
   completedAt?: string | null
   errorMessage?: string | null
+}
+
+interface RunResponsePayload {
+  run: RunPayload
+  analysis: { companies: CompanyResult[] }
 }
 
 interface CompanySnapshot {
@@ -263,7 +268,16 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     errorMessage: errors.length > 0 ? errors.join('; ') : null,
   }
 
-  res.status(200).json({ success: true, run, analysis: { companies: companiesResults }, errors })
+  const runPayload: RunPayload = {
+    id: run.id,
+    status: run.status,
+    modelVersion: run.modelVersion,
+    startedAt: run.startedAt,
+    completedAt: run.completedAt,
+    errorMessage: run.errorMessage,
+  }
+  
+  res.status(200).json({ success: true, run: runPayload, analysis: { companies: companiesResults } })
 }
 
 async function handleGet(req: VercelRequest, res: VercelResponse) {
