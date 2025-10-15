@@ -49,6 +49,14 @@ app.post('/api/ai-analysis', async (req, res) => {
 
       return res.status(200).json({
         success: true,
+        run: {
+          id: 'mock-screening-' + Date.now(),
+          modelVersion: 'gpt-3.5-turbo',
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          status: 'completed',
+          analysisMode: 'screening'
+        },
         analysis: {
           results: mockResults,
           mode: 'screening',
@@ -76,6 +84,14 @@ app.post('/api/ai-analysis', async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      run: {
+        id: 'mock-run-' + Date.now(),
+        modelVersion: 'gpt-4',
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        status: 'completed',
+        analysisMode: 'deep'
+      },
       analysis: {
         companies: mockDeepResults,
         mode: 'deep',

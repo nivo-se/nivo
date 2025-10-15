@@ -537,6 +537,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         setCurrentRun(null) // Clear any previous deep analysis
       } else {
         console.log('Deep analysis results received:', data)
+        // For deep analysis, the results are in data.analysis.companies
         setCurrentRun(data)
         // Don't clear screening results - they should persist for reference
       }
