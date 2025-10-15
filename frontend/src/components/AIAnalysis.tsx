@@ -532,11 +532,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       }
       
       if (analysisMode === 'screening') {
+        console.log('Screening results received:', data.analysis.results)
         setScreeningResults(data.analysis.results || [])
         setCurrentRun(null) // Clear any previous deep analysis
       } else {
+        console.log('Deep analysis results received:', data)
         setCurrentRun(data)
-        setScreeningResults([]) // Clear screening results
+        // Don't clear screening results - they should persist for reference
       }
       
       await loadHistory()
@@ -573,11 +575,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     setErrorMessage(null)
     setScreeningResults([])
     setCurrentRun(null)
+    setAnalysisMode('screening') // Reset to screening mode
   }
 
   const switchToDeepAnalysis = () => {
     setAnalysisMode('deep')
     setSelectedCompanies(new Set())
+    // Don't clear screening results - they should persist for selection
   }
 
   const estimateCost = () => {
@@ -615,11 +619,17 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <SelectValue placeholder={loadingLists ? "Laddar listor..." : "Välj en sparad lista"} />
               </SelectTrigger>
               <SelectContent>
-                {savedLists.map((list) => (
-                  <SelectItem key={list.id} value={list.id}>
-                    {list.name} ({list.companies.length} företag)
+                {savedLists.length > 0 ? (
+                  savedLists.map((list) => (
+                    <SelectItem key={list.id} value={list.id}>
+                      {list.name} ({list.companies.length} företag)
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-lists" disabled>
+                    Inga listor tillgängliga
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             {savedLists.length === 0 && !loadingLists && (
@@ -642,6 +652,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                 <p>Debug: {savedLists.length} listor laddade</p>
                 <p>Loading: {loadingLists ? 'Ja' : 'Nej'}</p>
+                <p>Selected List: {selectedListId || 'Ingen'}</p>
+                <p>Screening Results: {screeningResults.length} resultat</p>
+                <p>Analysis Mode: {analysisMode}</p>
                 {savedLists.length > 0 && (
                   <div>
                     <p>Listor:</p>
