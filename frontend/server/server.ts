@@ -22,25 +22,84 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
 
-// Import the full AI analysis implementation
-import { handlePost, handleGet } from '../../api/ai-analysis'
-
-// Proxy the AI analysis endpoints
+// Basic AI analysis endpoints for development
 app.post('/api/ai-analysis', async (req, res) => {
   try {
-    await handlePost(req, res)
-  } catch (error) {
+    const { companies, analysisType = 'screening' } = req.body || {}
+    
+    if (!Array.isArray(companies) || companies.length === 0) {
+      return res.status(400).json({ success: false, error: 'No companies provided' })
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
+    }
+
+    console.log(`Processing ${analysisType} analysis for ${companies.length} companies`)
+
+    // For now, return mock screening results to test the UI
+    if (analysisType === 'screening') {
+      const mockResults = companies.map((company: any, index: number) => ({
+        orgnr: company.OrgNr || company.orgnr,
+        companyName: company.name,
+        screeningScore: Math.floor(Math.random() * 40) + 60, // 60-100
+        riskFlag: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
+        briefSummary: `Mock screening result for ${company.name}. This is a placeholder response to test the UI workflow.`
+      }))
+
+      return res.status(200).json({
+        success: true,
+        analysis: {
+          results: mockResults,
+          mode: 'screening',
+          totalCompanies: companies.length
+        }
+      })
+    }
+
+    // For deep analysis, return mock detailed results
+    const mockDeepResults = companies.map((company: any) => ({
+      orgnr: company.OrgNr || company.orgnr,
+      name: company.name,
+      executiveSummary: `Mock deep analysis for ${company.name}. This is a placeholder response.`,
+      financialHealth: Math.floor(Math.random() * 4) + 6, // 6-10
+      growthPotential: ['Hög', 'Medium', 'Låg'][Math.floor(Math.random() * 3)],
+      marketPosition: ['Ledare', 'Utmanare', 'Följare', 'Nisch'][Math.floor(Math.random() * 4)],
+      strengths: ['Mock styrka 1', 'Mock styrka 2', 'Mock styrka 3'],
+      weaknesses: ['Mock svaghet 1', 'Mock svaghet 2', 'Mock svaghet 3'],
+      opportunities: ['Mock möjlighet 1', 'Mock möjlighet 2', 'Mock möjlighet 3'],
+      risks: ['Mock risk 1', 'Mock risk 2', 'Mock risk 3'],
+      recommendation: ['Köp', 'Håll', 'Sälj'][Math.floor(Math.random() * 3)],
+      targetPrice: Math.floor(Math.random() * 1000) + 100,
+      confidence: Math.floor(Math.random() * 30) + 70 // 70-100
+    }))
+
+    return res.status(200).json({
+      success: true,
+      analysis: {
+        companies: mockDeepResults,
+        mode: 'deep',
+        totalCompanies: companies.length
+      }
+    })
+
+  } catch (error: any) {
     console.error('AI Analysis API error:', error)
-    res.status(500).json({ success: false, error: 'Internal server error' })
+    return res.status(500).json({ success: false, error: error?.message || 'Unknown error' })
   }
 })
 
 app.get('/api/ai-analysis', async (req, res) => {
   try {
-    await handleGet(req, res)
-  } catch (error) {
+    // Return empty history for now
+    return res.status(200).json({
+      success: true,
+      runs: [],
+      total: 0
+    })
+  } catch (error: any) {
     console.error('AI Analysis GET API error:', error)
-    res.status(500).json({ success: false, error: 'Internal server error' })
+    return res.status(500).json({ success: false, error: error?.message || 'Unknown error' })
   }
 })
 
