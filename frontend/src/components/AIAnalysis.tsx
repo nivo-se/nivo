@@ -316,7 +316,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
           <span className="text-xs text-muted-foreground">Expand for SWOT, financial outlook, integration plays and more.</span>
         </div>
         <Accordion type="multiple" className="mt-2">
-          {company.sections.length === 0 ? (
+          {!company.sections || company.sections.length === 0 ? (
             <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
               No narrative sections captured for this company.
             </div>
@@ -358,7 +358,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
 
       <div>
         <h3 className="text-sm font-medium text-muted-foreground">Key metrics</h3>
-        {company.metrics.length === 0 ? (
+        {!company.metrics || company.metrics.length === 0 ? (
           <div className="mt-3 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
             The analysis did not surface quantitative metrics for this company.
           </div>

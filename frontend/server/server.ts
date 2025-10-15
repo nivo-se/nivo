@@ -89,7 +89,24 @@ app.post('/api/ai-analysis', async (req, res) => {
       financialGrade: Math.floor(Math.random() * 4) + 6, // 6-10
       commercialGrade: Math.floor(Math.random() * 4) + 6, // 6-10
       operationalGrade: Math.floor(Math.random() * 4) + 6, // 6-10
-      riskScore: Math.floor(Math.random() * 40) + 20 // 20-60
+      riskScore: Math.floor(Math.random() * 40) + 20, // 20-60
+      // Add sections and metrics arrays
+      sections: [
+        {
+          section_type: 'financial_analysis',
+          title: 'Finansiell Analys',
+          content_md: 'Mock finansiell analys för ' + company.name + '. Detta är en placeholder för att testa UI:n.',
+          supporting_metrics: [
+            { metric_name: 'Omsättningstillväxt', metric_value: Math.floor(Math.random() * 20) + 5, metric_unit: '%' },
+            { metric_name: 'EBIT-marginal', metric_value: Math.floor(Math.random() * 15) + 5, metric_unit: '%' }
+          ],
+          confidence: Math.floor(Math.random() * 30) + 70
+        }
+      ],
+      metrics: [
+        { metric_name: 'Omsättning', metric_value: Math.floor(Math.random() * 1000) + 100, metric_unit: 'TSEK' },
+        { metric_name: 'Anställda', metric_value: Math.floor(Math.random() * 200) + 10, metric_unit: 'personer' }
+      ]
     }))
 
     return res.status(200).json({
