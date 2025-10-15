@@ -19,9 +19,11 @@ export class SavedListsService {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        console.warn('No authenticated user found')
-        return []
+        console.warn('No authenticated user found, trying localStorage fallback')
+        return await this.getSavedListsFallback()
       }
+
+      console.log('Fetching saved lists for user:', user.id)
 
       const { data, error } = await supabase
         .from('saved_company_lists')
@@ -30,8 +32,16 @@ export class SavedListsService {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error fetching saved lists:', error)
-        return []
+        console.error('Error fetching saved lists from database:', error)
+        console.log('Falling back to localStorage')
+        return await this.getSavedListsFallback()
+      }
+
+      console.log('Found', data?.length || 0, 'saved lists in database')
+
+      if (!data || data.length === 0) {
+        console.log('No lists in database, trying localStorage fallback')
+        return await this.getSavedListsFallback()
       }
 
       return data.map(list => ({
@@ -45,7 +55,8 @@ export class SavedListsService {
       }))
     } catch (error) {
       console.error('Error in getSavedLists:', error)
-      return []
+      console.log('Falling back to localStorage')
+      return await this.getSavedListsFallback()
     }
   }
 

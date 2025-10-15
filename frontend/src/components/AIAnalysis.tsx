@@ -421,7 +421,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   const loadSavedLists = async () => {
     setLoadingLists(true)
     try {
+      console.log('Loading saved lists...')
       const lists = await SavedListsService.getSavedLists()
+      console.log('Loaded saved lists:', lists)
       setSavedLists(lists)
     } catch (error) {
       console.error('Failed to load saved lists', error)
@@ -621,7 +623,36 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               </SelectContent>
             </Select>
             {savedLists.length === 0 && !loadingLists && (
-              <p className="text-sm text-muted-foreground">Inga sparade listor hittades. Skapa en lista först.</p>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Inga sparade listor hittades. Skapa en lista först.</p>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={loadSavedLists}
+                  className="text-xs"
+                >
+                  <RefreshCw className="mr-2 h-3 w-3" />
+                  Försök igen
+                </Button>
+              </div>
+            )}
+            {/* Debug info */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                <p>Debug: {savedLists.length} listor laddade</p>
+                <p>Loading: {loadingLists ? 'Ja' : 'Nej'}</p>
+                {savedLists.length > 0 && (
+                  <div>
+                    <p>Listor:</p>
+                    <ul className="ml-4">
+                      {savedLists.map(list => (
+                        <li key={list.id}>- {list.name} ({list.companies.length} företag)</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

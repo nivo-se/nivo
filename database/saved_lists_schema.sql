@@ -4,7 +4,7 @@
 -- Table for saved company lists
 CREATE TABLE IF NOT EXISTS saved_company_lists (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id TEXT NOT NULL,
+    user_id UUID NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
     companies JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -22,19 +22,19 @@ ALTER TABLE saved_company_lists ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can only see their own lists
 CREATE POLICY "Users can view own lists" ON saved_company_lists
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id);
 
 -- Policy: Users can insert their own lists
 CREATE POLICY "Users can insert own lists" ON saved_company_lists
-    FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Policy: Users can update their own lists
 CREATE POLICY "Users can update own lists" ON saved_company_lists
-    FOR UPDATE USING (auth.uid()::text = user_id);
+    FOR UPDATE USING (auth.uid() = user_id);
 
 -- Policy: Users can delete their own lists
 CREATE POLICY "Users can delete own lists" ON saved_company_lists
-    FOR DELETE USING (auth.uid()::text = user_id);
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- Function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
