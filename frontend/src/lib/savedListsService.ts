@@ -41,7 +41,14 @@ export class SavedListsService {
 
       if (!data || data.length === 0) {
         console.log('No lists in database, trying localStorage fallback')
-        return await this.getSavedListsFallback()
+        const fallbackLists = await this.getSavedListsFallback()
+        
+        // If we have lists in localStorage but not in database, offer to migrate them
+        if (fallbackLists.length > 0) {
+          console.log(`Found ${fallbackLists.length} lists in localStorage, consider migrating to database`)
+        }
+        
+        return fallbackLists
       }
 
       return data.map(list => ({

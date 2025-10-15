@@ -970,3 +970,6 @@ Use available financial data (4 years history). Flag missing critical data.
 
 Be concise and direct. Prioritize red flags and high-potential opportunities.`
 
+// Export functions for use in development server
+export { handlePost, handleGet }
+
