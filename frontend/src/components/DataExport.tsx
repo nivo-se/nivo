@@ -22,16 +22,9 @@ import {
 } from 'lucide-react'
 import { AnalyticsService, CompanyFilter } from '../lib/analyticsService'
 import { SupabaseCompany } from '../lib/supabaseDataService'
+import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 
-interface SavedCompanyList {
-  id: string
-  name: string
-  description?: string
-  companies: SupabaseCompany[]
-  filters: any
-  createdAt: string
-  updatedAt: string
-}
+// SavedCompanyList interface is now imported from savedListsService
 
 interface ExportOptions {
   format: 'excel' | 'csv' | 'pdf'
@@ -65,17 +58,20 @@ const DataExport: React.FC = () => {
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [recordCount, setRecordCount] = useState<number>(0)
 
-  // Load saved lists from localStorage
+  // Load saved lists from database
   useEffect(() => {
-    const saved = localStorage.getItem('savedCompanyLists')
-    if (saved) {
+    const loadLists = async () => {
       try {
-        const lists = JSON.parse(saved)
+        const lists = await SavedListsService.getSavedLists()
         setSavedLists(lists)
       } catch (error) {
         console.error('Error loading saved lists:', error)
+        // Fallback to localStorage
+        const fallbackLists = await SavedListsService.getSavedListsFallback()
+        setSavedLists(fallbackLists)
       }
     }
+    loadLists()
   }, [])
 
   // Update record count when selected list changes
@@ -116,13 +112,15 @@ const DataExport: React.FC = () => {
       
       setExportJobs(prev => [newJob, ...prev])
       
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Generate actual export file
+      const exportData = generateExportData(selectedList.companies, exportOptions)
+      const blob = createExportBlob(exportData, exportOptions.format)
+      const downloadUrl = URL.createObjectURL(blob)
       
-      // Update job status
+      // Update job status with real download URL
       setExportJobs(prev => prev.map(job => 
         job.id === jobId 
-          ? { ...job, status: 'completed', downloadUrl: `/exports/${jobId}.${exportOptions.format}` }
+          ? { ...job, status: 'completed', downloadUrl }
           : job
       ))
       
@@ -457,6 +455,82 @@ const DataExport: React.FC = () => {
       </Tabs>
     </div>
   )
+}
+
+// Helper function to generate export data
+const generateExportData = (companies: any[], options: ExportOptions) => {
+  return companies.map(company => {
+    const data: any = {
+      'Organisationsnummer': company.OrgNr,
+      'Företagsnamn': company.name,
+      'Adress': company.address,
+      'Stad': company.city,
+      'Bransch': company.segment_name || company.industry_name,
+      'Registreringsdatum': company.incorporation_date,
+      'E-post': company.email,
+      'Hemsida': company.homepage
+    }
+
+    if (options.includeFinancials) {
+      data['Omsättning (TSEK)'] = company.revenue || company.SDI
+      data['Vinst (TSEK)'] = company.profit || company.resultat_e_avskrivningar
+      data['Antal anställda'] = company.employees || company.ANT
+    }
+
+    if (options.includeKPIs) {
+      data['Omsättningstillväxt (%)'] = company.revenue_growth ? (company.revenue_growth * 100).toFixed(1) : ''
+      data['EBIT-marginal (%)'] = company.ebit_margin ? (company.ebit_margin * 100).toFixed(1) : ''
+      data['Vinstmarginal (%)'] = company.net_margin ? (company.net_margin * 100).toFixed(1) : ''
+      data['Eget kapital (%)'] = company.equity_ratio ? (company.equity_ratio * 100).toFixed(1) : ''
+    }
+
+    return data
+  })
+}
+
+// Helper function to create export blob
+const createExportBlob = (data: any[], format: string) => {
+  if (format === 'excel') {
+    // For Excel, we'll create a CSV file (Excel can open CSV)
+    const csvContent = convertToCSV(data)
+    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  } else if (format === 'csv') {
+    const csvContent = convertToCSV(data)
+    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  } else if (format === 'json') {
+    const jsonContent = JSON.stringify(data, null, 2)
+    return new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
+  }
+  
+  // Default to CSV
+  const csvContent = convertToCSV(data)
+  return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+}
+
+// Helper function to convert data to CSV
+const convertToCSV = (data: any[]) => {
+  if (data.length === 0) return ''
+  
+  const headers = Object.keys(data[0])
+  const csvRows = []
+  
+  // Add headers
+  csvRows.push(headers.join(','))
+  
+  // Add data rows
+  for (const row of data) {
+    const values = headers.map(header => {
+      const value = row[header]
+      // Escape commas and quotes in CSV
+      if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+        return `"${value.replace(/"/g, '""')}"`
+      }
+      return value || ''
+    })
+    csvRows.push(values.join(','))
+  }
+  
+  return csvRows.join('\n')
 }
 
 export default DataExport

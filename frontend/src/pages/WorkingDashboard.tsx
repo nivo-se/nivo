@@ -201,17 +201,17 @@ const WorkingDashboard: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="border-[#E6E6E6]">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Industry Distribution</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Companies by industry segment</CardDescription>
+                      <CardTitle className="text-[#2E2A2B]">Branschfördelning</CardTitle>
+                      <CardDescription className="text-[#2E2A2B]/70">Företag efter branschsegment</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {[
-                          { name: 'Technology & IT', count: 676, percentage: 21.6, color: 'bg-blue-500' },
-                          { name: 'Creative & Media', count: 491, percentage: 15.7, color: 'bg-purple-500' },
-                          { name: 'Food & Hospitality', count: 423, percentage: 13.5, color: 'bg-green-500' },
-                          { name: 'Manufacturing', count: 387, percentage: 12.4, color: 'bg-orange-500' },
-                          { name: 'Professional Services', count: 298, percentage: 9.5, color: 'bg-red-500' },
+                          { name: 'Teknik & IT', count: 676, percentage: 21.6, color: 'bg-blue-500' },
+                          { name: 'Kreativ & Media', count: 491, percentage: 15.7, color: 'bg-purple-500' },
+                          { name: 'Mat & Gästfrihet', count: 423, percentage: 13.5, color: 'bg-green-500' },
+                          { name: 'Tillverkning', count: 387, percentage: 12.4, color: 'bg-orange-500' },
+                          { name: 'Professionella tjänster', count: 298, percentage: 9.5, color: 'bg-red-500' },
                         ].map((industry) => (
                           <div key={industry.name} className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
@@ -230,16 +230,16 @@ const WorkingDashboard: React.FC = () => {
 
                   <Card className="border-[#E6E6E6]">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Company Size Distribution</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Companies by employee count</CardDescription>
+                      <CardTitle className="text-[#2E2A2B]">Företagsstorleksfördelning</CardTitle>
+                      <CardDescription className="text-[#2E2A2B]/70">Företag efter antal anställda</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {[
-                          { name: 'Micro (1-9)', count: 2847, percentage: 33.8, color: 'bg-gray-400' },
-                          { name: 'Small (10-49)', count: 2103, percentage: 25.0, color: 'bg-gray-500' },
-                          { name: 'Medium (50-249)', count: 1847, percentage: 21.9, color: 'bg-gray-600' },
-                          { name: 'Large (250+)', count: 1631, percentage: 19.3, color: 'bg-gray-700' },
+                          { name: 'Mikro (1-9)', count: 2847, percentage: 33.8, color: 'bg-gray-400' },
+                          { name: 'Små (10-49)', count: 2103, percentage: 25.0, color: 'bg-gray-500' },
+                          { name: 'Medelstora (50-249)', count: 1847, percentage: 21.9, color: 'bg-gray-600' },
+                          { name: 'Stora (250+)', count: 1631, percentage: 19.3, color: 'bg-gray-700' },
                         ].map((size) => (
                           <div key={size.name} className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">

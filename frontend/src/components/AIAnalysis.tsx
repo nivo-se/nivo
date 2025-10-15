@@ -450,9 +450,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           <div className="flex items-center gap-3 text-purple-600">
             <Sparkles className="h-6 w-6" />
             <div>
-              <CardTitle>AI Deal Room</CardTitle>
+              <CardTitle>AI-insikter</CardTitle>
               <CardDescription>
-                Select shortlisted companies and trigger a full commercial, financial and integration analysis powered by GPT.
+                Välj företag från din lista och starta en fullständig kommersiell, finansiell och integrationsanalys driven av GPT.
               </CardDescription>
             </div>
           </div>

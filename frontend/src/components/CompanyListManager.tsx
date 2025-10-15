@@ -15,16 +15,9 @@ import {
   Users
 } from 'lucide-react'
 import { SupabaseCompany } from '../lib/supabaseDataService'
+import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 
-interface SavedCompanyList {
-  id: string
-  name: string
-  description?: string
-  companies: SupabaseCompany[]
-  filters: any
-  createdAt: string
-  updatedAt: string
-}
+// SavedCompanyList interface is now imported from savedListsService
 
 interface CompanyListManagerProps {
   currentCompanies: SupabaseCompany[]
@@ -45,58 +38,108 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
   const [listDescription, setListDescription] = useState('')
   const [editingList, setEditingList] = useState<SavedCompanyList | null>(null)
 
-  // Load saved lists from localStorage on component mount
+  // Load saved lists from database on component mount
   useEffect(() => {
-    const saved = localStorage.getItem('savedCompanyLists')
-    if (saved) {
+    const loadLists = async () => {
       try {
-        const lists = JSON.parse(saved)
+        const lists = await SavedListsService.getSavedLists()
         setSavedLists(lists)
         onListUpdate(lists)
       } catch (error) {
         console.error('Error loading saved lists:', error)
+        // Fallback to localStorage
+        const fallbackLists = await SavedListsService.getSavedListsFallback()
+        setSavedLists(fallbackLists)
+        onListUpdate(fallbackLists)
       }
     }
+    loadLists()
   }, []) // Remove onListUpdate from dependency array to prevent infinite loop
 
-  // Save lists to localStorage whenever savedLists changes
-  useEffect(() => {
-    localStorage.setItem('savedCompanyLists', JSON.stringify(savedLists))
-  }, [savedLists])
+  // No need to save to localStorage automatically - database handles persistence
 
-  const saveCurrentList = () => {
+  const saveCurrentList = async () => {
     if (!listName.trim()) return
 
-    const newList: SavedCompanyList = {
-      id: editingList?.id || Date.now().toString(),
-      name: listName.trim(),
-      description: listDescription.trim() || undefined,
-      companies: [...currentCompanies],
-      filters: { ...currentFilters },
-      createdAt: editingList?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+    try {
+      const listData = {
+        name: listName.trim(),
+        description: listDescription.trim() || undefined,
+        companies: [...currentCompanies],
+        filters: { ...currentFilters }
+      }
 
-    if (editingList) {
-      // Update existing list
-      setSavedLists(prev => prev.map(list => 
-        list.id === editingList.id ? newList : list
-      ))
-    } else {
-      // Add new list
-      setSavedLists(prev => [...prev, newList])
-    }
+      let savedList: SavedCompanyList | null = null
 
-    onListUpdate(savedLists)
-    setIsDialogOpen(false)
-    setListName('')
-    setListDescription('')
-    setEditingList(null)
+      if (editingList) {
+        // Update existing list
+        savedList = await SavedListsService.updateList(editingList.id, listData)
+      } else {
+        // Add new list
+        savedList = await SavedListsService.saveList(listData)
+      }
+
+      if (savedList) {
+        // Refresh the lists
+        const updatedLists = await SavedListsService.getSavedLists()
+        setSavedLists(updatedLists)
+        onListUpdate(updatedLists)
+        
+        setIsDialogOpen(false)
+        setListName('')
+        setListDescription('')
+        setEditingList(null)
+      } else {
+        console.error('Failed to save list')
+        // Fallback to localStorage
+        const fallbackList: SavedCompanyList = {
+          id: editingList?.id || Date.now().toString(),
+          name: listName.trim(),
+          description: listDescription.trim() || undefined,
+          companies: [...currentCompanies],
+          filters: { ...currentFilters },
+          createdAt: editingList?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+        await SavedListsService.saveListFallback(fallbackList)
+        
+        if (editingList) {
+          setSavedLists(prev => prev.map(list => 
+            list.id === editingList.id ? fallbackList : list
+          ))
+        } else {
+          setSavedLists(prev => [...prev, fallbackList])
+        }
+        onListUpdate(savedLists)
+        
+        setIsDialogOpen(false)
+        setListName('')
+        setListDescription('')
+        setEditingList(null)
+      }
+    } catch (error) {
+      console.error('Error saving list:', error)
+    }
   }
 
-  const deleteList = (listId: string) => {
-    setSavedLists(prev => prev.filter(list => list.id !== listId))
-    onListUpdate(savedLists.filter(list => list.id !== listId))
+  const deleteList = async (listId: string) => {
+    try {
+      const success = await SavedListsService.deleteList(listId)
+      if (success) {
+        // Refresh the lists
+        const updatedLists = await SavedListsService.getSavedLists()
+        setSavedLists(updatedLists)
+        onListUpdate(updatedLists)
+      } else {
+        console.error('Failed to delete list')
+        // Fallback to localStorage
+        await SavedListsService.deleteListFallback(listId)
+        setSavedLists(prev => prev.filter(list => list.id !== listId))
+        onListUpdate(savedLists.filter(list => list.id !== listId))
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error)
+    }
   }
 
   const editList = (list: SavedCompanyList) => {
