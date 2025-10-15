@@ -321,8 +321,8 @@ export class AIAnalysisService {
       {
         id: 'investment-ready-tech',
         name: 'Investment Ready Tech',
-        query: 'Identify SaaS or digital service companies with recurring revenue growth above 25% and solid margins',
-        description: 'Find tech companies with stark skalbarhet',
+        query: 'Identifiera SaaS eller digitala tjänsteföretag med återkommande intäktsökning över 25% och stabila marginaler',
+        description: 'Hitta teknikföretag med stark skalbarhet',
         analysisType: 'investment',
         focusAreas: ['growth', 'profitability', 'digitalization'],
         timeHorizon: 'medium'
@@ -330,7 +330,7 @@ export class AIAnalysisService {
       {
         id: 'resilient-industrials',
         name: 'Resilient Industrials',
-        query: 'Show industrial companies in Sweden with EBIT margins above 12% and diversified customer base',
+        query: 'Visa industriföretag i Sverige med EBIT-marginaler över 12% och diversifierad kundbas',
         description: 'Balans mellan motståndskraft och marginaler',
         analysisType: 'financial',
         focusAreas: ['profitability', 'risk'],
@@ -339,7 +339,7 @@ export class AIAnalysisService {
       {
         id: 'expansion-ready-retail',
         name: 'Expansion Ready Retail',
-        query: 'Find retail and ecommerce companies primed for expansion outside Nordic region',
+        query: 'Hitta detaljhandels- och e-handelsföretag redo för expansion utanför Norden',
         description: 'Fokuserar på internationalisering',
         analysisType: 'market',
         focusAreas: ['expansion', 'digitalization'],
@@ -348,7 +348,7 @@ export class AIAnalysisService {
       {
         id: 'risk-audit',
         name: 'Risk Audit Focus',
-        query: 'Run a concentrated risk analysis on mid-sized companies with high leverage',
+        query: 'Kör en koncentrerad riskanalys på medelstora företag med hög belåning',
         description: 'Identifiera riskprofil och mitigering',
         analysisType: 'risk',
         focusAreas: ['risk', 'profitability'],

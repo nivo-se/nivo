@@ -151,7 +151,7 @@ const CompanySelectionList: React.FC<{
           <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading companies
         </div>
       ) : companies.length === 0 ? (
-        <div className="py-8 text-center text-sm text-muted-foreground">No companies found for the applied filters.</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">Inga företag hittades för de tillämpade filtren.</div>
       ) : (
         companies.map((company) => (
           <label
@@ -205,9 +205,9 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
     </CardHeader>
     <CardContent className="space-y-6">
       <div>
-        <h3 className="text-sm font-medium text-muted-foreground">Executive Summary</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">Ökonomisk sammanfattning</h3>
         <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-          {company.summary || 'No summary provided.'}
+          {company.summary || 'Ingen sammanfattning tillgänglig.'}
         </p>
       </div>
 
@@ -260,7 +260,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="prose prose-sm max-w-none whitespace-pre-wrap text-foreground">
-                    {section.content_md || 'No content provided.'}
+                    {section.content_md || 'Inget innehåll tillgängligt.'}
                   </div>
                   {section.supporting_metrics?.length > 0 && (
                     <div className="mt-3 rounded-md border bg-muted/30 p-3">
@@ -297,7 +297,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
                   <th className="px-3 py-2 text-left font-semibold">Metric</th>
                   <th className="px-3 py-2 text-left font-semibold">Value</th>
                   <th className="px-3 py-2 text-left font-semibold">Year</th>
-                  <th className="px-3 py-2 text-left font-semibold">Source</th>
+                  <th className="px-3 py-2 text-left font-semibold">Källa</th>
                 </tr>
               </thead>
               <tbody>
@@ -309,7 +309,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
                       {metricUnitLabel(metric)}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{metric.year || 'N/A'}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{metric.source || 'Analysis'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{metric.source || 'Analys'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -393,7 +393,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     try {
       const selected = availableCompanies.filter((company) => selectedCompanies.has(company.OrgNr))
       if (selected.length === 0) {
-        throw new Error('Select at least one company to analyse')
+        throw new Error('Välj minst ett företag att analysera')
       }
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
@@ -426,12 +426,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       const response = await fetch(`/api/ai-analysis?runId=${encodeURIComponent(runId)}`)
       const data = await response.json()
       if (!data.success) {
-        throw new Error(data.error || 'Could not load run details')
+        throw new Error(data.error || 'Kunde inte ladda körningsdetaljer')
       }
       setCurrentRun({ run: data.run, analysis: data.analysis })
     } catch (error) {
       console.error('Failed to load run details', error)
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to load run details')
+      setErrorMessage(error instanceof Error ? error.message : 'Misslyckades att ladda körningsdetaljer')
     } finally {
       setLoadingRunId(null)
     }
@@ -460,9 +460,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         <CardContent className="space-y-6">
           <form onSubmit={handleSearch} className="flex flex-col gap-3 md:flex-row">
             <div className="flex-1">
-              <label className="text-sm font-medium text-muted-foreground">Search companies</label>
+              <label className="text-sm font-medium text-muted-foreground">Sök företag</label>
               <Input
-                placeholder="Filter by name, city or segment"
+                placeholder="Filtrera på namn, stad eller segment"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 className="mt-1"
@@ -481,8 +481,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-muted-foreground">Available companies</h3>
-                <span className="text-xs text-muted-foreground">{selectedCompanies.size} selected</span>
+                <h3 className="text-sm font-semibold text-muted-foreground">Tillgängliga företag</h3>
+                <span className="text-xs text-muted-foreground">{selectedCompanies.size} valda</span>
               </div>
               <CompanySelectionList
                 companies={availableCompanies}
@@ -494,7 +494,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Analysis templates</label>
+                <label className="text-sm font-medium text-muted-foreground">Analysmallar</label>
                 <div className="mt-2 grid gap-2">
                   {templates.map((template) => (
                     <button
@@ -511,9 +511,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Custom focus</label>
+                <label className="text-sm font-medium text-muted-foreground">Anpassad fokus</label>
                 <Textarea
-                  placeholder="Add specific diligence questions or AI instructions"
+                  placeholder="Lägg till specifika due diligence-frågor eller AI-instruktioner"
                   value={instructions}
                   onChange={(event) => setInstructions(event.target.value)}
                   className="mt-1 min-h-[120px]"
@@ -522,14 +522,14 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
               <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">
-                  Analyses are saved and can be revisited in the history panel below.
+                  Analyser sparas och kan återbesökas i historikpanelen nedan.
                 </div>
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={resetSelection} disabled={runningAnalysis}>
-                    <Undo2 className="mr-2 h-4 w-4" /> Clear
+                    <Undo2 className="mr-2 h-4 w-4" /> Rensa
                   </Button>
                   <Button type="button" onClick={handleRunAnalysis} disabled={runningAnalysis || selectedCompanies.size === 0}>
-                    {runningAnalysis ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}Run analysis
+                    {runningAnalysis ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}Kör analys
                   </Button>
                 </div>
               </div>
@@ -551,7 +551,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl">Analysis run summary</CardTitle>
+                  <CardTitle className="text-xl">Analyskörning sammanfattning</CardTitle>
                   <CardDescription>
                     Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
                     {formatDate(currentRun.run.completedAt)}
@@ -592,8 +592,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
       <Card>
         <CardHeader>
-          <CardTitle>Analysis history</CardTitle>
-          <CardDescription>Review recent AI generated assessments and reopen them for collaboration.</CardDescription>
+          <CardTitle>Analyshistorik</CardTitle>
+          <CardDescription>Granska senaste AI-genererade bedömningar och öppna dem för samarbete.</CardDescription>
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
