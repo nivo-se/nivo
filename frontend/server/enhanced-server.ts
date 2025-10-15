@@ -100,7 +100,7 @@ app.post('/api/ai-analysis', async (req, res) => {
         console.log(`🔍 Processing company: ${orgnr}`)
         
         // Generate enhanced company profile using Codex logic
-        const profile = await generateCompanyProfile(supabase, orgnr)
+        const profile = await generateCompanyProfile(supabase, orgnr, company)
         console.log(`📊 Generated profile for ${profile.companyName}`)
         
         if (analysisType === 'screening') {
@@ -183,7 +183,8 @@ app.post('/api/ai-analysis', async (req, res) => {
 })
 
 // Enhanced company profile generation (from Codex)
-async function generateCompanyProfile(supabase: any, orgnr: string) {
+async function generateCompanyProfile(supabase: any, orgnr: string, companyData?: any) {
+  // Get complete company data from master_analytics table
   const { data: base, error: baseError } = await supabase
     .from('master_analytics')
     .select(`
@@ -192,9 +193,19 @@ async function generateCompanyProfile(supabase: any, orgnr: string) {
       segment_name,
       city,
       employees,
+      revenue,
+      profit,
+      SDI,
+      DR,
+      ORS,
       Revenue_growth,
       EBIT_margin,
-      NetProfit_margin
+      NetProfit_margin,
+      digital_presence,
+      incorporation_date,
+      email,
+      homepage,
+      address
     `)
     .eq('OrgNr', orgnr)
     .maybeSingle()
@@ -202,63 +213,49 @@ async function generateCompanyProfile(supabase: any, orgnr: string) {
   if (baseError) throw baseError
   if (!base) throw new Error('Company not found in master_analytics')
 
-  const { data: accounts, error: accountsError } = await supabase
-    .from('company_accounts_by_id')
-    .select('*')
-    .eq('organisationNumber', orgnr)
-    .order('year', { ascending: false })
-    .limit(6)
+  console.log('🔍 Debug - master_analytics data for', orgnr, ':', base)
 
-  if (accountsError) throw accountsError
+  // Create financials array from master_analytics data
+  const financials = [{
+    year: new Date().getFullYear(),
+    revenue: safeNumber(base.SDI || base.revenue),
+    ebitda: null,
+    ebit: safeNumber(base.DR || base.profit),
+    netIncome: safeNumber(base.DR || base.profit),
+    totalDebt: null,
+    totalEquity: null,
+    employees: safeNumber(base.employees),
+    revenueGrowth: safeNumber(base.Revenue_growth),
+    ebitMargin: safeNumber(base.EBIT_margin),
+    debtToEquity: null,
+  }]
 
-  const financials = (accounts || [])
-    .map((row: any) => {
-      const year = Number.parseInt(row?.year, 10)
-      if (!Number.isFinite(year)) return null
+  // Use database data as the primary source
+  const finalCompanyName = base?.name || 'Okänt företag'
+  const finalEmployees = safeNumber(base?.employees)
+  const finalSegmentName = base?.segment_name || null
+  const finalCity = base?.city || null
+  const finalFinancials = financials
 
-      const revenue = safeNumber(row?.SDI)
-      const ebitda = safeNumber(row?.resultat_e_avskrivningar ?? row?.EBITDA)
-      const ebit = safeNumber(row?.EBIT)
-      const netIncome = safeNumber(row?.NetIncome ?? row?.DR)
-      const totalDebt = safeNumber(row?.summa_langfristiga_skulder ?? row?.FK ?? row?.FSD)
-      const totalEquity = safeNumber(row?.EK ?? row?.SEK ?? row?.SFA)
-      const employees = safeNumber(row?.Employees ?? row?.ANT)
-      const revenueGrowth = safeNumber(row?.RG ?? row?.revenue_growth)
-      const ebitMargin = safeNumber(row?.EBIT_margin) ?? 
-        (revenue && ebit !== null && revenue > 0 ? Number(ebit / revenue) : null)
-      const debtToEquity = totalDebt !== null && totalEquity && totalEquity !== 0 ? 
-        Number(totalDebt / totalEquity) : null
-
-      return {
-        year,
-        revenue,
-        ebitda,
-        ebit,
-        netIncome,
-        totalDebt,
-        totalEquity,
-        employees,
-        revenueGrowth,
-        ebitMargin,
-        debtToEquity,
-      }
-    })
-    .filter((item: any) => Boolean(item))
-    .sort((a: any, b: any) => b.year - a.year)
-    .slice(0, 4)
+  console.log('🔍 Debug - Using database data from master_analytics:', {
+    revenue: finalFinancials[0]?.revenue,
+    employees: finalEmployees,
+    ebitMargin: finalFinancials[0]?.ebitMargin,
+    revenueGrowth: finalFinancials[0]?.revenueGrowth
+  })
 
   return {
     orgnr,
-    companyName: base?.name || 'Okänt företag',
-    segmentName: base?.segment_name || null,
-    industry: base?.segment_name || null,
-    city: base?.city || null,
-    employees: safeNumber(base?.employees),
+    companyName: finalCompanyName,
+    segmentName: finalSegmentName,
+    industry: finalSegmentName,
+    city: finalCity,
+    employees: finalEmployees,
     sizeCategory: null,
     growthCategory: null,
     profitabilityCategory: null,
-    financials,
-    derived: computeDerivedMetrics(financials, [], safeNumber(base?.employees)),
+    financials: finalFinancials,
+    derived: computeDerivedMetrics(finalFinancials, [], finalEmployees),
     benchmarks: null
   }
 }
@@ -266,7 +263,10 @@ async function generateCompanyProfile(supabase: any, orgnr: string) {
 // Enhanced screening result generation
 async function generateScreeningResult(profile: any) {
   const latest = profile.financials[0]
+  console.log('🔍 Debug - profile.financials:', profile.financials)
+  console.log('🔍 Debug - latest financial:', latest)
   const revenue = latest?.revenue || 0
+  console.log('🔍 Debug - revenue value:', revenue)
   const employees = latest?.employees || profile.employees || 0
   const revenueGrowth = latest?.revenueGrowth || 0
   const ebitMargin = latest?.ebitMargin || 0
@@ -582,9 +582,29 @@ app.get('/api/companies', async (req, res) => {
   try {
     const { limit = 10, orgnr } = req.query
     
+    // First try to get data from master_analytics with all financial fields
     let query = supabase
       .from('master_analytics')
-      .select('OrgNr, name, segment_name, city, employees')
+      .select(`
+        OrgNr,
+        name,
+        segment_name,
+        city,
+        employees,
+        revenue,
+        profit,
+        SDI,
+        DR,
+        ORS,
+        Revenue_growth,
+        EBIT_margin,
+        NetProfit_margin,
+        digital_presence,
+        incorporation_date,
+        email,
+        homepage,
+        address
+      `)
       .limit(Number(limit))
     
     if (orgnr) {
@@ -594,8 +614,25 @@ app.get('/api/companies', async (req, res) => {
     const { data, error } = await query
     
     if (error) {
-      console.error('Error fetching companies:', error)
-      return res.status(500).json({ success: false, error: error.message })
+      console.error('Error fetching companies from master_analytics:', error)
+      // Fallback to basic company data if master_analytics doesn't exist
+      let fallbackQuery = supabase
+        .from('companies')
+        .select('OrgNr, name, segment_name, city, employees')
+        .limit(Number(limit))
+      
+      if (orgnr) {
+        fallbackQuery = fallbackQuery.eq('OrgNr', orgnr)
+      }
+      
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery
+      
+      if (fallbackError) {
+        console.error('Error fetching companies from fallback:', fallbackError)
+        return res.status(500).json({ success: false, error: fallbackError.message })
+      }
+      
+      return res.json({ success: true, data: fallbackData || [] })
     }
     
     res.json({ success: true, data: data || [] })
@@ -608,14 +645,30 @@ app.get('/api/companies', async (req, res) => {
 // Test AI table endpoint
 app.get('/api/test-ai-table', async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('ai_company_analysis')
+    const { table = 'ai_company_analysis', orgnr, limit = 10 } = req.query
+    
+    let query = supabase
+      .from(table as string)
       .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(Number(limit))
+    
+    if (orgnr) {
+      // Try different column names for organization number
+      if (table === 'master_analytics') {
+        query = query.eq('OrgNr', orgnr)
+      } else if (table === 'company_accounts_by_id') {
+        query = query.eq('organisationNumber', orgnr)
+      } else if (table === 'company_kpis_by_id') {
+        query = query.eq('OrgNr', orgnr)
+      } else {
+        query = query.eq('orgnr', orgnr)
+      }
+    }
+    
+    const { data, error } = await query
     
     if (error) {
-      console.error('Error fetching AI analysis data:', error)
+      console.error(`Error fetching data from ${table}:`, error)
       return res.status(500).json({ success: false, error: error.message })
     }
     

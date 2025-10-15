@@ -541,10 +541,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         // Transform the API response to match the interface
         const transformedResults = (data.analysis.results || []).map((result: any) => ({
           orgnr: result.orgnr,
-          companyName: result.company_name,
-          screeningScore: result.screening_score,
-          riskFlag: result.risk_flag?.replace(' risk', '') || null,
-          briefSummary: result.brief_summary
+          companyName: result.companyName,
+          screeningScore: result.screeningScore,
+          riskFlag: result.riskFlag?.replace(' risk', '') || null,
+          briefSummary: result.briefSummary
         }))
         console.log('Transformed screening results:', transformedResults)
         setScreeningResults(transformedResults)

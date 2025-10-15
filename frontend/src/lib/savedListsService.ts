@@ -196,70 +196,8 @@ export class SavedListsService {
         return JSON.parse(saved)
       }
       
-      // Create mock data with real companies for testing
-      const mockLists: SavedCompanyList[] = [
-        {
-          id: 'test-list-1',
-          name: 'Real Companies List',
-          description: 'Real companies from database for testing',
-          companies: [
-            {
-              OrgNr: '5591747166',
-              name: 'Tullkurvan AB',
-              address: 'Norra Esplanaden 2',
-              city: 'Haparanda',
-              incorporation_date: '2018-10-09',
-              email: null,
-              homepage: null,
-              segment: '10001335',
-              segment_name: 'Bilreservdelar',
-              revenue: '23128',
-              profit: '1107',
-              employees: '6',
-              Revenue_growth: 0.144157514593846,
-              EBIT_margin: 0.0478640608785887,
-              last_updated: new Date().toISOString()
-            } as SupabaseCompany,
-            {
-              OrgNr: '5593152019',
-              name: 'Wildlife Studios Sweden AB',
-              address: 'Stockholmsvägen 33',
-              city: 'Lidingö',
-              incorporation_date: '2021-04-29',
-              email: null,
-              homepage: null,
-              segment: '10001979',
-              segment_name: 'Data- och TV-spel',
-              revenue: '40148',
-              profit: '2297',
-              employees: '17',
-              Revenue_growth: 0.404611132491341,
-              EBIT_margin: 0.0572133107502242,
-              last_updated: new Date().toISOString()
-            } as SupabaseCompany,
-            {
-              OrgNr: '5566950209',
-              name: 'Femlycke AB',
-              address: 'Bråtelycke',
-              city: 'Fågelmara',
-              incorporation_date: '2005-12-23',
-              email: null,
-              homepage: null,
-              segment: '10241590',
-              segment_name: 'Gasproduktion',
-              revenue: '31617',
-              profit: '621',
-              employees: '9',
-              Revenue_growth: 0.0713995255845477,
-              EBIT_margin: 0.0196413321947054,
-              last_updated: new Date().toISOString()
-            } as SupabaseCompany
-          ],
-          filters: {},
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ]
+      // Return empty array - no mock data, use real database data only
+      const mockLists: SavedCompanyList[] = []
       
       // Store mock data in localStorage for future use
       localStorage.setItem('savedCompanyLists', JSON.stringify(mockLists))
