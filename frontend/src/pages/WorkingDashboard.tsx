@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '../components/ui/alert'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { BarChart3, Building2, Search, Brain, Download, Shield, Menu, X, LogOut, User, Loader2, Database, Target, TrendingUp, DollarSign, Globe, Users } from 'lucide-react'
+import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Database, Target, TrendingUp, DollarSign, Globe, Users } from 'lucide-react'
 import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
 import { supabaseConfig } from '../lib/supabase'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
@@ -16,6 +16,7 @@ import DataExport from '../components/DataExport'
 import ListBasedAnalytics from '../components/ListBasedAnalytics'
 import AIAnalytics from '../components/AIAnalytics'
 import AIAnalysis from '../components/AIAnalysis'
+import AnalyzedCompanies from '../pages/AnalyzedCompanies'
 import AdminPanel from '../components/AdminPanel'
 
 const WorkingDashboard: React.FC = () => {
@@ -59,6 +60,7 @@ const WorkingDashboard: React.FC = () => {
     { id: 'companies', label: 'Företagssökning', icon: Search },
     { id: 'analytics', label: 'Analys', icon: Building2 },
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
+    { id: 'analyzed-companies', label: 'Analyserade Företag', icon: FileText },
     { id: 'export', label: 'Exportera', icon: Download },
     { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
   ]
@@ -281,6 +283,9 @@ const WorkingDashboard: React.FC = () => {
       
       case 'ai-insights':
         return <AIAnalysis selectedDataView="master_analytics" />
+      
+      case 'analyzed-companies':
+        return <AnalyzedCompanies />
       
       case 'export':
         return <DataExport />

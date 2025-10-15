@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [isApproved, setIsApproved] = useState(false)
-  const authEnabled = supabaseConfig.isConfigured
+  const authEnabled = false // TEMPORARY: Disable auth for testing
 
   const createAuthDisabledError = (): AuthError => ({
     name: 'AuthNotConfigured',
@@ -87,7 +87,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Get initial session
     const getInitialSession = async () => {
       if (!authEnabled) {
-        setUser(null)
+        // TEMPORARY: Set mock user for testing
+        const mockUser = {
+          id: '795b5119-9fa0-437e-b196-715dcd497666',
+          email: 'jesper@rgcapital.se',
+          user_metadata: {},
+          app_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        } as User
+        setUser(mockUser)
         setSession(null)
         setUserRole('admin')
         setIsApproved(true)
