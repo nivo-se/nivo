@@ -679,6 +679,43 @@ app.get('/api/test-ai-table', async (req, res) => {
   }
 })
 
+// AI Analysis history endpoint
+app.get('/api/ai-analysis', async (req, res) => {
+  try {
+    const { history, limit = 10 } = req.query
+    
+    if (history) {
+      // Return analysis history
+      const { data, error } = await supabase
+        .from('ai_analysis_runs')
+        .select(`
+          id,
+          model_version,
+          started_at,
+          completed_at,
+          status,
+          analysis_mode,
+          initiated_by
+        `)
+        .order('started_at', { ascending: false })
+        .limit(Number(limit))
+      
+      if (error) {
+        console.error('Error fetching analysis history:', error)
+        return res.status(500).json({ success: false, error: error.message })
+      }
+      
+      return res.json({ success: true, data: data || [] })
+    }
+    
+    // If not history request, return 404
+    res.status(404).json({ success: false, error: 'Endpoint not found' })
+  } catch (error: any) {
+    console.error('AI analysis history error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 // Analyzed companies endpoint for UI
 app.get('/api/analyzed-companies', async (req, res) => {
   try {
