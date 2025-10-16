@@ -40,6 +40,9 @@ interface AnalysisRequest {
   instructions?: string
   filters?: any
   initiatedBy?: string
+  templateId?: string
+  templateName?: string
+  customInstructions?: string
 }
 
 interface UsageSummary {
@@ -170,7 +173,7 @@ function getSupabase(): SupabaseClient | null {
 // Main AI Analysis endpoint
 app.post('/api/ai-analysis', async (req, res) => {
   try {
-    const { companies, analysisType = 'deep', instructions, filters, initiatedBy } = req.body as AnalysisRequest || {}
+    const { companies, analysisType = 'deep', instructions, filters, initiatedBy, templateId, templateName, customInstructions } = req.body as AnalysisRequest || {}
     
     if (!Array.isArray(companies) || companies.length === 0) {
       return res.status(400).json({ success: false, error: 'No companies provided' })
@@ -216,6 +219,10 @@ app.post('/api/ai-analysis', async (req, res) => {
       startedAt,
       initiatedBy: typeof initiatedBy === 'string' ? initiatedBy : null,
       filters,
+      templateId,
+      templateName,
+      customInstructions,
+      companyCount: uniqueSelections.length,
     })
 
     const companiesResults: CompanyResult[] = []
@@ -317,16 +324,39 @@ app.get('/api/analysis-runs', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const limit = Math.min(Math.max(parseInt(req.query.limit as string || '10', 10) || 10, 1), 50)
-    const history = await fetchRunHistory(supabase, limit)
+    // Extract query parameters
+    const page = Math.max(parseInt(req.query.page as string || '1', 10) || 1, 1)
+    const limit = Math.min(Math.max(parseInt(req.query.limit as string || '20', 10) || 20, 1), 100)
+    const search = req.query.search as string
+    const analysisMode = req.query.analysis_mode as string
+    const templateId = req.query.template_id as string
+    const dateFrom = req.query.date_from as string
+    const dateTo = req.query.date_to as string
+    const status = req.query.status as string
+    const sortBy = req.query.sort_by as string || 'date'
+    const sortOrder = req.query.sort_order as string || 'desc'
+
+    const filters = {
+      search,
+      analysisMode,
+      templateId,
+      dateFrom,
+      dateTo,
+      status,
+      sortBy,
+      sortOrder,
+      page,
+      limit
+    }
+
+    const result = await fetchAnalysisRuns(supabase, filters)
     
     res.status(200).json({ 
       success: true, 
-      data: history,
-      pagination: {
-        limit,
-        total: history.length
-      }
+      runs: result.runs,
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages
     })
   } catch (error: any) {
     console.error('Get analysis runs error:', error)
@@ -415,7 +445,7 @@ app.get('/api/analysis-companies', async (req, res) => {
       financialGrade: item.financial_grade,
       commercialGrade: item.commercial_grade,
       operationalGrade: item.operational_grade,
-      financialMetrics: item.financial_metrics ? JSON.parse(item.financial_metrics) : undefined,
+      // financialMetrics: stored in ai_analysis_metrics table, not in ai_company_analysis
       nextSteps: item.next_steps || [],
       createdAt: item.created_at,
       // Enhanced Codex fields
@@ -515,8 +545,11 @@ async function insertRunRecord(supabase: SupabaseClient, run: any) {
       status: run.status,
       started_at: run.startedAt,
       completed_at: run.completedAt,
-      error_message: run.errorMessage
-      // Removed filters column as it doesn't exist in the schema
+      error_message: run.errorMessage,
+      analysis_template_id: run.templateId,
+      analysis_template_name: run.templateName,
+      custom_instructions: run.customInstructions,
+      company_count: run.companyCount
     }])
   
   if (error) {
@@ -941,7 +974,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
         financial_grade: result.financialGrade,
         commercial_grade: result.commercialGrade,
         operational_grade: result.operationalGrade,
-        financial_metrics: result.financialMetrics ? JSON.stringify(result.financialMetrics) : null,
+        // financial_metrics: not stored in ai_company_analysis table
         next_steps: result.nextSteps,
         executive_summary: result.executiveSummary,
         key_findings: result.keyFindings,
@@ -978,6 +1011,124 @@ async function fetchRunHistory(supabase: SupabaseClient, limit: number) {
   }
 
   return data || []
+}
+
+async function fetchAnalysisRuns(supabase: SupabaseClient, filters: any) {
+  const { page, limit, search, analysisMode, templateId, dateFrom, dateTo, status, sortBy, sortOrder } = filters
+  
+  // Build the query
+  let query = supabase
+    .from('ai_analysis_runs')
+    .select(`
+      *,
+      ai_company_analysis!inner(orgnr, company_name),
+      ai_screening_results!inner(orgnr, company_name)
+    `, { count: 'exact' })
+
+  // Apply filters
+  if (search) {
+    query = query.or(`analysis_template_name.ilike.%${search}%,custom_instructions.ilike.%${search}%,id.ilike.%${search}%`)
+  }
+  
+  if (analysisMode && analysisMode !== 'all') {
+    query = query.eq('analysis_mode', analysisMode)
+  }
+  
+  if (templateId && templateId !== 'all') {
+    if (templateId === 'custom') {
+      query = query.is('analysis_template_id', null)
+    } else {
+      query = query.eq('analysis_template_id', templateId)
+    }
+  }
+  
+  if (dateFrom) {
+    query = query.gte('started_at', dateFrom)
+  }
+  
+  if (dateTo) {
+    query = query.lte('started_at', dateTo)
+  }
+  
+  if (status && status !== 'all') {
+    query = query.eq('status', status)
+  }
+
+  // Apply sorting
+  const ascending = sortOrder === 'asc'
+  switch (sortBy) {
+    case 'date':
+      query = query.order('started_at', { ascending })
+      break
+    case 'companies':
+      query = query.order('company_count', { ascending })
+      break
+    case 'template':
+      query = query.order('analysis_template_name', { ascending })
+      break
+    default:
+      query = query.order('started_at', { ascending: false })
+  }
+
+  // Apply pagination
+  const offset = (page - 1) * limit
+  query = query.range(offset, offset + limit - 1)
+
+  const { data, error, count } = await query
+
+  if (error) {
+    console.error('Error fetching analysis runs:', error)
+    return { runs: [], total: 0, page, totalPages: 0 }
+  }
+
+  // Transform the data to include company information
+  const runs = (data || []).map(run => {
+    // Get unique companies from both tables
+    const companies = new Map()
+    
+    // Add companies from ai_company_analysis
+    if (run.ai_company_analysis) {
+      run.ai_company_analysis.forEach((company: any) => {
+        companies.set(company.orgnr, {
+          orgnr: company.orgnr,
+          name: company.company_name
+        })
+      })
+    }
+    
+    // Add companies from ai_screening_results
+    if (run.ai_screening_results) {
+      run.ai_screening_results.forEach((company: any) => {
+        companies.set(company.orgnr, {
+          orgnr: company.orgnr,
+          name: company.company_name
+        })
+      })
+    }
+
+    return {
+      id: run.id,
+      startedAt: run.started_at,
+      completedAt: run.completed_at,
+      analysisMode: run.analysis_mode,
+      templateName: run.analysis_template_name,
+      customInstructions: run.custom_instructions,
+      companyCount: run.company_count || 0,
+      companies: Array.from(companies.values()),
+      status: run.status,
+      modelVersion: run.model_version,
+      initiatedBy: run.initiated_by
+    }
+  })
+
+  const totalPages = Math.ceil((count || 0) / limit)
+
+  return {
+    runs,
+    total: count || 0,
+    page,
+    totalPages
+  }
 }
 
 async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
@@ -1056,7 +1207,7 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
       financialGrade: item.financial_grade,
       commercialGrade: item.commercial_grade,
       operationalGrade: item.operational_grade,
-      financialMetrics: item.financial_metrics ? JSON.parse(item.financial_metrics) : undefined,
+      // financialMetrics: stored in ai_analysis_metrics table, not in ai_company_analysis
       nextSteps: item.next_steps || [],
       createdAt: item.created_at,
       // Enhanced Codex fields

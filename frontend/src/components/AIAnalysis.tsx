@@ -415,6 +415,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   
   // UI state
   const [instructions, setInstructions] = useState('')
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
   const [loadingLists, setLoadingLists] = useState(false)
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [runningAnalysis, setRunningAnalysis] = useState(false)
@@ -532,6 +533,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           analysisType: analysisMode,
           instructions: instructions.trim() || undefined,
           filters: { dataView: selectedDataView },
+          templateId: selectedTemplate?.id,
+          templateName: selectedTemplate?.name,
+          customInstructions: selectedTemplate ? null : instructions.trim() || undefined,
         }),
       })
       const data = await response.json()
@@ -581,6 +585,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     setSelectedCompanies(new Set())
     setSelectedForDeepAnalysis(new Set())
     setInstructions('')
+    setSelectedTemplate(null)
     setErrorMessage(null)
     setScreeningResults([])
     setCurrentRun(null)
@@ -760,7 +765,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                     <button
                       type="button"
                       key={template.id}
-                      onClick={() => setInstructions(template.query)}
+                      onClick={() => {
+                        setSelectedTemplate(template)
+                        setInstructions(template.query)
+                      }}
                       className="rounded-lg border p-4 text-left transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm"
                     >
                       <p className="text-sm font-semibold text-foreground">{template.name}</p>

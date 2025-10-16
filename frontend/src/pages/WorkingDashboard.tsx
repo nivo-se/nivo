@@ -60,7 +60,7 @@ const WorkingDashboard: React.FC = () => {
     { id: 'companies', label: 'Företagssökning', icon: Search },
     { id: 'analytics', label: 'Analys', icon: Building2 },
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
-    { id: 'analyzed-companies', label: 'Analyserade Företag', icon: FileText },
+    { id: 'analyzed-companies', label: 'Analyser', icon: FileText },
     { id: 'export', label: 'Exportera', icon: Download },
     { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
   ]
