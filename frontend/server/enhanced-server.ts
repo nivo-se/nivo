@@ -624,11 +624,14 @@ Ge en snabb bedömning (1-100 poäng) baserat på:
 - Tillväxtpotential (Revenue_growth, trend)
 - Förvärvsattraktivitet (storlek, bransch, digital närvaro)
 
+VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
+Ge olika poäng och risknivåer baserat på företagets unika förhållanden.
+
 Svara ENDAST med giltig JSON utan markdown-formatering:
 {
   "screeningScore": 85,
   "riskFlag": "Low",
-  "briefSummary": "Kort sammanfattning på 2-3 meningar"
+  "briefSummary": "Kort sammanfattning på 2-3 meningar som refererar till specifika siffror från företaget"
 }
 
 VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdown-formatering.`
@@ -648,7 +651,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
             content: prompt
           }
         ],
-        temperature: 0.1,
+        temperature: 0.7,
         max_tokens: 200
       })
       
@@ -796,7 +799,12 @@ REGISTRERAT: ${companyData.incorporation_date || 'Okänt'}
 
 ${instructions ? `SPECIFIKA INSTRUKTIONER: ${instructions}` : ''}
 
-Genomför en omfattande analys baserad på de faktiska finansiella nyckeltalen från allabolag.se. Fokusera på:
+Genomför en omfattande analys baserad på de faktiska finansiella nyckeltalen från allabolag.se. 
+
+VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
+Ge olika betyg, poäng och rekommendationer baserat på företagets unika förhållanden.
+
+Fokusera på:
 
 1. FINANSIELL HÄLSA: 
    - P&L: SDI (nettoomsättning), DR/ORS (årets resultat), marginaler
@@ -885,7 +893,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
           content: prompt
         }
       ],
-      temperature: 0.2,
+      temperature: 0.7,
       max_tokens: 1500
     })
     
