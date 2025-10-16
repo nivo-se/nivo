@@ -988,7 +988,7 @@ async function persistCompanyResult(supabase: any, runId: string, result: any) {
     company_name: result.companyName,
     summary: result.summary,
     recommendation: result.recommendation,
-    confidence: result.confidence,
+    confidence: Math.round((result.confidence || 0) * 100),
     risk_score: result.riskScore,
     financial_grade: result.financialGrade,
     commercial_grade: result.commercialGrade,
