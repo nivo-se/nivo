@@ -20,6 +20,24 @@ create table if not exists ai_ops.ai_analysis_runs (
 create index if not exists ai_analysis_runs_status_idx
     on ai_ops.ai_analysis_runs (status, started_at desc);
 
+-- RAG summaries linking AI output to canonical company identifiers.
+create table if not exists ai_ops.ai_analysis (
+    id uuid primary key default gen_random_uuid(),
+    run_id uuid references ai_ops.ai_analysis_runs(id) on delete cascade,
+    company_id text not null,
+    orgnr text,
+    model_version text not null,
+    prompt_summary text,
+    analysis jsonb not null,
+    created_at timestamptz not null default now()
+);
+
+create index if not exists ai_analysis_company_idx
+    on ai_ops.ai_analysis (company_id, created_at desc);
+
+create index if not exists ai_analysis_run_idx
+    on ai_ops.ai_analysis (run_id);
+
 -- Headline results per company per run.
 create table if not exists ai_ops.ai_company_analysis (
     id bigserial primary key,

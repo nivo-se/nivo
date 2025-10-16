@@ -49,6 +49,7 @@ interface MetricResult {
 
 interface CompanyResult {
   orgnr: string
+  companyId?: string | null
   companyName: string
   summary: string | null
   recommendation: string | null
@@ -60,6 +61,7 @@ interface CompanyResult {
   nextSteps: string[]
   sections: SectionResult[]
   metrics: MetricResult[]
+  contextSummary?: string
 }
 
 interface ScreeningResult {
