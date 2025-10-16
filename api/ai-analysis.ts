@@ -72,7 +72,6 @@ interface CompanyResult {
   marketPosition: string
   confidence: number
   riskScore: number
-  targetPrice?: number | null
   nextSteps: string[]
   summary: string | null
   financialGrade: string | null
@@ -175,6 +174,7 @@ const deepAnalysisSchema = {
   strict: true,
   schema: {
     type: 'object',
+    additionalProperties: false,
     properties: {
       executive_summary: {
         type: 'string',
@@ -218,7 +218,7 @@ const deepAnalysisSchema = {
       },
       recommendation: {
         type: 'string',
-        enum: ['Stark köp', 'Köp', 'Behåll', 'Avvakta', 'Sälj'],
+        enum: ['Prioritera förvärv', 'Fördjupa due diligence', 'Övervaka', 'Avstå'],
       },
       acquisition_interest: {
         type: 'string',
@@ -252,12 +252,9 @@ const deepAnalysisSchema = {
         minItems: 3,
         items: { type: 'string', minLength: 10 },
       },
-      target_price: {
-        type: 'number',
-        description: 'Indikerat värde (MSEK) baserat på multipelresonemang.',
-      },
       word_count: {
         type: 'integer',
+        minimum: 0,
       },
     },
     required: [
@@ -898,7 +895,7 @@ Uppgift:
 - Gör narrativet cirka 300 ord och redovisa uppskattat word_count.
 - Analysera finansiell stabilitet, marginaler, skuldsättning och kapitalstruktur.
 - Lyft fram risker och uppsidor för ett potentiellt förvärv inom 12–24 månader.
-- Ge en tydlig rekommendation (Köp/Håll/Sälj) och bedöm förvärvsintresset (Hög/Medel/Låg).
+- Ge en tydlig rekommendation (Prioritera förvärv/Fördjupa due diligence/Övervaka/Avstå) och bedöm förvärvsintresset (Hög/Medel/Låg).
 
 Fråga att besvara:
 "Baserat på denna finansiella profil, hur presterar företaget och hur stabilt är det? Finns det betydande risker eller uppsidor? Är verksamheten intressant för förvärv?"
@@ -969,11 +966,6 @@ function buildCompanyResult(
       ? payload.narrative.trim()
       : keyFindings.join(' ')
 
-  const targetPrice =
-    payload?.target_price !== undefined && payload?.target_price !== null
-      ? Number(payload.target_price)
-      : null
-
   const financialHealth = clampNumber(
     Number(payload?.financial_health_score ?? NaN),
     1,
@@ -985,7 +977,7 @@ function buildCompanyResult(
   const marketPosition =
     typeof payload?.market_position === 'string' ? payload.market_position : 'Följare'
   const recommendation =
-    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Avvakta'
+    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Övervaka'
   const acquisitionInterest =
     typeof payload?.acquisition_interest === 'string' ? payload.acquisition_interest : 'Medel'
   const confidence = clampNumber(
@@ -1085,7 +1077,6 @@ function buildCompanyResult(
     marketPosition,
     confidence,
     riskScore,
-    targetPrice,
     nextSteps: nextSteps.length
       ? nextSteps
       : ['Komplettera dataunderlag', 'Verifiera senaste bokslut', 'Kör ny analys efter datakorrigering'],
@@ -1426,14 +1417,13 @@ function buildFallbackResult(orgnr: string, companyName: string, base?: any): Co
     weaknesses: [],
     opportunities: [],
     risks: [`Otillräckligt finansiellt dataunderlag för ${companyName}.`],
-    recommendation: 'Avvakta',
+    recommendation: 'Övervaka',
     acquisitionInterest: 'Låg',
     financialHealth: 4,
     growthPotential: 'Låg',
     marketPosition: 'Följare',
     confidence: 40,
     riskScore: 70,
-    targetPrice: null,
     nextSteps: [
       'Komplettera finansiell historik i Supabase',
       'Verifiera skuldsättning och marginaler',

@@ -31,9 +31,10 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
 
   const getRecommendationBadge = (recommendation: string) => {
     const variants = {
-      'Köp': 'default',
-      'Håll': 'secondary', 
-      'Sälj': 'destructive'
+      'Prioritera förvärv': 'default',
+      'Fördjupa due diligence': 'secondary', 
+      'Övervaka': 'outline',
+      'Avstå': 'destructive'
     } as const
     
     return (

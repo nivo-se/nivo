@@ -40,11 +40,13 @@ const COMPLETION_COST_PER_1K = 0.6
 const SCREENING_PROMPT_COST_PER_1K = 0.0005
 const SCREENING_COMPLETION_COST_PER_1K = 0.0015
 
+// Per OpenAI JSON schema response_format requirements (Nov 2025) we must disallow additional properties.
 const deepAnalysisSchema = {
   name: 'DeepCompanyAnalysis',
   strict: true,
   schema: {
     type: 'object',
+    additionalProperties: false,
     properties: {
       executive_summary: {
         type: 'string',
@@ -88,7 +90,7 @@ const deepAnalysisSchema = {
       },
       recommendation: {
         type: 'string',
-        enum: ['Stark köp', 'Köp', 'Behåll', 'Avvakta', 'Sälj'],
+        enum: ['Prioritera förvärv', 'Fördjupa due diligence', 'Övervaka', 'Avstå'],
       },
       acquisition_interest: {
         type: 'string',
@@ -122,12 +124,14 @@ const deepAnalysisSchema = {
         minItems: 3,
         items: { type: 'string', minLength: 10 },
       },
-      target_price: {
-        type: 'number',
-        description: 'Indikerat värde (MSEK) baserat på multipelresonemang.',
-      },
       word_count: {
         type: 'integer',
+        minimum: 0,
+      },
+      target_price_msek: {
+        type: 'number',
+        minimum: 0,
+        description: 'Target price in MSEK for acquisition valuation',
       },
     },
     required: [
@@ -143,9 +147,11 @@ const deepAnalysisSchema = {
       'financial_health_score',
       'growth_outlook',
       'market_position',
+      'target_price_msek',
       'confidence',
       'risk_score',
       'next_steps',
+      'word_count',
     ],
   },
 }
@@ -441,7 +447,7 @@ Uppgift:
 - Gör narrativet cirka 300 ord och redovisa uppskattat word_count.
 - Analysera finansiell stabilitet, marginaler, skuldsättning och kapitalstruktur.
 - Lyft fram risker och uppsidor för ett potentiellt förvärv inom 12–24 månader.
-- Ge en tydlig rekommendation (Köp/Håll/Sälj) och bedöm förvärvsintresset (Hög/Medel/Låg).
+- Ge en tydlig rekommendation (Prioritera förvärv/Fördjupa due diligence/Övervaka/Avstå) och bedöm förvärvsintresset (Hög/Medel/Låg).
 
 Fråga att besvara:
 "Baserat på denna finansiella profil, hur presterar företaget och hur stabilt är det? Finns det betydande risker eller uppsidor? Är verksamheten intressant för förvärv?"
@@ -452,28 +458,86 @@ ${instructionText}
 
 async function invokeDeepAnalysisModel(openai: OpenAI, prompt: string) {
   const started = Date.now()
-  const response = await openai.chat.completions.create({
-    model: MODEL_DEFAULT,
-    temperature: 0.25,
-    max_tokens: 1600,
-    messages: [
-      { role: 'system', content: deepAnalysisSystemPrompt },
-      { role: 'user', content: prompt },
-    ],
-    response_format: { type: 'json_schema', json_schema: deepAnalysisSchema },
-  })
-  const latency = Date.now() - started
-
-  let rawText = response.choices[0]?.message?.content || '{}'
-  let parsed: any = {}
   try {
-    parsed = JSON.parse(rawText)
-  } catch {
-    parsed = {}
-  }
+    const response = await openai.chat.completions.create({
+      model: MODEL_DEFAULT,
+      temperature: 0.25,
+      max_tokens: 1600,
+      messages: [
+        { role: 'system', content: deepAnalysisSystemPrompt },
+        { role: 'user', content: prompt },
+      ],
+      response_format: { type: 'json_schema', json_schema: deepAnalysisSchema },
+    })
+    const latency = Date.now() - started
 
-  const usage = response.usage || {}
-  return { parsed, rawText, usage, latency }
+    let rawText = response.choices[0]?.message?.content || '{}'
+    let parsed: any = {}
+    try {
+      parsed = JSON.parse(rawText)
+    } catch {
+      parsed = {}
+    }
+
+    const usage = response.usage || {}
+    return { parsed, rawText, usage, latency }
+  } catch (error: any) {
+    const latency = Date.now() - started
+    console.error('OpenAI deep analysis failure:', error?.response?.data || error?.message || error)
+    console.error('Full error object:', JSON.stringify(error, null, 2))
+    throw Object.assign(new Error('OpenAI deep analysis failed'), {
+      latency,
+      cause: error,
+    })
+  }
+}
+
+function buildFallbackResult(orgnr: string, companyName: string, company: any): any {
+  return {
+    orgnr,
+    orgNr: orgnr,
+    companyName,
+    name: companyName,
+    segmentName: company.segment_name || 'Okänd',
+    executiveSummary: `Fallback analys för ${companyName}. Data kunde inte genereras från AI-modellen.`,
+    keyFindings: [
+      'AI-analys kunde inte genomföras',
+      'Fallback data används',
+      'Kontrollera anslutning och försök igen'
+    ],
+    narrative: `Fallback analys för ${companyName} (${orgnr}). Den ursprungliga AI-analysen misslyckades, så denna grundläggande analys används istället.`,
+    strengths: ['Fallback data tillgänglig'],
+    weaknesses: ['AI-analys misslyckades'],
+    opportunities: ['Försök analys igen'],
+    risks: ['Begränsad data'],
+    recommendation: 'Övervaka',
+    acquisitionInterest: 'Medel',
+    financialHealth: 5,
+    growthPotential: 'Medel',
+    marketPosition: 'Följare',
+    targetPrice: null,
+    confidence: 30,
+    riskScore: 70,
+    nextSteps: [
+      'Kontrollera AI-anslutning',
+      'Försök analys igen',
+      'Verifiera dataunderlag'
+    ],
+    summary: `Fallback analys för ${companyName}`,
+    financialGrade: 'C',
+    commercialGrade: 'C',
+    operationalGrade: 'C',
+    sections: [],
+    metrics: [],
+    audit: {
+      prompt: 'Fallback analysis',
+      response: 'AI analysis failed',
+      latency_ms: 0,
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      cost_usd: 0,
+    },
+  }
 }
 
 function buildCompanyResult(
@@ -497,11 +561,6 @@ function buildCompanyResult(
       ? payload.narrative.trim()
       : keyFindings.join(' ')
 
-  const targetPrice =
-    payload?.target_price !== undefined && payload?.target_price !== null
-      ? Number(payload.target_price)
-      : null
-
   const financialHealth = clampNumber(
     Number(payload?.financial_health_score ?? NaN),
     1,
@@ -513,7 +572,7 @@ function buildCompanyResult(
   const marketPosition =
     typeof payload?.market_position === 'string' ? payload.market_position : 'Följare'
   const recommendation =
-    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Avvakta'
+    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Övervaka'
   const acquisitionInterest =
     typeof payload?.acquisition_interest === 'string' ? payload.acquisition_interest : 'Medel'
   const confidence = clampNumber(
@@ -613,7 +672,6 @@ function buildCompanyResult(
     marketPosition,
     confidence,
     riskScore,
-    targetPrice,
     nextSteps: nextSteps.length
       ? nextSteps
       : ['Komplettera dataunderlag', 'Verifiera senaste bokslut', 'Kör ny analys efter datakorrigering'],
@@ -621,6 +679,7 @@ function buildCompanyResult(
     financialGrade,
     commercialGrade,
     operationalGrade,
+    targetPrice: typeof payload?.target_price_msek === 'number' ? payload.target_price_msek : null,
     sections,
     metrics,
     audit: {
@@ -657,7 +716,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       id: runId,
       initiated_by: userId || initiatedBy || 'test-user',
       status: 'running',
-      model_version: analysisType === 'screening' ? 'gpt-3.5-turbo' : 'gpt-4',
+      model_version: analysisType === 'screening' ? 'gpt-3.5-turbo' : MODEL_DEFAULT,
       analysis_mode: analysisType,
       filters_json: filters || null,
       started_at: new Date().toISOString(),
@@ -683,15 +742,19 @@ app.post('/api/ai-analysis', async (req, res) => {
     const screeningResults = []
     const errors = []
 
-    for (const company of companies) {
-      const orgnr = company.OrgNr || company.orgnr
-      if (!orgnr) {
-        errors.push('Missing organisation number for selection')
-        continue
-      }
+  for (const company of companies) {
+    const orgnr = company.OrgNr || company.orgnr
+    if (!orgnr) {
+      errors.push('Missing organisation number for selection')
+      continue
+    }
+    const fallbackName =
+      typeof company.name === 'string' && company.name.trim().length > 0
+        ? company.name.trim()
+        : `Bolag ${orgnr}`
 
-      try {
-        console.log(`🔍 Processing company: ${orgnr}`)
+    try {
+      console.log(`🔍 Processing company: ${orgnr}`)
         
         // Generate enhanced company profile using Codex logic
         const profile = await generateCompanyProfile(supabase, orgnr, company)
@@ -721,7 +784,10 @@ app.post('/api/ai-analysis', async (req, res) => {
           // Generate deep analysis result using full Codex AI logic
           const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
           const prompt = buildDeepAnalysisPrompt(profile, instructions)
+          console.log('🔍 Attempting OpenAI deep analysis...')
           const { parsed, rawText, usage, latency } = await invokeDeepAnalysisModel(openai, prompt)
+          console.log('✅ OpenAI deep analysis successful')
+          console.log('📊 Parsed result:', JSON.stringify(parsed, null, 2))
           const deepResult = buildCompanyResult(profile, parsed, usage, latency, prompt, rawText)
           companiesResults.push(deepResult)
           
@@ -730,8 +796,17 @@ app.post('/api/ai-analysis', async (req, res) => {
         }
         
       } catch (error: any) {
-        console.error(`Error processing company ${orgnr}:`, error)
+        console.error(`Error processing company ${orgnr}:`, error?.cause?.response?.data || error)
         errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
+        if (analysisType !== 'screening') {
+          const fallback = buildFallbackResult(orgnr, fallbackName, company)
+          companiesResults.push(fallback)
+          try {
+            await persistCompanyResult(supabase, runId, fallback)
+          } catch (persistError) {
+            console.error('Failed to persist fallback analysis:', persistError)
+          }
+        }
       }
     }
 

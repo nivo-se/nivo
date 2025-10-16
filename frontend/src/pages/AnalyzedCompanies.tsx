@@ -67,9 +67,10 @@ const AnalyzedCompanies: React.FC = () => {
 
   const getRecommendationBadge = (recommendation: string) => {
     const variants = {
-      'Köp': 'default',
-      'Håll': 'secondary', 
-      'Sälj': 'destructive'
+      'Prioritera förvärv': 'default',
+      'Fördjupa due diligence': 'secondary', 
+      'Övervaka': 'outline',
+      'Avstå': 'destructive'
     } as const
     
     return (
@@ -117,8 +118,8 @@ const AnalyzedCompanies: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Analyserade Företag</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900">Analyserade Företag</h1>
+          <p className="text-gray-600 mt-1">
             Översikt över alla genomförda AI-analyser och deras resultat
           </p>
         </div>
@@ -132,9 +133,9 @@ const AnalyzedCompanies: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <Card className="bg-[#2E2A2B] border-[#4A4A4A]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="flex items-center">
             <Filter className="w-5 h-5 mr-2" />
             Filter och Sök
           </CardTitle>
@@ -147,24 +148,25 @@ const AnalyzedCompanies: React.FC = () => {
                 placeholder="Sök företag eller organisationsnummer..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-[#1A1A1A] border-[#4A4A4A] text-white"
+                className="pl-10"
               />
             </div>
             
             <Select value={filterRecommendation} onValueChange={setFilterRecommendation}>
-              <SelectTrigger className="bg-[#1A1A1A] border-[#4A4A4A] text-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Rekommendation" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alla rekommendationer</SelectItem>
-                <SelectItem value="Köp">Köp</SelectItem>
-                <SelectItem value="Håll">Håll</SelectItem>
-                <SelectItem value="Sälj">Sälj</SelectItem>
+                <SelectItem value="Prioritera förvärv">Prioritera förvärv</SelectItem>
+                <SelectItem value="Fördjupa due diligence">Fördjupa due diligence</SelectItem>
+                <SelectItem value="Övervaka">Övervaka</SelectItem>
+                <SelectItem value="Avstå">Avstå</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={filterRisk} onValueChange={setFilterRisk}>
-              <SelectTrigger className="bg-[#1A1A1A] border-[#4A4A4A] text-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Risknivå" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +182,7 @@ const AnalyzedCompanies: React.FC = () => {
               setSortBy(field)
               setSortOrder(order as 'asc' | 'desc')
             }}>
-              <SelectTrigger className="bg-[#1A1A1A] border-[#4A4A4A] text-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Sortera efter" />
               </SelectTrigger>
               <SelectContent>
@@ -197,16 +199,15 @@ const AnalyzedCompanies: React.FC = () => {
       </Card>
 
       {/* Results Table */}
-      <Card className="bg-[#2E2A2B] border-[#4A4A4A]">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between">
             <span>Analysresultat ({filteredCompanies.length})</span>
             <Button
               variant="outline"
               size="sm"
               onClick={loadAnalyzedCompanies}
               disabled={loading}
-              className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Uppdatera
@@ -217,13 +218,15 @@ const AnalyzedCompanies: React.FC = () => {
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A9B8E]"></div>
-              <span className="ml-2 text-gray-400">Laddar analyser...</span>
+              <span className="ml-2 text-gray-600">Laddar analyser...</span>
             </div>
           ) : filteredCompanies.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-300 mb-2">Inga analyser hittades</h3>
-              <p className="text-gray-400 mb-4">
+            <div className="text-center py-12">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                <FileText className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Inga analyser hittades</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
                 {searchTerm || filterRecommendation !== 'all' || filterRisk !== 'all' 
                   ? 'Inga analyser matchar dina filter. Prova att ändra söktermerna.'
                   : 'Du har inte genomfört några analyser än. Kom igång med din första analys!'
@@ -243,37 +246,37 @@ const AnalyzedCompanies: React.FC = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#4A4A4A]">
-                    <TableHead className="text-gray-300">Företag</TableHead>
-                    <TableHead className="text-gray-300">Analysdatum</TableHead>
-                    <TableHead className="text-gray-300">Rekommendation</TableHead>
-                    <TableHead className="text-gray-300">Poäng</TableHead>
-                    <TableHead className="text-gray-300">Risk</TableHead>
-                    <TableHead className="text-gray-300">Åtgärder</TableHead>
+                  <TableRow>
+                    <TableHead>Företag</TableHead>
+                    <TableHead>Analysdatum</TableHead>
+                    <TableHead>Rekommendation</TableHead>
+                    <TableHead>Poäng</TableHead>
+                    <TableHead>Risk</TableHead>
+                    <TableHead>Åtgärder</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredCompanies.map((company) => (
-                    <TableRow key={company.runId} className="border-[#4A4A4A] hover:bg-[#3A3A3A]">
-                      <TableCell className="text-white">
+                    <TableRow key={company.runId} className="hover:bg-gray-50">
+                      <TableCell>
                         <div>
-                          <div className="font-medium">{company.companyName}</div>
-                          <div className="text-sm text-gray-400">{company.orgnr}</div>
+                          <div className="font-medium text-gray-900">{company.companyName}</div>
+                          <div className="text-sm text-gray-500">{company.orgnr}</div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell>
                         <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          {formatDate(company.analysisDate)}
+                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                          <span className="text-gray-700">{formatDate(company.analysisDate)}</span>
                         </div>
                       </TableCell>
                       <TableCell>
                         {getRecommendationBadge(company.recommendation)}
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell>
                         <div className="flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-2" />
-                          {company.screeningScore}/100
+                          <TrendingUp className="w-4 h-4 mr-2 text-gray-400" />
+                          <span className="text-gray-700">{company.screeningScore}/100</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -285,7 +288,6 @@ const AnalyzedCompanies: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedAnalysis(company)}
-                            className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -293,7 +295,6 @@ const AnalyzedCompanies: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleReAnalyze(company)}
-                            className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
                           >
                             <RefreshCw className="w-4 h-4" />
                           </Button>
@@ -301,7 +302,7 @@ const AnalyzedCompanies: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteAnalysis(company.runId)}
-                            className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -324,11 +325,10 @@ const AnalyzedCompanies: React.FC = () => {
             size="sm"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
           >
             Föregående
           </Button>
-          <span className="text-gray-300 px-4">
+          <span className="text-gray-700 px-4">
             Sida {currentPage} av {totalPages}
           </span>
           <Button
@@ -336,7 +336,6 @@ const AnalyzedCompanies: React.FC = () => {
             size="sm"
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
           >
             Nästa
           </Button>

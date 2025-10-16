@@ -130,8 +130,7 @@ interface AIInalysis {
   financialHealth: 'excellent' | 'good' | 'fair' | 'poor'
   growthPotential: 'high' | 'medium' | 'low'
   marketOutlook: 'bullish' | 'neutral' | 'bearish'
-  recommendation: 'strong_buy' | 'buy' | 'hold' | 'sell' | 'strong_sell'
-  targetPrice?: number
+  recommendation: 'Prioritera förvärv' | 'Fördjupa due diligence' | 'Övervaka' | 'Avstå'
   confidence: number
   analysisDate: string
 }
@@ -604,13 +603,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     else marketOutlook = 'bearish'
     
     // Generate recommendation
-    let recommendation: 'strong_buy' | 'buy' | 'hold' | 'sell' | 'strong_sell'
+    let recommendation: 'Prioritera förvärv' | 'Fördjupa due diligence' | 'Övervaka' | 'Avstå'
     const overallScore = (company.SDI || 0) / 10000 + growth + ebitMargin + softFactors.digitalMaturity / 10
-    if (overallScore > 80) recommendation = 'strong_buy'
-    else if (overallScore > 60) recommendation = 'buy'
-    else if (overallScore > 40) recommendation = 'hold'
-    else if (overallScore > 20) recommendation = 'sell'
-    else recommendation = 'strong_sell'
+    if (overallScore > 80) recommendation = 'Prioritera förvärv'
+    else if (overallScore > 60) recommendation = 'Fördjupa due diligence'
+    else if (overallScore > 40) recommendation = 'Övervaka'
+    else recommendation = 'Avstå'
     
     return {
       executiveSummary: `${company.name} är en ${company.segment_name} med ${revenue.toLocaleString()} TSEK i omsättning och ${growth.toFixed(1)}% tillväxt. Företaget visar ${financialHealth === 'excellent' ? 'utmärkta' : financialHealth === 'good' ? 'god' : 'begränsade'} finansiella resultat och har ${growthPotential} tillväxtpotential.`,
@@ -642,7 +640,6 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
       growthPotential,
       marketOutlook,
       recommendation,
-      targetPrice: revenue * (2 + Math.random() * 2), // Simulated target price
       confidence: Math.min(100, 70 + Math.random() * 15),
       analysisDate: new Date().toISOString().split('T')[0]
     }
@@ -734,8 +731,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     weaknesses: Array.isArray(result?.weaknesses) ? result.weaknesses : [],
                     opportunities: Array.isArray(result?.opportunities) ? result.opportunities : [],
                     risks: Array.isArray(result?.risks) ? result.risks : [],
-                    recommendation: result?.recommendation || 'Håll',
-                    targetPrice: result?.targetPrice || 0,
+                    recommendation: result?.recommendation || 'Övervaka',
                     confidence: result?.confidence || 0
                   }
 
@@ -767,7 +763,6 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                       opportunities: safeResult.opportunities,
                       risks: safeResult.risks,
                       recommendation: safeResult.recommendation,
-                      targetPrice: safeResult.targetPrice,
                       confidence: safeResult.confidence
                     },
                     financialMetrics: {
@@ -1092,15 +1087,6 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                           </div>
                           <div className="text-xs text-orange-800">Marknadsutsikt</div>
                         </div>
-                        
-                        {(aiAnalysis?.targetPrice || 0) > 0 && (
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <div className="text-lg font-bold text-gray-700">
-                              {formatCurrency(aiAnalysis?.targetPrice || 0)}
-                            </div>
-                            <div className="text-xs text-gray-600">Target Price</div>
-                          </div>
-                        )}
                         
                         <div className="text-center p-2 bg-gray-100 rounded text-xs text-gray-600">
                           Analysdatum: {aiAnalysis?.analysisDate || new Date().toISOString().split('T')[0]}

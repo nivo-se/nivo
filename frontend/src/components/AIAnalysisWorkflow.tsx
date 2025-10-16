@@ -43,7 +43,6 @@ interface AIAnalysisResult {
   opportunities: string[]
   risks: string[]
   recommendation: string
-  targetPrice?: number
   confidence: number
 }
 
@@ -439,16 +438,6 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisCompl
                     </div>
                   </div>
 
-                  {result.targetPrice && (
-                    <div className="mt-3 pt-3 border-t">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Target Price:</span>
-                        <span className="text-lg font-bold text-blue-600">
-                          {formatCurrency(result.targetPrice)}
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>

@@ -146,7 +146,7 @@ export class AnalysisService {
         companyName: 'Tullkurvan AB',
         orgnr: '5591747166',
         analysisDate: new Date().toISOString(),
-        recommendation: 'Sälj',
+        recommendation: 'Avstå',
         screeningScore: 73,
         riskLevel: 'Medium risk',
         summary: 'Tullkurvan AB är ett Bilreservdelar företag med stark tillväxt och låg lönsamhet. Företaget har 6 anställda och en omsättning på 23,128 SEK.',
@@ -212,7 +212,7 @@ export class AnalysisService {
         companyName: 'Wildlife Studios Sweden AB',
         orgnr: '5593152019',
         analysisDate: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-        recommendation: 'Köp',
+        recommendation: 'Prioritera förvärv',
         screeningScore: 85,
         riskLevel: 'Low risk',
         summary: 'Wildlife Studios Sweden AB är ett Data- och TV-spel företag med stark tillväxt och god lönsamhet. Företaget har 17 anställda och en omsättning på 40,148 SEK.',

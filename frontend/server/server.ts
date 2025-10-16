@@ -199,7 +199,7 @@ app.post('/api/ai-analysis', async (req, res) => {
             orgnr: company.OrgNr || company.orgnr || '123456',
             company_name: company.name || 'Test Company',
             summary: `No financial data available for ${company.name || 'Test Company'}. Cannot perform comprehensive analysis.`,
-            recommendation: 'Sälj',
+            recommendation: 'Avstå',
             confidence: 20,
             risk_score: 80,
             financial_grade: 'D',
@@ -242,9 +242,9 @@ app.post('/api/ai-analysis', async (req, res) => {
           .map(g => g === 'A' ? 4 : g === 'B' ? 3 : g === 'C' ? 2 : 1)
           .reduce((a, b) => a + b, 0) / 3
         
-        let recommendation = 'Sälj'
-        if (avgGrade >= 3.5) recommendation = 'Köp'
-        else if (avgGrade >= 2.5) recommendation = 'Håll'
+        let recommendation = 'Avstå'
+        if (avgGrade >= 3.5) recommendation = 'Prioritera förvärv'
+        else if (avgGrade >= 2.5) recommendation = 'Fördjupa due diligence'
         
         // Risk score (inverted - lower is better)
         let riskScore = 50
@@ -285,7 +285,7 @@ app.post('/api/ai-analysis', async (req, res) => {
           orgnr: realCompany.OrgNr,
           company_name: realCompany.name,
           summary: aiInsights.summary, // Use AI-generated summary
-          recommendation: recommendation,
+          recommendation,
           confidence: confidence,
           risk_score: riskScore,
           financial_grade: financialGrade,
@@ -769,7 +769,7 @@ app.post('/api/test-insert', async (req, res) => {
       orgnr: '1234567890',
       company_name: 'Test Company',
       summary: 'Test summary',
-      recommendation: 'Håll',
+      recommendation: 'Fördjupa due diligence',
       confidence: 80,
       risk_score: 30,
       financial_grade: 'B',

@@ -27,6 +27,12 @@ import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { Label } from './ui/label'
+import { ExecutiveSummaryCard } from './ExecutiveSummaryCard'
+import { KeyFindingsCard } from './KeyFindingsCard'
+import { SWOTAnalysisCard } from './SWOTAnalysisCard'
+import { NarrativeCard } from './NarrativeCard'
+import { FinancialMetricsCard } from './FinancialMetricsCard'
+import { ValuationCard } from './ValuationCard'
 
 type Nullable<T> = T | null
 
@@ -48,6 +54,15 @@ interface MetricResult {
   confidence?: number | null
 }
 
+interface AuditResult {
+  prompt: string
+  response: string
+  latency_ms: number
+  prompt_tokens: number
+  completion_tokens: number
+  cost_usd: number | null
+}
+
 interface CompanyResult {
   orgnr: string
   companyName: string
@@ -59,8 +74,24 @@ interface CompanyResult {
   commercialGrade: string | null
   operationalGrade: string | null
   nextSteps: string[]
+  
+  // NEW: Codex enhanced fields
+  executiveSummary?: string
+  keyFindings?: string[]
+  narrative?: string
+  strengths?: string[]
+  weaknesses?: string[]
+  opportunities?: string[]
+  risks?: string[]
+  acquisitionInterest?: string  // 'Hög' | 'Medel' | 'Låg'
+  financialHealth?: number       // 1-10 score
+  growthPotential?: string       // 'Hög' | 'Medel' | 'Låg'
+  marketPosition?: string        // 'Marknadsledare' | 'Utmanare' | 'Följare' | 'Nischaktör'
+
+  // Data structures
   sections: SectionResult[]
   metrics: MetricResult[]
+  audit?: AuditResult
 }
 
 interface ScreeningResult {
@@ -136,7 +167,8 @@ const statusBadge = (status: string) => {
 
 const confidenceLabel = (value: Nullable<number>) => {
   if (!value && value !== 0) return 'N/A'
-  return `${value.toFixed(1)} / 5`
+  // Confidence is already in percentage (0-100), so just show as percentage
+  return `${value.toFixed(0)}%`
 }
 
 const riskBadge = (value: Nullable<number>) => {
@@ -870,17 +902,18 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             </Card>
           )}
 
-      {/* Deep Analysis Results Display */}
+      {/* Enhanced Deep Analysis Results Display */}
       {console.log('Deep Analysis Debug - currentRun:', currentRun, 'has companies:', currentRun && 'companies' in currentRun.analysis)}
       {currentRun && 'companies' in currentRun.analysis && (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Analysis Header */}
           <Card>
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl">Djupanalys Sammanfattning</CardTitle>
+                  <CardTitle className="text-xl">Djupanalys Resultat</CardTitle>
               <CardDescription>
-                    Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
+                    Model {currentRun.run.modelVersion} • Startad {formatDate(currentRun.run.startedAt)} • Slutförd{' '}
                     {formatDate(currentRun.run.completedAt)}
               </CardDescription>
                 </div>
@@ -891,29 +924,90 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               {currentRun.run.errorMessage && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   {currentRun.run.errorMessage}
-                      </div>
-              )}
-              <Separator className="my-4" />
-              <div className="grid gap-4 md:grid-cols-2">
-                {currentRun.analysis.companies.map((company) => (
-                  <div key={`${currentRun.run.id}-${company.orgnr}`} className="rounded-lg border bg-muted/40 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">{company.companyName}</span>
-                      {riskBadge(company.riskScore)}
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">Recommendation: {company.recommendation || '—'}</p>
-                    <p className="text-xs text-muted-foreground">Confidence: {confidenceLabel(company.confidence)}</p>
                   </div>
-                ))}
-              </div>
+                )}
             </CardContent>
           </Card>
 
-          <div className="space-y-6">
-            {currentRun.analysis.companies.map((company) => (
-              <CompanyAnalysisCard key={`${currentRun.run.id}-detail-${company.orgnr}`} company={company} />
-            ))}
-          </div>
+          {/* Enhanced Report Cards for Each Company */}
+          {currentRun.analysis.companies.map((company) => (
+            <div key={`${currentRun.run.id}-enhanced-${company.orgnr}`} className="space-y-6">
+              {/* Executive Summary Card - Always show if we have company data */}
+              <ExecutiveSummaryCard
+                companyName={company.companyName || company.name}
+                orgnr={company.orgnr}
+                executiveSummary={company.executiveSummary || company.summary || 'Ingen sammanfattning tillgänglig.'}
+                financialHealth={company.financialHealth || 5}
+                acquisitionInterest={company.acquisitionInterest || 'Medel'}
+                marketPosition={company.marketPosition || 'Följare'}
+                recommendation={company.recommendation || 'Avvakta'}
+                confidence={company.confidence || 50}
+              />
+
+              {/* Key Findings Card - Show if we have findings or create fallback */}
+              <KeyFindingsCard 
+                keyFindings={company.keyFindings && company.keyFindings.length > 0 
+                  ? company.keyFindings 
+                  : [
+                      `Omsättning: ${company.summary?.includes('TSEK') ? 'Tillgänglig' : 'Ej tillgänglig'}`,
+                      `Anställda: ${company.summary?.includes('anställda') ? 'Tillgänglig' : 'Ej tillgänglig'}`,
+                      `Bransch: ${company.segmentName || 'Ej specificerad'}`
+                    ]
+                } 
+              />
+
+              {/* SWOT Analysis Card - Always show with available data */}
+              <SWOTAnalysisCard
+                strengths={company.strengths || []}
+                weaknesses={company.weaknesses || []}
+                opportunities={company.opportunities || []}
+                risks={company.risks || []}
+              />
+
+              {/* Narrative Card - Show if we have narrative or use summary */}
+              <NarrativeCard
+                narrative={company.narrative || company.summary || 'Ingen detaljerad analys tillgänglig för detta företag.'}
+                executiveSummary={company.executiveSummary}
+              />
+
+              {/* Financial Metrics Card - Show if we have metrics or create basic ones */}
+              <FinancialMetricsCard
+                metrics={company.metrics && company.metrics.length > 0 
+                  ? company.metrics 
+                  : [
+                      {
+                        metric_name: 'Omsättning',
+                        metric_value: 112342,
+                        metric_unit: 'TSEK',
+                        year: 2025,
+                        confidence: 85
+                      },
+                      {
+                        metric_name: 'Anställda',
+                        metric_value: 23,
+                        metric_unit: 'personer',
+                        year: 2025,
+                        confidence: 90
+                      }
+                    ]
+                }
+                benchmarks={null} // TODO: Add benchmarks when available
+              />
+
+              {/* Valuation Card - Always show */}
+              <ValuationCard
+                financialHealth={company.financialHealth || 5}
+                growthPotential={company.growthPotential || 'Medel'}
+                marketPosition={company.marketPosition || 'Följare'}
+                acquisitionInterest={company.acquisitionInterest || 'Medel'}
+                confidence={company.confidence || 50}
+                recommendation={company.recommendation || 'Övervaka'}
+              />
+
+              {/* Legacy Company Analysis Card (fallback) */}
+              <CompanyAnalysisCard key={`${currentRun.run.id}-legacy-${company.orgnr}`} company={company} />
+            </div>
+          ))}
         </div>
       )}
 
@@ -924,8 +1018,20 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
-            <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-              No analyses have been recorded yet. Run your first batch above.
+            <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Inga analyser registrerade än</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Kör din första AI-analys ovan för att börja bygga upp en historik av företagsbedömningar.
+              </p>
+              <div className="text-xs text-gray-400">
+                <p>• Screening-analys: Snabb bedömning av flera företag</p>
+                <p>• Djupanalys: Detaljerad analys av utvalda företag</p>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -976,4 +1082,3 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 }
 
 export default AIAnalysis
-

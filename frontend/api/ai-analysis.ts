@@ -305,8 +305,7 @@ Svara ENDAST i strikt JSON-format enligt följande struktur:
       "weaknesses": string[],
       "opportunities": string[],
       "risks": string[],
-      "recommendation": "Köp|Behåll|Sälj|Utforska",
-      "targetPrice": number | null,
+      "recommendation": "Prioritera förvärv|Fördjupa DD|Övervaka|Avstå",
       "confidence": number
     }
   ],
