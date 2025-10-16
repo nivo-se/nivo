@@ -128,6 +128,54 @@ const AnalyzedCompanies: React.FC = () => {
     setExpandedRuns(newExpanded)
   }
 
+  const handleViewAnalysis = async (run: AnalysisRun) => {
+    try {
+      // For now, create a mock AnalyzedCompany object from the run data
+      // This should be replaced with actual API call to fetch analysis results
+      const mockAnalysis = {
+        runId: run.id,
+        companyName: run.companies[0]?.name || 'Okänt företag',
+        orgnr: run.companies[0]?.orgnr || '0000000000',
+        analysisDate: run.startedAt,
+        recommendation: 'Fördjupa due diligence',
+        screeningScore: 75,
+        riskLevel: 'Medium risk',
+        summary: 'Detaljerad analys kommer snart...',
+        financialGrade: 'B',
+        commercialGrade: 'B+',
+        operationalGrade: 'A-',
+        confidence: 85,
+        modelVersion: run.modelVersion,
+        nextSteps: [
+          'Genomför due diligence',
+          'Utvärdera marknadspotential',
+          'Analysera konkurrensläge'
+        ],
+        sections: [
+          {
+            section_type: 'financial_analysis',
+            title: 'Finansiell analys',
+            content_md: 'Finansiell analys kommer snart...',
+            supporting_metrics: [
+              { metric_name: 'Omsättning', metric_value: 1000000, metric_unit: 'SEK' },
+              { metric_name: 'Vinstmarginal', metric_value: 12.5, metric_unit: '%' }
+            ],
+            confidence: 85
+          }
+        ],
+        metrics: [
+          { metric_name: 'Omsättning', metric_value: '1,000,000', metric_unit: 'SEK' },
+          { metric_name: 'Vinstmarginal', metric_value: '12.5', metric_unit: '%' }
+        ]
+      }
+      
+      setSelectedAnalysis(mockAnalysis)
+    } catch (error) {
+      console.error('Error loading analysis details:', error)
+      alert('Kunde inte ladda analysdetaljer')
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const variants = {
       'completed': { variant: 'default' as const, icon: CheckCircle, text: 'Slutförd' },
@@ -426,7 +474,7 @@ const AnalyzedCompanies: React.FC = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setSelectedAnalysis(run)}
+                                  onClick={() => handleViewAnalysis(run)}
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -468,7 +516,7 @@ const AnalyzedCompanies: React.FC = () => {
                                           <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => setSelectedAnalysis({ ...run, selectedCompany: company })}
+                                            onClick={() => handleViewAnalysis({ ...run, companies: [company] })}
                                           >
                                             <Eye className="w-3 h-3" />
                                           </Button>
