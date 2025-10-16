@@ -473,7 +473,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       const response = await fetch('/api/ai-analysis?history=1&limit=10')
       const data = await response.json()
       if (data.success) {
-        setHistory(data.history || [])
+        setHistory(data.data || [])
       }
     } catch (error) {
       console.error('Failed to load AI analysis history', error)
@@ -1039,29 +1039,37 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-3 py-2 text-left font-semibold">Run ID</th>
-                    <th className="px-3 py-2 text-left font-semibold">Company</th>
-                    <th className="px-3 py-2 text-left font-semibold">Recommendation</th>
-                    <th className="px-3 py-2 text-left font-semibold">Confidence</th>
-                    <th className="px-3 py-2 text-left font-semibold">Completed</th>
+                    <th className="px-3 py-2 text-left font-semibold">Type</th>
+                    <th className="px-3 py-2 text-left font-semibold">Status</th>
+                    <th className="px-3 py-2 text-left font-semibold">Model</th>
+                    <th className="px-3 py-2 text-left font-semibold">Started</th>
                     <th className="px-3 py-2 text-left font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {history.map((row) => (
-                    <tr key={`${row.run_id}-${row.orgnr}`} className="border-t">
-                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.run_id}</td>
-                      <td className="px-3 py-2 text-sm font-medium text-foreground">{row.company_name}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.recommendation || '—'}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{confidenceLabel(row.confidence)}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.completed_at)}</td>
+                    <tr key={row.id} className="border-t">
+                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.id.slice(0, 8)}...</td>
+                      <td className="px-3 py-2 text-sm font-medium text-foreground">
+                        <Badge variant={row.analysis_mode === 'deep' ? 'default' : 'secondary'}>
+                          {row.analysis_mode === 'deep' ? 'Djupanalys' : 'Screening'}
+                        </Badge>
+                      </td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">
+                        <Badge variant={row.status === 'completed' ? 'default' : 'destructive'}>
+                          {row.status === 'completed' ? 'Slutförd' : row.status === 'completed_with_errors' ? 'Slutförd med fel' : row.status}
+                        </Badge>
+                      </td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.model_version}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.started_at)}</td>
                       <td className="px-3 py-2 text-sm">
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={loadingRunId === row.run_id}
-                          onClick={() => handleSelectRun(row.run_id)}
+                          disabled={loadingRunId === row.id}
+                          onClick={() => handleSelectRun(row.id)}
                         >
-                          {loadingRunId === row.run_id ? (
+                          {loadingRunId === row.id ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                             <Sparkles className="mr-2 h-4 w-4" />

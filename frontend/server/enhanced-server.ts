@@ -1152,7 +1152,7 @@ app.get('/api/test-ai-table', async (req, res) => {
 // AI Analysis history endpoint
 app.get('/api/ai-analysis', async (req, res) => {
   try {
-    const { history, limit = 10 } = req.query
+    const { history, limit = 10, runId } = req.query
     
     if (history) {
       // Return analysis history
@@ -1178,7 +1178,38 @@ app.get('/api/ai-analysis', async (req, res) => {
       return res.json({ success: true, data: data || [] })
     }
     
-    // If not history request, return 404
+    if (runId) {
+      // Return specific run details with analysis results
+      const { data: runData, error: runError } = await supabase
+        .from('ai_analysis_runs')
+        .select('*')
+        .eq('id', runId)
+        .single()
+      
+      if (runError) {
+        console.error('Error fetching run details:', runError)
+        return res.status(500).json({ success: false, error: runError.message })
+      }
+      
+      // Get analysis results for this run
+      const { data: analysisData, error: analysisError } = await supabase
+        .from('ai_company_analysis')
+        .select('*')
+        .eq('run_id', runId)
+      
+      if (analysisError) {
+        console.error('Error fetching analysis results:', analysisError)
+        return res.status(500).json({ success: false, error: analysisError.message })
+      }
+      
+      return res.json({ 
+        success: true, 
+        run: runData,
+        analysis: { companies: analysisData || [] }
+      })
+    }
+    
+    // If not history or runId request, return 404
     res.status(404).json({ success: false, error: 'Endpoint not found' })
   } catch (error: any) {
     console.error('AI analysis history error:', error)
