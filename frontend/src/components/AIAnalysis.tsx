@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import {
   Card,
   CardContent,
@@ -54,17 +53,9 @@ interface MetricResult {
   confidence?: number | null
 }
 
-interface AuditResult {
-  prompt: string
-  response: string
-  latency_ms: number
-  prompt_tokens: number
-  completion_tokens: number
-  cost_usd: number | null
-}
-
 interface CompanyResult {
   orgnr: string
+  companyId?: string | null
   companyName: string
   summary: string | null
   recommendation: string | null
@@ -74,24 +65,9 @@ interface CompanyResult {
   commercialGrade: string | null
   operationalGrade: string | null
   nextSteps: string[]
-  
-  // NEW: Codex enhanced fields
-  executiveSummary?: string
-  keyFindings?: string[]
-  narrative?: string
-  strengths?: string[]
-  weaknesses?: string[]
-  opportunities?: string[]
-  risks?: string[]
-  acquisitionInterest?: string  // 'Hög' | 'Medel' | 'Låg'
-  financialHealth?: number       // 1-10 score
-  growthPotential?: string       // 'Hög' | 'Medel' | 'Låg'
-  marketPosition?: string        // 'Marknadsledare' | 'Utmanare' | 'Följare' | 'Nischaktör'
-
-  // Data structures
   sections: SectionResult[]
   metrics: MetricResult[]
-  audit?: AuditResult
+  contextSummary?: string
 }
 
 interface ScreeningResult {
@@ -144,8 +120,8 @@ const formatDate = (value?: string | null) => {
   }
 }
 
-const gradeBadge = (label: string | null | undefined) => {
-  if (!label || typeof label !== 'string') return <Badge variant="outline">N/A</Badge>
+const gradeBadge = (label: string | null) => {
+  if (!label) return <Badge variant="outline">N/A</Badge>
   const normalized = label.toUpperCase()
   const variants: Record<string, string> = {
     A: 'bg-emerald-100 text-emerald-800 border-emerald-200',
@@ -167,8 +143,7 @@ const statusBadge = (status: string) => {
 
 const confidenceLabel = (value: Nullable<number>) => {
   if (!value && value !== 0) return 'N/A'
-  // Confidence is already in percentage (0-100), so just show as percentage
-  return `${value.toFixed(0)}%`
+  return `${value.toFixed(1)} / 5`
 }
 
 const riskBadge = (value: Nullable<number>) => {
@@ -428,8 +403,6 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
 )
 
 const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_analytics' }) => {
-  const { user } = useAuth()
-  
   // Saved lists state
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedListId, setSelectedListId] = useState<string>('')
@@ -470,10 +443,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
   const loadHistory = async () => {
     try {
-      const response = await fetch('/api/analysis-runs?limit=10')
+      const response = await fetch('/api/ai-analysis?history=1&limit=10')
       const data = await response.json()
       if (data.success) {
-        setHistory(data.runs || [])
+        setHistory(data.history || [])
       }
     } catch (error) {
       console.error('Failed to load AI analysis history', error)
@@ -559,7 +532,6 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           analysisType: analysisMode,
           instructions: instructions.trim() || undefined,
           filters: { dataView: selectedDataView },
-          userId: user?.id,
         }),
       })
       const data = await response.json()
@@ -569,19 +541,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       
       if (analysisMode === 'screening') {
         console.log('Screening results received:', data.analysis.results)
-        console.log('Setting screening results, current analysisMode:', analysisMode)
-        // Transform the API response to match the interface
-        const transformedResults = (data.analysis.results || []).map((result: any) => ({
-          orgnr: result.orgnr,
-          companyName: result.companyName,
-          screeningScore: result.screeningScore,
-          riskFlag: result.riskFlag?.replace(' risk', '') || null,
-          briefSummary: result.briefSummary
-        }))
-        console.log('Transformed screening results:', transformedResults)
-        setScreeningResults(transformedResults)
+        setScreeningResults(data.analysis.results || [])
         setCurrentRun(null) // Clear any previous deep analysis
-        console.log('Screening results set, currentRun cleared')
       } else {
         console.log('Deep analysis results received:', data)
         // For deep analysis, the results are in data.analysis.companies
@@ -602,12 +563,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     setLoadingRunId(runId)
     setErrorMessage(null)
     try {
-      const response = await fetch(`/api/analysis-runs/${encodeURIComponent(runId)}`)
+      const response = await fetch(`/api/ai-analysis?runId=${encodeURIComponent(runId)}`)
       const data = await response.json()
       if (!data.success) {
         throw new Error(data.error || 'Kunde inte ladda körningsdetaljer')
       }
-      setCurrentRun({ run: data.run, analysis: { companies: data.companies } })
+      setCurrentRun({ run: data.run, analysis: data.analysis })
     } catch (error) {
       console.error('Failed to load run details', error)
       setErrorMessage(error instanceof Error ? error.message : 'Misslyckades att ladda körningsdetaljer')
@@ -635,12 +596,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   const estimateCost = () => {
     if (analysisMode === 'screening') {
       const selectedCount = selectedCompanies.size
-      // GPT-3.5-turbo: ~$0.002 per company for screening
-      return selectedCount * 0.002
+      // GPT-4o-mini: ~$0.0008 per company for screening
+      return selectedCount * 0.0008
     } else {
       const selectedCount = selectedForDeepAnalysis.size
-      // GPT-4: ~$0.50 per company for deep analysis
-      return selectedCount * 0.50
+      // GPT-4o-mini: ~$0.20 per company for deep analysis
+      return selectedCount * 0.20
     }
   }
 
@@ -869,7 +830,6 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       </Card>
 
       {/* Screening Results Display */}
-      {console.log('UI Debug - screeningResults.length:', screeningResults.length, 'analysisMode:', analysisMode, 'currentRun:', currentRun)}
       {screeningResults.length > 0 && analysisMode === 'screening' && (
             <Card>
               <CardHeader>
@@ -902,18 +862,16 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             </Card>
           )}
 
-      {/* Enhanced Deep Analysis Results Display */}
-      {console.log('Deep Analysis Debug - currentRun:', currentRun, 'has companies:', currentRun && 'companies' in currentRun.analysis)}
+      {/* Deep Analysis Results Display */}
       {currentRun && 'companies' in currentRun.analysis && (
-        <div className="space-y-6">
-          {/* Analysis Header */}
+        <div className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl">Djupanalys Resultat</CardTitle>
+                  <CardTitle className="text-xl">Djupanalys Sammanfattning</CardTitle>
               <CardDescription>
-                    Model {currentRun.run.modelVersion} • Startad {formatDate(currentRun.run.startedAt)} • Slutförd{' '}
+                    Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
                     {formatDate(currentRun.run.completedAt)}
               </CardDescription>
                 </div>
@@ -924,90 +882,43 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               {currentRun.run.errorMessage && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   {currentRun.run.errorMessage}
+                      </div>
+              )}
+              <Separator className="my-4" />
+              <div className="grid gap-4 md:grid-cols-2">
+                {currentRun.analysis.companies.map((company) => (
+                  <div key={`${currentRun.run.id}-${company.orgnr}`} className="rounded-lg border bg-muted/40 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{company.companyName}</span>
+                      {riskBadge(company.riskScore)}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">Recommendation: {company.recommendation || '—'}</p>
+                    <p className="text-xs text-muted-foreground">Confidence: {confidenceLabel(company.confidence)}</p>
                   </div>
-                )}
+                ))}
+              </div>
             </CardContent>
           </Card>
 
-          {/* Enhanced Report Cards for Each Company */}
-          {currentRun.analysis.companies.map((company) => (
-            <div key={`${currentRun.run.id}-enhanced-${company.orgnr}`} className="space-y-6">
-              {/* Executive Summary Card - Always show if we have company data */}
-              <ExecutiveSummaryCard
-                companyName={company.companyName || company.name}
-                orgnr={company.orgnr}
-                executiveSummary={company.executiveSummary || company.summary || 'Ingen sammanfattning tillgänglig.'}
-                financialHealth={company.financialHealth || 5}
-                acquisitionInterest={company.acquisitionInterest || 'Medel'}
-                marketPosition={company.marketPosition || 'Följare'}
-                recommendation={company.recommendation || 'Avvakta'}
-                confidence={company.confidence || 50}
-              />
-
-              {/* Key Findings Card - Show if we have findings or create fallback */}
-              <KeyFindingsCard 
-                keyFindings={company.keyFindings && company.keyFindings.length > 0 
-                  ? company.keyFindings 
-                  : [
-                      `Omsättning: ${company.summary?.includes('TSEK') ? 'Tillgänglig' : 'Ej tillgänglig'}`,
-                      `Anställda: ${company.summary?.includes('anställda') ? 'Tillgänglig' : 'Ej tillgänglig'}`,
-                      `Bransch: ${company.segmentName || 'Ej specificerad'}`
-                    ]
-                } 
-              />
-
-              {/* SWOT Analysis Card - Always show with available data */}
-              <SWOTAnalysisCard
-                strengths={company.strengths || []}
-                weaknesses={company.weaknesses || []}
-                opportunities={company.opportunities || []}
-                risks={company.risks || []}
-              />
-
-              {/* Narrative Card - Show if we have narrative or use summary */}
-              <NarrativeCard
-                narrative={company.narrative || company.summary || 'Ingen detaljerad analys tillgänglig för detta företag.'}
-                executiveSummary={company.executiveSummary}
-              />
-
-              {/* Financial Metrics Card - Show if we have metrics or create basic ones */}
-              <FinancialMetricsCard
-                metrics={company.metrics && company.metrics.length > 0 
-                  ? company.metrics 
-                  : [
-                      {
-                        metric_name: 'Omsättning',
-                        metric_value: 112342,
-                        metric_unit: 'TSEK',
-                        year: 2025,
-                        confidence: 85
-                      },
-                      {
-                        metric_name: 'Anställda',
-                        metric_value: 23,
-                        metric_unit: 'personer',
-                        year: 2025,
-                        confidence: 90
-                      }
-                    ]
-                }
-                benchmarks={null} // TODO: Add benchmarks when available
-              />
-
-              {/* Valuation Card - Always show */}
-              <ValuationCard
-                financialHealth={company.financialHealth || 5}
-                growthPotential={company.growthPotential || 'Medel'}
-                marketPosition={company.marketPosition || 'Följare'}
-                acquisitionInterest={company.acquisitionInterest || 'Medel'}
-                confidence={company.confidence || 50}
-                recommendation={company.recommendation || 'Övervaka'}
-              />
-
-              {/* Legacy Company Analysis Card (fallback) */}
-              <CompanyAnalysisCard key={`${currentRun.run.id}-legacy-${company.orgnr}`} company={company} />
-            </div>
-          ))}
+          <div className="space-y-6">
+            {currentRun.analysis.companies.map((company) => (
+              <div key={`${currentRun.run.id}-detail-${company.orgnr}`} className="space-y-6">
+                {/* Enhanced Report Cards */}
+                <div className="grid gap-6">
+                  <ExecutiveSummaryCard company={company} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <KeyFindingsCard company={company} />
+                    <SWOTAnalysisCard company={company} />
+                  </div>
+                  <NarrativeCard company={company} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <FinancialMetricsCard company={company} />
+                    <ValuationCard company={company} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -1018,20 +929,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
-            <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-sm font-medium text-gray-900 mb-2">Inga analyser registrerade än</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Kör din första AI-analys ovan för att börja bygga upp en historik av företagsbedömningar.
-              </p>
-              <div className="text-xs text-gray-400">
-                <p>• Screening-analys: Snabb bedömning av flera företag</p>
-                <p>• Djupanalys: Detaljerad analys av utvalda företag</p>
-              </div>
+            <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No analyses have been recorded yet. Run your first batch above.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -1039,37 +938,29 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-3 py-2 text-left font-semibold">Run ID</th>
-                    <th className="px-3 py-2 text-left font-semibold">Type</th>
-                    <th className="px-3 py-2 text-left font-semibold">Status</th>
-                    <th className="px-3 py-2 text-left font-semibold">Model</th>
-                    <th className="px-3 py-2 text-left font-semibold">Started</th>
+                    <th className="px-3 py-2 text-left font-semibold">Company</th>
+                    <th className="px-3 py-2 text-left font-semibold">Recommendation</th>
+                    <th className="px-3 py-2 text-left font-semibold">Confidence</th>
+                    <th className="px-3 py-2 text-left font-semibold">Completed</th>
                     <th className="px-3 py-2 text-left font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {history.map((row) => (
-                    <tr key={row.id} className="border-t">
-                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.id.slice(0, 8)}...</td>
-                      <td className="px-3 py-2 text-sm font-medium text-foreground">
-                        <Badge variant={row.analysis_mode === 'deep' ? 'default' : 'secondary'}>
-                          {row.analysis_mode === 'deep' ? 'Djupanalys' : 'Screening'}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">
-                        <Badge variant={row.status === 'completed' ? 'default' : 'destructive'}>
-                          {row.status === 'completed' ? 'Slutförd' : row.status === 'completed_with_errors' ? 'Slutförd med fel' : row.status}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.model_version}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.started_at)}</td>
+                    <tr key={`${row.run_id}-${row.orgnr}`} className="border-t">
+                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.run_id}</td>
+                      <td className="px-3 py-2 text-sm font-medium text-foreground">{row.company_name}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.recommendation || '—'}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{confidenceLabel(row.confidence)}</td>
+                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.completed_at)}</td>
                       <td className="px-3 py-2 text-sm">
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={loadingRunId === row.id}
-                          onClick={() => handleSelectRun(row.id)}
+                          disabled={loadingRunId === row.run_id}
+                          onClick={() => handleSelectRun(row.run_id)}
                         >
-                          {loadingRunId === row.id ? (
+                          {loadingRunId === row.run_id ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                             <Sparkles className="mr-2 h-4 w-4" />
@@ -1090,3 +981,4 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 }
 
 export default AIAnalysis
+

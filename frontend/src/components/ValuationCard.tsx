@@ -1,204 +1,166 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
-import { Activity, BarChart2, Target, ShieldAlert, Compass } from 'lucide-react'
+import { Target, TrendingUp, Shield, Star, DollarSign } from 'lucide-react'
 
 interface ValuationCardProps {
-  financialHealth: number
-  growthPotential: string
-  marketPosition: string
-  acquisitionInterest: string
-  confidence: number
-  recommendation: string
+  company: {
+    companyName: string
+    targetPrice?: number | null
+    acquisitionInterest?: string | null
+    financialHealth?: number | null
+    growthPotential?: string | null
+    marketPosition?: string | null
+    confidence?: number | null
+  }
 }
 
-export function ValuationCard({
-  financialHealth,
-  growthPotential,
-  marketPosition,
-  acquisitionInterest,
-  confidence,
-  recommendation,
-}: ValuationCardProps) {
-  const readinessScore = Math.round(
-    (financialHealth * 0.4) +
-    (normalizePotential(growthPotential) * 0.25) +
-    (normalizeInterest(acquisitionInterest) * 0.2) +
-    (normalizePosition(marketPosition) * 0.15)
-  )
+export const ValuationCard: React.FC<ValuationCardProps> = ({ company }) => {
+  const getAcquisitionInterestColor = (interest?: string | null) => {
+    switch (interest?.toLowerCase()) {
+      case 'hög':
+      case 'high':
+        return 'bg-green-100 text-green-800 border-green-200'
+      case 'medel':
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'låg':
+      case 'low':
+        return 'bg-red-100 text-red-800 border-red-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
 
-  const focusAreas = deriveFocusAreas(financialHealth, growthPotential, marketPosition, confidence)
+  const getGrowthPotentialColor = (potential?: string | null) => {
+    switch (potential?.toLowerCase()) {
+      case 'hög':
+      case 'high':
+        return 'text-green-600'
+      case 'medel':
+      case 'medium':
+        return 'text-yellow-600'
+      case 'låg':
+      case 'low':
+        return 'text-red-600'
+      default:
+        return 'text-gray-500'
+    }
+  }
+
+  const getFinancialHealthColor = (score?: number | null) => {
+    if (!score) return 'text-gray-500'
+    if (score >= 8) return 'text-green-600'
+    if (score >= 6) return 'text-yellow-600'
+    return 'text-red-600'
+  }
+
+  const getConfidenceStars = (confidence?: number | null) => {
+    if (!confidence) return null
+    const stars = Math.round((confidence / 5) * 5)
+    return (
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`h-3 w-3 ${
+              i < stars ? 'text-yellow-400 fill-current' : 'text-gray-300'
+            }`}
+          />
+        ))}
+        <span className="text-xs text-gray-600 ml-1">({confidence.toFixed(1)}/5)</span>
+      </div>
+    )
+  }
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Compass className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                Förvärvsläge
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
-                Helhetsbedömning av bolagets lämplighet för nästa steg i förvärvsprocessen
-              </p>
-            </div>
-          </div>
-          <Badge className="bg-blue-50 text-blue-700 border-blue-200">
-            {recommendation}
-          </Badge>
-        </div>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-green-600" />
+          Värdering & Förvärvsintresse
+        </CardTitle>
       </CardHeader>
-
       <CardContent className="space-y-6">
-        {/* Readiness summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SummaryTile
-            icon={<Activity className="h-5 w-5 text-green-600" />}
-            label="Finansiell hälsa"
-            value={`${financialHealth}/10`}
-            description={financialHealth >= 8 ? 'Stark balans och lönsamhet' : financialHealth >= 6 ? 'Stabil men bör följas upp' : 'Behöver stärkt lönsamhet'}
-          />
-          <SummaryTile
-            icon={<BarChart2 className="h-5 w-5 text-purple-600" />}
-            label="Tillväxtpotential"
-            value={growthPotential}
-            description={growthPotential === 'Hög' ? 'God skalbarhet och marknadsdriv' : growthPotential === 'Medel' ? 'Balanserad utvecklingsmöjlighet' : 'Begränsad tillväxt – kräver plan'}
-          />
-          <SummaryTile
-            icon={<Target className="h-5 w-5 text-amber-600" />}
-            label="Förvärvsintresse"
-            value={acquisitionInterest}
-            description={acquisitionInterest === 'Hög' ? 'Bör prioriteras i pipen' : acquisitionInterest === 'Medel' ? 'Fortsätt dialog och uppföljning' : 'Låg prioritet i nuläget'}
-          />
-        </div>
-
-        {/* Confidence indicator */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
-              <ShieldAlert className="h-5 w-5 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Analysens tillförlitlighet</span>
+        {/* Target Price */}
+        {company.targetPrice && (
+          <div className="text-center p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <DollarSign className="h-6 w-6 text-green-600" />
+              <span className="text-sm font-medium text-gray-600">Målpris</span>
             </div>
-            <Badge className={`${confidence >= 75 ? 'bg-green-100 text-green-700' : confidence >= 55 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-              {confidence}%
-            </Badge>
-          </div>
-          <p className="text-sm text-gray-600">
-            {confidence >= 75
-              ? 'Underlaget är välförankrat i datapunkter och kan användas för nästa beslutssteg.'
-              : confidence >= 55
-              ? 'Underlaget är delvis komplett. Rekommenderas att komplettera data innan beslut.'
-              : 'Underlaget är svagt. Säkerställ uppdaterade siffror och kvalitativa insikter.'}
-          </p>
-        </div>
-
-        {/* Focus areas */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-800">Prioriterade åtgärder</h4>
-          <ul className="space-y-2">
-            {focusAreas.map((item, index) => (
-              <li key={index} className="flex items-start space-x-2">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                <span className="text-sm text-gray-700">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Readiness score */}
-        <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 border border-blue-100">
-          <p className="text-sm font-medium text-gray-700 mb-2">Sammanvägd förvärvsberedskap</p>
-          <div className="flex items-center justify-between">
-            <div className="text-3xl font-bold text-blue-600">{readinessScore}/100</div>
-            <p className="text-sm text-gray-600 max-w-xs">
-              Sammansatt score baserat på finansiell styrka, marknadsposition och signaler om förvärvsintresse.
+            <div className="text-3xl font-bold text-green-600">
+              {company.targetPrice.toLocaleString('sv-SE')} MSEK
+            </div>
+            <p className="text-sm text-gray-600 mt-1">
+              Baserat på finansiell analys och marknadsjämförelser
             </p>
           </div>
+        )}
+
+        {/* Acquisition Interest */}
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-blue-600" />
+            <span className="font-medium text-gray-700">Förvärvsintresse</span>
+          </div>
+          <Badge className={getAcquisitionInterestColor(company.acquisitionInterest)}>
+            {company.acquisitionInterest || 'Ej bedömd'}
+          </Badge>
+        </div>
+
+        {/* Supporting Factors Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 border rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-gray-600">Tillväxtpotential</span>
+            </div>
+            <div className={`text-lg font-semibold ${getGrowthPotentialColor(company.growthPotential)}`}>
+              {company.growthPotential || 'Ej bedömd'}
+            </div>
+          </div>
+
+          <div className="p-4 border rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-600">Finansiell Hälsa</span>
+            </div>
+            <div className={`text-lg font-semibold ${getFinancialHealthColor(company.financialHealth)}`}>
+              {company.financialHealth ? `${company.financialHealth}/10` : 'Ej bedömd'}
+            </div>
+          </div>
+
+          <div className="p-4 border rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium text-gray-600">Marknadsposition</span>
+            </div>
+            <div className="text-lg font-semibold text-gray-800">
+              {company.marketPosition || 'Ej bedömd'}
+            </div>
+          </div>
+        </div>
+
+        {/* Confidence Rating */}
+        {company.confidence && (
+          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <span className="text-sm font-medium text-gray-700">Analyskvalitet</span>
+            {getConfidenceStars(company.confidence)}
+          </div>
+        )}
+
+        {/* Summary */}
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <h4 className="font-medium text-gray-800 mb-2">Sammanfattning</h4>
+          <p className="text-sm text-gray-600">
+            {company.targetPrice ? 
+              `Företaget har ett beräknat målpris på ${company.targetPrice.toLocaleString('sv-SE')} MSEK med ${company.acquisitionInterest?.toLowerCase() || 'medel'} förvärvsintresse.` :
+              'Värderingsanalys pågår. Målpris och förvärvsintresse kommer att visas när analysen är klar.'
+            }
+          </p>
         </div>
       </CardContent>
     </Card>
   )
-}
-
-function SummaryTile({
-  icon,
-  label,
-  value,
-  description,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string
-  description: string
-}) {
-  return (
-    <div className="bg-white border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        {icon}
-        <span className="text-xs uppercase tracking-wide text-gray-500">{label}</span>
-      </div>
-      <div className="text-xl font-semibold text-gray-900">{value}</div>
-      <p className="text-sm text-gray-600 mt-2 leading-snug">{description}</p>
-    </div>
-  )
-}
-
-function normalizePotential(potential: string) {
-  if (potential === 'Hög') return 10
-  if (potential === 'Medel') return 7
-  return 4
-}
-
-function normalizeInterest(interest: string) {
-  if (interest === 'Hög') return 10
-  if (interest === 'Medel') return 7
-  return 3
-}
-
-function normalizePosition(position: string) {
-  switch (position) {
-    case 'Marknadsledare': return 10
-    case 'Utmanare': return 8
-    case 'Nischaktör': return 6
-    case 'Följare':
-    default: return 5
-  }
-}
-
-function deriveFocusAreas(
-  financialHealth: number,
-  growthPotential: string,
-  marketPosition: string,
-  confidence: number
-) {
-  const actions: string[] = []
-
-  if (financialHealth < 6) {
-    actions.push('Genomför en detaljerad balans- och kassaflödesanalys för att säkerställa finansiell stabilitet.')
-  } else {
-    actions.push('Bekräfta finansiella nyckeltal mot senaste bokslut och forecasting.')
-  }
-
-  if (growthPotential === 'Hög') {
-    actions.push('Kartlägg de mest attraktiva expansionssegmenten och möjliga synergier efter förvärv.')
-  } else if (growthPotential === 'Medel') {
-    actions.push('Identifiera accelerationsinitiativ (sälj, marknad, produkt) för att öka tillväxttakten.')
-  } else {
-    actions.push('Utvärdera hur bolaget kan stärkas via integration och effektivisering.')
-  }
-
-  if (marketPosition === 'Följare') {
-    actions.push('Analysera konkurrenslandskapet för att bedöma krav på differentiering post-förvärv.')
-  } else if (marketPosition === 'Nischaktör') {
-    actions.push('Bedöm nischens storlek och lönsamhet samt möjliga cross-sell-effekter.')
-  }
-
-  if (confidence < 60) {
-    actions.push('Komplettera datainsamling (kundkoncentration, pipeline, leverantörsberoende) innan beslut.')
-  }
-
-  return actions.slice(0, 4)
 }

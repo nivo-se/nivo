@@ -54,32 +54,20 @@ interface AuditResult {
 
 interface CompanyResult {
   orgnr: string
-  orgNr: string
+  companyId?: string | null
   companyName: string
-  name: string
-  segmentName?: string | null
-  executiveSummary: string
-  keyFindings: string[]
-  narrative: string
-  strengths: string[]
-  weaknesses: string[]
-  opportunities: string[]
-  risks: string[]
-  recommendation: string
-  acquisitionInterest: string
-  financialHealth: number
-  growthPotential: string
-  marketPosition: string
-  confidence: number
-  riskScore: number
-  nextSteps: string[]
   summary: string | null
+  recommendation: string | null
+  confidence: number | null
+  riskScore: number | null
   financialGrade: string | null
   commercialGrade: string | null
   operationalGrade: string | null
+  nextSteps: string[]
   sections: SectionResult[]
   metrics: MetricResult[]
   audit: AuditResult
+  contextSummary?: string
 }
 
 interface ScreeningResult {
@@ -106,173 +94,129 @@ interface RunResponsePayload {
   analysis: { companies: CompanyResult[] } | { results: ScreeningResult[] }
 }
 
-interface FinancialYearRecord {
-  year: number
-  revenue: number | null
-  ebitda: number | null
-  ebit: number | null
-  netIncome: number | null
-  totalDebt: number | null
-  totalEquity: number | null
-  employees: number | null
-  revenueGrowth?: number | null
-  ebitMargin?: number | null
-  debtToEquity?: number | null
-}
-
-interface KPIRecord {
-  year: number
-  revenueGrowth?: number | null
-  ebitMargin?: number | null
-  netMargin?: number | null
-  equityRatio?: number | null
-  returnOnEquity?: number | null
-}
-
-interface CompanyBenchmarks {
-  segment?: string | null
-  avgRevenueGrowth?: number | null
-  avgEbitMargin?: number | null
-  avgNetMargin?: number | null
-  avgEquityRatio?: number | null
-}
-
-interface CompanyDerivedMetrics {
-  revenueCagr?: number | null
-  avgEbitdaMargin?: number | null
-  avgNetMargin?: number | null
-  equityRatioLatest?: number | null
-  debtToEquityLatest?: number | null
-  revenuePerEmployee?: number | null
-}
-
-interface CompanyProfile {
+interface CompanySnapshot {
   orgnr: string
+  companyId?: string | null
   companyName: string
   segmentName?: string | null
   industry?: string | null
   city?: string | null
   employees?: number | null
-  sizeCategory?: string | null
-  growthCategory?: string | null
-  profitabilityCategory?: string | null
-  financials: FinancialYearRecord[]
-  kpis: KPIRecord[]
-  derived: CompanyDerivedMetrics
-  benchmarks?: CompanyBenchmarks
+  metrics: Record<string, any>
+  financials: Array<Record<string, any>>
+  contextSummary: string
 }
 
-const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4.1-mini'
-const MODEL_SCREENING = 'gpt-3.5-turbo'
-const PROMPT_COST_PER_1K = 0.15
-const COMPLETION_COST_PER_1K = 0.6
-const SCREENING_PROMPT_COST_PER_1K = 0.0005
-const SCREENING_COMPLETION_COST_PER_1K = 0.0015
+interface CompanyDataBundle {
+  orgnr: string
+  companyId: string | null
+  companyName: string
+  segmentName?: string | null
+  industry?: string | null
+  city?: string | null
+  email?: string | null
+  homepage?: string | null
+  incorporationDate?: string | null
+  employees?: number | null
+  financials: FinancialRecord[]
+  kpis: KPIRecord[]
+  contextSummary: string
+}
 
-const deepAnalysisSchema = {
-  name: 'DeepCompanyAnalysis',
+interface FinancialRecord {
+  year: number
+  revenue: Nullable<number>
+  profit: Nullable<number>
+  employees: Nullable<number>
+}
+
+interface KPIRecord {
+  year: number
+  revenue_growth: Nullable<number>
+  ebit_margin: Nullable<number>
+  net_margin: Nullable<number>
+  equity_ratio: Nullable<number>
+  return_on_equity: Nullable<number>
+}
+
+const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+const MODEL_SCREENING = 'gpt-4o-mini'  // Use mini for cost efficiency
+const PROMPT_COST_PER_1K = 0.00015  // GPT-4o-mini rates
+const COMPLETION_COST_PER_1K = 0.0006
+const SCREENING_PROMPT_COST_PER_1K = 0.00015  // Same as deep analysis for consistency
+const SCREENING_COMPLETION_COST_PER_1K = 0.0006
+
+const ANALYSIS_QUESTION =
+  "Based on this company's financial data and KPIs, analyze its performance and attractiveness for acquisition. Highlight major strengths, weaknesses, and potential red flags."
+
+const analysisSchema = {
+  name: 'CompanyAnalysisBundle',
   strict: true,
   schema: {
     type: 'object',
-    additionalProperties: false,
     properties: {
-      executive_summary: {
-        type: 'string',
-        description: 'Två meningar som sammanfattar företagets läge och investeringsläge.',
-        minLength: 40,
-      },
-      key_findings: {
+      summary: { type: 'string' },
+      recommendation: { type: 'string' },
+      confidence: { type: 'number' },
+      risk_score: { type: 'number' },
+      financial_grade: { type: 'string' },
+      commercial_grade: { type: 'string' },
+      operational_grade: { type: 'string' },
+      next_steps: { type: 'array', items: { type: 'string' } },
+      sections: {
         type: 'array',
-        minItems: 4,
-        maxItems: 6,
         items: {
-          type: 'string',
-          minLength: 20,
+          type: 'object',
+          properties: {
+            section_type: { type: 'string' },
+            title: { type: 'string' },
+            content_md: { type: 'string' },
+            supporting_metrics: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  metric_name: { type: 'string' },
+                  metric_value: { type: 'number' },
+                  metric_unit: { type: 'string' },
+                  source: { type: 'string' },
+                  year: { type: 'integer' },
+                },
+                required: ['metric_name', 'metric_value'],
+              },
+            },
+            confidence: { type: 'number' },
+            tokens_used: { type: 'integer' },
+          },
+          required: ['section_type', 'content_md'],
         },
-        description: 'Bullet points med de viktigaste observationerna.',
       },
-      narrative: {
-        type: 'string',
-        description: 'En handlingsinriktad text kring 280-320 ord på svenska.',
-        minLength: 1200,
-      },
-      strengths: {
+      metrics: {
         type: 'array',
-        minItems: 3,
-        items: { type: 'string', minLength: 15 },
-      },
-      weaknesses: {
-        type: 'array',
-        minItems: 2,
-        items: { type: 'string', minLength: 15 },
-      },
-      opportunities: {
-        type: 'array',
-        minItems: 2,
-        items: { type: 'string', minLength: 15 },
-      },
-      risks: {
-        type: 'array',
-        minItems: 2,
-        items: { type: 'string', minLength: 15 },
-      },
-      recommendation: {
-        type: 'string',
-        enum: ['Prioritera förvärv', 'Fördjupa due diligence', 'Övervaka', 'Avstå'],
-      },
-      acquisition_interest: {
-        type: 'string',
-        enum: ['Hög', 'Medel', 'Låg'],
-      },
-      financial_health_score: {
-        type: 'number',
-        minimum: 1,
-        maximum: 10,
-      },
-      growth_outlook: {
-        type: 'string',
-        enum: ['Hög', 'Medel', 'Låg'],
-      },
-      market_position: {
-        type: 'string',
-        enum: ['Marknadsledare', 'Utmanare', 'Följare', 'Nischaktör'],
-      },
-      confidence: {
-        type: 'number',
-        minimum: 0,
-        maximum: 100,
-      },
-      risk_score: {
-        type: 'number',
-        minimum: 0,
-        maximum: 100,
-      },
-      next_steps: {
-        type: 'array',
-        minItems: 3,
-        items: { type: 'string', minLength: 10 },
-      },
-      word_count: {
-        type: 'integer',
-        minimum: 0,
+        items: {
+          type: 'object',
+          properties: {
+            metric_name: { type: 'string' },
+            metric_value: { type: 'number' },
+            metric_unit: { type: 'string' },
+            source: { type: 'string' },
+            year: { type: 'integer' },
+            confidence: { type: 'number' },
+          },
+          required: ['metric_name', 'metric_value'],
+        },
       },
     },
     required: [
-      'executive_summary',
-      'key_findings',
-      'narrative',
-      'strengths',
-      'weaknesses',
-      'opportunities',
-      'risks',
+      'summary',
       'recommendation',
-      'acquisition_interest',
-      'financial_health_score',
-      'growth_outlook',
-      'market_position',
       'confidence',
       'risk_score',
-      'next_steps',
+      'financial_grade',
+      'commercial_grade',
+      'operational_grade',
+      'sections',
+      'metrics',
     ],
   },
 }
@@ -340,16 +284,12 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
   }
 
-  const { companies, analysisType = 'deep', instructions, filters, initiatedBy } =
-    (req.body as AnalysisRequest) || {}
+  const { companies, analysisType = 'deep', instructions, filters, initiatedBy } = req.body as AnalysisRequest || {}
   if (!Array.isArray(companies) || companies.length === 0) {
     return res.status(400).json({ success: false, error: 'No companies provided' })
   }
 
-  const normalizedAnalysisType =
-    analysisType === 'comprehensive' ? 'deep' : analysisType
-
-  if (normalizedAnalysisType !== 'screening' && normalizedAnalysisType !== 'deep') {
+  if (analysisType !== 'screening' && analysisType !== 'deep') {
     return res.status(400).json({ success: false, error: 'Invalid analysis type. Must be "screening" or "deep"' })
   }
 
@@ -370,13 +310,13 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
   const runId = randomUUID()
   const startedAt = new Date().toISOString()
 
-  const modelVersion = normalizedAnalysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
+  const modelVersion = analysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
 
   await insertRunRecord(supabase, {
     id: runId,
     status: 'running',
     modelVersion,
-    analysisMode: normalizedAnalysisType,
+    analysisMode: analysisType,
     startedAt,
     initiatedBy: typeof initiatedBy === 'string' ? initiatedBy : null,
     filters,
@@ -386,7 +326,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
   const screeningResults: ScreeningResult[] = []
   const errors: string[] = []
 
-  if (normalizedAnalysisType === 'screening') {
+  if (analysisType === 'screening') {
     // Process screening in batches for efficiency
     const batchSize = 5
     for (let i = 0; i < uniqueSelections.length; i += batchSize) {
@@ -401,31 +341,32 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     }
   } else {
     // Process deep analysis one by one
-    for (const selection of uniqueSelections) {
-      const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
-      if (!orgnr) {
-        errors.push('Missing organisation number for selection')
-        continue
-      }
-
-      const fallbackName =
-        typeof selection?.name === 'string' && selection.name.trim().length > 0
-          ? selection.name.trim()
-          : `Bolag ${orgnr}`
-
-      try {
-        const profile = await generateCompanyProfile(supabase, orgnr)
-        const prompt = buildDeepAnalysisPrompt(profile, instructions)
-        const { parsed, rawText, usage, latency } = await invokeDeepAnalysisModel(openai, prompt)
-        const result = buildCompanyResult(profile, parsed, usage, latency, prompt, rawText)
-        companiesResults.push(result)
-        await persistCompanyResult(supabase, runId, result)
-      } catch (error: any) {
-        console.error('AI analysis failed', error)
-        errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
-        const fallback = buildFallbackResult(orgnr, fallbackName, selection)
-        companiesResults.push(fallback)
-        await persistCompanyResult(supabase, runId, fallback)
+  for (const selection of uniqueSelections) {
+    const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
+    if (!orgnr) {
+      errors.push('Missing organisation number for selection')
+      continue
+    }
+    try {
+        const bundle = await fetchCompanyDataBundle(supabase, orgnr)
+        const prompt = buildPrompt(bundle.contextSummary, instructions)
+      const { parsed, rawText, usage, latency } = await invokeModel(openai, prompt)
+        const result = buildCompanyResult(
+          bundle.orgnr,
+          bundle.companyName,
+          bundle.companyId,
+          parsed,
+          usage,
+          latency,
+          prompt,
+          rawText,
+          bundle.contextSummary
+        )
+      companiesResults.push(result)
+        await persistCompanyResult(supabase, runId, result, bundle)
+    } catch (error: any) {
+      console.error('AI analysis failed', error)
+      errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
       }
     }
   }
@@ -442,7 +383,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     id: runId,
     status: errors.length > 0 ? 'completed_with_errors' : 'completed',
     modelVersion,
-    analysisMode: normalizedAnalysisType,
+    analysisMode: analysisType,
     startedAt,
     completedAt,
     errorMessage: errors.length > 0 ? errors.join('; ') : null,
@@ -450,7 +391,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
 
   const response: RunResponsePayload = {
     run: runPayload,
-    analysis: normalizedAnalysisType === 'screening'
+    analysis: analysisType === 'screening' 
       ? { results: screeningResults }
       : { companies: companiesResults }
   }
@@ -501,12 +442,12 @@ async function processScreeningBatch(
     if (!orgnr) continue
     
     try {
-      const profile = await generateCompanyProfile(supabase, orgnr)
+      const snapshot = await fetchCompanySnapshot(supabase, orgnr)
       companiesData.push({
-        orgnr: profile.orgnr,
-        name: profile.companyName,
-        industry: profile.segmentName || profile.industry || 'Unknown',
-        financials: profile.financials,
+        orgnr: snapshot.orgnr,
+        name: snapshot.companyName,
+        industry: snapshot.segmentName || snapshot.industry || 'Unknown',
+        financials: snapshot.financials
       })
     } catch (error) {
       console.error(`Failed to fetch data for ${orgnr}:`, error)
@@ -555,7 +496,7 @@ function buildScreeningPrompt(companiesData: any[], instructions?: string): stri
   
   companiesData.forEach((company, index) => {
     const financials = company.financials.map((f: any) => 
-      `${f.year}: Rev=${f.revenue ?? 'N/A'}, Profit=${f.netIncome ?? 'N/A'}`
+      `${f.year}: Rev=${f.revenue || 'N/A'}, Profit=${f.profitAfterTax || 'N/A'}`
     ).join(', ')
     
     prompt += `${index + 1}. ${company.name} (${company.orgnr})\n`
@@ -706,239 +647,509 @@ async function updateRunRecord(
   if (error) throw error
 }
 
-async function generateCompanyProfile(
-  supabase: SupabaseClient,
-  orgnr: string,
-  baseRow?: any | null
-): Promise<CompanyProfile> {
-  let base = baseRow
+const currencyFormatter = new Intl.NumberFormat('sv-SE', {
+  style: 'currency',
+  currency: 'SEK',
+  maximumFractionDigits: 0,
+})
 
-  if (!base) {
-    const { data, error } = await supabase
-      .from('master_analytics')
-      .select(
-        `
-          OrgNr,
-          name,
-          segment_name,
-          industry_name,
-          city,
-          employees,
-          Revenue_growth,
-          EBIT_margin,
-          NetProfit_margin,
-          company_size_category,
-          growth_category,
-          profitability_category
-        `
-      )
-      .eq('OrgNr', orgnr)
-      .maybeSingle()
+const integerFormatter = new Intl.NumberFormat('sv-SE', {
+  maximumFractionDigits: 0,
+})
 
-    if (error) throw error
-    base = data
+const percentFormatter = new Intl.NumberFormat('sv-SE', {
+  maximumFractionDigits: 1,
+})
+
+function resolveCompanyId(company: any): string | null {
+  const candidates = [
+    company?.company_id,
+    company?.companyId,
+    company?.companyID,
+    company?.id,
+    company?.companyid,
+  ]
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim().length > 0) {
+      return candidate.trim()
+    }
   }
+  return null
+}
 
-  if (!base) {
-    throw new Error('Company not found in master_analytics')
-  }
-
-  const { data: accounts, error: accountsError } = await supabase
-    .from('company_accounts_by_id')
-    .select('*')
-    .eq('organisationNumber', orgnr)
-    .order('year', { ascending: false })
-    .limit(6)
-
-  if (accountsError) throw accountsError
-
-  const financials = (accounts || [])
+function normalizeFinancialRecords(rows: any[] | null | undefined): FinancialRecord[] {
+  if (!Array.isArray(rows)) return []
+  return rows
     .map((row: any) => {
-      const year = Number.parseInt(row?.year, 10)
+      const year = Number(row?.year)
       if (!Number.isFinite(year)) {
         return null
       }
-
-      const revenue = safeNumber(row?.SDI)
-      const ebitda = safeNumber(row?.resultat_e_avskrivningar ?? row?.EBITDA)
-      const ebit = safeNumber(row?.EBIT)
-      const netIncome = safeNumber(row?.NetIncome ?? row?.DR)
-      const totalDebt = safeNumber(row?.summa_langfristiga_skulder ?? row?.FK ?? row?.FSD)
-      const totalEquity = safeNumber(row?.EK ?? row?.SEK ?? row?.SFA)
-      const employees = safeNumber(row?.Employees ?? row?.ANT)
-      const revenueGrowth = safeNumber(row?.RG ?? row?.revenue_growth)
-      const ebitMargin =
-        safeNumber(row?.EBIT_margin) ??
-        (revenue && ebit !== null && revenue > 0 ? Number(ebit / revenue) : null)
-      const debtToEquity =
-        totalDebt !== null && totalEquity && totalEquity !== 0 ? Number(totalDebt / totalEquity) : null
-
       return {
         year,
-        revenue,
-        ebitda,
-        ebit,
-        netIncome,
-        totalDebt,
-        totalEquity,
-        employees,
-        revenueGrowth,
-        ebitMargin,
-        debtToEquity,
-      } as FinancialYearRecord
+        revenue: safeNumber(row?.revenue ?? row?.Revenue ?? row?.SDI),
+        profit: safeNumber(row?.profit ?? row?.Profit ?? row?.NetIncome ?? row?.DR),
+        employees: safeNumber(row?.employees ?? row?.Employees),
+      }
     })
-    .filter((item): item is FinancialYearRecord => Boolean(item))
+    .filter((row): row is FinancialRecord => Boolean(row))
     .sort((a, b) => b.year - a.year)
     .slice(0, 4)
+}
 
-  const { data: kpiRows, error: kpiError } = await supabase
-    .from('company_kpis_by_id')
-    .select('year, ebit_margin, net_margin, revenue_growth, equity_ratio, return_on_equity')
-    .eq('organisationNumber', orgnr)
-    .order('year', { ascending: false })
-    .limit(6)
-
-  if (kpiError) throw kpiError
-
-  const kpis = (kpiRows || [])
+function normalizeKpiRecords(rows: any[] | null | undefined): KPIRecord[] {
+  if (!Array.isArray(rows)) return []
+  return rows
     .map((row: any) => {
-      const year = Number.parseInt(row?.year, 10)
-      if (!Number.isFinite(year)) return null
+      const year = Number(row?.year)
+      if (!Number.isFinite(year)) {
+        return null
+      }
       return {
         year,
-        revenueGrowth: safeNumber(row?.revenue_growth),
-        ebitMargin: safeNumber(row?.ebit_margin),
-        netMargin: safeNumber(row?.net_margin),
-        equityRatio: safeNumber(row?.equity_ratio),
-        returnOnEquity: safeNumber(row?.return_on_equity),
-      } as KPIRecord
+        revenue_growth: safeNumber(row?.revenue_growth ?? row?.Revenue_growth ?? row?.RG),
+        ebit_margin: safeNumber(row?.ebit_margin ?? row?.EBIT_margin),
+        net_margin: safeNumber(row?.net_margin ?? row?.NetProfit_margin ?? row?.net_margin_pct),
+        equity_ratio: safeNumber(row?.equity_ratio ?? row?.Equity_ratio),
+        return_on_equity: safeNumber(row?.return_on_equity ?? row?.Return_on_equity ?? row?.roe),
+      }
     })
-    .filter((item): item is KPIRecord => Boolean(item))
+    .filter((row): row is KPIRecord => Boolean(row))
     .sort((a, b) => b.year - a.year)
     .slice(0, 4)
+}
 
-  const derived = computeDerivedMetrics(financials, kpis, safeNumber(base?.employees))
-  const benchmarks = await fetchSegmentBenchmarks(supabase, base?.segment_name)
-
-  return {
-    orgnr,
-    companyName: base?.name || 'Okänt företag',
-    segmentName: base?.segment_name || null,
-    industry: base?.industry_name || null,
-    city: base?.city || null,
-    employees: safeNumber(base?.employees),
-    sizeCategory: base?.company_size_category || null,
-    growthCategory: base?.growth_category || null,
-    profitabilityCategory: base?.profitability_category || null,
-    financials,
-    kpis,
-    derived,
-    benchmarks,
+function formatCurrency(value: Nullable<number>): string {
+  if (value === null || value === undefined) return 'N/A'
+  try {
+    return currencyFormatter.format(value)
+  } catch (error) {
+    return value.toString()
   }
 }
 
-function buildDeepAnalysisPrompt(profile: CompanyProfile, instructions?: string) {
-  const financialLines = profile.financials.length
-    ? profile.financials
-        .map(
-          (row) =>
-            `${row.year} | ${formatNumber(row.revenue)} | ${formatNumber(row.ebitda)} | ${formatNumber(row.netIncome)} | ${formatNumber(row.totalDebt)} | ${formatNumber(row.totalEquity)} | ${formatNumber(row.employees)} | ${formatPercent(row.revenueGrowth)}`
-        )
-        .join('\n')
-    : 'Ingen historik tillgänglig'
-
-  const kpiLines = profile.kpis.length
-    ? profile.kpis
-        .map(
-          (row) =>
-            `${row.year}: Tillväxt=${formatPercent(row.revenueGrowth)}, EBIT-marginal=${formatPercent(row.ebitMargin)}, Nettomarginal=${formatPercent(row.netMargin)}, Soliditet=${formatPercent(row.equityRatio)}`
-        )
-        .join('\n')
-    : 'Inga KPI-data tillgängliga.'
-
-  const derived = profile.derived
-  const benchmarkText = profile.benchmarks
-    ? `Sektorbenchmark (${profile.benchmarks.segment}):
-- Medeltillväxt: ${formatPercent(profile.benchmarks.avgRevenueGrowth)}
-- Medel EBIT-marginal: ${formatPercent(profile.benchmarks.avgEbitMargin)}
-- Medel nettomarginal: ${formatPercent(profile.benchmarks.avgNetMargin)}`
-    : 'Sektorbenchmark: Ej tillgänglig.'
-
-  const instructionText = instructions ? `Extra instruktioner från användaren: ${instructions}` : ''
-
-  return `
-Företag: ${profile.companyName} (${profile.orgnr})
-Bransch/segment: ${profile.segmentName || profile.industry || 'Okänd'}
-Ort: ${profile.city || 'Okänd'}
-Storleksklass: ${profile.sizeCategory || 'Okänd'} • Tillväxtkategori: ${profile.growthCategory || 'Okänd'} • Lönsamhetsprofil: ${profile.profitabilityCategory || 'Okänd'}
-
-Finansiell historik (TSEK):
-År | Omsättning | EBITDA | Nettoresultat | Skulder | Eget kapital | Anställda | Tillväxt
-${financialLines}
-
-Beräknade nyckeltal:
-- Fyraårs CAGR omsättning: ${formatPercent(derived.revenueCagr)}
-- Genomsnittlig EBITDA-marginal: ${formatPercent(derived.avgEbitdaMargin)}
-- Genomsnittlig nettomarginal: ${formatPercent(derived.avgNetMargin)}
-- Soliditet (senaste): ${formatPercent(derived.equityRatioLatest)}
-- Skuldsättningsgrad (senaste): ${formatRatio(derived.debtToEquityLatest)}
-- Omsättning per anställd (senaste): ${formatCurrency(derived.revenuePerEmployee)}
-
-KPI-historik:
-${kpiLines}
-
-${benchmarkText}
-
-Uppgift:
-- Svara på svenska med professionell ton.
-- Leverera JSON enligt schemat DeepCompanyAnalysis.
-- Gör narrativet cirka 300 ord och redovisa uppskattat word_count.
-- Analysera finansiell stabilitet, marginaler, skuldsättning och kapitalstruktur.
-- Lyft fram risker och uppsidor för ett potentiellt förvärv inom 12–24 månader.
-- Ge en tydlig rekommendation (Prioritera förvärv/Fördjupa due diligence/Övervaka/Avstå) och bedöm förvärvsintresset (Hög/Medel/Låg).
-
-Fråga att besvara:
-"Baserat på denna finansiella profil, hur presterar företaget och hur stabilt är det? Finns det betydande risker eller uppsidor? Är verksamheten intressant för förvärv?"
-
-${instructionText}
-`
+function formatInteger(value: Nullable<number>): string {
+  if (value === null || value === undefined) return 'N/A'
+  try {
+    return integerFormatter.format(value)
+  } catch (error) {
+    return value.toString()
+  }
 }
 
-async function invokeDeepAnalysisModel(openai: OpenAI, prompt: string) {
+function formatPercent(value: Nullable<number>): string {
+  if (value === null || value === undefined) return 'N/A'
+  const normalized = Math.abs(value) <= 1 ? value * 100 : value
+  try {
+    return `${percentFormatter.format(normalized)}%`
+  } catch (error) {
+    return `${normalized.toFixed(1)}%`
+  }
+}
+
+function formatPercentChange(value: Nullable<number>): string {
+  if (value === null || value === undefined) return 'N/A'
+  const percent = value * 100
+  try {
+    return `${percentFormatter.format(percent)}%`
+  } catch (error) {
+    return `${percent.toFixed(1)}%`
+  }
+}
+
+function formatContextSummary({
+  company,
+  orgnr,
+  companyId,
+  financials,
+  kpis,
+  employees,
+}: {
+  company: any
+  orgnr: string
+  companyId: string | null
+  financials: FinancialRecord[]
+  kpis: KPIRecord[]
+  employees: Nullable<number>
+}): string {
+  const companyName = company?.name ?? company?.company_name ?? 'Unknown company'
+  const generalInfoLines: string[] = [
+    `- Name: ${companyName}`,
+    `- Organisation number: ${orgnr}`,
+  ]
+
+  if (companyId) {
+    generalInfoLines.push(`- Company ID: ${companyId}`)
+  }
+
+  const segment = company?.segment_name ?? company?.segment
+  if (segment) {
+    generalInfoLines.push(`- Segment: ${segment}`)
+  }
+
+  const industry = company?.industry_name ?? company?.industry
+  if (industry) {
+    generalInfoLines.push(`- Industry: ${industry}`)
+  }
+
+  if (company?.city) {
+    generalInfoLines.push(`- City: ${company.city}`)
+  }
+
+  const incorporation = company?.incorporation_date ?? company?.incorporationDate
+  if (incorporation) {
+    generalInfoLines.push(`- Incorporated: ${incorporation}`)
+  }
+
+  if (company?.homepage) {
+    generalInfoLines.push(`- Website: ${company.homepage}`)
+  }
+
+  if (company?.email) {
+    generalInfoLines.push(`- Email: ${company.email}`)
+  }
+
+  if (employees !== null && employees !== undefined) {
+    generalInfoLines.push(`- Employees (latest): ${formatInteger(employees)}`)
+  }
+
+  const lastUpdated = company?.last_updated ?? company?.lastUpdated
+  if (lastUpdated) {
+    generalInfoLines.push(`- Last updated in companies: ${lastUpdated}`)
+  }
+
+  const coverageYears = uniqueSortedYears([...financials, ...kpis])
+  if (coverageYears.length > 0) {
+    const firstYear = coverageYears[0]
+    const lastYear = coverageYears[coverageYears.length - 1]
+    const coverageLabel = firstYear === lastYear ? `${firstYear}` : `${firstYear}–${lastYear}`
+    generalInfoLines.push(`- Data coverage: ${coverageLabel}`)
+  }
+
+  const sections: string[] = []
+  sections.push(['### General Information', ...generalInfoLines].join('\n'))
+
+  const financialLines = financials.length
+    ? financials.map((row) => {
+        const metrics: string[] = []
+        if (row.revenue !== null && row.revenue !== undefined) {
+          metrics.push(`Revenue ${formatCurrency(row.revenue)}`)
+        }
+        if (row.profit !== null && row.profit !== undefined) {
+          metrics.push(`Profit ${formatCurrency(row.profit)}`)
+        }
+        if (row.employees !== null && row.employees !== undefined) {
+          metrics.push(`Employees ${formatInteger(row.employees)}`)
+        }
+        const metricsText = metrics.length > 0 ? metrics.join(' | ') : 'No financial metrics available'
+        return `- ${row.year}: ${metricsText}`
+      })
+    : ['- No financial records available in company_accounts for the last four fiscal years.']
+
+  sections.push(['### Financial Performance (company_accounts)', ...financialLines].join('\n'))
+
+  const trendLines = describeFinancialTrends(financials)
+  if (trendLines.length > 0) {
+    sections.push(['### Financial Trends & Momentum', ...trendLines].join('\n'))
+  }
+
+  const kpiLines = kpis.length
+    ? kpis.map((row) => {
+        const metrics: string[] = []
+        if (row.revenue_growth !== null && row.revenue_growth !== undefined) {
+          metrics.push(`Revenue growth ${formatPercent(row.revenue_growth)}`)
+        }
+        if (row.ebit_margin !== null && row.ebit_margin !== undefined) {
+          metrics.push(`EBIT margin ${formatPercent(row.ebit_margin)}`)
+        }
+        if (row.net_margin !== null && row.net_margin !== undefined) {
+          metrics.push(`Net margin ${formatPercent(row.net_margin)}`)
+        }
+        if (row.equity_ratio !== null && row.equity_ratio !== undefined) {
+          metrics.push(`Equity ratio ${formatPercent(row.equity_ratio)}`)
+        }
+        if (row.return_on_equity !== null && row.return_on_equity !== undefined) {
+          metrics.push(`Return on equity ${formatPercent(row.return_on_equity)}`)
+        }
+        const metricsText = metrics.length > 0 ? metrics.join(' | ') : 'No KPI metrics recorded'
+        return `- ${row.year}: ${metricsText}`
+      })
+    : ['- No KPI records available in company_kpis for the last four fiscal years.']
+
+  sections.push(['### KPI Summary (company_kpis)', ...kpiLines].join('\n'))
+
+  const kpiHighlights = buildKpiHighlights(kpis)
+  if (kpiHighlights.length > 0) {
+    sections.push(['### KPI Highlights', ...kpiHighlights].join('\n'))
+  }
+
+  sections.push(
+    [
+      '### Data Sources',
+      '- companies (core metadata)',
+      '- company_accounts (last four reported financial years)',
+      '- company_kpis (last four KPI snapshots)',
+    ].join('\n')
+  )
+
+  return sections.join('\n\n')
+}
+
+function describeFinancialTrends(financials: FinancialRecord[]): string[] {
+  if (!Array.isArray(financials) || financials.length < 2) return []
+  const metrics: Array<{ key: keyof FinancialRecord; label: string; formatter: (value: Nullable<number>) => string }> = [
+    { key: 'revenue', label: 'Revenue', formatter: formatCurrency },
+    { key: 'profit', label: 'Profit after tax', formatter: formatCurrency },
+    { key: 'employees', label: 'Employees', formatter: formatInteger },
+  ]
+
+  const lines: string[] = []
+  for (const metric of metrics) {
+    const line = buildFinancialTrendLine(financials, metric.key, metric.label, metric.formatter)
+    if (line) {
+      lines.push(line)
+    }
+  }
+  return lines
+}
+
+function buildFinancialTrendLine(
+  financials: FinancialRecord[],
+  key: keyof FinancialRecord,
+  label: string,
+  formatter: (value: Nullable<number>) => string
+): string | null {
+  const validRecords = financials.filter((row) => row[key] !== null && row[key] !== undefined)
+  if (validRecords.length < 2) {
+    return null
+  }
+
+  const latest = validRecords[0]
+  const earliest = validRecords[validRecords.length - 1]
+  const latestValue = latest[key]
+  const earliestValue = earliest[key]
+
+  if (latestValue === null || latestValue === undefined || earliestValue === null || earliestValue === undefined) {
+    return null
+  }
+
+  const change = (latestValue as number) - (earliestValue as number)
+  if (change === 0) {
+    return `- ${label} remained stable at ${formatter(latestValue)} between ${earliest.year} and ${latest.year}.`
+  }
+
+  const direction = change > 0 ? 'increased' : 'decreased'
+  const signSymbol = change > 0 ? '+' : '-'
+  const changeSummaryParts: string[] = []
+  changeSummaryParts.push(`${signSymbol}${formatter(Math.abs(change))}`)
+
+  const percentChange = earliestValue !== 0 ? ((latestValue as number) - (earliestValue as number)) / Math.abs(earliestValue as number) : null
+  if (percentChange !== null) {
+    changeSummaryParts.push(`${signSymbol}${formatPercentChange(Math.abs(percentChange))}`)
+  }
+
+  const changeSummary = changeSummaryParts.length > 0 ? ` (${changeSummaryParts.join(', ')})` : ''
+
+  return `- ${label} ${direction} from ${formatter(earliestValue)} (${earliest.year}) to ${formatter(latestValue)} (${latest.year})${changeSummary}.`
+}
+
+function buildKpiHighlights(kpis: KPIRecord[]): string[] {
+  if (!Array.isArray(kpis) || kpis.length === 0) return []
+  const highlights: string[] = []
+  const latest = kpis[0]
+
+  if (latest.revenue_growth !== null && latest.revenue_growth !== undefined) {
+    highlights.push(`- Latest revenue growth (${latest.year}): ${formatPercent(latest.revenue_growth)}`)
+  }
+  if (latest.ebit_margin !== null && latest.ebit_margin !== undefined) {
+    highlights.push(`- Latest EBIT margin (${latest.year}): ${formatPercent(latest.ebit_margin)}`)
+  }
+  if (latest.net_margin !== null && latest.net_margin !== undefined) {
+    highlights.push(`- Latest net margin (${latest.year}): ${formatPercent(latest.net_margin)}`)
+  }
+  if (latest.equity_ratio !== null && latest.equity_ratio !== undefined) {
+    highlights.push(`- Latest equity ratio (${latest.year}): ${formatPercent(latest.equity_ratio)}`)
+  }
+  if (latest.return_on_equity !== null && latest.return_on_equity !== undefined) {
+    highlights.push(`- Latest return on equity (${latest.year}): ${formatPercent(latest.return_on_equity)}`)
+  }
+
+  if (kpis.length > 1) {
+    const avgEbit = average(kpis.map((row) => row.ebit_margin))
+    if (avgEbit !== null) {
+      highlights.push(`- Average EBIT margin (${kpis.length} years): ${formatPercent(avgEbit)}`)
+    }
+    const avgNetMargin = average(kpis.map((row) => row.net_margin))
+    if (avgNetMargin !== null) {
+      highlights.push(`- Average net margin (${kpis.length} years): ${formatPercent(avgNetMargin)}`)
+    }
+    const avgRevenueGrowth = average(kpis.map((row) => row.revenue_growth))
+    if (avgRevenueGrowth !== null) {
+      highlights.push(`- Average revenue growth (${kpis.length} years): ${formatPercent(avgRevenueGrowth)}`)
+    }
+  }
+
+  return highlights
+}
+
+function average(values: Array<Nullable<number>>): Nullable<number> {
+  const filtered = values.filter((value): value is number => value !== null && value !== undefined && Number.isFinite(value))
+  if (filtered.length === 0) return null
+  const sum = filtered.reduce((acc, value) => acc + value, 0)
+  return sum / filtered.length
+}
+
+function uniqueSortedYears(records: Array<{ year: number }>): number[] {
+  const years = records
+    .map((record) => Number(record?.year))
+    .filter((year) => Number.isFinite(year))
+  return Array.from(new Set(years)).sort((a, b) => a - b)
+}
+
+async function fetchCompanyDataBundle(supabase: SupabaseClient, orgnr: string): Promise<CompanyDataBundle> {
+  const trimmedOrgnr = String(orgnr).trim()
+
+  const baseQuery = supabase.from('companies').select('*').eq('OrgNr', trimmedOrgnr).maybeSingle()
+  const { data: companyByOrgNr, error: baseError } = await baseQuery
+  if (baseError) throw baseError
+
+  let companyRecord = companyByOrgNr
+  if (!companyRecord) {
+    const { data: fallbackCompany, error: fallbackError } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('orgnr', trimmedOrgnr)
+      .maybeSingle()
+    if (fallbackError) throw fallbackError
+    companyRecord = fallbackCompany
+  }
+
+  if (!companyRecord) {
+    throw new Error('Company not found in companies')
+  }
+
+  const canonicalOrgnr = String(companyRecord.OrgNr ?? companyRecord.orgnr ?? trimmedOrgnr).trim()
+
+  const { data: accounts, error: accountsError } = await supabase
+    .from('company_accounts')
+    .select('*')
+    .or(`OrgNr.eq.${canonicalOrgnr},orgnr.eq.${canonicalOrgnr}`)
+    .order('year', { ascending: false })
+    .limit(4)
+  if (accountsError) throw accountsError
+
+  const { data: kpis, error: kpisError } = await supabase
+    .from('company_kpis')
+    .select('*')
+    .or(`OrgNr.eq.${canonicalOrgnr},orgnr.eq.${canonicalOrgnr}`)
+    .order('year', { ascending: false })
+    .limit(4)
+  if (kpisError) throw kpisError
+
+  const financials = normalizeFinancialRecords(accounts)
+  const kpiRecords = normalizeKpiRecords(kpis)
+  const companyId = resolveCompanyId(companyRecord)
+  const employees = financials.length > 0
+    ? financials[0].employees ?? safeNumber(companyRecord?.employees ?? companyRecord?.Employees)
+    : safeNumber(companyRecord?.employees ?? companyRecord?.Employees)
+
+  const contextSummary = formatContextSummary({
+    company: companyRecord,
+    orgnr: canonicalOrgnr,
+    companyId,
+    financials,
+    kpis: kpiRecords,
+    employees,
+  })
+
+  return {
+    orgnr: canonicalOrgnr,
+    companyId,
+    companyName: (companyRecord?.name ?? companyRecord?.company_name ?? 'Unknown company') as string,
+    segmentName: companyRecord?.segment_name ?? companyRecord?.segment ?? null,
+    industry: companyRecord?.industry_name ?? companyRecord?.industry ?? null,
+    city: companyRecord?.city ?? null,
+    email: companyRecord?.email ?? null,
+    homepage: companyRecord?.homepage ?? null,
+    incorporationDate: companyRecord?.incorporation_date ?? companyRecord?.incorporationDate ?? null,
+    employees: employees ?? null,
+    financials,
+    kpis: kpiRecords,
+    contextSummary,
+  }
+}
+
+async function fetchCompanySnapshot(supabase: SupabaseClient, orgnr: string): Promise<CompanySnapshot> {
+  const bundle = await fetchCompanyDataBundle(supabase, orgnr)
+  const latestFinancial = bundle.financials[0]
+  const latestKpi = bundle.kpis[0]
+
+  const metrics: Record<string, any> = {
+    revenue: latestFinancial?.revenue ?? null,
+    profit: latestFinancial?.profit ?? null,
+    employees: latestFinancial?.employees ?? bundle.employees ?? null,
+    revenue_growth: latestKpi?.revenue_growth ?? null,
+    ebit_margin: latestKpi?.ebit_margin ?? null,
+    net_margin: latestKpi?.net_margin ?? null,
+    equity_ratio: latestKpi?.equity_ratio ?? null,
+    return_on_equity: latestKpi?.return_on_equity ?? null,
+  }
+
+  const financials = bundle.financials.map((row) => ({
+    year: row.year,
+    revenue: row.revenue,
+    profitAfterTax: row.profit,
+    employees: row.employees,
+  }))
+
+  return {
+    orgnr: bundle.orgnr,
+    companyId: bundle.companyId,
+    companyName: bundle.companyName,
+    segmentName: bundle.segmentName ?? null,
+    industry: bundle.industry ?? null,
+    city: bundle.city ?? null,
+    employees: bundle.employees ?? null,
+    metrics,
+    financials,
+    contextSummary: bundle.contextSummary,
+  }
+}
+
+function buildPrompt(contextSummary: string, instructions?: string) {
+  const trimmedInstructions = instructions?.trim()
+  const instructionText = trimmedInstructions ? `\nAdditional instructions: ${trimmedInstructions}` : ''
+  return `${contextSummary}\n\nTask: ${ANALYSIS_QUESTION}${instructionText}\nRespond using the JSON schema provided by the system.`
+}
+
+async function invokeModel(openai: OpenAI, prompt: string) {
   const started = Date.now()
-  const response = await openai.responses.create({
+  const response = await openai.chat.completions.create({
     model: MODEL_DEFAULT,
-    temperature: 0.25,
-    max_output_tokens: 1600,
-    input: [
-      { role: 'system', content: [{ type: 'text', text: deepAnalysisSystemPrompt }] },
-      { role: 'user', content: [{ type: 'text', text: prompt }] },
+    temperature: 0.2,
+    max_tokens: 1400,
+    messages: [
+      { role: 'system', content: defaultSystemPrompt },
+      { role: 'user', content: prompt },
     ],
-    response_format: { type: 'json_schema', json_schema: deepAnalysisSchema },
+    response_format: { type: 'json_schema', json_schema: analysisSchema },
   })
   const latency = Date.now() - started
 
-  let rawText = (response as any).output_text as string | undefined
-  if (!rawText) {
-    try {
-      rawText = (response as any)?.output?.[0]?.content?.[0]?.text
-    } catch (error) {
-      rawText = '{}'
-    }
-  }
+  const rawText = response.choices?.[0]?.message?.content ?? '{}'
 
   let parsed: any = {}
   try {
     parsed = JSON.parse(rawText || '{}')
-  } catch {
+  } catch (error) {
     parsed = {}
   }
 
   const usage: UsageSummary = {}
-  const rawUsage: any = (response as any).usage
+  const rawUsage: any = response.usage
   if (rawUsage) {
-    usage.input_tokens = rawUsage.input_tokens || rawUsage.prompt_tokens || 0
-    usage.output_tokens = rawUsage.output_tokens || rawUsage.completion_tokens || 0
+    usage.input_tokens = rawUsage.prompt_tokens || rawUsage.input_tokens || 0
+    usage.output_tokens = rawUsage.completion_tokens || rawUsage.output_tokens || 0
     usage.total_tokens = rawUsage.total_tokens || 0
   }
 
@@ -946,144 +1157,56 @@ async function invokeDeepAnalysisModel(openai: OpenAI, prompt: string) {
 }
 
 function buildCompanyResult(
-  profile: CompanyProfile,
+  orgnr: string,
+  companyName: string,
+  companyId: string | null,
   payload: any,
   usage: UsageSummary,
   latencyMs: number,
   prompt: string,
-  rawText: string
+  rawText: string,
+  contextSummary: string
 ): CompanyResult {
-  const executiveSummary =
-    typeof payload?.executive_summary === 'string' ? payload.executive_summary.trim() : ''
-  const keyFindings = ensureStringArray(payload?.key_findings)
-  const strengths = ensureStringArray(payload?.strengths)
-  const weaknesses = ensureStringArray(payload?.weaknesses)
-  const opportunities = ensureStringArray(payload?.opportunities)
-  const risks = ensureStringArray(payload?.risks)
-  const nextSteps = ensureStringArray(payload?.next_steps)
-  const narrative =
-    typeof payload?.narrative === 'string' && payload.narrative.trim().length > 0
-      ? payload.narrative.trim()
-      : keyFindings.join(' ')
+  const sections: SectionResult[] = Array.isArray(payload?.sections)
+    ? payload.sections.map((section: any) => ({
+        section_type: section?.section_type || section?.type || 'unspecified',
+        title: section?.title || null,
+        content_md: section?.content_md || section?.content || '',
+        supporting_metrics: Array.isArray(section?.supporting_metrics) ? section.supporting_metrics : [],
+        confidence: section?.confidence ?? null,
+        tokens_used: section?.tokens_used ?? null,
+      }))
+    : []
 
-  const financialHealth = clampNumber(
-    Number(payload?.financial_health_score ?? NaN),
-    1,
-    10,
-    5
-  )
-  const growthPotential =
-    typeof payload?.growth_outlook === 'string' ? payload.growth_outlook : 'Medel'
-  const marketPosition =
-    typeof payload?.market_position === 'string' ? payload.market_position : 'Följare'
-  const recommendation =
-    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Övervaka'
-  const acquisitionInterest =
-    typeof payload?.acquisition_interest === 'string' ? payload.acquisition_interest : 'Medel'
-  const confidence = clampNumber(
-    Number(payload?.confidence ?? NaN),
-    0,
-    100,
-    estimateConfidenceFromProfile(profile)
-  )
-  const riskScore = clampNumber(
-    Number(payload?.risk_score ?? NaN),
-    0,
-    100,
-    estimateRiskScore(profile, financialHealth)
-  )
-
-  const { financialGrade, commercialGrade, operationalGrade } = deriveGrades(profile)
-  const metrics = buildMetricsFromProfile(profile)
-
-  const sections: SectionResult[] = [
-    {
-      section_type: 'key_findings',
-      title: 'Nyckelobservationer',
-      content_md: keyFindings.length
-        ? keyFindings.map((item) => `- ${item}`).join('\n')
-        : '- Inga nyckelobservationer genererade.',
-      supporting_metrics: metrics.map((metric) => ({
-        metric_name: metric.metric_name,
-        metric_value: metric.metric_value,
-        metric_unit: metric.metric_unit,
-      })),
-      confidence,
-    },
-    {
-      section_type: 'executive_overview',
-      title: 'Sammanfattad analys',
-      content_md:
-        narrative ||
-        executiveSummary ||
-        'Analysen kunde inte generera ett narrativ baserat på underlaget.',
-      supporting_metrics: [],
-      confidence,
-    },
-    {
-      section_type: 'risk_opportunity',
-      title: 'Risker och möjligheter',
-      content_md: [
-        '**Risker:**',
-        risks.length ? risks.map((item) => `- ${item}`).join('\n') : '- Ej identifierat',
-        '\n**Möjligheter:**',
-        opportunities.length
-          ? opportunities.map((item) => `- ${item}`).join('\n')
-          : '- Ej identifierat',
-      ].join('\n'),
-      supporting_metrics: [],
-      confidence,
-    },
-  ]
-
-  if (strengths.length || weaknesses.length) {
-    sections.push({
-      section_type: 'strengths_weaknesses',
-      title: 'Styrkor och svagheter',
-      content_md: [
-        '**Styrkor:**',
-        strengths.length ? strengths.map((item) => `- ${item}`).join('\n') : '- Ej identifierat',
-        '\n**Svagheter:**',
-        weaknesses.length
-          ? weaknesses.map((item) => `- ${item}`).join('\n')
-          : '- Ej identifierat',
-      ].join('\n'),
-      supporting_metrics: [],
-      confidence,
-    })
-  }
+  const metrics: MetricResult[] = Array.isArray(payload?.metrics)
+    ? payload.metrics
+        .filter((metric: any) => metric?.metric_value !== undefined && metric?.metric_value !== null)
+        .map((metric: any) => ({
+          metric_name: metric?.metric_name || metric?.name || 'metric',
+          metric_value: Number(metric?.metric_value),
+          metric_unit: metric?.metric_unit ?? null,
+          source: metric?.source ?? null,
+          year: metric?.year ?? null,
+          confidence: metric?.confidence ?? null,
+        }))
+    : []
 
   const promptTokens = usage.input_tokens || 0
   const completionTokens = usage.output_tokens || 0
   const cost = calculateCost(promptTokens, completionTokens)
 
   return {
-    orgnr: profile.orgnr,
-    orgNr: profile.orgnr,
-    companyName: profile.companyName,
-    name: profile.companyName,
-    segmentName: profile.segmentName,
-    executiveSummary: executiveSummary || narrative,
-    keyFindings,
-    narrative,
-    strengths,
-    weaknesses,
-    opportunities,
-    risks,
-    recommendation,
-    acquisitionInterest,
-    financialHealth,
-    growthPotential,
-    marketPosition,
-    confidence,
-    riskScore,
-    nextSteps: nextSteps.length
-      ? nextSteps
-      : ['Komplettera dataunderlag', 'Verifiera senaste bokslut', 'Kör ny analys efter datakorrigering'],
-    summary: narrative || executiveSummary || null,
-    financialGrade,
-    commercialGrade,
-    operationalGrade,
+    orgnr,
+    companyId,
+    companyName,
+    summary: payload?.summary ?? null,
+    recommendation: payload?.recommendation ?? null,
+    confidence: payload?.confidence ?? null,
+    riskScore: payload?.risk_score ?? null,
+    financialGrade: payload?.financial_grade ?? null,
+    commercialGrade: payload?.commercial_grade ?? null,
+    operationalGrade: payload?.operational_grade ?? null,
+    nextSteps: Array.isArray(payload?.next_steps) ? payload.next_steps : [],
     sections,
     metrics,
     audit: {
@@ -1094,359 +1217,16 @@ function buildCompanyResult(
       completion_tokens: completionTokens,
       cost_usd: cost,
     },
+    contextSummary,
   }
 }
 
-function computeDerivedMetrics(
-  financials: FinancialYearRecord[],
-  kpis: KPIRecord[],
-  fallbackEmployees?: number | null
-): CompanyDerivedMetrics {
-  if (!financials.length) {
-    return {
-      revenueCagr: null,
-      avgEbitdaMargin: null,
-      avgNetMargin: null,
-      equityRatioLatest: kpis[0]?.equityRatio ?? null,
-      debtToEquityLatest: null,
-      revenuePerEmployee: null,
-    }
-  }
-
-  const sorted = [...financials].sort((a, b) => b.year - a.year)
-  const latest = sorted[0]
-  const oldest = sorted[sorted.length - 1]
-  const spanYears = Math.max(1, latest.year - oldest.year || sorted.length - 1 || 1)
-
-  const revenueCagr =
-    isFiniteNumber(latest.revenue) &&
-    isFiniteNumber(oldest.revenue) &&
-    latest.revenue! > 0 &&
-    oldest.revenue! > 0
-      ? Math.pow(Number(latest.revenue) / Number(oldest.revenue), 1 / spanYears) - 1
-      : null
-
-  const ebitdaMargins = sorted
-    .map((row) =>
-      isFiniteNumber(row.ebitda) && isFiniteNumber(row.revenue) && row.revenue! > 0
-        ? Number(row.ebitda) / Number(row.revenue)
-        : null
-    )
-    .filter(isFiniteNumber)
-  const avgEbitdaMargin = ebitdaMargins.length ? average(ebitdaMargins) : null
-
-  const netMargins = sorted
-    .map((row) =>
-      isFiniteNumber(row.netIncome) && isFiniteNumber(row.revenue) && row.revenue! > 0
-        ? Number(row.netIncome) / Number(row.revenue)
-        : null
-    )
-    .filter(isFiniteNumber)
-  const avgNetMargin = netMargins.length ? average(netMargins) : null
-
-  const equityRatioLatest =
-    kpis.find((kpi) => isFiniteNumber(kpi.equityRatio))?.equityRatio ??
-    (isFiniteNumber(latest.totalEquity)
-      ? Number(latest.totalEquity) /
-        (Number(latest.totalEquity) + (Number(latest.totalDebt) || 0))
-      : null)
-
-  const debtToEquityLatest =
-    isFiniteNumber(latest.debtToEquity) && latest.debtToEquity! >= 0
-      ? Number(latest.debtToEquity)
-      : isFiniteNumber(latest.totalDebt) &&
-        isFiniteNumber(latest.totalEquity) &&
-        Number(latest.totalEquity) !== 0
-      ? Number(latest.totalDebt) / Number(latest.totalEquity)
-      : null
-
-  const employees = isFiniteNumber(latest.employees)
-    ? Number(latest.employees)
-    : isFiniteNumber(fallbackEmployees)
-    ? Number(fallbackEmployees)
-    : null
-  const revenuePerEmployee =
-    employees && employees > 0 && isFiniteNumber(latest.revenue)
-      ? Number(latest.revenue) / employees
-      : null
-
-  return {
-    revenueCagr,
-    avgEbitdaMargin,
-    avgNetMargin,
-    equityRatioLatest,
-    debtToEquityLatest,
-    revenuePerEmployee,
-  }
-}
-
-async function fetchSegmentBenchmarks(
+async function persistCompanyResult(
   supabase: SupabaseClient,
-  segmentName?: string | null
-): Promise<CompanyBenchmarks | undefined> {
-  if (!segmentName) return undefined
-  const { data, error } = await supabase
-    .from('master_analytics')
-    .select(
-      `
-        avg_revenue_growth:avg(Revenue_growth),
-        avg_ebit_margin:avg(EBIT_margin),
-        avg_net_margin:avg(NetProfit_margin)
-      `
-    )
-    .eq('segment_name', segmentName)
-    .maybeSingle()
-
-  if (error) throw error
-  if (!data) return { segment: segmentName }
-
-  return {
-    segment: segmentName,
-    avgRevenueGrowth: safeNumber((data as any)?.avg_revenue_growth),
-    avgEbitMargin: safeNumber((data as any)?.avg_ebit_margin),
-    avgNetMargin: safeNumber((data as any)?.avg_net_margin),
-  }
-}
-
-function average(values: number[]): number {
-  if (!values.length) return 0
-  const sum = values.reduce((acc, value) => acc + value, 0)
-  return sum / values.length
-}
-
-function clampNumber(value: number, min: number, max: number, fallback: number): number {
-  if (!Number.isFinite(value)) return fallback
-  if (value < min) return min
-  if (value > max) return max
-  return value
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value)
-}
-
-function formatNumber(value: number | null | undefined, decimals = 0): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return Number(value).toLocaleString('sv-SE', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
-}
-
-function formatCurrency(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${formatNumber(value, 0)} TSEK`
-}
-
-function formatPercent(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${(Number(value) * 100).toFixed(1)} %`
-}
-
-function formatRatio(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${Number(value).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}x`
-}
-
-function percentValue(value: number | null | undefined): number | null {
-  if (!isFiniteNumber(value)) return null
-  return Number((Number(value) * 100).toFixed(2))
-}
-
-function ensureStringArray(value: any): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .filter((item) => typeof item === 'string' && item.trim().length > 0)
-      .map((item) => item.trim())
-  }
-  if (typeof value === 'string' && value.trim().length > 0) {
-    return value
-      .split(/[\n•\-]+/)
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0)
-  }
-  return []
-}
-
-function estimateConfidenceFromProfile(profile: CompanyProfile): number {
-  let score = 55
-  if (profile.financials.length >= 4) score += 15
-  if (profile.kpis.length >= 3) score += 10
-  if (isFiniteNumber(profile.derived.revenueCagr)) score += 5
-  if (isFiniteNumber(profile.derived.avgEbitdaMargin)) score += 5
-  return clampNumber(score, 50, 95, 60)
-}
-
-function estimateRiskScore(profile: CompanyProfile, financialHealth: number): number {
-  const latest = profile.financials[0]
-  let risk = 70 - financialHealth * 4
-
-  if (latest) {
-    if (isFiniteNumber(latest.revenueGrowth) && Number(latest.revenueGrowth) < 0) {
-      risk += 10
-    }
-    if (isFiniteNumber(latest.ebitMargin) && Number(latest.ebitMargin) < 0) {
-      risk += 15
-    }
-  }
-
-  if (isFiniteNumber(profile.derived.debtToEquityLatest) && profile.derived.debtToEquityLatest! > 2) {
-    risk += 10
-  }
-  if (isFiniteNumber(profile.derived.equityRatioLatest) && profile.derived.equityRatioLatest! < 0.2) {
-    risk += 10
-  }
-
-  return clampNumber(risk, 0, 100, 70)
-}
-
-function deriveGrades(profile: CompanyProfile) {
-  const latest = profile.financials[0]
-  const latestRevenue = isFiniteNumber(latest?.revenue) ? Number(latest?.revenue) : 0
-  const latestEmployees = isFiniteNumber(latest?.employees)
-    ? Number(latest?.employees)
-    : isFiniteNumber(profile.employees)
-    ? Number(profile.employees)
-    : null
-
-  const latestEbitMargin =
-    isFiniteNumber(latest?.ebitMargin) && latest?.ebitMargin !== null
-      ? Number(latest.ebitMargin)
-      : profile.kpis.find((kpi) => isFiniteNumber(kpi.ebitMargin))?.ebitMargin ?? null
-
-  const latestNetMargin =
-    profile.kpis.find((kpi) => isFiniteNumber(kpi.netMargin))?.netMargin ??
-    (isFiniteNumber(latest?.netIncome) && latestRevenue > 0
-      ? Number(latest!.netIncome) / latestRevenue
-      : null)
-
-  let financialGrade = 'D'
-  if (latestEbitMargin !== null && latestNetMargin !== null) {
-    if (latestEbitMargin > 0.1 && latestNetMargin > 0.05) financialGrade = 'A'
-    else if (latestEbitMargin > 0.05 && latestNetMargin > 0.02) financialGrade = 'B'
-    else if (latestEbitMargin > 0 && latestNetMargin > 0) financialGrade = 'C'
-  }
-
-  const revenueGrowth =
-    profile.kpis.find((kpi) => isFiniteNumber(kpi.revenueGrowth))?.revenueGrowth ??
-    profile.derived.revenueCagr ??
-    0
-
-  let commercialGrade = 'D'
-  if (isFiniteNumber(revenueGrowth)) {
-    const growthValue = Number(revenueGrowth)
-    if (growthValue > 0.2 && latestRevenue > 50000) commercialGrade = 'A'
-    else if (growthValue > 0.1 && latestRevenue > 25000) commercialGrade = 'B'
-    else if (growthValue > 0.05) commercialGrade = 'C'
-  }
-
-  const revenuePerEmployee = profile.derived.revenuePerEmployee
-  let operationalGrade = 'D'
-  if (isFiniteNumber(revenuePerEmployee) && latestEmployees !== null) {
-    if (revenuePerEmployee! > 5000 && latestEmployees > 5) operationalGrade = 'A'
-    else if (revenuePerEmployee! > 3000 && latestEmployees > 3) operationalGrade = 'B'
-    else if (revenuePerEmployee! > 2000) operationalGrade = 'C'
-  }
-
-  return { financialGrade, commercialGrade, operationalGrade }
-}
-
-function buildMetricsFromProfile(profile: CompanyProfile): MetricResult[] {
-  const metrics: MetricResult[] = []
-
-  const pushMetric = (
-    name: string,
-    value: number | null | undefined,
-    unit: string,
-    options: { year?: number | null; confidence?: number } = {}
-  ) => {
-    if (!isFiniteNumber(value)) return
-    metrics.push({
-      metric_name: name,
-      metric_value: Number(value),
-      metric_unit: unit,
-      source: 'system',
-      year: options.year ?? null,
-      confidence: options.confidence ?? 80,
-    })
-  }
-
-  const derived = profile.derived
-  pushMetric('Revenue CAGR (4 år)', percentValue(derived.revenueCagr), '%')
-  pushMetric('Genomsnittlig EBITDA-marginal', percentValue(derived.avgEbitdaMargin), '%')
-  pushMetric('Genomsnittlig nettomarginal', percentValue(derived.avgNetMargin), '%')
-  pushMetric('Soliditet (senaste)', percentValue(derived.equityRatioLatest), '%')
-  pushMetric('Skuldsättningsgrad (senaste)', derived.debtToEquityLatest, 'x')
-  pushMetric('Omsättning per anställd', derived.revenuePerEmployee, 'TSEK')
-
-  const latest = profile.financials[0]
-  if (latest) {
-    pushMetric('Omsättning (senaste)', latest.revenue, 'TSEK', { year: latest.year, confidence: 90 })
-    pushMetric('EBITDA (senaste)', latest.ebitda, 'TSEK', { year: latest.year, confidence: 85 })
-    pushMetric('Nettoresultat (senaste)', latest.netIncome, 'TSEK', {
-      year: latest.year,
-      confidence: 85,
-    })
-  }
-
-  return metrics
-}
-
-function buildFallbackResult(orgnr: string, companyName: string, base?: any): CompanyResult {
-  const summary = `Det gick inte att skapa en djupanalys för ${companyName} (${orgnr}) på grund av begränsat dataunderlag. Komplettera de senaste fyra boksluten och kör analysen igen.`
-  const sections: SectionResult[] = [
-    {
-      section_type: 'data_gap',
-      title: 'Data saknas',
-      content_md: summary,
-      supporting_metrics: [],
-      confidence: 30,
-    },
-  ]
-
-  return {
-    orgnr,
-    orgNr: orgnr,
-    companyName,
-    name: companyName,
-    segmentName: base?.segment_name || null,
-    executiveSummary: summary,
-    keyFindings: [summary],
-    narrative: summary,
-    strengths: [],
-    weaknesses: [],
-    opportunities: [],
-    risks: [`Otillräckligt finansiellt dataunderlag för ${companyName}.`],
-    recommendation: 'Övervaka',
-    acquisitionInterest: 'Låg',
-    financialHealth: 4,
-    growthPotential: 'Låg',
-    marketPosition: 'Följare',
-    confidence: 40,
-    riskScore: 70,
-    nextSteps: [
-      'Komplettera finansiell historik i Supabase',
-      'Verifiera skuldsättning och marginaler',
-      'Kör djupanalysen på nytt efter datakorrigering',
-    ],
-    summary,
-    financialGrade: 'D',
-    commercialGrade: 'D',
-    operationalGrade: 'D',
-    sections,
-    metrics: [],
-    audit: {
-      prompt: '',
-      response: summary,
-      latency_ms: 0,
-      prompt_tokens: 0,
-      completion_tokens: 0,
-      cost_usd: null,
-    },
-  }
-}
-
-async function persistCompanyResult(supabase: SupabaseClient, runId: string, result: CompanyResult) {
+  runId: string,
+  result: CompanyResult,
+  bundle: CompanyDataBundle
+) {
   const companyRow = {
     run_id: runId,
     orgnr: result.orgnr,
@@ -1463,6 +1243,37 @@ async function persistCompanyResult(supabase: SupabaseClient, runId: string, res
 
   const { error: companyError } = await supabase.schema('ai_ops').from('ai_company_analysis').upsert(companyRow)
   if (companyError) throw companyError
+
+  const resolvedCompanyId = bundle.companyId ?? result.companyId ?? result.orgnr
+  if (!bundle.companyId && !result.companyId) {
+    console.warn(`Falling back to organisation number for company_id linkage: ${result.orgnr}`)
+  }
+
+  const analysisPayload = {
+    summary: result.summary,
+    recommendation: result.recommendation,
+    confidence: result.confidence,
+    risk_score: result.riskScore,
+    financial_grade: result.financialGrade,
+    commercial_grade: result.commercialGrade,
+    operational_grade: result.operationalGrade,
+    next_steps: result.nextSteps,
+    sections: result.sections,
+    metrics: result.metrics,
+  }
+
+  const { error: ragError } = await supabase
+    .schema('ai_ops')
+    .from('ai_analysis')
+    .insert({
+      run_id: runId,
+      company_id: resolvedCompanyId,
+      orgnr: result.orgnr,
+      model_version: MODEL_DEFAULT,
+      prompt_summary: bundle.contextSummary ?? result.contextSummary ?? null,
+      analysis: analysisPayload,
+    })
+  if (ragError) throw ragError
 
   if (result.sections.length > 0) {
     const { error } = await supabase
@@ -1551,6 +1362,19 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
     .eq('run_id', runId)
   if (metricsError) throw metricsError
 
+  const { data: ragAnalyses, error: ragError } = await supabase
+    .schema('ai_ops')
+    .from('ai_analysis')
+    .select('company_id, orgnr, prompt_summary, analysis')
+    .eq('run_id', runId)
+  if (ragError) throw ragError
+
+  const ragByOrgnr = new Map<string, any>()
+  for (const row of ragAnalyses || []) {
+    if (!row?.orgnr) continue
+    ragByOrgnr.set(row.orgnr, row)
+  }
+
   const groupedSections = new Map<string, SectionResult[]>()
   for (const section of sections || []) {
     const key = section.orgnr
@@ -1579,20 +1403,40 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
     })
   }
 
-  const companyResults = (companies || []).map((company: any) => ({
+  const companyResults = (companies || []).map((company: any) => {
+    const ragRow = ragByOrgnr.get(company.orgnr)
+    let analysisJson = ragRow?.analysis || {}
+    if (typeof analysisJson === 'string') {
+      try {
+        analysisJson = JSON.parse(analysisJson)
+      } catch (error) {
+        analysisJson = {}
+      }
+    }
+    const contextSummary = typeof ragRow?.prompt_summary === 'string' ? ragRow.prompt_summary : undefined
+    const nextSteps = Array.isArray(company.next_steps)
+      ? company.next_steps
+      : Array.isArray(analysisJson.next_steps)
+      ? analysisJson.next_steps
+      : []
+
+    return {
     orgnr: company.orgnr,
+      companyId: ragRow?.company_id ?? null,
     companyName: company.company_name,
-    summary: company.summary,
-    recommendation: company.recommendation,
-    confidence: company.confidence,
-    riskScore: company.risk_score,
-    financialGrade: company.financial_grade,
-    commercialGrade: company.commercial_grade,
-    operationalGrade: company.operational_grade,
-    nextSteps: company.next_steps || [],
+      summary: company.summary ?? analysisJson.summary ?? null,
+      recommendation: company.recommendation ?? analysisJson.recommendation ?? null,
+      confidence: company.confidence ?? analysisJson.confidence ?? null,
+      riskScore: company.risk_score ?? analysisJson.risk_score ?? null,
+      financialGrade: company.financial_grade ?? analysisJson.financial_grade ?? null,
+      commercialGrade: company.commercial_grade ?? analysisJson.commercial_grade ?? null,
+      operationalGrade: company.operational_grade ?? analysisJson.operational_grade ?? null,
+      nextSteps,
     sections: groupedSections.get(company.orgnr) || [],
     metrics: groupedMetrics.get(company.orgnr) || [],
-  }))
+      contextSummary,
+    }
+  })
 
   const runPayload: RunResponse = {
     id: run.id,
@@ -1630,16 +1474,14 @@ function safeNumber(value: any): Nullable<number> {
   return Number.isFinite(parsed) ? parsed : null
 }
 
-const deepAnalysisSystemPrompt = `Du är Nivos ledande företagsanalytiker med fokus på M&A i svenska små och medelstora bolag.
-Din uppgift är att leverera handlingsbara beslutsunderlag till investeringskommittén. Svara alltid på svenska med professionell ton.
+const defaultSystemPrompt = `You are Nivo's lead corporate development strategist. Your task is to produce
+concise yet actionable analysis for potential SME acquisitions in Sweden.
+Assess each target's financial health, commercial opportunity, and post-acquisition
+value creation levers. Incorporate any engineered insights such as risk flags or
+segment information when relevant.
 
-När du analyserar ska du:
-- Utvärdera marginalstabilitet, kassaflödesprofil, skuldsättning och kapitalstruktur.
-- Bedöma marknadsposition, skalpotential och integrationsmöjligheter efter förvärv.
-- Lyfta fram konkreta risker och uppsidor, alltid kopplade till siffror i underlaget.
-- Vara tydlig när något baseras på antaganden och ange hur det kan verifieras.
-
-Utdata måste följa det specificerade JSON-schemat utan extra text.`
+Respond in professional English even if source data is Swedish. If information is
+missing, acknowledge the gap explicitly and infer carefully using comparable metrics.`
 
 const screeningSystemPrompt = `You are a rapid M&A screening analyst. For each company, provide:
 1. Screening Score (1-100): Based on financial health, growth trajectory, and market position
@@ -1653,3 +1495,4 @@ Be concise and direct. Prioritize red flags and high-potential opportunities.`
 
 // Export functions for use in development server
 export { handlePost, handleGet }
+
