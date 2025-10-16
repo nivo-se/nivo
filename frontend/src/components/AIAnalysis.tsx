@@ -1007,7 +1007,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               {/* Legacy Company Analysis Card (fallback) */}
               <CompanyAnalysisCard key={`${currentRun.run.id}-legacy-${company.orgnr}`} company={company} />
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

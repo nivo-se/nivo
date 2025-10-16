@@ -1268,10 +1268,40 @@ app.get('/api/analysis-runs/:runId', async (req, res) => {
       return res.status(500).json({ success: false, error: analysisError.message })
     }
     
+    // Transform data for frontend (same as analysis-companies endpoint)
+    const transformedCompanies = (analysisData || []).map(item => ({
+      id: item.id,
+      runId: item.run_id,
+      orgnr: item.orgnr,
+      companyName: item.company_name,
+      summary: item.summary,
+      recommendation: item.recommendation,
+      confidence: item.confidence,
+      riskScore: item.risk_score,
+      financialGrade: item.financial_grade,
+      commercialGrade: item.commercial_grade,
+      operationalGrade: item.operational_grade,
+      nextSteps: item.next_steps,
+      createdAt: item.created_at,
+      // Enhanced Codex fields
+      executiveSummary: item.executive_summary,
+      keyFindings: item.key_findings,
+      narrative: item.narrative,
+      strengths: item.strengths,
+      weaknesses: item.weaknesses,
+      opportunities: item.opportunities,
+      risks: item.risks,
+      acquisitionInterest: item.acquisition_interest,
+      financialHealth: item.financial_health_score,
+      growthPotential: item.growth_outlook,
+      marketPosition: item.market_position,
+      targetPrice: item.target_price_msek
+    }))
+
     return res.json({ 
       success: true, 
       run: runData,
-      companies: analysisData || []
+      companies: transformedCompanies
     })
   } catch (error: any) {
     console.error('Analysis run details endpoint error:', error)
