@@ -989,7 +989,7 @@ async function persistCompanyResult(supabase: any, runId: string, result: any) {
     summary: result.summary,
     recommendation: result.recommendation,
     confidence: Math.round((result.confidence || 0) * 100),
-    risk_score: result.riskScore,
+    risk_score: Math.round((result.riskScore || 0) * 10),
     financial_grade: result.financialGrade,
     commercial_grade: result.commercialGrade,
     operational_grade: result.operationalGrade,
@@ -1004,7 +1004,7 @@ async function persistCompanyResult(supabase: any, runId: string, result: any) {
     opportunities: result.opportunities,
     risks: result.risks,
     acquisition_interest: result.acquisitionInterest,
-    financial_health_score: result.financialHealth,
+    financial_health_score: Math.round((result.financialHealth || 0) * 10),
     growth_outlook: result.growthPotential,
     market_position: result.marketPosition,
     target_price_msek: result.targetPrice
