@@ -11,7 +11,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Separator } from './ui/separator'
-import {
+import { 
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -26,6 +26,12 @@ import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { Label } from './ui/label'
+import { ExecutiveSummaryCard } from './ExecutiveSummaryCard'
+import { KeyFindingsCard } from './KeyFindingsCard'
+import { SWOTAnalysisCard } from './SWOTAnalysisCard'
+import { NarrativeCard } from './NarrativeCard'
+import { FinancialMetricsCard } from './FinancialMetricsCard'
+import { ValuationCard } from './ValuationCard'
 
 type Nullable<T> = T | null
 
@@ -426,8 +432,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       console.log('Loading saved lists...')
       const lists = await SavedListsService.getSavedLists()
       console.log('Loaded saved lists:', lists)
-      setSavedLists(lists)
-    } catch (error) {
+        setSavedLists(lists)
+      } catch (error) {
       console.error('Failed to load saved lists', error)
       setSavedLists([])
     } finally {
@@ -511,13 +517,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         // For deep analysis, use companies selected from screening results
         companiesToAnalyze = availableCompanies.filter((company) => selectedForDeepAnalysis.has(company.OrgNr))
       }
-      
+
       if (companiesToAnalyze.length === 0) {
         throw new Error(analysisMode === 'screening' 
           ? 'Välj minst ett företag att screena' 
           : 'Välj företag från screeningresultat för djupanalys')
       }
-      
+
       const response = await fetch('/api/ai-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -590,12 +596,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   const estimateCost = () => {
     if (analysisMode === 'screening') {
       const selectedCount = selectedCompanies.size
-      // GPT-3.5-turbo: ~$0.002 per company for screening
-      return selectedCount * 0.002
+      // GPT-4o-mini: ~$0.0008 per company for screening
+      return selectedCount * 0.0008
     } else {
       const selectedCount = selectedForDeepAnalysis.size
-      // GPT-4: ~$0.50 per company for deep analysis
-      return selectedCount * 0.50
+      // GPT-4o-mini: ~$0.20 per company for deep analysis
+      return selectedCount * 0.20
     }
   }
 
@@ -620,23 +626,23 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             <Select value={selectedListId} onValueChange={setSelectedListId} disabled={loadingLists}>
               <SelectTrigger>
                 <SelectValue placeholder={loadingLists ? "Laddar listor..." : "Välj en sparad lista"} />
-              </SelectTrigger>
-              <SelectContent>
+                </SelectTrigger>
+        <SelectContent>
                 {savedLists.length > 0 ? (
                   savedLists.map((list) => (
                     <SelectItem key={list.id} value={list.id}>
                       {list.name} ({list.companies.length} företag)
-                    </SelectItem>
+          </SelectItem>
                   ))
                 ) : (
                   <SelectItem value="no-lists" disabled>
                     Inga listor tillgängliga
-                  </SelectItem>
+            </SelectItem>
                 )}
-              </SelectContent>
-            </Select>
+        </SelectContent>
+              </Select>
             {savedLists.length === 0 && !loadingLists && (
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Inga sparade listor hittades. Skapa en lista först.</p>
                 <Button 
                   type="button" 
@@ -666,7 +672,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                         <li key={list.id}>- {list.name} ({list.companies.length} företag)</li>
                       ))}
                     </ul>
-                  </div>
+            </div>
                 )}
               </div>
             )}
@@ -680,15 +686,15 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="screening" id="screening" />
                   <Label htmlFor="screening" className="flex-1">
-                    <div>
+                  <div>
                       <div className="font-medium">Screening (Snabb analys)</div>
                       <div className="text-sm text-muted-foreground">
                         Snabb bedömning av 30-40 företag för att identifiera de mest lovande
                       </div>
-                    </div>
+                  </div>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                   <RadioGroupItem value="deep" id="deep" />
                   <Label htmlFor="deep" className="flex-1">
                     <div>
@@ -700,7 +706,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                   </Label>
                 </div>
               </RadioGroup>
-            </div>
+                  </div>
           )}
 
           {/* Step 3: Company Selection */}
@@ -741,13 +747,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                   )}
                 </div>
               )}
-            </div>
+                  </div>
           )}
 
           {/* Step 4: Analysis Configuration */}
           {selectedListId && (
             <div className="space-y-4">
-              <div>
+                  <div>
                 <label className="text-sm font-medium text-muted-foreground">Analysmallar</label>
                 <div className="mt-2 grid gap-2">
                   {templates.map((template) => (
@@ -762,7 +768,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                     </button>
                   ))}
                 </div>
-              </div>
+          </div>
 
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Anpassad fokus</label>
@@ -825,14 +831,14 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
       {/* Screening Results Display */}
       {screeningResults.length > 0 && analysisMode === 'screening' && (
-        <Card>
-          <CardHeader>
+            <Card>
+              <CardHeader>
             <CardTitle className="text-xl">Screening Resultat</CardTitle>
             <CardDescription>
               Snabb bedömning av {screeningResults.length} företag. Välj de mest lovande för djupanalys.
             </CardDescription>
-          </CardHeader>
-          <CardContent>
+              </CardHeader>
+              <CardContent>
             <div className="space-y-3">
               {screeningResults
                 .sort((a, b) => (b.screeningScore || 0) - (a.screeningScore || 0))
@@ -843,8 +849,8 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                     selected={selectedForDeepAnalysis.has(result.orgnr)}
                     onToggle={toggleScreeningSelection}
                   />
-                ))}
-            </div>
+                  ))}
+                </div>
             {selectedForDeepAnalysis.size > 0 && (
               <div className="mt-4 flex justify-end">
                 <Button onClick={switchToDeepAnalysis}>
@@ -852,9 +858,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
                 </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          )}
 
       {/* Deep Analysis Results Display */}
       {currentRun && 'companies' in currentRun.analysis && (
@@ -864,10 +870,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-xl">Djupanalys Sammanfattning</CardTitle>
-                  <CardDescription>
+              <CardDescription>
                     Model {currentRun.run.modelVersion} • Started {formatDate(currentRun.run.startedAt)} • Completed{' '}
                     {formatDate(currentRun.run.completedAt)}
-                  </CardDescription>
+              </CardDescription>
                 </div>
                 {statusBadge(currentRun.run.status)}
               </div>
@@ -876,7 +882,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
               {currentRun.run.errorMessage && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                   {currentRun.run.errorMessage}
-                </div>
+                      </div>
               )}
               <Separator className="my-4" />
               <div className="grid gap-4 md:grid-cols-2">
@@ -896,7 +902,21 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
           <div className="space-y-6">
             {currentRun.analysis.companies.map((company) => (
-              <CompanyAnalysisCard key={`${currentRun.run.id}-detail-${company.orgnr}`} company={company} />
+              <div key={`${currentRun.run.id}-detail-${company.orgnr}`} className="space-y-6">
+                {/* Enhanced Report Cards */}
+                <div className="grid gap-6">
+                  <ExecutiveSummaryCard company={company} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <KeyFindingsCard company={company} />
+                    <SWOTAnalysisCard company={company} />
+                  </div>
+                  <NarrativeCard company={company} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <FinancialMetricsCard company={company} />
+                    <ValuationCard company={company} />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>

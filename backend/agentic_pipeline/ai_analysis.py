@@ -418,7 +418,7 @@ class AIAnalysisBatch:
 class AIAnalysisConfig:
     """Configuration for LLM-powered analysis."""
 
-    model: str = "gpt-4.1-mini"
+    model: str = "gpt-4o-mini"
     temperature: float = 0.15
     max_output_tokens: int = 1200
     system_prompt: str = field(default_factory=_default_system_prompt)
@@ -719,7 +719,7 @@ class AgenticLLMAnalyzer:
         run = AIAnalysisRun(
             id=run_id or str(uuid.uuid4()),
             initiated_by=initiated_by,
-            model_version="gpt-3.5-turbo",  # Use cheaper model for screening
+            model_version="gpt-4o-mini",  # Use mini model for cost efficiency
             analysis_mode="screening",
             started_at=datetime.utcnow(),
             filters=filters,
@@ -799,7 +799,7 @@ class AgenticLLMAnalyzer:
                     module="screening_analysis",
                     prompt=prompt,
                     response=raw_text,
-                    model="gpt-3.5-turbo",
+                    model="gpt-4o-mini",
                     latency_ms=latency_ms,
                     prompt_tokens=usage.get("input_tokens", 0) if usage else 0,
                     completion_tokens=usage.get("output_tokens", 0) if usage else 0,
@@ -837,7 +837,7 @@ class AgenticLLMAnalyzer:
         """Invoke the screening model with optimized settings."""
         start_time = time.perf_counter()
         response = self.client.responses.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             temperature=0.1,  # Lower temperature for more consistent screening
             max_output_tokens=500,  # Smaller output for screening
             input=[
@@ -879,13 +879,13 @@ class AgenticLLMAnalyzer:
         return parsed, raw_text, usage_dict, latency_ms
 
     def _estimate_screening_cost(self, usage: Optional[dict[str, Any]]) -> Optional[float]:
-        """Estimate cost for screening analysis (using gpt-3.5-turbo rates)."""
+        """Estimate cost for screening analysis (using gpt-4o-mini rates)."""
         if not usage:
             return None
         prompt_tokens = usage.get("input_tokens") or 0
         completion_tokens = usage.get("output_tokens") or 0
-        # GPT-3.5-turbo rates: $0.0005/1K input, $0.0015/1K output
-        cost = (prompt_tokens / 1000) * 0.0005 + (completion_tokens / 1000) * 0.0015
+        # GPT-4o-mini rates: $0.00015/1K input, $0.0006/1K output
+        cost = (prompt_tokens / 1000) * 0.00015 + (completion_tokens / 1000) * 0.0006
         return round(cost, 4)
 
     def _analyze_row(self, row: pd.Series, run: AIAnalysisRun, enrichment_data: Optional[str] = None) -> CompanyAnalysisRecord:

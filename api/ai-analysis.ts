@@ -139,12 +139,12 @@ interface KPIRecord {
   return_on_equity: Nullable<number>
 }
 
-const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4o'
-const MODEL_SCREENING = 'gpt-3.5-turbo'
-const PROMPT_COST_PER_1K = 0.15
-const COMPLETION_COST_PER_1K = 0.6
-const SCREENING_PROMPT_COST_PER_1K = 0.0005
-const SCREENING_COMPLETION_COST_PER_1K = 0.0015
+const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+const MODEL_SCREENING = 'gpt-4o-mini'  // Use mini for cost efficiency
+const PROMPT_COST_PER_1K = 0.00015  // GPT-4o-mini rates
+const COMPLETION_COST_PER_1K = 0.0006
+const SCREENING_PROMPT_COST_PER_1K = 0.00015  // Same as deep analysis for consistency
+const SCREENING_COMPLETION_COST_PER_1K = 0.0006
 
 const ANALYSIS_QUESTION =
   "Based on this company's financial data and KPIs, analyze its performance and attractiveness for acquisition. Highlight major strengths, weaknesses, and potential red flags."
@@ -311,7 +311,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
   const startedAt = new Date().toISOString()
 
   const modelVersion = analysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
-  
+
   await insertRunRecord(supabase, {
     id: runId,
     status: 'running',
@@ -341,16 +341,16 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     }
   } else {
     // Process deep analysis one by one
-    for (const selection of uniqueSelections) {
-      const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
-      if (!orgnr) {
-        errors.push('Missing organisation number for selection')
-        continue
-      }
-      try {
+  for (const selection of uniqueSelections) {
+    const orgnr = String(selection?.OrgNr || selection?.orgnr || '').trim()
+    if (!orgnr) {
+      errors.push('Missing organisation number for selection')
+      continue
+    }
+    try {
         const bundle = await fetchCompanyDataBundle(supabase, orgnr)
         const prompt = buildPrompt(bundle.contextSummary, instructions)
-        const { parsed, rawText, usage, latency } = await invokeModel(openai, prompt)
+      const { parsed, rawText, usage, latency } = await invokeModel(openai, prompt)
         const result = buildCompanyResult(
           bundle.orgnr,
           bundle.companyName,
@@ -362,11 +362,11 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
           rawText,
           bundle.contextSummary
         )
-        companiesResults.push(result)
+      companiesResults.push(result)
         await persistCompanyResult(supabase, runId, result, bundle)
-      } catch (error: any) {
-        console.error('AI analysis failed', error)
-        errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
+    } catch (error: any) {
+      console.error('AI analysis failed', error)
+      errors.push(`${orgnr}: ${error?.message || 'Unknown error'}`)
       }
     }
   }
@@ -388,7 +388,7 @@ async function handlePost(req: VercelRequest, res: VercelResponse) {
     completedAt,
     errorMessage: errors.length > 0 ? errors.join('; ') : null,
   }
-  
+
   const response: RunResponsePayload = {
     run: runPayload,
     analysis: analysisType === 'screening' 
@@ -1421,9 +1421,9 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
       : []
 
     return {
-      orgnr: company.orgnr,
+    orgnr: company.orgnr,
       companyId: ragRow?.company_id ?? null,
-      companyName: company.company_name,
+    companyName: company.company_name,
       summary: company.summary ?? analysisJson.summary ?? null,
       recommendation: company.recommendation ?? analysisJson.recommendation ?? null,
       confidence: company.confidence ?? analysisJson.confidence ?? null,
@@ -1432,8 +1432,8 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
       commercialGrade: company.commercial_grade ?? analysisJson.commercial_grade ?? null,
       operationalGrade: company.operational_grade ?? analysisJson.operational_grade ?? null,
       nextSteps,
-      sections: groupedSections.get(company.orgnr) || [],
-      metrics: groupedMetrics.get(company.orgnr) || [],
+    sections: groupedSections.get(company.orgnr) || [],
+    metrics: groupedMetrics.get(company.orgnr) || [],
       contextSummary,
     }
   })
