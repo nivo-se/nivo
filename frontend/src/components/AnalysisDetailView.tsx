@@ -107,12 +107,12 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
 
         <div className="space-y-6">
           {/* Company Header */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-white text-xl">{analysis.companyName}</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardTitle className="text-xl">{analysis.companyName}</CardTitle>
+                  <CardDescription>
                     Organisationsnummer: {analysis.orgnr}
                   </CardDescription>
                 </div>
@@ -125,15 +125,15 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
           </Card>
 
           {/* Economic Summary */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
+              <CardTitle className="flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
                 Ekonomisk sammanfattning
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 {analysis.summary}
               </p>
             </CardContent>
@@ -141,27 +141,27 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
 
           {/* Performance Grades */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+            <Card>
               <CardHeader className="text-center">
-                <CardTitle className="text-white text-sm">FINANCIAL GRADE</CardTitle>
+                <CardTitle className="text-sm">FINANCIAL GRADE</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 {getGradeBadge(analysis.financialGrade)}
               </CardContent>
             </Card>
 
-            <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+            <Card>
               <CardHeader className="text-center">
-                <CardTitle className="text-white text-sm">COMMERCIAL GRADE</CardTitle>
+                <CardTitle className="text-sm">COMMERCIAL GRADE</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 {getGradeBadge(analysis.commercialGrade)}
               </CardContent>
             </Card>
 
-            <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+            <Card>
               <CardHeader className="text-center">
-                <CardTitle className="text-white text-sm">OPERATIONAL GRADE</CardTitle>
+                <CardTitle className="text-sm">OPERATIONAL GRADE</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 {getGradeBadge(analysis.operationalGrade)}
@@ -170,16 +170,16 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
           </div>
 
           {/* Recommended Next Steps */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white">Rekommenderade nästa steg</CardTitle>
+              <CardTitle>Rekommenderade nästa steg</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {analysis.nextSteps?.map((step, index) => (
                   <li key={index} className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-[#4A9B8E] mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300">{step}</span>
+                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">{step}</span>
                   </li>
                 ))}
               </ul>
@@ -187,19 +187,19 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
           </Card>
 
           {/* Narrative Sections */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white">Narrativa sektioner</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle>Narrativa sektioner</CardTitle>
+              <CardDescription>
                 Expandera för SWOT, finansiell utsikt, integrationsmöjligheter och mer.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {analysis.sections?.map((section, index) => (
-                <div key={index} className="border border-[#4A4A4A] rounded-lg">
+                <div key={index} className="border border-gray-200 rounded-lg">
                   <Button
                     variant="ghost"
-                    className="w-full justify-between p-4 text-left hover:bg-[#3A3A3A]"
+                    className="w-full justify-between p-4 text-left hover:bg-gray-50"
                     onClick={() => toggleSection(section.section_type)}
                   >
                     <div className="flex items-center">
@@ -208,7 +208,7 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                       ) : (
                         <ChevronRight className="w-4 h-4 mr-2" />
                       )}
-                      <span className="text-white font-medium">{section.title}</span>
+                      <span className="font-medium">{section.title}</span>
                       <Badge variant="outline" className="ml-2 text-xs">
                         Förtroende {section.confidence}/5
                       </Badge>
@@ -216,18 +216,18 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                   </Button>
                   
                   {expandedSections.has(section.section_type) && (
-                    <div className="px-4 pb-4 border-t border-[#4A4A4A]">
+                    <div className="px-4 pb-4 border-t border-gray-200">
                       <div className="pt-4">
-                        <div className="text-gray-300 whitespace-pre-wrap mb-4">
+                        <div className="text-gray-700 whitespace-pre-wrap mb-4">
                           {section.content_md}
                         </div>
                         
                         {section.supporting_metrics && section.supporting_metrics.length > 0 && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {section.supporting_metrics.map((metric, metricIndex) => (
-                              <div key={metricIndex} className="bg-[#2E2A2B] p-3 rounded-lg">
-                                <div className="text-sm text-gray-400">{metric.metric_name}</div>
-                                <div className="text-lg font-semibold text-white">
+                              <div key={metricIndex} className="bg-gray-50 p-3 rounded-lg">
+                                <div className="text-sm text-gray-600">{metric.metric_name}</div>
+                                <div className="text-lg font-semibold text-gray-900">
                                   {metric.metric_value} {metric.metric_unit}
                                 </div>
                               </div>
@@ -243,28 +243,28 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
           </Card>
 
           {/* Key Metrics */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white">Nyckeltal</CardTitle>
+              <CardTitle>Nyckeltal</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#4A4A4A]">
-                      <th className="text-left text-gray-300 py-2">METRIK</th>
-                      <th className="text-left text-gray-300 py-2">VÄRDE</th>
-                      <th className="text-left text-gray-300 py-2">ÅR</th>
-                      <th className="text-left text-gray-300 py-2">KÄLLA</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left text-gray-600 py-2">METRIK</th>
+                      <th className="text-left text-gray-600 py-2">VÄRDE</th>
+                      <th className="text-left text-gray-600 py-2">ÅR</th>
+                      <th className="text-left text-gray-600 py-2">KÄLLA</th>
                     </tr>
                   </thead>
                   <tbody>
                     {analysis.metrics?.map((metric, index) => (
-                      <tr key={index} className="border-b border-[#4A4A4A]">
-                        <td className="text-white py-2">{metric.metric_name}</td>
-                        <td className="text-white py-2">{metric.metric_value}</td>
-                        <td className="text-gray-400 py-2">N/A</td>
-                        <td className="text-gray-400 py-2">Analys</td>
+                      <tr key={index} className="border-b border-gray-200">
+                        <td className="text-gray-900 py-2">{metric.metric_name}</td>
+                        <td className="text-gray-900 py-2">{metric.metric_value}</td>
+                        <td className="text-gray-500 py-2">N/A</td>
+                        <td className="text-gray-500 py-2">Analys</td>
                       </tr>
                     ))}
                   </tbody>
@@ -274,38 +274,37 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
           </Card>
 
           {/* Analysis Metadata */}
-          <Card className="bg-[#1A1A1A] border-[#4A4A4A]">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white">Analysinformation</CardTitle>
+              <CardTitle>Analysinformation</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-400">Analysdatum:</span>
-                  <span className="text-white ml-2">{formatDate(analysis.analysisDate)}</span>
+                  <span className="text-gray-600">Analysdatum:</span>
+                  <span className="text-gray-900 ml-2">{formatDate(analysis.analysisDate)}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Modell:</span>
-                  <span className="text-white ml-2">{analysis.modelVersion}</span>
+                  <span className="text-gray-600">Modell:</span>
+                  <span className="text-gray-900 ml-2">{analysis.modelVersion}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Screening Score:</span>
-                  <span className="text-white ml-2">{analysis.screeningScore}/100</span>
+                  <span className="text-gray-600">Screening Score:</span>
+                  <span className="text-gray-900 ml-2">{analysis.screeningScore}/100</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Förtroende:</span>
-                  <span className="text-white ml-2">{analysis.confidence}%</span>
+                  <span className="text-gray-600">Förtroende:</span>
+                  <span className="text-gray-900 ml-2">{analysis.confidence}%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-[#4A4A4A]">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <Button
               variant="outline"
               onClick={handleExportPDF}
-              className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
             >
               <Download className="w-4 h-4 mr-2" />
               Exportera PDF
@@ -313,14 +312,12 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
             <Button
               variant="outline"
               onClick={onReAnalyze}
-              className="border-[#4A4A4A] text-gray-300 hover:bg-[#4A4A4A]"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Analysera igen
             </Button>
             <Button
               onClick={onClose}
-              className="bg-[#4A9B8E] hover:bg-[#3d8277] text-white"
             >
               Stäng
             </Button>

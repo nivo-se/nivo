@@ -130,49 +130,74 @@ const AnalyzedCompanies: React.FC = () => {
 
   const handleViewAnalysis = async (run: AnalysisRun) => {
     try {
-      // For now, create a mock AnalyzedCompany object from the run data
-      // This should be replaced with actual API call to fetch analysis results
-      const mockAnalysis = {
+      // Fetch real analysis data from the API
+      const response = await fetch(`/api/analysis-runs/${run.id}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch analysis details')
+      }
+      
+      const data = await response.json()
+      if (!data.success || !data.companies || data.companies.length === 0) {
+        throw new Error('No analysis data found')
+      }
+      
+      // Get the first company's analysis data
+      const companyAnalysis = data.companies[0]
+      
+      // Transform the real data into the expected format
+      const realAnalysis = {
         runId: run.id,
-        companyName: run.companies[0]?.name || 'Okänt företag',
-        orgnr: run.companies[0]?.orgnr || '0000000000',
+        companyName: companyAnalysis.companyName,
+        orgnr: companyAnalysis.orgnr,
         analysisDate: run.startedAt,
-        recommendation: 'Fördjupa due diligence',
-        screeningScore: 75,
-        riskLevel: 'Medium risk',
-        summary: 'Detaljerad analys kommer snart...',
-        financialGrade: 'B',
-        commercialGrade: 'B+',
-        operationalGrade: 'A-',
-        confidence: 85,
+        recommendation: companyAnalysis.recommendation === 'Pursue' ? 'Prioritera förvärv' : 
+                       companyAnalysis.recommendation === 'Consider' ? 'Fördjupa due diligence' :
+                       companyAnalysis.recommendation === 'Monitor' ? 'Övervaka' : 'Avstå',
+        screeningScore: Math.round(companyAnalysis.confidence / 10), // Convert confidence to 0-100 scale
+        riskLevel: companyAnalysis.riskScore <= 20 ? 'Low risk' : 
+                  companyAnalysis.riskScore <= 40 ? 'Medium risk' : 'High risk',
+        summary: companyAnalysis.summary,
+        financialGrade: companyAnalysis.financialGrade,
+        commercialGrade: companyAnalysis.commercialGrade,
+        operationalGrade: companyAnalysis.operationalGrade,
+        confidence: Math.round(companyAnalysis.confidence / 10), // Convert to percentage
         modelVersion: run.modelVersion,
-        nextSteps: [
-          'Genomför due diligence',
-          'Utvärdera marknadspotential',
-          'Analysera konkurrensläge'
-        ],
+        nextSteps: companyAnalysis.nextSteps || [],
         sections: [
           {
-            section_type: 'financial_analysis',
-            title: 'Finansiell analys',
-            content_md: 'Finansiell analys kommer snart...',
+            section_type: 'executive_summary',
+            title: 'Executive Summary',
+            content_md: companyAnalysis.executiveSummary || companyAnalysis.summary,
             supporting_metrics: [
-              { metric_name: 'Omsättning', metric_value: 1000000, metric_unit: 'SEK' },
-              { metric_name: 'Vinstmarginal', metric_value: 12.5, metric_unit: '%' }
+              { metric_name: 'Financial Health', metric_value: companyAnalysis.financialHealth, metric_unit: '/100' },
+              { metric_name: 'Growth Potential', metric_value: companyAnalysis.growthPotential === 'Hög' ? 85 : 60, metric_unit: '/100' },
+              { metric_name: 'Market Position', metric_value: companyAnalysis.marketPosition === 'Stark' ? 90 : 70, metric_unit: '/100' }
             ],
-            confidence: 85
+            confidence: Math.round(companyAnalysis.confidence / 10)
+          },
+          {
+            section_type: 'swot_analysis',
+            title: 'SWOT Analys',
+            content_md: `**Styrkor:**\n${companyAnalysis.strengths?.join('\n') || 'Inga styrkor identifierade'}\n\n**Svagheter:**\n${companyAnalysis.weaknesses?.join('\n') || 'Inga svagheter identifierade'}\n\n**Möjligheter:**\n${companyAnalysis.opportunities?.join('\n') || 'Inga möjligheter identifierade'}\n\n**Risker:**\n${companyAnalysis.risks?.join('\n') || 'Inga risker identifierade'}`,
+            supporting_metrics: [
+              { metric_name: 'Risk Score', metric_value: companyAnalysis.riskScore, metric_unit: '/100' },
+              { metric_name: 'Target Price', metric_value: companyAnalysis.targetPrice, metric_unit: 'SEK' }
+            ],
+            confidence: Math.round(companyAnalysis.confidence / 10)
           }
         ],
         metrics: [
-          { metric_name: 'Omsättning', metric_value: '1,000,000', metric_unit: 'SEK' },
-          { metric_name: 'Vinstmarginal', metric_value: '12.5', metric_unit: '%' }
+          { metric_name: 'Financial Health', metric_value: companyAnalysis.financialHealth?.toString() || 'N/A', metric_unit: '/100' },
+          { metric_name: 'Risk Score', metric_value: companyAnalysis.riskScore?.toString() || 'N/A', metric_unit: '/100' },
+          { metric_name: 'Target Price', metric_value: companyAnalysis.targetPrice?.toString() || 'N/A', metric_unit: 'SEK' },
+          { metric_name: 'Acquisition Interest', metric_value: companyAnalysis.acquisitionInterest || 'N/A', metric_unit: '' }
         ]
       }
       
-      setSelectedAnalysis(mockAnalysis)
+      setSelectedAnalysis(realAnalysis)
     } catch (error) {
       console.error('Error loading analysis details:', error)
-      alert('Kunde inte ladda analysdetaljer')
+      alert('Kunde inte ladda analysdetaljer: ' + error.message)
     }
   }
 
