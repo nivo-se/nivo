@@ -536,6 +536,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
           templateId: selectedTemplate?.id,
           templateName: selectedTemplate?.name,
           customInstructions: selectedTemplate ? null : instructions.trim() || undefined,
+          initiatedBy: 'user-' + Date.now(), // Temporary user ID until auth is properly integrated
         }),
       })
       const data = await response.json()

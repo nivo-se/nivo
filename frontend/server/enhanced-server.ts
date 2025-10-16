@@ -211,19 +211,27 @@ app.post('/api/ai-analysis', async (req, res) => {
 
     const modelVersion = analysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
     
-    await insertRunRecord(supabase, {
-      id: runId,
-      status: 'running',
-      modelVersion,
-      analysisMode: analysisType,
-      startedAt,
-      initiatedBy: typeof initiatedBy === 'string' ? initiatedBy : null,
-      filters,
-      templateId,
-      templateName,
-      customInstructions,
-      companyCount: uniqueSelections.length,
-    })
+    try {
+      await insertRunRecord(supabase, {
+        id: runId,
+        status: 'running',
+        modelVersion,
+        analysisMode: analysisType,
+        startedAt,
+        initiatedBy: typeof initiatedBy === 'string' ? initiatedBy : 'unknown-user',
+        filters,
+        templateId,
+        templateName,
+        customInstructions,
+        companyCount: uniqueSelections.length,
+      })
+    } catch (error) {
+      console.error('Failed to create analysis run:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: `Failed to create analysis run: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      })
+    }
 
     const companiesResults: CompanyResult[] = []
     const screeningResults: ScreeningResult[] = []
@@ -539,7 +547,7 @@ async function insertRunRecord(supabase: SupabaseClient, run: any) {
     .from('ai_analysis_runs')
     .insert([{
       id: run.id,
-      initiated_by: run.initiatedBy,
+      initiated_by: run.initiatedBy || 'unknown-user',
       model_version: run.modelVersion,
       analysis_mode: run.analysisMode,
       status: run.status,
@@ -554,6 +562,7 @@ async function insertRunRecord(supabase: SupabaseClient, run: any) {
   
   if (error) {
     console.error('Error inserting run record:', error)
+    throw new Error(`Failed to create analysis run: ${error.message}`)
   }
 }
 
@@ -1021,8 +1030,8 @@ async function fetchAnalysisRuns(supabase: SupabaseClient, filters: any) {
     .from('ai_analysis_runs')
     .select(`
       *,
-      ai_company_analysis!inner(orgnr, company_name),
-      ai_screening_results!inner(orgnr, company_name)
+      ai_company_analysis(orgnr, company_name),
+      ai_screening_results(orgnr, company_name)
     `, { count: 'exact' })
 
   // Apply filters
