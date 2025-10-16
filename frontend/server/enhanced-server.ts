@@ -1047,7 +1047,7 @@ async function persistCompanyResult(supabase: any, runId: string, result: any) {
   console.log('✅ Enhanced company analysis saved to database')
 }
 
-// Companies endpoint for testing
+// GET /api/companies - Get company data for analysis
 app.get('/api/companies', async (req, res) => {
   try {
     const { limit = 10, orgnr } = req.query
@@ -1105,7 +1105,14 @@ app.get('/api/companies', async (req, res) => {
       return res.json({ success: true, data: fallbackData || [] })
     }
     
-    res.json({ success: true, data: data || [] })
+    res.json({ 
+      success: true, 
+      companies: data || [],
+      pagination: {
+        limit: Number(limit),
+        total: data?.length || 0
+      }
+    })
   } catch (error: any) {
     console.error('Companies endpoint error:', error)
     res.status(500).json({ success: false, error: error.message })
@@ -1149,76 +1156,131 @@ app.get('/api/test-ai-table', async (req, res) => {
   }
 })
 
-// AI Analysis history endpoint
-app.get('/api/ai-analysis', async (req, res) => {
+// ============================================
+// STANDARDIZED AI ANALYSIS API ENDPOINTS
+// ============================================
+//
+// API STRUCTURE OVERVIEW:
+//
+// 1. ANALYSIS CREATION:
+//    POST /api/ai-analysis
+//    - Creates new AI analysis runs
+//    - Body: { companies: [], analysisType: 'screening'|'deep', instructions: '', filters: {} }
+//    - Response: { success: true, run: {...}, analysis: {...} }
+//
+// 2. ANALYSIS RUNS (HISTORY):
+//    GET /api/analysis-runs
+//    - Lists all analysis runs with pagination
+//    - Query: ?limit=10&offset=0
+//    - Response: { success: true, runs: [...], pagination: {...} }
+//
+//    GET /api/analysis-runs/:runId
+//    - Gets specific analysis run with results
+//    - Response: { success: true, run: {...}, companies: [...] }
+//
+// 3. ANALYZED COMPANIES:
+//    GET /api/analysis-companies
+//    - Gets all analyzed companies with filtering
+//    - Query: ?limit=20&offset=0&search=&recommendation=&risk_level=
+//    - Response: { success: true, companies: [...], pagination: {...} }
+//
+// 4. COMPANY DATA:
+//    GET /api/companies
+//    - Gets company data for analysis
+//    - Query: ?limit=10&orgnr=
+//    - Response: { success: true, companies: [...], pagination: {...} }
+//
+// 5. UTILITY ENDPOINTS:
+//    GET /api/test-ai-table - Test database connectivity
+//    GET /api/test-enhanced - Health check
+//    POST /api/migrate-enhanced-fields - Database migration
+//
+// RESPONSE STANDARD:
+// - All endpoints return: { success: boolean, error?: string, ...data }
+// - List endpoints include pagination: { limit, offset, total }
+// - Resource names are plural and consistent (runs, companies, etc.)
+// ============================================
+
+// GET /api/analysis-runs - List all analysis runs (history)
+app.get('/api/analysis-runs', async (req, res) => {
   try {
-    const { history, limit = 10, runId } = req.query
+    const { limit = 10, offset = 0 } = req.query
     
-    if (history) {
-      // Return analysis history
-      const { data, error } = await supabase
-        .from('ai_analysis_runs')
-        .select(`
-          id,
-          model_version,
-          started_at,
-          completed_at,
-          status,
-          analysis_mode,
-          initiated_by
-        `)
-        .order('started_at', { ascending: false })
-        .limit(Number(limit))
-      
-      if (error) {
-        console.error('Error fetching analysis history:', error)
-        return res.status(500).json({ success: false, error: error.message })
-      }
-      
-      return res.json({ success: true, data: data || [] })
+    const { data, error } = await supabase
+      .from('ai_analysis_runs')
+      .select(`
+        id,
+        model_version,
+        started_at,
+        completed_at,
+        status,
+        analysis_mode,
+        initiated_by
+      `)
+      .order('started_at', { ascending: false })
+      .range(Number(offset), Number(offset) + Number(limit) - 1)
+    
+    if (error) {
+      console.error('Error fetching analysis runs:', error)
+      return res.status(500).json({ success: false, error: error.message })
     }
     
-    if (runId) {
-      // Return specific run details with analysis results
-      const { data: runData, error: runError } = await supabase
-        .from('ai_analysis_runs')
-        .select('*')
-        .eq('id', runId)
-        .single()
-      
-      if (runError) {
-        console.error('Error fetching run details:', runError)
-        return res.status(500).json({ success: false, error: runError.message })
+    return res.json({ 
+      success: true, 
+      runs: data || [],
+      pagination: {
+        limit: Number(limit),
+        offset: Number(offset),
+        total: data?.length || 0
       }
-      
-      // Get analysis results for this run
-      const { data: analysisData, error: analysisError } = await supabase
-        .from('ai_company_analysis')
-        .select('*')
-        .eq('run_id', runId)
-      
-      if (analysisError) {
-        console.error('Error fetching analysis results:', analysisError)
-        return res.status(500).json({ success: false, error: analysisError.message })
-      }
-      
-      return res.json({ 
-        success: true, 
-        run: runData,
-        analysis: { companies: analysisData || [] }
-      })
-    }
-    
-    // If not history or runId request, return 404
-    res.status(404).json({ success: false, error: 'Endpoint not found' })
+    })
   } catch (error: any) {
-    console.error('AI analysis history error:', error)
+    console.error('Analysis runs endpoint error:', error)
     res.status(500).json({ success: false, error: error.message })
   }
 })
 
-// Analyzed companies endpoint for UI
-app.get('/api/analyzed-companies', async (req, res) => {
+// GET /api/analysis-runs/:runId - Get specific analysis run with results
+app.get('/api/analysis-runs/:runId', async (req, res) => {
+  try {
+    const { runId } = req.params
+    
+    // Get run details
+    const { data: runData, error: runError } = await supabase
+      .from('ai_analysis_runs')
+      .select('*')
+      .eq('id', runId)
+      .single()
+    
+    if (runError) {
+      console.error('Error fetching run details:', runError)
+      return res.status(404).json({ success: false, error: 'Analysis run not found' })
+    }
+    
+    // Get analysis results for this run
+    const { data: analysisData, error: analysisError } = await supabase
+      .from('ai_company_analysis')
+      .select('*')
+      .eq('run_id', runId)
+    
+    if (analysisError) {
+      console.error('Error fetching analysis results:', analysisError)
+      return res.status(500).json({ success: false, error: analysisError.message })
+    }
+    
+    return res.json({ 
+      success: true, 
+      run: runData,
+      companies: analysisData || []
+    })
+  } catch (error: any) {
+    console.error('Analysis run details endpoint error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+// GET /api/analysis-companies - Get all analyzed companies with filtering
+app.get('/api/analysis-companies', async (req, res) => {
   try {
     const { limit = 20, offset = 0, search, recommendation, risk_level } = req.query
     
@@ -1316,7 +1378,15 @@ app.get('/api/analyzed-companies', async (req, res) => {
       targetPrice: item.target_price_msek
     }))
     
-    res.json({ success: true, data: transformedData })
+    res.json({ 
+      success: true, 
+      companies: transformedData,
+      pagination: {
+        limit: Number(limit),
+        offset: Number(offset),
+        total: transformedData.length
+      }
+    })
   } catch (error: any) {
     console.error('Analyzed companies endpoint error:', error)
     res.status(500).json({ success: false, error: error.message })

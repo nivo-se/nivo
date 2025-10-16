@@ -470,10 +470,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
 
   const loadHistory = async () => {
     try {
-      const response = await fetch('/api/ai-analysis?history=1&limit=10')
+      const response = await fetch('/api/analysis-runs?limit=10')
       const data = await response.json()
       if (data.success) {
-        setHistory(data.data || [])
+        setHistory(data.runs || [])
       }
     } catch (error) {
       console.error('Failed to load AI analysis history', error)
@@ -602,12 +602,12 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
     setLoadingRunId(runId)
     setErrorMessage(null)
     try {
-      const response = await fetch(`/api/ai-analysis?runId=${encodeURIComponent(runId)}`)
+      const response = await fetch(`/api/analysis-runs/${encodeURIComponent(runId)}`)
       const data = await response.json()
       if (!data.success) {
         throw new Error(data.error || 'Kunde inte ladda körningsdetaljer')
       }
-      setCurrentRun({ run: data.run, analysis: data.analysis })
+      setCurrentRun({ run: data.run, analysis: { companies: data.companies } })
     } catch (error) {
       console.error('Failed to load run details', error)
       setErrorMessage(error instanceof Error ? error.message : 'Misslyckades att ladda körningsdetaljer')
