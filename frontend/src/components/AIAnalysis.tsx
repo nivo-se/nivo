@@ -755,15 +755,15 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
             <div className="space-y-4">
                   <div>
                 <label className="text-sm font-medium text-muted-foreground">Analysmallar</label>
-                <div className="mt-2 grid gap-2">
+                <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
                   {templates.map((template) => (
                     <button
                       type="button"
                       key={template.id}
                       onClick={() => setInstructions(template.query)}
-                      className="rounded-md border p-3 text-left transition hover:border-purple-300 hover:bg-purple-50"
+                      className="rounded-lg border p-4 text-left transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm"
                     >
-                      <p className="text-sm font-semibold text-foreground">{template.title}</p>
+                      <p className="text-sm font-semibold text-foreground">{template.name}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{template.description}</p>
                     </button>
                   ))}

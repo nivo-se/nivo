@@ -30,7 +30,7 @@ export type AnalysisTemplate = {
   name: string
   query: string
   description: string
-  analysisType?: 'financial' | 'comprehensive' | 'investment' | 'market' | 'risk'
+  analysisType?: 'financial' | 'comprehensive' | 'investment' | 'market' | 'risk' | 'sustainability' | 'innovation' | 'turnaround'
   focusAreas?: string[]
   timeHorizon?: 'short' | 'medium' | 'long'
 }
@@ -319,40 +319,94 @@ export class AIAnalysisService {
   static getAnalysisTemplates(): AnalysisTemplate[] {
     return [
       {
-        id: 'investment-ready-tech',
-        name: 'Investment Ready Tech',
-        query: 'Identifiera SaaS eller digitala tjänsteföretag med återkommande intäktsökning över 25% och stabila marginaler',
-        description: 'Hitta teknikföretag med stark skalbarhet',
+        id: 'high-growth-tech',
+        name: 'Högväxande Teknikföretag',
+        query: 'Analysera SaaS, fintech och digitala tjänsteföretag med återkommande intäktsökning över 30%, starka marginaler (EBIT >15%) och skalbar affärsmodell. Fokusera på marknadsposition, teknisk konkurrensfördel, kundlojalitet och internationaliseringspotential.',
+        description: 'Identifiera teknikföretag med exceptionell tillväxtpotential och skalbarhet',
         analysisType: 'investment',
-        focusAreas: ['growth', 'profitability', 'digitalization'],
+        focusAreas: ['growth', 'profitability', 'digitalization', 'scalability', 'market_position'],
         timeHorizon: 'medium'
       },
       {
-        id: 'resilient-industrials',
-        name: 'Resilient Industrials',
-        query: 'Visa industriföretag i Sverige med EBIT-marginaler över 12% och diversifierad kundbas',
-        description: 'Balans mellan motståndskraft och marginaler',
+        id: 'resilient-manufacturing',
+        name: 'Motståndskraftig Tillverkning',
+        query: 'Utvärdera industriföretag med EBIT-marginaler över 12%, diversifierad kundbas, starka balansräkningar (EKA >30%) och låg skuldsättning. Analysera operativ effektivitet, leverantörsrelationer, automatisering och miljöhållbarhet.',
+        description: 'Hitta tillverkningsföretag med finansiell stabilitet och operativ excellens',
         analysisType: 'financial',
-        focusAreas: ['profitability', 'risk'],
+        focusAreas: ['profitability', 'risk', 'operational_efficiency', 'sustainability', 'supply_chain'],
         timeHorizon: 'long'
       },
       {
-        id: 'expansion-ready-retail',
-        name: 'Expansion Ready Retail',
-        query: 'Hitta detaljhandels- och e-handelsföretag redo för expansion utanför Norden',
-        description: 'Fokuserar på internationalisering',
+        id: 'international-expansion',
+        name: 'Internationell Expansion',
+        query: 'Identifiera företag redo för expansion utanför Norden med starka marginaler, digital närvaro, etablerade varumärken och kapacitet för internationell tillväxt. Analysera marknadsbarriärer, konkurrensläge och synergimöjligheter.',
+        description: 'Företag med potential för framgångsrik internationalisering',
         analysisType: 'market',
-        focusAreas: ['expansion', 'digitalization'],
+        focusAreas: ['expansion', 'digitalization', 'brand_strength', 'market_barriers', 'synergies'],
         timeHorizon: 'short'
       },
       {
-        id: 'risk-audit',
-        name: 'Risk Audit Focus',
-        query: 'Kör en koncentrerad riskanalys på medelstora företag med hög belåning',
-        description: 'Identifiera riskprofil och mitigering',
+        id: 'comprehensive-risk-assessment',
+        name: 'Omfattande Riskbedömning',
+        query: 'Genomför djupgående riskanalys med fokus på finansiell hälsa, marknadsrisker, operativa utmaningar och externa hot. Utvärdera skuldsättning, likviditet, koncentrationsrisker och klimatpåverkan.',
+        description: 'Identifiera och kvantifiera alla typer av risker och mitigering',
         analysisType: 'risk',
-        focusAreas: ['risk', 'profitability'],
+        focusAreas: ['risk', 'profitability', 'liquidity', 'concentration_risk', 'climate_risk'],
         timeHorizon: 'short'
+      },
+      {
+        id: 'acquisition-targets',
+        name: 'Förvärvsmål',
+        query: 'Analysera företag som attraktiva förvärvsmål baserat på strategisk passform, finansiell prestanda, marknadsposition och synergipotential. Utvärdera integrationsrisker, kulturell kompatibilitet och värderingsmöjligheter.',
+        description: 'Identifiera optimala förvärvsmål med hög synergipotential',
+        analysisType: 'investment',
+        focusAreas: ['strategic_fit', 'synergies', 'valuation', 'integration_risk', 'cultural_fit'],
+        timeHorizon: 'medium'
+      },
+      {
+        id: 'sustainability-leaders',
+        name: 'Hållbarhetsledare',
+        query: 'Utvärdera företag med stark miljö- och hållbarhetsprofil, grön omställning och ESG-excellens. Analysera klimatpåverkan, cirkulär ekonomi, socialt ansvar och framtida hållbarhetsregleringar.',
+        description: 'Företag i framkant av hållbar utveckling och ESG',
+        analysisType: 'comprehensive',
+        focusAreas: ['sustainability', 'esg', 'climate_impact', 'circular_economy', 'social_responsibility'],
+        timeHorizon: 'long'
+      },
+      {
+        id: 'digital-transformation',
+        name: 'Digital Transformation',
+        query: 'Identifiera företag som genomgår eller behöver digital transformation med fokus på automatisering, AI-implementering, dataanalys och kundupplevelse. Utvärdera teknisk mognad och investeringsbehov.',
+        description: 'Företag med potential för digital förnyelse och innovation',
+        analysisType: 'comprehensive',
+        focusAreas: ['digitalization', 'automation', 'ai_implementation', 'data_analytics', 'customer_experience'],
+        timeHorizon: 'medium'
+      },
+      {
+        id: 'niche-market-dominance',
+        name: 'Nischmarknadsdominans',
+        query: 'Analysera företag med stark positionering i nischmarknader, höga marknadsandelar och konkurrensfördelar. Utvärdera marknadsstorlek, tillväxtpotential, inträdesbarriärer och försvarbarhet.',
+        description: 'Företag med stark position i specialiserade marknader',
+        analysisType: 'market',
+        focusAreas: ['market_position', 'competitive_advantage', 'barriers_to_entry', 'market_size', 'growth_potential'],
+        timeHorizon: 'long'
+      },
+      {
+        id: 'turnaround-opportunities',
+        name: 'Vändningsmöjligheter',
+        query: 'Identifiera företag med underpresterande resultat men starka tillgångar, etablerade marknader eller unika resurser som kan vändas. Analysera vändningspotential, ledarskap och kapitalbehov.',
+        description: 'Företag med potential för operativ och finansiell vändning',
+        analysisType: 'investment',
+        focusAreas: ['turnaround_potential', 'asset_quality', 'leadership', 'capital_requirements', 'market_position'],
+        timeHorizon: 'medium'
+      },
+      {
+        id: 'innovation-leaders',
+        name: 'Innovationsledare',
+        query: 'Utvärdera företag med stark innovationskraft, R&D-investeringar, patentportföljer och teknologiska genombrott. Analysera innovationspipeline, forskningskapacitet och kommersialisering.',
+        description: 'Företag i framkant av teknologisk innovation och utveckling',
+        analysisType: 'comprehensive',
+        focusAreas: ['innovation', 'rd_investment', 'patents', 'technology_breakthroughs', 'commercialization'],
+        timeHorizon: 'long'
       }
     ]
   }
