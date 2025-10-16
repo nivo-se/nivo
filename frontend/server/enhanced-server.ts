@@ -6,6 +6,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
+import OpenAI from 'openai'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -31,14 +32,607 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey
 console.log('Supabase URL:', supabaseUrl ? 'Loaded' : 'Missing')
 console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Loaded' : 'Missing')
 
+// Codex AI Analysis Constants and Schemas
+const MODEL_DEFAULT = process.env.OPENAI_MODEL || 'gpt-4o-mini'
+const MODEL_SCREENING = 'gpt-3.5-turbo'
+const PROMPT_COST_PER_1K = 0.15
+const COMPLETION_COST_PER_1K = 0.6
+const SCREENING_PROMPT_COST_PER_1K = 0.0005
+const SCREENING_COMPLETION_COST_PER_1K = 0.0015
+
+const deepAnalysisSchema = {
+  name: 'DeepCompanyAnalysis',
+  strict: true,
+  schema: {
+    type: 'object',
+    properties: {
+      executive_summary: {
+        type: 'string',
+        description: 'Två meningar som sammanfattar företagets läge och investeringsläge.',
+        minLength: 40,
+      },
+      key_findings: {
+        type: 'array',
+        minItems: 4,
+        maxItems: 6,
+        items: {
+          type: 'string',
+          minLength: 20,
+        },
+        description: 'Bullet points med de viktigaste observationerna.',
+      },
+      narrative: {
+        type: 'string',
+        description: 'En handlingsinriktad text kring 280-320 ord på svenska.',
+        minLength: 1200,
+      },
+      strengths: {
+        type: 'array',
+        minItems: 3,
+        items: { type: 'string', minLength: 15 },
+      },
+      weaknesses: {
+        type: 'array',
+        minItems: 2,
+        items: { type: 'string', minLength: 15 },
+      },
+      opportunities: {
+        type: 'array',
+        minItems: 2,
+        items: { type: 'string', minLength: 15 },
+      },
+      risks: {
+        type: 'array',
+        minItems: 2,
+        items: { type: 'string', minLength: 15 },
+      },
+      recommendation: {
+        type: 'string',
+        enum: ['Stark köp', 'Köp', 'Behåll', 'Avvakta', 'Sälj'],
+      },
+      acquisition_interest: {
+        type: 'string',
+        enum: ['Hög', 'Medel', 'Låg'],
+      },
+      financial_health_score: {
+        type: 'number',
+        minimum: 1,
+        maximum: 10,
+      },
+      growth_outlook: {
+        type: 'string',
+        enum: ['Hög', 'Medel', 'Låg'],
+      },
+      market_position: {
+        type: 'string',
+        enum: ['Marknadsledare', 'Utmanare', 'Följare', 'Nischaktör'],
+      },
+      confidence: {
+        type: 'number',
+        minimum: 0,
+        maximum: 100,
+      },
+      risk_score: {
+        type: 'number',
+        minimum: 0,
+        maximum: 100,
+      },
+      next_steps: {
+        type: 'array',
+        minItems: 3,
+        items: { type: 'string', minLength: 10 },
+      },
+      target_price: {
+        type: 'number',
+        description: 'Indikerat värde (MSEK) baserat på multipelresonemang.',
+      },
+      word_count: {
+        type: 'integer',
+      },
+    },
+    required: [
+      'executive_summary',
+      'key_findings',
+      'narrative',
+      'strengths',
+      'weaknesses',
+      'opportunities',
+      'risks',
+      'recommendation',
+      'acquisition_interest',
+      'financial_health_score',
+      'growth_outlook',
+      'market_position',
+      'confidence',
+      'risk_score',
+      'next_steps',
+    ],
+  },
+}
+
+const screeningSchema = {
+  name: 'ScreeningAnalysis',
+  strict: true,
+  schema: {
+    type: 'object',
+    properties: {
+      screening_score: {
+        type: 'number',
+        description: 'Overall screening score from 1-100 based on financial health, growth, and market position.',
+        minimum: 1,
+        maximum: 100,
+      },
+      risk_flag: {
+        type: 'string',
+        description: 'Risk level: Low, Medium, or High',
+        enum: ['Low', 'Medium', 'High'],
+      },
+      brief_summary: {
+        type: 'string',
+        description: '2-3 sentences highlighting key strengths and weaknesses.',
+      },
+    },
+    required: ['screening_score', 'risk_flag', 'brief_summary'],
+  },
+}
+
+const deepAnalysisSystemPrompt = `Du är Nivos ledande företagsanalytiker med fokus på M&A i svenska små och medelstora bolag.
+Din uppgift är att leverera handlingsbara beslutsunderlag till investeringskommittén. Svara alltid på svenska med professionell ton.
+
+När du analyserar ska du:
+- Utvärdera marginalstabilitet, kassaflödesprofil, skuldsättning och kapitalstruktur.
+- Bedöma marknadsposition, skalpotential och integrationsmöjligheter efter förvärv.
+- Lyfta fram konkreta risker och uppsidor, alltid kopplade till siffror i underlaget.
+- Vara tydlig när något baseras på antaganden och ange hur det kan verifieras.
+
+Utdata måste följa det specificerade JSON-schemat utan extra text.`
+
+const screeningSystemPrompt = `You are a rapid M&A screening analyst. For each company, provide:
+1. Screening Score (1-100): Based on financial health, growth trajectory, and market position
+2. Risk Flag: (Low/Medium/High) - Key concerns if any
+3. Brief Summary: 2-3 sentences highlighting key strengths/weaknesses
+
+Focus on: Revenue trends, profitability, debt levels, growth consistency.
+Use available financial data (4 years history). Flag missing critical data.
+
+Be concise and direct. Prioritize red flags and high-potential opportunities.`
+
+// Utility functions from Codex
+function safeNumber(value: any): number | null {
+  if (value === null || value === undefined || value === '') return null
+  const num = Number(value)
+  return Number.isFinite(num) ? num : null
+}
+
+function formatNumber(value: number | null): string {
+  if (value === null || value === undefined) return 'N/A'
+  return new Intl.NumberFormat('sv-SE').format(value)
+}
+
+function formatPercent(value: number | null): string {
+  if (value === null || value === undefined) return 'N/A'
+  return `${(value * 100).toFixed(1)}%`
+}
+
+function formatCurrency(value: number | null): string {
+  if (value === null || value === undefined) return 'N/A'
+  return `${formatNumber(value)} TSEK`
+}
+
+function formatRatio(value: number | null): string {
+  if (value === null || value === undefined) return 'N/A'
+  return value.toFixed(2)
+}
+
+function clampNumber(value: number, min: number, max: number, fallback: number): number {
+  if (!Number.isFinite(value)) return fallback
+  return Math.max(min, Math.min(max, value))
+}
+
+function ensureStringArray(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value.filter(item => typeof item === 'string' && item.trim().length > 0)
+  }
+  return []
+}
+
+function calculateCost(promptTokens: number, completionTokens: number): number {
+  const promptCost = (promptTokens / 1000) * PROMPT_COST_PER_1K
+  const completionCost = (completionTokens / 1000) * COMPLETION_COST_PER_1K
+  return promptCost + completionCost
+}
+
+function computeDerivedMetrics(financials: any[], kpis: any[], employees: number | null) {
+  if (financials.length === 0) {
+    return {
+      revenueCagr: null,
+      avgEbitdaMargin: null,
+      avgNetMargin: null,
+      equityRatioLatest: null,
+      debtToEquityLatest: null,
+      revenuePerEmployee: null,
+    }
+  }
+
+  const latest = financials[0]
+  const oldest = financials[financials.length - 1]
+  
+  // Calculate CAGR
+  let revenueCagr = null
+  if (latest.revenue && oldest.revenue && latest.revenue > 0 && oldest.revenue > 0) {
+    const years = latest.year - oldest.year
+    if (years > 0) {
+      revenueCagr = Math.pow(latest.revenue / oldest.revenue, 1 / years) - 1
+    }
+  }
+
+  // Calculate average margins
+  const validMargins = financials.filter(f => f.ebitMargin !== null && f.ebitMargin !== undefined)
+  const avgEbitdaMargin = validMargins.length > 0 
+    ? validMargins.reduce((sum, f) => sum + f.ebitMargin, 0) / validMargins.length 
+    : null
+
+  const validNetMargins = financials.filter(f => f.netIncome && f.revenue)
+  const avgNetMargin = validNetMargins.length > 0
+    ? validNetMargins.reduce((sum, f) => sum + (f.netIncome / f.revenue), 0) / validNetMargins.length
+    : null
+
+  // Latest ratios
+  const equityRatioLatest = latest.totalEquity && latest.totalDebt 
+    ? latest.totalEquity / (latest.totalEquity + latest.totalDebt)
+    : null
+
+  const debtToEquityLatest = latest.totalDebt && latest.totalEquity
+    ? latest.totalDebt / latest.totalEquity
+    : null
+
+  const revenuePerEmployee = latest.revenue && employees
+    ? latest.revenue / employees
+    : null
+
+  return {
+    revenueCagr,
+    avgEbitdaMargin,
+    avgNetMargin,
+    equityRatioLatest,
+    debtToEquityLatest,
+    revenuePerEmployee,
+  }
+}
+
+function estimateConfidenceFromProfile(profile: any): number {
+  let confidence = 50
+  if (profile.financials.length >= 3) confidence += 20
+  if (profile.financials.length >= 4) confidence += 10
+  if (profile.derived.revenueCagr !== null) confidence += 10
+  if (profile.derived.avgEbitdaMargin !== null) confidence += 10
+  return Math.min(95, confidence)
+}
+
+function estimateRiskScore(profile: any, financialHealth: number): number {
+  let riskScore = 50
+  riskScore -= (financialHealth - 5) * 5 // Better health = lower risk
+  if (profile.derived.debtToEquityLatest && profile.derived.debtToEquityLatest > 1) riskScore += 20
+  if (profile.derived.revenueCagr && profile.derived.revenueCagr < 0) riskScore += 15
+  return Math.max(0, Math.min(100, riskScore))
+}
+
+function deriveGrades(profile: any) {
+  const derived = profile.derived
+  
+  const financialGrade = derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.08 ? 'A' :
+                        derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.05 ? 'B' :
+                        derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.02 ? 'C' : 'D'
+  
+  const commercialGrade = derived.revenueCagr && derived.revenueCagr > 0.1 ? 'A' :
+                         derived.revenueCagr && derived.revenueCagr > 0.05 ? 'B' :
+                         derived.revenueCagr && derived.revenueCagr > 0 ? 'C' : 'D'
+  
+  const operationalGrade = profile.employees && profile.employees > 20 ? 'A' :
+                          profile.employees && profile.employees > 10 ? 'B' :
+                          profile.employees && profile.employees > 5 ? 'C' : 'D'
+  
+  return { financialGrade, commercialGrade, operationalGrade }
+}
+
+function buildMetricsFromProfile(profile: any) {
+  const derived = profile.derived
+  const latest = profile.financials[0]
+  
+  return [
+    {
+      metric_name: 'Omsättningstillväxt (CAGR)',
+      metric_value: derived.revenueCagr || 0,
+      metric_unit: '%',
+      source: 'Beräknad',
+      year: latest?.year,
+      confidence: 85
+    },
+    {
+      metric_name: 'Genomsnittlig EBITDA-marginal',
+      metric_value: derived.avgEbitdaMargin || 0,
+      metric_unit: '%',
+      source: 'Beräknad',
+      year: latest?.year,
+      confidence: 80
+    },
+    {
+      metric_name: 'Soliditet',
+      metric_value: derived.equityRatioLatest || 0,
+      metric_unit: '%',
+      source: 'Beräknad',
+      year: latest?.year,
+      confidence: 90
+    },
+    {
+      metric_name: 'Omsättning per anställd',
+      metric_value: derived.revenuePerEmployee || 0,
+      metric_unit: 'TSEK',
+      source: 'Beräknad',
+      year: latest?.year,
+      confidence: 75
+    }
+  ]
+}
+
 const app = express()
 const port = process.env.PORT ? Number(process.env.PORT) : 3001
 
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
 
-// Import the enhanced AI analysis functions from the Vercel API
-// We'll adapt the Vercel API code to work with Express
+// Codex AI Analysis Functions
+
+function buildDeepAnalysisPrompt(profile: any, instructions?: string) {
+  const financialLines = profile.financials.length
+    ? profile.financials
+        .map(
+          (row: any) =>
+            `${row.year} | ${formatNumber(row.revenue)} | ${formatNumber(row.ebitda)} | ${formatNumber(row.netIncome)} | ${formatNumber(row.totalDebt)} | ${formatNumber(row.totalEquity)} | ${formatNumber(row.employees)} | ${formatPercent(row.revenueGrowth)}`
+        )
+        .join('\n')
+    : 'Ingen historik tillgänglig'
+
+  const kpiLines = profile.kpis && profile.kpis.length
+    ? profile.kpis
+        .map(
+          (row: any) =>
+            `${row.year}: Tillväxt=${formatPercent(row.revenueGrowth)}, EBIT-marginal=${formatPercent(row.ebitMargin)}, Nettomarginal=${formatPercent(row.netMargin)}, Soliditet=${formatPercent(row.equityRatio)}`
+        )
+        .join('\n')
+    : 'Inga KPI-data tillgängliga.'
+
+  const derived = profile.derived
+  const benchmarkText = profile.benchmarks
+    ? `Sektorbenchmark (${profile.benchmarks.segment}):
+- Medeltillväxt: ${formatPercent(profile.benchmarks.avgRevenueGrowth)}
+- Medel EBIT-marginal: ${formatPercent(profile.benchmarks.avgEbitMargin)}
+- Medel nettomarginal: ${formatPercent(profile.benchmarks.avgNetMargin)}`
+    : 'Sektorbenchmark: Ej tillgänglig.'
+
+  const instructionText = instructions ? `Extra instruktioner från användaren: ${instructions}` : ''
+
+  return `
+Företag: ${profile.companyName} (${profile.orgnr})
+Bransch/segment: ${profile.segmentName || profile.industry || 'Okänd'}
+Ort: ${profile.city || 'Okänd'}
+Storleksklass: ${profile.sizeCategory || 'Okänd'} • Tillväxtkategori: ${profile.growthCategory || 'Okänd'} • Lönsamhetsprofil: ${profile.profitabilityCategory || 'Okänd'}
+
+Finansiell historik (TSEK):
+År | Omsättning | EBITDA | Nettoresultat | Skulder | Eget kapital | Anställda | Tillväxt
+${financialLines}
+
+Beräknade nyckeltal:
+- Fyraårs CAGR omsättning: ${formatPercent(derived.revenueCagr)}
+- Genomsnittlig EBITDA-marginal: ${formatPercent(derived.avgEbitdaMargin)}
+- Genomsnittlig nettomarginal: ${formatPercent(derived.avgNetMargin)}
+- Soliditet (senaste): ${formatPercent(derived.equityRatioLatest)}
+- Skuldsättningsgrad (senaste): ${formatRatio(derived.debtToEquityLatest)}
+- Omsättning per anställd (senaste): ${formatCurrency(derived.revenuePerEmployee)}
+
+KPI-historik:
+${kpiLines}
+
+${benchmarkText}
+
+Uppgift:
+- Svara på svenska med professionell ton.
+- Leverera JSON enligt schemat DeepCompanyAnalysis.
+- Gör narrativet cirka 300 ord och redovisa uppskattat word_count.
+- Analysera finansiell stabilitet, marginaler, skuldsättning och kapitalstruktur.
+- Lyft fram risker och uppsidor för ett potentiellt förvärv inom 12–24 månader.
+- Ge en tydlig rekommendation (Köp/Håll/Sälj) och bedöm förvärvsintresset (Hög/Medel/Låg).
+
+Fråga att besvara:
+"Baserat på denna finansiella profil, hur presterar företaget och hur stabilt är det? Finns det betydande risker eller uppsidor? Är verksamheten intressant för förvärv?"
+
+${instructionText}
+`
+}
+
+async function invokeDeepAnalysisModel(openai: OpenAI, prompt: string) {
+  const started = Date.now()
+  const response = await openai.chat.completions.create({
+    model: MODEL_DEFAULT,
+    temperature: 0.25,
+    max_tokens: 1600,
+    messages: [
+      { role: 'system', content: deepAnalysisSystemPrompt },
+      { role: 'user', content: prompt },
+    ],
+    response_format: { type: 'json_schema', json_schema: deepAnalysisSchema },
+  })
+  const latency = Date.now() - started
+
+  let rawText = response.choices[0]?.message?.content || '{}'
+  let parsed: any = {}
+  try {
+    parsed = JSON.parse(rawText)
+  } catch {
+    parsed = {}
+  }
+
+  const usage = response.usage || {}
+  return { parsed, rawText, usage, latency }
+}
+
+function buildCompanyResult(
+  profile: any,
+  payload: any,
+  usage: any,
+  latencyMs: number,
+  prompt: string,
+  rawText: string
+): any {
+  const executiveSummary =
+    typeof payload?.executive_summary === 'string' ? payload.executive_summary.trim() : ''
+  const keyFindings = ensureStringArray(payload?.key_findings)
+  const strengths = ensureStringArray(payload?.strengths)
+  const weaknesses = ensureStringArray(payload?.weaknesses)
+  const opportunities = ensureStringArray(payload?.opportunities)
+  const risks = ensureStringArray(payload?.risks)
+  const nextSteps = ensureStringArray(payload?.next_steps)
+  const narrative =
+    typeof payload?.narrative === 'string' && payload.narrative.trim().length > 0
+      ? payload.narrative.trim()
+      : keyFindings.join(' ')
+
+  const targetPrice =
+    payload?.target_price !== undefined && payload?.target_price !== null
+      ? Number(payload.target_price)
+      : null
+
+  const financialHealth = clampNumber(
+    Number(payload?.financial_health_score ?? NaN),
+    1,
+    10,
+    5
+  )
+  const growthPotential =
+    typeof payload?.growth_outlook === 'string' ? payload.growth_outlook : 'Medel'
+  const marketPosition =
+    typeof payload?.market_position === 'string' ? payload.market_position : 'Följare'
+  const recommendation =
+    typeof payload?.recommendation === 'string' ? payload.recommendation : 'Avvakta'
+  const acquisitionInterest =
+    typeof payload?.acquisition_interest === 'string' ? payload.acquisition_interest : 'Medel'
+  const confidence = clampNumber(
+    Number(payload?.confidence ?? NaN),
+    0,
+    100,
+    estimateConfidenceFromProfile(profile)
+  )
+  const riskScore = clampNumber(
+    Number(payload?.risk_score ?? NaN),
+    0,
+    100,
+    estimateRiskScore(profile, financialHealth)
+  )
+
+  const { financialGrade, commercialGrade, operationalGrade } = deriveGrades(profile)
+  const metrics = buildMetricsFromProfile(profile)
+
+  const sections = [
+    {
+      section_type: 'key_findings',
+      title: 'Nyckelobservationer',
+      content_md: keyFindings.length
+        ? keyFindings.map((item) => `- ${item}`).join('\n')
+        : '- Inga nyckelobservationer genererade.',
+      supporting_metrics: metrics.map((metric) => ({
+        metric_name: metric.metric_name,
+        metric_value: metric.metric_value,
+        metric_unit: metric.metric_unit,
+      })),
+      confidence,
+    },
+    {
+      section_type: 'executive_overview',
+      title: 'Sammanfattad analys',
+      content_md:
+        narrative ||
+        executiveSummary ||
+        'Analysen kunde inte generera ett narrativ baserat på underlaget.',
+      supporting_metrics: [],
+      confidence,
+    },
+    {
+      section_type: 'risk_opportunity',
+      title: 'Risker och möjligheter',
+      content_md: [
+        '**Risker:**',
+        risks.length ? risks.map((item) => `- ${item}`).join('\n') : '- Ej identifierat',
+        '\n**Möjligheter:**',
+        opportunities.length
+          ? opportunities.map((item) => `- ${item}`).join('\n')
+          : '- Ej identifierat',
+      ].join('\n'),
+      supporting_metrics: [],
+      confidence,
+    },
+  ]
+
+  if (strengths.length || weaknesses.length) {
+    sections.push({
+      section_type: 'strengths_weaknesses',
+      title: 'Styrkor och svagheter',
+      content_md: [
+        '**Styrkor:**',
+        strengths.length ? strengths.map((item) => `- ${item}`).join('\n') : '- Ej identifierat',
+        '\n**Svagheter:**',
+        weaknesses.length
+          ? weaknesses.map((item) => `- ${item}`).join('\n')
+          : '- Ej identifierat',
+      ].join('\n'),
+      supporting_metrics: [],
+      confidence,
+    })
+  }
+
+  const promptTokens = usage.prompt_tokens || 0
+  const completionTokens = usage.completion_tokens || 0
+  const cost = calculateCost(promptTokens, completionTokens)
+
+  return {
+    orgnr: profile.orgnr,
+    orgNr: profile.orgnr,
+    companyName: profile.companyName,
+    name: profile.companyName,
+    segmentName: profile.segmentName,
+    executiveSummary: executiveSummary || narrative,
+    keyFindings,
+    narrative,
+    strengths,
+    weaknesses,
+    opportunities,
+    risks,
+    recommendation,
+    acquisitionInterest,
+    financialHealth,
+    growthPotential,
+    marketPosition,
+    confidence,
+    riskScore,
+    targetPrice,
+    nextSteps: nextSteps.length
+      ? nextSteps
+      : ['Komplettera dataunderlag', 'Verifiera senaste bokslut', 'Kör ny analys efter datakorrigering'],
+    summary: narrative || executiveSummary || null,
+    financialGrade,
+    commercialGrade,
+    operationalGrade,
+    sections,
+    metrics,
+    audit: {
+      prompt,
+      response: rawText,
+      latency_ms: latencyMs,
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      cost_usd: cost,
+    },
+  }
+}
 
 // Enhanced AI analysis endpoint using Codex improvements
 app.post('/api/ai-analysis', async (req, res) => {
@@ -124,8 +718,11 @@ app.post('/api/ai-analysis', async (req, res) => {
             console.error('Error saving screening result:', screeningError)
           }
         } else {
-          // Generate deep analysis result using enhanced Codex logic
-          const deepResult = await generateDeepAnalysisResult(profile, instructions)
+          // Generate deep analysis result using full Codex AI logic
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+          const prompt = buildDeepAnalysisPrompt(profile, instructions)
+          const { parsed, rawText, usage, latency } = await invokeDeepAnalysisModel(openai, prompt)
+          const deepResult = buildCompanyResult(profile, parsed, usage, latency, prompt, rawText)
           companiesResults.push(deepResult)
           
           // Save deep analysis result to database
@@ -306,250 +903,9 @@ async function generateScreeningResult(profile: any) {
   }
 }
 
-// Enhanced deep analysis result generation
-async function generateDeepAnalysisResult(profile: any, instructions?: string) {
-  const latest = profile.financials[0]
-  const derived = profile.derived
+// Database persistence functions
 
-  // Enhanced analysis with Swedish content
-  const executiveSummary = `${profile.companyName} är ett ${profile.segmentName || 'okänt'} företag med ${derived.revenueCagr ? (derived.revenueCagr > 0.1 ? 'stark' : 'måttlig') : 'begränsad'} tillväxt. Företaget har ${profile.employees || 'okänt antal'} anställda och en omsättning på ${formatCurrency(latest?.revenue)}.`
-
-  const keyFindings = [
-    `Omsättningstillväxt: ${formatPercent(derived.revenueCagr)} över senaste perioden`,
-    `EBITDA-marginal: ${formatPercent(derived.avgEbitdaMargin)} genomsnitt`,
-    `Soliditet: ${formatPercent(derived.equityRatioLatest)} senaste år`,
-    `Skuldsättningsgrad: ${formatRatio(derived.debtToEquityLatest)}`,
-    `Omsättning per anställd: ${formatCurrency(derived.revenuePerEmployee)}`
-  ].filter(item => !item.includes('N/A'))
-
-  const narrative = `${executiveSummary} Finansiell analys visar ${derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.05 ? 'god lönsamhet' : 'utmanande lönsamhet'}. ${derived.revenueCagr && derived.revenueCagr > 0.1 ? 'Stark tillväxt' : 'Måttlig tillväxt'} indikerar ${derived.revenueCagr && derived.revenueCagr > 0.1 ? 'positiv marknadsutveckling' : 'stabila marknadsförhållanden'}. Skuldsättningen är ${derived.debtToEquityLatest && derived.debtToEquityLatest > 1 ? 'hög' : 'hanterbar'}, vilket påverkar investeringsprofilen.`
-
-  const strengths = [
-    derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.05 ? 'God lönsamhet och marginalstabilitet' : null,
-    derived.revenueCagr && derived.revenueCagr > 0.05 ? 'Positiv tillväxtutveckling' : null,
-    derived.equityRatioLatest && derived.equityRatioLatest > 0.3 ? 'Stark kapitalstruktur' : null,
-    profile.employees && profile.employees > 10 ? 'Etablerad organisation' : null
-  ].filter(Boolean)
-
-  const weaknesses = [
-    derived.avgEbitdaMargin && derived.avgEbitdaMargin < 0.02 ? 'Låg lönsamhet' : null,
-    derived.revenueCagr && derived.revenueCagr < 0 ? 'Negativ tillväxt' : null,
-    derived.debtToEquityLatest && derived.debtToEquityLatest > 2 ? 'Hög skuldsättning' : null,
-    profile.employees && profile.employees < 5 ? 'Begränsad organisation' : null
-  ].filter(Boolean)
-
-  const opportunities = [
-    'Marknadsexpansion inom befintlig bransch',
-    'Digitalisering och effektivisering',
-    'Strategiska partnerskap',
-    'Produktutveckling och innovation'
-  ]
-
-  const risks = [
-    derived.debtToEquityLatest && derived.debtToEquityLatest > 1.5 ? 'Finansiell risk från hög skuldsättning' : 'Marknadsrisk',
-    'Konkurrens från större aktörer',
-    'Ekonomiska cykler och marknadsförändringar',
-    'Regulatoriska förändringar'
-  ]
-
-  // Enhanced recommendation logic
-  let recommendation = 'Avvakta'
-  let acquisitionInterest = 'Medel'
-  let financialHealth = 5
-  let growthPotential = 'Medel'
-  let marketPosition = 'Följare'
-
-  if (derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.08 && derived.revenueCagr && derived.revenueCagr > 0.1) {
-    recommendation = 'Köp'
-    acquisitionInterest = 'Hög'
-    financialHealth = 8
-    growthPotential = 'Hög'
-    marketPosition = 'Utmanare'
-  } else if (derived.avgEbitdaMargin && derived.avgEbitdaMargin > 0.05 && derived.revenueCagr && derived.revenueCagr > 0.05) {
-    recommendation = 'Behåll'
-    acquisitionInterest = 'Medel'
-    financialHealth = 6
-    growthPotential = 'Medel'
-  }
-
-  const confidence = Math.min(95, 60 + (profile.financials.length * 5) + (keyFindings.length * 3))
-  const riskScore = Math.max(0, 70 - (financialHealth * 4) - (derived.avgEbitdaMargin ? derived.avgEbitdaMargin * 100 : 0))
-
-  const nextSteps = [
-    'Genomför detaljerad due diligence',
-    'Verifiera finansiell historik',
-    'Analysera marknadspotential',
-    'Bedöm integrationsmöjligheter'
-  ]
-
-  return {
-    orgnr: profile.orgnr,
-    orgNr: profile.orgnr,
-    companyName: profile.companyName,
-    name: profile.companyName,
-    segmentName: profile.segmentName,
-    executiveSummary,
-    keyFindings,
-    narrative,
-    strengths,
-    weaknesses,
-    opportunities,
-    risks,
-    recommendation,
-    acquisitionInterest,
-    financialHealth,
-    growthPotential,
-    marketPosition,
-    confidence,
-    riskScore,
-    targetPrice: null,
-    nextSteps,
-    summary: narrative,
-    financialGrade: deriveGrade(derived.avgEbitdaMargin, 'financial'),
-    commercialGrade: deriveGrade(derived.revenueCagr, 'commercial'),
-    operationalGrade: deriveGrade(derived.revenuePerEmployee, 'operational'),
-    sections: [],
-    metrics: [],
-    audit: {
-      prompt: '',
-      response: narrative,
-      latency_ms: 0,
-      prompt_tokens: 0,
-      completion_tokens: 0,
-      cost_usd: null
-    }
-  }
-}
-
-// Helper functions
-function safeNumber(value: any): number | null {
-  if (value === null || value === undefined || value === '') return null
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
-}
-
-function computeDerivedMetrics(financials: any[], kpis: any[], fallbackEmployees?: number | null) {
-  if (!financials.length) {
-    return {
-      revenueCagr: null,
-      avgEbitdaMargin: null,
-      avgNetMargin: null,
-      equityRatioLatest: null,
-      debtToEquityLatest: null,
-      revenuePerEmployee: null,
-    }
-  }
-
-  const sorted = [...financials].sort((a, b) => b.year - a.year)
-  const latest = sorted[0]
-  const oldest = sorted[sorted.length - 1]
-  const spanYears = Math.max(1, latest.year - oldest.year || sorted.length - 1 || 1)
-
-  const revenueCagr = isFiniteNumber(latest.revenue) && isFiniteNumber(oldest.revenue) && 
-    latest.revenue! > 0 && oldest.revenue! > 0
-    ? Math.pow(Number(latest.revenue) / Number(oldest.revenue), 1 / spanYears) - 1
-    : null
-
-  const ebitdaMargins = sorted
-    .map((row) => isFiniteNumber(row.ebitda) && isFiniteNumber(row.revenue) && row.revenue! > 0
-      ? Number(row.ebitda) / Number(row.revenue)
-      : null)
-    .filter(isFiniteNumber)
-  const avgEbitdaMargin = ebitdaMargins.length ? average(ebitdaMargins) : null
-
-  const netMargins = sorted
-    .map((row) => isFiniteNumber(row.netIncome) && isFiniteNumber(row.revenue) && row.revenue! > 0
-      ? Number(row.netIncome) / Number(row.revenue)
-      : null)
-    .filter(isFiniteNumber)
-  const avgNetMargin = netMargins.length ? average(netMargins) : null
-
-  const equityRatioLatest = isFiniteNumber(latest.totalEquity)
-    ? Number(latest.totalEquity) / (Number(latest.totalEquity) + (Number(latest.totalDebt) || 0))
-    : null
-
-  const debtToEquityLatest = isFiniteNumber(latest.debtToEquity) && latest.debtToEquity! >= 0
-    ? Number(latest.debtToEquity)
-    : isFiniteNumber(latest.totalDebt) && isFiniteNumber(latest.totalEquity) && Number(latest.totalEquity) !== 0
-    ? Number(latest.totalDebt) / Number(latest.totalEquity)
-    : null
-
-  const employees = isFiniteNumber(latest.employees)
-    ? Number(latest.employees)
-    : isFiniteNumber(fallbackEmployees)
-    ? Number(fallbackEmployees)
-    : null
-  const revenuePerEmployee = employees && employees > 0 && isFiniteNumber(latest.revenue)
-    ? Number(latest.revenue) / employees
-    : null
-
-  return {
-    revenueCagr,
-    avgEbitdaMargin,
-    avgNetMargin,
-    equityRatioLatest,
-    debtToEquityLatest,
-    revenuePerEmployee,
-  }
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value)
-}
-
-function average(values: number[]): number {
-  if (!values.length) return 0
-  const sum = values.reduce((acc, value) => acc + value, 0)
-  return sum / values.length
-}
-
-function formatNumber(value: number | null | undefined, decimals = 0): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return Number(value).toLocaleString('sv-SE', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
-}
-
-function formatCurrency(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${formatNumber(value, 0)} TSEK`
-}
-
-function formatPercent(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${(Number(value) * 100).toFixed(1)} %`
-}
-
-function formatRatio(value: number | null | undefined): string {
-  if (!isFiniteNumber(value)) return 'N/A'
-  return `${Number(value).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}x`
-}
-
-function deriveGrade(value: number | null | undefined, type: string): string {
-  if (!isFiniteNumber(value)) return 'D'
-  
-  if (type === 'financial') {
-    if (value > 0.1) return 'A'
-    if (value > 0.05) return 'B'
-    if (value > 0) return 'C'
-    return 'D'
-  } else if (type === 'commercial') {
-    if (value > 0.2) return 'A'
-    if (value > 0.1) return 'B'
-    if (value > 0.05) return 'C'
-    return 'D'
-  } else if (type === 'operational') {
-    if (value > 5000) return 'A'
-    if (value > 3000) return 'B'
-    if (value > 2000) return 'C'
-    return 'D'
-  }
-  
-  return 'D'
-}
-
-// Enhanced database persistence
+// Enhanced database persistence with all Codex fields
 async function persistCompanyResult(supabase: any, runId: string, result: any) {
   const companyRow = {
     run_id: runId,
@@ -562,16 +918,55 @@ async function persistCompanyResult(supabase: any, runId: string, result: any) {
     financial_grade: result.financialGrade,
     commercial_grade: result.commercialGrade,
     operational_grade: result.operationalGrade,
-    next_steps: result.nextSteps
+    next_steps: result.nextSteps,
+    
+    // NEW: Codex enhanced fields
+    executive_summary: result.executiveSummary,
+    key_findings: result.keyFindings,
+    narrative: result.narrative,
+    strengths: result.strengths,
+    weaknesses: result.weaknesses,
+    opportunities: result.opportunities,
+    risks: result.risks,
+    acquisition_interest: result.acquisitionInterest,
+    financial_health_score: result.financialHealth,
+    growth_outlook: result.growthPotential,
+    market_position: result.marketPosition,
+    target_price_msek: result.targetPrice
   }
 
-  const { error: companyError } = await supabase
+  const { data: insertedData, error: companyError } = await supabase
     .from('ai_company_analysis')
     .insert(companyRow)
+    .select('id')
+    .single()
 
   if (companyError) {
     console.error('Error inserting company analysis:', companyError)
     throw companyError
+  }
+
+  // Save audit information if available
+  if (result.audit && insertedData?.id) {
+    const auditRow = {
+      analysis_id: insertedData.id,
+      prompt_text: result.audit.prompt,
+      response_text: result.audit.response,
+      prompt_tokens: result.audit.prompt_tokens,
+      completion_tokens: result.audit.completion_tokens,
+      total_tokens: result.audit.prompt_tokens + result.audit.completion_tokens,
+      cost_usd: result.audit.cost_usd,
+      latency_ms: result.audit.latency_ms
+    }
+
+    const { error: auditError } = await supabase
+      .from('ai_analysis_audit')
+      .insert(auditRow)
+
+    if (auditError) {
+      console.error('Error inserting audit record:', auditError)
+      // Don't throw here, as the main analysis was saved successfully
+    }
   }
 
   console.log('✅ Enhanced company analysis saved to database')
@@ -737,6 +1132,18 @@ app.get('/api/analyzed-companies', async (req, res) => {
         operational_grade,
         next_steps,
         created_at,
+        executive_summary,
+        key_findings,
+        narrative,
+        strengths,
+        weaknesses,
+        opportunities,
+        risks,
+        acquisition_interest,
+        financial_health_score,
+        growth_outlook,
+        market_position,
+        target_price_msek,
         ai_analysis_runs!inner(
           started_at,
           completed_at,
@@ -787,7 +1194,20 @@ app.get('/api/analyzed-companies', async (req, res) => {
       nextSteps: item.next_steps,
       createdAt: item.created_at,
       analysisDate: item.ai_analysis_runs?.started_at,
-      modelVersion: item.ai_analysis_runs?.model_version
+      modelVersion: item.ai_analysis_runs?.model_version,
+      // Enhanced Codex fields
+      executiveSummary: item.executive_summary,
+      keyFindings: item.key_findings,
+      narrative: item.narrative,
+      strengths: item.strengths,
+      weaknesses: item.weaknesses,
+      opportunities: item.opportunities,
+      risks: item.risks,
+      acquisitionInterest: item.acquisition_interest,
+      financialHealth: item.financial_health_score,
+      growthPotential: item.growth_outlook,
+      marketPosition: item.market_position,
+      targetPrice: item.target_price_msek
     }))
     
     res.json({ success: true, data: transformedData })
@@ -809,6 +1229,56 @@ app.get('/api/test-enhanced', (req, res) => {
       'Comprehensive risk assessment'
     ]
   })
+})
+
+// Migration endpoint to add enhanced columns
+app.post('/api/migrate-enhanced-fields', async (req, res) => {
+  try {
+    console.log('🔧 Applying enhanced fields migration...')
+    
+    // Test if columns already exist by trying to select them
+    const { data: testData, error: testError } = await supabase
+      .from('ai_company_analysis')
+      .select('executive_summary, key_findings, narrative')
+      .limit(1)
+    
+    if (!testError) {
+      console.log('✅ Enhanced columns already exist')
+      return res.json({ 
+        success: true, 
+        message: 'Enhanced columns already exist',
+        timestamp: new Date().toISOString()
+      })
+    }
+    
+    // If columns don't exist, we need to apply the migration manually
+    // For now, let's just return a message that manual migration is needed
+    console.log('⚠️ Enhanced columns need to be added manually to the database')
+    res.json({ 
+      success: false, 
+      message: 'Enhanced columns need to be added manually to the database. Please run the migration script in Supabase SQL editor.',
+      migration_sql: `
+        ALTER TABLE public.ai_company_analysis 
+        ADD COLUMN IF NOT EXISTS executive_summary TEXT,
+        ADD COLUMN IF NOT EXISTS key_findings JSONB,
+        ADD COLUMN IF NOT EXISTS narrative TEXT,
+        ADD COLUMN IF NOT EXISTS strengths JSONB,
+        ADD COLUMN IF NOT EXISTS weaknesses JSONB,
+        ADD COLUMN IF NOT EXISTS opportunities JSONB,
+        ADD COLUMN IF NOT EXISTS risks JSONB,
+        ADD COLUMN IF NOT EXISTS acquisition_interest TEXT,
+        ADD COLUMN IF NOT EXISTS financial_health_score NUMERIC,
+        ADD COLUMN IF NOT EXISTS growth_outlook TEXT,
+        ADD COLUMN IF NOT EXISTS market_position TEXT,
+        ADD COLUMN IF NOT EXISTS target_price_msek NUMERIC;
+      `,
+      timestamp: new Date().toISOString()
+    })
+    
+  } catch (error: any) {
+    console.error('Migration error:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
 })
 
 // Start server
