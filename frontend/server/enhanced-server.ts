@@ -266,9 +266,23 @@ app.post('/api/ai-analysis', async (req, res) => {
     }
 
     const completedAt = new Date().toISOString()
+    const finalStatus = errors.length > 0 ? 'completed_with_errors' : 'completed'
+    
+    // Update the run record with completion status
+    try {
+      await updateRunRecord(supabase, {
+        id: runId,
+        status: finalStatus,
+        completedAt,
+        errorMessage: errors.length > 0 ? errors.join('; ') : null,
+      })
+    } catch (updateError) {
+      console.error('Failed to update run record:', updateError)
+    }
+    
     const runPayload: RunPayload = {
       id: runId,
-      status: errors.length > 0 ? 'completed_with_errors' : 'completed',
+      status: finalStatus,
       modelVersion,
       analysisMode: analysisType,
       startedAt,
@@ -368,6 +382,80 @@ app.get('/api/analysis-runs', async (req, res) => {
     })
   } catch (error: any) {
     console.error('Get analysis runs error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Delete analysis run endpoint
+app.delete('/api/analysis-runs/:runId', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const { runId } = req.params
+
+    // Delete related records first (due to foreign key constraints)
+    const { error: auditError } = await supabase
+      .from('ai_analysis_audit')
+      .delete()
+      .eq('run_id', runId)
+
+    if (auditError) {
+      console.error('Error deleting audit records:', auditError)
+    }
+
+    const { error: metricsError } = await supabase
+      .from('ai_analysis_metrics')
+      .delete()
+      .eq('run_id', runId)
+
+    if (metricsError) {
+      console.error('Error deleting metrics records:', metricsError)
+    }
+
+    const { error: sectionsError } = await supabase
+      .from('ai_analysis_sections')
+      .delete()
+      .eq('run_id', runId)
+
+    if (sectionsError) {
+      console.error('Error deleting sections records:', sectionsError)
+    }
+
+    const { error: companyError } = await supabase
+      .from('ai_company_analysis')
+      .delete()
+      .eq('run_id', runId)
+
+    if (companyError) {
+      console.error('Error deleting company analysis records:', companyError)
+    }
+
+    const { error: screeningError } = await supabase
+      .from('ai_screening_results')
+      .delete()
+      .eq('run_id', runId)
+
+    if (screeningError) {
+      console.error('Error deleting screening results:', screeningError)
+    }
+
+    // Finally delete the main run record
+    const { error: runError } = await supabase
+      .from('ai_analysis_runs')
+      .delete()
+      .eq('id', runId)
+
+    if (runError) {
+      console.error('Error deleting run record:', runError)
+      return res.status(500).json({ success: false, error: 'Failed to delete analysis run' })
+    }
+
+    res.status(200).json({ success: true, message: 'Analysis run deleted successfully' })
+  } catch (error: any) {
+    console.error('Delete analysis run error:', error)
     res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
   }
 })
@@ -543,11 +631,14 @@ app.get('/api/companies', async (req, res) => {
 
 // Helper functions
 async function insertRunRecord(supabase: SupabaseClient, run: any) {
+  // Ensure initiated_by is never null
+  const initiatedBy = run.initiatedBy || 'unknown-user'
+  
   const { error } = await supabase
     .from('ai_analysis_runs')
     .insert([{
       id: run.id,
-      initiated_by: run.initiatedBy || 'unknown-user',
+      initiated_by: initiatedBy,
       model_version: run.modelVersion,
       analysis_mode: run.analysisMode,
       status: run.status,
@@ -563,6 +654,22 @@ async function insertRunRecord(supabase: SupabaseClient, run: any) {
   if (error) {
     console.error('Error inserting run record:', error)
     throw new Error(`Failed to create analysis run: ${error.message}`)
+  }
+}
+
+async function updateRunRecord(supabase: SupabaseClient, run: any) {
+  const { error } = await supabase
+    .from('ai_analysis_runs')
+    .update({
+      status: run.status,
+      completed_at: run.completedAt,
+      error_message: run.errorMessage
+    })
+    .eq('id', run.id)
+  
+  if (error) {
+    console.error('Error updating run record:', error)
+    throw new Error(`Failed to update analysis run: ${error.message}`)
   }
 }
 
