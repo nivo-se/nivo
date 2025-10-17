@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url'
 import OpenAI from 'openai'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
+import { fetchComprehensiveCompanyData } from './data-enrichment.js'
+import { QualityIssue, createQualityIssue } from './data-quality.js'
+import { getCompanyContext } from './industry-benchmarks.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -243,8 +246,13 @@ app.post('/api/ai-analysis', async (req, res) => {
       for (let i = 0; i < uniqueSelections.length; i += batchSize) {
         const batch = uniqueSelections.slice(i, i + batchSize)
         try {
-          const batchResults = await processScreeningBatch(supabase, openai, runId, batch, instructions)
-          screeningResults.push(...batchResults)
+          const batchResult = await processScreeningBatch(supabase, openai, runId, batch, instructions)
+          screeningResults.push(...batchResult.results)
+          
+          // Log quality issues for monitoring
+          if (batchResult.issues.length > 0) {
+            console.log(`Quality issues in batch ${Math.floor(i/batchSize) + 1}:`, batchResult.issues)
+          }
         } catch (error: any) {
           console.error('Screening batch failed', error)
           errors.push(`Batch ${Math.floor(i/batchSize) + 1}: ${error?.message || 'Unknown error'}`)
@@ -679,69 +687,39 @@ async function processScreeningBatch(
   runId: string,
   batch: CompanySelection[],
   instructions?: string
-): Promise<ScreeningResult[]> {
+): Promise<{ results: ScreeningResult[], issues: QualityIssue[] }> {
   const results: ScreeningResult[] = []
+  const allIssues: QualityIssue[] = []
   
   for (const selection of batch) {
     const orgnr = selection.OrgNr || selection.orgnr || ''
-    if (!orgnr) continue
+    if (!orgnr) {
+      allIssues.push(createQualityIssue(
+        'warning',
+        'Missing organization number',
+        { selection }
+      ))
+      continue
+    }
     
     try {
-      // Fetch comprehensive company data from master_analytics
-      const { data: companyData, error } = await supabase
-        .from('master_analytics')
-        .select('*')
-        .eq('OrgNr', orgnr)
-        .single()
+      // Use enhanced data fetching with quality tracking
+      const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+      allIssues.push(...dataResult.issues)
       
-      if (error || !companyData) {
-        console.error(`Failed to fetch data for ${orgnr}:`, error)
+      if (!dataResult.success || !dataResult.data) {
+        allIssues.push(createQualityIssue(
+          'critical', 
+          `Failed to load data for ${orgnr}`,
+          { orgnr, issues: dataResult.issues }
+        ))
         continue
       }
       
-      // Create screening prompt
-      const prompt = `Analysera detta svenska företag för förvärvsintresse:
-
-Företag: ${companyData.name}
-Organisationsnummer: ${orgnr}
-Bransch: ${companyData.segment_name || 'Okänd'}
-Stad: ${companyData.city || 'Okänd'}
-Anställda: ${companyData.employees || 'Okänt'}
-
-FINANSIELL DATA (från allabolag.se):
-Nettoomsättning (SDI): ${companyData.SDI ? (companyData.SDI / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Årets resultat (DR): ${companyData.DR ? (companyData.DR / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Årets resultat (ORS): ${companyData.ORS ? (companyData.ORS / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Tillväxt: ${companyData.Revenue_growth ? (companyData.Revenue_growth * 100).toFixed(1) + '%' : 'Okänd'}
-EBIT-marginal: ${companyData.EBIT_margin ? (companyData.EBIT_margin * 100).toFixed(1) + '%' : 'Okänd'}
-Nettovinstmarginal: ${companyData.NetProfit_margin ? (companyData.NetProfit_margin * 100).toFixed(1) + '%' : 'Okänd'}
-
-KOMPLETT FINANSIELL ANALYS:
-Baserat på de tillgängliga nyckeltalen från allabolag.se, analysera:
-- Finansiell hälsa: Omsättning, vinst, marginaler
-- Tillväxtpotential: Revenue_growth och trend
-- Lönsamhet: EBIT-marginal och nettovinstmarginal
-- Förvärvsattraktivitet: Storlek, bransch, digital närvaro
-
-${instructions ? `Specifika instruktioner: ${instructions}` : ''}
-
-Ge en snabb bedömning (1-100 poäng) baserat på:
-- Finansiell hälsa (SDI, DR, ORS, marginaler)
-- Lönsamhet (EBIT-marginal, Nettovinstmarginal)
-- Tillväxtpotential (Revenue_growth, trend)
-- Förvärvsattraktivitet (storlek, bransch, digital närvaro)
-
-VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
-Ge olika poäng och risknivåer baserat på företagets unika förhållanden.
-
-Svara ENDAST med giltig JSON utan markdown-formatering:
-{
-  "screeningScore": 85,
-  "riskFlag": "Low",
-  "briefSummary": "Kort sammanfattning på 2-3 meningar som refererar till specifika siffror från företaget"
-}
-
-VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdown-formatering.`
+      const companyData = dataResult.data
+      
+      // Create enhanced screening prompt with comprehensive data
+      const prompt = createEnhancedScreeningPrompt(companyData, instructions)
 
       const startTime = Date.now()
       
@@ -789,7 +767,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
       
       const result: ScreeningResult = {
         orgnr,
-        companyName: companyData.name,
+        companyName: companyData.masterData.name,
         screeningScore: parsedResult.screeningScore || 50,
         riskFlag: parsedResult.riskFlag || 'Medium',
         briefSummary: parsedResult.briefSummary || 'Ingen sammanfattning tillgänglig',
@@ -812,7 +790,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
         .insert([{
           run_id: runId,
           orgnr,
-          company_name: companyData.name,
+          company_name: companyData.masterData.name,
           screening_score: result.screeningScore,
           risk_flag: result.riskFlag,
           brief_summary: result.briefSummary,
@@ -826,6 +804,11 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
       
     } catch (error: any) {
       console.error(`Error processing screening for ${orgnr}:`, error)
+      allIssues.push(createQualityIssue(
+        'critical',
+        `Processing error for ${orgnr}: ${error.message}`,
+        { orgnr, error: error.message }
+      ))
       // Add error result
       results.push({
         orgnr,
@@ -845,7 +828,184 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
     }
   }
   
-  return results
+  return { results, issues: allIssues }
+}
+
+/**
+ * Create enhanced screening prompt with comprehensive data
+ */
+function createEnhancedScreeningPrompt(companyData: any, instructions?: string): string {
+  const { masterData, historicalData, trends, benchmarks } = companyData
+  
+  // Format historical data
+  const historicalText = historicalData.length > 0 
+    ? historicalData.map(year => 
+        `${year.year}: Omsättning ${(year.SDI/1000).toFixed(0)} TSEK | EBIT ${(year.EBIT/1000).toFixed(0)} TSEK | Vinst ${(year.DR/1000).toFixed(0)} TSEK`
+      ).join('\n')
+    : 'Begränsad historisk data tillgänglig'
+  
+  // Get industry context
+  const industryContext = getCompanyContext(masterData, benchmarks)
+  
+  return `FÖRETAG: ${masterData.name} (${masterData.OrgNr})
+Bransch: ${masterData.segment_name} | Stad: ${masterData.city} | Anställda: ${masterData.employees}
+
+FINANSIELL HISTORIK (${historicalData.length} år):
+${historicalText}
+
+TILLVÄXTTRENDER:
+- Omsättning CAGR: ${(trends.revenueCagr * 100).toFixed(1)}%
+- EBIT-utveckling: ${trends.ebitTrend}
+- Vinstmarginal trend: ${trends.marginTrend}
+- Konsistens: ${trends.consistencyScore.toFixed(0)}/100
+
+BALANSRÄKNING (senaste år):
+- Totala tillgångar: ${masterData.total_assets ? (masterData.total_assets/1000).toFixed(0) : 'Okänt'} TSEK
+- Eget kapital: ${masterData.equity ? (masterData.equity/1000).toFixed(0) : 'Okänt'} TSEK  
+- Skulder: ${masterData.total_debt ? (masterData.total_debt/1000).toFixed(0) : 'Okänt'} TSEK
+- Soliditet: ${masterData.equity_ratio ? masterData.equity_ratio.toFixed(1) : 'Okänt'}%
+
+LÖNSAMHETSANALYS:
+- EBIT-marginal: ${(masterData.EBIT_margin * 100).toFixed(1)}% (branschsnitt: ${benchmarks.avgEbitMargin.toFixed(1)}%)
+- Nettovinstmarginal: ${(masterData.NetProfit_margin * 100).toFixed(1)}%
+- Avkastning på eget kapital: ${masterData.roe ? masterData.roe.toFixed(1) : 'Okänt'}%
+
+INDUSTRY CONTEXT:
+${industryContext}
+
+${instructions ? `Specifika instruktioner: ${instructions}` : ''}
+
+Ge en snabb bedömning (1-100 poäng) baserat på:
+- Finansiell stabilitet (soliditet, skuldsättning, kassaflöde)
+- Tillväxttrajektoria (CAGR, trend, konsistens)
+- Lönsamhetsutveckling (marginaler, ROE, branschjämförelse)
+- Förvärvsattraktivitet (storlek, bransch, digital närvaro)
+
+VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
+Ge olika poäng och risknivåer baserat på företagets unika förhållanden.
+
+Svara ENDAST med giltig JSON utan markdown-formatering:
+{
+  "screeningScore": 85,
+  "riskFlag": "Low",
+  "briefSummary": "Kort sammanfattning på 2-3 meningar som refererar till specifika siffror från företaget"
+}
+
+VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdown-formatering.`
+}
+
+/**
+ * Create enhanced deep analysis prompt with comprehensive data
+ */
+function createEnhancedDeepAnalysisPrompt(companyData: any, instructions?: string): string {
+  const { masterData, historicalData, trends, benchmarks } = companyData
+  
+  // Format historical data
+  const historicalText = historicalData.length > 0 
+    ? historicalData.map(year => 
+        `${year.year}: Omsättning ${(year.SDI/1000).toFixed(0)} TSEK | EBIT ${(year.EBIT/1000).toFixed(0)} TSEK | Vinst ${(year.DR/1000).toFixed(0)} TSEK`
+      ).join('\n')
+    : 'Begränsad historisk data tillgänglig'
+  
+  // Get industry context
+  const industryContext = getCompanyContext(masterData, benchmarks)
+  
+  return `Genomför en djupgående förvärvsanalys av detta svenska företag:
+
+FÖRETAG: ${masterData.name} (${masterData.OrgNr})
+Bransch: ${masterData.segment_name} | Stad: ${masterData.city} | Grundat: ${masterData.incorporation_date || 'Okänt'}
+Adress: ${masterData.address || 'Okänt'} | Hemsida: ${masterData.homepage || 'Okänt'}
+E-post: ${masterData.email || 'Okänt'} | Anställda: ${masterData.employees || 'Okänt'}
+
+FINANSIELL HISTORIK (${historicalData.length} år):
+${historicalText}
+
+TILLVÄXTTRENDER:
+- Omsättning CAGR: ${(trends.revenueCagr * 100).toFixed(1)}%
+- EBIT-utveckling: ${trends.ebitTrend}
+- Vinstmarginal trend: ${trends.marginTrend}
+- Konsistens: ${trends.consistencyScore.toFixed(0)}/100
+- Volatilitet: ${trends.volatilityIndex.toFixed(1)}%
+
+BALANSRÄKNING (senaste år):
+- Totala tillgångar: ${masterData.total_assets ? (masterData.total_assets/1000).toFixed(0) : 'Okänt'} TSEK
+- Eget kapital: ${masterData.equity ? (masterData.equity/1000).toFixed(0) : 'Okänt'} TSEK
+- Skulder totalt: ${masterData.total_debt ? (masterData.total_debt/1000).toFixed(0) : 'Okänt'} TSEK
+- Likvida medel: ${masterData.cash ? (masterData.cash/1000).toFixed(0) : 'Okänt'} TSEK
+- Soliditet: ${masterData.equity_ratio ? masterData.equity_ratio.toFixed(1) : 'Okänt'}%
+- Skuldsättningsgrad: ${masterData.debt_to_equity ? masterData.debt_to_equity.toFixed(2) : 'Okänt'}
+
+LÖNSAMHETSANALYS:
+- EBIT-marginal: ${(masterData.EBIT_margin * 100).toFixed(1)}% (branschsnitt: ${benchmarks.avgEbitMargin.toFixed(1)}%)
+- Nettovinstmarginal: ${(masterData.NetProfit_margin * 100).toFixed(1)}%
+- Avkastning på eget kapital: ${masterData.roe ? masterData.roe.toFixed(1) : 'Okänt'}%
+- Kassaflöde/vinst: ${masterData.cash_flow_ratio ? masterData.cash_flow_ratio.toFixed(2) : 'Okänt'}
+
+INDUSTRY CONTEXT:
+${industryContext}
+
+DIGITAL NÄRVARO: ${masterData.digital_presence ? 'Ja' : 'Nej'}
+
+${instructions ? `SPECIFIKA INSTRUKTIONER: ${instructions}` : ''}
+
+Genomför en omfattande analys baserad på de faktiska finansiella nyckeltalen från allabolag.se och historisk data.
+
+VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
+Ge olika betyg, poäng och rekommendationer baserat på företagets unika förhållanden.
+
+Analysera med fokus på:
+1. Finansiell stabilitet baserat på balansräkning och soliditet
+2. Tillväxttrajektoria - är tillväxten hållbar eller avtagande?
+3. Lönsamhetsutveckling - förbättras marginalerna?
+4. Kapitaleffektivitet - hur väl omsätter företaget tillgångar till vinst?
+5. Skuldhantering - är skuldsättningen sund relativt kassaflöde?
+
+GE SPECIFIKA SVAR för varje metrik med hänvisning till exakta siffror.
+
+Svara ENDAST med giltig JSON utan markdown-formatering:
+
+{
+  "executiveSummary": "Kort executive summary på 2-3 meningar som refererar till specifika siffror",
+  "keyFindings": [
+    "Viktigt fynd 1 med specifika siffror",
+    "Viktigt fynd 2 med specifika siffror",
+    "Viktigt fynd 3 med specifika siffror"
+  ],
+  "narrative": "Detaljerad analys på 3-4 stycken som täcker finansiell hälsa, marknadsposition, tillväxtpotential och förvärvsattraktivitet med hänvisning till exakta siffror",
+  "strengths": [
+    "Styrka 1 med specifika siffror",
+    "Styrka 2 med specifika siffror"
+  ],
+  "weaknesses": [
+    "Svaghet 1 med specifika siffror",
+    "Svaghet 2 med specifika siffror"
+  ],
+  "opportunities": [
+    "Möjlighet 1 med specifika siffror",
+    "Möjlighet 2 med specifika siffror"
+  ],
+  "risks": [
+    "Risk 1 med specifika siffror",
+    "Risk 2 med specifika siffror"
+  ],
+  "acquisitionInterest": "Hög/Medium/Låg",
+  "financialHealth": 8,
+  "growthPotential": "Hög/Medium/Låg",
+  "marketPosition": "Stark/Medium/Svag",
+  "targetPrice": 25.5,
+  "recommendation": "Pursue/Consider/Monitor/Pass",
+  "confidence": 4.2,
+  "riskScore": 2,
+  "financialGrade": "A/B/C/D",
+  "commercialGrade": "A/B/C/D",
+  "operationalGrade": "A/B/C/D",
+  "nextSteps": [
+    "Nästa steg 1",
+    "Nästa steg 2"
+  ]
+}
+
+VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdown-formatering.`
 }
 
 async function processDeepAnalysis(
@@ -859,131 +1019,18 @@ async function processDeepAnalysis(
   if (!orgnr) return null
   
   try {
-    // Fetch comprehensive company data from master_analytics
-    const { data: companyData, error } = await supabase
-      .from('master_analytics')
-      .select('*')
-      .eq('OrgNr', orgnr)
-      .single()
+    // Use enhanced data fetching with quality tracking
+    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
     
-    if (error || !companyData) {
-      console.error(`Failed to fetch data for ${orgnr}:`, error)
+    if (!dataResult.success || !dataResult.data) {
+      console.error(`Failed to load comprehensive data for ${orgnr}:`, dataResult.issues)
       return null
     }
     
-    // Create comprehensive analysis prompt
-    const prompt = `Genomför en djupgående förvärvsanalys av detta svenska företag:
-
-FÖRETAGSINFORMATION:
-Företag: ${companyData.name}
-Organisationsnummer: ${orgnr}
-Bransch: ${companyData.segment_name || 'Okänd'}
-Stad: ${companyData.city || 'Okänd'}
-Adress: ${companyData.address || 'Okänd'}
-Hemsida: ${companyData.homepage || 'Okänd'}
-E-post: ${companyData.email || 'Okänd'}
-
-GRUNDDATA:
-Anställda: ${companyData.employees || 'Okänt'}
-
-FINANSIELL DATA (från allabolag.se):
-Nettoomsättning (SDI): ${companyData.SDI ? (companyData.SDI / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Årets resultat (DR): ${companyData.DR ? (companyData.DR / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Årets resultat (ORS): ${companyData.ORS ? (companyData.ORS / 1000).toFixed(0) + ' TSEK' : 'Okänd'}
-Tillväxt: ${companyData.Revenue_growth ? (companyData.Revenue_growth * 100).toFixed(1) + '%' : 'Okänd'}
-EBIT-marginal: ${companyData.EBIT_margin ? (companyData.EBIT_margin * 100).toFixed(1) + '%' : 'Okänd'}
-Nettovinstmarginal: ${companyData.NetProfit_margin ? (companyData.NetProfit_margin * 100).toFixed(1) + '%' : 'Okänd'}
-
-FINANSIELL ANALYS:
-Baserat på de tillgängliga nyckeltalen från allabolag.se, analysera:
-- Finansiell hälsa: Omsättning, vinst, marginaler
-- Tillväxtpotential: Revenue_growth och trend
-- Lönsamhet: EBIT-marginal och nettovinstmarginal
-- Förvärvsattraktivitet: Storlek, bransch, digital närvaro
-
-DIGITAL NÄRVARO: ${companyData.digital_presence ? 'Ja' : 'Nej'}
-REGISTRERAT: ${companyData.incorporation_date || 'Okänt'}
-
-${instructions ? `SPECIFIKA INSTRUKTIONER: ${instructions}` : ''}
-
-Genomför en omfattande analys baserad på de faktiska finansiella nyckeltalen från allabolag.se. 
-
-VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
-Ge olika betyg, poäng och rekommendationer baserat på företagets unika förhållanden.
-
-Fokusera på:
-
-1. FINANSIELL HÄLSA: 
-   - P&L: SDI (nettoomsättning), DR/ORS (årets resultat), marginaler
-   - Lönsamhet: EBIT-marginal och nettovinstmarginal
-
-2. TILLVÄXT OCH POTENTIAL:
-   - Revenue_growth och trendanalys
-   - Finansiell styrka för expansion
-
-3. MARKNADSPOSITION OCH FÖRVÄRVSATTRAKTIVITET:
-   - Storlek, bransch, digital närvaro, konkurrenskraft
-   - Potential för tillväxt, synergier, risker
-   - Finansiell stabilitet för förvärv
-
-Svara ENDAST med giltig JSON utan markdown-formatering:
-
-{
-  "executiveSummary": "Kort executive summary på 2-3 meningar",
-  "keyFindings": [
-    "Viktigt fynd 1",
-    "Viktigt fynd 2",
-    "Viktigt fynd 3"
-  ],
-  "narrative": "Detaljerad analys på 3-4 stycken som täcker finansiell hälsa, marknadsposition, tillväxtpotential och förvärvsattraktivitet",
-  "strengths": [
-    "Styrka 1",
-    "Styrka 2"
-  ],
-  "weaknesses": [
-    "Svaghet 1",
-    "Svaghet 2"
-  ],
-  "opportunities": [
-    "Möjlighet 1",
-    "Möjlighet 2"
-  ],
-  "risks": [
-    "Risk 1",
-    "Risk 2"
-  ],
-  "acquisitionInterest": "Hög",
-  "financialHealth": 8,
-  "growthPotential": "Hög",
-  "marketPosition": "Stark",
-  "targetPrice": 25.5,
-  "recommendation": "Pursue",
-  "confidence": 4.2,
-  "riskScore": 2,
-  "financialGrade": "B",
-  "commercialGrade": "A",
-  "operationalGrade": "B",
-  "financialMetrics": {
-    "revenue": 150000,
-    "profit": 7000,
-    "equity": 50000,
-    "assets": 200000,
-    "liabilities": 150000,
-    "cash": 25000,
-    "debt": 100000,
-    "equityRatio": 25.0,
-    "currentRatio": 1.5,
-    "debtToEquity": 2.0,
-    "returnOnEquity": 14.0,
-    "returnOnAssets": 3.5
-  },
-  "nextSteps": [
-    "Nästa steg 1",
-    "Nästa steg 2"
-  ]
-}
-
-VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdown-formatering.`
+    const companyData = dataResult.data
+    
+    // Create enhanced deep analysis prompt with comprehensive data
+    const prompt = createEnhancedDeepAnalysisPrompt(companyData, instructions)
 
     const startTime = Date.now()
     
@@ -1047,7 +1094,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
     
     const result: CompanyResult = {
       orgnr,
-      companyName: companyData.name,
+      companyName: companyData.masterData.name,
       summary: parsedResult.executiveSummary || 'Ingen sammanfattning tillgänglig',
       recommendation: parsedResult.recommendation || 'Consider',
       confidence: parsedResult.confidence || 3.0,
@@ -1090,7 +1137,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
       .insert([{
         run_id: runId,
         orgnr,
-        company_name: companyData.name,
+        company_name: companyData.masterData.name,
         summary: result.summary,
         recommendation: result.recommendation,
         confidence: Math.round((result.confidence || 0) * 100), // Convert to integer
