@@ -46,14 +46,17 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
   // Load saved lists from database on component mount
   useEffect(() => {
     const loadLists = async () => {
+      console.log('CompanyListManager: Loading saved lists...')
       try {
         const lists = await SavedListsService.getSavedLists()
+        console.log('CompanyListManager: Loaded', lists.length, 'saved lists from database')
         setSavedLists(lists)
         onListUpdate(lists)
       } catch (error) {
-        console.error('Error loading saved lists:', error)
+        console.error('CompanyListManager: Error loading saved lists:', error)
         // Fallback to localStorage
         const fallbackLists = await SavedListsService.getSavedListsFallback()
+        console.log('CompanyListManager: Loaded', fallbackLists.length, 'saved lists from localStorage')
         setSavedLists(fallbackLists)
         onListUpdate(fallbackLists)
       }
@@ -207,6 +210,8 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
       day: 'numeric'
     })
   }
+
+  console.log('CompanyListManager: Rendering with', currentCompanies.length, 'companies and', savedLists.length, 'saved lists')
 
   return (
     <div className="space-y-4">

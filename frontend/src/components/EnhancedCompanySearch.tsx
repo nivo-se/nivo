@@ -510,6 +510,7 @@ const EnhancedCompanySearch: React.FC = () => {
       </Card>
 
       {/* Company List Manager */}
+      {console.log('EnhancedCompanySearch: Rendering CompanyListManager with', getSelectedCompaniesArray().length, 'companies')}
       <CompanyListManager
         currentCompanies={getSelectedCompaniesArray()}
         currentFilters={filters}
