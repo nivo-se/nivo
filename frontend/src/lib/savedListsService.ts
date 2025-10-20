@@ -19,7 +19,7 @@ export class SavedListsService {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        console.warn('No authenticated user found, trying localStorage fallback')
+        console.warn('No authenticated user found, using localStorage fallback')
         return await this.getSavedListsFallback()
       }
 
@@ -74,8 +74,15 @@ export class SavedListsService {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        console.error('No authenticated user found')
-        return null
+        console.warn('No authenticated user found, using localStorage fallback')
+        const newList: SavedCompanyList = {
+          ...list,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+        await this.saveListFallback(newList)
+        return newList
       }
 
       const listData = {
@@ -119,8 +126,20 @@ export class SavedListsService {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        console.error('No authenticated user found')
-        return null
+        console.warn('No authenticated user found, using localStorage fallback')
+        const existingLists = await this.getSavedListsFallback()
+        const existingList = existingLists.find(l => l.id === id)
+        if (!existingList) {
+          console.error('List not found for update')
+          return null
+        }
+        const updatedList = {
+          ...existingList,
+          ...updates,
+          updatedAt: new Date().toISOString()
+        }
+        await this.saveListFallback(updatedList)
+        return updatedList
       }
 
       const updateData: any = {}
@@ -158,14 +177,173 @@ export class SavedListsService {
   }
 
   /**
+   * Add companies to an existing list (merge with existing companies)
+   */
+  static async addCompaniesToList(listId: string, newCompanies: any[]): Promise<SavedCompanyList | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        console.warn('No authenticated user found, using localStorage fallback')
+        const existingLists = await this.getSavedListsFallback()
+        const existingList = existingLists.find(l => l.id === listId)
+        if (!existingList) {
+          console.error('List not found for adding companies')
+          return null
+        }
+        
+        // Merge companies (avoid duplicates)
+        const existingOrgNrs = new Set(existingList.companies.map(c => c.OrgNr))
+        const uniqueNewCompanies = newCompanies.filter(c => !existingOrgNrs.has(c.OrgNr))
+        const updatedList = {
+          ...existingList,
+          companies: [...existingList.companies, ...uniqueNewCompanies],
+          updatedAt: new Date().toISOString()
+        }
+        await this.saveListFallback(updatedList)
+        return updatedList
+      }
+
+      // First get the current list
+      const { data: currentList, error: fetchError } = await supabase
+        .from('saved_company_lists')
+        .select('*')
+        .eq('id', listId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (fetchError || !currentList) {
+        console.error('Error fetching current list:', fetchError)
+        return null
+      }
+
+      // Merge companies (avoid duplicates based on OrgNr)
+      const existingCompanies = currentList.companies || []
+      const existingOrgNrs = new Set(existingCompanies.map((c: any) => c.OrgNr))
+      
+      const uniqueNewCompanies = newCompanies.filter(company => 
+        !existingOrgNrs.has(company.OrgNr)
+      )
+
+      const mergedCompanies = [...existingCompanies, ...uniqueNewCompanies]
+
+      // Update the list with merged companies
+      const { data, error } = await supabase
+        .from('saved_company_lists')
+        .update({
+          companies: mergedCompanies,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', listId)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error adding companies to list:', error)
+        return null
+      }
+
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        companies: data.companies || [],
+        filters: data.filters || {},
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      }
+    } catch (error) {
+      console.error('Error in addCompaniesToList:', error)
+      return null
+    }
+  }
+
+  /**
+   * Remove companies from an existing list
+   */
+  static async removeCompaniesFromList(listId: string, companyOrgNrs: string[]): Promise<SavedCompanyList | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        console.warn('No authenticated user found, using localStorage fallback')
+        const existingLists = await this.getSavedListsFallback()
+        const existingList = existingLists.find(l => l.id === listId)
+        if (!existingList) {
+          console.error('List not found for removing companies')
+          return null
+        }
+        
+        // Remove companies
+        const updatedList = {
+          ...existingList,
+          companies: existingList.companies.filter(c => !companyOrgNrs.includes(c.OrgNr)),
+          updatedAt: new Date().toISOString()
+        }
+        await this.saveListFallback(updatedList)
+        return updatedList
+      }
+
+      // First get the current list
+      const { data: currentList, error: fetchError } = await supabase
+        .from('saved_company_lists')
+        .select('*')
+        .eq('id', listId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (fetchError || !currentList) {
+        console.error('Error fetching current list:', fetchError)
+        return null
+      }
+
+      // Remove companies with matching OrgNrs
+      const existingCompanies = currentList.companies || []
+      const filteredCompanies = existingCompanies.filter((company: any) => 
+        !companyOrgNrs.includes(company.OrgNr)
+      )
+
+      // Update the list with filtered companies
+      const { data, error } = await supabase
+        .from('saved_company_lists')
+        .update({
+          companies: filteredCompanies,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', listId)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error removing companies from list:', error)
+        return null
+      }
+
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        companies: data.companies || [],
+        filters: data.filters || {},
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      }
+    } catch (error) {
+      console.error('Error in removeCompaniesFromList:', error)
+      return null
+    }
+  }
+
+  /**
    * Delete a list
    */
   static async deleteList(id: string): Promise<boolean> {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        console.error('No authenticated user found')
-        return false
+        console.warn('No authenticated user found, using localStorage fallback')
+        await this.deleteListFallback(id)
+        return true
       }
 
       const { error } = await supabase

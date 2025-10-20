@@ -17,6 +17,7 @@ import ListBasedAnalytics from '../components/ListBasedAnalytics'
 import AIAnalytics from '../components/AIAnalytics'
 import AIAnalysis from '../components/AIAnalysis'
 import AnalyzedCompanies from '../pages/AnalyzedCompanies'
+import Valuation from '../pages/Valuation'
 import AdminPanel from '../components/AdminPanel'
 
 const WorkingDashboard: React.FC = () => {
@@ -61,6 +62,7 @@ const WorkingDashboard: React.FC = () => {
     { id: 'analytics', label: 'Analys', icon: Building2 },
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
     { id: 'analyzed-companies', label: 'Analyser', icon: FileText },
+    { id: 'valuation', label: 'Värdering', icon: Target },
     { id: 'export', label: 'Exportera', icon: Download },
     { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
   ]
@@ -286,6 +288,9 @@ const WorkingDashboard: React.FC = () => {
       
       case 'analyzed-companies':
         return <AnalyzedCompanies />
+      
+      case 'valuation':
+        return <Valuation />
       
       case 'export':
         return <DataExport />

@@ -16,7 +16,7 @@ export async function getIndustryBenchmarks(
   try {
     const { data, error } = await supabase
       .from('master_analytics')
-      .select('EBIT_margin, Revenue_growth, debt_to_equity, SDI, employees, segment_name')
+      .select('EBIT_margin, Revenue_growth, SDI, employees, segment_name')
       .eq('segment_name', segment)
       .not('EBIT_margin', 'is', null)
       .not('Revenue_growth', 'is', null)
@@ -47,7 +47,7 @@ export async function getIndustryBenchmarks(
     return {
       avgEbitMargin: validData.reduce((sum, d) => sum + (d.EBIT_margin * 100), 0) / validData.length,
       avgGrowthRate: validData.reduce((sum, d) => sum + (d.Revenue_growth * 100), 0) / validData.length,
-      avgDebtToEquity: validData.reduce((sum, d) => sum + (d.debt_to_equity || 0), 0) / validData.length,
+      avgDebtToEquity: 0.5, // Default assumption since column doesn't exist
       avgEmployeeProductivity: validData.reduce((sum, d) => sum + (d.SDI / d.employees), 0) / validData.length,
       sampleSize: validData.length
     }
@@ -80,7 +80,7 @@ export function getCompanyContext(
 ): string {
   const ebitMargin = (companyData.EBIT_margin || 0) * 100
   const growthRate = (companyData.Revenue_growth || 0) * 100
-  const debtToEquity = companyData.debt_to_equity || 0
+  const debtToEquity = 0.5 // Default assumption since column doesn't exist
   const employeeProductivity = companyData.SDI / (companyData.employees || 1)
   
   const context = []

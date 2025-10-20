@@ -5,6 +5,7 @@ import { Badge } from './ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 import { ChevronDown, ChevronRight, Download, RefreshCw, X, FileText, TrendingUp, AlertTriangle, CheckCircle, BarChart3, Building2, Users } from 'lucide-react'
 import { AnalyzedCompany } from '../lib/analysisService'
+import ValuationModelsCard from './ValuationModelsCard'
 
 interface AnalysisDetailViewProps {
   analysis: AnalyzedCompany
@@ -272,6 +273,15 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
               </div>
             </CardContent>
           </Card>
+
+          {/* Valuation Models */}
+          <ValuationModelsCard 
+            runId={analysis.runId}
+            orgnr={analysis.orgnr}
+            onModelSelect={(modelKey, valueType) => {
+              console.log('Selected valuation model:', modelKey, valueType)
+            }}
+          />
 
           {/* Analysis Metadata */}
           <Card>

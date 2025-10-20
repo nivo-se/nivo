@@ -10,6 +10,26 @@ import { randomUUID } from 'crypto'
 import { fetchComprehensiveCompanyData } from './data-enrichment.js'
 import { QualityIssue, createQualityIssue } from './data-quality.js'
 import { getCompanyContext } from './industry-benchmarks.js'
+import { 
+  runValuations, 
+  createCompanyProfile, 
+  ValuationOutput,
+  CompanyProfile 
+} from './valuation/engine.js'
+import { 
+  loadAllAssumptions, 
+  AssumptionsOverride,
+  getAllAssumptions,
+  updateAssumptions,
+  createAssumptions,
+  deleteAssumptions
+} from './valuation/assumptions.js'
+import { 
+  getLLMSuggestions, 
+  convertSuggestionsToAssumptions,
+  validateSuggestions,
+  CompanyContext 
+} from './valuation/llm-advisor.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -859,11 +879,11 @@ TILLVÄXTTRENDER:
 - Vinstmarginal trend: ${trends.marginTrend}
 - Konsistens: ${trends.consistencyScore.toFixed(0)}/100
 
-BALANSRÄKNING (senaste år):
-- Totala tillgångar: ${masterData.total_assets ? (masterData.total_assets/1000).toFixed(0) : 'Okänt'} TSEK
-- Eget kapital: ${masterData.equity ? (masterData.equity/1000).toFixed(0) : 'Okänt'} TSEK  
-- Skulder: ${masterData.total_debt ? (masterData.total_debt/1000).toFixed(0) : 'Okänt'} TSEK
-- Soliditet: ${masterData.equity_ratio ? masterData.equity_ratio.toFixed(1) : 'Okänt'}%
+FINANSIELL ÖVERSIKT (senaste år):
+- Omsättning (SDI): ${(masterData.SDI/1000).toFixed(0)} TSEK
+- Nettoresultat (DR): ${(masterData.DR/1000).toFixed(0)} TSEK
+- Rörelseresultat (ORS): ${(masterData.ORS/1000).toFixed(0)} TSEK
+- Anställda: ${masterData.employees} personer
 
 LÖNSAMHETSANALYS:
 - EBIT-marginal: ${(masterData.EBIT_margin * 100).toFixed(1)}% (branschsnitt: ${benchmarks.avgEbitMargin.toFixed(1)}%)
@@ -876,9 +896,9 @@ ${industryContext}
 ${instructions ? `Specifika instruktioner: ${instructions}` : ''}
 
 Ge en snabb bedömning (1-100 poäng) baserat på:
-- Finansiell stabilitet (soliditet, skuldsättning, kassaflöde)
+- Finansiell stabilitet (lönsamhet, vinstmarginaler, konsistens)
 - Tillväxttrajektoria (CAGR, trend, konsistens)
-- Lönsamhetsutveckling (marginaler, ROE, branschjämförelse)
+- Lönsamhetsutveckling (marginaler, branschjämförelse)
 - Förvärvsattraktivitet (storlek, bransch, digital närvaro)
 
 VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna från finansiell data ovan. 
@@ -886,8 +906,8 @@ Ge olika poäng och risknivåer baserat på företagets unika förhållanden.
 
 Svara ENDAST med giltig JSON utan markdown-formatering:
 {
-  "screeningScore": 85,
-  "riskFlag": "Low",
+  "screeningScore": 50,
+  "riskFlag": "Medium",
   "briefSummary": "Kort sammanfattning på 2-3 meningar som refererar till specifika siffror från företaget"
 }
 
@@ -927,13 +947,12 @@ TILLVÄXTTRENDER:
 - Konsistens: ${trends.consistencyScore.toFixed(0)}/100
 - Volatilitet: ${trends.volatilityIndex.toFixed(1)}%
 
-BALANSRÄKNING (senaste år):
-- Totala tillgångar: ${masterData.total_assets ? (masterData.total_assets/1000).toFixed(0) : 'Okänt'} TSEK
-- Eget kapital: ${masterData.equity ? (masterData.equity/1000).toFixed(0) : 'Okänt'} TSEK
-- Skulder totalt: ${masterData.total_debt ? (masterData.total_debt/1000).toFixed(0) : 'Okänt'} TSEK
-- Likvida medel: ${masterData.cash ? (masterData.cash/1000).toFixed(0) : 'Okänt'} TSEK
-- Soliditet: ${masterData.equity_ratio ? masterData.equity_ratio.toFixed(1) : 'Okänt'}%
-- Skuldsättningsgrad: ${masterData.debt_to_equity ? masterData.debt_to_equity.toFixed(2) : 'Okänt'}
+BALANSRÄKNING (begränsad data):
+- Omsättning (SDI): ${(masterData.SDI/1000).toFixed(0)} TSEK
+- Nettoresultat (DR): ${(masterData.DR/1000).toFixed(0)} TSEK
+- Rörelseresultat (ORS): ${(masterData.ORS/1000).toFixed(0)} TSEK
+- Anställda: ${masterData.employees} personer
+- Omsättning per anställd: ${(masterData.SDI/masterData.employees/1000).toFixed(0)} TSEK
 
 LÖNSAMHETSANALYS:
 - EBIT-marginal: ${(masterData.EBIT_margin * 100).toFixed(1)}% (branschsnitt: ${benchmarks.avgEbitMargin.toFixed(1)}%)
@@ -954,11 +973,16 @@ VIKTIGT: Var specifik och unik för detta företag. Använd de exakta siffrorna 
 Ge olika betyg, poäng och rekommendationer baserat på företagets unika förhållanden.
 
 Analysera med fokus på:
-1. Finansiell stabilitet baserat på balansräkning och soliditet
+1. Finansiell stabilitet baserat på lönsamhet och tillväxt
 2. Tillväxttrajektoria - är tillväxten hållbar eller avtagande?
 3. Lönsamhetsutveckling - förbättras marginalerna?
-4. Kapitaleffektivitet - hur väl omsätter företaget tillgångar till vinst?
-5. Skuldhantering - är skuldsättningen sund relativt kassaflöde?
+4. Kapitaleffektivitet - hur väl omsätter företaget omsättning till vinst?
+5. Marknadsposition - storlek och branschposition
+
+BERÄKNA MÅLPRIS baserat på:
+- Omsättningsmultipel: 0.8-2.5x omsättning (beroende på bransch och tillväxt)
+- Vinstmultipel: 5-15x nettoresultat (beroende på stabilitet och tillväxt)
+- Anpassa för bransch, storlek och tillväxtpotential
 
 GE SPECIFIKA SVAR för varje metrik med hänvisning till exakta siffror.
 
@@ -989,13 +1013,13 @@ Svara ENDAST med giltig JSON utan markdown-formatering:
     "Risk 2 med specifika siffror"
   ],
   "acquisitionInterest": "Hög/Medium/Låg",
-  "financialHealth": 8,
-  "growthPotential": "Hög/Medium/Låg",
-  "marketPosition": "Stark/Medium/Svag",
-  "targetPrice": 25.5,
+  "financialHealth": 5,
+  "growthPotential": "Medium",
+  "marketPosition": "Medium",
+  "targetPrice": 0,
   "recommendation": "Pursue/Consider/Monitor/Pass",
-  "confidence": 4.2,
-  "riskScore": 2,
+  "confidence": 3.0,
+  "riskScore": 5,
   "financialGrade": "A/B/C/D",
   "commercialGrade": "A/B/C/D",
   "operationalGrade": "A/B/C/D",
@@ -1160,6 +1184,59 @@ async function processDeepAnalysis(
         market_position: result.marketPosition,
         target_price_msek: result.targetPrice
       }])
+
+    // Compute and save valuations
+    try {
+      const profile = createCompanyProfile(companyData.masterData)
+      const assumptions = await loadAllAssumptions(
+        supabase, 
+        profile.industry, 
+        profile.sizeBucket, 
+        profile.growthBucket
+      )
+      
+      const valuations = runValuations(profile, assumptions)
+      
+      // Create valuation run
+      const { data: valuationRun, error: runError } = await supabase
+        .from('valuation_runs')
+        .insert({
+          analysis_run_id: runId,
+          company_orgnr: orgnr,
+          selected_model_key: 'hybrid_score', // Default to hybrid model
+          value_type: 'equity'
+        })
+        .select()
+        .single()
+
+      if (!runError && valuationRun) {
+        // Insert valuation results
+        const resultsToInsert = valuations.map(valuation => ({
+          valuation_run_id: valuationRun.id,
+          model_key: valuation.modelKey,
+          value_ev: valuation.valueEv,
+          value_equity: valuation.valueEquity,
+          basis: valuation.basis,
+          multiple_used: valuation.multipleUsed,
+          confidence: valuation.confidence,
+          inputs: valuation.inputs,
+          notes: valuation.inputs.reason
+        }))
+
+        await supabase
+          .from('valuation_results')
+          .insert(resultsToInsert)
+
+        // Update target price with selected model's equity value
+        const selectedValuation = valuations.find(v => v.modelKey === 'hybrid_score')
+        if (selectedValuation && selectedValuation.valueEquity) {
+          result.targetPrice = Math.round(selectedValuation.valueEquity / 1000000) // Convert to MSEK
+        }
+      }
+    } catch (valuationError) {
+      console.error('Valuation computation failed:', valuationError)
+      // Continue without valuations - don't fail the entire analysis
+    }
     
     return result
     
@@ -1411,8 +1488,490 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
   }
 }
 
+// ============================================================================
+// TEST ENDPOINTS
+// ============================================================================
+
+// Test saved_company_lists table access
+app.get('/api/test-saved-lists', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Test if table exists and is accessible
+    const { data, error } = await supabase
+      .from('saved_company_lists')
+      .select('*')
+      .limit(1)
+
+    if (error) {
+      console.error('Error accessing saved_company_lists table:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: error.message,
+        code: error.code,
+        details: error.details
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'saved_company_lists table is accessible',
+      count: data?.length || 0
+    })
+  } catch (error: any) {
+    console.error('Test saved lists error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Test authentication and saved lists
+app.get('/api/test-auth-lists', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Test authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Auth error: ' + authError.message 
+      })
+    }
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: 'No authenticated user',
+        user: null,
+        lists: []
+      })
+    }
+
+    // Test fetching lists for this user
+    const { data, error } = await supabase
+      .from('saved_company_lists')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database error: ' + error.message,
+        code: error.code
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Authentication and database access working',
+      user: {
+        id: user.id,
+        email: user.email
+      },
+      lists: data || []
+    })
+  } catch (error: any) {
+    console.error('Test auth lists error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// ============================================================================
+// VALUATION API ENDPOINTS
+// ============================================================================
+
+// Preview valuations for a company (no persistence)
+app.post('/api/valuation/preview', async (req, res) => {
+  try {
+    const { orgnr, overrides, valueType = 'equity' } = req.body
+    
+    if (!orgnr) {
+      return res.status(400).json({ success: false, error: 'Organization number required' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Fetch company data
+    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+    if (!dataResult.success || !dataResult.data) {
+      return res.status(404).json({ success: false, error: 'Company data not found' })
+    }
+
+    // Create company profile
+    const profile = createCompanyProfile(dataResult.data.masterData)
+    
+    // Load assumptions
+    const assumptions = await loadAllAssumptions(
+      supabase, 
+      profile.industry, 
+      profile.sizeBucket, 
+      profile.growthBucket,
+      overrides
+    )
+
+    // Run valuations
+    const results = runValuations(profile, assumptions)
+
+    res.status(200).json({
+      success: true,
+      data: {
+        company: profile,
+        valuations: results,
+        valueType
+      }
+    })
+  } catch (error: any) {
+    console.error('Valuation preview error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Commit valuations to database (persist results)
+app.post('/api/valuation/commit', async (req, res) => {
+  try {
+    const { analysisRunId, orgnr, selectedModelKey, overrides, valueType = 'equity' } = req.body
+    
+    if (!analysisRunId || !orgnr) {
+      return res.status(400).json({ success: false, error: 'Analysis run ID and organization number required' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Fetch company data
+    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+    if (!dataResult.success || !dataResult.data) {
+      return res.status(404).json({ success: false, error: 'Company data not found' })
+    }
+
+    // Create company profile
+    const profile = createCompanyProfile(dataResult.data.masterData)
+    
+    // Load assumptions
+    const assumptions = await loadAllAssumptions(
+      supabase, 
+      profile.industry, 
+      profile.sizeBucket, 
+      profile.growthBucket,
+      overrides
+    )
+
+    // Run valuations
+    const results = runValuations(profile, assumptions)
+
+    // Create valuation run
+    const { data: valuationRun, error: runError } = await supabase
+      .from('valuation_runs')
+      .insert({
+        analysis_run_id: analysisRunId,
+        company_orgnr: orgnr,
+        selected_model_key: selectedModelKey,
+        value_type: valueType
+      })
+      .select()
+      .single()
+
+    if (runError) {
+      console.error('Error creating valuation run:', runError)
+      return res.status(500).json({ success: false, error: 'Failed to create valuation run' })
+    }
+
+    // Insert valuation results
+    const resultsToInsert = results.map(result => ({
+      valuation_run_id: valuationRun.id,
+      model_key: result.modelKey,
+      value_ev: result.valueEv,
+      value_equity: result.valueEquity,
+      basis: result.basis,
+      multiple_used: result.multipleUsed,
+      confidence: result.confidence,
+      inputs: result.inputs,
+      notes: result.inputs.reason
+    }))
+
+    const { error: resultsError } = await supabase
+      .from('valuation_results')
+      .insert(resultsToInsert)
+
+    if (resultsError) {
+      console.error('Error inserting valuation results:', resultsError)
+      return res.status(500).json({ success: false, error: 'Failed to save valuation results' })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        valuationRunId: valuationRun.id,
+        company: profile,
+        valuations: results,
+        selectedModelKey,
+        valueType
+      }
+    })
+  } catch (error: any) {
+    console.error('Valuation commit error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Get valuations for a specific run and company
+app.get('/api/valuation/:runId/:orgnr', async (req, res) => {
+  try {
+    const { runId, orgnr } = req.params
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Get valuation run
+    const { data: valuationRun, error: runError } = await supabase
+      .from('valuation_runs')
+      .select('*')
+      .eq('analysis_run_id', runId)
+      .eq('company_orgnr', orgnr)
+      .single()
+
+    if (runError || !valuationRun) {
+      return res.status(404).json({ success: false, error: 'Valuation run not found' })
+    }
+
+    // Get valuation results
+    const { data: results, error: resultsError } = await supabase
+      .from('valuation_results')
+      .select('*')
+      .eq('valuation_run_id', valuationRun.id)
+      .order('model_key')
+
+    if (resultsError) {
+      console.error('Error fetching valuation results:', resultsError)
+      return res.status(500).json({ success: false, error: 'Failed to fetch valuation results' })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        valuationRun,
+        valuations: results || []
+      }
+    })
+  } catch (error: any) {
+    console.error('Get valuation error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Select/update active model for a valuation run
+app.patch('/api/valuation/:valuationRunId/select', async (req, res) => {
+  try {
+    const { valuationRunId } = req.params
+    const { modelKey, valueType = 'equity' } = req.body
+
+    if (!modelKey) {
+      return res.status(400).json({ success: false, error: 'Model key required' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const { error } = await supabase
+      .from('valuation_runs')
+      .update({
+        selected_model_key: modelKey,
+        value_type: valueType
+      })
+      .eq('id', valuationRunId)
+
+    if (error) {
+      console.error('Error updating valuation run:', error)
+      return res.status(500).json({ success: false, error: 'Failed to update valuation run' })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Valuation model selection updated'
+    })
+  } catch (error: any) {
+    console.error('Select valuation model error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Get LLM suggestions for valuation assumptions
+app.post('/api/valuation/advice', async (req, res) => {
+  try {
+    const { orgnr } = req.body
+    
+    if (!orgnr) {
+      return res.status(400).json({ success: false, error: 'Organization number required' })
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Fetch company data
+    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+    if (!dataResult.success || !dataResult.data) {
+      return res.status(404).json({ success: false, error: 'Company data not found' })
+    }
+
+    // Create company profile
+    const profile = createCompanyProfile(dataResult.data.masterData)
+    
+    // Create company context for LLM
+    const context: CompanyContext = {
+      name: profile.name,
+      industry: profile.industry,
+      sizeBucket: profile.sizeBucket,
+      growthBucket: profile.growthBucket,
+      revenue: profile.revenue,
+      netProfit: profile.netProfit,
+      ebitda: profile.ebitda,
+      revenueGrowth: profile.revenueGrowth,
+      ebitMargin: profile.ebitMargin,
+      netProfitMargin: profile.netProfitMargin,
+      employees: profile.employees,
+      benchmarks: dataResult.data.benchmarks
+    }
+
+    // Get LLM suggestions
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const suggestions = await getLLMSuggestions(openai, context)
+    const validatedSuggestions = validateSuggestions(suggestions)
+
+    res.status(200).json({
+      success: true,
+      data: {
+        company: profile,
+        suggestions: validatedSuggestions
+      }
+    })
+  } catch (error: any) {
+    console.error('LLM advice error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Admin endpoints for managing valuation assumptions
+app.get('/api/valuation/assumptions', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const assumptions = await getAllAssumptions(supabase)
+
+    res.status(200).json({
+      success: true,
+      data: assumptions
+    })
+  } catch (error: any) {
+    console.error('Get assumptions error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+app.patch('/api/valuation/assumptions/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const updates = req.body
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const success = await updateAssumptions(supabase, id, updates)
+
+    if (!success) {
+      return res.status(500).json({ success: false, error: 'Failed to update assumptions' })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Assumptions updated successfully'
+    })
+  } catch (error: any) {
+    console.error('Update assumptions error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+app.post('/api/valuation/assumptions', async (req, res) => {
+  try {
+    const assumptions = req.body
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const success = await createAssumptions(supabase, assumptions)
+
+    if (!success) {
+      return res.status(500).json({ success: false, error: 'Failed to create assumptions' })
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Assumptions created successfully'
+    })
+  } catch (error: any) {
+    console.error('Create assumptions error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+app.delete('/api/valuation/assumptions/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const success = await deleteAssumptions(supabase, id)
+
+    if (!success) {
+      return res.status(500).json({ success: false, error: 'Failed to delete assumptions' })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Assumptions deleted successfully'
+    })
+  } catch (error: any) {
+    console.error('Delete assumptions error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
 // Start server
 app.listen(port, () => {
   console.log(`🚀 Enhanced AI Analysis Server running on http://localhost:${port}`)
   console.log('✨ Features: Enhanced Codex AI analysis with Swedish localization')
+  console.log('📊 Features: Multi-model valuation engine with EV vs Equity handling')
 })

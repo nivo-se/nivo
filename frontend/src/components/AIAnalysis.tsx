@@ -19,7 +19,7 @@ import {
 } from './ui/accordion'
 import { ScrollArea } from './ui/scroll-area'
 import { Checkbox } from './ui/checkbox'
-import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2 } from 'lucide-react'
+import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2, List, FileText } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
 import { AIAnalysisService } from '../lib/aiAnalysisService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
@@ -430,9 +430,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
   const loadSavedLists = async () => {
     setLoadingLists(true)
     try {
-      console.log('Loading saved lists...')
       const lists = await SavedListsService.getSavedLists()
-      console.log('Loaded saved lists:', lists)
         setSavedLists(lists)
       } catch (error) {
       console.error('Failed to load saved lists', error)
@@ -545,11 +543,9 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
       }
       
       if (analysisMode === 'screening') {
-        console.log('Screening results received:', data.analysis.results)
         setScreeningResults(data.analysis.results || [])
         setCurrentRun(null) // Clear any previous deep analysis
       } else {
-        console.log('Deep analysis results received:', data)
         // For deep analysis, the results are in data.analysis.companies
         setCurrentRun(data)
         // Don't clear screening results - they should persist for reference
@@ -648,19 +644,25 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </SelectContent>
               </Select>
             {savedLists.length === 0 && !loadingLists && (
-            <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Inga sparade listor hittades. Skapa en lista först.</p>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={loadSavedLists}
-                  className="text-xs"
-                >
-                  <RefreshCw className="mr-2 h-3 w-3" />
-                  Försök igen
-                </Button>
+            <div className="rounded-md border border-dashed p-6 text-center">
+              <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                <List className="h-5 w-5 text-muted-foreground" />
               </div>
+              <h3 className="text-sm font-medium text-foreground mb-1">Inga sparade listor</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Skapa en företagslista först via Företagssökning.
+              </p>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={loadSavedLists}
+                className="text-xs"
+              >
+                <RefreshCw className="mr-2 h-3 w-3" />
+                Uppdatera
+              </Button>
+            </div>
             )}
             {/* Debug info */}
             {process.env.NODE_ENV === 'development' && (
@@ -938,8 +940,17 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
-            <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-              No analyses have been recorded yet. Run your first batch above.
+            <div className="rounded-md border border-dashed p-8 text-center">
+              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                <FileText className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-2">Inga analyser än</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Kör din första AI-analys ovan för att se resultat här.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Analyshistoriken hjälper dig att spåra och jämföra företagsbedömningar över tid.
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">

@@ -12,7 +12,10 @@ import {
   Edit, 
   Building2,
   Calendar,
-  Users
+  Users,
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import { SupabaseCompany } from '../lib/supabaseDataService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
@@ -37,6 +40,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
   const [listName, setListName] = useState('')
   const [listDescription, setListDescription] = useState('')
   const [editingList, setEditingList] = useState<SavedCompanyList | null>(null)
+  const [expandedLists, setExpandedLists] = useState<Set<string>>(new Set())
 
   // Load saved lists from database on component mount
   useEffect(() => {

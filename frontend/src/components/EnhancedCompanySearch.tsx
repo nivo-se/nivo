@@ -24,7 +24,9 @@ import {
   Check
 } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany, CompanyFilter } from '../lib/supabaseDataService'
+import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import CompanyListManager from './CompanyListManager'
+import AddToListsDialog from './AddToListsDialog'
 
 interface SearchResults {
   companies: SupabaseCompany[]
@@ -38,15 +40,7 @@ interface SearchResults {
   }
 }
 
-interface SavedCompanyList {
-  id: string
-  name: string
-  description?: string
-  companies: SupabaseCompany[]
-  filters: any
-  createdAt: string
-  updatedAt: string
-}
+// SavedCompanyList interface is now imported from savedListsService
 
 const EnhancedCompanySearch: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
@@ -61,8 +55,22 @@ const EnhancedCompanySearch: React.FC = () => {
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
   const [selectAll, setSelectAll] = useState(false)
   const [allMatchingCompanyOrgNrs, setAllMatchingCompanyOrgNrs] = useState<Set<string>>(new Set())
+  const [showAddToListsDialog, setShowAddToListsDialog] = useState(false)
 
   const itemsPerPage = 20
+
+  // Load saved lists on component mount
+  useEffect(() => {
+    const loadSavedLists = async () => {
+      try {
+        const lists = await SavedListsService.getSavedLists()
+        setSavedLists(lists)
+      } catch (error) {
+        console.error('Error loading saved lists:', error)
+      }
+    }
+    loadSavedLists()
+  }, [])
 
   // Handle individual company selection
   const handleCompanySelect = (companyOrgNr: string, checked: boolean) => {
@@ -311,8 +319,15 @@ const EnhancedCompanySearch: React.FC = () => {
     setCurrentPage(1)
   }
 
-  const handleListUpdate = (lists: SavedCompanyList[]) => {
+  const handleListUpdate = async (lists: SavedCompanyList[]) => {
     setSavedLists(lists)
+    // Also refresh from service to ensure consistency
+    try {
+      const refreshedLists = await SavedListsService.getSavedLists()
+      setSavedLists(refreshedLists)
+    } catch (error) {
+      console.error('Error refreshing saved lists:', error)
+    }
   }
 
   const formatNumber = (num: number | null | undefined) => {
@@ -527,6 +542,19 @@ const EnhancedCompanySearch: React.FC = () => {
                 <div className="text-sm text-gray-600">
                   {selectedCompanies.size} företag valda
                 </div>
+              </div>
+            )}
+            
+            {/* Save to Lists Button */}
+            {selectedCompanies.size > 0 && (
+              <div className="flex justify-end mb-4">
+                <Button 
+                  onClick={() => setShowAddToListsDialog(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Lägg till i listor ({selectedCompanies.size} företag)
+                </Button>
               </div>
             )}
             
@@ -997,6 +1025,21 @@ const EnhancedCompanySearch: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Add to Lists Dialog */}
+      <AddToListsDialog
+        isOpen={showAddToListsDialog}
+        onClose={() => setShowAddToListsDialog(false)}
+        companies={selectedCompaniesArray}
+        onSuccess={(list) => {
+          // Refresh the saved lists
+          handleListUpdate([...savedLists, list])
+          // Clear selections
+          setSelectedCompanies(new Set())
+          setSelectAll(false)
+          setSelectedCompaniesArray([])
+        }}
+      />
     </div>
   )
 }

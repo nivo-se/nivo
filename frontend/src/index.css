@@ -4,25 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Zapf Humanist 601 Demi BT';
-  src: local('Zapf Humanist 601 Demi BT Regular'),
-       url('/fonts/zapf/ZapfHumanist601DemiBT-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Zapf Humanist 601 Demi BT';
-  src: local('Zapf Humanist 601 Demi BT Demi'),
-       url('/fonts/zapf/ZapfHumanist601DemiBT-Demi.woff2') format('woff2');
-  font-weight: 700;
-  font-display: swap;
-}
+/* Zapf Humanist font removed due to loading issues - using fallback fonts */
 
 @layer base {
   :root {
-    --font-zapf: 'Zapf Humanist 601 Demi BT', 'Poppins', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial';
+    --font-zapf: 'Poppins', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial';
     --font-poppins: 'Poppins', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial';
 
     --nivo-c-primary: #596152; /* Gray Olive */
