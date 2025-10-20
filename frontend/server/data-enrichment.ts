@@ -14,7 +14,8 @@ import {
 import { getIndustryBenchmarks } from './industry-benchmarks.js'
 
 /**
- * Fetch comprehensive company data from multiple sources
+ * Fetch comprehensive company data from available sources
+ * Note: Historical tables are currently empty, so we focus on master_analytics
  */
 export async function fetchComprehensiveCompanyData(
   supabase: SupabaseClient,
@@ -23,32 +24,26 @@ export async function fetchComprehensiveCompanyData(
   const issues: QualityIssue[] = []
   
   try {
-    // 1. Validate required tables exist
-    const requiredTables = ['master_analytics', 'company_accounts_by_id', 'company_kpis_by_id']
-    const missingTables = await validateTablesExist(supabase, requiredTables)
+    // 1. Validate that master_analytics table exists and is accessible
+    const { error: tableError } = await supabase
+      .from('master_analytics')
+      .select('*')
+      .limit(1)
     
-    if (missingTables.length > 0) {
+    if (tableError) {
       issues.push(createQualityIssue(
         'critical',
-        `Missing required tables: ${missingTables.join(', ')}`,
-        { missingTables }
+        `Cannot access master_analytics table: ${tableError.message}`,
+        { error: tableError.message }
       ))
       return { data: null, issues, success: false }
     }
     
-    // 2. Fetch data from all sources in parallel
-    const [masterResult, historicalResult, kpiResult] = await Promise.all([
-      fetchMasterAnalytics(supabase, orgnr),
-      fetchHistoricalAccounts(supabase, orgnr),
-      fetchDetailedKPIs(supabase, orgnr)
-    ])
-    
-    // 3. Collect quality issues
+    // 2. Fetch master analytics data (primary source)
+    const masterResult = await fetchMasterAnalytics(supabase, orgnr)
     issues.push(...masterResult.issues)
-    issues.push(...historicalResult.issues)
-    issues.push(...kpiResult.issues)
     
-    // 4. Check for critical data availability
+    // 3. Check for critical data availability
     if (!masterResult.data) {
       issues.push(createQualityIssue(
         'critical',
@@ -58,12 +53,23 @@ export async function fetchComprehensiveCompanyData(
       return { data: null, issues, success: false }
     }
     
-    if (!historicalResult.data || historicalResult.data.length < 2) {
-      issues.push(createQualityIssue(
-        'warning',
-        'Limited historical data available',
-        { orgnr, yearsAvailable: historicalResult.data?.length || 0 }
-      ))
+    // 4. Try to fetch historical data (may be empty)
+    const historicalResult = await fetchHistoricalAccounts(supabase, orgnr)
+    const kpiResult = await fetchDetailedKPIs(supabase, orgnr)
+    
+    // Add historical data issues as warnings (not critical)
+    if (historicalResult.issues.length > 0) {
+      issues.push(...historicalResult.issues.map(issue => ({
+        ...issue,
+        level: 'warning' as const // Downgrade to warning since historical data is optional
+      })))
+    }
+    
+    if (kpiResult.issues.length > 0) {
+      issues.push(...kpiResult.issues.map(issue => ({
+        ...issue,
+        level: 'warning' as const // Downgrade to warning since KPI data is optional
+      })))
     }
     
     // 5. Calculate trends and benchmarks
