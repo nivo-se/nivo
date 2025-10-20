@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { ChevronDown, ChevronRight, Download, RefreshCw, X, FileText, TrendingUp, AlertTriangle, CheckCircle, BarChart3, Building2, Users } from 'lucide-react'
 import { AnalyzedCompany } from '../lib/analysisService'
 import ValuationModelsCard from './ValuationModelsCard'
@@ -95,6 +95,10 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white flex items-center justify-between">
             <span>Analys: {analysis.companyName}</span>
+          </DialogTitle>
+          <DialogDescription className="text-gray-300">
+            Detaljerad analys och värdering för {analysis.companyName}
+          </DialogDescription>
             <Button
               variant="ghost"
               size="sm"
