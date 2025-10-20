@@ -93,12 +93,15 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#2E2A2B] border-[#4A4A4A] text-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white flex items-center justify-between">
-            <span>Analys: {analysis.companyName}</span>
-          </DialogTitle>
-          <DialogDescription className="text-gray-300">
-            Detaljerad analys och värdering för {analysis.companyName}
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-2xl font-bold text-white">
+                Analys: {analysis.companyName}
+              </DialogTitle>
+              <DialogDescription className="text-gray-300">
+                Detaljerad analys och värdering för {analysis.companyName}
+              </DialogDescription>
+            </div>
             <Button
               variant="ghost"
               size="sm"
@@ -107,7 +110,7 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
             >
               <X className="w-5 h-5" />
             </Button>
-          </DialogTitle>
+          </div>
         </DialogHeader>
 
         <div className="space-y-6">
