@@ -1677,7 +1677,6 @@ async function fetchValuationSourceData(
       OrgNr,
       name,
       segment_name,
-      industry_name,
       employees,
       SDI,
       DR,
@@ -1731,7 +1730,7 @@ async function fetchValuationSourceData(
     return {
       orgnr: orgnr || row?.OrgNr,
       name: row?.name || 'Okänt bolag',
-      industry: row?.segment_name || row?.industry_name || null,
+      industry: row?.segment_name || null,
       employees: typeof row?.employees === 'number' ? row.employees : Number.parseInt(row?.employees, 10) || null,
       records,
     }
@@ -1752,7 +1751,7 @@ function fallbackInsightForCompany(
   const { metrics } = company
   const summaryParts: string[] = []
   if (metrics.revenueLatest) {
-    summaryParts.push(`Omsättning ${Math.round(metrics.revenueLatest / 1_000_000)} MSEK`)
+    summaryParts.push(`Omsättning ${Math.round(metrics.revenueLatest / 1_000)} MSEK`)
   }
   if (metrics.evToEbit) {
     summaryParts.push(`EV/EBIT ${metrics.evToEbit.toFixed(1)}x`)
@@ -1775,7 +1774,7 @@ function fallbackInsightForCompany(
   return {
     summary,
     valuationView: metrics.enterpriseValue
-      ? `Indicativt företagsvärde omkring ${(metrics.enterpriseValue / 1_000_000).toFixed(1)} MSEK`
+      ? `Indicativt företagsvärde omkring ${(metrics.enterpriseValue / 1_000).toFixed(1)} MSEK`
       : null,
     valuationRange: metrics.enterpriseValue
       ? `${(metrics.enterpriseValue * 0.85).toFixed(0)}–${(metrics.enterpriseValue * 1.15).toFixed(0)} SEK`

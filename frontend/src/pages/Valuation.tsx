@@ -100,7 +100,7 @@ interface CompaniesResponse {
 
 const formatCurrency = (value: number | null | undefined) => {
   if (typeof value !== 'number' || Number.isNaN(value)) return '–'
-  return `${(value / 1_000_000).toFixed(1)} MSEK`
+  return `${(value / 1_000).toFixed(1)} MSEK`
 }
 
 const formatMultiple = (value: number | null | undefined) => {
@@ -545,7 +545,7 @@ const ValuationPage: React.FC = () => {
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">{company.OrgNr}</TableCell>
                           <TableCell className="text-sm">
-                            {typeof company.SDI === 'number' ? `${(company.SDI / 1_000_000).toFixed(1)} MSEK` : '–'}
+                            {typeof company.SDI === 'number' ? `${(company.SDI / 1_000).toFixed(1)} MSEK` : '–'}
                           </TableCell>
                           <TableCell className="text-sm">
                             {typeof company.Revenue_growth === 'number'

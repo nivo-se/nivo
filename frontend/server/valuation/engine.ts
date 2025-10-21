@@ -134,7 +134,7 @@ export class RevenueMultipleModel implements ValuationModel {
       modelName: this.name,
       valueEv: ev,
       valueEquity: equity,
-      basis: `Revenue (${(profile.revenue/1000000).toFixed(1)}M SEK) × ${multiple}x multiple`,
+      basis: `Revenue (${(profile.revenue/1000).toFixed(1)}M SEK) × ${multiple}x multiple`,
       multipleUsed: multiple,
       confidence: Math.min(100, Math.max(0, confidence)),
       inputs: {
@@ -175,8 +175,8 @@ export class EbitdaMultipleModel implements ValuationModel {
     if (netDebtCalc.method === 'zero') confidence -= 5
     
     const basis = profile.ebitda 
-      ? `EBITDA (${(ebitda/1000000).toFixed(1)}M SEK) × ${multiple}x multiple`
-      : `EBITDA proxy (${(ebitda/1000000).toFixed(1)}M SEK) × ${multiple}x multiple`
+      ? `EBITDA (${(ebitda/1000).toFixed(1)}M SEK) × ${multiple}x multiple`
+      : `EBITDA proxy (${(ebitda/1000).toFixed(1)}M SEK) × ${multiple}x multiple`
     
     return {
       modelKey: this.key,
@@ -243,7 +243,7 @@ export class EarningsMultipleModel implements ValuationModel {
       modelName: this.name,
       valueEv: ev,
       valueEquity: equity,
-      basis: `Net Profit (${(profile.netProfit/1000000).toFixed(1)}M SEK) × ${multiple}x multiple`,
+      basis: `Net Profit (${(profile.netProfit/1000).toFixed(1)}M SEK) × ${multiple}x multiple`,
       multipleUsed: multiple,
       confidence: Math.min(100, Math.max(0, confidence)),
       inputs: {
