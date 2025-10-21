@@ -47,6 +47,7 @@ export interface DashboardAnalytics {
   averageNetProfitMargin: number
   averageNetProfitGrowth: number
   averageRevenue: number
+  averageCAGR4Y: number | null
 }
 
 export interface CompanyFilter {
@@ -169,7 +170,8 @@ export class AnalyticsService {
         averageEBITMargin: this.calculateAverage(sampleForAverages?.map(c => c.EBIT_margin) || []),
         averageNetProfitMargin: this.calculateAverage(sampleForAverages?.map(c => c.NetProfit_margin) || []),
         averageNetProfitGrowth: this.calculateAverage(sampleForAverages?.map(c => c.Revenue_growth) || []), // Using revenue growth as proxy for now
-        averageRevenue: this.calculateAverage(sampleForAverages?.map(c => c.SDI) || [])
+        averageRevenue: this.calculateAverage(sampleForAverages?.map(c => c.SDI) || []),
+        averageCAGR4Y: null // TODO: Calculate when historical data is available
       }
 
       console.log('Final analytics result:', result)
@@ -186,7 +188,8 @@ export class AnalyticsService {
         averageEBITMargin: 0,
         averageNetProfitMargin: 0,
         averageNetProfitGrowth: 0,
-        averageRevenue: 0
+        averageRevenue: 0,
+        averageCAGR4Y: null
       }
     }
   }
@@ -610,5 +613,12 @@ export class AnalyticsService {
     const validNumbers = numbers.filter(n => n !== null && n !== undefined) as number[]
     if (validNumbers.length === 0) return 0
     return validNumbers.reduce((sum, num) => sum + num, 0) / validNumbers.length
+  }
+
+  // Helper function to calculate CAGR (Compound Annual Growth Rate)
+  // Formula: CAGR = (Ending Value / Beginning Value)^(1/number of years) - 1
+  private static calculateCAGR(beginningValue: number, endingValue: number, years: number): number {
+    if (beginningValue <= 0 || endingValue <= 0 || years <= 0) return 0
+    return Math.pow(endingValue / beginningValue, 1 / years) - 1
   }
 }

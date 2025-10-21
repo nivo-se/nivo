@@ -110,7 +110,7 @@ const WorkingDashboard: React.FC = () => {
             ) : (
               <>
                 {/* Key Metrics - Using Analytics Tab Style */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
                   <Card className="border-[#E6E6E6]">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
@@ -196,6 +196,23 @@ const WorkingDashboard: React.FC = () => {
                           </p>
                         </div>
                         <TrendingUp className="h-8 w-8 text-red-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-[#E6E6E6]">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig CAGR (4 år)</p>
+                          <p className="text-2xl font-bold text-[#2E2A2B]">
+                            {analytics?.averageCAGR4Y ? `${(analytics.averageCAGR4Y * 100).toFixed(1)}%` : 'Ej tillgänglig'}
+                          </p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-indigo-600" />
+                      </div>
+                      <div className="mt-2 flex items-center text-sm">
+                        <span className="text-[#2E2A2B]/50">Kräver historisk data</span>
                       </div>
                     </CardContent>
                   </Card>
