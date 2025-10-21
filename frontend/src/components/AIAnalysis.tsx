@@ -933,69 +933,6 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_anal
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Analyshistorik</CardTitle>
-          <CardDescription>Granska senaste AI-genererade bedömningar och öppna dem för samarbete.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {history.length === 0 ? (
-            <div className="rounded-md border border-dashed p-8 text-center">
-              <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                <FileText className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">Inga analyser än</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Kör din första AI-analys ovan för att se resultat här.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Analyshistoriken hjälper dig att spåra och jämföra företagsbedömningar över tid.
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="px-3 py-2 text-left font-semibold">Run ID</th>
-                    <th className="px-3 py-2 text-left font-semibold">Company</th>
-                    <th className="px-3 py-2 text-left font-semibold">Recommendation</th>
-                    <th className="px-3 py-2 text-left font-semibold">Confidence</th>
-                    <th className="px-3 py-2 text-left font-semibold">Completed</th>
-                    <th className="px-3 py-2 text-left font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((row) => (
-                    <tr key={`${row.run_id}-${row.orgnr}`} className="border-t">
-                      <td className="px-3 py-2 text-xs font-mono text-muted-foreground">{row.run_id}</td>
-                      <td className="px-3 py-2 text-sm font-medium text-foreground">{row.company_name}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{row.recommendation || '—'}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{confidenceLabel(row.confidence)}</td>
-                      <td className="px-3 py-2 text-sm text-muted-foreground">{formatDate(row.completed_at)}</td>
-                      <td className="px-3 py-2 text-sm">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={loadingRunId === row.run_id}
-                          onClick={() => handleSelectRun(row.run_id)}
-                        >
-                          {loadingRunId === row.run_id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Sparkles className="mr-2 h-4 w-4" />
-                          )}
-                          Open
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   )
 }

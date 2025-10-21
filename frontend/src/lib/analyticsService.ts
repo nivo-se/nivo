@@ -44,6 +44,9 @@ export interface DashboardAnalytics {
   totalWithDigitalPresence: number
   averageRevenueGrowth: number
   averageEBITMargin: number
+  averageNetProfitMargin: number
+  averageNetProfitGrowth: number
+  averageRevenue: number
 }
 
 export interface CompanyFilter {
@@ -149,7 +152,7 @@ export class AnalyticsService {
       try {
         const { data, error } = await supabase
           .from('master_analytics')
-          .select('Revenue_growth, EBIT_margin')
+          .select('Revenue_growth, EBIT_margin, NetProfit_margin, SDI')
           .limit(1000)
         sampleForAverages = data || []
         console.log('Sample data for averages:', sampleForAverages.length, 'records')
@@ -163,7 +166,10 @@ export class AnalyticsService {
         totalWithKPIs,
         totalWithDigitalPresence,
         averageRevenueGrowth: this.calculateAverage(sampleForAverages?.map(c => c.Revenue_growth) || []),
-        averageEBITMargin: this.calculateAverage(sampleForAverages?.map(c => c.EBIT_margin) || [])
+        averageEBITMargin: this.calculateAverage(sampleForAverages?.map(c => c.EBIT_margin) || []),
+        averageNetProfitMargin: this.calculateAverage(sampleForAverages?.map(c => c.NetProfit_margin) || []),
+        averageNetProfitGrowth: this.calculateAverage(sampleForAverages?.map(c => c.Revenue_growth) || []), // Using revenue growth as proxy for now
+        averageRevenue: this.calculateAverage(sampleForAverages?.map(c => c.SDI) || [])
       }
 
       console.log('Final analytics result:', result)
@@ -177,7 +183,10 @@ export class AnalyticsService {
         totalWithKPIs: 0,
         totalWithDigitalPresence: 0,
         averageRevenueGrowth: 0,
-        averageEBITMargin: 0
+        averageEBITMargin: 0,
+        averageNetProfitMargin: 0,
+        averageNetProfitGrowth: 0,
+        averageRevenue: 0
       }
     }
   }

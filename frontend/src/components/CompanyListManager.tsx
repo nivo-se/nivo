@@ -354,7 +354,11 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
           <CardContent>
             <div className="space-y-3">
               {savedLists.map((list) => (
-                <div key={list.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                <div 
+                  key={list.id} 
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => onListSelect(list)}
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium">{list.name}</h4>
@@ -378,7 +382,10 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onListSelect(list)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onListSelect(list)
+                      }}
                     >
                       Välj
                     </Button>

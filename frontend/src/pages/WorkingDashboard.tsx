@@ -164,7 +164,7 @@ const WorkingDashboard: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig EBIT Tillväxt</p>
                           <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageEBITMargin ? `${((analytics.averageEBITMargin * 100) * 0.8).toFixed(1)}%` : 'N/A'}
+                            {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
                           </p>
                         </div>
                         <TrendingUp className="h-8 w-8 text-green-600" />
@@ -178,7 +178,7 @@ const WorkingDashboard: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Vinstmarginal</p>
                           <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageEBITMargin ? `${((analytics.averageEBITMargin * 100) * 0.75).toFixed(1)}%` : 'N/A'}
+                            {analytics?.averageNetProfitMargin ? `${(analytics.averageNetProfitMargin * 100).toFixed(1)}%` : 'N/A'}
                           </p>
                         </div>
                         <Target className="h-8 w-8 text-orange-600" />
@@ -192,7 +192,7 @@ const WorkingDashboard: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Vinst Tillväxt</p>
                           <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageRevenueGrowth ? `${((analytics.averageRevenueGrowth * 100) * 1.2).toFixed(1)}%` : 'N/A'}
+                            {analytics?.averageNetProfitGrowth ? `${(analytics.averageNetProfitGrowth * 100).toFixed(1)}%` : 'N/A'}
                           </p>
                         </div>
                         <TrendingUp className="h-8 w-8 text-red-600" />

@@ -142,6 +142,20 @@ const EnhancedCompanySearch: React.FC = () => {
       
       const searchFilters: CompanyFilter = { ...filters }
       
+      // Convert MSEK to thousands (database format)
+      if (searchFilters.minRevenue !== undefined) {
+        searchFilters.minRevenue = searchFilters.minRevenue * 1000
+      }
+      if (searchFilters.maxRevenue !== undefined) {
+        searchFilters.maxRevenue = searchFilters.maxRevenue * 1000
+      }
+      if (searchFilters.minProfit !== undefined) {
+        searchFilters.minProfit = searchFilters.minProfit * 1000
+      }
+      if (searchFilters.maxProfit !== undefined) {
+        searchFilters.maxProfit = searchFilters.maxProfit * 1000
+      }
+      
       if (searchTerm.trim()) {
         searchFilters.name = searchTerm.trim()
       }
@@ -406,7 +420,7 @@ const EnhancedCompanySearch: React.FC = () => {
               {/* Revenue & Profit in one row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Omsättning (kSEK)</label>
+                  <label className="text-sm font-medium mb-1 block">Omsättning (MSEK)</label>
                   <div className="grid grid-cols-2 gap-1">
                     <Input
                       type="number"
@@ -427,7 +441,7 @@ const EnhancedCompanySearch: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Vinst (kSEK)</label>
+                  <label className="text-sm font-medium mb-1 block">Vinst (MSEK)</label>
                   <div className="grid grid-cols-2 gap-1">
                     <Input
                       type="number"
