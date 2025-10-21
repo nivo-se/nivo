@@ -10,12 +10,18 @@ import { randomUUID } from 'crypto'
 import { fetchComprehensiveCompanyData } from './data-enrichment.js'
 import { QualityIssue, createQualityIssue } from './data-quality.js'
 import { getCompanyContext } from './industry-benchmarks.js'
-import { 
-  runValuations, 
-  createCompanyProfile, 
+import {
+  runValuations,
+  createCompanyProfile,
   ValuationOutput,
-  CompanyProfile 
+  CompanyProfile
 } from './valuation/engine.js'
+import {
+  computeValuationMetrics,
+  buildValuationExportDataset,
+  type ValuationMetrics,
+  type NormalizedFinancialHistory
+} from '../src/lib/valuation.js'
 import { 
   loadAllAssumptions, 
   AssumptionsOverride,
@@ -90,6 +96,35 @@ interface MetricResult {
   source?: string | null
   year?: number | null
   confidence?: number | null
+}
+
+interface ValuationCompanyResponse {
+  orgnr: string
+  name: string
+  industry: string | null
+  employees: number | null
+  metrics: ValuationMetrics
+  history: NormalizedFinancialHistory
+  chartSeries: Array<{ year: number; revenue: number | null; ebit: number | null; ebitda: number | null }>
+  aiInsights?: CompanyValuationInsight
+}
+
+interface CompanyValuationInsight {
+  summary: string
+  valuationView?: string | null
+  riskFlags: string[]
+  opportunities?: string[]
+  valuationRange?: string | null
+  mode: 'default' | 'deep'
+}
+
+interface ValuationApiResponse {
+  valuationSessionId: string | null
+  mode: 'default' | 'deep'
+  generatedAt: string
+  companies: ValuationCompanyResponse[]
+  overallSummary: string
+  exportDataset: ReturnType<typeof buildValuationExportDataset>
 }
 
 interface AuditResult {
@@ -611,8 +646,9 @@ app.get('/api/companies', async (req, res) => {
 
     const limit = Math.min(Math.max(parseInt(req.query.limit as string || '50', 10) || 50, 1), 200)
     const offset = Math.max(parseInt(req.query.offset as string || '0', 10) || 0, 0)
-    
-    const { data: companies, error } = await supabase
+    const searchTerm = (req.query.search as string)?.trim()
+
+    let query = supabase
       .from('master_analytics')
       .select(`
         OrgNr,
@@ -637,13 +673,20 @@ app.get('/api/companies', async (req, res) => {
       .order('revenue', { ascending: false })
       .range(offset, offset + limit - 1)
 
+    if (searchTerm) {
+      const sanitized = searchTerm.replace(/[%]/g, '\\%').replace(/,/g, ' ')
+      query = query.or(`name.ilike.%${sanitized}%,OrgNr.ilike.%${sanitized}%`)
+    }
+
+    const { data: companies, error } = await query
+
     if (error) {
       console.error('Database error:', error)
       return res.status(500).json({ success: false, error: 'Database error' })
     }
 
-    res.status(200).json({ 
-      success: true, 
+    res.status(200).json({
+      success: true,
       companies: companies || [],
       pagination: {
         limit,
@@ -1587,6 +1630,445 @@ app.get('/api/test-auth-lists', async (req, res) => {
 // ============================================================================
 // VALUATION API ENDPOINTS
 // ============================================================================
+
+function pickOrgNumber(row: any): string | null {
+  return (
+    row?.OrgNr ||
+    row?.orgnr ||
+    row?.organisationNumber ||
+    row?.organisation_number ||
+    row?.org_number ||
+    null
+  )
+}
+
+function buildChartSeries(history: NormalizedFinancialHistory) {
+  return [...history.records]
+    .sort((a, b) => a.year - b.year)
+    .map((record) => {
+      const singleYearMetrics = computeValuationMetrics([record]).metrics
+      return {
+        year: record.year,
+        revenue: record.revenue ?? null,
+        ebit: record.ebit ?? null,
+        ebitda: record.ebitda ?? null,
+        evToEbitda: singleYearMetrics.evToEbitda,
+      }
+    })
+}
+
+interface FetchedValuationData {
+  companies: Array<{
+    orgnr: string
+    name: string
+    industry: string | null
+    employees: number | null
+    records: Array<Record<string, any>>
+  }>
+}
+
+async function fetchValuationSourceData(
+  supabase: SupabaseClient,
+  companyIds: string[]
+): Promise<FetchedValuationData> {
+  const { data: masterRows, error: masterError } = await supabase
+    .from('master_analytics')
+    .select(`
+      OrgNr,
+      name,
+      segment_name,
+      industry_name,
+      employees,
+      SDI,
+      DR,
+      ORS,
+      Revenue_growth,
+      EBIT_margin,
+      NetProfit_margin
+    `)
+    .in('OrgNr', companyIds)
+
+  if (masterError) {
+    throw new Error(`Failed to fetch master data: ${masterError.message}`)
+  }
+
+  const { data: accountRows, error: accountsError } = await supabase
+    .from('company_accounts_by_id')
+    .select('*')
+    .in('organisationNumber', companyIds)
+    .order('year', { ascending: false })
+
+  if (accountsError) {
+    throw new Error(`Failed to fetch financial accounts: ${accountsError.message}`)
+  }
+
+  const accountsMap = new Map<string, any[]>()
+  for (const row of accountRows || []) {
+    const orgnr = pickOrgNumber(row)
+    if (!orgnr) continue
+    const existing = accountsMap.get(orgnr) || []
+    existing.push(row)
+    accountsMap.set(orgnr, existing)
+  }
+
+  const companies = (masterRows || []).map((row: any) => {
+    const orgnr = pickOrgNumber(row)
+    const fallbackYear = new Date().getFullYear()
+    const fallbackRecord = {
+      year: fallbackYear,
+      SDI: row?.SDI,
+      RG: row?.RG,
+      EBIT: row?.RG,
+      EBITDA: row?.ORS,
+      DR: row?.DR,
+      EK: row?.EK,
+      SV: row?.SV,
+      SEK: row?.SEK,
+    }
+    const rawRecords = accountsMap.get(orgnr || '') || []
+    const records = rawRecords.length ? rawRecords : [fallbackRecord]
+
+    return {
+      orgnr: orgnr || row?.OrgNr,
+      name: row?.name || 'Okänt bolag',
+      industry: row?.segment_name || row?.industry_name || null,
+      employees: typeof row?.employees === 'number' ? row.employees : Number.parseInt(row?.employees, 10) || null,
+      records,
+    }
+  })
+
+  return { companies }
+}
+
+interface AiInsightResult {
+  companyInsights: Record<string, CompanyValuationInsight>
+  overallSummary: string
+}
+
+function fallbackInsightForCompany(
+  company: ValuationCompanyResponse,
+  mode: 'default' | 'deep'
+): CompanyValuationInsight {
+  const { metrics } = company
+  const summaryParts: string[] = []
+  if (metrics.revenueLatest) {
+    summaryParts.push(`Omsättning ${Math.round(metrics.revenueLatest / 1_000_000)} MSEK`)
+  }
+  if (metrics.evToEbit) {
+    summaryParts.push(`EV/EBIT ${metrics.evToEbit.toFixed(1)}x`)
+  }
+  if (metrics.peRatio) {
+    summaryParts.push(`P/E ${metrics.peRatio.toFixed(1)}x`)
+  }
+  const summary = summaryParts.length
+    ? `${company.name}: ${summaryParts.join(', ')}.`
+    : `${company.name}: Begränsat dataunderlag för värdering.`
+
+  const riskFlags: string[] = []
+  if (metrics.equityRatio !== null && metrics.equityRatio < 0.25) {
+    riskFlags.push('Låg soliditet')
+  }
+  if (metrics.revenueCagr3Y !== null && metrics.revenueCagr3Y < 0) {
+    riskFlags.push('Negativ tillväxttakt')
+  }
+
+  return {
+    summary,
+    valuationView: metrics.enterpriseValue
+      ? `Indicativt företagsvärde omkring ${(metrics.enterpriseValue / 1_000_000).toFixed(1)} MSEK`
+      : null,
+    valuationRange: metrics.enterpriseValue
+      ? `${(metrics.enterpriseValue * 0.85).toFixed(0)}–${(metrics.enterpriseValue * 1.15).toFixed(0)} SEK`
+      : null,
+    riskFlags,
+    opportunities:
+      metrics.revenueCagr3Y && metrics.revenueCagr3Y > 0.05
+        ? ['Stabil historisk tillväxt över 5 % per år']
+        : [],
+    mode,
+  }
+}
+
+function createFallbackInsights(
+  companies: ValuationCompanyResponse[],
+  mode: 'default' | 'deep'
+): AiInsightResult {
+  const companyInsights: Record<string, CompanyValuationInsight> = {}
+  const summaryLines: string[] = []
+
+  companies.forEach((company) => {
+    const insight = fallbackInsightForCompany(company, mode)
+    companyInsights[company.orgnr] = insight
+    summaryLines.push(insight.summary)
+  })
+
+  return {
+    companyInsights,
+    overallSummary:
+      summaryLines.length > 0
+        ? `Automatiskt sammanställd värderingsöversikt för ${companies.length} bolag. ${summaryLines.join(' ')}`
+        : `Automatiskt sammanställd värderingsöversikt för ${companies.length} bolag.`,
+  }
+}
+
+async function generateValuationInsights(
+  companies: ValuationCompanyResponse[],
+  mode: 'default' | 'deep'
+): Promise<AiInsightResult> {
+  if (!process.env.OPENAI_API_KEY) {
+    return createFallbackInsights(companies, mode)
+  }
+
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const baseModel = mode === 'deep' ? 'gpt-4.1-mini' : 'gpt-4.1-mini'
+
+  const payload = companies.map((company) => ({
+    orgnr: company.orgnr,
+    name: company.name,
+    industry: company.industry,
+    metrics: {
+      enterpriseValue: company.metrics.enterpriseValue,
+      evToEbit: company.metrics.evToEbit,
+      evToEbitda: company.metrics.evToEbitda,
+      peRatio: company.metrics.peRatio,
+      pbRatio: company.metrics.pbRatio,
+      psRatio: company.metrics.psRatio,
+      equityRatio: company.metrics.equityRatio,
+      revenueCagr3Y: company.metrics.revenueCagr3Y,
+    },
+  }))
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: baseModel,
+      temperature: 0.2,
+      max_tokens: 800,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Du är en senior företagsvärderare. Analysera svenska företag baserat på nyckeltal. Svara alltid på svenska och med JSON-format.',
+        },
+        {
+          role: 'user',
+          content: `Analysera följande företag och producera JSON med strukturen {"overall_summary":"...","companies":[{"orgnr":"","summary":"","valuation_view":"","valuation_range":"","risk_flags":[],"opportunities":[]}]}.
+Mode: ${mode}.
+Data: ${JSON.stringify(payload)}`,
+        },
+      ],
+    })
+
+    const content = completion.choices?.[0]?.message?.content
+    if (!content) {
+      return createFallbackInsights(companies, mode)
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content)
+
+    const companyInsights: Record<string, CompanyValuationInsight> = {}
+    for (const entry of parsed.companies || []) {
+      if (!entry?.orgnr) continue
+      companyInsights[entry.orgnr] = {
+        summary: entry.summary || 'Sammanfattning saknas',
+        valuationView: entry.valuation_view || null,
+        valuationRange: entry.valuation_range || null,
+        riskFlags: Array.isArray(entry.risk_flags) ? entry.risk_flags : [],
+        opportunities: Array.isArray(entry.opportunities) ? entry.opportunities : [],
+        mode,
+      }
+    }
+
+    const fallback = createFallbackInsights(companies, mode)
+    const combinedInsights: Record<string, CompanyValuationInsight> = {}
+    companies.forEach((company) => {
+      combinedInsights[company.orgnr] =
+        companyInsights[company.orgnr] || fallback.companyInsights[company.orgnr]
+    })
+
+    let overallSummary: string = parsed.overall_summary || fallback.overallSummary
+
+    if (mode === 'deep' && companies.length) {
+      const topCompanies = [...companies]
+        .sort((a, b) => (b.metrics.enterpriseValue || 0) - (a.metrics.enterpriseValue || 0))
+        .slice(0, Math.min(2, companies.length))
+
+      const deepPrompt = topCompanies.map((company) => ({
+        orgnr: company.orgnr,
+        name: company.name,
+        metrics: {
+          enterpriseValue: company.metrics.enterpriseValue,
+          evToEbit: company.metrics.evToEbit,
+          peRatio: company.metrics.peRatio,
+          equityRatio: company.metrics.equityRatio,
+          revenueCagr3Y: company.metrics.revenueCagr3Y,
+        },
+      }))
+
+      const deepCompletion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        temperature: 0.3,
+        max_tokens: 600,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Du är en expert på M&A och företagsvärdering. Ge kort men insiktsfull analys på svenska.',
+          },
+          {
+            role: 'user',
+            content: `Fördjupa analysen för dessa prioriterade bolag. Returnera JSON med {"companies":[{"orgnr":"","deep_summary":"","risk_flags":[],"opportunities":[]}]}.
+Data: ${JSON.stringify(deepPrompt)}`,
+          },
+        ],
+      })
+
+      const deepContent = deepCompletion.choices?.[0]?.message?.content
+      if (deepContent) {
+        const deepJsonMatch = deepContent.match(/\{[\s\S]*\}/)
+        const deepParsed = deepJsonMatch ? JSON.parse(deepJsonMatch[0]) : JSON.parse(deepContent)
+
+        for (const item of deepParsed.companies || []) {
+          if (!item?.orgnr || !combinedInsights[item.orgnr]) continue
+          combinedInsights[item.orgnr] = {
+            ...combinedInsights[item.orgnr],
+            summary: item.deep_summary || combinedInsights[item.orgnr].summary,
+            riskFlags: Array.isArray(item.risk_flags) ? item.risk_flags : combinedInsights[item.orgnr].riskFlags,
+            opportunities: Array.isArray(item.opportunities)
+              ? item.opportunities
+              : combinedInsights[item.orgnr].opportunities,
+            mode: 'deep',
+          }
+        }
+
+        overallSummary = deepParsed.overall_summary || overallSummary
+      }
+    }
+
+    return {
+      companyInsights: combinedInsights,
+      overallSummary,
+    }
+  } catch (error) {
+    console.error('AI valuation insight generation failed:', error)
+    return createFallbackInsights(companies, mode)
+  }
+}
+
+async function persistValuationSession(
+  supabase: SupabaseClient,
+  payload: {
+    companyIds: string[]
+    mode: 'default' | 'deep'
+    companies: ValuationCompanyResponse[]
+    insights: AiInsightResult
+    exportDataset: ReturnType<typeof buildValuationExportDataset>
+  }
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('valuation_sessions')
+    .insert({
+      company_ids: payload.companyIds,
+      mode: payload.mode,
+      valuation_payload: payload.companies.map((company) => ({
+        orgnr: company.orgnr,
+        name: company.name,
+        industry: company.industry,
+        employees: company.employees,
+        metrics: company.metrics,
+        history: company.history,
+        aiInsights: payload.insights.companyInsights[company.orgnr] ?? null,
+      })),
+      overall_summary: payload.insights.overallSummary,
+      export_dataset: payload.exportDataset,
+      generated_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('Failed to persist valuation session:', error)
+    throw new Error('Could not save valuation session to database')
+  }
+
+  return data?.id || null
+}
+
+app.post('/api/valuation', async (req, res) => {
+  try {
+    const { companyIds, mode: modeInput } = req.body || {}
+    const mode: 'default' | 'deep' = modeInput === 'deep' ? 'deep' : 'default'
+
+    if (!Array.isArray(companyIds) || companyIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'companyIds array is required' })
+    }
+
+    if (companyIds.length > 15) {
+      return res.status(400).json({ success: false, error: 'Max 15 företag kan värderas samtidigt' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const { companies: fetchedCompanies } = await fetchValuationSourceData(supabase, companyIds)
+
+    if (!fetchedCompanies.length) {
+      return res.status(404).json({ success: false, error: 'Inga företag hittades för angivna ID' })
+    }
+
+    const companies: ValuationCompanyResponse[] = fetchedCompanies.map((company) => {
+      const { metrics, history } = computeValuationMetrics(company.records)
+      return {
+        orgnr: company.orgnr,
+        name: company.name,
+        industry: company.industry,
+        employees: company.employees,
+        metrics,
+        history,
+        chartSeries: buildChartSeries(history),
+      }
+    })
+
+    const insights = await generateValuationInsights(companies, mode)
+
+    const exportDataset = buildValuationExportDataset(
+      companies.map((company) => ({
+        orgnr: company.orgnr,
+        name: company.name,
+        industry: company.industry,
+        history: company.history,
+        metrics: company.metrics,
+      }))
+    )
+
+    const valuationSessionId = await persistValuationSession(supabase, {
+      companyIds: companyIds.map(String),
+      mode,
+      companies,
+      insights,
+      exportDataset,
+    })
+
+    const response: ValuationApiResponse = {
+      valuationSessionId,
+      mode,
+      generatedAt: new Date().toISOString(),
+      companies: companies.map((company) => ({
+        ...company,
+        aiInsights: insights.companyInsights[company.orgnr],
+      })),
+      overallSummary: insights.overallSummary,
+      exportDataset,
+    }
+
+    res.status(200).json({ success: true, data: response })
+  } catch (error: any) {
+    console.error('Valuation API error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
 
 // Preview valuations for a company (no persistence)
 app.post('/api/valuation/preview', async (req, res) => {

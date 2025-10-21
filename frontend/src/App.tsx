@@ -11,6 +11,7 @@ import WorkingDashboard from "./pages/WorkingDashboard";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
+import Valuation from "./pages/Valuation";
 
 const queryClient = new QueryClient();
 
@@ -33,13 +34,21 @@ const App = () => (
                       </ProtectedRoute>
                     } 
                   />
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute>
                   <Admin />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/valuation"
+              element={
+                <ProtectedRoute>
+                  <Valuation />
+                </ProtectedRoute>
+              }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
