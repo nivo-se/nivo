@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import FadeIn from './animations/FadeIn';
 import StaggeredContainer from './animations/StaggeredContainer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Settings, Zap, TrendingUp, Users } from 'lucide-react';
@@ -35,25 +34,32 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
   ];
 
   return (
-    <section id={id} className={cn('py-20 bg-white', className)}>
-      <div className="container mx-auto px-4 md:px-6 py-8">
+    <section id={id} className={cn('py-16 md:py-24 bg-white', className)}>
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
         <StaggeredContainer
           staggerDelay={150}
-          className="grid md:grid-cols-2 grid-gap-nivo max-w-6xl mx-auto px-4"
+          className="grid grid-gap-nivo max-w-6xl mx-auto px-2 sm:px-4 md:grid-cols-2"
         >
           {services.map((service, index) => {
             const IconComponent = service.icon;
 
-              return (
-                <Card key={index} className="group h-full border-grayOlive/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl">
-                <CardContent className="p-0">
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-grayOlive/15 transition-transform duration-300 group-hover:scale-105">
+            return (
+              <Card
+                key={index}
+                className="group h-full border-grayOlive/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-grayOlive/15 transition-transform duration-300 group-hover:scale-105">
                       <IconComponent className="h-6 w-6 text-grayOlive" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-heading font-semibold text-jetBlack mb-3">{service.title}</h3>
-                      <p className="text-jetBlack/75 leading-relaxed">{service.description}</p>
+                      <h3 className="mb-2 text-lg font-heading font-semibold text-jetBlack sm:text-xl">
+                        {service.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-jetBlack/75 sm:text-base">
+                        {service.description}
+                      </p>
                     </div>
                   </div>
                 </CardContent>

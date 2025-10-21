@@ -26,43 +26,51 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
   };
 
   return (
-    <footer id="contact" className={cn('py-20 md:py-32 bg-jetBlack text-platinum border-t border-grayOlive/40', className)}>
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="border-t border-platinum/10 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <Link to="/" className="text-xl font-heading font-semibold tracking-tight">
-              Nivo
-            </Link>
-          </div>
+    <footer
+      id="contact"
+      className={cn(
+        'py-16 md:py-24 bg-jetBlack text-platinum border-t border-grayOlive/40',
+        className
+      )}
+    >
+      <div className="container mx-auto px-6">
+        <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+          <Link to="/" className="inline-flex items-center">
+            <img
+              src="/nivo-wordmark-white.svg"
+              alt="Nivo Group"
+              className="h-7 w-auto sm:h-8"
+            />
+          </Link>
 
-          <div className="flex space-x-6 mb-4 md:mb-0">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:gap-6">
             <button
               onClick={() => scrollToSection('about-nivo')}
-              className="text-sm text-platinum/80 transition-colors hover:text-platinum"
+              className="text-platinum/70 transition-colors hover:text-platinum"
             >
               Om oss
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="text-sm text-platinum/80 transition-colors hover:text-platinum"
+              className="text-platinum/70 transition-colors hover:text-platinum"
             >
               Tjänster
             </button>
             <button
               onClick={() => scrollToSection('team')}
-              className="text-sm text-platinum/80 transition-colors hover:text-platinum"
+              className="text-platinum/70 transition-colors hover:text-platinum"
             >
               Team
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-sm text-platinum/80 transition-colors hover:text-platinum"
+              className="text-platinum/70 transition-colors hover:text-platinum"
             >
               Kontakt
             </button>
           </div>
 
-          <div className="text-sm text-platinum/70">
+          <div className="text-center text-xs text-platinum/60 md:text-right">
             &copy; {new Date().getFullYear()} Nivo. Alla rättigheter förbehållna.
           </div>
         </div>

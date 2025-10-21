@@ -11,7 +11,7 @@ interface AboutProps {
 
 const About: React.FC<AboutProps> = ({ className, id }) => {
   return (
-    <section id={id} className={cn('py-20 md:py-32 bg-white', className)}>
+    <section id={id} className={cn('py-16 md:py-28 bg-white', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid md:grid-cols-12 grid-gap-nivo items-start max-w-6xl mx-auto">
           <FadeIn className="md:col-span-4" delay={100}>
@@ -28,12 +28,12 @@ const About: React.FC<AboutProps> = ({ className, id }) => {
           <FadeIn className="md:col-span-8" delay={400}>
             <div className="space-y-6">
               <FadeIn delay={500} duration={900} direction="up">
-                <p className="text-lg leading-relaxed text-jetBlack/80">
+                <p className="text-base leading-relaxed text-jetBlack/80 sm:text-lg">
                   Nivo erbjuder nordiska bolag en möjlighet att accelerera tillväxt och lönsamhet genom ett operationellt engagerat team och långsiktigt kapital. Alltid med fokus på konkreta resultat och hållbart värdeskapande.
                 </p>
               </FadeIn>
               <FadeIn delay={700} duration={900} direction="up">
-                <p className="text-lg leading-relaxed text-jetBlack/80">
+                <p className="text-base leading-relaxed text-jetBlack/80 sm:text-lg">
                   Vi värdesätter schysst företagande, enkelhet och samarbeten med människor som delar våra värderingar. Vår filosofi är att bygga partnerskap som varar och skapa framgångar som står sig över tid, med en stark grund i våra gemensamma ambitioner och långsiktiga visioner.
                 </p>
               </FadeIn>

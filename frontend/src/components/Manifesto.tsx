@@ -11,7 +11,7 @@ interface ManifestoProps {
 
 const Manifesto: React.FC<ManifestoProps> = ({ className, id }) => {
   return (
-    <section id={id} className={cn('py-20 bg-white', className)}>
+    <section id={id} className={cn('py-16 md:py-24 bg-white', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
           <FadeIn delay={100} direction="up">
@@ -22,13 +22,13 @@ const Manifesto: React.FC<ManifestoProps> = ({ className, id }) => {
           </TextReveal>
 
           <FadeIn delay={400} duration={900} direction="up">
-            <p className="text-lg leading-relaxed mb-8 text-center text-jetBlack/85">
+            <p className="text-base leading-relaxed mb-8 text-center text-jetBlack/85 sm:text-lg">
               Vi är ett team med omfattande erfarenhet inom entreprenörskap, investeringar och företagsledning som arbetar med företagare för att skapa hållbara och konkurrenskraftiga företag.
             </p>
           </FadeIn>
 
           <FadeIn delay={600} duration={900} direction="up">
-            <p className="text-lg leading-relaxed text-jetBlack/75 text-center">
+            <p className="text-base leading-relaxed text-jetBlack/75 text-center sm:text-lg">
               Med erfarenhet från att ha byggt några av Sveriges snabbast växande och mest lönsamma företag, har vi djup förståelse för vad som skapar framgång. Det handlar inte om fler strategiska presentationer, utan om att stödja målmedvetna entreprenörer som har produkter som möter marknadens behov och en förmåga att anpassa sig till en snabbt föränderlig omvärld.
             </p>
           </FadeIn>

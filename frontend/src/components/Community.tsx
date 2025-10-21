@@ -15,17 +15,17 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
         <div className="grid md:grid-cols-2 grid-gap-nivo items-start max-w-6xl mx-auto">
           <FadeIn>
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-heading text-jetBlack">
+              <h2 className="text-3xl font-heading text-jetBlack sm:text-4xl">
                 Är ditt företag redo för nästa steg?
               </h2>
-              <p className="text-lg leading-relaxed text-jetBlack/80">
+              <p className="text-base leading-relaxed text-jetBlack/80 sm:text-lg">
                 Nivo är ständigt på jakt efter kvalitetsföretag och intressanta förvärvsmöjligheter. Om du är företagare som funderar på nästa steg för ditt bolag, eller om du är branschexpert med insikter om potentiella förvärv, tveka inte att höra av dig! Vi ser fram emot att höra från dig och utforska hur vi tillsammans kan utveckla framgångsrika verksamheter.
               </p>
             </div>
           </FadeIn>
 
           <FadeIn delay={200}>
-            <div className="card-elevated">
+            <div className="card-elevated max-w-xl md:ml-auto">
               <form className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-jetBlack mb-1">

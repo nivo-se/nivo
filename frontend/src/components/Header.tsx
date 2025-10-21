@@ -56,24 +56,24 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <NavLink 
-          to="/" 
+        <NavLink
+          to="/"
           className={cn(
             "flex items-center space-x-2 transition-all duration-300 hover:opacity-80",
             isScrolled ? "text-foreground" : "text-white"
           )}
         >
-          <img 
-            src="/nivo-wordmark-white.svg" 
-            alt="Nivo Logo" 
-            className="h-8 w-auto"
+          <img
+            src={isScrolled ? '/nivo-wordmark-green.svg' : '/nivo-wordmark-white.svg'}
+            alt="Nivo Logo"
+            className="h-7 w-auto sm:h-8"
             onError={(e) => {
               // Fallback to text if logo doesn't exist
               e.currentTarget.style.display = 'none';
               e.currentTarget.nextElementSibling?.classList.remove('hidden');
             }}
           />
-          <span className="text-xl font-serif font-medium tracking-tight hidden">
+          <span className="hidden text-xl font-serif font-medium tracking-tight">
             Nivo
           </span>
         </NavLink>
