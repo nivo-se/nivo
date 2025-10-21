@@ -1826,7 +1826,7 @@ async function generateValuationInsights(
     name: company.name,
     industry: company.industry,
     metrics: {
-      enterpriseValue: company.metrics.enterpriseValue,
+      enterpriseValue: company.metrics.enterpriseValue ? company.metrics.enterpriseValue / 1000 : null,
       evToEbit: company.metrics.evToEbit,
       evToEbitda: company.metrics.evToEbitda,
       peRatio: company.metrics.peRatio,
