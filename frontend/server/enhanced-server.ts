@@ -1638,7 +1638,7 @@ app.put('/api/saved-lists/:id', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const mockUserId = 'default-user'
+    const mockUserId = '00000000-0000-0000-0000-000000000000'
 
     const { data, error } = await supabase
       .from('saved_company_lists')
@@ -1686,7 +1686,7 @@ app.delete('/api/saved-lists/:id', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const mockUserId = 'default-user'
+    const mockUserId = '00000000-0000-0000-0000-000000000000'
 
     const { error } = await supabase
       .from('saved_company_lists')
