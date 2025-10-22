@@ -1862,8 +1862,15 @@ Data: ${JSON.stringify(payload)}`,
       return createFallbackInsights(companies, mode)
     }
 
-    const jsonMatch = content.match(/\{[\s\S]*\}/)
-    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content)
+    let parsed
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content)
+    } catch (parseError) {
+      console.error('JSON parsing error in AI insights:', parseError)
+      console.error('Content that failed to parse:', content)
+      return createFallbackInsights(companies, mode)
+    }
 
     const companyInsights: Record<string, CompanyValuationInsight> = {}
     for (const entry of parsed.companies || []) {
@@ -2011,24 +2018,91 @@ app.post('/api/valuation', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const { companies: fetchedCompanies } = await fetchValuationSourceData(supabase, companyIds)
+    // Fetch company data directly from master_analytics for each company
+    const companies: ValuationCompanyResponse[] = []
+    
+    for (const companyId of companyIds) {
+      const { data: companyData, error } = await supabase
+        .from('master_analytics')
+        .select(`
+          OrgNr,
+          name,
+          segment_name,
+          city,
+          employees,
+          revenue,
+          profit,
+          SDI,
+          DR,
+          ORS,
+          Revenue_growth,
+          EBIT_margin,
+          NetProfit_margin,
+          digital_presence,
+          incorporation_date,
+          email,
+          homepage,
+          address
+        `)
+        .eq('OrgNr', companyId)
+        .single()
 
-    if (!fetchedCompanies.length) {
-      return res.status(404).json({ success: false, error: 'Inga företag hittades för angivna ID' })
+      if (error || !companyData) {
+        console.error(`Failed to fetch data for company ${companyId}:`, error)
+        continue
+      }
+
+      // Create company profile and run valuations
+      const profile = createCompanyProfile(companyData)
+      const assumptions = await loadAllAssumptions(
+        supabase, 
+        profile.industry, 
+        profile.sizeBucket, 
+        profile.growthBucket
+      )
+      const valuations = runValuations(profile, assumptions)
+
+      // Calculate metrics from valuations
+      const revenueModel = valuations.find(v => v.modelKey === 'revenue_multiple')
+      const ebitdaModel = valuations.find(v => v.modelKey === 'ebitda_multiple')
+      const earningsModel = valuations.find(v => v.modelKey === 'earnings_multiple')
+      
+      const metrics = {
+        enterpriseValue: revenueModel?.valueEv || null,
+        equityValue: revenueModel?.valueEquity || null,
+        revenueLatest: profile.revenue,
+        revenueCagr3Y: null, // Not available without historical data
+        evToEbit: null,
+        evToEbitda: null,
+        peRatio: null,
+        pbRatio: null,
+        psRatio: null,
+        equityRatio: null
+      }
+      
+      console.log(`Company ${companyData.OrgNr} metrics:`, {
+        revenue: profile.revenue,
+        ebitda: profile.ebitda,
+        netProfit: profile.netProfit,
+        revenueModel: revenueModel?.valueEv,
+        ebitdaModel: ebitdaModel?.valueEv,
+        earningsModel: earningsModel?.valueEv
+      })
+
+      companies.push({
+        orgnr: companyData.OrgNr,
+        name: companyData.name,
+        industry: profile.industry,
+        employees: companyData.employees,
+        metrics,
+        history: [], // Empty for now
+        chartSeries: [], // Empty for now
+      })
     }
 
-    const companies: ValuationCompanyResponse[] = fetchedCompanies.map((company) => {
-      const { metrics, history } = computeValuationMetrics(company.records)
-      return {
-        orgnr: company.orgnr,
-        name: company.name,
-        industry: company.industry,
-        employees: company.employees,
-        metrics,
-        history,
-        chartSeries: buildChartSeries(history),
-      }
-    })
+    if (!companies.length) {
+      return res.status(404).json({ success: false, error: 'Inga företag hittades för angivna ID' })
+    }
 
     const insights = await generateValuationInsights(companies, mode)
 

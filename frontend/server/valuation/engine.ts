@@ -518,6 +518,24 @@ export function runValuations(
 /**
  * Create company profile from master analytics data
  */
+// Map segment names to industry categories used in assumptions
+function mapSegmentToIndustry(segmentName: string): string {
+  if (!segmentName) return 'Okänd'
+  
+  const segment = segmentName.toLowerCase()
+  
+  // Map to industry categories that have assumptions
+  if (segment.includes('teknik') || segment.includes('it') || segment.includes('software') || segment.includes('digital')) {
+    return 'Teknik'
+  }
+  if (segment.includes('tillverkning') || segment.includes('mineraler') || segment.includes('industri') || segment.includes('produktion')) {
+    return 'Tillverkning'
+  }
+  
+  // Default to Tillverkning for manufacturing-related segments
+  return 'Tillverkning'
+}
+
 export function createCompanyProfile(data: any): CompanyProfile {
   // Determine size bucket
   let sizeBucket: 'small' | 'medium' | 'large' = 'small'
@@ -532,7 +550,7 @@ export function createCompanyProfile(data: any): CompanyProfile {
   return {
     orgnr: data.OrgNr,
     name: data.name,
-    industry: data.segment_name || 'Okänd',
+    industry: mapSegmentToIndustry(data.segment_name),
     sizeBucket,
     growthBucket,
     revenue: data.SDI || 0,
