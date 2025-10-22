@@ -2083,14 +2083,38 @@ app.post('/api/valuation/preview', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data
-    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
-    if (!dataResult.success || !dataResult.data) {
+    // Fetch company data directly from master_analytics (same as /api/companies)
+    const { data: companyData, error } = await supabase
+      .from('master_analytics')
+      .select(`
+        OrgNr,
+        name,
+        segment_name,
+        city,
+        employees,
+        revenue,
+        profit,
+        SDI,
+        DR,
+        ORS,
+        Revenue_growth,
+        EBIT_margin,
+        NetProfit_margin,
+        digital_presence,
+        incorporation_date,
+        email,
+        homepage,
+        address
+      `)
+      .eq('OrgNr', orgnr)
+      .single()
+
+    if (error || !companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
     // Create company profile
-    const profile = createCompanyProfile(dataResult.data.masterData)
+    const profile = createCompanyProfile(companyData)
     
     // Load assumptions
     const assumptions = await loadAllAssumptions(
@@ -2132,14 +2156,38 @@ app.post('/api/valuation/commit', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data
-    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
-    if (!dataResult.success || !dataResult.data) {
+    // Fetch company data directly from master_analytics (same as /api/companies)
+    const { data: companyData, error } = await supabase
+      .from('master_analytics')
+      .select(`
+        OrgNr,
+        name,
+        segment_name,
+        city,
+        employees,
+        revenue,
+        profit,
+        SDI,
+        DR,
+        ORS,
+        Revenue_growth,
+        EBIT_margin,
+        NetProfit_margin,
+        digital_presence,
+        incorporation_date,
+        email,
+        homepage,
+        address
+      `)
+      .eq('OrgNr', orgnr)
+      .single()
+
+    if (error || !companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
     // Create company profile
-    const profile = createCompanyProfile(dataResult.data.masterData)
+    const profile = createCompanyProfile(companyData)
     
     // Load assumptions
     const assumptions = await loadAllAssumptions(
@@ -2311,14 +2359,38 @@ app.post('/api/valuation/advice', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data
-    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
-    if (!dataResult.success || !dataResult.data) {
+    // Fetch company data directly from master_analytics (same as /api/companies)
+    const { data: companyData, error } = await supabase
+      .from('master_analytics')
+      .select(`
+        OrgNr,
+        name,
+        segment_name,
+        city,
+        employees,
+        revenue,
+        profit,
+        SDI,
+        DR,
+        ORS,
+        Revenue_growth,
+        EBIT_margin,
+        NetProfit_margin,
+        digital_presence,
+        incorporation_date,
+        email,
+        homepage,
+        address
+      `)
+      .eq('OrgNr', orgnr)
+      .single()
+
+    if (error || !companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
     // Create company profile
-    const profile = createCompanyProfile(dataResult.data.masterData)
+    const profile = createCompanyProfile(companyData)
     
     // Create company context for LLM
     const context: CompanyContext = {
