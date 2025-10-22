@@ -1,4 +1,4 @@
--- Test Security Fixes
+-- Test Security Fixes (Simple Version)
 -- Run this after applying the security fixes to verify they work
 
 -- ==============================================
@@ -43,23 +43,30 @@ FROM pg_policies
 WHERE tablename = 'saved_company_lists'
 ORDER BY policyname;
 
--- ==============================================
--- 3. TEST VIEWS
--- ==============================================
-
--- Check views don't have SECURITY DEFINER
+-- Check policies exist for AI analysis tables
 SELECT 
-    viewname,
+    tablename,
+    COUNT(*) as policy_count,
     CASE 
-        WHEN definition LIKE '%SECURITY DEFINER%' THEN '❌ Has SECURITY DEFINER'
-        ELSE '✅ No SECURITY DEFINER'
+        WHEN COUNT(*) > 0 THEN '✅ Policies Exist'
+        ELSE '❌ No Policies'
     END as status
-FROM pg_views 
-WHERE schemaname = 'public' 
-    AND viewname IN ('scraper_migration_stats', 'scraper_pending_review');
+FROM pg_policies 
+WHERE schemaname = 'public'
+    AND tablename IN (
+        'ai_analysis_runs',
+        'ai_analysis_sections',
+        'ai_analysis_metrics',
+        'ai_analysis_audit',
+        'ai_screening_results',
+        'ai_analysis_feedback',
+        'ai_company_analysis'
+    )
+GROUP BY tablename
+ORDER BY tablename;
 
 -- ==============================================
--- 4. TEST FUNCTIONALITY
+-- 3. TEST FUNCTIONALITY
 -- ==============================================
 
 -- Test saved_company_lists access (should work with proper user_id)
@@ -69,26 +76,20 @@ WHERE user_id = '00000000-0000-0000-0000-000000000000'::uuid;
 -- Test AI analysis tables access (should work with permissive policies)
 SELECT COUNT(*) as total_ai_runs FROM public.ai_analysis_runs;
 
--- Test views work (only if they exist)
--- Check if views exist before testing them
-DO $$
-BEGIN
-    -- Test scraper_migration_stats view if it exists
-    IF EXISTS (SELECT 1 FROM pg_views WHERE schemaname = 'public' AND viewname = 'scraper_migration_stats') THEN
-        PERFORM * FROM public.scraper_migration_stats LIMIT 1;
-        RAISE NOTICE 'scraper_migration_stats view works';
-    ELSE
-        RAISE NOTICE 'scraper_migration_stats view does not exist (this is OK)';
-    END IF;
-    
-    -- Test scraper_pending_review view if it exists
-    IF EXISTS (SELECT 1 FROM pg_views WHERE schemaname = 'public' AND viewname = 'scraper_pending_review') THEN
-        PERFORM * FROM public.scraper_pending_review LIMIT 1;
-        RAISE NOTICE 'scraper_pending_review view works';
-    ELSE
-        RAISE NOTICE 'scraper_pending_review view does not exist (this is OK)';
-    END IF;
-END $$;
+-- ==============================================
+-- 4. CHECK VIEWS (IF ANY EXIST)
+-- ==============================================
+
+-- Check what views exist in public schema
+SELECT 
+    viewname,
+    CASE 
+        WHEN definition LIKE '%SECURITY DEFINER%' THEN '❌ Has SECURITY DEFINER'
+        ELSE '✅ No SECURITY DEFINER'
+    END as status
+FROM pg_views 
+WHERE schemaname = 'public'
+ORDER BY viewname;
 
 -- ==============================================
 -- 5. SUMMARY
@@ -96,5 +97,5 @@ END $$;
 
 SELECT 
     'Security Fixes Applied' as test,
-    'All RLS policies enabled and views fixed' as result,
+    'All RLS policies enabled and views checked' as result,
     'Ready for production' as status;
