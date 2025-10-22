@@ -17,29 +17,23 @@ export class SavedListsService {
    */
   static async getSavedLists(): Promise<SavedCompanyList[]> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
-        return await this.getSavedListsFallback()
+      console.log('Fetching saved lists from API...')
+
+      const response = await fetch('/api/saved-lists')
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      console.log('Fetching saved lists for user:', user.id)
-
-      const { data, error } = await supabase
-        .from('saved_company_lists')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching saved lists from database:', error)
-        console.log('Falling back to localStorage')
-        return await this.getSavedListsFallback()
+      const result = await response.json()
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch saved lists')
       }
 
-      console.log('Found', data?.length || 0, 'saved lists in database')
+      console.log('Found', result.data?.length || 0, 'saved lists from API')
 
-      if (!data || data.length === 0) {
+      if (!result.data || result.data.length === 0) {
         console.log('No lists in database, trying localStorage fallback')
         const fallbackLists = await this.getSavedListsFallback()
         
@@ -51,7 +45,7 @@ export class SavedListsService {
         return fallbackLists
       }
 
-      return data.map(list => ({
+      return result.data.map((list: any) => ({
         id: list.id,
         name: list.name,
         description: list.description,
@@ -72,50 +66,55 @@ export class SavedListsService {
    */
   static async saveList(list: Omit<SavedCompanyList, 'id' | 'createdAt' | 'updatedAt'>): Promise<SavedCompanyList | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
-        const newList: SavedCompanyList = {
-          ...list,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-        await this.saveListFallback(newList)
-        return newList
+      console.log('Saving list via API:', list.name)
+
+      const response = await fetch('/api/saved-lists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: list.name,
+          description: list.description,
+          companies: list.companies,
+          filters: list.filters
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const listData = {
-        user_id: user.id,
-        name: list.name,
-        description: list.description,
-        companies: list.companies,
-        filters: list.filters
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to save list')
       }
 
-      const { data, error } = await supabase
-        .from('saved_company_lists')
-        .insert(listData)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error saving list:', error)
-        return null
-      }
+      console.log('List saved successfully:', result.data.id)
 
       return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        companies: data.companies || [],
-        filters: data.filters || {},
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
+        id: result.data.id,
+        name: result.data.name,
+        description: result.data.description,
+        companies: result.data.companies || [],
+        filters: result.data.filters || {},
+        createdAt: result.data.created_at,
+        updatedAt: result.data.updated_at
       }
     } catch (error) {
       console.error('Error in saveList:', error)
-      return null
+      console.log('Falling back to localStorage')
+      
+      // Fallback to localStorage
+      const newList: SavedCompanyList = {
+        ...list,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      await this.saveListFallback(newList)
+      return newList
     }
   }
 
@@ -124,55 +123,55 @@ export class SavedListsService {
    */
   static async updateList(id: string, updates: Partial<Omit<SavedCompanyList, 'id' | 'createdAt' | 'updatedAt'>>): Promise<SavedCompanyList | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
-        const existingLists = await this.getSavedListsFallback()
-        const existingList = existingLists.find(l => l.id === id)
-        if (!existingList) {
-          console.error('List not found for update')
-          return null
-        }
-        const updatedList = {
-          ...existingList,
-          ...updates,
-          updatedAt: new Date().toISOString()
-        }
-        await this.saveListFallback(updatedList)
-        return updatedList
+      console.log('Updating list via API:', id)
+
+      const response = await fetch(`/api/saved-lists/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const updateData: any = {}
-      if (updates.name !== undefined) updateData.name = updates.name
-      if (updates.description !== undefined) updateData.description = updates.description
-      if (updates.companies !== undefined) updateData.companies = updates.companies
-      if (updates.filters !== undefined) updateData.filters = updates.filters
+      const result = await response.json()
 
-      const { data, error } = await supabase
-        .from('saved_company_lists')
-        .update(updateData)
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error updating list:', error)
-        return null
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update list')
       }
+
+      console.log('List updated successfully:', result.data.id)
 
       return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        companies: data.companies || [],
-        filters: data.filters || {},
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
+        id: result.data.id,
+        name: result.data.name,
+        description: result.data.description,
+        companies: result.data.companies || [],
+        filters: result.data.filters || {},
+        createdAt: result.data.created_at,
+        updatedAt: result.data.updated_at
       }
     } catch (error) {
       console.error('Error in updateList:', error)
-      return null
+      console.log('Falling back to localStorage')
+      
+      // Fallback to localStorage
+      const existingLists = await this.getSavedListsFallback()
+      const existingList = existingLists.find(l => l.id === id)
+      if (!existingList) {
+        console.error('List not found for update')
+        return null
+      }
+      const updatedList = {
+        ...existingList,
+        ...updates,
+        updatedAt: new Date().toISOString()
+      }
+      await this.saveListFallback(updatedList)
+      return updatedList
     }
   }
 
@@ -339,28 +338,31 @@ export class SavedListsService {
    */
   static async deleteList(id: string): Promise<boolean> {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
-        await this.deleteListFallback(id)
-        return true
+      console.log('Deleting list via API:', id)
+
+      const response = await fetch(`/api/saved-lists/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const { error } = await supabase
-        .from('saved_company_lists')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id)
+      const result = await response.json()
 
-      if (error) {
-        console.error('Error deleting list:', error)
-        return false
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete list')
       }
 
+      console.log('List deleted successfully:', id)
       return true
     } catch (error) {
       console.error('Error in deleteList:', error)
-      return false
+      console.log('Falling back to localStorage')
+      
+      // Fallback to localStorage
+      await this.deleteListFallback(id)
+      return true
     }
   }
 

@@ -1532,6 +1532,187 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
 }
 
 // ============================================================================
+// SAVED COMPANY LISTS API
+// ============================================================================
+
+// Get all saved lists for the current user
+app.get('/api/saved-lists', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // For now, we'll use a mock user ID since authentication isn't fully set up
+    // In production, this should come from the authenticated user
+    const mockUserId = '00000000-0000-0000-0000-000000000000'
+
+    const { data, error } = await supabase
+      .from('saved_company_lists')
+      .select('*')
+      .eq('user_id', mockUserId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching saved lists:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database error: ' + error.message 
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: data || []
+    })
+  } catch (error: any) {
+    console.error('Get saved lists error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Create a new saved list
+app.post('/api/saved-lists', async (req, res) => {
+  try {
+    const { name, description, companies, filters } = req.body
+
+    if (!name || !companies || !Array.isArray(companies)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Name and companies array are required' 
+      })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // For now, we'll use a mock user ID
+    const mockUserId = '00000000-0000-0000-0000-000000000000'
+
+    const { data, error } = await supabase
+      .from('saved_company_lists')
+      .insert({
+        user_id: mockUserId,
+        name,
+        description: description || '',
+        companies: companies,
+        filters: filters || {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating saved list:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database error: ' + error.message 
+      })
+    }
+
+    res.status(201).json({
+      success: true,
+      data: data
+    })
+  } catch (error: any) {
+    console.error('Create saved list error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Update an existing saved list
+app.put('/api/saved-lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { name, description, companies, filters } = req.body
+
+    if (!id) {
+      return res.status(400).json({ success: false, error: 'List ID is required' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const mockUserId = 'default-user'
+
+    const { data, error } = await supabase
+      .from('saved_company_lists')
+      .update({
+        name,
+        description,
+        companies,
+        filters,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .eq('user_id', mockUserId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating saved list:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database error: ' + error.message 
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: data
+    })
+  } catch (error: any) {
+    console.error('Update saved list error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Delete a saved list
+app.delete('/api/saved-lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      return res.status(400).json({ success: false, error: 'List ID is required' })
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    const mockUserId = 'default-user'
+
+    const { error } = await supabase
+      .from('saved_company_lists')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', mockUserId)
+
+    if (error) {
+      console.error('Error deleting saved list:', error)
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database error: ' + error.message 
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'List deleted successfully'
+    })
+  } catch (error: any) {
+    console.error('Delete saved list error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// ============================================================================
 // TEST ENDPOINTS
 // ============================================================================
 
