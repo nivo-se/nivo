@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      .nivo-green { fill: #10b981; }
+      .nivo-dark { fill: #047857; }
+      .nivo-light { fill: #34d399; }
+    </style>
+  </defs>
+  
+  <!-- Nivo favicon - "N" with modern styling -->
+  <g>
+    <!-- Background circle for better visibility -->
+    <circle class="nivo-light" cx="16" cy="16" r="15" opacity="0.1"/>
+    
+    <!-- Main "N" letter - bold and clear -->
+    <path class="nivo-green" d="M6 6 L6 26 L10 26 L10 14 L22 26 L26 26 L26 6 L22 6 L22 18 L10 6 Z"/>
+    
+    <!-- Accent element - small dot representing data/analytics -->
+    <circle class="nivo-dark" cx="24" cy="8" r="1.5"/>
+  </g>
+</svg>

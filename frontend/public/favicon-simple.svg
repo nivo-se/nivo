@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .nivo-green { fill: #10b981; }
+    </style>
+  </defs>
+  
+  <!-- Ultra-simple "N" for 16x16 favicon -->
+  <g>
+    <!-- Simple bold "N" -->
+    <path class="nivo-green" d="M2 2 L2 14 L4 14 L4 6 L12 14 L14 14 L14 2 L12 2 L12 10 L4 2 Z"/>
+  </g>
+</svg>
