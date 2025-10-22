@@ -45,6 +45,15 @@ ALTER TABLE public.ai_screening_results ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_analysis_feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_company_analysis ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow all operations on ai_analysis_runs" ON public.ai_analysis_runs;
+DROP POLICY IF EXISTS "Allow all operations on ai_analysis_sections" ON public.ai_analysis_sections;
+DROP POLICY IF EXISTS "Allow all operations on ai_analysis_metrics" ON public.ai_analysis_metrics;
+DROP POLICY IF EXISTS "Allow all operations on ai_analysis_audit" ON public.ai_analysis_audit;
+DROP POLICY IF EXISTS "Allow all operations on ai_screening_results" ON public.ai_screening_results;
+DROP POLICY IF EXISTS "Allow all operations on ai_analysis_feedback" ON public.ai_analysis_feedback;
+DROP POLICY IF EXISTS "Allow all operations on ai_company_analysis" ON public.ai_company_analysis;
+
 -- Create permissive policies for AI analysis tables (for development)
 -- These can be made more restrictive in production
 CREATE POLICY "Allow all operations on ai_analysis_runs" ON public.ai_analysis_runs
