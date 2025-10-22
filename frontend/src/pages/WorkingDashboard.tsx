@@ -71,6 +71,14 @@ const WorkingDashboard: React.FC = () => {
   const adminItems: MenuItem[] = isAdmin ? [{ id: 'admin', label: 'Admin', icon: Shield }] : []
   const allMenuItems = [...menuItems, ...adminItems]
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const requestedView = params.get('view') || params.get('tab')
+    if (requestedView && [...menuItems, ...adminItems].some((item) => item.id === requestedView)) {
+      setCurrentPage(requestedView)
+    }
+  }, [])
+
   const handleSignOut = async () => {
     try {
       await signOut()

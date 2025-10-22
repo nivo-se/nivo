@@ -1,5 +1,6 @@
 // Supabase Data Service - Direct connection to Supabase database
-import { supabase } from './supabase'
+import { supabase, supabaseConfig } from './supabase'
+import { localCompanies } from './sampleData'
 
 export interface SupabaseCompany {
   OrgNr: string
@@ -83,7 +84,74 @@ export interface DashboardAnalytics {
   totalWithDigitalPresence: number
   averageRevenueGrowth: number
   averageEBITMargin: number
+  averageNetProfitMargin: number
+  averageNetProfitGrowth: number
   averageRevenue: number
+}
+
+const toNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
+const computeAverage = (values: Array<number | null>): number => {
+  const numeric = values.filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+  if (!numeric.length) {
+    return 0
+  }
+  return numeric.reduce((sum, value) => sum + value, 0) / numeric.length
+}
+
+const buildDashboardAnalytics = (
+  rows: Array<Partial<SupabaseCompany> & { homepage?: string | null; digital_presence?: boolean | number }>,
+  totalCount?: number
+): DashboardAnalytics => {
+  const inferredDigitalPresence = rows.map((row) => {
+    if (typeof row.digital_presence === 'boolean') {
+      return row.digital_presence
+    }
+    if (typeof row.digital_presence === 'number') {
+      return row.digital_presence === 1
+    }
+    if (typeof row.homepage === 'string') {
+      return row.homepage.trim().length > 0
+    }
+    return false
+  })
+
+  const revenueValues = rows.map((row) => toNumber(row.SDI ?? row.revenue))
+  const revenueGrowthValues = rows.map((row) => toNumber((row as any).Revenue_growth))
+  const ebitMarginValues = rows.map((row) => toNumber((row as any).EBIT_margin))
+  const netMarginValues = rows.map((row) => toNumber((row as any).NetProfit_margin))
+  const netGrowthValues = rows.map((row) => toNumber((row as any).NetProfit_growth ?? (row as any).Revenue_growth))
+
+  const totalCompanies = totalCount ?? rows.length
+  const totalWithFinancials = revenueValues.filter((value) => value !== null).length
+  const totalWithKPIs = rows.filter((_, index) => (
+    revenueGrowthValues[index] !== null ||
+    ebitMarginValues[index] !== null ||
+    netMarginValues[index] !== null
+  )).length
+  const totalWithDigitalPresence = inferredDigitalPresence.filter(Boolean).length
+
+  return {
+    totalCompanies,
+    totalWithFinancials,
+    totalWithKPIs,
+    totalWithDigitalPresence,
+    averageRevenueGrowth: computeAverage(revenueGrowthValues),
+    averageEBITMargin: computeAverage(ebitMarginValues),
+    averageNetProfitMargin: computeAverage(netMarginValues),
+    averageNetProfitGrowth: computeAverage(netGrowthValues),
+    averageRevenue: computeAverage(revenueValues)
+  }
 }
 
 class SupabaseDataService {
@@ -287,80 +355,30 @@ class SupabaseDataService {
 
   // Get dashboard analytics
   async getDashboardAnalytics(): Promise<DashboardAnalytics> {
+    if (!supabaseConfig.isConfigured) {
+      return buildDashboardAnalytics(localCompanies, localCompanies.length)
+    }
+
     try {
-      // Get total companies
-      const { count: totalCompanies } = await supabase
+      const { data, error, count } = await supabase
         .from('master_analytics')
-        .select('*', { count: 'exact', head: true })
+        .select('OrgNr, SDI, revenue, Revenue_growth, EBIT_margin, NetProfit_margin, NetProfit_growth, homepage, digital_presence', {
+          count: 'exact'
+        })
+        .limit(2000)
 
-      // Get companies with financial data
-      const { count: totalWithFinancials } = await supabase
-        .from('master_analytics')
-        .select('*', { count: 'exact', head: true })
-        .not('SDI', 'is', null)
-
-      // Get companies with KPIs
-      const { count: totalWithKPIs } = await supabase
-        .from('master_analytics')
-        .select('*', { count: 'exact', head: true })
-        .not('SDI', 'is', null)
-
-      // Get companies with digital presence
-      const { count: totalWithDigitalPresence } = await supabase
-        .from('master_analytics')
-        .select('*', { count: 'exact', head: true })
-        .not('homepage', 'is', null)
-
-      // Get average revenue growth
-      const { data: growthData } = await supabase
-        .from('master_analytics')
-        .select('Revenue_growth')
-        .not('Revenue_growth', 'is', null)
-
-      const averageRevenueGrowth = growthData?.length 
-        ? growthData.reduce((sum, item) => sum + (item.Revenue_growth || 0), 0) / growthData.length
-        : 0
-
-      // Get average EBIT margin
-      const { data: marginData } = await supabase
-        .from('master_analytics')
-        .select('EBIT_margin')
-        .not('EBIT_margin', 'is', null)
-
-      const averageEBITMargin = marginData?.length
-        ? marginData.reduce((sum, item) => sum + (item.EBIT_margin || 0), 0) / marginData.length
-        : 0
-
-      // Get average revenue (SDI field)
-      const { data: revenueData } = await supabase
-        .from('master_analytics')
-        .select('SDI')
-        .not('SDI', 'is', null)
-
-      const averageRevenue = revenueData?.length
-        ? revenueData.reduce((sum, item) => sum + (item.SDI || 0), 0) / revenueData.length
-        : 0
-
-      return {
-        totalCompanies: totalCompanies || 0,
-        totalWithFinancials: totalWithFinancials || 0,
-        totalWithKPIs: totalWithKPIs || 0,
-        totalWithDigitalPresence: totalWithDigitalPresence || 0,
-        averageRevenueGrowth,
-        averageEBITMargin,
-        averageRevenue
+      if (error) {
+        throw error
       }
+
+      if (!data || data.length === 0) {
+        return buildDashboardAnalytics(localCompanies, localCompanies.length)
+      }
+
+      return buildDashboardAnalytics(data as any, count ?? data.length)
     } catch (error) {
       console.error('Error fetching dashboard analytics:', error)
-      return {
-        totalCompanies: 0,
-        totalWithFinancials: 0,
-        totalWithKPIs: 0,
-        totalWithDigitalPresence: 0,
-        averageRevenueGrowth: 0,
-        averageEBITMargin: 0,
-        averageRevenue: 0
-      }
+      return buildDashboardAnalytics(localCompanies, localCompanies.length)
     }
   }
 

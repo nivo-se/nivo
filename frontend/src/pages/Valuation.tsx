@@ -38,11 +38,9 @@ import {
   BarChart,
   Bar
 } from 'recharts'
-import {
-  ValuationMetrics,
-  ValuationDatasetForExport,
-  toCsv
-} from '../lib/valuation'
+import { ValuationMetrics, ValuationDatasetForExport, toCsv } from '../lib/valuation'
+import { SavedCompanyList, SavedListsService } from '../lib/savedListsService'
+import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
 
 const MIN_COMPANIES = 3
 
@@ -117,6 +115,35 @@ const formatCagr = (value: number | null | undefined) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '–'
   return `${(value * 100).toFixed(1)}%`
 }
+
+const parseNumeric = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
+const parseInteger = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.round(value)
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const parsed = parseInt(value, 10)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
+
+const mapSupabaseCompanyToOption = (company: SupabaseCompany): CompanyOption => ({
+  OrgNr: company.OrgNr,
+  name: company.name ?? 'Okänt bolag',
+  segment_name: company.segment_name ?? company.industry_name ?? null,
+  city: company.city ?? null,
+  SDI: parseNumeric(company.SDI ?? company.revenue) ?? null,
+  DR: parseNumeric(company.DR ?? company.profit) ?? null,
+  Revenue_growth: parseNumeric(company.Revenue_growth) ?? null,
+  employees: parseInteger(company.employees) ?? null,
+})
 
 const uniqueCompanies = (companies: CompanyOption[]) => {
   const seen = new Set<string>()
@@ -283,6 +310,15 @@ const useDebounce = <T,>(value: T, delay = 400) => {
 }
 
 const fetchCompanies = async (searchTerm: string): Promise<CompanyOption[]> => {
+  try {
+    const supabaseResults = await supabaseDataService.searchCompanies(searchTerm, 20)
+    if (supabaseResults.length > 0) {
+      return uniqueCompanies(supabaseResults.map(mapSupabaseCompanyToOption))
+    }
+  } catch (error) {
+    console.error('Supabase valuation search failed:', error)
+  }
+
   const params = new URLSearchParams({ limit: '20' })
   if (searchTerm) {
     params.set('search', searchTerm)
@@ -324,6 +360,8 @@ const ValuationPage: React.FC = () => {
   const [valuation, setValuation] = useState<ValuationApiResponse | null>(null)
   const [mode, setMode] = useState<'default' | 'deep'>('default')
   const [chartCompany, setChartCompany] = useState<string | null>(null)
+  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
+  const [activeSavedList, setActiveSavedList] = useState<string>('')
 
   const { data: searchResults = [], isFetching: searchLoading } = useQuery({
     queryKey: ['valuation-search', debouncedSearch],
@@ -351,12 +389,85 @@ const ValuationPage: React.FC = () => {
     },
   })
 
+  useEffect(() => {
+    let isMounted = true
+
+    const loadSavedLists = async () => {
+      try {
+        const lists = await SavedListsService.getSavedLists()
+        if (!isMounted) return
+        setSavedLists(lists)
+        setActiveSavedList((current) => current || (lists[0]?.id ?? ''))
+      } catch (error) {
+        console.error('Kunde inte hämta sparade listor:', error)
+      }
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'savedCompanyLists') {
+        SavedListsService.getSavedLists()
+          .then((lists) => {
+            if (!isMounted) return
+            setSavedLists(lists)
+            setActiveSavedList((current) => current || (lists[0]?.id ?? ''))
+          })
+          .catch((storageError) => {
+            console.error('Synkronisering av sparade listor misslyckades:', storageError)
+          })
+      }
+    }
+
+    loadSavedLists()
+    window.addEventListener('storage', handleStorage)
+
+    return () => {
+      isMounted = false
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [])
+
+  const activeSavedListData = useMemo(
+    () => savedLists.find((list) => list.id === activeSavedList) ?? null,
+    [savedLists, activeSavedList]
+  )
+
   const handleAddCompany = (company: CompanyOption) => {
     setSelectedCompanies((prev) => uniqueCompanies([...prev, company]))
   }
 
   const handleRemoveCompany = (orgnr: string) => {
     setSelectedCompanies((prev) => prev.filter((company) => company.OrgNr !== orgnr))
+  }
+
+  const handleApplySavedList = () => {
+    if (!activeSavedListData) {
+      toast({
+        title: 'Ingen lista vald',
+        description: 'Välj en sparad lista innan du laddar bolag.',
+      })
+      return
+    }
+
+    const mappedCompanies = uniqueCompanies(
+      (activeSavedListData.companies || []).map(mapSupabaseCompanyToOption)
+    )
+
+    if (mappedCompanies.length === 0) {
+      toast({
+        title: 'Listan saknar bolag',
+        description: 'Den valda listan innehåller inga bolag att ladda.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setSelectedCompanies(mappedCompanies)
+    setValuation(null)
+    setChartCompany(null)
+    toast({
+      title: 'Lista inläst',
+      description: `${mappedCompanies.length} bolag lades till i värderingen.`,
+    })
   }
 
   const handleRunValuation = () => {
@@ -476,6 +587,49 @@ const ValuationPage: React.FC = () => {
               </RadioGroup>
             </div>
           </div>
+
+          {savedLists.length > 0 && (
+            <div className="grid gap-3 md:grid-cols-[2fr,1fr] md:items-end">
+              <div className="space-y-2">
+                <Label htmlFor="saved-list">Sparade listor</Label>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Select value={activeSavedList} onValueChange={setActiveSavedList}>
+                    <SelectTrigger id="saved-list" className="w-full sm:w-64">
+                      <SelectValue placeholder="Välj sparad lista" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {savedLists.map((list) => (
+                        <SelectItem key={list.id} value={list.id}>
+                          {list.name} ({list.companies.length})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={handleApplySavedList} disabled={!activeSavedList}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Ladda lista
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => (window.location.href = '/dashboard?view=companies')}
+                  >
+                    Hantera listor
+                  </Button>
+                </div>
+              </div>
+              {activeSavedListData && (
+                <div className="rounded-lg border border-dashed border-muted-foreground/40 p-4 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium text-foreground">{activeSavedListData.name}</span>
+                    <Badge variant="secondary">{activeSavedListData.companies.length} bolag</Badge>
+                  </div>
+                  {activeSavedListData.description && (
+                    <p className="mt-2 text-muted-foreground">{activeSavedListData.description}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid gap-3">
             <Label>Valda företag ({selectedCompanies.length})</Label>
