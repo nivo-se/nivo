@@ -323,14 +323,27 @@ const EnhancedCompanySearch: React.FC = () => {
   }
 
   const handleListSelect = (list: SavedCompanyList) => {
-    // Apply the saved list's filters and companies
-    setFilters(list.filters)
+    const appliedFilters = list.filters || {}
+
+    setFilters(appliedFilters)
+    setSearchTerm(appliedFilters.name || '')
+
+    const companyOrgNrs = list.companies.map(company => company.OrgNr)
+    const orgNrSet = new Set(companyOrgNrs)
+
+    setAllMatchingCompanyOrgNrs(orgNrSet)
+    setSelectedCompanies(orgNrSet)
+    setSelectedCompaniesArray(list.companies)
+    setSelectAll(list.companies.length > 0)
+
     setSearchResults({
       companies: list.companies,
       total: list.companies.length,
       summary: calculateSummary(list.companies)
     })
+
     setCurrentPage(1)
+    setViewMode('list')
   }
 
   const handleListUpdate = async (lists: SavedCompanyList[]) => {

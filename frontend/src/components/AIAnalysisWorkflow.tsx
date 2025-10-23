@@ -20,16 +20,7 @@ import {
   Info
 } from 'lucide-react'
 import { SupabaseCompany } from '../lib/supabaseDataService'
-
-interface SavedCompanyList {
-  id: string
-  name: string
-  description?: string
-  companies: SupabaseCompany[]
-  filters: any
-  createdAt: string
-  updatedAt: string
-}
+import { SavedCompanyList } from '../lib/savedListsService'
 
 interface AIAnalysisResult {
   orgNr: string
@@ -47,12 +38,18 @@ interface AIAnalysisResult {
 }
 
 interface AIAnalysisWorkflowProps {
+  savedLists: SavedCompanyList[]
+  selectedList: SavedCompanyList | null
+  onSelectList: (listId: string) => void
   onAnalysisComplete?: (results: AIAnalysisResult[]) => void
 }
 
-const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisComplete }) => {
-  const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
-  const [selectedList, setSelectedList] = useState<SavedCompanyList | null>(null)
+const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
+  savedLists,
+  selectedList,
+  onSelectList,
+  onAnalysisComplete
+}) => {
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState(0)
@@ -60,21 +57,13 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisCompl
   const [error, setError] = useState<string | null>(null)
   const [estimatedCost, setEstimatedCost] = useState<number>(0)
 
-  // Load saved lists from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('savedCompanyLists')
-    if (saved) {
-      try {
-        const lists = JSON.parse(saved)
-        setSavedLists(lists)
-        if (lists.length > 0 && !selectedList) {
-          setSelectedList(lists[0])
-        }
-      } catch (error) {
-        console.error('Error loading saved lists:', error)
-      }
+    if (selectedList?.companies?.length) {
+      setSelectedCompanies(new Set(selectedList.companies.map((company) => company.OrgNr)))
+    } else {
+      setSelectedCompanies(new Set())
     }
-  }, [])
+  }, [selectedList])
 
   // Calculate estimated cost when companies are selected
   useEffect(() => {
@@ -98,10 +87,15 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisCompl
   }
 
   const handleSelectAll = () => {
-    if (selectedCompanies.size === selectedList?.companies.length) {
+    if (!selectedList?.companies?.length) {
+      setSelectedCompanies(new Set())
+      return
+    }
+
+    if (selectedCompanies.size === selectedList.companies.length) {
       setSelectedCompanies(new Set())
     } else {
-      const allOrgNrs = new Set(selectedList?.companies.map(c => c.OrgNr) || [])
+      const allOrgNrs = new Set(selectedList.companies.map((company) => company.OrgNr))
       setSelectedCompanies(allOrgNrs)
     }
   }
@@ -197,16 +191,14 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisCompl
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-2xl font-bold">AI-analys Workflow</h2>
-          <p className="text-gray-600">Välj företag och kör omfattande AI-analys med OpenAI</p>
+          <p className="text-gray-600">Stegvis process för att välja företag, köra analys och spara insikter</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Info className="h-4 w-4 text-blue-500" />
-          <span className="text-sm text-gray-600">
-            Kostnad: ~${estimatedCost.toFixed(2)}
-          </span>
+        <div className="flex items-center gap-2 text-sm text-gray-600 bg-[#E6E6E6] px-3 py-2 rounded-md">
+          <Info className="h-4 w-4 text-[#596152]" />
+          <span>Beräknad OpenAI-kostnad: ~${estimatedCost.toFixed(2)}</span>
         </div>
       </div>
 
@@ -221,24 +213,27 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({ onAnalysisCompl
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {savedLists.map((list) => (
-              <div
+              <button
                 key={list.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  selectedList?.id === list.id 
-                    ? 'border-blue-500 bg-blue-50' 
+                type="button"
+                className={`text-left p-4 border rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#596152] ${
+                  selectedList?.id === list.id
+                    ? 'border-[#596152] bg-[#E6E6E6]'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
-                onClick={() => {
-                  setSelectedList(list)
-                  setSelectedCompanies(new Set())
-                }}
+                onClick={() => onSelectList(list.id)}
               >
-                <h4 className="font-semibold">{list.name}</h4>
-                <p className="text-sm text-gray-600">{list.companies.length} företag</p>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-[#2E2A2B]">{list.name}</h4>
+                  <Badge variant="secondary">{list.companies.length} bolag</Badge>
+                </div>
                 {list.description && (
-                  <p className="text-xs text-gray-500 mt-1">{list.description}</p>
+                  <p className="text-xs text-gray-500 mt-2">{list.description}</p>
                 )}
-              </div>
+                {list.filters?.name && (
+                  <p className="mt-3 text-xs text-gray-500">Filter: {list.filters.name}</p>
+                )}
+              </button>
             ))}
           </div>
         </CardContent>

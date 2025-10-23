@@ -2660,7 +2660,7 @@ app.post('/api/valuation/advice', async (req, res) => {
       ebitMargin: profile.ebitMargin,
       netProfitMargin: profile.netProfitMargin,
       employees: profile.employees,
-      benchmarks: dataResult.data.benchmarks
+      benchmarks: null // Benchmarks not available in this context
     }
 
     // Get LLM suggestions
@@ -2773,6 +2773,107 @@ app.delete('/api/valuation/assumptions/:id', async (req, res) => {
     })
   } catch (error: any) {
     console.error('Delete assumptions error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+// Dashboard Analytics endpoint
+app.get('/api/analytics', async (req, res) => {
+  try {
+    const supabase = getSupabase()
+    if (!supabase) {
+      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    }
+
+    // Get analytics data from master_analytics table
+    const { data: companies, error } = await supabase
+      .from('master_analytics')
+      .select(`
+        OrgNr,
+        name,
+        SDI,
+        DR,
+        ORS,
+        Revenue_growth,
+        EBIT_margin,
+        NetProfit_margin,
+        digital_presence,
+        homepage
+      `)
+      .limit(1000) // Sample for analytics
+
+    if (error) {
+      console.error('Analytics query error:', error)
+      return res.status(500).json({ success: false, error: 'Failed to fetch analytics data' })
+    }
+
+    if (!companies || companies.length === 0) {
+      // Return fallback analytics if no data
+      return res.status(200).json({
+        success: true,
+        data: {
+          totalCompanies: 0,
+          totalWithFinancials: 0,
+          totalWithKPIs: 0,
+          totalWithDigitalPresence: 0,
+          averageRevenueGrowth: 0,
+          averageEBITMargin: 0,
+          averageNetProfitMargin: 0,
+          averageNetProfitGrowth: 0,
+          averageRevenue: 0,
+          averageCAGR4Y: null
+        }
+      })
+    }
+
+    // Calculate analytics
+    const totalCompanies = companies.length
+    const totalWithFinancials = companies.filter(c => c.SDI && c.SDI > 0).length
+    const totalWithKPIs = companies.filter(c => 
+      c.Revenue_growth !== null || c.EBIT_margin !== null || c.NetProfit_margin !== null
+    ).length
+    const totalWithDigitalPresence = companies.filter(c => 
+      c.digital_presence === true || (c.homepage && c.homepage.trim().length > 0)
+    ).length
+
+    // Calculate averages
+    const revenueGrowthValues = companies.map(c => c.Revenue_growth).filter(v => v !== null && !isNaN(v))
+    const ebitMarginValues = companies.map(c => c.EBIT_margin).filter(v => v !== null && !isNaN(v))
+    const netProfitMarginValues = companies.map(c => c.NetProfit_margin).filter(v => v !== null && !isNaN(v))
+    const revenueValues = companies.map(c => c.SDI).filter(v => v !== null && !isNaN(v))
+
+    const averageRevenueGrowth = revenueGrowthValues.length > 0 
+      ? revenueGrowthValues.reduce((sum, val) => sum + val, 0) / revenueGrowthValues.length 
+      : 0
+    const averageEBITMargin = ebitMarginValues.length > 0 
+      ? ebitMarginValues.reduce((sum, val) => sum + val, 0) / ebitMarginValues.length 
+      : 0
+    const averageNetProfitMargin = netProfitMarginValues.length > 0 
+      ? netProfitMarginValues.reduce((sum, val) => sum + val, 0) / netProfitMarginValues.length 
+      : 0
+    const averageRevenue = revenueValues.length > 0 
+      ? revenueValues.reduce((sum, val) => sum + val, 0) / revenueValues.length 
+      : 0
+
+    const analytics = {
+      totalCompanies,
+      totalWithFinancials,
+      totalWithKPIs,
+      totalWithDigitalPresence,
+      averageRevenueGrowth,
+      averageEBITMargin,
+      averageNetProfitMargin,
+      averageNetProfitGrowth: averageRevenueGrowth, // Using revenue growth as proxy
+      averageRevenue,
+      averageCAGR4Y: null // Not available without historical data
+    }
+
+    res.status(200).json({
+      success: true,
+      data: analytics
+    })
+  } catch (error: any) {
+    console.error('Analytics endpoint error:', error)
     res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
   }
 })

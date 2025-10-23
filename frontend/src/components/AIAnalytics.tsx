@@ -8,11 +8,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { 
-  Brain, 
-  TrendingUp, 
-  TrendingDown, 
-  Target, 
-  BarChart3, 
+  Brain,
+  TrendingUp,
+  TrendingDown,
+  Target,
+  BarChart3,
   Star,
   AlertTriangle,
   CheckCircle,
@@ -36,20 +36,14 @@ import {
   Phone,
   Mail,
   ExternalLink,
-  Calendar
+  Calendar,
+  RefreshCw,
+  Loader2,
+  List
 } from 'lucide-react'
 import { SupabaseCompany } from '../lib/supabaseDataService'
+import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import AIAnalysisWorkflow from './AIAnalysisWorkflow'
-
-interface SavedCompanyList {
-  id: string
-  name: string
-  description?: string
-  companies: SupabaseCompany[]
-  filters: any
-  createdAt: string
-  updatedAt: string
-}
 
 interface CompanyAnalysis {
   company: SupabaseCompany
@@ -145,6 +139,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   const [analysisResults, setAnalysisResults] = useState<CompanyAnalysis[]>([])
   const [marketBenchmarks, setMarketBenchmarks] = useState<MarketBenchmark[]>([])
   const [loading, setLoading] = useState(false)
+  const [listsLoading, setListsLoading] = useState(false)
   const [selectedCompany, setSelectedCompany] = useState<CompanyAnalysis | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
@@ -163,21 +158,69 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     }
   }, [isDetailModalOpen])
 
-  // Load saved lists from localStorage
+  // Load saved lists from API/localStorage service
   useEffect(() => {
-    const saved = localStorage.getItem('savedCompanyLists')
-    if (saved) {
+    let isMounted = true
+
+    const loadLists = async () => {
+      setListsLoading(true)
       try {
-        const lists = JSON.parse(saved)
+        const lists = await SavedListsService.getSavedLists()
+        if (!isMounted) return
+
         setSavedLists(lists)
         if (lists.length > 0 && !selectedList) {
           setSelectedList(lists[0])
         }
       } catch (error) {
         console.error('Error loading saved lists:', error)
+      } finally {
+        if (isMounted) {
+          setListsLoading(false)
+        }
       }
     }
+
+    loadLists()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'savedCompanyLists') {
+        SavedListsService.getSavedLists().then(setSavedLists).catch((error) => {
+          console.error('Error syncing saved lists from storage:', error)
+        })
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  useEffect(() => {
+    if (selectedList && !savedLists.some((list) => list.id === selectedList.id)) {
+      setSelectedList(savedLists[0] ?? null)
+    }
+  }, [savedLists, selectedList])
+
+  const refreshSavedLists = async () => {
+    setListsLoading(true)
+    try {
+      const lists = await SavedListsService.getSavedLists()
+      setSavedLists(lists)
+      if (lists.length > 0 && (!selectedList || !lists.some((list) => list.id === selectedList.id))) {
+        setSelectedList(lists[0])
+      }
+    } catch (error) {
+      console.error('Failed to refresh saved lists:', error)
+    } finally {
+      setListsLoading(false)
+    }
+  }
 
   // Run AI analysis when selected list changes
   useEffect(() => {
@@ -676,7 +719,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
             <p className="text-gray-600 mb-4">
               Skapa en sparad företagslista i "Företagssökning" för att köra AI-analys
             </p>
-            <Button onClick={() => window.location.href = '/companies'}>
+            <Button onClick={() => (window.location.href = '/dashboard?view=companies')}>
               Gå till Företagssökning
             </Button>
           </CardContent>
@@ -688,22 +731,64 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold">AI-insikter</h2>
-          <p className="text-gray-600">Avancerad analys för att identifiera prime targets</p>
+          <h2 className="text-2xl font-bold text-[#2E2A2B]">AI-insikter</h2>
+          <p className="text-gray-600">
+            Utforska sparade bolagslistor med AI för att generera investeringshypoteser, risker och nästa steg.
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Brain className="h-4 w-4 mr-2" />
-            Generera insikter
+          <Button variant="outline" size="sm" onClick={refreshSavedLists} disabled={listsLoading}>
+            {listsLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            Uppdatera listor
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => window.open('/docs/valuation.md', '_blank') }>
             <BarChart3 className="h-4 w-4 mr-2" />
-            Exportera rapport
+            Läs metodik
           </Button>
         </div>
       </div>
+
+      <Card className="border-[#596152]/30 bg-[#E6E6E6]/40">
+        <CardHeader>
+          <CardTitle className="text-lg text-[#2E2A2B]">Hur använder jag AI-insikter?</CardTitle>
+          <CardDescription>
+            Följ den föreslagna loopen för att gå från sparad lista till beslutbara rekommendationer.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+                <List className="h-4 w-4" />
+                1. Förbered input
+              </div>
+              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+                Välj en sparad lista från Företagssökning och ange eventuell frågeställning eller fokusområde.
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+                <Brain className="h-4 w-4" />
+                2. Kör analys
+              </div>
+              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+                Starta AI-flödet, följ kostnadsindikatorn och granska de genererade insikterna för varje bolag.
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+                <Target className="h-4 w-4" />
+                3. Förfina & spara
+              </div>
+              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+                Justera frågorna, spara de viktigaste insikterna till listor eller exportera dem för vidare beslut.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tabs for different analysis modes */}
       <Tabs defaultValue="ai-workflow" className="w-full">
@@ -713,7 +798,14 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
         </TabsList>
         
         <TabsContent value="ai-workflow" className="mt-6">
-          <AIAnalysisWorkflow 
+          <AIAnalysisWorkflow
+            savedLists={savedLists}
+            selectedList={selectedList}
+            onSelectList={(listId) => {
+              const list = savedLists.find((item) => item.id === listId) || null
+              setSelectedList(list)
+              setAnalysisResults([])
+            }}
             onAnalysisComplete={(results) => {
               console.log('AI Analysis Complete:', results)
               // Convert AI analysis results to our format and display them
