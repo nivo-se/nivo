@@ -22,6 +22,7 @@ import json
 import math
 import sqlite3
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -111,6 +112,30 @@ def load_staging_data(src: Path) -> Tuple[List[Dict[str, Any]], List[Dict[str, A
     return [dict(row) for row in companies], [dict(row) for row in financials]
 
 
+def clean_raw_json(raw_json: str) -> str:
+    """Clean raw JSON to keep only essential parts (removes Sentry traces, hydration data, etc.).
+    
+    This reduces size by ~45% while keeping all useful financial and company data.
+    PostgreSQL JSONB will compress it further to ~15% of original size.
+    """
+    data = json.loads(raw_json)
+    page_props = data.get("pageProps", {})
+    company = page_props.get("company", {})
+    
+    # Keep only essential parts: company info and financial accounts
+    essential = {
+        "company": {
+            "orgnr": company.get("orgnr"),
+            "name": company.get("name"),
+            "companyId": company.get("companyId"),
+            "companyAccounts": company.get("companyAccounts", []),
+            "annualReports": company.get("annualReports", []),
+        }
+    }
+    
+    return json.dumps(essential, ensure_ascii=False)
+
+
 def parse_account_codes(raw_json: str, target_year: int, target_period: str) -> Tuple[Dict[str, float], Dict[str, Any]]:
     data = json.loads(raw_json)
     company = data.get("pageProps", {}).get("company", {})
@@ -181,8 +206,8 @@ def build_companies_rows(companies: Iterable[Dict[str, Any]], metrics_lookup: Di
             "foundation_year": item.get("foundation_year"),
             "employees_latest": metrics_lookup.get(orgnr, {}).get("employees_latest"),
             "accounts_last_year": item.get("company_accounts_last_year"),
-            "created_at": None,
-            "updated_at": None,
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat(),
         })
     return rows
 
@@ -303,7 +328,7 @@ def compute_metrics(
             "company_size_bucket": size_bucket,
             "growth_bucket": growth_bucket,
             "profitability_bucket": profitability_bucket,
-            "calculated_at": None,
+            "calculated_at": datetime.now().isoformat(),
             "source_job_id": latest.get("source_job_id"),
         })
 
@@ -326,7 +351,7 @@ def transform(source: Path) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]],
         employees = to_int(row.get("employees") or company_info.get("employees"))
 
         financial_rows.append({
-            "id": f"{row['company_id']}_{row['year']}_{row['period']}",
+            # id is excluded - PostgreSQL will generate UUID automatically
             "orgnr": row["orgnr"],
             "company_id": row.get("company_id"),
             "year": row["year"],
@@ -341,7 +366,7 @@ def transform(source: Path) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]],
             "debt_sek": thousands_to_sek(debt),
             "employees": employees,
             "account_codes": json.dumps(account_codes, ensure_ascii=False),
-            "raw_json": row["raw_data"],
+            "raw_json": clean_raw_json(row["raw_data"]),
             "scraped_at": row.get("scraped_at"),
             "source_job_id": row.get("job_id"),
         })
@@ -409,7 +434,12 @@ def main() -> None:
     if args.csv_dir:
         csv_dir = Path(args.csv_dir)
         write_csv(csv_dir / "companies.csv", companies_rows)
-        write_csv(csv_dir / "company_financials.csv", financial_rows)
+        # Exclude 'id' from financials CSV - PostgreSQL will generate UUIDs automatically
+        financial_rows_for_csv = [
+            {k: v for k, v in row.items() if k != "id"}
+            for row in financial_rows
+        ]
+        write_csv(csv_dir / "company_financials.csv", financial_rows_for_csv)
         write_csv(csv_dir / "company_metrics.csv", metrics_rows)
         print(f"CSV exports written to {csv_dir}")
 

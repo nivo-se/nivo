@@ -43,7 +43,7 @@ create table if not exists public.company_financials (
     debt_sek numeric,
     employees integer,
     account_codes jsonb,
-    raw_json jsonb not null,
+    raw_json jsonb,
     scraped_at timestamptz not null default now(),
     source_job_id text
 );

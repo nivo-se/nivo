@@ -716,61 +716,77 @@ async function generateCompanyProfile(
   let base = baseRow
 
   if (!base) {
-    const { data, error } = await supabase
-      .from('master_analytics')
-      .select(
-        `
-          OrgNr,
-          name,
-          segment_name,
-          industry_name,
-          city,
-          employees,
-          Revenue_growth,
-          EBIT_margin,
-          NetProfit_margin,
-          company_size_category,
-          growth_category,
-          profitability_category
-        `
-      )
-      .eq('OrgNr', orgnr)
+    // Get company data from new schema
+    const { data: companyData, error: companyError } = await supabase
+      .from('companies')
+      .select('orgnr, company_name, segment_names, foundation_year, employees_latest')
+      .eq('orgnr', orgnr)
       .maybeSingle()
 
-    if (error) throw error
-    base = data
+    if (companyError) throw companyError
+
+    // Get metrics from new schema
+    const { data: metricsData, error: metricsError } = await supabase
+      .from('company_metrics')
+      .select('orgnr, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, company_size_bucket, growth_bucket, profitability_bucket')
+      .eq('orgnr', orgnr)
+      .maybeSingle()
+
+    if (metricsError) throw metricsError
+
+    if (!companyData) {
+      throw new Error('Company not found in companies table')
+    }
+
+    // Transform to expected format for backward compatibility
+    const segmentNames = Array.isArray(companyData.segment_names) ? companyData.segment_names : (companyData.segment_names ? [companyData.segment_names] : [])
+    base = {
+      OrgNr: companyData.orgnr,
+      name: companyData.company_name,
+      segment_name: segmentNames[0] || null,
+      industry_name: segmentNames[0] || null,
+      employees: companyData.employees_latest,
+      Revenue_growth: metricsData?.revenue_cagr_3y || null,
+      EBIT_margin: metricsData?.avg_ebitda_margin || null,
+      NetProfit_margin: metricsData?.avg_net_margin || null,
+      company_size_category: metricsData?.company_size_bucket || null,
+      growth_category: metricsData?.growth_bucket || null,
+      profitability_category: metricsData?.profitability_bucket || null
+    }
   }
 
-  if (!base) {
-    throw new Error('Company not found in master_analytics')
-  }
-
-  const { data: accounts, error: accountsError } = await supabase
-    .from('company_accounts_by_id')
-    .select('*')
-    .eq('organisationNumber', orgnr)
+  // Get financial data from new schema
+  const { data: financialsData, error: financialsError } = await supabase
+    .from('company_financials')
+    .select('year, revenue_sek, profit_sek, ebitda_sek, equity_sek, debt_sek, employees, account_codes')
+    .eq('orgnr', orgnr)
+    .eq('period', '12')  // Only annual reports
     .order('year', { ascending: false })
     .limit(6)
 
-  if (accountsError) throw accountsError
+  if (financialsError) throw financialsError
 
-  const financials = (accounts || [])
+  const financials = (financialsData || [])
     .map((row: any) => {
       const year = Number.parseInt(row?.year, 10)
       if (!Number.isFinite(year)) {
         return null
       }
 
-      const revenue = safeNumber(row?.SDI)
-      const ebitda = safeNumber(row?.resultat_e_avskrivningar ?? row?.EBITDA)
-      const ebit = safeNumber(row?.EBIT)
-      const netIncome = safeNumber(row?.NetIncome ?? row?.DR)
-      const totalDebt = safeNumber(row?.summa_langfristiga_skulder ?? row?.FK ?? row?.FSD)
-      const totalEquity = safeNumber(row?.EK ?? row?.SEK ?? row?.SFA)
-      const employees = safeNumber(row?.Employees ?? row?.ANT)
-      const revenueGrowth = safeNumber(row?.RG ?? row?.revenue_growth)
+      // Extract from new schema fields
+      const revenue = safeNumber(row?.revenue_sek)
+      const ebitda = safeNumber(row?.ebitda_sek)
+      const netIncome = safeNumber(row?.profit_sek)
+      const totalDebt = safeNumber(row?.debt_sek)
+      const totalEquity = safeNumber(row?.equity_sek)
+      const employees = safeNumber(row?.employees)
+      
+      // Extract additional fields from account_codes JSONB if needed
+      const accountCodes = row?.account_codes || {}
+      const ebit = safeNumber(accountCodes?.RG || accountCodes?.EBIT) || (revenue && ebitda ? ebitda : null)
+      const revenueGrowth = safeNumber(accountCodes?.RG) || null
+      
       const ebitMargin =
-        safeNumber(row?.EBIT_margin) ??
         (revenue && ebit !== null && revenue > 0 ? Number(ebit / revenue) : null)
       const debtToEquity =
         totalDebt !== null && totalEquity && totalEquity !== 0 ? Number(totalDebt / totalEquity) : null
@@ -793,26 +809,20 @@ async function generateCompanyProfile(
     .sort((a, b) => b.year - a.year)
     .slice(0, 4)
 
-  const { data: kpiRows, error: kpiError } = await supabase
-    .from('company_kpis_by_id')
-    .select('year, ebit_margin, net_margin, revenue_growth, equity_ratio, return_on_equity')
-    .eq('organisationNumber', orgnr)
-    .order('year', { ascending: false })
-    .limit(6)
-
-  if (kpiError) throw kpiError
-
-  const kpis = (kpiRows || [])
-    .map((row: any) => {
-      const year = Number.parseInt(row?.year, 10)
-      if (!Number.isFinite(year)) return null
+  // KPIs are now calculated from financials data (company_metrics has aggregated values)
+  const kpis = financials
+    .map((fin: FinancialYearRecord) => {
       return {
-        year,
-        revenueGrowth: safeNumber(row?.revenue_growth),
-        ebitMargin: safeNumber(row?.ebit_margin),
-        netMargin: safeNumber(row?.net_margin),
-        equityRatio: safeNumber(row?.equity_ratio),
-        returnOnEquity: safeNumber(row?.return_on_equity),
+        year: fin.year,
+        revenueGrowth: fin.revenueGrowth,
+        ebitMargin: fin.ebitMargin,
+        netMargin: fin.netIncome && fin.revenue ? fin.netIncome / fin.revenue : null,
+        equityRatio: fin.totalEquity && fin.totalDebt !== null 
+          ? fin.totalEquity / (fin.totalEquity + fin.totalDebt) 
+          : null,
+        returnOnEquity: fin.netIncome && fin.totalEquity 
+          ? fin.netIncome / fin.totalEquity 
+          : null,
       } as KPIRecord
     })
     .filter((item): item is KPIRecord => Boolean(item))
