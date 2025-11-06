@@ -64,7 +64,7 @@ const WorkingDashboard: React.FC = () => {
     { id: 'analyzed-companies', label: 'Analyser', icon: FileText },
     { id: 'valuation', label: 'Värdering', icon: Target },
     { id: 'export', label: 'Exportera', icon: Download },
-    { id: 'scraper', label: 'Importera Data', icon: Database, disabled: true },
+    { id: 'scraper', label: 'Importera Data', icon: Database, disabled: false },
   ]
 
   // Add admin item at the bottom if user is admin

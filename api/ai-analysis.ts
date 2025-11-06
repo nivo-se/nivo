@@ -529,8 +529,8 @@ async function invokeScreeningModel(openai: OpenAI, prompt: string) {
     temperature: 0.1,
     max_output_tokens: 500,
     input: [
-      { role: 'system', content: [{ type: 'text', text: screeningSystemPrompt }] },
-      { role: 'user', content: [{ type: 'text', text: prompt }] },
+      { role: 'system', content: [{ type: 'input_text', text: screeningSystemPrompt }] },
+      { role: 'user', content: [{ type: 'input_text', text: prompt }] },
     ],
     response_format: { type: 'json_schema', json_schema: screeningSchema },
   })
@@ -1438,10 +1438,11 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
     }
   })
 
-  const runPayload: RunResponse = {
+  const runPayload: RunPayload = {
     id: run.id,
     status: run.status,
     modelVersion: run.model_version,
+    analysisMode: run.analysis_mode || 'deep',
     startedAt: run.started_at,
     completedAt: run.completed_at,
     errorMessage: run.error_message,

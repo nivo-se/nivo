@@ -30,13 +30,7 @@ export const supabase = isConfigured
         detectSessionInUrl: true
       }
     })
-  : createClient('https://placeholder.supabase.co', 'placeholder-key', {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
-      }
-    })
+  : null
 
 // Database types (we'll expand these as we add more tables)
 export interface Database {

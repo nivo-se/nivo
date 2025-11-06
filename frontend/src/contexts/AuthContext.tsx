@@ -43,6 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check user role and approval status
   const checkUserStatus = async (userId: string, userEmail?: string) => {
+    if (!supabase) {
+      console.warn('Supabase not configured, skipping user status check')
+      return
+    }
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -105,6 +109,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return
       }
 
+      if (!supabase) {
+        console.warn('Supabase not configured, skipping session check')
+        setLoading(false)
+        return
+      }
+
       const { data: { session }, error } = await supabase.auth.getSession()
       if (error) {
         console.error('Error getting session:', error)
@@ -132,6 +142,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     // Listen for auth changes
+    if (!supabase) {
+      return
+    }
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session)
@@ -157,7 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [authEnabled])
 
   const signUp = async (email: string, password: string) => {
-    if (!authEnabled) {
+    if (!authEnabled || !supabase) {
       return { error: createAuthDisabledError() }
     }
 
@@ -180,7 +194,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signIn = async (email: string, password: string) => {
-    if (!authEnabled) {
+    if (!authEnabled || !supabase) {
       return { error: createAuthDisabledError() }
     }
 
@@ -192,7 +206,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signOut = async () => {
-    if (!authEnabled) {
+    if (!authEnabled || !supabase) {
       return { error: createAuthDisabledError() }
     }
 

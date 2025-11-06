@@ -1,0 +1,21 @@
+{
+  "name": "allabolag-scraper",
+  "version": "1.0.0",
+  "description": "Allabolag.se scraper with modular architecture",
+  "type": "module",
+  "main": "test.js",
+  "scripts": {
+    "test": "node test.js",
+    "build": "tsc",
+    "dev": "tsx test.ts"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -14,6 +14,9 @@ lib/
 lib64/
 # Allow frontend/src/lib/ directory
 !frontend/src/lib/
+# Allow scraper/allabolag-scraper/src/lib/ directory
+!scraper/allabolag-scraper/src/lib/
+!scraper/allabolag-scraper/src/lib/**
 parts/
 sdist/
 var/
@@ -95,3 +98,7 @@ node_modules
 # Allow checked-in frontend shared library utilities
 !frontend/src/lib/
 !frontend/src/lib/**
+
+# Generated datasets
+data/new_schema_local.db
+data/csv_export/
