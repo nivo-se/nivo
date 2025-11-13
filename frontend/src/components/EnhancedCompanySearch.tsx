@@ -23,7 +23,7 @@ import {
   X,
   Check
 } from 'lucide-react'
-import { supabaseDataService, SupabaseCompany, CompanyFilter } from '../lib/supabaseDataService'
+import { supabaseCompanyService, SupabaseCompany, CompanyFilter } from '../lib/supabaseCompanyService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import CompanyListManager from './CompanyListManager'
 import AddToListsDialog from './AddToListsDialog'
@@ -104,7 +104,7 @@ const EnhancedCompanySearch: React.FC = () => {
     const fetchSelectedCompanies = async () => {
       if (selectedCompanies.size > 0) {
         try {
-          const companies = await supabaseDataService.getCompaniesByOrgNrs(Array.from(selectedCompanies))
+          const companies = await supabaseCompanyService.getCompaniesByOrgNrs(Array.from(selectedCompanies))
           setSelectedCompaniesArray(companies)
         } catch (error) {
           console.error('Error fetching selected companies:', error)
@@ -162,8 +162,8 @@ const EnhancedCompanySearch: React.FC = () => {
 
       // Get paginated results and all matching company OrgNrs in parallel
       const [result, allMatchingOrgNrs] = await Promise.all([
-        supabaseDataService.getCompanies(currentPage, itemsPerPage, searchFilters),
-        supabaseDataService.getAllMatchingCompanyOrgNrs(searchFilters)
+        supabaseCompanyService.getCompanies(currentPage, itemsPerPage, searchFilters),
+        supabaseCompanyService.getAllMatchingCompanyOrgNrs(searchFilters)
       ])
       
       // Calculate summary from the companies data
@@ -357,12 +357,44 @@ const EnhancedCompanySearch: React.FC = () => {
     }
   }
 
-  const formatNumber = (num: number | null | undefined) => {
-    // Show as T SEK (thousand SEK) without manipulation
-    if (num === null || num === undefined || isNaN(num)) {
-      return '0 T SEK'
+  const formatCurrency = (value: number | null | undefined, decimals = 1) => {
+    // Handle string values that might come from API
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) {
+      return 'N/A'
     }
-    return `${num.toLocaleString()} T SEK`
+    // Database stores values in thousands (as-is from Allabolag)
+    // Raw: 100,000 tSEK → DB: 100,000 tSEK → Display: 100 mSEK
+    // Conversion: divide by 1,000 to convert thousands to mSEK
+    // Always display as mSEK (no BSEK conversion)
+    const valueInMSEK = numValue / 1_000
+    return `${valueInMSEK.toFixed(decimals)} mSEK`
+  }
+
+  // Special formatter for EBIT (ORS/RG) which appears to be stored in SEK instead of thousands
+  const formatEBIT = (value: number | null | undefined, decimals = 1) => {
+    // Handle string values that might come from API
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) {
+      return 'N/A'
+    }
+    // EBIT appears to be stored in SEK (not thousands) in some cases
+    // If value is >= 1,000,000, it's likely in SEK, divide by 1,000,000
+    // Otherwise, if value is >= 1,000, assume thousands and divide by 1,000
+    // For very small values (< 1,000), assume they're already in thousands
+    if (numValue >= 1_000_000) {
+      // Value is in SEK, convert to mSEK
+      const valueInMSEK = numValue / 1_000_000
+      return `${valueInMSEK.toFixed(decimals)} mSEK`
+    } else if (numValue >= 1_000) {
+      // Value is likely in thousands, convert to mSEK
+      const valueInMSEK = numValue / 1_000
+      return `${valueInMSEK.toFixed(decimals)} mSEK`
+    } else {
+      // Very small value, assume already in thousands
+      const valueInMSEK = numValue / 1_000
+      return `${valueInMSEK.toFixed(decimals)} mSEK`
+    }
   }
 
   const getGrowthIcon = (growth?: number) => {
@@ -602,9 +634,24 @@ const EnhancedCompanySearch: React.FC = () => {
                           <div className="flex items-center gap-2 mb-2">
                             <h3 
                               className="font-semibold text-lg cursor-pointer hover:text-blue-600"
-                              onClick={() => {
-                                setSelectedCompany(company)
-                                setShowCompanyDetail(true)
+                              onClick={async () => {
+                                // Fetch full company data with historicalData
+                                try {
+                                  const fullCompany = await supabaseCompanyService.getCompany(company.OrgNr)
+                                  if (fullCompany) {
+                                    setSelectedCompany(fullCompany)
+                                    setShowCompanyDetail(true)
+                                  } else {
+                                    // Fallback to company from list if fetch fails
+                                    setSelectedCompany(company)
+                                    setShowCompanyDetail(true)
+                                  }
+                                } catch (error) {
+                                  console.error('Error fetching company details:', error)
+                                  // Fallback to company from list
+                                  setSelectedCompany(company)
+                                  setShowCompanyDetail(true)
+                                }
                               }}
                             >
                               {company.name}
@@ -613,13 +660,42 @@ const EnhancedCompanySearch: React.FC = () => {
                           </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Building2 className="h-4 w-4" />
-                            {company.segment_name || company.industry_name || 'Unknown Industry'}
+                            {(() => {
+                              // Parse segment_name if it's a JSON string array
+                              let industries: string[] = []
+                              if (company.segment_name) {
+                                try {
+                                  const parsed = typeof company.segment_name === 'string' 
+                                    ? JSON.parse(company.segment_name) 
+                                    : company.segment_name
+                                  industries = Array.isArray(parsed) ? parsed : [parsed]
+                                } catch {
+                                  industries = [company.segment_name]
+                                }
+                              } else if (company.industry_name) {
+                                industries = [company.industry_name]
+                              }
+                              
+                              if (industries.length === 0) {
+                                return <span className="text-gray-500">Okänd bransch</span>
+                              }
+                              
+                              return (
+                                <div className="flex flex-wrap gap-1">
+                                  {industries.map((industry, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {industry}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )
+                            })()}
                           </div>
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
-                            {company.city || 'Unknown City'}
+                            {company.city || 'Okänd stad'}
                           </div>
                           {company.homepage && (
                             <div className="flex items-center gap-1">
@@ -636,20 +712,22 @@ const EnhancedCompanySearch: React.FC = () => {
                              <div className="flex items-center gap-2">
                                <DollarSign className="h-4 w-4 text-green-600" />
                                <span className="text-sm">
-                                 Omsättning: <span className="font-medium">{formatNumber(company.SDI || 0)}</span>
+                                 Omsättning:{' '}
+                                 <span className="font-medium">{formatCurrency(company.SDI)}</span>
                                </span>
                              </div>
                              <div className="flex items-center gap-2">
                                <DollarSign className="h-4 w-4 text-blue-600" />
                                <span className="text-sm">
-                                 Vinst: <span className="font-medium">{formatNumber(company.DR || 0)}</span>
+                                 Vinst:{' '}
+                                 <span className="font-medium">{formatCurrency(company.DR)}</span>
                                </span>
                              </div>
                              <div className="flex items-center gap-2">
                                {getGrowthIcon(company.Revenue_growth)}
                                <span className={`text-sm ${getGrowthColor(company.Revenue_growth)}`}>
                                  Tillväxt: <span className="font-medium">
-                                   {company.Revenue_growth ? `${(company.Revenue_growth * 100).toFixed(1)}%` : 'N/A'}
+                                   {company.Revenue_growth != null ? `${company.Revenue_growth.toFixed(1)}%` : 'N/A'}
                                  </span>
                                </span>
                              </div>
@@ -709,7 +787,7 @@ const EnhancedCompanySearch: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatNumber(searchResults.summary.avgRevenue)}
+                    {formatCurrency(searchResults.summary.avgRevenue)}
                   </div>
                   <p className="text-xs text-gray-600">Genomsnittlig omsättning</p>
                 </CardContent>
@@ -810,7 +888,39 @@ const EnhancedCompanySearch: React.FC = () => {
                   <p className="text-[#E6E6E6] text-sm mb-4">Företagsinformation och finansiell analys</p>
                   <div className="grid grid-cols-2 gap-4 text-[#E6E6E6] text-sm">
                     <div><strong>Org.nr:</strong> {selectedCompany.OrgNr}</div>
-                    <div><strong>Bransch:</strong> {selectedCompany.segment_name || 'N/A'}</div>
+                    <div>
+                      <strong>Bransch:</strong>{' '}
+                      {(() => {
+                        // Parse segment_name if it's a JSON string array
+                        let industries: string[] = []
+                        if (selectedCompany.segment_name) {
+                          try {
+                            const parsed = typeof selectedCompany.segment_name === 'string' 
+                              ? JSON.parse(selectedCompany.segment_name) 
+                              : selectedCompany.segment_name
+                            industries = Array.isArray(parsed) ? parsed : [parsed]
+                          } catch {
+                            industries = [selectedCompany.segment_name]
+                          }
+                        } else if (selectedCompany.industry_name) {
+                          industries = [selectedCompany.industry_name]
+                        }
+                        
+                        if (industries.length === 0) {
+                          return <span>N/A</span>
+                        }
+                        
+                        return (
+                          <span className="flex flex-wrap gap-1 mt-1">
+                            {industries.map((industry, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+                                {industry}
+                              </Badge>
+                            ))}
+                          </span>
+                        )
+                      })()}
+                    </div>
                     <div><strong>Adress:</strong> {selectedCompany.address || 'N/A'}</div>
                     <div><strong>Stad:</strong> {selectedCompany.city || 'N/A'}</div>
                     {selectedCompany.homepage && (
@@ -854,63 +964,118 @@ const EnhancedCompanySearch: React.FC = () => {
                     <div className="flex items-end justify-between h-full">
                       {/* Chart bars with real data from company_accounts_by_id */}
                       {selectedCompany.historicalData && Array.isArray(selectedCompany.historicalData) && selectedCompany.historicalData.length > 0 ? (
-                        selectedCompany.historicalData.map((data, index) => {
-                          // Ensure data exists and has required properties
-                          if (!data || typeof data !== 'object') {
-                            return null
-                          }
+                        (() => {
+                          // Calculate max Revenue (SDI) across all years for proper scaling
+                          // Bar height represents Revenue, with EBIT and Profit stacked proportionally
+                          const allRevenues = selectedCompany.historicalData.map(d => {
+                            const sdi = (d && (d.SDI !== null && d.SDI !== undefined)) ? d.SDI : 0
+                            return sdi
+                          })
+                          const maxRevenue = Math.max(...allRevenues, 1) // Prevent division by zero
                           
-                          const safeData = {
-                            year: data.year || 2023,
-                            SDI: data.SDI || 0, // Revenue (Omsättning)
-                            RG: data.RG || 0,   // EBIT
-                            DR: data.DR || 0    // Net Profit (Vinst)
-                          }
-                          
-                          const maxValue = Math.max(...selectedCompany.historicalData!.map(d => (d && d.SDI) || 0), 1) // Prevent division by zero
-                          const height = (safeData.SDI / maxValue) * 100
-                          const ebitHeight = (safeData.RG / maxValue) * 100
-                          const vinstHeight = (safeData.DR / maxValue) * 100
-                          
-                          return (
-                            <div key={index} className="flex flex-col items-center">
-                              <div className="flex flex-col items-end gap-1 mb-2">
-                                {/* Omsättning */}
-                                <div className="bg-[#596152] w-12 rounded-t-lg" style={{ height: `${height}%` }}></div>
-                                {/* EBIT */}
-                                <div className="bg-[#596152]/70 w-12 rounded-t-lg" style={{ height: `${ebitHeight}%` }}></div>
-                                {/* Vinst */}
-                                <div className="bg-[#596152]/40 w-12 rounded-t-lg" style={{ height: `${vinstHeight}%` }}></div>
+                          return selectedCompany.historicalData.map((data, index) => {
+                            // Ensure data exists and has required properties
+                            if (!data || typeof data !== 'object') {
+                              return null
+                            }
+                            
+                            const safeData = {
+                              year: data.year || 2023,
+                              SDI: (data.SDI !== null && data.SDI !== undefined) ? data.SDI : 0, // Revenue (Omsättning)
+                              RG: (data.RG !== null && data.RG !== undefined) ? data.RG : 0,   // EBIT
+                              DR: (data.DR !== null && data.DR !== undefined) ? data.DR : 0    // Net Profit (Vinst)
+                            }
+                            
+                            // Calculate heights as percentages of max Revenue for proper scaling
+                            // Bar height represents Revenue, with EBIT and Profit stacked proportionally
+                            const sdiHeight = (safeData.SDI / maxRevenue) * 100
+                            const rgHeight = safeData.RG > 0 ? (safeData.RG / maxRevenue) * 100 : 0
+                            const drHeight = safeData.DR > 0 ? (safeData.DR / maxRevenue) * 100 : 0
+                            
+                            // Total bar height is Revenue (since it's the largest and represents the full bar)
+                            const totalBarHeight = sdiHeight
+                            
+                            return (
+                              <div key={index} className="flex flex-col items-center flex-1">
+                                <div className="flex flex-col items-end justify-end gap-0 mb-2 w-full" style={{ height: '100%' }}>
+                                  {/* Stacked bars - Revenue (bottom), EBIT (middle), Profit (top) */}
+                                  {totalBarHeight > 0 && (
+                                    <div 
+                                      className="w-full relative"
+                                      style={{ height: `${Math.max(totalBarHeight, 2)}%`, minHeight: totalBarHeight > 0 ? '4px' : '0' }}
+                                    >
+                                      {/* Revenue (SDI) - full bar height (bottom segment) */}
+                                      <div 
+                                        className="bg-[#596152] w-full absolute bottom-0 rounded-t"
+                                        style={{ 
+                                          height: '100%',
+                                          minHeight: '4px'
+                                        }}
+                                        title={`Omsättning: ${formatCurrency(safeData.SDI, 1)}`}
+                                      ></div>
+                                      {/* EBIT (RG) - middle segment, visible as overlay on Revenue */}
+                                      {rgHeight > 0 && safeData.RG > 0 && (
+                                        <div 
+                                          className="bg-[#7A8B7A] w-full absolute bottom-0 rounded"
+                                          style={{ 
+                                            height: `${Math.max(rgHeight, 3)}%`,
+                                            minHeight: '4px',
+                                            zIndex: 1,
+                                            opacity: 0.9
+                                          }}
+                                          title={`EBIT: ${formatEBIT(safeData.RG, 1)}`}
+                                        ></div>
+                                      )}
+                                      {/* Profit (DR) - top segment, visible as overlay */}
+                                      {drHeight > 0 && safeData.DR > 0 && (
+                                        <div 
+                                          className="bg-[#9BAF9B] w-full absolute bottom-0 rounded-t"
+                                          style={{ 
+                                            height: `${Math.max(drHeight, 3)}%`,
+                                            minHeight: '4px',
+                                            zIndex: 2,
+                                            opacity: 0.9
+                                          }}
+                                          title={`Vinst: ${formatCurrency(safeData.DR, 1)}`}
+                                        ></div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="text-xs text-[#2E2A2B] font-medium mt-1">{safeData.year ? `${safeData.year}-12-31` : 'N/A'}</div>
+                                <div className="text-xs font-bold text-[#596152] mt-0.5">{formatCurrency(safeData.SDI, 1)}</div>
+                                {(safeData.RG !== null && safeData.RG !== undefined && safeData.RG !== 0) && (
+                                  <div className="text-xs font-bold text-[#7A8B7A]">{formatEBIT(safeData.RG, 1)}</div>
+                                )}
+                                {(safeData.DR !== null && safeData.DR !== undefined && safeData.DR !== 0) && (
+                                  <div className="text-xs font-bold text-[#9BAF9B]">{formatCurrency(safeData.DR, 1)}</div>
+                                )}
                               </div>
-                              <div className="text-xs text-[#2E2A2B] font-medium">{`${safeData.year}-12-31`}</div>
-                              <div className="text-xs font-bold text-[#596152]">{formatNumber(safeData.SDI)}</div>
-                              <div className="text-xs font-bold text-[#596152]/70">{formatNumber(safeData.RG)}</div>
-                              <div className="text-xs font-bold text-[#596152]/40">{formatNumber(safeData.DR)}</div>
-                            </div>
-                          )
-                        }).filter(Boolean) // Remove any null entries
+                            )
+                          }).filter(Boolean) // Remove any null entries
+                        })()
                       ) : (
                         // Fallback to mock data if no historical data
                         <>
                           <div className="flex flex-col items-center">
                             <div className="bg-[#596152] w-12 h-20 mb-2 rounded-t-lg"></div>
                             <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatNumber(selectedCompany.SDI || 0)}</div>
+                            <div className="text-xs font-bold text-[#596152]">{formatCurrency(selectedCompany.SDI, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
                             <div className="bg-[#596152]/80 w-12 h-16 mb-2 rounded-t-lg"></div>
                             <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 1}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatNumber((selectedCompany.SDI || 0) * 0.95)}</div>
+                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.95, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
                             <div className="bg-[#596152]/60 w-12 h-12 mb-2 rounded-t-lg"></div>
                             <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 2}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatNumber((selectedCompany.SDI || 0) * 0.9)}</div>
+                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.9, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
                             <div className="bg-[#596152]/40 w-12 h-8 mb-2 rounded-t-lg"></div>
                             <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 3}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatNumber((selectedCompany.SDI || 0) * 0.85)}</div>
+                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.85, 1)}</div>
                           </div>
                         </>
                       )}
@@ -924,11 +1089,11 @@ const EnhancedCompanySearch: React.FC = () => {
                       <span className="font-medium text-[#2E2A2B]">Omsättning</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#596152]/70 rounded"></div>
+                      <div className="w-4 h-4 bg-[#7A8B7A] rounded"></div>
                       <span className="font-medium text-[#2E2A2B]">EBIT</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#596152]/40 rounded"></div>
+                      <div className="w-4 h-4 bg-[#9BAF9B] rounded"></div>
                       <span className="font-medium text-[#2E2A2B]">Vinst</span>
                     </div>
                   </div>
@@ -938,7 +1103,7 @@ const EnhancedCompanySearch: React.FC = () => {
               {/* Summary Cards */}
               <div className="mb-8">
                 <h3 className="text-xl font-bold text-[#2E2A2B] mb-4">Sammanfattning {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-5 gap-4">
                   <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
@@ -946,7 +1111,35 @@ const EnhancedCompanySearch: React.FC = () => {
                       </div>
                       <div>
                         <div className="text-sm text-[#2E2A2B]/70">Omsättning</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">{formatNumber(selectedCompany.SDI || 0)}</div>
+                        <div className="text-2xl font-bold text-[#2E2A2B]">{formatCurrency(selectedCompany.SDI, 1)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-[#2E2A2B]/70">EBIT</div>
+                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                          {selectedCompany.ORS ? formatEBIT(selectedCompany.ORS, 1) : 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-[#2E2A2B]/70">Vinst</div>
+                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                          {selectedCompany.DR ? formatCurrency(selectedCompany.DR, 1) : 'N/A'}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -959,7 +1152,49 @@ const EnhancedCompanySearch: React.FC = () => {
                       <div>
                         <div className="text-sm text-[#2E2A2B]/70">Tillväxt</div>
                         <div className="text-2xl font-bold text-[#2E2A2B]">
-                          {selectedCompany.Revenue_growth ? `${(selectedCompany.Revenue_growth * 100).toFixed(1)}%` : 'N/A'}
+                          {(() => {
+                            // Calculate year-over-year growth from historical data
+                            // Use the same data points as shown in the chart (historicalData array)
+                            let currentNum: number | null = null
+                            let previousNum: number | null = null
+                            
+                            if (selectedCompany.historicalData && Array.isArray(selectedCompany.historicalData) && selectedCompany.historicalData.length >= 2) {
+                              // historicalData is sorted descending (newest first): [2024, 2023, 2022, 2021]
+                              const currentYearData = selectedCompany.historicalData[0]
+                              const previousYearData = selectedCompany.historicalData[1]
+                              
+                              if (currentYearData && previousYearData) {
+                                // Get SDI (Revenue) values - these are in thousands, same as chart displays
+                                const current = currentYearData.SDI
+                                const previous = previousYearData.SDI
+                                
+                                // Convert to numbers if needed
+                                currentNum = typeof current === 'number' ? current : (current != null && current !== '' ? Number(current) : null)
+                                previousNum = typeof previous === 'number' ? previous : (previous != null && previous !== '' ? Number(previous) : null)
+                              }
+                            }
+                            
+                            // Fallback: try to get from the chart data if historicalData didn't work
+                            if ((currentNum == null || previousNum == null) && selectedCompany.historicalData && Array.isArray(selectedCompany.historicalData)) {
+                              // Try to find valid values in the array
+                              const validData = selectedCompany.historicalData.filter(d => d && d.SDI != null && d.SDI !== '' && Number(d.SDI) > 0)
+                              if (validData.length >= 2) {
+                                currentNum = typeof validData[0].SDI === 'number' ? validData[0].SDI : Number(validData[0].SDI)
+                                previousNum = typeof validData[1].SDI === 'number' ? validData[1].SDI : Number(validData[1].SDI)
+                              }
+                            }
+                            
+                            // Calculate growth if we have valid numbers
+                            if (currentNum != null && previousNum != null && 
+                                !isNaN(currentNum) && !isNaN(previousNum) && 
+                                isFinite(currentNum) && isFinite(previousNum) &&
+                                previousNum > 0) {
+                              const growth = ((currentNum / previousNum) - 1) * 100
+                              return `${growth.toFixed(1)}%`
+                            }
+                            
+                            return 'N/A'
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -973,7 +1208,16 @@ const EnhancedCompanySearch: React.FC = () => {
                       <div>
                         <div className="text-sm text-[#2E2A2B]/70">EBIT-marginal</div>
                         <div className="text-2xl font-bold text-[#2E2A2B]">
-                          {selectedCompany.EBIT_margin ? `${(selectedCompany.EBIT_margin * 100).toFixed(1)}%` : 'N/A'}
+                          {(() => {
+                            // Calculate EBIT margin: EBIT / Revenue
+                            const ebit = selectedCompany.ORS || selectedCompany.RG
+                            const revenue = selectedCompany.SDI
+                            if (ebit && revenue && revenue > 0) {
+                              const margin = (ebit / revenue) * 100
+                              return `${margin.toFixed(1)}%`
+                            }
+                            return 'N/A'
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -1013,37 +1257,94 @@ const EnhancedCompanySearch: React.FC = () => {
                   <h3 className="text-lg font-bold text-[#2E2A2B] mb-4">Finansiella nyckeltal {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
+                      <span className="text-[#2E2A2B]/70 text-sm">EBIT:</span>
+                      <div className="text-right">
+                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                          {selectedCompany.ORS ? formatEBIT(selectedCompany.ORS, 1) : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
                       <span className="text-[#2E2A2B]/70 text-sm">EBIT-marginal:</span>
                       <div className="text-right">
                         <span className="font-semibold text-[#2E2A2B] text-sm">
-                          {selectedCompany.EBIT_margin ? `${(selectedCompany.EBIT_margin * 100).toFixed(1)}%` : 'N/A'}
+                          {(() => {
+                            // Calculate EBIT margin: EBIT / Revenue
+                            const ebit = selectedCompany.ORS || selectedCompany.RG
+                            const revenue = selectedCompany.SDI
+                            if (ebit && revenue && revenue > 0) {
+                              const margin = (ebit / revenue) * 100
+                              return `${margin.toFixed(1)}%`
+                            }
+                            return 'N/A'
+                          })()}
                         </span>
-                        <div className="text-xs text-[#596152]">↗ +0.5%</div>
                       </div>
                     </div>
                     <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Nettoresultat:</span>
+                      <span className="text-[#2E2A2B]/70 text-sm">Vinst (Nettoresultat):</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">{formatNumber(selectedCompany.ORS || 0)}</span>
-                        <div className="text-xs text-[#596152]">↗ +12%</div>
+                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                          {selectedCompany.DR ? formatCurrency(selectedCompany.DR, 1) : 'N/A'}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Soliditet:</span>
+                      <span className="text-[#2E2A2B]/70 text-sm">Vinstmarginal:</span>
                       <div className="text-right">
                         <span className="font-semibold text-[#2E2A2B] text-sm">
                           {selectedCompany.NetProfit_margin ? `${(selectedCompany.NetProfit_margin * 100).toFixed(1)}%` : 'N/A'}
                         </span>
-                        <div className="text-xs text-red-500">↘ -2.1%</div>
                       </div>
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="text-[#2E2A2B]/70 text-sm">Tillväxt:</span>
                       <div className="text-right">
                         <span className="font-semibold text-[#2E2A2B] text-sm">
-                          {selectedCompany.Revenue_growth ? `${(selectedCompany.Revenue_growth * 100).toFixed(1)}%` : 'N/A'}
+                          {(() => {
+                            // Calculate year-over-year growth from historical data
+                            // Use the same data points as shown in the chart (historicalData array)
+                            let currentNum: number | null = null
+                            let previousNum: number | null = null
+                            
+                            if (selectedCompany.historicalData && Array.isArray(selectedCompany.historicalData) && selectedCompany.historicalData.length >= 2) {
+                              // historicalData is sorted descending (newest first): [2024, 2023, 2022, 2021]
+                              const currentYearData = selectedCompany.historicalData[0]
+                              const previousYearData = selectedCompany.historicalData[1]
+                              
+                              if (currentYearData && previousYearData) {
+                                // Get SDI (Revenue) values - these are in thousands, same as chart displays
+                                const current = currentYearData.SDI
+                                const previous = previousYearData.SDI
+                                
+                                // Convert to numbers if needed
+                                currentNum = typeof current === 'number' ? current : (current != null && current !== '' ? Number(current) : null)
+                                previousNum = typeof previous === 'number' ? previous : (previous != null && previous !== '' ? Number(previous) : null)
+                              }
+                            }
+                            
+                            // Fallback: try to get from the chart data if historicalData didn't work
+                            if ((currentNum == null || previousNum == null) && selectedCompany.historicalData && Array.isArray(selectedCompany.historicalData)) {
+                              // Try to find valid values in the array
+                              const validData = selectedCompany.historicalData.filter(d => d && d.SDI != null && d.SDI !== '' && Number(d.SDI) > 0)
+                              if (validData.length >= 2) {
+                                currentNum = typeof validData[0].SDI === 'number' ? validData[0].SDI : Number(validData[0].SDI)
+                                previousNum = typeof validData[1].SDI === 'number' ? validData[1].SDI : Number(validData[1].SDI)
+                              }
+                            }
+                            
+                            // Calculate growth if we have valid numbers
+                            if (currentNum != null && previousNum != null && 
+                                !isNaN(currentNum) && !isNaN(previousNum) && 
+                                isFinite(currentNum) && isFinite(previousNum) &&
+                                previousNum > 0) {
+                              const growth = ((currentNum / previousNum) - 1) * 100
+                              return `${growth.toFixed(1)}%`
+                            }
+                            
+                            return 'N/A'
+                          })()}
                         </span>
-                        <div className="text-xs text-red-500">↘ -3.2%</div>
                       </div>
                     </div>
                   </div>
@@ -1073,5 +1374,3 @@ const EnhancedCompanySearch: React.FC = () => {
 }
 
 export default EnhancedCompanySearch
-
-
