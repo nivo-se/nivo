@@ -4,9 +4,12 @@ import cors from 'cors'
 import { config } from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 import OpenAI from 'openai'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
+import Database from 'better-sqlite3'
+import { getLocalDB, localDBExists } from './local-db.js'
 import { fetchComprehensiveCompanyData } from './data-enrichment.js'
 import { QualityIssue, createQualityIssue } from './data-quality.js'
 import { getCompanyContext } from './industry-benchmarks.js'
@@ -216,7 +219,10 @@ const SCREENING_COMPLETION_COST_PER_1K = 0.0006
 // Supabase client
 function getSupabase(): SupabaseClient | null {
   const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
     console.error('Missing Supabase credentials')
@@ -637,61 +643,360 @@ app.get('/api/analysis-companies', async (req, res) => {
   }
 })
 
+// Helper function to transform new schema data to old format for compatibility
+function transformCompanyData(row: any): any {
+  // Extract segment names from JSONB array - return as JSON string for frontend parsing
+  let segmentNames: string[] = []
+  if (row.segment_names) {
+    if (Array.isArray(row.segment_names)) {
+      segmentNames = row.segment_names
+    } else if (typeof row.segment_names === 'string') {
+      try {
+        segmentNames = JSON.parse(row.segment_names)
+      } catch {
+        segmentNames = [row.segment_names]
+      }
+    } else {
+      segmentNames = [row.segment_names]
+    }
+  }
+  // Return as JSON string so frontend can parse it
+  const segmentNameJson = segmentNames.length > 0 ? JSON.stringify(segmentNames) : null
+  
+  // Extract address fields from JSONB
+  let addressStr: string | undefined
+  let cityStr: string | undefined
+  let addressObj: any = null
+  
+  // First try to get city from address field
+  if (row.address) {
+    if (typeof row.address === 'string') {
+      // Try to parse as JSON string first (SQLite stores JSON as text)
+      try {
+        const parsed = JSON.parse(row.address)
+        if (typeof parsed === 'object' && parsed !== null) {
+          addressObj = parsed
+        } else {
+          addressStr = row.address
+          // Try to extract city from string address (e.g., "Street 123, 12345 City")
+          const cityMatch = row.address.match(/\d{5}\s+([^,]+)$/)
+          if (cityMatch) {
+            cityStr = cityMatch[1].trim()
+          }
+        }
+      } catch {
+        // Not JSON, treat as plain string
+        addressStr = row.address
+        // Try to extract city from string address (e.g., "Street 123, 12345 City")
+        const cityMatch = row.address.match(/\d{5}\s+([^,]+)$/)
+        if (cityMatch) {
+          cityStr = cityMatch[1].trim()
+        }
+      }
+    } else if (typeof row.address === 'object') {
+      // Address is already an object
+      addressObj = row.address
+    }
+    
+    // Extract from address object if we have one
+    if (addressObj) {
+      // Try to get address from visitorAddress, mainOffice, or location
+      const addr = addressObj.visitorAddress || addressObj.mainOffice || addressObj.location || addressObj.domicile || addressObj
+      
+      // Extract city
+      cityStr = addr.postPlace || addr.city || addressObj.postPlace || addressObj.city
+      
+      // Build full address string
+      const parts: string[] = []
+      if (addr.addressLine || addressObj.addressLine) {
+        parts.push(addr.addressLine || addressObj.addressLine)
+      }
+      if (addr.postCode || addressObj.postCode) {
+        parts.push(addr.postCode || addressObj.postCode)
+      }
+      if (cityStr) {
+        parts.push(cityStr)
+      }
+      
+      if (parts.length > 0) {
+        addressStr = parts.join(', ')
+      } else if (addr.addressLine || addressObj.addressLine) {
+        addressStr = addr.addressLine || addressObj.addressLine
+      }
+    }
+  }
+  
+  // Fallback: Extract city from raw_json if address field is empty
+  if (!cityStr && row.raw_json) {
+    try {
+      const rawData = typeof row.raw_json === 'string' ? JSON.parse(row.raw_json) : row.raw_json
+      
+      // Check top-level company object
+      if (rawData?.company) {
+        const company = rawData.company
+        
+        // Try multiple possible locations for city/postPlace in company object
+        cityStr = company.visitorAddress?.postPlace || 
+                  company.mainOffice?.postPlace || 
+                  company.location?.postPlace ||
+                  company.visitorAddress?.city ||
+                  company.mainOffice?.city ||
+                  company.location?.city ||
+                  company.postPlace ||
+                  company.city ||
+                  company.domicile?.postPlace ||
+                  company.domicile?.city
+        
+        // Also extract address if available
+        if (!addressStr) {
+          addressStr = company.visitorAddress?.addressLine ||
+                      company.mainOffice?.addressLine ||
+                      company.location?.addressLine ||
+                      company.addressLine ||
+                      company.domicile?.addressLine
+        }
+      }
+      
+      // Also check pageProps.company structure (some Allabolag responses use this)
+      if (!cityStr && rawData?.pageProps?.company) {
+        const company = rawData.pageProps.company
+        cityStr = company.visitorAddress?.postPlace || 
+                  company.mainOffice?.postPlace || 
+                  company.location?.postPlace ||
+                  company.visitorAddress?.city ||
+                  company.mainOffice?.city ||
+                  company.location?.city ||
+                  company.postPlace ||
+                  company.city ||
+                  company.domicile?.postPlace ||
+                  company.domicile?.city
+        
+        if (!addressStr) {
+          addressStr = company.visitorAddress?.addressLine ||
+                      company.mainOffice?.addressLine ||
+                      company.location?.addressLine ||
+                      company.addressLine ||
+                      company.domicile?.addressLine
+        }
+      }
+      
+      // Debug logging if we still don't have city (only log first few to avoid spam)
+      if (!cityStr && process.env.NODE_ENV === 'development' && Math.random() < 0.01) {
+        console.log(`[City Extraction] No city found for ${row.orgnr}, raw_json structure:`, 
+          rawData?.company ? `Has company object with keys: ${Object.keys(rawData.company).slice(0, 10).join(', ')}` : 'No company object',
+          rawData?.pageProps?.company ? `Has pageProps.company` : 'No pageProps.company')
+      }
+    } catch (e) {
+      // Failed to parse raw_json, ignore
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[City Extraction] Error parsing raw_json for ${row.orgnr}:`, e)
+      }
+    }
+  }
+
+  return {
+    OrgNr: row.orgnr,
+    name: row.company_name,
+    segment_name: segmentNameJson, // Return as JSON string for frontend to parse
+    city: cityStr || null,
+    employees: row.employees_latest || null,
+    // Database stores values in thousands (as-is from Allabolag)
+    revenue: row.latest_revenue_sek ? row.latest_revenue_sek.toString() : null,
+    profit: row.latest_profit_sek ? row.latest_profit_sek.toString() : null,
+    // Return values as-is (in thousands) - frontend will format as MSEK by dividing by 1,000
+    SDI: row.latest_revenue_sek || null,
+    DR: row.latest_profit_sek || null,
+    ORS: row.latest_ebitda_sek || null,
+    Revenue_growth: row.revenue_cagr_3y || null,
+    EBIT_margin: row.avg_ebitda_margin || null,
+    NetProfit_margin: row.avg_net_margin || null,
+    digital_presence: row.digital_presence || false,
+    incorporation_date: row.foundation_year ? `${row.foundation_year}-01-01` : null,
+    email: row.email || null,
+    homepage: row.homepage || null,
+    address: addressStr || null
+  }
+}
+
 app.get('/api/companies', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    if (!localDBExists()) {
+      return res.status(500).json({ success: false, error: 'Local database not found' })
     }
 
+    const db = getLocalDB()
+    const orgnr = req.query.orgnr ? String(req.query.orgnr).trim() : null
+    
+    // Debug logging
+    console.log('[API /api/companies] orgnr param:', orgnr, 'all query:', req.query)
+    
+    // If orgnr is provided, return single company with historical data
+    if (orgnr) {
+      // Get company with metrics and raw_json for address data
+      const companyQuery = `
+        SELECT 
+          c.orgnr,
+          c.company_name,
+          c.segment_names,
+          c.address,
+          c.employees_latest,
+          c.homepage,
+          c.email,
+          c.foundation_year,
+          m.latest_revenue_sek,
+          m.latest_profit_sek,
+          m.latest_ebitda_sek,
+          m.revenue_cagr_3y,
+          m.avg_ebitda_margin,
+          m.avg_net_margin,
+          m.digital_presence,
+          m.latest_year,
+          (SELECT raw_json FROM company_financials cf 
+           WHERE cf.orgnr = c.orgnr AND cf.raw_json IS NOT NULL 
+           ORDER BY cf.year DESC, cf.period DESC LIMIT 1) as raw_json
+        FROM companies c
+        INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+        WHERE c.orgnr = ?
+      `
+      const companyStmt = db.prepare(companyQuery)
+      const companyRow = companyStmt.get(orgnr) as any
+      
+      if (!companyRow) {
+        return res.status(404).json({ success: false, error: 'Company not found' })
+      }
+      
+      // Debug: Check if raw_json is fetched
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[API /api/companies] Company ${orgnr} - has raw_json:`, !!companyRow.raw_json)
+        if (companyRow.raw_json) {
+          try {
+            const parsed = typeof companyRow.raw_json === 'string' ? JSON.parse(companyRow.raw_json) : companyRow.raw_json
+            console.log(`[API /api/companies] raw_json company keys:`, parsed?.company ? Object.keys(parsed.company).slice(0, 10) : 'No company object')
+          } catch (e) {
+            console.log(`[API /api/companies] Error parsing raw_json:`, e)
+          }
+        }
+      }
+
+      // Get historical financial data
+      const historicalQuery = `
+        SELECT 
+          year,
+          account_code,
+          amount_sek
+        FROM financial_accounts
+        WHERE orgnr = ? AND period = '12' AND account_code IN ('SDI', 'RG', 'DR')
+        ORDER BY year DESC
+        LIMIT 12
+      `
+      const historicalStmt = db.prepare(historicalQuery)
+      const historicalRows = historicalStmt.all(orgnr) as Array<{year: number, account_code: string, amount_sek: number}>
+      
+      // Group by year
+      const historicalByYear = new Map<number, {SDI: number | null, RG: number | null, DR: number | null}>()
+      for (const row of historicalRows) {
+        if (!historicalByYear.has(row.year)) {
+          historicalByYear.set(row.year, { SDI: null, RG: null, DR: null })
+        }
+        const yearData = historicalByYear.get(row.year)!
+        if (row.account_code === 'SDI') yearData.SDI = row.amount_sek
+        else if (row.account_code === 'RG') yearData.RG = row.amount_sek
+        else if (row.account_code === 'DR') yearData.DR = row.amount_sek
+      }
+      
+      // Convert to array and sort
+      const historicalData = Array.from(historicalByYear.entries())
+        .sort((a, b) => b[0] - a[0])
+        .slice(0, 4)
+        .map(([year, data]) => ({
+          year,
+          SDI: data.SDI,
+          RG: data.RG,
+          DR: data.DR
+        }))
+
+      // Transform company data
+      const transformedCompany = transformCompanyData(companyRow)
+      
+      // Add historical data
+      ;(transformedCompany as any).historicalData = historicalData
+      ;(transformedCompany as any).year = companyRow.latest_year || historicalData[0]?.year || 2023
+
+      return res.status(200).json({
+        success: true,
+        company: transformedCompany
+      })
+    }
+
+    // Otherwise, return list of companies
     const limit = Math.min(Math.max(parseInt(req.query.limit as string || '50', 10) || 50, 1), 200)
     const offset = Math.max(parseInt(req.query.offset as string || '0', 10) || 0, 0)
     const searchTerm = (req.query.search as string)?.trim()
 
-    let query = supabase
-      .from('master_analytics')
-      .select(`
-        OrgNr,
-        name,
-        segment_name,
-        city,
-        employees,
-        revenue,
-        profit,
-        SDI,
-        DR,
-        ORS,
-        Revenue_growth,
-        EBIT_margin,
-        NetProfit_margin,
-        digital_presence,
-        incorporation_date,
-        email,
-        homepage,
-        address
-      `)
-      .order('revenue', { ascending: false })
-      .range(offset, offset + limit - 1)
+    // Build query with JOIN companies + company_metrics + company_financials (for raw_json with address data)
+    let query = `
+      SELECT 
+        c.orgnr,
+        c.company_name,
+        c.segment_names,
+        c.address,
+        c.employees_latest,
+        c.homepage,
+        c.email,
+        c.foundation_year,
+        m.latest_revenue_sek,
+        m.latest_profit_sek,
+        m.latest_ebitda_sek,
+        m.revenue_cagr_3y,
+        m.avg_ebitda_margin,
+        m.avg_net_margin,
+        m.digital_presence,
+        (SELECT raw_json FROM company_financials cf 
+         WHERE cf.orgnr = c.orgnr AND cf.raw_json IS NOT NULL 
+         ORDER BY cf.year DESC, cf.period DESC LIMIT 1) as raw_json
+      FROM companies c
+      INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+    `
 
+    const params: any[] = []
+    
     if (searchTerm) {
-      const sanitized = searchTerm.replace(/[%]/g, '\\%').replace(/,/g, ' ')
-      query = query.or(`name.ilike.%${sanitized}%,OrgNr.ilike.%${sanitized}%`)
+      query += ` WHERE (c.company_name LIKE ? OR c.orgnr LIKE ?)`
+      const searchPattern = `%${searchTerm}%`
+      params.push(searchPattern, searchPattern)
     }
 
-    const { data: companies, error } = await query
+    query += ` ORDER BY m.latest_revenue_sek DESC LIMIT ? OFFSET ?`
+    params.push(limit, offset)
 
-    if (error) {
-      console.error('Database error:', error)
-      return res.status(500).json({ success: false, error: 'Database error' })
+    const stmt = db.prepare(query)
+    const companies = stmt.all(...params) as any[]
+
+    // Get total count
+    let countQuery = `
+      SELECT COUNT(*) as total
+      FROM companies c
+      INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+    `
+    if (searchTerm) {
+      countQuery += ` WHERE (c.company_name LIKE ? OR c.orgnr LIKE ?)`
     }
+    const countStmt = db.prepare(countQuery)
+    const countResult = countStmt.get(...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`] : [])) as { total: number }
+    const total = countResult.total || 0
+
+    // Transform to old format for compatibility
+    const transformedCompanies = companies.map((row: any) => {
+      return transformCompanyData(row)
+    })
 
     res.status(200).json({
       success: true,
-      companies: companies || [],
+      companies: transformedCompanies,
       pagination: {
         limit,
         offset,
-        total: companies?.length || 0
+        total
       }
     })
   } catch (error: any) {
@@ -903,7 +1208,7 @@ function createEnhancedScreeningPrompt(companyData: any, instructions?: string):
   // Format historical data
   const historicalText = historicalData.length > 0 
     ? historicalData.map(year => 
-        `${year.year}: Omsättning ${(year.SDI/1000).toFixed(0)} TSEK | EBIT ${(year.EBIT/1000).toFixed(0)} TSEK | Vinst ${(year.DR/1000).toFixed(0)} TSEK`
+        `${year.year}: Omsättning ${(year.SDI/1_000_000).toFixed(1)} MSEK | EBIT ${(year.EBIT/1_000_000).toFixed(1)} MSEK | Vinst ${(year.DR/1_000_000).toFixed(1)} MSEK`
       ).join('\n')
     : 'Begränsad historisk data tillgänglig'
   
@@ -923,9 +1228,9 @@ TILLVÄXTTRENDER:
 - Konsistens: ${trends.consistencyScore.toFixed(0)}/100
 
 FINANSIELL ÖVERSIKT (senaste år):
-- Omsättning (SDI): ${(masterData.SDI/1000).toFixed(0)} TSEK
-- Nettoresultat (DR): ${(masterData.DR/1000).toFixed(0)} TSEK
-- Rörelseresultat (ORS): ${(masterData.ORS/1000).toFixed(0)} TSEK
+- Omsättning (SDI): ${(masterData.SDI/1_000_000).toFixed(1)} MSEK
+- Nettoresultat (DR): ${(masterData.DR/1_000_000).toFixed(1)} MSEK
+- Rörelseresultat (ORS): ${(masterData.ORS/1_000_000).toFixed(1)} MSEK
 - Anställda: ${masterData.employees} personer
 
 LÖNSAMHETSANALYS:
@@ -966,7 +1271,7 @@ function createEnhancedDeepAnalysisPrompt(companyData: any, instructions?: strin
   // Format historical data
   const historicalText = historicalData.length > 0 
     ? historicalData.map(year => 
-        `${year.year}: Omsättning ${(year.SDI/1000).toFixed(0)} TSEK | EBIT ${(year.EBIT/1000).toFixed(0)} TSEK | Vinst ${(year.DR/1000).toFixed(0)} TSEK`
+        `${year.year}: Omsättning ${(year.SDI/1_000_000).toFixed(1)} MSEK | EBIT ${(year.EBIT/1_000_000).toFixed(1)} MSEK | Vinst ${(year.DR/1_000_000).toFixed(1)} MSEK`
       ).join('\n')
     : 'Begränsad historisk data tillgänglig'
   
@@ -990,12 +1295,14 @@ TILLVÄXTTRENDER:
 - Konsistens: ${trends.consistencyScore.toFixed(0)}/100
 - Volatilitet: ${trends.volatilityIndex.toFixed(1)}%
 
-BALANSRÄKNING (begränsad data):
-- Omsättning (SDI): ${(masterData.SDI/1000).toFixed(0)} TSEK
-- Nettoresultat (DR): ${(masterData.DR/1000).toFixed(0)} TSEK
-- Rörelseresultat (ORS): ${(masterData.ORS/1000).toFixed(0)} TSEK
+- BALANSRÄKNING (begränsad data):
+- Omsättning (SDI): ${(masterData.SDI/1_000_000).toFixed(1)} MSEK
+- Nettoresultat (DR): ${(masterData.DR/1_000_000).toFixed(1)} MSEK
+- Rörelseresultat (ORS): ${(masterData.ORS/1_000_000).toFixed(1)} MSEK
 - Anställda: ${masterData.employees} personer
-- Omsättning per anställd: ${(masterData.SDI/masterData.employees/1000).toFixed(0)} TSEK
+- Omsättning per anställd: ${
+    masterData.employees ? (masterData.SDI / masterData.employees / 1000).toFixed(0) : 'N/A'
+  } kSEK
 
 LÖNSAMHETSANALYS:
 - EBIT-marginal: ${(masterData.EBIT_margin * 100).toFixed(1)}% (branschsnitt: ${benchmarks.avgEbitMargin.toFixed(1)}%)
@@ -1273,7 +1580,7 @@ async function processDeepAnalysis(
         // Update target price with selected model's equity value
         const selectedValuation = valuations.find(v => v.modelKey === 'hybrid_score')
         if (selectedValuation && selectedValuation.valueEquity) {
-          result.targetPrice = Math.round(selectedValuation.valueEquity / 1000000) // Convert to MSEK
+          result.targetPrice = Math.round(selectedValuation.valueEquity / 1000) // Database stores in thousands, convert to MSEK
         }
       }
     } catch (valuationError) {
@@ -1848,76 +2155,197 @@ interface FetchedValuationData {
   }>
 }
 
+/**
+ * Helper function to fetch company data from new schema and transform to old format
+ * for compatibility with createCompanyProfile and other functions
+ */
+async function fetchCompanyDataFromNewSchema(
+  supabase: SupabaseClient,
+  orgnr: string
+): Promise<any | null> {
+  // Fetch from companies table
+  const { data: companyData, error: companyError } = await supabase
+    .from('companies')
+    .select(`
+      orgnr,
+      company_name,
+      segment_names,
+      address,
+      homepage,
+      email,
+      foundation_year,
+      employees_latest
+    `)
+    .eq('orgnr', orgnr)
+    .single()
+
+  if (companyError || !companyData) {
+    console.error(`[valuation] Failed to fetch company row for ${orgnr}`, companyError?.message || 'No data returned')
+    return null
+  }
+
+  // Fetch from company_metrics table
+  const { data: metricsData, error: metricsError } = await supabase
+    .from('company_metrics')
+    .select(`
+      orgnr,
+      latest_revenue_sek,
+      latest_profit_sek,
+      latest_ebitda_sek,
+      revenue_cagr_3y,
+      avg_ebitda_margin,
+      avg_net_margin,
+      digital_presence
+    `)
+    .eq('orgnr', orgnr)
+    .single()
+  if (metricsError) {
+    console.warn(`[valuation] Metrics fetch warning for ${orgnr}`, metricsError.message)
+  }
+
+  // Transform to old format
+  const segmentNames = Array.isArray(companyData.segment_names)
+    ? companyData.segment_names
+    : (companyData.segment_names ? [companyData.segment_names] : [])
+  
+  // Extract city from address JSONB
+  let city: string | null = null
+  if (companyData.address) {
+    if (typeof companyData.address === 'object') {
+      city = companyData.address.postPlace || companyData.address.visitorAddress?.postPlace || null
+    }
+  }
+
+  // Transform revenue/profit from thousands to SEK (if needed)
+  // Database stores in thousands, but createCompanyProfile expects SEK
+  const revenue = metricsData?.latest_revenue_sek ? metricsData.latest_revenue_sek * 1000 : null
+  const profit = metricsData?.latest_profit_sek ? metricsData.latest_profit_sek * 1000 : null
+
+  return {
+    OrgNr: companyData.orgnr,
+    name: companyData.company_name,
+    segment_name: segmentNames[0] || null,
+    city: city,
+    employees: companyData.employees_latest,
+    revenue: revenue,
+    profit: profit,
+    SDI: metricsData?.latest_revenue_sek || null, // In thousands
+    DR: metricsData?.latest_profit_sek || null, // In thousands
+    ORS: metricsData?.latest_ebitda_sek || null, // In thousands
+    Revenue_growth: metricsData?.revenue_cagr_3y || null,
+    EBIT_margin: metricsData?.avg_ebitda_margin || null,
+    NetProfit_margin: metricsData?.avg_net_margin || null,
+    digital_presence: metricsData?.digital_presence || false,
+    incorporation_date: companyData.foundation_year ? `${companyData.foundation_year}-01-01` : null,
+    email: companyData.email,
+    homepage: companyData.homepage,
+    address: companyData.address
+  }
+}
+
 async function fetchValuationSourceData(
   supabase: SupabaseClient,
   companyIds: string[]
 ): Promise<FetchedValuationData> {
-  const { data: masterRows, error: masterError } = await supabase
-    .from('master_analytics')
+  // Fetch from new schema: companies + company_metrics
+  const { data: companyRows, error: companyError } = await supabase
+    .from('companies')
     .select(`
-      OrgNr,
-      name,
-      segment_name,
-      employees,
-      SDI,
-      DR,
-      ORS,
-      Revenue_growth,
-      EBIT_margin,
-      NetProfit_margin
+      orgnr,
+      company_name,
+      segment_names,
+      employees_latest
     `)
-    .in('OrgNr', companyIds)
+    .in('orgnr', companyIds)
 
-  if (masterError) {
-    throw new Error(`Failed to fetch master data: ${masterError.message}`)
+  if (companyError) {
+    throw new Error(`Failed to fetch company data: ${companyError.message}`)
   }
 
+  const { data: metricsRows, error: metricsError } = await supabase
+    .from('company_metrics')
+    .select(`
+      orgnr,
+      latest_revenue_sek,
+      latest_profit_sek,
+      latest_ebitda_sek,
+      revenue_cagr_3y,
+      avg_ebitda_margin,
+      avg_net_margin
+    `)
+    .in('orgnr', companyIds)
+
+  if (metricsError) {
+    throw new Error(`Failed to fetch metrics data: ${metricsError.message}`)
+  }
+
+  // Fetch historical financial accounts from new schema
   const { data: accountRows, error: accountsError } = await supabase
-    .from('company_accounts_by_id')
-    .select('*')
-    .in('organisationNumber', companyIds)
+    .from('financial_accounts')
+    .select('orgnr, year, account_code, amount_sek')
+    .in('orgnr', companyIds)
+    .eq('period', '12')
     .order('year', { ascending: false })
 
   if (accountsError) {
     throw new Error(`Failed to fetch financial accounts: ${accountsError.message}`)
   }
 
-  const accountsMap = new Map<string, any[]>()
+  // Build accounts map by orgnr and year
+  const accountsMap = new Map<string, Map<number, any>>()
   for (const row of accountRows || []) {
-    const orgnr = pickOrgNumber(row)
+    const orgnr = row.orgnr
     if (!orgnr) continue
-    const existing = accountsMap.get(orgnr) || []
-    existing.push(row)
-    accountsMap.set(orgnr, existing)
+    if (!accountsMap.has(orgnr)) {
+      accountsMap.set(orgnr, new Map())
+    }
+    const yearMap = accountsMap.get(orgnr)!
+    const year = row.year
+    if (!yearMap.has(year)) {
+      yearMap.set(year, { year })
+    }
+    const record = yearMap.get(year)!
+    // Map account codes
+    if (row.account_code === 'SDI') record.SDI = row.amount_sek
+    else if (row.account_code === 'RG') record.RG = row.amount_sek
+    else if (row.account_code === 'DR') record.DR = row.amount_sek
+    else if (row.account_code === 'EBITDA') record.EBITDA = row.amount_sek
   }
 
-  const companies = (masterRows || []).map((row: any) => {
-    const orgnr = pickOrgNumber(row)
+  // Build companies array
+  const companiesMap = new Map<string, any>()
+  for (const companyRow of companyRows || []) {
+    const orgnr = companyRow.orgnr
+    const metricsRow = metricsRows?.find(m => m.orgnr === orgnr)
+    const segmentNames = Array.isArray(companyRow.segment_names) 
+      ? companyRow.segment_names 
+      : (companyRow.segment_names ? [companyRow.segment_names] : [])
+    
     const fallbackYear = new Date().getFullYear()
     const fallbackRecord = {
       year: fallbackYear,
-      SDI: row?.SDI,
-      RG: row?.RG,
-      EBIT: row?.RG,
-      EBITDA: row?.ORS,
-      DR: row?.DR,
-      EK: row?.EK,
-      SV: row?.SV,
-      SEK: row?.SEK,
+      SDI: metricsRow?.latest_revenue_sek || null,
+      RG: metricsRow?.latest_revenue_sek || null,
+      EBIT: metricsRow?.latest_ebitda_sek || null,
+      EBITDA: metricsRow?.latest_ebitda_sek || null,
+      DR: metricsRow?.latest_profit_sek || null,
     }
-    const rawRecords = accountsMap.get(orgnr || '') || []
-    const records = rawRecords.length ? rawRecords : [fallbackRecord]
+    
+    const yearRecords = accountsMap.get(orgnr) || new Map()
+    const records = Array.from(yearRecords.values()).length > 0 
+      ? Array.from(yearRecords.values())
+      : [fallbackRecord]
 
-    return {
-      orgnr: orgnr || row?.OrgNr,
-      name: row?.name || 'Okänt bolag',
-      industry: row?.segment_name || null,
-      employees: typeof row?.employees === 'number' ? row.employees : Number.parseInt(row?.employees, 10) || null,
+    companiesMap.set(orgnr, {
+      orgnr: orgnr,
+      name: companyRow.company_name || 'Okänt bolag',
+      industry: segmentNames[0] || null,
+      employees: companyRow.employees_latest || null,
       records,
-    }
   })
+  }
 
-  return { companies }
+  return { companies: Array.from(companiesMap.values()) }
 }
 
 interface AiInsightResult {
@@ -2199,37 +2627,14 @@ app.post('/api/valuation', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data directly from master_analytics for each company
+    // Fetch company data from new schema for each company
     const companies: ValuationCompanyResponse[] = []
     
     for (const companyId of companyIds) {
-      const { data: companyData, error } = await supabase
-        .from('master_analytics')
-        .select(`
-          OrgNr,
-          name,
-          segment_name,
-          city,
-          employees,
-          revenue,
-          profit,
-          SDI,
-          DR,
-          ORS,
-          Revenue_growth,
-          EBIT_margin,
-          NetProfit_margin,
-          digital_presence,
-          incorporation_date,
-          email,
-          homepage,
-          address
-        `)
-        .eq('OrgNr', companyId)
-        .single()
+      const companyData = await fetchCompanyDataFromNewSchema(supabase, companyId)
 
-      if (error || !companyData) {
-        console.error(`Failed to fetch data for company ${companyId}:`, error)
+      if (!companyData) {
+        console.error(`Failed to fetch data for company ${companyId}`)
         continue
       }
 
@@ -2338,33 +2743,10 @@ app.post('/api/valuation/preview', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data directly from master_analytics (same as /api/companies)
-    const { data: companyData, error } = await supabase
-      .from('master_analytics')
-      .select(`
-        OrgNr,
-        name,
-        segment_name,
-        city,
-        employees,
-        revenue,
-        profit,
-        SDI,
-        DR,
-        ORS,
-        Revenue_growth,
-        EBIT_margin,
-        NetProfit_margin,
-        digital_presence,
-        incorporation_date,
-        email,
-        homepage,
-        address
-      `)
-      .eq('OrgNr', orgnr)
-      .single()
+    // Fetch company data from new schema
+    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
 
-    if (error || !companyData) {
+    if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
@@ -2411,33 +2793,10 @@ app.post('/api/valuation/commit', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data directly from master_analytics (same as /api/companies)
-    const { data: companyData, error } = await supabase
-      .from('master_analytics')
-      .select(`
-        OrgNr,
-        name,
-        segment_name,
-        city,
-        employees,
-        revenue,
-        profit,
-        SDI,
-        DR,
-        ORS,
-        Revenue_growth,
-        EBIT_margin,
-        NetProfit_margin,
-        digital_presence,
-        incorporation_date,
-        email,
-        homepage,
-        address
-      `)
-      .eq('OrgNr', orgnr)
-      .single()
+    // Fetch company data from new schema
+    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
 
-    if (error || !companyData) {
+    if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
@@ -2614,33 +2973,10 @@ app.post('/api/valuation/advice', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // Fetch company data directly from master_analytics (same as /api/companies)
-    const { data: companyData, error } = await supabase
-      .from('master_analytics')
-      .select(`
-        OrgNr,
-        name,
-        segment_name,
-        city,
-        employees,
-        revenue,
-        profit,
-        SDI,
-        DR,
-        ORS,
-        Revenue_growth,
-        EBIT_margin,
-        NetProfit_margin,
-        digital_presence,
-        incorporation_date,
-        email,
-        homepage,
-        address
-      `)
-      .eq('OrgNr', orgnr)
-      .single()
+    // Fetch company data from new schema
+    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
 
-    if (error || !companyData) {
+    if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
@@ -2736,15 +3072,16 @@ app.post('/api/valuation/assumptions', async (req, res) => {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const success = await createAssumptions(supabase, assumptions)
+    const createdRecord = await createAssumptions(supabase, assumptions)
 
-    if (!success) {
+    if (!createdRecord) {
       return res.status(500).json({ success: false, error: 'Failed to create assumptions' })
     }
 
     res.status(201).json({
       success: true,
-      message: 'Assumptions created successfully'
+      message: 'Assumptions created successfully',
+      data: createdRecord
     })
   } catch (error: any) {
     console.error('Create assumptions error:', error)
@@ -2777,95 +3114,528 @@ app.delete('/api/valuation/assumptions/:id', async (req, res) => {
   }
 })
 
-// Dashboard Analytics endpoint
-app.get('/api/analytics', async (req, res) => {
+// Dashboard Analytics endpoint - Local SQLite Database
+app.get('/api/analytics-local', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const dbPath = path.resolve(__dirname, '../../data/new_schema_local.db')
+    console.log(`[Local DB] Opening database at: ${dbPath}`)
+    
+    if (!fs.existsSync(dbPath)) {
+      console.error(`[Local DB] Database file not found: ${dbPath}`)
+      return res.status(500).json({ success: false, error: 'Local database file not found' })
+    }
+    
+    const db = new Database(dbPath, { readonly: true })
+
+    // Get total companies count
+    const totalCompaniesResult = db.prepare('SELECT COUNT(*) as count FROM companies').get() as { count: number }
+    const totalCompanies = totalCompaniesResult.count || 0
+
+    // Get all metrics from company_metrics table (pre-calculated KPIs)
+    const metricsQuery = db.prepare(`
+      SELECT 
+        orgnr,
+        latest_revenue_sek,
+        latest_profit_sek,
+        latest_ebitda_sek,
+        revenue_cagr_3y,
+        avg_ebitda_margin,
+        avg_net_margin
+      FROM company_metrics
+    `)
+    const allMetrics = metricsQuery.all() as Array<{
+      orgnr: string
+      latest_revenue_sek: number | null
+      latest_profit_sek: number | null
+      latest_ebitda_sek: number | null
+      revenue_cagr_3y: number | null
+      avg_ebitda_margin: number | null
+      avg_net_margin: number | null
+    }>
+    
+    console.log(`[Local DB Analytics] Metrics query result: ${allMetrics.length} rows`)
+    if (allMetrics.length > 0) {
+      const sample = allMetrics[0]
+      console.log(`[Local DB Analytics] Sample metric:`, {
+        orgnr: sample.orgnr,
+        latest_revenue_sek: sample.latest_revenue_sek,
+        revenue_type: typeof sample.latest_revenue_sek,
+        isNull: sample.latest_revenue_sek === null,
+        isGreaterThanZero: sample.latest_revenue_sek > 0
+      })
+      // Check first 5 metrics
+      const firstFive = allMetrics.slice(0, 5)
+      console.log(`[Local DB Analytics] First 5 metrics revenue values:`, 
+        firstFive.map(m => ({ orgnr: m.orgnr, revenue: m.latest_revenue_sek, type: typeof m.latest_revenue_sek }))
+      )
+    } else {
+      console.error(`[Local DB Analytics] ERROR: No metrics returned from query!`)
     }
 
-    // Get analytics data from master_analytics table
-    const { data: companies, error } = await supabase
-      .from('master_analytics')
-      .select(`
-        OrgNr,
-        name,
-        SDI,
-        DR,
-        ORS,
-        Revenue_growth,
-        EBIT_margin,
-        NetProfit_margin,
-        digital_presence,
-        homepage
-      `)
-      .limit(1000) // Sample for analytics
+    // Calculate metrics from pre-calculated values
+    const revenueValues: number[] = []
+    const growthValues: number[] = []
+    const ebitMarginValues: number[] = []
+    const netMarginValues: number[] = []
+    let totalWithFinancials = 0
+    let totalWithKPIs = 0
 
-    if (error) {
-      console.error('Analytics query error:', error)
-      return res.status(500).json({ success: false, error: 'Failed to fetch analytics data' })
-    }
+    allMetrics.forEach(metric => {
+      // Companies with financials = have revenue data
+      if (metric.latest_revenue_sek !== null && metric.latest_revenue_sek > 0) {
+        totalWithFinancials++
+        revenueValues.push(metric.latest_revenue_sek)
+      }
 
-    if (!companies || companies.length === 0) {
-      // Return fallback analytics if no data
-      return res.status(200).json({
-        success: true,
-        data: {
-          totalCompanies: 0,
-          totalWithFinancials: 0,
-          totalWithKPIs: 0,
-          totalWithDigitalPresence: 0,
-          averageRevenueGrowth: 0,
-          averageEBITMargin: 0,
-          averageNetProfitMargin: 0,
-          averageNetProfitGrowth: 0,
-          averageRevenue: 0,
-          averageCAGR4Y: null
+      // Companies with KPIs = have at least one KPI calculated
+      const hasKPI = metric.revenue_cagr_3y !== null || 
+                     metric.avg_ebitda_margin !== null || 
+                     metric.avg_net_margin !== null
+      
+      if (hasKPI) {
+        totalWithKPIs++
+      }
+
+      // Collect values for averages (only valid numbers)
+      if (metric.revenue_cagr_3y !== null && !isNaN(metric.revenue_cagr_3y)) {
+        growthValues.push(metric.revenue_cagr_3y)
+      }
+      
+      // Filter out extreme outliers (margins outside -1 to 1 range are likely data errors)
+      // This prevents a few extreme values from skewing the average
+      if (metric.avg_ebitda_margin !== null && !isNaN(metric.avg_ebitda_margin)) {
+        // Only include reasonable margins (-100% to +100%)
+        if (metric.avg_ebitda_margin >= -1 && metric.avg_ebitda_margin <= 1) {
+          ebitMarginValues.push(metric.avg_ebitda_margin)
         }
+      }
+      
+      if (metric.avg_net_margin !== null && !isNaN(metric.avg_net_margin)) {
+        // Only include reasonable margins (-100% to +50%)
+        // Net margins above 50% are extremely rare and likely data errors
+        if (metric.avg_net_margin >= -1 && metric.avg_net_margin <= 0.5) {
+          netMarginValues.push(metric.avg_net_margin)
+        }
+      }
+    })
+
+    // Get digital presence count
+    const digitalPresenceQuery = db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM companies 
+      WHERE homepage IS NOT NULL AND homepage != ''
+    `)
+    const digitalResult = digitalPresenceQuery.get() as { count: number }
+    const totalWithDigitalPresence = digitalResult.count || 0
+
+    // Calculate averages - return null if no data (not 0)
+    const averageRevenue = revenueValues.length > 0
+      ? revenueValues.reduce((sum, val) => sum + val, 0) / revenueValues.length
+      : null
+    const averageRevenueGrowth = growthValues.length > 0
+      ? growthValues.reduce((sum, val) => sum + val, 0) / growthValues.length
+      : null
+    const averageEBITMargin = ebitMarginValues.length > 0
+      ? ebitMarginValues.reduce((sum, val) => sum + val, 0) / ebitMarginValues.length
+      : null
+    const averageNetProfitMargin = netMarginValues.length > 0
+      ? netMarginValues.reduce((sum, val) => sum + val, 0) / netMarginValues.length
+      : null
+
+    // Get industry distribution - count unique companies per industry
+    // segment_names is a JSON array, so we need to extract and count unique companies
+    // Handle cases where segment_names might not be valid JSON
+    let industries: Array<{ industry_name: string; count: number }> = []
+    try {
+      const industryQuery = db.prepare(`
+        SELECT 
+          json_extract(value, '$') as industry_name,
+          COUNT(DISTINCT orgnr) as count
+        FROM companies,
+        json_each(segment_names)
+        WHERE segment_names IS NOT NULL 
+          AND segment_names != ''
+          AND json_valid(segment_names) = 1
+          AND json_array_length(segment_names) > 0
+        GROUP BY industry_name
+        ORDER BY count DESC
+        LIMIT 10
+      `)
+      industries = industryQuery.all() as Array<{ industry_name: string; count: number }>
+    } catch (error: any) {
+      console.warn('[Local DB Analytics] Industry query failed, trying alternative approach:', error.message)
+      // Fallback: try to parse segment_names as text and extract industries
+      try {
+        const fallbackQuery = db.prepare(`
+          SELECT segment_names, COUNT(*) as count
+          FROM companies
+          WHERE segment_names IS NOT NULL AND segment_names != ''
+          GROUP BY segment_names
+          ORDER BY count DESC
+          LIMIT 10
+        `)
+        const fallbackResults = fallbackQuery.all() as Array<{ segment_names: string; count: number }>
+        const industryMap = new Map<string, number>()
+        fallbackResults.forEach(row => {
+          try {
+            const segments = JSON.parse(row.segment_names)
+            if (Array.isArray(segments)) {
+              segments.forEach((seg: string) => {
+                industryMap.set(seg, (industryMap.get(seg) || 0) + row.count)
+              })
+            }
+          } catch (e) {
+            // If not JSON, treat as single industry name
+            industryMap.set(row.segment_names, (industryMap.get(row.segment_names) || 0) + row.count)
+          }
+        })
+        industries = Array.from(industryMap.entries()).map(([name, count]) => ({ industry_name: name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10)
+      } catch (fallbackError) {
+        console.error('[Local DB Analytics] Fallback industry query also failed:', fallbackError)
+      }
+    }
+    
+    // Calculate total companies with segments for percentage calculation
+    let companiesWithSegments = totalCompanies
+    try {
+      const companiesWithSegmentsQuery = db.prepare(`
+        SELECT COUNT(DISTINCT orgnr) as count
+        FROM companies,
+        json_each(segment_names)
+        WHERE segment_names IS NOT NULL 
+          AND segment_names != ''
+          AND json_valid(segment_names) = 1
+          AND json_array_length(segment_names) > 0
+      `)
+      const companiesWithSegmentsResult = companiesWithSegmentsQuery.get() as { count: number }
+      companiesWithSegments = companiesWithSegmentsResult.count || totalCompanies
+    } catch (error) {
+      // If query fails, use totalCompanies as fallback
+      companiesWithSegments = totalCompanies
+    }
+    
+    const topIndustries = industries.map(ind => ({
+      name: ind.industry_name || 'Okänd',
+      count: ind.count,
+      percentage: totalCompanies > 0 ? (ind.count / totalCompanies) * 100 : 0
+    }))
+
+    // Get company size distribution based on revenue from metrics
+    // Need to get revenue for ALL companies from company_metrics
+    const allCompanyRevenues = new Map<string, number>()
+    let metricsWithRevenue = 0
+    allMetrics.forEach(metric => {
+      // Convert to number explicitly in case SQLite returns string
+      const revenue = typeof metric.latest_revenue_sek === 'string' 
+        ? parseFloat(metric.latest_revenue_sek) 
+        : metric.latest_revenue_sek
+      
+      if (revenue !== null && revenue !== undefined && !isNaN(revenue) && revenue > 0) {
+        allCompanyRevenues.set(metric.orgnr, revenue)
+        metricsWithRevenue++
+      }
+    })
+
+    console.log(`[Local DB Analytics] Size distribution calculation:`)
+    console.log(`  - Total metrics processed: ${allMetrics.length}`)
+    console.log(`  - Metrics with valid revenue: ${metricsWithRevenue}`)
+    console.log(`  - Companies with revenue in map: ${allCompanyRevenues.size}`)
+    if (allCompanyRevenues.size > 0) {
+      const revenueValues = Array.from(allCompanyRevenues.values())
+      const sampleRevenues = revenueValues.slice(0, 5)
+      console.log(`  - Sample revenue values: ${sampleRevenues.join(', ')}`)
+      const minRevenue = Math.min(...revenueValues)
+      const maxRevenue = Math.max(...revenueValues)
+      console.log(`  - Revenue range: ${minRevenue} - ${maxRevenue}`)
+      console.log(`  - Sample revenue types: ${sampleRevenues.map(v => typeof v).join(', ')}`)
+    } else {
+      console.log(`  - WARNING: No companies with revenue found!`)
+      if (allMetrics.length > 0) {
+        const sample = allMetrics[0]
+        console.log(`  - Sample metric:`, {
+          orgnr: sample.orgnr,
+          latest_revenue_sek: sample.latest_revenue_sek,
+          type: typeof sample.latest_revenue_sek,
+          isNull: sample.latest_revenue_sek === null,
+          isUndefined: sample.latest_revenue_sek === undefined
+        })
+      }
+    }
+
+    const sizeDistribution: Array<{ name: string; count: number; percentage: number }> = []
+    
+    // Use direct SQL query as fallback if allCompanyRevenues is empty
+    if (allCompanyRevenues.size === 0) {
+      console.log(`[Local DB Analytics] WARNING: allCompanyRevenues is empty, using SQL fallback`)
+      const sizeRanges = [
+        { name: 'Små (50-100 MSEK)', min: 50_000, max: 100_000 },
+        { name: 'Medelstora (100-150 MSEK)', min: 100_000, max: 150_000 },
+        { name: 'Stora (150-200 MSEK)', min: 150_000, max: 200_000 }
+      ]
+      
+      for (const range of sizeRanges) {
+        const countQuery = db.prepare(`
+          SELECT COUNT(*) as count 
+          FROM company_metrics 
+          WHERE latest_revenue_sek >= ? AND latest_revenue_sek < ?
+        `)
+        const result = countQuery.get(range.min, range.max) as { count: number }
+        const count = result.count || 0
+        console.log(`  - ${range.name}: ${count} companies (SQL query, range: ${range.min} - ${range.max})`)
+        sizeDistribution.push({
+          name: range.name,
+          count,
+          percentage: totalCompanies > 0 ? (count / totalCompanies) * 100 : 0
+        })
+      }
+    } else {
+      // Database stores revenue in thousands (tSEK), so 50,000 = 50M SEK
+      const sizeRanges = [
+        { name: 'Små (50-100 MSEK)', min: 50_000, max: 100_000 },
+        { name: 'Medelstora (100-150 MSEK)', min: 100_000, max: 150_000 },
+        { name: 'Stora (150-200 MSEK)', min: 150_000, max: 200_000 }
+      ]
+
+      sizeRanges.forEach(range => {
+        const revenueValues = Array.from(allCompanyRevenues.values())
+        const matchingRevenues = revenueValues.filter(r => {
+          const num = typeof r === 'string' ? parseFloat(r) : r
+          return !isNaN(num) && num >= range.min && num < range.max
+        })
+        const count = matchingRevenues.length
+        console.log(`  - ${range.name}: ${count} companies (range: ${range.min} - ${range.max})`)
+        if (count === 0 && revenueValues.length > 0) {
+          // Debug why no matches
+          const sampleInRange = revenueValues.filter(r => {
+            const num = typeof r === 'string' ? parseFloat(r) : r
+            return !isNaN(num) && num >= range.min - 1000 && num <= range.max + 1000
+          }).slice(0, 3)
+          console.log(`    - Sample values near range: ${sampleInRange.join(', ')}`)
+        }
+        sizeDistribution.push({
+          name: range.name,
+          count,
+          percentage: totalCompanies > 0 ? (count / totalCompanies) * 100 : 0
+        })
       })
     }
 
-    // Calculate analytics
-    const totalCompanies = companies.length
-    const totalWithFinancials = companies.filter(c => c.SDI && c.SDI > 0).length
-    const totalWithKPIs = companies.filter(c => 
-      c.Revenue_growth !== null || c.EBIT_margin !== null || c.NetProfit_margin !== null
-    ).length
-    const totalWithDigitalPresence = companies.filter(c => 
-      c.digital_presence === true || (c.homepage && c.homepage.trim().length > 0)
-    ).length
+    // Add "Unknown size" for companies without revenue data
+    // Use SQL query if allCompanyRevenues is empty
+    let companiesWithRevenue = allCompanyRevenues.size
+    if (companiesWithRevenue === 0) {
+      const revenueCountQuery = db.prepare(`
+        SELECT COUNT(*) as count 
+        FROM company_metrics 
+        WHERE latest_revenue_sek IS NOT NULL AND latest_revenue_sek > 0
+      `)
+      const revenueResult = revenueCountQuery.get() as { count: number }
+      companiesWithRevenue = revenueResult.count || 0
+    }
+    const companiesWithoutRevenue = totalCompanies - companiesWithRevenue
+    if (companiesWithoutRevenue > 0) {
+      sizeDistribution.push({
+        name: 'Okänd storlek',
+        count: companiesWithoutRevenue,
+        percentage: totalCompanies > 0 ? (companiesWithoutRevenue / totalCompanies) * 100 : 0
+      })
+    }
+
+    // Detailed logging for all metrics - verify all 5 cards
+    console.log(`[Local DB Analytics] ========================================`)
+    console.log(`📊 CARD VALUES VERIFICATION:`)
+    console.log(`---`)
+    console.log(`Card 1 - Totalt antal företag: ${totalCompanies.toLocaleString('sv-SE')}`)
+    console.log(`Card 2 - Genomsnittlig omsättning: ${averageRevenue ? (averageRevenue / 1_000).toFixed(1) + ' MSEK' : 'N/A'} (from ${revenueValues.length} companies)`)  // Database stores in thousands
+    console.log(`Card 3 - Genomsnittlig tillväxt (3 år CAGR): ${averageRevenueGrowth !== null ? (averageRevenueGrowth * 100).toFixed(2) + '%' : 'N/A'} (from ${growthValues.length} companies)`)
+    console.log(`Card 4 - Genomsnittlig EBIT-marginal: ${averageEBITMargin !== null ? (averageEBITMargin * 100).toFixed(2) + '%' : 'N/A'} (from ${ebitMarginValues.length} companies)`)
+    console.log(`Card 5 - Genomsnittlig vinstmarginal: ${averageNetProfitMargin !== null ? (averageNetProfitMargin * 100).toFixed(2) + '%' : 'N/A'} (from ${netMarginValues.length} companies)`)
+    console.log(`---`)
+    console.log(`Supporting metrics:`)
+    console.log(`  - Total with Financials: ${totalWithFinancials}`)
+    console.log(`  - Total with KPIs: ${totalWithKPIs}`)
+    console.log(`  - Total with Digital Presence: ${totalWithDigitalPresence}`)
+    console.log(`---`)
+    console.log(`📊 COMPANY SIZE DISTRIBUTION:`)
+    console.log(`  - Total companies with revenue: ${allCompanyRevenues.size}`)
+    console.log(`  - Size distribution entries: ${sizeDistribution.length}`)
+    sizeDistribution.forEach((size, idx) => {
+      console.log(`    ${idx + 1}. ${size.name}: ${size.count} companies (${size.percentage.toFixed(1)}%)`)
+    })
+    console.log(`========================================`)
+
+    // Get detailed margin analysis (before closing DB)
+    const marginAnalysisQuery = db.prepare(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN latest_profit_sek < 0 THEN 1 END) as negative_profit,
+        COUNT(CASE WHEN latest_profit_sek >= 0 THEN 1 END) as positive_profit,
+        COUNT(CASE WHEN latest_profit_sek IS NULL THEN 1 END) as null_profit,
+        COUNT(CASE WHEN latest_ebitda_sek < 0 THEN 1 END) as negative_ebit,
+        COUNT(CASE WHEN latest_ebitda_sek >= 0 THEN 1 END) as positive_ebit,
+        COUNT(CASE WHEN latest_ebitda_sek IS NULL THEN 1 END) as null_ebit,
+        COUNT(CASE WHEN avg_ebitda_margin < -1 THEN 1 END) as extreme_negative_margin,
+        COUNT(CASE WHEN avg_ebitda_margin >= -1 AND avg_ebitda_margin < 0 THEN 1 END) as negative_margin,
+        COUNT(CASE WHEN avg_ebitda_margin >= 0 AND avg_ebitda_margin <= 1 THEN 1 END) as positive_margin,
+        COUNT(CASE WHEN avg_ebitda_margin > 1 THEN 1 END) as extreme_positive_margin
+      FROM company_metrics
+    `)
+    const marginAnalysis = marginAnalysisQuery.get() as {
+      total: number
+      negative_profit: number
+      positive_profit: number
+      null_profit: number
+      negative_ebit: number
+      positive_ebit: number
+      null_ebit: number
+      extreme_negative_margin: number
+      negative_margin: number
+      positive_margin: number
+      extreme_positive_margin: number
+    }
+
+    // Close database connection after all queries
+    db.close()
+
+    // Log the size distribution before sending response
+    console.log(`[Local DB Analytics] Sending response with sizeDistribution:`, JSON.stringify(sizeDistribution, null, 2))
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalCompanies,
+        totalWithFinancials,
+        totalWithKPIs,
+        totalWithDigitalPresence,
+        averageRevenueGrowth,
+        averageEBITMargin,
+        averageNetProfitMargin,
+        // Profit growth not available - would need historical profit data to calculate CAGR
+        // For now, set to null as we don't have profit_cagr_3y in the database
+        averageNetProfitGrowth: null,
+        averageRevenue,
+        averageCAGR4Y: null,
+        topIndustries,
+        companySizeDistribution: sizeDistribution,
+        marginAnalysis: {
+          profit: {
+            negative: marginAnalysis.negative_profit,
+            positive: marginAnalysis.positive_profit,
+            null: marginAnalysis.null_profit,
+            total: marginAnalysis.total
+          },
+          ebit: {
+            negative: marginAnalysis.negative_ebit,
+            positive: marginAnalysis.positive_ebit,
+            null: marginAnalysis.null_ebit,
+            total: marginAnalysis.total
+          },
+          ebitdaMargin: {
+            extremeNegative: marginAnalysis.extreme_negative_margin,
+            negative: marginAnalysis.negative_margin,
+            positive: marginAnalysis.positive_margin,
+            extremePositive: marginAnalysis.extreme_positive_margin,
+            total: marginAnalysis.total
+          }
+        }
+      }
+    })
+  } catch (error: any) {
+    console.error('[Local DB Analytics] Error:', error)
+    console.error('[Local DB Analytics] Stack:', error?.stack)
+    res.status(500).json({ 
+      success: false, 
+      error: error?.message || 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+    })
+  }
+})
+
+// Dashboard Analytics endpoint - redirect to local DB version
+app.get('/api/analytics', async (req, res) => {
+  // Redirect to local DB analytics endpoint
+  try {
+    if (!localDBExists()) {
+      return res.status(500).json({ success: false, error: 'Local database not found' })
+    }
+
+    const db = getLocalDB()
+
+    // Get total companies count
+    const totalCompaniesResult = db.prepare('SELECT COUNT(*) as count FROM companies').get() as { count: number }
+    const totalCompanies = totalCompaniesResult.count || 0
+
+    // Get metrics counts directly from company_metrics table
+    const metricsCountQuery = db.prepare(`
+      SELECT 
+        COUNT(*) as total_metrics,
+        COUNT(CASE WHEN latest_revenue_sek IS NOT NULL AND latest_revenue_sek > 0 THEN 1 END) as with_financials,
+        COUNT(CASE WHEN revenue_cagr_3y IS NOT NULL OR avg_ebitda_margin IS NOT NULL OR avg_net_margin IS NOT NULL THEN 1 END) as with_kpis
+      FROM company_metrics
+    `)
+    const metricsCounts = metricsCountQuery.get() as { total_metrics: number; with_financials: number; with_kpis: number }
+
+    // Get all metrics for calculating averages
+    const metricsQuery = db.prepare(`
+      SELECT 
+        latest_revenue_sek,
+        revenue_cagr_3y,
+        avg_ebitda_margin,
+        avg_net_margin
+      FROM company_metrics
+      WHERE latest_revenue_sek IS NOT NULL
+    `)
+    const allMetrics = metricsQuery.all() as Array<{
+      latest_revenue_sek: number | null
+      revenue_cagr_3y: number | null
+      avg_ebitda_margin: number | null
+      avg_net_margin: number | null
+    }>
+
+    // Get digital presence count
+    const digitalPresenceQuery = db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM companies 
+      WHERE homepage IS NOT NULL AND homepage != ''
+    `)
+    const digitalResult = digitalPresenceQuery.get() as { count: number }
+    const totalWithDigitalPresence = digitalResult.count || 0
 
     // Calculate averages
-    const revenueGrowthValues = companies.map(c => c.Revenue_growth).filter(v => v !== null && !isNaN(v))
-    const ebitMarginValues = companies.map(c => c.EBIT_margin).filter(v => v !== null && !isNaN(v))
-    const netProfitMarginValues = companies.map(c => c.NetProfit_margin).filter(v => v !== null && !isNaN(v))
-    const revenueValues = companies.map(c => c.SDI).filter(v => v !== null && !isNaN(v))
+    const revenueValues = allMetrics.map(m => m.latest_revenue_sek).filter(v => v !== null && !isNaN(v!)) as number[]
+    const revenueGrowthValues = allMetrics.map(m => m.revenue_cagr_3y).filter(v => v !== null && !isNaN(v!)) as number[]
+    // Filter out extreme outliers (margins outside -1 to 1 range are likely data errors)
+    const ebitMarginValues = allMetrics
+      .map(m => m.avg_ebitda_margin)
+      .filter(v => v !== null && !isNaN(v!) && v! >= -1 && v! <= 1) as number[]
+    const netProfitMarginValues = allMetrics.map(m => m.avg_net_margin).filter(v => v !== null && !isNaN(v!)) as number[]
 
     const averageRevenueGrowth = revenueGrowthValues.length > 0 
       ? revenueGrowthValues.reduce((sum, val) => sum + val, 0) / revenueGrowthValues.length 
-      : 0
+      : null
     const averageEBITMargin = ebitMarginValues.length > 0 
       ? ebitMarginValues.reduce((sum, val) => sum + val, 0) / ebitMarginValues.length 
-      : 0
+      : null
     const averageNetProfitMargin = netProfitMarginValues.length > 0 
       ? netProfitMarginValues.reduce((sum, val) => sum + val, 0) / netProfitMarginValues.length 
-      : 0
+      : null
     const averageRevenue = revenueValues.length > 0 
       ? revenueValues.reduce((sum, val) => sum + val, 0) / revenueValues.length 
-      : 0
+      : null
 
     const analytics = {
       totalCompanies,
-      totalWithFinancials,
-      totalWithKPIs,
+      totalWithFinancials: metricsCounts.with_financials,
+      totalWithKPIs: metricsCounts.with_kpis,
       totalWithDigitalPresence,
       averageRevenueGrowth,
       averageEBITMargin,
       averageNetProfitMargin,
-      averageNetProfitGrowth: averageRevenueGrowth, // Using revenue growth as proxy
+      averageNetProfitGrowth: averageRevenueGrowth,
       averageRevenue,
-      averageCAGR4Y: null // Not available without historical data
+      averageCAGR4Y: null
     }
 
     res.status(200).json({

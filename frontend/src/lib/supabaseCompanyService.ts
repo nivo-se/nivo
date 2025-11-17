@@ -51,6 +51,12 @@ export interface SupabaseCompany {
   growth_category?: string         // growth_bucket
   digital_presence?: boolean
   company_id?: string  // Allabolag company ID for linking
+  
+  // Segmentation Scores (from company_metrics)
+  fit_score?: number              // Fit score (0-100)
+  ops_upside_score?: number       // Ops upside score (0-100)
+  nivo_total_score?: number       // Total score (0-200)
+  segment_tier?: 'A' | 'B' | null // Segment tier
 }
 
 export interface SearchResults {
@@ -369,13 +375,9 @@ class SupabaseCompanyService {
         // Get historical financial data
         const historicalData = await getHistoricalFinancialData(company.orgnr)
         
-        // Calculate growth from historical data
-        let growth: number | null = null
-        if (historicalData.length >= 2) {
-          const current = historicalData[0]?.SDI
-          const previous = historicalData[1]?.SDI
-          growth = calculateGrowth(current ?? null, previous ?? null)
-        }
+        // Use database-calculated 3-year CAGR for growth (more reliable than calculating from 2 years)
+        // revenue_cagr_3y is stored as a decimal (e.g., 0.15 = 15%), frontend will multiply by 100 for display
+        const growth = metrics?.revenue_cagr_3y ?? null
 
         // Extract address and city
         const { addressStr, cityStr } = extractAddressFromJsonb(company.address)
@@ -388,8 +390,10 @@ class SupabaseCompanyService {
         const ebit = extractScaledCurrency(metrics?.latest_ebitda_sek)
         const profit = extractScaledCurrency(metrics?.latest_profit_sek)
         
-        const ebitMargin = calculateEBITMargin(ebit ?? null, revenue ?? null)
-        const profitMargin = calculateProfitMargin(profit ?? null, revenue ?? null)
+        // Use database-calculated margins (stored as decimals, e.g., 0.05 = 5%)
+        // Don't calculate on the fly as it can cause unit mismatches
+        const ebitMargin = metrics?.avg_ebitda_margin ?? undefined
+        const profitMargin = metrics?.avg_net_margin ?? undefined
 
         return {
           OrgNr: company.orgnr,
@@ -642,8 +646,8 @@ class SupabaseCompanyService {
     }
   }
 
-  // Get companies by OrgNrs array
-  async getCompaniesByOrgNrs(orgNrs: string[]): Promise<SupabaseCompany[]> {
+  // Get companies by OrgNrs array (without historical data to avoid timeouts)
+  async getCompaniesByOrgNrs(orgNrs: string[], includeHistorical: boolean = false): Promise<SupabaseCompany[]> {
     if (!supabase || !supabaseConfig.isConfigured || orgNrs.length === 0) {
       return []
     }
@@ -660,27 +664,39 @@ class SupabaseCompanyService {
         return []
       }
 
-      // Get metrics
+      // Get metrics (skip if timeout risk)
       const { data: metricsData } = await supabase
         .from('company_metrics')
         .select('orgnr, latest_year, latest_revenue_sek, latest_profit_sek, latest_ebitda_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, company_size_bucket, growth_bucket, profitability_bucket, digital_presence')
         .in('orgnr', orgNrs)
+        .limit(orgNrs.length) // Add limit to prevent timeout
 
       const metricsMap = new Map((metricsData || []).map(m => [m.orgnr, m]))
 
-      // Transform data
+      // Transform data (skip historical data fetch to avoid timeouts)
       const companies = await Promise.all(companiesData.map(async (company) => {
         const metrics = metricsMap.get(company.orgnr)
         
-        // Get historical financial data
-        const historicalData = await getHistoricalFinancialData(company.orgnr)
-        
-        // Calculate growth from historical data
+        // Get historical financial data only if requested (skip to avoid timeouts)
+        let historicalData: Array<{ year: number; SDI: number | null; RG: number | null; DR: number | null }> | undefined = undefined
         let growth: number | null = null
-        if (historicalData.length >= 2) {
-          const current = historicalData[0]?.SDI
-          const previous = historicalData[1]?.SDI
-          growth = calculateGrowth(current ?? null, previous ?? null)
+        
+        if (includeHistorical) {
+          try {
+            historicalData = await getHistoricalFinancialData(company.orgnr)
+            // Calculate growth from historical data
+            if (historicalData.length >= 2) {
+              const current = historicalData[0]?.SDI
+              const previous = historicalData[1]?.SDI
+              growth = calculateGrowth(current ?? null, previous ?? null)
+            }
+          } catch (error) {
+            console.warn(`Error fetching historical data for ${company.orgnr}:`, error)
+            // Continue without historical data
+          }
+        } else {
+          // Use revenue_cagr_3y from metrics if available
+          growth = metrics?.revenue_cagr_3y ? metrics.revenue_cagr_3y / 100 : null
         }
 
         // Extract address and city
@@ -694,8 +710,10 @@ class SupabaseCompanyService {
         const ebit = extractScaledCurrency(metrics?.latest_ebitda_sek)
         const profit = extractScaledCurrency(metrics?.latest_profit_sek)
         
-        const ebitMargin = calculateEBITMargin(ebit ?? null, revenue ?? null)
-        const profitMargin = calculateProfitMargin(profit ?? null, revenue ?? null)
+        // Use database-calculated margins (stored as decimals, e.g., 0.05 = 5%)
+        // Don't calculate on the fly as it can cause unit mismatches
+        const ebitMargin = metrics?.avg_ebitda_margin ?? undefined
+        const profitMargin = metrics?.avg_net_margin ?? undefined
 
         return {
           OrgNr: company.orgnr,

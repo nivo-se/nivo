@@ -205,7 +205,8 @@ export class AnalyticsService {
         averageRevenueGrowth: this.calculateAverage(sampleForAverages?.map(c => c.revenue_cagr_3y) || []),
         averageEBITMargin: this.calculateAverage(sampleForAverages?.map(c => c.avg_ebitda_margin) || []),
         averageNetProfitMargin: this.calculateAverage(sampleForAverages?.map(c => c.avg_net_margin) || []),
-        averageNetProfitGrowth: this.calculateAverage(sampleForAverages?.map(c => c.revenue_cagr_3y) || []), // Using revenue CAGR as proxy
+        // Profit growth not available - would need historical profit data to calculate CAGR
+        averageNetProfitGrowth: null,
         averageRevenue: this.calculateAverage(sampleForAverages?.map(c => c.latest_revenue_sek) || []),
         averageCAGR4Y: null // TODO: Calculate when historical data is available
       }
