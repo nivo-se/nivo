@@ -1842,22 +1842,79 @@ async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
 // SAVED COMPANY LISTS API
 // ============================================================================
 
+// Helper function to get authenticated user from request
+async function getAuthenticatedUser(req: any): Promise<{ id: string } | null> {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null
+    }
+
+    const token = authHeader.substring(7)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return null
+    }
+
+    // Create a client with the user's token
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+
+    const { data: { user }, error } = await userClient.auth.getUser()
+    if (error || !user) {
+      return null
+    }
+
+    return { id: user.id }
+  } catch (error) {
+    console.error('Error getting authenticated user:', error)
+    return null
+  }
+}
+
 // Get all saved lists for the current user
 app.get('/api/saved-lists', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
+    // Get authenticated user from request
+    const user = await getAuthenticatedUser(req)
+    if (!user) {
+      // If no authenticated user, return empty array (or you could return 401)
+      return res.status(200).json({
+        success: true,
+        data: []
+      })
+    }
+
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      })
+    }
+
+    const token = authHeader.substring(7)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // For now, we'll use a mock user ID since authentication isn't fully set up
-    // In production, this should come from the authenticated user
-    const mockUserId = '00000000-0000-0000-0000-000000000000'
+    // Create authenticated client with user's token
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
 
-    const { data, error } = await supabase
+    const { data, error } = await userClient
       .from('saved_company_lists')
       .select('*')
-      .eq('user_id', mockUserId)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -1890,18 +1947,42 @@ app.post('/api/saved-lists', async (req, res) => {
       })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
+    // Get authenticated user from request
+    const user = await getAuthenticatedUser(req)
+    if (!user) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required. Please log in to save lists.' 
+      })
+    }
+
+    // Get auth token to create authenticated client
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication token required' 
+      })
+    }
+
+    const token = authHeader.substring(7)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    // For now, we'll use a mock user ID
-    const mockUserId = '00000000-0000-0000-0000-000000000000'
+    // Create authenticated client with user's token
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
 
-    const { data, error } = await supabase
+    const { data, error } = await userClient
       .from('saved_company_lists')
       .insert({
-        user_id: mockUserId,
+        user_id: user.id,
         name,
         description: description || '',
         companies: companies,
@@ -1940,14 +2021,37 @@ app.put('/api/saved-lists/:id', async (req, res) => {
       return res.status(400).json({ success: false, error: 'List ID is required' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
+    // Get authenticated user from request
+    const user = await getAuthenticatedUser(req)
+    if (!user) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required' 
+      })
+    }
+
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication token required' 
+      })
+    }
+
+    const token = authHeader.substring(7)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const mockUserId = '00000000-0000-0000-0000-000000000000'
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
 
-    const { data, error } = await supabase
+    const { data, error } = await userClient
       .from('saved_company_lists')
       .update({
         name,
@@ -1957,7 +2061,7 @@ app.put('/api/saved-lists/:id', async (req, res) => {
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
-      .eq('user_id', mockUserId)
+      .eq('user_id', user.id)
       .select()
       .single()
 
@@ -1988,18 +2092,41 @@ app.delete('/api/saved-lists/:id', async (req, res) => {
       return res.status(400).json({ success: false, error: 'List ID is required' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
+    // Get authenticated user from request
+    const user = await getAuthenticatedUser(req)
+    if (!user) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required' 
+      })
+    }
+
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication token required' 
+      })
+    }
+
+    const token = authHeader.substring(7)
+    const supabaseUrl = process.env.VITE_SUPABASE_URL
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
       return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
     }
 
-    const mockUserId = '00000000-0000-0000-0000-000000000000'
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
 
-    const { error } = await supabase
+    const { error } = await userClient
       .from('saved_company_lists')
       .delete()
       .eq('id', id)
-      .eq('user_id', mockUserId)
+      .eq('user_id', user.id)
 
     if (error) {
       console.error('Error deleting saved list:', error)

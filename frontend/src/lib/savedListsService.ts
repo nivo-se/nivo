@@ -19,7 +19,14 @@ export class SavedListsService {
     try {
       console.log('Fetching saved lists from API...')
 
-      const response = await fetch('/api/saved-lists')
+      // Get auth token from Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
+      const response = await fetch('/api/saved-lists', { headers })
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -68,11 +75,18 @@ export class SavedListsService {
     try {
       console.log('Saving list via API:', list.name)
 
+      // Get auth token from Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      }
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const response = await fetch('/api/saved-lists', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           name: list.name,
           description: list.description,
@@ -125,11 +139,18 @@ export class SavedListsService {
     try {
       console.log('Updating list via API:', id)
 
+      // Get auth token from Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      }
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const response = await fetch(`/api/saved-lists/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify(updates)
       })
 
@@ -340,8 +361,16 @@ export class SavedListsService {
     try {
       console.log('Deleting list via API:', id)
 
+      // Get auth token from Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const response = await fetch(`/api/saved-lists/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers
       })
 
       if (!response.ok) {
