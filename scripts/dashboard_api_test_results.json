@@ -1,0 +1,371 @@
+[
+  {
+    "name": "List Companies",
+    "status": "pass",
+    "description": "Fetches first page of companies",
+    "method": "GET",
+    "path": "/api/companies?limit=5",
+    "requires": [
+      "local_db"
+    ],
+    "message": "OK",
+    "response_time_ms": 4480,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Search Companies by Name",
+    "status": "pass",
+    "description": "Search companies by name",
+    "method": "GET",
+    "path": "/api/companies?search=Nivo",
+    "requires": [
+      "local_db"
+    ],
+    "message": "OK",
+    "response_time_ms": 4,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Get Single Company",
+    "status": "pass",
+    "description": "Fetch single company by orgnr",
+    "method": "GET",
+    "path": "/api/companies?orgnr=5560001421",
+    "requires": [
+      "local_db"
+    ],
+    "message": "OK",
+    "response_time_ms": 15,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Dashboard Analytics (Local)",
+    "status": "pass",
+    "description": "Fetch dashboard analytics from local DB",
+    "method": "GET",
+    "path": "/api/analytics-local",
+    "requires": [
+      "local_db"
+    ],
+    "message": "OK",
+    "response_time_ms": 35,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Dashboard Analytics (Supabase redirect)",
+    "status": "pass",
+    "description": "Fetch dashboard analytics via Supabase endpoint (redirects to local)",
+    "method": "GET",
+    "path": "/api/analytics",
+    "requires": [],
+    "message": "OK",
+    "response_time_ms": 16,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Create AI Analysis",
+    "status": "pass",
+    "description": "Create AI analysis run",
+    "method": "POST",
+    "path": "/api/ai-analysis",
+    "requires": [
+      "supabase",
+      "openai"
+    ],
+    "message": "OK",
+    "response_time_ms": 11715,
+    "status_code": 200,
+    "details": {
+      "stored": {
+        "analysis_run_id": "0d86c996-0334-4f4a-9547-2f05f0105af8"
+      }
+    }
+  },
+  {
+    "name": "Get AI Analysis Results",
+    "status": "pass",
+    "description": "Fetch AI analysis results",
+    "method": "GET",
+    "path": "/api/ai-analysis?runId=0d86c996-0334-4f4a-9547-2f05f0105af8",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 87,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "List Analysis Runs",
+    "status": "pass",
+    "description": "List paginated analysis runs",
+    "method": "GET",
+    "path": "/api/analysis-runs?limit=5",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 55,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Get Analysis Run Detail",
+    "status": "pass",
+    "description": "Get single analysis run",
+    "method": "GET",
+    "path": "/api/analysis-runs/0d86c996-0334-4f4a-9547-2f05f0105af8",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 91,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Get Analysis Companies",
+    "status": "pass",
+    "description": "List analyzed companies",
+    "method": "GET",
+    "path": "/api/analysis-companies?limit=5",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 55,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Create Valuation",
+    "status": "pass",
+    "description": "Create valuation run",
+    "method": "POST",
+    "path": "/api/valuation",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 9335,
+    "status_code": 200,
+    "details": {
+      "stored": {
+        "valuation_session_id": "4e110711-e4b4-4100-a8e0-ed43b9fa75aa"
+      }
+    }
+  },
+  {
+    "name": "Valuation Preview",
+    "status": "pass",
+    "description": "Preview valuation results",
+    "method": "POST",
+    "path": "/api/valuation/preview",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 553,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Commit Valuation",
+    "status": "pass",
+    "description": "Commit valuation run",
+    "method": "POST",
+    "path": "/api/valuation/commit",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 720,
+    "status_code": 200,
+    "details": {
+      "stored": {
+        "valuation_run_record_id": "863234fb-941f-40de-b6bf-dfacdcc68ad3"
+      }
+    }
+  },
+  {
+    "name": "Get Valuation",
+    "status": "pass",
+    "description": "Fetch valuation results",
+    "method": "GET",
+    "path": "/api/valuation/0d86c996-0334-4f4a-9547-2f05f0105af8/5560001421",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 67,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Select Valuation Model",
+    "status": "pass",
+    "description": "Select valuation model",
+    "method": "PATCH",
+    "path": "/api/valuation/863234fb-941f-40de-b6bf-dfacdcc68ad3/select",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 32,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Valuation Advice",
+    "status": "pass",
+    "description": "Get valuation advice",
+    "method": "POST",
+    "path": "/api/valuation/advice",
+    "requires": [
+      "openai"
+    ],
+    "message": "OK",
+    "response_time_ms": 69,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Delete Analysis Run",
+    "status": "pass",
+    "description": "Delete analysis run",
+    "method": "DELETE",
+    "path": "/api/analysis-runs/0d86c996-0334-4f4a-9547-2f05f0105af8",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 226,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "List Valuation Assumptions",
+    "status": "pass",
+    "description": "Fetch valuation assumptions",
+    "method": "GET",
+    "path": "/api/valuation/assumptions",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 36,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Create Valuation Assumption",
+    "status": "pass",
+    "description": "Create new assumption",
+    "method": "POST",
+    "path": "/api/valuation/assumptions",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 34,
+    "status_code": 201,
+    "details": {
+      "stored": {
+        "assumption_id": "289ce612-9be6-4612-8c63-8c56cd985d0a"
+      }
+    }
+  },
+  {
+    "name": "Update Valuation Assumption",
+    "status": "pass",
+    "description": "Update assumption",
+    "method": "PATCH",
+    "path": "/api/valuation/assumptions/289ce612-9be6-4612-8c63-8c56cd985d0a",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 36,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Delete Valuation Assumption",
+    "status": "pass",
+    "description": "Delete assumption",
+    "method": "DELETE",
+    "path": "/api/valuation/assumptions/289ce612-9be6-4612-8c63-8c56cd985d0a",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 32,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "List Saved Company Lists",
+    "status": "pass",
+    "description": "Fetch saved lists",
+    "method": "GET",
+    "path": "/api/saved-lists",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 42,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Create Saved Company List",
+    "status": "pass",
+    "description": "Create saved list",
+    "method": "POST",
+    "path": "/api/saved-lists",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 40,
+    "status_code": 201,
+    "details": {
+      "stored": {
+        "saved_list_id": "38fe9ab6-8058-4aee-a20e-795c6f9ea900"
+      }
+    }
+  },
+  {
+    "name": "Update Saved Company List",
+    "status": "pass",
+    "description": "Update saved list",
+    "method": "PUT",
+    "path": "/api/saved-lists/38fe9ab6-8058-4aee-a20e-795c6f9ea900",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 49,
+    "status_code": 200,
+    "details": {}
+  },
+  {
+    "name": "Delete Saved Company List",
+    "status": "pass",
+    "description": "Delete saved list",
+    "method": "DELETE",
+    "path": "/api/saved-lists/38fe9ab6-8058-4aee-a20e-795c6f9ea900",
+    "requires": [
+      "supabase"
+    ],
+    "message": "OK",
+    "response_time_ms": 35,
+    "status_code": 200,
+    "details": {}
+  }
+]

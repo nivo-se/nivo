@@ -1,0 +1,461 @@
+{
+  "base_url": "http://localhost:3001",
+  "timeout_seconds": 15,
+  "default_headers": {
+    "Content-Type": "application/json"
+  },
+  "tests": [
+    {
+      "name": "List Companies",
+      "method": "GET",
+      "path": "/api/companies?limit=5",
+      "description": "Fetches first page of companies",
+      "requires": [
+        "local_db"
+      ],
+      "expect": {
+        "status": 200,
+        "must_include_keys": [
+          "companies",
+          "pagination"
+        ]
+      }
+    },
+    {
+      "name": "Search Companies by Name",
+      "method": "GET",
+      "path": "/api/companies?search=Nivo",
+      "description": "Search companies by name",
+      "requires": [
+        "local_db"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Get Single Company",
+      "method": "GET",
+      "path": "/api/companies?orgnr={{sample_orgnr}}",
+      "description": "Fetch single company by orgnr",
+      "requires": [
+        "local_db"
+      ],
+      "placeholders": [
+        "sample_orgnr"
+      ],
+      "expect": {
+        "status": 200,
+        "must_include_keys": [
+          "company"
+        ]
+      }
+    },
+    {
+      "name": "Dashboard Analytics (Local)",
+      "method": "GET",
+      "path": "/api/analytics-local",
+      "description": "Fetch dashboard analytics from local DB",
+      "requires": [
+        "local_db"
+      ],
+      "expect": {
+        "status": 200,
+        "must_include_keys": [
+          "success",
+          "data.totalCompanies"
+        ]
+      }
+    },
+    {
+      "name": "Dashboard Analytics (Supabase redirect)",
+      "method": "GET",
+      "path": "/api/analytics",
+      "description": "Fetch dashboard analytics via Supabase endpoint (redirects to local)",
+      "requires": [],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Create AI Analysis",
+      "method": "POST",
+      "path": "/api/ai-analysis",
+      "description": "Create AI analysis run",
+      "requires": [
+        "supabase",
+        "openai"
+      ],
+      "placeholders": [
+        "sample_orgnr",
+        "sample_orgnr_2"
+      ],
+      "payloadTemplate": {
+        "companies": [
+          {
+            "OrgNr": "{{sample_orgnr}}"
+          },
+          {
+            "OrgNr": "{{sample_orgnr_2}}"
+          }
+        ],
+        "analysisType": "screening",
+        "instructions": "API automated test",
+        "initiatedBy": "api-test"
+      },
+      "expect": {
+        "status": 200
+      },
+      "storeResponse": {
+        "path": "run.id",
+        "as": "analysis_run_id"
+      }
+    },
+    {
+      "name": "Get AI Analysis Results",
+      "method": "GET",
+      "path": "/api/ai-analysis?runId={{analysis_run_id}}",
+      "description": "Fetch AI analysis results",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "analysis_run_id"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "List Analysis Runs",
+      "method": "GET",
+      "path": "/api/analysis-runs?limit=5",
+      "description": "List paginated analysis runs",
+      "requires": [
+        "supabase"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Get Analysis Run Detail",
+      "method": "GET",
+      "path": "/api/analysis-runs/{{analysis_run_id}}",
+      "description": "Get single analysis run",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "analysis_run_id"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Get Analysis Companies",
+      "method": "GET",
+      "path": "/api/analysis-companies?limit=5",
+      "description": "List analyzed companies",
+      "requires": [
+        "supabase"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Create Valuation",
+      "method": "POST",
+      "path": "/api/valuation",
+      "description": "Create valuation run",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "sample_orgnr",
+        "sample_orgnr_2"
+      ],
+      "payloadTemplate": {
+        "companyIds": [
+          "{{sample_orgnr}}",
+          "{{sample_orgnr_2}}"
+        ],
+        "mode": "default"
+      },
+      "expect": {
+        "status": 200
+      },
+      "storeResponse": {
+        "path": "data.valuationSessionId",
+        "as": "valuation_session_id"
+      }
+    },
+    {
+      "name": "Valuation Preview",
+      "method": "POST",
+      "path": "/api/valuation/preview",
+      "description": "Preview valuation results",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "sample_orgnr"
+      ],
+      "payloadTemplate": {
+        "orgnr": "{{sample_orgnr}}",
+        "valueType": "equity"
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Commit Valuation",
+      "method": "POST",
+      "path": "/api/valuation/commit",
+      "description": "Commit valuation run",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "analysis_run_id",
+        "sample_orgnr"
+      ],
+      "payloadTemplate": {
+        "analysisRunId": "{{analysis_run_id}}",
+        "orgnr": "{{sample_orgnr}}",
+        "selectedModelKey": "revenue_multiple",
+        "overrides": []
+      },
+      "expect": {
+        "status": 200
+      },
+      "storeResponse": {
+        "path": "data.valuationRunId",
+        "as": "valuation_run_record_id"
+      }
+    },
+    {
+      "name": "Get Valuation",
+      "method": "GET",
+      "path": "/api/valuation/{{analysis_run_id}}/{{sample_orgnr}}",
+      "description": "Fetch valuation results",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "analysis_run_id",
+        "sample_orgnr"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Select Valuation Model",
+      "method": "PATCH",
+      "path": "/api/valuation/{{valuation_run_record_id}}/select",
+      "description": "Select valuation model",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "valuation_run_record_id"
+      ],
+      "payloadTemplate": {
+        "modelKey": "ebitda_multiple"
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Valuation Advice",
+      "method": "POST",
+      "path": "/api/valuation/advice",
+      "description": "Get valuation advice",
+      "requires": [
+        "openai"
+      ],
+      "placeholders": [
+        "sample_orgnr"
+      ],
+      "payloadTemplate": {
+        "orgnr": "{{sample_orgnr}}",
+        "question": "What are the key risks?"
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Delete Analysis Run",
+      "method": "DELETE",
+      "path": "/api/analysis-runs/{{analysis_run_id}}",
+      "description": "Delete analysis run",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "analysis_run_id"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "List Valuation Assumptions",
+      "method": "GET",
+      "path": "/api/valuation/assumptions",
+      "description": "Fetch valuation assumptions",
+      "requires": [
+        "supabase"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Create Valuation Assumption",
+      "method": "POST",
+      "path": "/api/valuation/assumptions",
+      "description": "Create new assumption",
+      "requires": [
+        "supabase"
+      ],
+      "payloadTemplate": {
+        "model_key": "revenue_multiple",
+        "industry": "API Test {{test_suffix}}",
+        "size_bucket": "small",
+        "growth_bucket": "low",
+        "revenue_multiple": 1.3
+      },
+      "expect": {
+        "status": 201
+      },
+      "storeResponse": {
+        "path": "data.id",
+        "as": "assumption_id"
+      },
+      "placeholders": [
+        "test_suffix"
+      ]
+    },
+    {
+      "name": "Update Valuation Assumption",
+      "method": "PATCH",
+      "path": "/api/valuation/assumptions/{{assumption_id}}",
+      "description": "Update assumption",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "assumption_id"
+      ],
+      "payloadTemplate": {
+        "revenue_multiple": 1.5
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Delete Valuation Assumption",
+      "method": "DELETE",
+      "path": "/api/valuation/assumptions/{{assumption_id}}",
+      "description": "Delete assumption",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "assumption_id"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "List Saved Company Lists",
+      "method": "GET",
+      "path": "/api/saved-lists",
+      "description": "Fetch saved lists",
+      "requires": [
+        "supabase"
+      ],
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Create Saved Company List",
+      "method": "POST",
+      "path": "/api/saved-lists",
+      "description": "Create saved list",
+      "requires": [
+        "supabase"
+      ],
+      "payloadTemplate": {
+        "name": "API Test List",
+        "description": "Created by automated tests",
+        "companies": [
+          "{{sample_orgnr}}"
+        ],
+        "filters": {
+          "minRevenue": 1000000
+        }
+      },
+      "placeholders": [
+        "sample_orgnr"
+      ],
+      "expect": {
+        "status": 201
+      },
+      "storeResponse": {
+        "path": "data.id",
+        "as": "saved_list_id"
+      }
+    },
+    {
+      "name": "Update Saved Company List",
+      "method": "PUT",
+      "path": "/api/saved-lists/{{saved_list_id}}",
+      "description": "Update saved list",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "saved_list_id"
+      ],
+      "payloadTemplate": {
+        "name": "API Test List Updated",
+        "description": "Updated by automated tests",
+        "companies": [
+          "{{sample_orgnr}}"
+        ],
+        "filters": {
+          "minRevenue": 2000000
+        }
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Delete Saved Company List",
+      "method": "DELETE",
+      "path": "/api/saved-lists/{{saved_list_id}}",
+      "description": "Delete saved list",
+      "requires": [
+        "supabase"
+      ],
+      "placeholders": [
+        "saved_list_id"
+      ],
+      "expect": {
+        "status": 200
+      }
+    }
+  ]
+}
