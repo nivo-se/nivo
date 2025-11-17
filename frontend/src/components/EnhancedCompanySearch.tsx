@@ -1208,16 +1208,9 @@ const EnhancedCompanySearch: React.FC = () => {
                       <div>
                         <div className="text-sm text-[#2E2A2B]/70">EBIT-marginal</div>
                         <div className="text-2xl font-bold text-[#2E2A2B]">
-                          {(() => {
-                            // Calculate EBIT margin: EBIT / Revenue
-                            const ebit = selectedCompany.ORS || selectedCompany.RG
-                            const revenue = selectedCompany.SDI
-                            if (ebit && revenue && revenue > 0) {
-                              const margin = (ebit / revenue) * 100
-                              return `${margin.toFixed(1)}%`
-                            }
-                            return 'N/A'
-                          })()}
+                          {selectedCompany.EBIT_margin != null 
+                            ? `${(selectedCompany.EBIT_margin * 100).toFixed(1)}%`
+                            : 'N/A'}
                         </div>
                       </div>
                     </div>
