@@ -153,6 +153,14 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 OPENAI_API_KEY=your_openai_api_key
 ```
 
+## ✅ CI: Dashboard API Regression
+
+- GitHub Actions workflow `dashboard-api-tests.yml` runs on every push/PR to `main`.  
+- The job bootstraps a lightweight SQLite file via `scripts/create_test_local_db.py` (set `CREATE_TEST_LOCAL_DB_FORCE=1` to overwrite).  
+- The dashboard server (`frontend/server/enhanced-server.ts`) is started with `npx tsx …` and the regression suite `scripts/test_dashboard_apis.py` hits all dashboard-facing APIs (no scraping endpoints).  
+- Add these repository secrets so the workflow can talk to Supabase/OpenAI: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL`, `OPENAI_API_KEY`.  
+- Test artifacts (`scripts/dashboard_api_test_results.json`) are uploaded for every run.
+
 ## 📊 Key Tables
 
 - `master_analytics`: Main company data with financial metrics

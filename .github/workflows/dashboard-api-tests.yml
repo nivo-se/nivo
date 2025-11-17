@@ -1,0 +1,104 @@
+name: Dashboard API Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard-api-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Create frontend env file
+        run: |
+          cat <<'EOF' > frontend/.env.local
+          VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+          VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+          SUPABASE_URL=${SUPABASE_URL}
+          SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          EOF
+
+      - name: Create root env file
+        run: |
+          cat <<'EOF' > .env.local
+          VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+          VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+          SUPABASE_URL=${SUPABASE_URL}
+          SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          SUPABASE_DB_URL=${SUPABASE_DB_URL}
+          EOF
+
+      - name: Bootstrap lightweight local database
+        run: CREATE_TEST_LOCAL_DB_FORCE=1 python3 scripts/create_test_local_db.py
+
+      - name: Start enhanced dashboard server
+        run: |
+          npx tsx frontend/server/enhanced-server.ts > server.log 2>&1 &
+          echo $! > server.pid
+
+      - name: Wait for dashboard API
+        run: |
+          for attempt in {1..30}; do
+            if curl -sf http://localhost:3001/api/analytics >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Dashboard API did not start in time"
+          cat server.log
+          exit 1
+
+      - name: Run dashboard API regression suite
+        run: ./scripts/test_dashboard_apis.py
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi
+          rm -f server.pid
+          echo "--- Server log ---"
+          cat server.log || true
+
+      - name: Upload API test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-api-test-results
+          path: scripts/dashboard_api_test_results.json
+
