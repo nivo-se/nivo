@@ -6,12 +6,11 @@ import { Alert, AlertDescription } from '../components/ui/alert'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Database, Target, TrendingUp, DollarSign, Globe, Users } from 'lucide-react'
+import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Target, TrendingUp, DollarSign, Users } from 'lucide-react'
 import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
 import { supabaseConfig } from '../lib/supabase'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
 import BusinessRulesConfig from '../components/BusinessRulesConfig'
-import ScraperInterface from '../components/ScraperInterface'
 import DataExport from '../components/DataExport'
 import ListBasedAnalytics from '../components/ListBasedAnalytics'
 import AIAnalytics from '../components/AIAnalytics'
@@ -19,6 +18,7 @@ import AIAnalysis from '../components/AIAnalysis'
 import AnalyzedCompanies from '../pages/AnalyzedCompanies'
 import Valuation from '../pages/Valuation'
 import AdminPanel from '../components/AdminPanel'
+import SegmentationTiers from '../components/SegmentationTiers'
 
 const WorkingDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -35,7 +35,15 @@ const WorkingDashboard: React.FC = () => {
         setLoading(true)
         const data = await supabaseDataService.getDashboardAnalytics()
         setAnalytics(data)
-        console.log('Loaded analytics:', data)
+        // Log card values for verification
+        const cardValues = {
+          'Card 1 - Totalt antal företag': data.totalCompanies?.toLocaleString('sv-SE') || 'N/A',
+          'Card 2 - Genomsnittlig omsättning': data.averageRevenue ? `${(data.averageRevenue / 1_000).toFixed(1)} mSEK` : 'N/A',
+          'Card 3 - Genomsnittlig tillväxt': data.averageRevenueGrowth ? `${(data.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A',
+          'Card 4 - EBIT-marginal': data.averageEBITMargin ? `${(data.averageEBITMargin * 100).toFixed(1)}%` : 'N/A',
+          'Card 5 - Vinstmarginal': data.averageNetProfitMargin ? `${(data.averageNetProfitMargin * 100).toFixed(1)}%` : 'N/A'
+        }
+        console.log('[Dashboard] Loaded analytics - Card Values:', cardValues)
       } catch (error) {
         console.error('Error loading analytics:', error)
       } finally {
@@ -59,17 +67,48 @@ const WorkingDashboard: React.FC = () => {
   const menuItems: MenuItem[] = [
     { id: 'overview', label: 'Översikt', icon: BarChart3 },
     { id: 'companies', label: 'Företagssökning', icon: Search },
+    { id: 'segmentation', label: 'Segmentering', icon: Target },
     { id: 'analytics', label: 'Analys', icon: Building2 },
     { id: 'ai-insights', label: 'AI-insikter', icon: Brain },
     { id: 'analyzed-companies', label: 'Analyser', icon: FileText },
     { id: 'valuation', label: 'Värdering', icon: Target },
     { id: 'export', label: 'Exportera', icon: Download },
-    { id: 'scraper', label: 'Importera Data', icon: Database, disabled: false },
   ]
 
   // Add admin item at the bottom if user is admin
   const adminItems: MenuItem[] = isAdmin ? [{ id: 'admin', label: 'Admin', icon: Shield }] : []
   const allMenuItems = [...menuItems, ...adminItems]
+
+  const formatMillion = (value: number | null | undefined) => {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return 'N/A'
+    }
+    if (Math.abs(value) >= 1_000_000_000) {
+      return `${(value / 1_000_000).toFixed(1)} BSEK`  // Value already in thousands
+    }
+    return `${(value / 1_000).toFixed(1)} mSEK`  // Database stores in thousands
+  }
+
+  const formatPercent = (value: number | null | undefined) => {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return 'N/A'
+    }
+    // Value is already a decimal (e.g., 0.1175 = 11.75%)
+    return `${(value * 100).toFixed(1)}%`
+  }
+
+  const industryColors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-red-500']
+  const sizeColorMap: Record<string, string> = {
+    'Mikro (1-9)': 'bg-gray-400',
+    'Små (10-49)': 'bg-gray-500',
+    'Medelstora (50-249)': 'bg-gray-600',
+    'Stora (250+)': 'bg-gray-700',
+  }
+
+  const digitalPresenceShare =
+    analytics && analytics.totalCompanies
+      ? analytics.totalWithDigitalPresence / analytics.totalCompanies
+      : null
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -91,7 +130,57 @@ const WorkingDashboard: React.FC = () => {
 
   const renderContent = () => {
     switch (currentPage) {
-      case 'overview':
+      case 'overview': {
+        const metricCards = [
+          {
+            key: 'avgRevenue',
+            label: 'Genomsnittlig omsättning',
+            value: formatMillion(analytics?.averageRevenue),
+            icon: DollarSign,
+            iconClass: 'text-green-600',
+          },
+          {
+            key: 'avgRevenueGrowth',
+            label: 'Genomsnittlig tillväxt (3 år CAGR)',
+            value: formatPercent(analytics?.averageRevenueGrowth),
+            icon: TrendingUp,
+            iconClass: 'text-purple-600',
+          },
+          {
+            key: 'avgEbitMargin',
+            label: 'Genomsnittlig EBIT-marginal',
+            value: formatPercent(analytics?.averageEBITMargin),
+            icon: BarChart3,
+            iconClass: 'text-blue-600',
+          },
+          {
+            key: 'avgNetMargin',
+            label: 'Genomsnittlig vinstmarginal',
+            value: formatPercent(analytics?.averageNetProfitMargin),
+            icon: Target,
+            iconClass: 'text-orange-600',
+          },
+          {
+            key: 'totalCompanies',
+            label: 'Totalt antal företag',
+            value: analytics?.totalCompanies ? analytics.totalCompanies.toLocaleString('sv-SE') : 'N/A',
+            icon: Building2,
+            iconClass: 'text-indigo-600',
+          },
+        ]
+
+        const industryDistribution = analytics?.topIndustries ?? []
+        const sizeDistribution = analytics?.companySizeDistribution ?? []
+        
+        // Debug logging
+        console.log('[Dashboard] Analytics object:', analytics)
+        console.log('[Dashboard] Size distribution from analytics:', analytics?.companySizeDistribution)
+        console.log('[Dashboard] Size distribution variable:', sizeDistribution)
+        console.log('[Dashboard] Size distribution length:', sizeDistribution.length)
+        if (sizeDistribution.length > 0) {
+          console.log('[Dashboard] First size item:', sizeDistribution[0])
+        }
+
         return (
           <div className="space-y-6">
             <div className="bg-[#2E2A2B] rounded-lg p-6 text-white">
@@ -118,112 +207,20 @@ const WorkingDashboard: React.FC = () => {
             ) : (
               <>
                 {/* Key Metrics - Using Analytics Tab Style */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Omsättning</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.totalCompanies ? `${(analytics.averageRevenue || 0).toLocaleString('sv-SE')} TSEK` : 'N/A'}
-                          </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                  {metricCards.map(({ key, label, value, icon: Icon, iconClass }) => (
+                    <Card key={key} className="border-[#E6E6E6]">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-[#2E2A2B]/70">{label}</p>
+                            <p className="text-2xl font-bold text-[#2E2A2B]">{value}</p>
+                          </div>
+                          <Icon className={`h-8 w-8 ${iconClass}`} />
                         </div>
-                        <DollarSign className="h-8 w-8 text-green-600" />
-                      </div>
-                      <div className="mt-2 flex items-center text-sm">
-                        <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                        <span className="text-green-500">+8.7%</span>
-                        <span className="text-[#2E2A2B]/50 ml-1">vs last period</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Tillväxt</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageRevenueGrowth ? `${(analytics.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A'}
-                          </p>
-                        </div>
-                        <TrendingUp className="h-8 w-8 text-purple-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig EBIT Marginal</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
-                          </p>
-                        </div>
-                        <BarChart3 className="h-8 w-8 text-blue-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig EBIT Tillväxt</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageEBITMargin ? `${(analytics.averageEBITMargin * 100).toFixed(1)}%` : 'N/A'}
-                          </p>
-                        </div>
-                        <TrendingUp className="h-8 w-8 text-green-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Vinstmarginal</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageNetProfitMargin ? `${(analytics.averageNetProfitMargin * 100).toFixed(1)}%` : 'N/A'}
-                          </p>
-                        </div>
-                        <Target className="h-8 w-8 text-orange-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig Vinst Tillväxt</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageNetProfitGrowth ? `${(analytics.averageNetProfitGrowth * 100).toFixed(1)}%` : 'N/A'}
-                          </p>
-                        </div>
-                        <TrendingUp className="h-8 w-8 text-red-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-[#E6E6E6]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-[#2E2A2B]/70">Genomsnittlig CAGR (4 år)</p>
-                          <p className="text-2xl font-bold text-[#2E2A2B]">
-                            {analytics?.averageCAGR4Y ? `${(analytics.averageCAGR4Y * 100).toFixed(1)}%` : 'Ej tillgänglig'}
-                          </p>
-                        </div>
-                        <TrendingUp className="h-8 w-8 text-indigo-600" />
-                      </div>
-                      <div className="mt-2 flex items-center text-sm">
-                        <span className="text-[#2E2A2B]/50">Kräver historisk data</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
 
                 {/* Industry and Market Analysis */}
@@ -235,24 +232,43 @@ const WorkingDashboard: React.FC = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {[
-                          { name: 'Teknik & IT', count: 676, percentage: 21.6, color: 'bg-blue-500' },
-                          { name: 'Kreativ & Media', count: 491, percentage: 15.7, color: 'bg-purple-500' },
-                          { name: 'Mat & Gästfrihet', count: 423, percentage: 13.5, color: 'bg-green-500' },
-                          { name: 'Tillverkning', count: 387, percentage: 12.4, color: 'bg-orange-500' },
-                          { name: 'Professionella tjänster', count: 298, percentage: 9.5, color: 'bg-red-500' },
-                        ].map((industry) => (
-                          <div key={industry.name} className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-3 h-3 rounded-full ${industry.color}`}></div>
-                              <span className="text-sm font-medium text-[#2E2A2B]">{industry.name}</span>
+                        {industryDistribution.length === 0 ? (
+                          <p className="text-sm text-[#2E2A2B]/60">Ingen branschdata tillgänglig.</p>
+                        ) : (
+                          <>
+                            {industryDistribution.map((industry, index) => (
+                              <div key={industry.name} className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div
+                                    className={`w-3 h-3 rounded-full ${
+                                      industryColors[index % industryColors.length]
+                                    }`}
+                                  ></div>
+                                  <span className="text-sm font-medium text-[#2E2A2B]">
+                                    {industry.name}
+                                  </span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-bold text-[#2E2A2B]">
+                                    {industry.count.toLocaleString('sv-SE')}
+                                  </div>
+                                  <div className="text-xs text-[#2E2A2B]/70">
+                                    {industry.percentage.toFixed(1)}%
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                            <div className="pt-3 mt-3 border-t border-[#E6E6E6] flex items-center justify-between">
+                              <span className="text-sm font-semibold text-[#2E2A2B]">Totalt</span>
+                              <div className="text-right">
+                                <div className="text-sm font-bold text-[#2E2A2B]">
+                                  {analytics?.totalCompanies?.toLocaleString('sv-SE') || '0'}
+                                </div>
+                                <div className="text-xs text-[#2E2A2B]/70">100.0%</div>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-sm font-bold text-[#2E2A2B]">{industry.count}</div>
-                              <div className="text-xs text-[#2E2A2B]/70">{industry.percentage}%</div>
-                            </div>
-                          </div>
-                        ))}
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -260,32 +276,200 @@ const WorkingDashboard: React.FC = () => {
                   <Card className="border-[#E6E6E6]">
                     <CardHeader>
                       <CardTitle className="text-[#2E2A2B]">Företagsstorleksfördelning</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Företag efter antal anställda</CardDescription>
+                      <CardDescription className="text-[#2E2A2B]/70">Företag efter omsättning</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {[
-                          { name: 'Mikro (1-9)', count: 2847, percentage: 33.8, color: 'bg-gray-400' },
-                          { name: 'Små (10-49)', count: 2103, percentage: 25.0, color: 'bg-gray-500' },
-                          { name: 'Medelstora (50-249)', count: 1847, percentage: 21.9, color: 'bg-gray-600' },
-                          { name: 'Stora (250+)', count: 1631, percentage: 19.3, color: 'bg-gray-700' },
-                        ].map((size) => (
-                          <div key={size.name} className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-3 h-3 rounded-full ${size.color}`}></div>
-                              <span className="text-sm font-medium text-[#2E2A2B]">{size.name}</span>
+                        {sizeDistribution.length === 0 ? (
+                          <p className="text-sm text-[#2E2A2B]/60">Ingen storleksdata tillgänglig.</p>
+                        ) : (
+                          <>
+                            {sizeDistribution.map((size) => (
+                              <div key={size.name} className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div
+                                    className={`w-3 h-3 rounded-full ${
+                                      sizeColorMap[size.name] || 'bg-gray-500'
+                                    }`}
+                                  ></div>
+                                  <span className="text-sm font-medium text-[#2E2A2B]">{size.name}</span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-bold text-[#2E2A2B]">
+                                    {size.count.toLocaleString('sv-SE')}
+                                  </div>
+                                  <div className="text-xs text-[#2E2A2B]/70">
+                                    {size.percentage.toFixed(1)}%
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                            <div className="pt-3 mt-3 border-t border-[#E6E6E6] flex items-center justify-between">
+                              <span className="text-sm font-semibold text-[#2E2A2B]">Totalt</span>
+                              <div className="text-right">
+                                <div className="text-sm font-bold text-[#2E2A2B]">
+                                  {analytics?.totalCompanies?.toLocaleString('sv-SE') || '0'}
+                                </div>
+                                <div className="text-xs text-[#2E2A2B]/70">100.0%</div>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-sm font-bold text-[#2E2A2B]">{size.count}</div>
-                              <div className="text-xs text-[#2E2A2B]/70">{size.percentage}%</div>
-                            </div>
-                          </div>
-                        ))}
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
+
                 </div>
 
+                {/* Margin Analysis Card */}
+                {analytics?.marginAnalysis && (
+                  <Card className="border-[#E6E6E6]">
+                    <CardHeader>
+                      <CardTitle className="text-[#2E2A2B]">Finansiell analys - Detaljerad översikt</CardTitle>
+                      <CardDescription className="text-[#2E2A2B]/70">Fördelning av lönsamhet och marginaler</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Profit Analysis */}
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">Vinst (Nettoresultat)</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Negativ vinst:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-red-600">
+                                  {analytics.marginAnalysis.profit.negative.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.profit.negative / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Positiv vinst:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-green-600">
+                                  {analytics.marginAnalysis.profit.positive.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.profit.positive / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Saknar data:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-[#2E2A2B]">
+                                  {analytics.marginAnalysis.profit.null.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.profit.null / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* EBIT Analysis */}
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">EBIT (Rörelseresultat)</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Negativ EBIT:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-red-600">
+                                  {analytics.marginAnalysis.ebit.negative.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebit.negative / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Positiv EBIT:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-green-600">
+                                  {analytics.marginAnalysis.ebit.positive.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebit.positive / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Saknar data:</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-[#2E2A2B]">
+                                  {analytics.marginAnalysis.ebit.null.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebit.null / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* EBIT Margin Analysis */}
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">EBIT-marginal</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Extrem negativ (&lt; -100%):</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-red-700">
+                                  {analytics.marginAnalysis.ebitdaMargin.extremeNegative.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebitdaMargin.extremeNegative / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Negativ (-100% till 0%):</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-orange-600">
+                                  {analytics.marginAnalysis.ebitdaMargin.negative.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebitdaMargin.negative / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Positiv (0% till 100%):</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-green-600">
+                                  {analytics.marginAnalysis.ebitdaMargin.positive.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebitdaMargin.positive / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#2E2A2B]/70">Extrem positiv (&gt; 100%):</span>
+                              <div className="text-right">
+                                <span className="text-sm font-bold text-purple-600">
+                                  {analytics.marginAnalysis.ebitdaMargin.extremePositive.toLocaleString('sv-SE')}
+                                </span>
+                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                  ({((analytics.marginAnalysis.ebitdaMargin.extremePositive / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-[#E6E6E6]">
+                        <p className="text-xs text-[#2E2A2B]/60">
+                          <strong>Totalt:</strong> {analytics.marginAnalysis.profit.total.toLocaleString('sv-SE')} företag. 
+                          Extremvärden (&lt; -100% eller &gt; 100%) filtreras bort vid beräkning av genomsnittlig EBIT-marginal för att undvika snedvridning.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 <div className="bg-[#596152]/10 p-4 rounded-lg border border-[#596152]/20">
                   <h3 className="font-semibold text-[#596152] mb-2">✅ Dashboard ansluten till livedata</h3>
@@ -298,12 +482,13 @@ const WorkingDashboard: React.FC = () => {
             )}
           </div>
         )
+      }
       
       case 'companies':
         return <EnhancedCompanySearch />
       
-      case 'scraper':
-        return <ScraperInterface />
+      case 'segmentation':
+        return <SegmentationTiers />
       
       case 'analytics':
         return <ListBasedAnalytics />
