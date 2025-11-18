@@ -4,18 +4,18 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js'
-import { 
-  DataLoadResult, 
-  QualityIssue, 
-  ComprehensiveCompanyData, 
+import {
+  DataLoadResult,
+  QualityIssue,
+  ComprehensiveCompanyData,
   createQualityIssue,
-  calculateFinancialTrends 
+  calculateFinancialTrends
 } from './data-quality.js'
 import { getIndustryBenchmarks } from './industry-benchmarks.js'
 
 /**
  * Fetch comprehensive company data from available sources
- * Note: Historical tables are currently empty, so we focus on master_analytics
+ * Note: Uses the new companies + company_metrics schema and company_financials for history
  */
 export async function fetchComprehensiveCompanyData(
   supabase: SupabaseClient,
@@ -24,25 +24,25 @@ export async function fetchComprehensiveCompanyData(
   const issues: QualityIssue[] = []
   
   try {
-    // 1. Validate that master_analytics table exists and is accessible
+    // 1. Validate that core tables are accessible
     const { error: tableError } = await supabase
-      .from('master_analytics')
-      .select('*')
+      .from('companies')
+      .select('orgnr')
       .limit(1)
     
     if (tableError) {
       issues.push(createQualityIssue(
         'critical',
-        `Cannot access master_analytics table: ${tableError.message}`,
-        { error: tableError.message }
+        `Cannot access companies table: ${tableError.message}`,
+        { error: tableError?.message }
       ))
       return { data: null, issues, success: false }
     }
-    
-    // 2. Fetch master analytics data (primary source)
-    const masterResult = await fetchMasterAnalytics(supabase, orgnr)
+
+    // 2. Fetch primary company snapshot (companies + company_metrics)
+    const masterResult = await fetchCompanySnapshot(supabase, orgnr)
     issues.push(...masterResult.issues)
-    
+
     // 3. Check for critical data availability
     if (!masterResult.data) {
       issues.push(createQualityIssue(
@@ -100,42 +100,64 @@ export async function fetchComprehensiveCompanyData(
 /**
  * Fetch master analytics data (current year snapshot)
  */
-async function fetchMasterAnalytics(
+async function fetchCompanySnapshot(
   supabase: SupabaseClient,
   orgnr: string
 ): Promise<DataLoadResult<any>> {
   const issues: QualityIssue[] = []
-  
+
   try {
     const { data, error } = await supabase
-      .from('master_analytics')
-      .select('*')
-      .eq('OrgNr', orgnr)
+      .from('companies')
+      .select(`
+        orgnr,
+        company_id,
+        company_name,
+        address,
+        homepage,
+        email,
+        segment_names,
+        foundation_year,
+        employees_latest,
+        company_metrics (
+          latest_revenue_sek,
+          latest_profit_sek,
+          latest_ebitda_sek,
+          revenue_cagr_3y,
+          avg_ebitda_margin,
+          avg_net_margin,
+          company_size_bucket,
+          profitability_bucket,
+          growth_bucket,
+          digital_presence
+        )
+      `)
+      .eq('orgnr', orgnr)
       .single()
     
     if (error) {
       issues.push(createQualityIssue(
         'critical',
-        `Failed to fetch master analytics: ${error.message}`,
+        `Failed to fetch company snapshot: ${error.message}`,
         { orgnr, error: error.message }
       ))
       return { data: null, issues, success: false }
     }
-    
+
     if (!data) {
       issues.push(createQualityIssue(
         'critical',
-        'No master analytics data found',
+        'No company data found',
         { orgnr }
       ))
       return { data: null, issues, success: false }
     }
-    
+
     // Check data completeness
     const missingFields = []
-    if (!data.SDI) missingFields.push('SDI (revenue)')
-    if (!data.DR) missingFields.push('DR (net profit)')
-    if (!data.EBIT_margin) missingFields.push('EBIT_margin')
+    if (!data.company_metrics?.latest_revenue_sek) missingFields.push('latest_revenue_sek (revenue)')
+    if (!data.company_metrics?.latest_profit_sek) missingFields.push('latest_profit_sek (net profit)')
+    if (!data.company_metrics?.avg_ebitda_margin) missingFields.push('avg_ebitda_margin')
     
     if (missingFields.length > 0) {
       issues.push(createQualityIssue(
@@ -145,12 +167,34 @@ async function fetchMasterAnalytics(
       ))
     }
     
-    return { data, issues, success: true }
-    
+    const mapped = {
+      OrgNr: data.orgnr,
+      company_id: data.company_id,
+      name: data.company_name,
+      address: data.address,
+      homepage: data.homepage,
+      email: data.email,
+      segment_name: Array.isArray(data.segment_names) ? data.segment_names[0] : data.segment_names,
+      foundation_year: data.foundation_year,
+      employees: data.employees_latest,
+      SDI: data.company_metrics?.latest_revenue_sek,
+      DR: data.company_metrics?.latest_profit_sek,
+      ORS: data.company_metrics?.latest_ebitda_sek,
+      Revenue_growth: data.company_metrics?.revenue_cagr_3y,
+      EBIT_margin: data.company_metrics?.avg_ebitda_margin,
+      NetProfit_margin: data.company_metrics?.avg_net_margin,
+      company_size_category: data.company_metrics?.company_size_bucket,
+      profitability_category: data.company_metrics?.profitability_bucket,
+      growth_category: data.company_metrics?.growth_bucket,
+      digital_presence: data.company_metrics?.digital_presence
+    }
+
+    return { data: mapped, issues, success: true }
+
   } catch (error) {
     issues.push(createQualityIssue(
       'critical',
-      `Master analytics fetch error: ${error.message}`,
+      `Company snapshot fetch error: ${error.message}`,
       { orgnr, error: error.message }
     ))
     return { data: null, issues, success: false }
@@ -165,12 +209,12 @@ async function fetchHistoricalAccounts(
   orgnr: string
 ): Promise<DataLoadResult<any[]>> {
   const issues: QualityIssue[] = []
-  
+
   try {
     const { data, error } = await supabase
-      .from('company_accounts_by_id')
-      .select('*')
-      .eq('OrgNr', orgnr)
+      .from('company_financials')
+      .select('year, revenue_sek, profit_sek, ebitda_sek, employees')
+      .eq('orgnr', orgnr)
       .order('year', { ascending: false })
       .limit(4) // Last 4 years
     
@@ -191,9 +235,9 @@ async function fetchHistoricalAccounts(
       ))
       return { data: [], issues, success: false }
     }
-    
+
     // Check data quality
-    const validYears = data.filter(d => d.year && d.SDI > 0)
+    const validYears = data.filter(d => d.year && (d.revenue_sek || 0) > 0)
     if (validYears.length < 2) {
       issues.push(createQualityIssue(
         'warning',
@@ -222,15 +266,14 @@ async function fetchDetailedKPIs(
   orgnr: string
 ): Promise<DataLoadResult<any[]>> {
   const issues: QualityIssue[] = []
-  
+
   try {
     const { data, error } = await supabase
-      .from('company_kpis_by_id')
-      .select('*')
-      .eq('OrgNr', orgnr)
-      .order('year', { ascending: false })
-      .limit(4)
-    
+      .from('company_metrics')
+      .select('revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, equity_ratio_latest, debt_to_equity_latest')
+      .eq('orgnr', orgnr)
+      .maybeSingle()
+
     if (error) {
       issues.push(createQualityIssue(
         'info',
@@ -239,8 +282,8 @@ async function fetchDetailedKPIs(
       ))
       return { data: [], issues, success: false }
     }
-    
-    return { data: data || [], issues, success: true }
+
+    return { data: data ? [data] : [], issues, success: true }
     
   } catch (error) {
     issues.push(createQualityIssue(

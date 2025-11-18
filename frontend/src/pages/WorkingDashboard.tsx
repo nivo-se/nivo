@@ -474,7 +474,7 @@ const WorkingDashboard: React.FC = () => {
                 <div className="bg-[#596152]/10 p-4 rounded-lg border border-[#596152]/20">
                   <h3 className="font-semibold text-[#596152] mb-2">✅ Dashboard ansluten till livedata</h3>
                   <p className="text-[#2E2A2B]/80">
-                    All statistik hämtas nu från master_analytics-tabellen i realtid. 
+                    All statistik hämtas nu från den nya company_metrics-datamodellen i realtid.
                     Navigera till Företagssökning för att utforska data i detalj.
                   </p>
                 </div>
@@ -494,7 +494,7 @@ const WorkingDashboard: React.FC = () => {
         return <ListBasedAnalytics />
       
       case 'ai-insights':
-        return <AIAnalysis selectedDataView="master_analytics" />
+        return <AIAnalysis selectedDataView="company_metrics" />
       
       case 'analyzed-companies':
         return <AnalyzedCompanies />

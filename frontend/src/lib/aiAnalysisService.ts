@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseDataService } from './supabaseDataService'
 
 export interface AIAnalysisRequest {
   query: string
@@ -41,12 +42,21 @@ export class AIAnalysisService {
     try {
       // Step 1: Parse the natural language query
       const parsedQuery = await this.parseNaturalLanguageQuery(request.query)
-      
-      // Step 2: Build SQL query based on parsed intent
-      const sqlQuery = await this.buildSQLFromIntent(parsedQuery, request.dataView, request.filters)
-      
-      // Step 3: Execute query and get results
-      const rawResults = await this.executeQuery(sqlQuery)
+
+      // Step 2: Convert intent + filters to supabaseDataService filters
+      const combinedFilters = {
+        industry: request.filters?.segment || parsedQuery.filters.segment,
+        city: request.filters?.city || parsedQuery.filters.city,
+        minRevenue: request.filters?.minRevenue,
+        maxRevenue: request.filters?.maxRevenue,
+        minEmployees: request.filters?.minEmployees,
+        maxEmployees: request.filters?.maxEmployees,
+        minRevenueGrowth: parsedQuery.criteria.find((c: any) => c.type === 'growth')?.value,
+        maxRevenueGrowth: undefined
+      }
+
+      const { companies } = await supabaseDataService.getCompanies(1, 200, combinedFilters as any)
+      const rawResults = companies
       
       // Step 4: Generate AI insights
       const insights = await this.generateInsights(rawResults, request.query)
@@ -237,7 +247,7 @@ export class AIAnalysisService {
     }
 
     // Calculate basic statistics
-    const revenues = results.map(r => parseFloat(r.revenue || r.Revenue || '0')).filter(r => r > 0)
+    const revenues = results.map(r => parseFloat(r.SDI || r.revenue || r.Revenue || '0')).filter(r => r > 0)
     const avgRevenue = revenues.length > 0 ? revenues.reduce((a, b) => a + b, 0) / revenues.length : 0
 
     // Generate insights based on data
@@ -248,7 +258,7 @@ export class AIAnalysisService {
     }
 
     // Industry distribution
-    const segments = results.map(r => r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
+    const segments = results.map(r => r.segment_name || r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
     if (segments.length > 0) {
       const segmentCounts = segments.reduce((acc, seg) => {
         acc[seg] = (acc[seg] || 0) + 1
@@ -262,7 +272,7 @@ export class AIAnalysisService {
     }
 
     // Growth insights
-    const growthRates = results.map(r => parseFloat(r.revenue_growth || r.Revenue_growth || '0')).filter(g => g > 0)
+    const growthRates = results.map(r => parseFloat(r.Revenue_growth || r.revenue_growth || '0')).filter(g => g > 0)
     if (growthRates.length > 0) {
       const avgGrowth = growthRates.reduce((a, b) => a + b, 0) / growthRates.length
       insights.push(`Average growth rate: ${(avgGrowth * 100).toFixed(1)}%`)
@@ -273,10 +283,10 @@ export class AIAnalysisService {
 
   // Create summary statistics
   private static createSummary(results: any[]): any {
-    const revenues = results.map(r => parseFloat(r.revenue || r.Revenue || '0')).filter(r => r > 0)
-    const growthRates = results.map(r => parseFloat(r.revenue_growth || r.Revenue_growth || '0')).filter(g => g > 0)
-    
-    const segments = results.map(r => r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
+    const revenues = results.map(r => parseFloat(r.SDI || r.revenue || r.Revenue || '0')).filter(r => r > 0)
+    const growthRates = results.map(r => parseFloat(r.Revenue_growth || r.revenue_growth || '0')).filter(g => g > 0)
+
+    const segments = results.map(r => r.segment_name || r.segment || r.Bransch || 'Unknown').filter(s => s !== 'Unknown')
     const segmentCounts = segments.reduce((acc, seg) => {
       acc[seg] = (acc[seg] || 0) + 1
       return acc

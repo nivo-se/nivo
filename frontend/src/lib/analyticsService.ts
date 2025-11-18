@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseDataService, type SupabaseCompany } from './supabaseDataService'
 
 // =====================================================
 // INTERFACES FOR MASTER_ANALYTICS TABLE
@@ -238,120 +239,28 @@ export class AnalyticsService {
     filters?: CompanyFilter
   ): Promise<{ data: MasterAnalyticsCompany[], total: number }> {
     try {
-      console.log('Fetching companies with filters:', { page, limit, filters })
-
-      // Note: This method is deprecated - use supabaseDataService.getCompanies() instead
-      // This is kept for backward compatibility but uses new schema
-      let query = supabase
-        .from('companies')
-        .select('orgnr, company_name, address, homepage, email, segment_names, foundation_year, employees_latest', { count: 'exact' })
-
-      // Apply filters (with error handling for each filter)
-      if (filters?.segment) {
-        try {
-          query = query.eq('segment', filters.segment)
-        } catch (error) {
-          console.log('Segment filter failed:', error)
-        }
-      }
-      
-      // Add name search filter if provided
-      if (filters?.name) {
-        try {
-          query = query.ilike('name', `%${filters.name}%`)
-        } catch (error) {
-          console.log('Name search filter failed:', error)
-        }
-      }
-      if (filters?.companySize) {
-        try {
-          query = query.eq('company_size_category', filters.companySize)
-        } catch (error) {
-          console.log('Company size filter failed:', error)
-        }
-      }
-      if (filters?.employeeSize) {
-        try {
-          query = query.eq('employee_size_category', filters.employeeSize)
-        } catch (error) {
-          console.log('Employee size filter failed:', error)
-        }
-      }
-      if (filters?.profitability) {
-        try {
-          query = query.eq('profitability_category', filters.profitability)
-        } catch (error) {
-          console.log('Profitability filter failed:', error)
-        }
-      }
-      if (filters?.growth) {
-        try {
-          query = query.eq('growth_category', filters.growth)
-        } catch (error) {
-          console.log('Growth filter failed:', error)
-        }
-      }
-      if (filters?.digitalPresence !== undefined) {
-        try {
-          query = query.eq('digital_presence', filters.digitalPresence)
-        } catch (error) {
-          console.log('Digital presence filter failed, trying homepage fallback:', error)
-          // Fallback to homepage
-          if (filters.digitalPresence) {
-            query = query.not('homepage', 'is', null).neq('homepage', '')
-          }
-        }
-      }
-      if (filters?.city) {
-        try {
-          query = query.ilike('city', `%${filters.city}%`)
-        } catch (error) {
-          console.log('City filter failed:', error)
-        }
-      }
-      if (filters?.minRevenue) {
-        try {
-          query = query.gte('revenue', filters.minRevenue.toString())
-        } catch (error) {
-          console.log('Min revenue filter failed:', error)
-        }
-      }
-      if (filters?.maxRevenue) {
-        try {
-          query = query.lte('revenue', filters.maxRevenue.toString())
-        } catch (error) {
-          console.log('Max revenue filter failed:', error)
-        }
+      const mappedFilters = {
+        name: filters?.name,
+        industry: filters?.segment,
+        city: filters?.city,
+        minRevenue: filters?.minRevenue,
+        maxRevenue: filters?.maxRevenue,
+        minRevenueGrowth: undefined,
+        maxRevenueGrowth: undefined,
+        profitability: filters?.profitability,
+        size: filters?.companySize,
+        minProfit: undefined,
+        maxProfit: undefined,
+        minEBITAmount: undefined,
+        maxEBITAmount: undefined,
+        digitalPresence: filters?.digitalPresence
       }
 
-      // Apply pagination
-      const from = (page - 1) * limit
-      const to = from + limit - 1
-      query = query.range(from, to)
-
-      console.log('Executing query...')
-      const { data, count, error } = await query
-
-      if (error) {
-        console.error('Supabase query error:', error)
-        // Try a simpler query as fallback
-        const { data: fallbackData, count: fallbackCount } = await supabase
-          .from('master_analytics')
-          .select('*', { count: 'exact' })
-          .range(from, to)
-        
-        console.log('Fallback query result:', { dataCount: fallbackData?.length, totalCount: fallbackCount })
-        return {
-          data: fallbackData || [],
-          total: fallbackCount || 0
-        }
-      }
-
-      console.log('Query result:', { dataCount: data?.length, totalCount: count })
+      const { companies, total } = await supabaseDataService.getCompanies(page, limit, mappedFilters)
 
       return {
-        data: data || [],
-        total: count || 0
+        data: companies.map(this.mapSupabaseCompany),
+        total
       }
     } catch (error) {
       console.error('Error fetching companies:', error)
@@ -363,15 +272,14 @@ export class AnalyticsService {
   static async getHighGrowthCompanies(limit: number = 20): Promise<MasterAnalyticsCompany[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('*')
-        .eq('growth_category', 'High Growth')
-        .not('Revenue_growth', 'is', null)
-        .order('Revenue_growth', { ascending: false })
+        .from('company_metrics')
+        .select('orgnr, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, latest_revenue_sek, company_size_bucket, growth_bucket, profitability_bucket, digital_presence, companies (company_name, address, homepage, email, segment_names, employees_latest)')
+        .not('revenue_cagr_3y', 'is', null)
+        .order('revenue_cagr_3y', { ascending: false })
         .limit(limit)
 
       if (error) throw error
-      return data || []
+      return (data || []).map(this.mapMetricsRow)
     } catch (error) {
       console.error('Error fetching high-growth companies:', error)
       return []
@@ -382,15 +290,14 @@ export class AnalyticsService {
   static async getHighProfitabilityCompanies(limit: number = 20): Promise<MasterAnalyticsCompany[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('*')
-        .eq('profitability_category', 'High Profitability')
-        .not('EBIT_margin', 'is', null)
-        .order('EBIT_margin', { ascending: false })
+        .from('company_metrics')
+        .select('orgnr, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, latest_revenue_sek, company_size_bucket, growth_bucket, profitability_bucket, digital_presence, companies (company_name, address, homepage, email, segment_names, employees_latest)')
+        .not('avg_ebitda_margin', 'is', null)
+        .order('avg_ebitda_margin', { ascending: false })
         .limit(limit)
 
       if (error) throw error
-      return data || []
+      return (data || []).map(this.mapMetricsRow)
     } catch (error) {
       console.error('Error fetching high-profitability companies:', error)
       return []
@@ -401,15 +308,15 @@ export class AnalyticsService {
   static async getCompaniesBySize(size: string, limit: number = 20): Promise<MasterAnalyticsCompany[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('*')
-        .eq('company_size_category', size)
-        .not('revenue', 'is', null)
-        .order('revenue', { ascending: false })
+        .from('company_metrics')
+        .select('orgnr, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, latest_revenue_sek, company_size_bucket, growth_bucket, profitability_bucket, digital_presence, companies (company_name, address, homepage, email, segment_names, employees_latest)')
+        .eq('company_size_bucket', size)
+        .not('latest_revenue_sek', 'is', null)
+        .order('latest_revenue_sek', { ascending: false })
         .limit(limit)
 
       if (error) throw error
-      return data || []
+      return (data || []).map(this.mapMetricsRow)
     } catch (error) {
       console.error('Error fetching companies by size:', error)
       return []
@@ -420,15 +327,15 @@ export class AnalyticsService {
   static async getDigitalCompanies(limit: number = 20): Promise<MasterAnalyticsCompany[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('*')
+        .from('company_metrics')
+        .select('orgnr, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, latest_revenue_sek, company_size_bucket, growth_bucket, profitability_bucket, digital_presence, companies (company_name, address, homepage, email, segment_names, employees_latest)')
         .eq('digital_presence', true)
-        .not('revenue', 'is', null)
-        .order('revenue', { ascending: false })
+        .not('latest_revenue_sek', 'is', null)
+        .order('latest_revenue_sek', { ascending: false })
         .limit(limit)
 
       if (error) throw error
-      return data || []
+      return (data || []).map(this.mapMetricsRow)
     } catch (error) {
       console.error('Error fetching digital companies:', error)
       return []
@@ -439,30 +346,34 @@ export class AnalyticsService {
   static async getSegmentAnalysis(): Promise<{ segment: string, count: number, avgGrowth: number, avgProfitability: number }[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('segment, Revenue_growth, EBIT_margin')
-        .not('segment', 'is', null)
+        .from('company_metrics')
+        .select('revenue_cagr_3y, avg_ebitda_margin, companies (segment_names)')
 
       if (error) throw error
 
-      // Group by segment
       const segmentMap = new Map<string, { count: number, growth: number[], profitability: number[] }>()
-      
-      data?.forEach(company => {
-        const segment = company.segment || 'Unknown'
-        if (!segmentMap.has(segment)) {
-          segmentMap.set(segment, { count: 0, growth: [], profitability: [] })
-        }
-        
-        const segmentData = segmentMap.get(segment)!
-        segmentData.count++
-        
-        if (company.Revenue_growth !== null) {
-          segmentData.growth.push(company.Revenue_growth)
-        }
-        if (company.EBIT_margin !== null) {
-          segmentData.profitability.push(company.EBIT_margin)
-        }
+
+      data?.forEach(row => {
+        const segments = Array.isArray(row.companies?.segment_names)
+          ? row.companies?.segment_names
+          : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+
+        segments.forEach(segmentName => {
+          const segment = segmentName || 'Unknown'
+          if (!segmentMap.has(segment)) {
+            segmentMap.set(segment, { count: 0, growth: [], profitability: [] })
+          }
+
+          const segmentData = segmentMap.get(segment)!
+          segmentData.count++
+
+          if (row.revenue_cagr_3y !== null && row.revenue_cagr_3y !== undefined) {
+            segmentData.growth.push(row.revenue_cagr_3y)
+          }
+          if (row.avg_ebitda_margin !== null && row.avg_ebitda_margin !== undefined) {
+            segmentData.profitability.push(row.avg_ebitda_margin)
+          }
+        })
       })
 
       return Array.from(segmentMap.entries()).map(([segment, data]) => ({
@@ -481,14 +392,14 @@ export class AnalyticsService {
   static async getGrowthDistribution(): Promise<{ category: string, count: number }[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('growth_category')
-        .not('growth_category', 'is', null)
+        .from('company_metrics')
+        .select('growth_bucket')
+        .not('growth_bucket', 'is', null)
 
       if (error) throw error
 
       const distribution = data?.reduce((acc, company) => {
-        const category = company.growth_category || 'Unknown'
+        const category = company.growth_bucket || 'Unknown'
         acc[category] = (acc[category] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}
@@ -507,14 +418,14 @@ export class AnalyticsService {
   static async getProfitabilityDistribution(): Promise<{ category: string, count: number }[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('profitability_category')
-        .not('profitability_category', 'is', null)
+        .from('company_metrics')
+        .select('profitability_bucket')
+        .not('profitability_bucket', 'is', null)
 
       if (error) throw error
 
       const distribution = data?.reduce((acc, company) => {
-        const category = company.profitability_category || 'Unknown'
+        const category = company.profitability_bucket || 'Unknown'
         acc[category] = (acc[category] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}
@@ -551,13 +462,19 @@ export class AnalyticsService {
   static async getUniqueCities(): Promise<string[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('city')
-        .not('city', 'is', null)
+        .from('companies')
+        .select('address')
 
       if (error) throw error
 
-      const cities = new Set(data?.map(item => item.city) || [])
+      const cities = new Set(
+        (data || []).map(item => {
+          if (item.address && typeof item.address === 'object') {
+            return (item.address as any).postPlace || (item.address as any).visitorAddress?.postPlace || null
+          }
+          return null
+        }).filter(Boolean) as string[]
+      )
       return Array.from(cities).sort()
     } catch (error) {
       console.error('Error fetching cities:', error)
@@ -569,14 +486,14 @@ export class AnalyticsService {
   static async getRevenueDistribution(): Promise<{ range: string, count: number }[]> {
     try {
       const { data, error } = await supabase
-        .from('master_analytics')
-        .select('company_size_category')
-        .not('company_size_category', 'is', null)
+        .from('company_metrics')
+        .select('company_size_bucket')
+        .not('company_size_bucket', 'is', null)
 
       if (error) throw error
 
       const distribution = data?.reduce((acc, company) => {
-        const category = company.company_size_category || 'Unknown'
+        const category = company.company_size_bucket || 'Unknown'
         acc[category] = (acc[category] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}
@@ -659,5 +576,73 @@ export class AnalyticsService {
   private static calculateCAGR(beginningValue: number, endingValue: number, years: number): number {
     if (beginningValue <= 0 || endingValue <= 0 || years <= 0) return 0
     return Math.pow(endingValue / beginningValue, 1 / years) - 1
+  }
+
+  private static mapSupabaseCompany(company: SupabaseCompany): MasterAnalyticsCompany {
+    const segmentName = Array.isArray(company.segment_name)
+      ? company.segment_name[0]
+      : company.segment_name
+
+    const city = typeof company.address === 'object'
+      ? (company.address as any).postPlace || (company.address as any).visitorAddress?.postPlace || company.city
+      : company.city
+
+    return {
+      OrgNr: company.OrgNr,
+      name: company.name,
+      address: typeof company.address === 'string' ? company.address : undefined,
+      city: city || undefined,
+      email: company.email,
+      homepage: company.homepage,
+      segment: segmentName || company.segment,
+      segment_name: segmentName || company.segment_name,
+      industry_name: company.industry_name,
+      revenue: company.revenue,
+      profit: company.profit,
+      employees: company.employees,
+      SDI: company.SDI,
+      DR: company.DR,
+      ORS: company.ORS,
+      Revenue_growth: company.Revenue_growth,
+      EBIT_margin: company.EBIT_margin,
+      NetProfit_margin: company.NetProfit_margin,
+      company_size_category: company.company_size_category,
+      employee_size_category: company.employee_size_category,
+      profitability_category: company.profitability_category,
+      growth_category: company.growth_category,
+      digital_presence: company.digital_presence
+    }
+  }
+
+  private static mapMetricsRow(row: any): MasterAnalyticsCompany {
+    const segmentNames = Array.isArray(row.companies?.segment_names)
+      ? row.companies.segment_names
+      : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+
+    const address = row.companies?.address
+    const city = typeof address === 'object'
+      ? address.postPlace || address.visitorAddress?.postPlace || undefined
+      : undefined
+
+    return {
+      OrgNr: row.orgnr,
+      name: row.companies?.company_name || 'Unknown Company',
+      address: typeof address === 'string' ? address : undefined,
+      city,
+      homepage: row.companies?.homepage || undefined,
+      email: row.companies?.email || undefined,
+      segment_name: segmentNames[0],
+      employees: row.companies?.employees_latest?.toString(),
+      SDI: row.latest_revenue_sek ?? undefined,
+      DR: row.latest_profit_sek ?? undefined,
+      ORS: row.latest_ebitda_sek ?? undefined,
+      Revenue_growth: row.revenue_cagr_3y ?? undefined,
+      EBIT_margin: row.avg_ebitda_margin ?? undefined,
+      NetProfit_margin: row.avg_net_margin ?? undefined,
+      company_size_category: row.company_size_bucket ?? undefined,
+      profitability_category: row.profitability_bucket ?? undefined,
+      growth_category: row.growth_bucket ?? undefined,
+      digital_presence: row.digital_presence ?? undefined
+    }
   }
 }

@@ -1198,25 +1198,31 @@ async function fetchSegmentBenchmarks(
 ): Promise<CompanyBenchmarks | undefined> {
   if (!segmentName) return undefined
   const { data, error } = await supabase
-    .from('master_analytics')
-    .select(
-      `
-        avg_revenue_growth:avg(Revenue_growth),
-        avg_ebit_margin:avg(EBIT_margin),
-        avg_net_margin:avg(NetProfit_margin)
-      `
-    )
-    .eq('segment_name', segmentName)
-    .maybeSingle()
+    .from('company_metrics')
+    .select('revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, companies (segment_names)')
+    .limit(500)
 
   if (error) throw error
   if (!data) return { segment: segmentName }
 
+  const rowsInSegment = data.filter(row => {
+    const segments = Array.isArray(row.companies?.segment_names)
+      ? row.companies.segment_names
+      : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+    return segments.includes(segmentName)
+  })
+
+  if (!rowsInSegment.length) return { segment: segmentName }
+
+  const revenueGrowthValues = rowsInSegment.map(row => safeNumber(row.revenue_cagr_3y)).filter(Number.isFinite) as number[]
+  const ebitMarginValues = rowsInSegment.map(row => safeNumber(row.avg_ebitda_margin)).filter(Number.isFinite) as number[]
+  const netMarginValues = rowsInSegment.map(row => safeNumber(row.avg_net_margin)).filter(Number.isFinite) as number[]
+
   return {
     segment: segmentName,
-    avgRevenueGrowth: safeNumber((data as any)?.avg_revenue_growth),
-    avgEbitMargin: safeNumber((data as any)?.avg_ebit_margin),
-    avgNetMargin: safeNumber((data as any)?.avg_net_margin),
+    avgRevenueGrowth: average(revenueGrowthValues),
+    avgEbitMargin: average(ebitMarginValues),
+    avgNetMargin: average(netMarginValues),
   }
 }
 

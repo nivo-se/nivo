@@ -15,40 +15,44 @@ export async function getIndustryBenchmarks(
 ): Promise<IndustryBenchmarks> {
   try {
     const { data, error } = await supabase
-      .from('master_analytics')
-      .select('EBIT_margin, Revenue_growth, SDI, employees, segment_name')
-      .eq('segment_name', segment)
-      .not('EBIT_margin', 'is', null)
-      .not('Revenue_growth', 'is', null)
-      .limit(100) // Sample size for benchmarking
-    
+      .from('company_metrics')
+      .select('avg_ebitda_margin, revenue_cagr_3y, latest_revenue_sek, companies (employees_latest, segment_names)')
+      .limit(500)
+
     if (error) {
       console.warn(`Failed to fetch benchmarks for segment ${segment}:`, error)
       return getDefaultBenchmarks()
     }
-    
-    if (!data || data.length === 0) {
+
+    const filtered = (data || []).filter(row => {
+      const segments = Array.isArray(row.companies?.segment_names)
+        ? row.companies?.segment_names
+        : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+      return segments.includes(segment)
+    })
+
+    if (!filtered || filtered.length === 0) {
       console.warn(`No data found for segment ${segment}`)
       return getDefaultBenchmarks()
     }
-    
+
     // Filter out invalid data
-    const validData = data.filter(d => 
-      d.EBIT_margin !== null && 
-      d.Revenue_growth !== null && 
-      d.SDI > 0 && 
-      d.employees > 0
+    const validData = filtered.filter(d =>
+      d.avg_ebitda_margin !== null &&
+      d.revenue_cagr_3y !== null &&
+      d.latest_revenue_sek > 0 &&
+      (d.companies?.employees_latest || 0) > 0
     )
-    
+
     if (validData.length === 0) {
       return getDefaultBenchmarks()
     }
-    
+
     return {
-      avgEbitMargin: validData.reduce((sum, d) => sum + (d.EBIT_margin * 100), 0) / validData.length,
-      avgGrowthRate: validData.reduce((sum, d) => sum + (d.Revenue_growth * 100), 0) / validData.length,
+      avgEbitMargin: validData.reduce((sum, d) => sum + (d.avg_ebitda_margin * 100), 0) / validData.length,
+      avgGrowthRate: validData.reduce((sum, d) => sum + (d.revenue_cagr_3y * 100), 0) / validData.length,
       avgDebtToEquity: 0.5, // Default assumption since column doesn't exist
-      avgEmployeeProductivity: validData.reduce((sum, d) => sum + (d.SDI / d.employees), 0) / validData.length,
+      avgEmployeeProductivity: validData.reduce((sum, d) => sum + (d.latest_revenue_sek / (d.companies?.employees_latest || 1)), 0) / validData.length,
       sampleSize: validData.length
     }
     
@@ -78,10 +82,10 @@ export function getCompanyContext(
   companyData: any,
   benchmarks: IndustryBenchmarks
 ): string {
-  const ebitMargin = (companyData.EBIT_margin || 0) * 100
-  const growthRate = (companyData.Revenue_growth || 0) * 100
+  const ebitMargin = (companyData.avg_ebitda_margin || companyData.EBIT_margin || 0) * 100
+  const growthRate = (companyData.revenue_cagr_3y || companyData.Revenue_growth || 0) * 100
   const debtToEquity = 0.5 // Default assumption since column doesn't exist
-  const employeeProductivity = companyData.SDI / (companyData.employees || 1)
+  const employeeProductivity = (companyData.latest_revenue_sek || companyData.SDI || 0) / (companyData.employees || 1)
   
   const context = []
   

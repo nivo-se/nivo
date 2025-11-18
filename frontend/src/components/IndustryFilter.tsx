@@ -17,6 +17,7 @@ import {
   RotateCcw
 } from 'lucide-react'
 import { supabase, supabaseConfig } from '../lib/supabase'
+import { supabaseDataService } from '../lib/supabaseDataService'
 import { getLocalIndustrySummaries } from '../lib/sampleData'
 
 interface Industry {
@@ -68,40 +69,28 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
           return
         }
 
-        // Get industry codes with company counts
-        const { data: industryData, error: industryError } = await supabase
-          .from('industry_codes')
-          .select('code, name, category')
-          .order('name')
+        const [{ data: industryData, error: industryError }, industryStats] = await Promise.all([
+          supabase
+            .from('industry_codes')
+            .select('code, name, category')
+            .order('name'),
+          supabaseDataService.getIndustryStats()
+        ])
 
         if (industryError) {
           console.error('Error loading industries:', industryError)
           return
         }
 
-        // Get company counts for each industry
-        const { data: companyCounts, error: countError } = await supabase
-          .from('master_analytics')
-          .select('segment')
-          .not('segment', 'is', null)
-
-        if (countError) {
-          console.error('Error loading company counts:', countError)
-        }
-
-        // Count companies per industry
-        const industryCounts = new Map<string, number>()
-        companyCounts?.forEach(company => {
-          if (company.segment) {
-            industryCounts.set(company.segment, (industryCounts.get(company.segment) || 0) + 1)
-          }
+        const countsByIndustry = new Map<string, number>()
+        industryStats.forEach(({ industry, count }) => {
+          countsByIndustry.set(industry, count)
         })
 
-        // Combine industry data with counts
-        const industriesWithCounts = industryData?.map(industry => ({
+        const industriesWithCounts = (industryData || []).map(industry => ({
           ...industry,
-          companyCount: industryCounts.get(industry.code) || 0
-        })).filter(industry => industry.companyCount > 0) || []
+          companyCount: countsByIndustry.get(industry.code) || countsByIndustry.get(industry.name) || 0
+        })).filter(industry => industry.companyCount > 0)
 
         setIndustries(industriesWithCounts)
         setFilteredIndustries(industriesWithCounts)

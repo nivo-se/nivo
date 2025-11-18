@@ -402,7 +402,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
   </Card>
 )
 
-const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'master_analytics' }) => {
+const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_metrics' }) => {
   // Saved lists state
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedListId, setSelectedListId] = useState<string>('')
