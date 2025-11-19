@@ -216,7 +216,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
           {applyFiltersMutation.isError && (
             <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-              Error: {applyFiltersMutation.error?.message || 'Failed to generate shortlist'}
+              <p className="font-semibold">Error generating shortlist</p>
+              <p className="text-xs mt-1 opacity-90">
+                {applyFiltersMutation.error?.message?.includes('Backend API is not configured') || 
+                 applyFiltersMutation.error?.message?.includes('localhost') ? (
+                  'The backend API is not available. Please ensure the backend is deployed or running locally.'
+                ) : (
+                  applyFiltersMutation.error?.message || 'Failed to generate shortlist'
+                )}
+              </p>
             </div>
           )}
 
@@ -243,8 +251,26 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
       {analyticsError && (
         <Card>
           <CardContent className="py-8">
-            <div className="text-center text-destructive">
-              Error loading analytics: {analyticsError.message}
+            <div className="text-center">
+              <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+              <p className="font-semibold text-destructive mb-2">Error loading analytics</p>
+              <p className="text-sm text-muted-foreground">
+                {analyticsError.message?.includes('Backend API is not configured') || 
+                 analyticsError.message?.includes('localhost') ? (
+                  <>
+                    The backend API is not available in this environment.
+                    <br />
+                    Financial Filters require the backend API to be running.
+                    {import.meta.env.DEV && (
+                      <span className="block mt-2 text-xs">
+                        Start the backend: <code className="bg-muted px-1 py-0.5 rounded">./scripts/start-backend.sh</code>
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  analyticsError.message
+                )}
+              </p>
             </div>
           </CardContent>
         </Card>
