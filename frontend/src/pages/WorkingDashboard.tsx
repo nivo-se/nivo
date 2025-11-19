@@ -19,6 +19,8 @@ import AnalyzedCompanies from '../pages/AnalyzedCompanies'
 import Valuation from '../pages/Valuation'
 import AdminPanel from '../components/AdminPanel'
 import SegmentationTiers from '../components/SegmentationTiers'
+import { FinancialFilterPanel } from '../components/FinancialFilterPanel'
+import { AIDeepDivePanel } from '../components/AIDeepDivePanel'
 
 const WorkingDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -66,6 +68,7 @@ const WorkingDashboard: React.FC = () => {
 
   const menuItems: MenuItem[] = [
     { id: 'overview', label: 'Översikt', icon: BarChart3 },
+    { id: 'financial-filters', label: 'Financial Filters', icon: Target },
     { id: 'companies', label: 'Företagssökning', icon: Search },
     { id: 'segmentation', label: 'Segmentering', icon: Target },
     { id: 'analytics', label: 'Analys', icon: Building2 },
@@ -130,6 +133,9 @@ const WorkingDashboard: React.FC = () => {
 
   const renderContent = () => {
     switch (currentPage) {
+      case 'financial-filters':
+        return <FinancialFilterPanel />
+      
       case 'overview': {
         const metricCards = [
           {
@@ -474,7 +480,7 @@ const WorkingDashboard: React.FC = () => {
                 <div className="bg-[#596152]/10 p-4 rounded-lg border border-[#596152]/20">
                   <h3 className="font-semibold text-[#596152] mb-2">✅ Dashboard ansluten till livedata</h3>
                   <p className="text-[#2E2A2B]/80">
-                    All statistik hämtas nu från master_analytics-tabellen i realtid. 
+                    All statistik hämtas nu från den nya company_metrics-datamodellen i realtid.
                     Navigera till Företagssökning för att utforska data i detalj.
                   </p>
                 </div>
@@ -494,7 +500,7 @@ const WorkingDashboard: React.FC = () => {
         return <ListBasedAnalytics />
       
       case 'ai-insights':
-        return <AIAnalysis selectedDataView="master_analytics" />
+        return <AIAnalysis selectedDataView="company_metrics" />
       
       case 'analyzed-companies':
         return <AnalyzedCompanies />

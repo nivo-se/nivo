@@ -27,6 +27,7 @@ import { supabaseCompanyService, SupabaseCompany, CompanyFilter } from '../lib/s
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import CompanyListManager from './CompanyListManager'
 import AddToListsDialog from './AddToListsDialog'
+import { AIDeepDivePanel } from './AIDeepDivePanel'
 
 interface SearchResults {
   companies: SupabaseCompany[]
@@ -1335,6 +1336,14 @@ const EnhancedCompanySearch: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* AI Deep Dive Section */}
+              <div className="mb-8">
+                <AIDeepDivePanel 
+                  orgnr={selectedCompany.OrgNr} 
+                  companyName={selectedCompany.name}
+                />
               </div>
             </div>
           </div>
