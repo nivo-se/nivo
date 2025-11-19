@@ -54,9 +54,9 @@ app.post('/api/ai-analysis', async (req, res) => {
     // Fetch real company data from database
     const companyOrgnrs = companies.map(c => c.OrgNr || c.orgnr).filter(Boolean)
     const { data: realCompanies, error: fetchError } = await supabase
-      .from('master_analytics')
-      .select('*')
-      .in('OrgNr', companyOrgnrs)
+      .from('company_metrics')
+      .select('orgnr, latest_revenue_sek, latest_profit_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, company_size_bucket, growth_bucket, profitability_bucket, digital_presence, companies (company_name, segment_names, employees_latest)')
+      .in('orgnr', companyOrgnrs)
 
     if (fetchError) {
       console.error('Error fetching company data:', fetchError)
@@ -66,7 +66,25 @@ app.post('/api/ai-analysis', async (req, res) => {
       })
     }
 
-    console.log(`Found ${realCompanies?.length || 0} real companies in database`)
+    const mappedCompanies = (realCompanies || []).map((row) => {
+      const segmentNames = Array.isArray(row.companies?.segment_names)
+        ? row.companies.segment_names
+        : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+
+      return {
+        OrgNr: row.orgnr,
+        name: row.companies?.company_name || 'Unknown company',
+        segment_name: segmentNames[0],
+        revenue: Number(row.latest_revenue_sek) || 0,
+        profit: Number(row.latest_profit_sek) || 0,
+        employees: Number(row.companies?.employees_latest) || 0,
+        Revenue_growth: Number(row.revenue_cagr_3y) || 0,
+        EBIT_margin: Number(row.avg_ebitda_margin) || 0,
+        NetProfit_margin: Number(row.avg_net_margin) || 0
+      }
+    })
+
+    console.log(`Found ${mappedCompanies.length} real companies in database`)
 
     // Create analysis run record in database
     const runId = crypto.randomUUID()
@@ -98,7 +116,7 @@ app.post('/api/ai-analysis', async (req, res) => {
     if (analysisType === 'screening') {
       // Generate screening results using real company data
       const screeningResults = companies.map(company => {
-        const realCompany = realCompanies?.find(rc => rc.OrgNr === (company.OrgNr || company.orgnr))
+        const realCompany = mappedCompanies.find(rc => rc.OrgNr === (company.OrgNr || company.orgnr))
         
         if (!realCompany) {
           console.warn(`No real data found for company ${company.OrgNr || company.orgnr}`)
@@ -190,7 +208,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       const allSections = []
       
       for (const company of companies) {
-        const realCompany = realCompanies?.find(rc => rc.OrgNr === (company.OrgNr || company.orgnr))
+        const realCompany = mappedCompanies.find(rc => rc.OrgNr === (company.OrgNr || company.orgnr))
         
         if (!realCompany) {
           console.warn(`No real data found for company ${company.OrgNr || company.orgnr}`)
@@ -396,30 +414,53 @@ app.post('/api/ai-analysis', async (req, res) => {
 app.get('/api/companies', async (req, res) => {
   try {
     const { limit = 10, orgnr } = req.query
-    
+
     let query = supabase
-      .from('master_analytics')
-      .select('*')
+      .from('company_metrics')
+      .select('orgnr, latest_revenue_sek, latest_profit_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, company_size_bucket, profitability_bucket, growth_bucket, companies (company_name, segment_names, employees_latest, homepage, email)')
       .limit(Number(limit))
-    
+
     if (orgnr) {
-      query = query.eq('OrgNr', orgnr)
+      query = query.eq('orgnr', orgnr as string)
     }
-    
+
     const { data: companies, error } = await query
 
     if (error) {
       console.error('Error fetching companies:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Failed to fetch companies' 
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch companies'
       })
     }
 
+    const mapped = (companies || []).map((row) => {
+      const segmentNames = Array.isArray(row.companies?.segment_names)
+        ? row.companies.segment_names
+        : (row.companies?.segment_names ? [row.companies.segment_names] : [])
+
+      return {
+        OrgNr: row.orgnr,
+        name: row.companies?.company_name,
+        SDI: row.latest_revenue_sek,
+        DR: row.latest_profit_sek,
+        Revenue_growth: row.revenue_cagr_3y,
+        EBIT_margin: row.avg_ebitda_margin,
+        NetProfit_margin: row.avg_net_margin,
+        company_size_category: row.company_size_bucket,
+        profitability_category: row.profitability_bucket,
+        growth_category: row.growth_bucket,
+        employees: row.companies?.employees_latest,
+        segment_name: segmentNames[0],
+        homepage: row.companies?.homepage,
+        email: row.companies?.email
+      }
+    })
+
     return res.json({
       success: true,
-      companies: companies || [],
-      total: companies?.length || 0
+      companies: mapped,
+      total: mapped.length || 0
     })
   } catch (error) {
     console.error('Error fetching companies:', error)
