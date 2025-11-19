@@ -84,17 +84,16 @@ export interface JobStatus {
 
 class IntelligenceService {
   private getApiBaseUrl(): string {
-    // If explicitly set, use it
+    // If explicitly set, use it (for external API deployment)
     if (import.meta.env.VITE_API_BASE_URL) {
       return import.meta.env.VITE_API_BASE_URL
     }
-    // In development, use localhost
+    // In development, use localhost FastAPI backend
     if (import.meta.env.DEV) {
       return 'http://localhost:8000'
     }
-    // In production/Vercel, the backend API needs to be deployed separately
-    // For now, return empty which will cause errors - but that's expected
-    // TODO: Deploy backend API and set VITE_API_BASE_URL in Vercel environment variables
+    // In production/Vercel, use relative URLs (serverless functions are on same domain)
+    // This will use /api/* routes which are handled by Vercel serverless functions
     return ''
   }
 

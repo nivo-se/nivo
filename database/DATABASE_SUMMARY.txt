@@ -1,0 +1,105 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    DATABASE STRUCTURE SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+ACTIVE DATABASE: data/new_schema_local.db (SQLite)
+                  Supabase (PostgreSQL) - Production
+
+CORE TABLES:
+  1. companies (13,609 records)
+     - Master company data
+     - Primary Key: orgnr
+     
+  2. company_financials (66,614 records)
+     - Historical financial statements
+     - Foreign Key: orgnr → companies
+     
+  3. company_metrics (13,609 records)
+     - Pre-calculated KPIs
+     - Foreign Key: orgnr → companies
+     
+  4. financial_accounts (3,314,236 records)
+     - Normalized account codes
+     - Foreign Key: financial_id → company_financials
+     - Foreign Key: orgnr → companies
+
+  5. financial_accounts_pivot (VIEW)
+     - Pivoted view of financial_accounts
+
+  6. company_kpis_local (SQLite only)
+     - Additional local KPI calculations
+
+═══════════════════════════════════════════════════════════════════════════════
+                        DATA FORMAT STATUS
+═══════════════════════════════════════════════════════════════════════════════
+
+CURRENT STATE (INCONSISTENT):
+  ❌ Database stores values in SEK (multiplied by 1000)
+     Example: 66,334,000 SEK stored as 66334000.0
+  ❌ UI divides by 1,000,000 to display as mSEK
+     Example: 66334000 / 1000000 = 66.334 mSEK
+
+TARGET STATE (REQUIRED):
+  ✅ Database should store values in thousands (as-is from Allabolag)
+     Example: 66,334 thousands stored as 66334.0
+  ✅ UI should divide by 1,000 to display as mSEK
+     Example: 66334 / 1000 = 66.334 mSEK
+
+ACTION REQUIRED:
+  1. Update migration script to NOT multiply by 1000
+  2. Update UI formatting to divide by 1000 (not 1,000,000)
+  3. Migrate existing data OR update UI to handle current format
+
+═══════════════════════════════════════════════════════════════════════════════
+                        OLD DATABASES FOUND
+═══════════════════════════════════════════════════════════════════════════════
+
+STAGING DATABASES (36+ files):
+  Location: scraper/allabolag-scraper/staging/
+  - staging_current.db (active)
+  - staging_50_200_combined.db
+  - staging_*.db (30+ individual job databases)
+  Status: ⚠️ Can be cleaned up after migration verification
+
+BACKUP DATABASES:
+  Location: backups/databases/
+  - allabolag_backup_may2024.db
+  - allabolag_original_20251023.db
+  Status: ✅ Keep for historical reference
+
+═══════════════════════════════════════════════════════════════════════════════
+                        KEY ACCOUNT CODES
+═══════════════════════════════════════════════════════════════════════════════
+
+SDI    - Nettoomsättning (Revenue)
+RG     - Resultat före skatt (EBIT)
+DR     - Årets resultat (Net Profit)
+EBITDA - EBITDA (calculated)
+EK     - Eget kapital (Equity)
+FK     - Skulder (Debt)
+SV     - Summa tillgångar (Total Assets)
+ANT    - Antal anställda (Employees)
+EKA    - Eget kapital i % (Equity Ratio)
++ 40+ more account codes
+
+═══════════════════════════════════════════════════════════════════════════════
+                        SCHEMA FILES
+═══════════════════════════════════════════════════════════════════════════════
+
+Main Schemas:
+  - database/new_schema.sql (PostgreSQL)
+  - database/financial_accounts_schema.sql (PostgreSQL)
+  - database/financial_accounts_schema_sqlite.sql (SQLite)
+  - scripts/migrate_staging_to_new_schema.py (Migration script)
+
+Documentation:
+  - database/DATABASE_STRUCTURE_OVERVIEW.md (Full overview)
+  - docs/schema/new_company_schema.md (Schema docs)
+  - database/DATA_MAPPING_GUIDE.md (Data mapping)
+
+Other Schemas:
+  - database/saved_lists_schema.sql
+  - database/ai_ops_schema.sql
+  - database/valuation_schema.sql
+
+═══════════════════════════════════════════════════════════════════════════════
