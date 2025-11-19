@@ -2,37 +2,7 @@
   "version": 2,
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/filters/analytics.py": {
-      "runtime": "python3.9"
-    },
-    "api/filters/apply.py": {
-      "runtime": "python3.9"
-    },
-    "api/shortlists/stage1.py": {
-      "runtime": "python3.9"
-    },
-    "api/status.py": {
-      "runtime": "python3.9"
-    }
-  },
   "routes": [
-    {
-      "src": "/api/filters/analytics",
-      "dest": "/api/filters/analytics.py"
-    },
-    {
-      "src": "/api/filters/apply",
-      "dest": "/api/filters/apply.py"
-    },
-    {
-      "src": "/api/shortlists/stage1",
-      "dest": "/api/shortlists/stage1.py"
-    },
-    {
-      "src": "/api/status",
-      "dest": "/api/status.py"
-    },
     {
       "src": "/api/ai-analysis",
       "dest": "/frontend/api/ai-analysis.ts"
