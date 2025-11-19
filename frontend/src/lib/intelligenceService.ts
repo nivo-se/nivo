@@ -84,7 +84,7 @@ export interface JobStatus {
 
 class IntelligenceService {
   private getApiBaseUrl(): string {
-    // If explicitly set, use it (for external API deployment)
+    // If explicitly set, use it (for external API deployment like Railway)
     if (import.meta.env.VITE_API_BASE_URL) {
       return import.meta.env.VITE_API_BASE_URL
     }
@@ -92,8 +92,9 @@ class IntelligenceService {
     if (import.meta.env.DEV) {
       return 'http://localhost:8000'
     }
-    // In production/Vercel, use relative URLs (serverless functions are on same domain)
-    // This will use /api/* routes which are handled by Vercel serverless functions
+    // In production, if VITE_API_BASE_URL is not set, show helpful error
+    // The backend should be deployed separately (Railway/Render) and URL set in Vercel env vars
+    console.warn('VITE_API_BASE_URL not set. Backend API needs to be deployed separately.')
     return ''
   }
 
