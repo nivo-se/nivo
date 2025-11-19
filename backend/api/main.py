@@ -18,14 +18,27 @@ app = FastAPI(
 )
 
 # CORS configuration
-cors_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,http://localhost:3001,http://localhost:8080,http://localhost:8081,http://localhost:8082,http://localhost:8083,http://localhost:8084,http://127.0.0.1:8084"
-).split(",")
+# Allow localhost ports and Vercel preview deployments
+default_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:8082",
+    "http://localhost:8083",
+    "http://localhost:8084",
+    "http://127.0.0.1:8084",
+]
+
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
+if cors_origins_env:
+    default_origins.extend([origin.strip() for origin in cors_origins_env.split(",") if origin.strip()])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=default_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview deployments
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

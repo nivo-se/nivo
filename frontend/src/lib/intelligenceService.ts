@@ -3,7 +3,20 @@
  * Unified service for all intelligence operations
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+// API base URL - use environment variable or default based on environment
+const getApiBaseUrl = (): string => {
+  // If explicitly set, use it
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  // In development, use localhost
+  if (import.meta.env.DEV) {
+    return 'http://localhost:8000'
+  }
+  // In production, return empty to indicate API is not available
+  // The backend API needs to be deployed separately
+  return ''
+}
 
 // Helper to handle API errors
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -70,8 +83,35 @@ export interface JobStatus {
 }
 
 class IntelligenceService {
+  private getApiBaseUrl(): string {
+    // If explicitly set, use it
+    if (import.meta.env.VITE_API_BASE_URL) {
+      return import.meta.env.VITE_API_BASE_URL
+    }
+    // In development, use localhost
+    if (import.meta.env.DEV) {
+      return 'http://localhost:8000'
+    }
+    // In production/Vercel, the backend API needs to be deployed separately
+    // For now, return empty which will cause errors - but that's expected
+    // TODO: Deploy backend API and set VITE_API_BASE_URL in Vercel environment variables
+    return ''
+  }
+
   private async fetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const baseUrl = this.getApiBaseUrl()
+    
+    // If no base URL in production, throw a helpful error
+    if (!baseUrl && !import.meta.env.DEV) {
+      throw new Error(
+        'Backend API is not configured. Please set VITE_API_BASE_URL environment variable ' +
+        'or deploy the backend API. Financial Filters require the backend API to be running.'
+      )
+    }
+    
+    const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint
+    
+    const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
