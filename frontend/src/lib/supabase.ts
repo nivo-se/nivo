@@ -21,16 +21,22 @@ export const supabaseConfig = {
   isConfigured
 }
 
-// Create Supabase client (even if not configured, to prevent errors)
-export const supabase = isConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    })
-  : null
+// Create Supabase client singleton (even if not configured, to prevent errors)
+// Use a single instance to avoid multiple GoTrueClient warnings
+let supabaseInstance: ReturnType<typeof createClient> | null = null
+
+if (isConfigured) {
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storageKey: 'nivo-supabase-auth' // Use consistent storage key
+    }
+  })
+}
+
+export const supabase = supabaseInstance
 
 // Database types (we'll expand these as we add more tables)
 export interface Database {
@@ -166,11 +172,5 @@ export interface Database {
   }
 }
 
-// Typed Supabase client
-export const typedSupabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-})
+// Typed Supabase client - reuse the same instance to avoid multiple clients
+export const typedSupabase = supabaseInstance as ReturnType<typeof createClient<Database>> | null

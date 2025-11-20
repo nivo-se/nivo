@@ -88,6 +88,9 @@ export interface DashboardAnalytics {
   averageNetProfitMargin: number
   averageNetProfitGrowth: number
   averageRevenue: number
+  // Optional fields for dashboard charts
+  topIndustries?: Array<{ name: string; count: number }>
+  companySizeDistribution?: Array<{ size: string; count: number }>
 }
 
 const toNumber = (value: unknown): number | null => {
@@ -562,13 +565,74 @@ class SupabaseDataService {
       // Build analytics with actual database counts (not sample-based counts)
       const analytics = buildDashboardAnalytics(analyticsData as any, totalCompanies || 0)
       
+      // Fetch top industries
+      let topIndustries: Array<{ name: string; count: number }> = []
+      try {
+        const { data: industryData } = await supabase
+          .from('companies')
+          .select('segment_names')
+          .not('segment_names', 'is', null)
+          .limit(5000)
+        
+        if (industryData) {
+          const industryCounts: Record<string, number> = {}
+          industryData.forEach(company => {
+            const segments = company.segment_names as string[] || []
+            segments.forEach(segment => {
+              industryCounts[segment] = (industryCounts[segment] || 0) + 1
+            })
+          })
+          
+          const industryEntries = Object.entries(industryCounts)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10)
+          
+          const total = industryEntries.reduce((sum, item) => sum + item.count, 0) || totalCompanies || 1
+          topIndustries = industryEntries.map(item => ({
+            ...item,
+            percentage: (item.count / total) * 100
+          }))
+        }
+      } catch (error) {
+        console.log('Error fetching top industries:', error)
+      }
+      
+      // Fetch company size distribution
+      let companySizeDistribution: Array<{ size: string; count: number }> = []
+      try {
+        const { data: sizeData } = await supabase
+          .from('company_metrics')
+          .select('company_size_bucket')
+          .not('company_size_bucket', 'is', null)
+          .limit(5000)
+        
+        if (sizeData) {
+          const sizeCounts: Record<string, number> = {}
+          sizeData.forEach(metric => {
+            const size = metric.company_size_bucket as string
+            if (size) {
+              sizeCounts[size] = (sizeCounts[size] || 0) + 1
+            }
+          })
+          
+          companySizeDistribution = Object.entries(sizeCounts)
+            .map(([size, count]) => ({ size, count }))
+            .sort((a, b) => b.count - a.count)
+        }
+      } catch (error) {
+        console.log('Error fetching company size distribution:', error)
+      }
+      
       // Override with actual database counts
       return {
         ...analytics,
         totalCompanies: totalCompanies || 0,
         totalWithFinancials: totalWithFinancials,
         totalWithKPIs: totalWithKPIs,
-        totalWithDigitalPresence: totalWithDigitalPresence
+        totalWithDigitalPresence: totalWithDigitalPresence,
+        topIndustries: topIndustries.length > 0 ? topIndustries : undefined,
+        companySizeDistribution: companySizeDistribution.length > 0 ? companySizeDistribution : undefined
       }
     } catch (error) {
       console.error('Error fetching dashboard analytics:', error)
