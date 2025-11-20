@@ -21,9 +21,48 @@ const getApiBaseUrl = (): string => {
 // Helper to handle API errors
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: response.statusText }))
-    throw new Error(error.error || error.message || `HTTP ${response.status}`)
+    // Check if response is HTML (error page) instead of JSON
+    const contentType = response.headers.get('content-type') || ''
+    if (contentType.includes('text/html')) {
+      const text = await response.text()
+      // If it's an HTML error page, provide a helpful error message
+      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+        throw new Error(
+          `Backend API returned HTML instead of JSON. This usually means:\n` +
+          `1. The API endpoint doesn't exist (404)\n` +
+          `2. The API base URL is incorrect\n` +
+          `3. The backend server is not running\n` +
+          `URL: ${response.url}\n` +
+          `Status: ${response.status} ${response.statusText}`
+        )
+      }
+      throw new Error(`Unexpected response format: ${response.statusText}`)
+    }
+    // Try to parse as JSON
+    try {
+      const error = await response.json()
+      throw new Error(error.error || error.message || error.detail || `HTTP ${response.status}`)
+    } catch (parseError) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
   }
+  
+  // Check content type before parsing
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    const text = await response.text()
+    if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+      throw new Error(
+        `Backend API returned HTML instead of JSON. Check that:\n` +
+        `1. VITE_API_BASE_URL is set correctly\n` +
+        `2. The backend server is running\n` +
+        `3. The endpoint exists\n` +
+        `URL: ${response.url}`
+      )
+    }
+    throw new Error(`Expected JSON but got ${contentType}`)
+  }
+  
   return response.json()
 }
 
@@ -105,20 +144,35 @@ class IntelligenceService {
     if (!baseUrl && !import.meta.env.DEV) {
       throw new Error(
         'Backend API is not configured. Please set VITE_API_BASE_URL environment variable ' +
-        'or deploy the backend API. Financial Filters require the backend API to be running.'
+        'in Vercel settings. Financial Filters require the backend API to be running.\n' +
+        'Railway backend URL: https://vitereactshadcnts-production-fad5.up.railway.app'
       )
     }
     
     const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint
     
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    })
-    return handleResponse<T>(response)
+    // Log the URL in development for debugging
+    if (import.meta.env.DEV) {
+      console.log(`[IntelligenceService] Fetching: ${url}`)
+    }
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+      })
+      return handleResponse<T>(response)
+    } catch (error) {
+      // Enhance error with URL information
+      if (error instanceof Error) {
+        console.error(`[IntelligenceService] Error fetching ${url}:`, error.message)
+        // Don't modify the error, just log it
+      }
+      throw error
+    }
   }
 
   // Filter Analytics
@@ -128,10 +182,20 @@ class IntelligenceService {
     )
   }
 
-  async applyFilters(weights: FilterWeights, percentileCutoffs?: Record<string, { min: number; max: number }>): Promise<{ companies: any[]; total: number }> {
+  async applyFilters(
+    weights: FilterWeights, 
+    stageOneSize: number = 180,
+    usePercentiles: boolean = false,
+    percentileCutoffs?: Record<string, { min: number; max: number }>
+  ): Promise<{ companies: any[]; total: number }> {
     return this.fetch('/api/filters/apply', {
       method: 'POST',
-      body: JSON.stringify({ weights, percentile_cutoffs: percentileCutoffs }),
+      body: JSON.stringify({ 
+        weights, 
+        stage_one_size: stageOneSize,
+        use_percentiles: usePercentiles,
+        percentile_cutoffs: percentileCutoffs 
+      }),
     })
   }
 

@@ -90,7 +90,7 @@ export interface DashboardAnalytics {
   averageRevenue: number
   // Optional fields for dashboard charts
   topIndustries?: Array<{ name: string; count: number; percentage: number }>
-  companySizeDistribution?: Array<{ name: string; size: string; count: number; percentage: number }>
+  companySizeDistribution?: Array<{ name: string; count: number; percentage: number }>
 }
 
 const toNumber = (value: unknown): number | null => {
@@ -566,13 +566,21 @@ class SupabaseDataService {
       const analytics = buildDashboardAnalytics(analyticsData as any, totalCompanies || 0)
       
       // Fetch top industries
-      let topIndustries: Array<{ name: string; count: number }> = []
+      let topIndustries: Array<{ name: string; count: number; percentage: number }> = []
       try {
+        // Count all companies with segment_names (not just a sample)
+        // First get total count of companies with segments
+        const { count: companiesWithSegmentsCount } = await supabase
+          .from('companies')
+          .select('orgnr', { count: 'exact', head: true })
+          .not('segment_names', 'is', null)
+        
+        // Then fetch all companies with segments (or a large sample if too many)
         const { data: industryData } = await supabase
           .from('companies')
           .select('segment_names')
           .not('segment_names', 'is', null)
-          .limit(5000)
+          .limit(10000) // Increased limit for better accuracy
         
         if (industryData) {
           const industryCounts: Record<string, number> = {}
@@ -588,10 +596,12 @@ class SupabaseDataService {
             .sort((a, b) => b.count - a.count)
             .slice(0, 10)
           
-          const total = industryEntries.reduce((sum, item) => sum + item.count, 0) || totalCompanies || 1
+          // Use totalCompanies for percentage calculation (percentage of all companies)
+          // This shows what % of all companies are in each industry
+          const totalForPercentage = totalCompanies || companiesWithSegmentsCount || 1
           topIndustries = industryEntries.map(item => ({
             ...item,
-            percentage: (item.count / total) * 100
+            percentage: (item.count / totalForPercentage) * 100
           }))
         }
       } catch (error) {
@@ -599,13 +609,20 @@ class SupabaseDataService {
       }
       
       // Fetch company size distribution
-      let companySizeDistribution: Array<{ size: string; count: number; percentage: number }> = []
+      let companySizeDistribution: Array<{ name: string; count: number; percentage: number }> = []
       try {
+        // Count all companies with size data (not just a sample)
+        const { count: companiesWithSizeCount } = await supabase
+          .from('company_metrics')
+          .select('orgnr', { count: 'exact', head: true })
+          .not('company_size_bucket', 'is', null)
+        
+        // Fetch all companies with size data (or a large sample if too many)
         const { data: sizeData } = await supabase
           .from('company_metrics')
           .select('company_size_bucket')
           .not('company_size_bucket', 'is', null)
-          .limit(5000)
+          .limit(10000) // Increased limit for better accuracy
         
         if (sizeData) {
           const sizeCounts: Record<string, number> = {}
@@ -617,15 +634,20 @@ class SupabaseDataService {
           })
           
           const sizeEntries = Object.entries(sizeCounts)
-            .map(([size, count]) => ({ name: size, size: size, count }))
+            .map(([size, count]) => ({ name: size, count }))
             .sort((a, b) => b.count - a.count)
           
-          const total = sizeEntries.reduce((sum, item) => sum + item.count, 0) || totalCompanies || 1
+          // Use totalCompanies for percentage calculation (percentage of all companies)
+          // This shows what % of all companies are in each size category
+          // Note: Counts are from the sample, but percentages are calculated against totalCompanies
+          // Always use totalCompanies (never fall back to sample size or companiesWithSizeCount)
+          // This ensures percentages represent % of ALL companies, not just companies with size data
+          const totalForPercentage = totalCompanies ?? 1
+          
           companySizeDistribution = sizeEntries.map(item => ({
             name: item.name,
-            size: item.size,
-            count: item.count,
-            percentage: (item.count / total) * 100
+            count: item.count, // Actual count from sample
+            percentage: (item.count / totalForPercentage) * 100 // Percentage of all companies
           }))
         }
       } catch (error) {

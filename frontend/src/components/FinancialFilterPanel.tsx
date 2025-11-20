@@ -33,7 +33,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
   // Apply filters mutation
   const applyFiltersMutation = useMutation({
-    mutationFn: () => intelligenceService.applyFilters(weights),
+    mutationFn: () => intelligenceService.applyFilters(weights, stageOneSize, usePercentiles),
     onSuccess: (data) => {
       if (onShortlistGenerated) {
         onShortlistGenerated(data.companies)
@@ -81,13 +81,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="revenue-weight" className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
                   Revenue Weight
                 </Label>
                 <span className="text-sm font-medium">{weights.revenue}%</span>
               </div>
               <Slider
+                id="revenue-weight"
+                aria-label="Revenue Weight"
                 value={[weights.revenue]}
                 onValueChange={(value) => handleWeightChange('revenue', value)}
                 max={100}
@@ -98,13 +100,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="ebit-margin-weight" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   EBIT Margin Weight
                 </Label>
                 <span className="text-sm font-medium">{weights.ebitMargin}%</span>
               </div>
               <Slider
+                id="ebit-margin-weight"
+                aria-label="EBIT Margin Weight"
                 value={[weights.ebitMargin]}
                 onValueChange={(value) => handleWeightChange('ebitMargin', value)}
                 max={100}
@@ -115,13 +119,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="growth-weight" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Growth Weight
                 </Label>
                 <span className="text-sm font-medium">{weights.growth}%</span>
               </div>
               <Slider
+                id="growth-weight"
+                aria-label="Growth Weight"
                 value={[weights.growth]}
                 onValueChange={(value) => handleWeightChange('growth', value)}
                 max={100}
@@ -132,13 +138,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="leverage-weight" className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4" />
                   Leverage Weight
                 </Label>
                 <span className="text-sm font-medium">{weights.leverage}%</span>
               </div>
               <Slider
+                id="leverage-weight"
+                aria-label="Leverage Weight"
                 value={[weights.leverage]}
                 onValueChange={(value) => handleWeightChange('leverage', value)}
                 max={100}
@@ -149,13 +157,15 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="headcount-weight" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   Headcount Weight
                 </Label>
                 <span className="text-sm font-medium">{weights.headcount}%</span>
               </div>
               <Slider
+                id="headcount-weight"
+                aria-label="Headcount Weight"
                 value={[weights.headcount]}
                 onValueChange={(value) => handleWeightChange('headcount', value)}
                 max={100}
@@ -254,7 +264,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
             <div className="text-center">
               <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
               <p className="font-semibold text-destructive mb-2">Error loading analytics</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground whitespace-pre-line">
                 {analyticsError.message?.includes('Backend API is not configured') || 
                  analyticsError.message?.includes('localhost') ? (
                   <>
@@ -266,6 +276,29 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
                         Start the backend: <code className="bg-muted px-1 py-0.5 rounded">./scripts/start-backend.sh</code>
                       </span>
                     )}
+                    {!import.meta.env.DEV && (
+                      <span className="block mt-2 text-xs">
+                        Set <code className="bg-muted px-1 py-0.5 rounded">VITE_API_BASE_URL</code> in Vercel environment variables.
+                        <br />
+                        Railway URL: <code className="bg-muted px-1 py-0.5 rounded">https://vitereactshadcnts-production-fad5.up.railway.app</code>
+                      </span>
+                    )}
+                  </>
+                ) : analyticsError.message?.includes('HTML instead of JSON') ? (
+                  <>
+                    Backend API returned HTML instead of JSON.
+                    <br />
+                    This usually means:
+                    <br />
+                    • VITE_API_BASE_URL is not set in Vercel
+                    <br />
+                    • The backend server is not running
+                    <br />
+                    • The endpoint URL is incorrect
+                    <br />
+                    <span className="block mt-2 text-xs">
+                      Set <code className="bg-muted px-1 py-0.5 rounded">VITE_API_BASE_URL</code> in Vercel settings.
+                    </span>
                   </>
                 ) : (
                   analyticsError.message

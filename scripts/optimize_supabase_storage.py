@@ -25,9 +25,10 @@ load_dotenv(dotenv_path=env_path)
 # Essential account codes to keep
 ESSENTIAL_CODES = ['SDI', 'RG', 'DR', 'EBITDA', 'EK', 'FK', 'SV', 'ANT', 'EKA']
 
-# Years to keep (last 5 years)
+# Years to keep (last 3 years - more aggressive since Railway handles backend)
+# Frontend only needs recent data for dashboard
 CURRENT_YEAR = datetime.now().year
-MIN_YEAR = CURRENT_YEAR - 5
+MIN_YEAR = CURRENT_YEAR - 3
 
 
 def get_db_connection():
