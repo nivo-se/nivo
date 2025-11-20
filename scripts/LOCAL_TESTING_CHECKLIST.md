@@ -101,3 +101,5 @@ psql $SUPABASE_DB_URL -f database/financial_accounts_schema.sql
 
 
 
+
+

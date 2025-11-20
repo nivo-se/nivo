@@ -1,0 +1,14 @@
+# Ignore frontend files when Railway builds
+frontend/
+node_modules/
+package.json
+package-lock.json
+*.tsx
+*.ts
+!backend/**/*.ts
+!backend/**/*.py
+vite.config.ts
+tsconfig*.json
+tailwind.config.ts
+postcss.config.js
+
