@@ -78,15 +78,18 @@ These services correctly use `intelligenceService` or Supabase:
 
 ## 📋 Action Items
 
-### High Priority
+### ✅ Completed
 
-1. **Fix hardcoded localhost URLs**
-   - [ ] `SessionTrackingDashboard.tsx` - Update to use Railway or remove if not needed
-   - [ ] `ScraperStatusDashboard.tsx` - Update to use Railway API or remove if not needed
+1. **Fixed hardcoded localhost URLs**
+   - [x] `SessionTrackingDashboard.tsx` - Updated to use environment-aware URLs
+   - [x] `ScraperStatusDashboard.tsx` - Updated to use Railway API base URL
+   - [x] `localDataService.ts` - Updated to use `getBaseUrl()` method
+
+### High Priority (Remaining)
 
 2. **Fix saved lists service**
    - [ ] `savedListsService.ts` - Already uses Supabase as fallback, but API calls will fail
-   - [ ] Consider removing API calls and using Supabase directly
+   - [ ] Consider removing API calls and using Supabase directly (it already has fallback)
 
 3. **Fix AI Analysis endpoints**
    - [ ] `AIAnalysis.tsx` - Uses Vercel serverless functions (`/api/ai-analysis`)
