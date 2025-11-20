@@ -344,11 +344,13 @@ def migrate_financials(conn_source: sqlite3.Connection, conn_target: sqlite3.Con
             account_codes = extract_account_codes_from_raw_data(raw_data, target_year=year, target_period=period)
         
         # Use explicit fields if account codes not found
+        # IMPORTANT: staging_financials.revenue and profit are in thousands of SEK
+        # Multiply by 1000 to convert to actual SEK
         if not account_codes:
             if revenue:
-                account_codes['SDI'] = revenue
+                account_codes['SDI'] = revenue * 1000
             if profit:
-                account_codes['DR'] = profit
+                account_codes['DR'] = profit * 1000
         
         # Build values list
         values = [

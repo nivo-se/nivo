@@ -2,11 +2,17 @@
 Company intelligence endpoints
 """
 from fastapi import APIRouter, HTTPException, Path
-from typing import Optional
+from pydantic import BaseModel
+from typing import Optional, List
 from .dependencies import get_supabase_client
+from ..services.db_factory import get_database_service
 from supabase import Client
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
+
+
+class BatchCompanyRequest(BaseModel):
+    orgnrs: List[str]
 
 
 @router.get("/{orgnr}/intel")
@@ -126,4 +132,75 @@ async def trigger_enrichment(orgnr: str = Path(..., description="Organization nu
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error triggering enrichment: {str(e)}")
+
+
+@router.post("/batch")
+async def get_companies_batch(request: BatchCompanyRequest):
+    """
+    Get company details and financial metrics for multiple companies by org numbers.
+    Returns company name, revenue, margins, growth, etc.
+    """
+    try:
+        db = get_database_service()
+        
+        # Build query to get companies with their KPIs and actual revenue from financials
+        # Use financials table for revenue (more accurate than KPI table which uses incomplete 2024 data)
+        placeholders = ",".join("?" for _ in request.orgnrs)
+        sql = f"""
+            SELECT 
+                c.orgnr,
+                c.company_name,
+                c.homepage,
+                c.employees_latest,
+                COALESCE(f.max_revenue_sek, k.latest_revenue_sek) as latest_revenue_sek,
+                k.latest_profit_sek,
+                k.latest_ebitda_sek,
+                k.avg_ebitda_margin,
+                k.avg_net_margin,
+                k.revenue_cagr_3y,
+                k.revenue_growth_yoy,
+                k.company_size_bucket,
+                k.growth_bucket,
+                k.profitability_bucket
+            FROM companies c
+            LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
+            LEFT JOIN (
+                SELECT orgnr, MAX(sdi_sek) as max_revenue_sek
+                FROM financials
+                WHERE currency = 'SEK' 
+                  AND (period = '12' OR period LIKE '%-12')
+                  AND year >= 2020
+                  AND sdi_sek IS NOT NULL
+                GROUP BY orgnr
+            ) f ON f.orgnr = c.orgnr
+            WHERE c.orgnr IN ({placeholders})
+            ORDER BY COALESCE(f.max_revenue_sek, k.latest_revenue_sek, 0) DESC, c.company_name ASC
+        """
+        
+        rows = db.run_raw_query(sql, params=request.orgnrs)
+        
+        # Convert to list of dicts
+        companies = []
+        for row in rows:
+            companies.append({
+                "orgnr": row.get("orgnr"),
+                "company_name": row.get("company_name"),
+                "homepage": row.get("homepage"),
+                "employees_latest": row.get("employees_latest"),
+                "latest_revenue_sek": row.get("latest_revenue_sek"),
+                "latest_profit_sek": row.get("latest_profit_sek"),
+                "latest_ebitda_sek": row.get("latest_ebitda_sek"),
+                "avg_ebitda_margin": row.get("avg_ebitda_margin"),
+                "avg_net_margin": row.get("avg_net_margin"),
+                "revenue_cagr_3y": row.get("revenue_cagr_3y"),
+                "revenue_growth_yoy": row.get("revenue_growth_yoy"),
+                "company_size_bucket": row.get("company_size_bucket"),
+                "growth_bucket": row.get("growth_bucket"),
+                "profitability_bucket": row.get("profitability_bucket"),
+            })
+        
+        return {"companies": companies, "count": len(companies)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
 
