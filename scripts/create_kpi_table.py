@@ -161,19 +161,36 @@ def calculate_yoy_growth(values: List[float], years: List[int]) -> Optional[floa
     return growth
 
 def calculate_avg_margin(revenues: List[float], profits: List[float]) -> Optional[float]:
-    """Calculate average margin (profit/revenue)"""
-    if not revenues or not profits or len(revenues) != len(profits):
+    """Calculate average margin using weighted average (total profit / total revenue)
+    
+    This is more accurate than simple average when revenue varies significantly.
+    Example: If 2024 has 100M revenue and 10M profit (10%), but 2021 has 0.1M revenue 
+    and -0.1M profit (-100%), the weighted average correctly weights by revenue size.
+    """
+    if not revenues or not profits:
         return None
     
-    margins = []
-    for rev, prof in zip(revenues, profits):
+    # Filter to only years where we have both revenue and profit
+    # Match by index (they should be aligned by year from the query)
+    valid_pairs = []
+    min_len = min(len(revenues), len(profits))
+    for i in range(min_len):
+        rev = revenues[i] if i < len(revenues) else None
+        prof = profits[i] if i < len(profits) else None
         if rev and rev > 0 and prof is not None:
-            margins.append(prof / rev)
+            valid_pairs.append((rev, prof))
     
-    if not margins:
+    if not valid_pairs:
         return None
     
-    return sum(margins) / len(margins)
+    # Use weighted average: total profit / total revenue
+    total_revenue = sum(rev for rev, _ in valid_pairs)
+    total_profit = sum(prof for _, prof in valid_pairs)
+    
+    if total_revenue == 0:
+        return None
+    
+    return total_profit / total_revenue
 
 def create_kpi_table(conn: sqlite3.Connection):
     """Create the company_kpis table"""
@@ -281,10 +298,10 @@ def populate_kpi_table(conn: sqlite3.Connection):
         SELECT 
             orgnr,
             year,
-            sdi_sek as revenue,
+            COALESCE(si_sek, sdi_sek) as revenue,  -- Use SI (Nettoomsättning) preferred, SDI fallback
             dr_sek as profit,
-            ebitda_sek as ebitda,
-            rg_sek as ebit,
+            COALESCE(ebitda_sek, ors_sek) as ebitda,  -- Use EBITDA preferred, ORS fallback
+            resultat_e_avskrivningar_sek as ebit,  -- Use correct EBIT code (NOT RG!)
             ek_sek as equity,
             fk_sek as debt,
             sv_sek as assets,
@@ -363,15 +380,41 @@ def populate_kpi_table(conn: sqlite3.Connection):
         financials_list.sort(key=lambda x: x['year'], reverse=True)
         latest = financials_list[0]
         
-        # Extract time series
-        revenues = [f['revenue'] for f in financials_list if f['revenue']]
-        revenue_years = [f['year'] for f in financials_list if f['revenue']]
+        # Extract time series - match by year to handle missing data correctly
+        # Use SI (Nettoomsättning) for revenue, fallback to SDI
+        revenues = []
+        revenue_years = []
+        for f in financials_list:
+            # Try to get revenue from financials - should use SI, but KPI script uses SDI
+            # We'll update this to use SI in the query
+            if f['revenue']:
+                revenues.append(f['revenue'])
+                revenue_years.append(f['year'])
         
-        profits = [f['profit'] for f in financials_list if f['profit'] is not None]
-        profit_years = [f['year'] for f in financials_list if f['profit'] is not None]
+        profits = []
+        profit_years = []
+        for f in financials_list:
+            if f['profit'] is not None:
+                profits.append(f['profit'])
+                profit_years.append(f['year'])
         
-        ebitdas = [f['ebitda'] for f in financials_list if f['ebitda']]
-        ebits = [f['ebit'] for f in financials_list if f['ebit']]
+        # For margins, we need matching years - create year-indexed dicts
+        financials_by_year = {f['year']: f for f in financials_list}
+        
+        # Get EBITDA and EBIT for years that have revenue
+        ebitdas = []
+        ebits = []
+        for year in revenue_years:
+            if year in financials_by_year:
+                f = financials_by_year[year]
+                if f['ebitda'] is not None:
+                    ebitdas.append(f['ebitda'])
+                else:
+                    ebitdas.append(None)  # Keep alignment but mark as missing
+                if f['ebit'] is not None:
+                    ebits.append(f['ebit'])
+                else:
+                    ebits.append(None)
         
         # Validate number helper (defined before use)
         def validate_number(value):
@@ -405,9 +448,17 @@ def populate_kpi_table(conn: sqlite3.Connection):
         profit_cagr_3y = validate_number(profit_cagr_3y)
         profit_cagr_5y = validate_number(profit_cagr_5y)
         
-        # Calculate average margins
-        avg_ebitda_margin = calculate_avg_margin(revenues, ebitdas) if revenues and ebitdas else None
-        avg_ebit_margin = calculate_avg_margin(revenues, ebits) if revenues and ebits else None
+        # Calculate average margins - filter out None values and ensure matching lengths
+        # For EBITDA and EBIT, only use years where we have both revenue and the metric
+        ebitdas_filtered = [ebitda for ebitda in ebitdas if ebitda is not None]
+        ebits_filtered = [ebit for ebit in ebits if ebit is not None]
+        
+        # Match revenues to EBITDA/EBIT by index (they're already aligned by year)
+        revenues_for_ebitda = [rev for i, rev in enumerate(revenues) if i < len(ebitdas) and ebitdas[i] is not None]
+        revenues_for_ebit = [rev for i, rev in enumerate(revenues) if i < len(ebits) and ebits[i] is not None]
+        
+        avg_ebitda_margin = calculate_avg_margin(revenues_for_ebitda, ebitdas_filtered) if revenues_for_ebitda and ebitdas_filtered else None
+        avg_ebit_margin = calculate_avg_margin(revenues_for_ebit, ebits_filtered) if revenues_for_ebit and ebits_filtered else None
         avg_net_margin = calculate_avg_margin(revenues, profits) if revenues and profits else None
         
         # Validate margin values
