@@ -61,8 +61,20 @@ def discover_account_codes_from_raw_data(conn: sqlite3.Connection) -> Set[str]:
     
     return all_codes
 
-def extract_account_codes_from_raw_data(raw_data: str) -> Dict[str, float]:
-    """Extract all account codes from raw_data JSON"""
+def extract_account_codes_from_raw_data(raw_data: str, target_year: int = None, target_period: str = None) -> Dict[str, float]:
+    """Extract account codes from raw_data JSON for a specific year/period
+    
+    IMPORTANT: Allabolag stores all financial values in thousands of SEK.
+    So 72,000 in JSON = 72,000,000 SEK (72 million).
+    We multiply by 1000 to convert to actual SEK.
+    
+    Exception: Employee count (ANT) is NOT in thousands, so we keep it as-is.
+    
+    Args:
+        raw_data: JSON string from staging database
+        target_year: Year to extract (if None, extracts from first/latest report)
+        target_period: Period to extract (if None, uses '12' or latest)
+    """
     account_codes = {}
     
     try:
@@ -77,17 +89,58 @@ def extract_account_codes_from_raw_data(raw_data: str) -> Dict[str, float]:
                 
                 # Check companyAccounts (the actual structure)
                 if 'companyAccounts' in company:
-                    for report in company['companyAccounts']:
-                        if 'accounts' in report and isinstance(report['accounts'], list):
-                            for acc in report['accounts']:
-                                if isinstance(acc, dict):
-                                    code = acc.get('code')
-                                    amount = acc.get('amount')
-                                    if code and amount is not None:
-                                        try:
-                                            account_codes[code] = float(amount)
-                                        except (ValueError, TypeError):
-                                            pass
+                    # If target_year is specified, find the matching report
+                    if target_year is not None:
+                        for report in company['companyAccounts']:
+                            report_year = report.get('year')
+                            report_period = report.get('period', '')
+                            
+                            # Match year and period
+                            year_match = report_year == target_year
+                            period_match = (target_period is None or 
+                                          report_period == target_period or 
+                                          report_period.endswith('-12') or
+                                          report_period == '12')
+                            
+                            if year_match and period_match:
+                                # Extract account codes from this specific report
+                                if 'accounts' in report and isinstance(report['accounts'], list):
+                                    for acc in report['accounts']:
+                                        if isinstance(acc, dict):
+                                            code = acc.get('code')
+                                            amount = acc.get('amount')
+                                            if code and amount is not None:
+                                                try:
+                                                    value = float(amount)
+                                                    # Allabolag stores values in thousands of SEK
+                                                    # Multiply by 1000 to get actual SEK
+                                                    # EXCEPT for employee count (ANT) which is not in thousands
+                                                    if code != 'ANT':
+                                                        value = value * 1000
+                                                    account_codes[code] = value
+                                                except (ValueError, TypeError):
+                                                    pass
+                                break  # Found matching report, stop searching
+                    else:
+                        # No target year specified - extract from first report (usually latest)
+                        if company['companyAccounts']:
+                            report = company['companyAccounts'][0]
+                            if 'accounts' in report and isinstance(report['accounts'], list):
+                                for acc in report['accounts']:
+                                    if isinstance(acc, dict):
+                                        code = acc.get('code')
+                                        amount = acc.get('amount')
+                                        if code and amount is not None:
+                                            try:
+                                                value = float(amount)
+                                                # Allabolag stores values in thousands of SEK
+                                                # Multiply by 1000 to get actual SEK
+                                                # EXCEPT for employee count (ANT) which is not in thousands
+                                                if code != 'ANT':
+                                                    value = value * 1000
+                                                account_codes[code] = value
+                                            except (ValueError, TypeError):
+                                                pass
     except Exception as e:
         pass
     
@@ -284,10 +337,11 @@ def migrate_financials(conn_source: sqlite3.Connection, conn_target: sqlite3.Con
     for row in financials:
         orgnr, company_id, year, period, period_start, period_end, currency, employees, revenue, profit, raw_data, scraped_at = row
         
-        # Extract account codes from raw_data
+        # Extract account codes from raw_data for THIS SPECIFIC YEAR
         account_codes = {}
         if raw_data:
-            account_codes = extract_account_codes_from_raw_data(raw_data)
+            # IMPORTANT: Extract account codes for the specific year we're processing
+            account_codes = extract_account_codes_from_raw_data(raw_data, target_year=year, target_period=period)
         
         # Use explicit fields if account codes not found
         if not account_codes:

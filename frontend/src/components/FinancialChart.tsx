@@ -42,7 +42,7 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
           <p className="font-medium text-gray-900">{`Year: ${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.dataKey === 'revenue' ? 'Revenue' : 'EBIT'}: {entry.value ? `${(entry.value / 1000).toFixed(1)}K SEK` : 'N/A'}
+              {entry.dataKey === 'revenue' ? 'Revenue' : 'EBIT'}: {entry.value ? `${(entry.value / 1_000_000).toFixed(1)} mSEK` : 'N/A'}
             </p>
           ))}
         </div>
@@ -56,10 +56,13 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
   )
 
   const formatYAxis = (value: number) => {
-    if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(0)}M SEK`
-    } else if (value >= 1000) {
-      return `${(value / 1000).toFixed(0)}K SEK`
+    // Database now stores values in actual SEK (multiplied by 1000 from Allabolag)
+    if (value >= 1_000_000_000) {
+      return `${(value / 1_000_000_000).toFixed(0)}B SEK`
+    } else if (value >= 1_000_000) {
+      return `${(value / 1_000_000).toFixed(0)}M SEK`
+    } else if (value >= 1_000) {
+      return `${(value / 1_000).toFixed(0)}K SEK`
     }
     return `${value} SEK`
   }

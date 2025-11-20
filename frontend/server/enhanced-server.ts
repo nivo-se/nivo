@@ -3244,7 +3244,7 @@ app.delete('/api/valuation/assumptions/:id', async (req, res) => {
 // Dashboard Analytics endpoint - Local SQLite Database
 app.get('/api/analytics-local', async (req, res) => {
   try {
-    const dbPath = path.resolve(__dirname, '../../data/new_schema_local.db')
+    const dbPath = path.resolve(__dirname, '../../data/nivo_optimized.db')
     console.log(`[Local DB] Opening database at: ${dbPath}`)
     
     if (!fs.existsSync(dbPath)) {
@@ -3258,7 +3258,8 @@ app.get('/api/analytics-local', async (req, res) => {
     const totalCompaniesResult = db.prepare('SELECT COUNT(*) as count FROM companies').get() as { count: number }
     const totalCompanies = totalCompaniesResult.count || 0
 
-    // Get all metrics from company_metrics table (pre-calculated KPIs)
+    // Get all KPIs from pre-calculated company_kpis table
+    // This is much faster than calculating on-the-fly and enables efficient segmentation
     const metricsQuery = db.prepare(`
       SELECT 
         orgnr,
@@ -3268,7 +3269,7 @@ app.get('/api/analytics-local', async (req, res) => {
         revenue_cagr_3y,
         avg_ebitda_margin,
         avg_net_margin
-      FROM company_metrics
+      FROM company_kpis
     `)
     const allMetrics = metricsQuery.all() as Array<{
       orgnr: string

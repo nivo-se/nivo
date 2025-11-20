@@ -358,44 +358,27 @@ const EnhancedCompanySearch: React.FC = () => {
     }
   }
 
+  // Database now stores values in actual SEK (multiplied by 1000 from Allabolag)
+  // Raw: 100,000 tSEK → DB: 100,000,000 SEK → Display: 100 mSEK
   const formatCurrency = (value: number | null | undefined, decimals = 1) => {
-    // Handle string values that might come from API
+    if (value === null || value === undefined) return 'N/A'
     const numValue = typeof value === 'string' ? parseFloat(value) : value
-    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) {
-      return 'N/A'
-    }
-    // Database stores values in thousands (as-is from Allabolag)
-    // Raw: 100,000 tSEK → DB: 100,000 tSEK → Display: 100 mSEK
-    // Conversion: divide by 1,000 to convert thousands to mSEK
-    // Always display as mSEK (no BSEK conversion)
-    const valueInMSEK = numValue / 1_000
+    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) return 'N/A'
+    
+    // Convert from SEK to mSEK for display
+    const valueInMSEK = numValue / 1_000_000
     return `${valueInMSEK.toFixed(decimals)} mSEK`
   }
 
-  // Special formatter for EBIT (ORS/RG) which appears to be stored in SEK instead of thousands
+  // Database now stores all values in actual SEK (multiplied by 1000 from Allabolag)
   const formatEBIT = (value: number | null | undefined, decimals = 1) => {
-    // Handle string values that might come from API
+    if (value === null || value === undefined) return 'N/A'
     const numValue = typeof value === 'string' ? parseFloat(value) : value
-    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) {
-      return 'N/A'
-    }
-    // EBIT appears to be stored in SEK (not thousands) in some cases
-    // If value is >= 1,000,000, it's likely in SEK, divide by 1,000,000
-    // Otherwise, if value is >= 1,000, assume thousands and divide by 1,000
-    // For very small values (< 1,000), assume they're already in thousands
-    if (numValue >= 1_000_000) {
-      // Value is in SEK, convert to mSEK
-      const valueInMSEK = numValue / 1_000_000
-      return `${valueInMSEK.toFixed(decimals)} mSEK`
-    } else if (numValue >= 1_000) {
-      // Value is likely in thousands, convert to mSEK
-      const valueInMSEK = numValue / 1_000
-      return `${valueInMSEK.toFixed(decimals)} mSEK`
-    } else {
-      // Very small value, assume already in thousands
-      const valueInMSEK = numValue / 1_000
-      return `${valueInMSEK.toFixed(decimals)} mSEK`
-    }
+    if (typeof numValue !== 'number' || !Number.isFinite(numValue)) return 'N/A'
+    
+    // All values are now in actual SEK, convert to mSEK for display
+    const valueInMSEK = numValue / 1_000_000
+    return `${valueInMSEK.toFixed(decimals)} mSEK`
   }
 
   const getGrowthIcon = (growth?: number) => {

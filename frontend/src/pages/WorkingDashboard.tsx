@@ -40,7 +40,7 @@ const WorkingDashboard: React.FC = () => {
         // Log card values for verification
         const cardValues = {
           'Card 1 - Totalt antal företag': data.totalCompanies?.toLocaleString('sv-SE') || 'N/A',
-          'Card 2 - Genomsnittlig omsättning': data.averageRevenue ? `${(data.averageRevenue / 1_000).toFixed(1)} mSEK` : 'N/A',
+          'Card 2 - Genomsnittlig omsättning': data.averageRevenue ? `${(data.averageRevenue / 1_000_000).toFixed(1)} mSEK` : 'N/A',
           'Card 3 - Genomsnittlig tillväxt': data.averageRevenueGrowth ? `${(data.averageRevenueGrowth * 100).toFixed(1)}%` : 'N/A',
           'Card 4 - EBIT-marginal': data.averageEBITMargin ? `${(data.averageEBITMargin * 100).toFixed(1)}%` : 'N/A',
           'Card 5 - Vinstmarginal': data.averageNetProfitMargin ? `${(data.averageNetProfitMargin * 100).toFixed(1)}%` : 'N/A'
@@ -87,9 +87,9 @@ const WorkingDashboard: React.FC = () => {
       return 'N/A'
     }
     if (Math.abs(value) >= 1_000_000_000) {
-      return `${(value / 1_000_000).toFixed(1)} BSEK`  // Value already in thousands
+      return `${(value / 1_000_000_000).toFixed(1)} bSEK`  // Database stores in actual SEK
     }
-    return `${(value / 1_000).toFixed(1)} mSEK`  // Database stores in thousands
+    return `${(value / 1_000_000).toFixed(1)} mSEK`  // Database stores in actual SEK
   }
 
   const formatPercent = (value: number | null | undefined) => {

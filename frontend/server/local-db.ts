@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Local database path
-const DB_PATH = path.resolve(__dirname, '../../data/new_schema_local.db')
+// Local database path - using optimized database
+const DB_PATH = path.resolve(__dirname, '../../data/nivo_optimized.db')
 
 let dbInstance: Database.Database | null = null
 

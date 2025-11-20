@@ -97,8 +97,10 @@ interface CompaniesResponse {
 }
 
 const formatCurrency = (value: number | null | undefined) => {
+  // Database now stores values in actual SEK (multiplied by 1000 from Allabolag)
+  // Convert from SEK to mSEK for display
   if (typeof value !== 'number' || Number.isNaN(value)) return '–'
-  return `${(value / 1_000).toFixed(1)} MSEK`
+  return `${(value / 1_000_000).toFixed(1)} mSEK`
 }
 
 const formatMultiple = (value: number | null | undefined) => {

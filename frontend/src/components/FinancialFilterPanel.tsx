@@ -343,7 +343,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
                             <p className="font-semibold">{data.name}</p>
                             <p className="text-sm">Growth: {(data.x * 100).toFixed(1)}%</p>
                             <p className="text-sm">EBITDA Margin: {(data.y * 100).toFixed(1)}%</p>
-                            <p className="text-sm">Revenue: {(data.revenue / 1000).toFixed(1)} MSEK</p>
+                            <p className="text-sm">Revenue: {(data.revenue / 1_000_000).toFixed(1)} mSEK</p>
                           </div>
                         )
                       }
