@@ -259,7 +259,7 @@ const WorkingDashboard: React.FC = () => {
                                     {industry.count.toLocaleString('sv-SE')}
                                   </div>
                                   <div className="text-xs text-[#2E2A2B]/70">
-                                    {industry.percentage.toFixed(1)}%
+                                    {industry.percentage ? industry.percentage.toFixed(1) : '0.0'}%
                                   </div>
                                 </div>
                               </div>
@@ -305,7 +305,7 @@ const WorkingDashboard: React.FC = () => {
                                     {size.count.toLocaleString('sv-SE')}
                                   </div>
                                   <div className="text-xs text-[#2E2A2B]/70">
-                                    {size.percentage.toFixed(1)}%
+                                    {size.percentage ? size.percentage.toFixed(1) : '0.0'}%
                                   </div>
                                 </div>
                               </div>

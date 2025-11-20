@@ -90,7 +90,7 @@ export interface DashboardAnalytics {
   averageRevenue: number
   // Optional fields for dashboard charts
   topIndustries?: Array<{ name: string; count: number; percentage: number }>
-  companySizeDistribution?: Array<{ size: string; count: number }>
+  companySizeDistribution?: Array<{ name: string; size: string; count: number; percentage: number }>
 }
 
 const toNumber = (value: unknown): number | null => {
@@ -599,7 +599,7 @@ class SupabaseDataService {
       }
       
       // Fetch company size distribution
-      let companySizeDistribution: Array<{ size: string; count: number }> = []
+      let companySizeDistribution: Array<{ size: string; count: number; percentage: number }> = []
       try {
         const { data: sizeData } = await supabase
           .from('company_metrics')
@@ -616,9 +616,17 @@ class SupabaseDataService {
             }
           })
           
-          companySizeDistribution = Object.entries(sizeCounts)
-            .map(([size, count]) => ({ size, count }))
+          const sizeEntries = Object.entries(sizeCounts)
+            .map(([size, count]) => ({ name: size, size: size, count }))
             .sort((a, b) => b.count - a.count)
+          
+          const total = sizeEntries.reduce((sum, item) => sum + item.count, 0) || totalCompanies || 1
+          companySizeDistribution = sizeEntries.map(item => ({
+            name: item.name,
+            size: item.size,
+            count: item.count,
+            percentage: (item.count / total) * 100
+          }))
         }
       } catch (error) {
         console.log('Error fetching company size distribution:', error)
