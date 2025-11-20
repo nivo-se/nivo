@@ -89,7 +89,7 @@ export interface DashboardAnalytics {
   averageNetProfitGrowth: number
   averageRevenue: number
   // Optional fields for dashboard charts
-  topIndustries?: Array<{ name: string; count: number }>
+  topIndustries?: Array<{ name: string; count: number; percentage: number }>
   companySizeDistribution?: Array<{ size: string; count: number }>
 }
 
