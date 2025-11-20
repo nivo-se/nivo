@@ -1,0 +1,159 @@
+{
+  "account_codes": {
+    "SDI": {
+      "sv": "Omsättning",
+      "en": "Revenue (Total Sales)",
+      "description": "Total revenue/sales. May include all revenue streams.",
+      "usage": "Use for total revenue. Note: SI (Nettoomsättning) may be more accurate for net revenue.",
+      "example_value": 121450
+    },
+    "SI": {
+      "sv": "Nettoomsättning",
+      "en": "Net Revenue (Net Sales)",
+      "description": "Net revenue after returns and adjustments. This is what Allabolag displays as 'Nettoomsättning' in the income statement.",
+      "usage": "PREFERRED for revenue display - matches Allabolag's main revenue figure.",
+      "example_value": 121329
+    },
+    "DR": {
+      "sv": "Årets resultat",
+      "en": "Net Profit (Profit for the Year)",
+      "description": "Net profit after all expenses and taxes.",
+      "usage": "Use for net profit/loss.",
+      "example_value": 4
+    },
+    "resultat_e_avskrivningar": {
+      "sv": "Rörelseresultat efter avskrivningar",
+      "en": "Operating Profit after Depreciation (EBIT)",
+      "description": "Operating result after depreciation. This is EBIT (Earnings Before Interest and Taxes). Displayed as 'Rörelseresultat efter avskrivningar' in Allabolag income statement.",
+      "usage": "PREFERRED for EBIT - matches Allabolag's EBIT figure exactly.",
+      "example_value": 69
+    },
+    "RG": {
+      "sv": "Rörelsekapital",
+      "en": "Working Capital",
+      "description": "Working capital (current assets - current liabilities). NOT the same as EBIT!",
+      "usage": "Do NOT use for EBIT. This is working capital, not operating profit.",
+      "example_value": 129,
+      "warning": "RG is NOT EBIT - use resultat_e_avskrivningar for EBIT"
+    },
+    "ORS": {
+      "sv": "Rörelseresultat",
+      "en": "Operating Result (EBITDA)",
+      "description": "Operating result before depreciation. May be EBITDA or similar operating metric.",
+      "usage": "Use for EBITDA if available, but verify against EBITDA code if present.",
+      "example_value": 7
+    },
+    "EBITDA": {
+      "sv": "EBITDA",
+      "en": "EBITDA",
+      "description": "Earnings Before Interest, Taxes, Depreciation, and Amortization.",
+      "usage": "Use for EBITDA if available.",
+      "example_value": 82
+    },
+    "resultat_e_finansnetto": {
+      "sv": "Resultat efter finansnetto",
+      "en": "Profit After Financial Items (PBT)",
+      "description": "Profit after financial income and expenses, before tax.",
+      "usage": "Use for profit before tax (PBT).",
+      "example_value": 7
+    },
+    "BE": {
+      "sv": "Bruttoresultat",
+      "en": "Gross Profit",
+      "description": "Gross profit (revenue - cost of goods sold).",
+      "usage": "Use for gross profit.",
+      "example_value": 0
+    },
+    "TR": {
+      "sv": "Operating Result",
+      "en": "Operating Result",
+      "description": "General operating result metric.",
+      "usage": "Verify usage - may vary.",
+      "example_value": 0
+    },
+    "ADI": {
+      "sv": "Avskrivningar",
+      "en": "Depreciation",
+      "description": "Total depreciation expenses.",
+      "usage": "Use for depreciation.",
+      "example_value": 121
+    },
+    "ADK": {
+      "sv": "Avskrivningar på byggnader",
+      "en": "Building Depreciation",
+      "description": "Depreciation on buildings.",
+      "usage": "Use for building depreciation.",
+      "example_value": 0
+    },
+    "ADR": {
+      "sv": "Avskrivningar på inventarier",
+      "en": "Equipment Depreciation",
+      "description": "Depreciation on equipment/inventory.",
+      "usage": "Use for equipment depreciation.",
+      "example_value": 121
+    },
+    "EK": {
+      "sv": "Eget kapital",
+      "en": "Equity",
+      "description": "Shareholders' equity.",
+      "usage": "Use for equity.",
+      "example_value": -13
+    },
+    "FK": {
+      "sv": "Främmande kapital",
+      "en": "Debt",
+      "description": "Total debt/liabilities.",
+      "usage": "Use for total debt.",
+      "example_value": -62
+    },
+    "SV": {
+      "sv": "Summa tillgångar",
+      "en": "Total Assets",
+      "description": "Total assets.",
+      "usage": "Use for total assets.",
+      "example_value": 0
+    },
+    "ANT": {
+      "sv": "Antal anställda",
+      "en": "Number of Employees",
+      "description": "Employee count. NOT in thousands - actual count.",
+      "usage": "Use for employee count. Do NOT multiply by 1000.",
+      "example_value": 11,
+      "note": "This is NOT in thousands - it's the actual employee count"
+    }
+  },
+  "recommended_mappings": {
+    "revenue": {
+      "primary": "SI",
+      "fallback": "SDI",
+      "reason": "SI (Nettoomsättning) matches Allabolag's displayed revenue figure exactly"
+    },
+    "ebit": {
+      "primary": "resultat_e_avskrivningar",
+      "fallback": null,
+      "reason": "resultat_e_avskrivningar is 'Rörelseresultat efter avskrivningar' which matches Allabolag's EBIT display. RG is working capital, NOT EBIT."
+    },
+    "ebitda": {
+      "primary": "EBITDA",
+      "fallback": "ORS",
+      "reason": "Use EBITDA code if available, otherwise ORS"
+    },
+    "net_profit": {
+      "primary": "DR",
+      "fallback": null,
+      "reason": "DR is 'Årets resultat' - net profit for the year"
+    },
+    "gross_profit": {
+      "primary": "BE",
+      "fallback": null,
+      "reason": "BE is 'Bruttoresultat' - gross profit"
+    }
+  },
+  "important_notes": {
+    "revenue_discrepancy": "SDI (121,450) vs SI (121,329): SDI is total revenue, SI is net revenue. Use SI for display to match Allabolag.",
+    "ebit_warning": "RG (129) is NOT EBIT - it's working capital. Use resultat_e_avskrivningar (69) for EBIT.",
+    "thousands_conversion": "All financial values are in thousands of SEK in raw data. Multiply by 1000 to get actual SEK. Exception: ANT (employees) is actual count.",
+    "currency": "All values are in SEK unless currency field indicates otherwise (e.g., EUR)."
+  }
+}
+

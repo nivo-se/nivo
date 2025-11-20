@@ -18,15 +18,58 @@ from collections import defaultdict
 from typing import Dict, List, Any, Set
 
 # Account codes to extract (all known codes from Allabolag)
+# See database/allabolag_account_code_mapping.json for complete documentation
 ALL_ACCOUNT_CODES = [
-    'SDI', 'DR', 'ORS', 'RG', 'EK', 'FK', 'SV',  # Core metrics
-    'ADI', 'ADK', 'ADR', 'AK', 'ANT',  # Additional
-    'FI', 'GG', 'KBP', 'LG',  # More
-    'SAP', 'SED', 'SI', 'SEK', 'SF', 'SFA', 'SGE', 'SIA', 'SIK',  # Even more
-    'SKG', 'SKGKI', 'SKO', 'SLG', 'SOM', 'SUB',  # More
-    'SVD', 'UTR', 'FSD', 'KB',  # More
-    'AWA', 'IAC', 'MIN', 'BE', 'TR',  # More
-    # Add any others discovered
+    # Revenue (use SI for Nettoomsättning, SDI for total revenue)
+    'SDI', 'SI',  # Revenue codes
+    
+    # Profit metrics
+    'DR',  # Net profit (Årets resultat)
+    'resultat_e_avskrivningar',  # EBIT (Rörelseresultat efter avskrivningar) - PREFERRED for EBIT
+    'resultat_e_finansnetto',  # Profit after financial items (PBT)
+    'EBITDA',  # EBITDA - PREFERRED
+    'ORS',  # Operating result (EBITDA fallback)
+    'BE',  # Gross profit (Bruttoresultat)
+    'TR',  # Operating result
+    
+    # Balance sheet
+    'EK', 'FK', 'SV',  # Equity, Debt, Total Assets
+    
+    # Depreciation
+    'ADI', 'ADK', 'ADR',  # Depreciation codes
+    
+    # Fixed assets
+    'AK',  # Fixed assets (Anläggningskapital)
+    
+    # Employees
+    'ANT',  # Number of employees (NOT in thousands!)
+    
+    # Financial items
+    'FI',  # Financial income
+    'GG',  # Average employees
+    
+    # Liabilities
+    'KBP', 'LG', 'KB',  # Various liability codes
+    
+    # Sum codes
+    'SAP', 'SED', 'SEK', 'SF', 'SFA', 'SGE', 'SIA', 'SIK',  # Sum codes
+    'SKG', 'SKGKI', 'SKO', 'SLG', 'SOM', 'SUB',  # More sum codes
+    'SVD',  # Sum code
+    
+    # Other
+    'UTR', 'FSD', 'AWA', 'IAC', 'MIN',  # Other codes
+    'RG',  # Working capital (NOT EBIT! - kept for reference but don't use for EBIT)
+    'RPE',  # Result after financial items
+    
+    # Calculated/derived fields from Allabolag
+    'summa_rorelsekostnader',  # Total operating costs
+    'summa_finansiella_anltillg',  # Total financial fixed assets
+    'summa_langfristiga_skulder',  # Total long-term liabilities
+    'avk_eget_kapital',  # Return on equity
+    'avk_totalt_kapital',  # Return on total capital
+    'EKA',  # Equity ratio
+    'loner_styrelse_vd',  # Board and CEO salaries
+    'loner_ovriga',  # Other salaries
 ]
 
 def discover_account_codes_from_raw_data(conn: sqlite3.Connection) -> Set[str]:
@@ -96,11 +139,12 @@ def extract_account_codes_from_raw_data(raw_data: str, target_year: int = None, 
                             report_period = report.get('period', '')
                             
                             # Match year and period
-                            year_match = report_year == target_year
+                            # Handle both string and integer years
+                            year_match = (str(report_year) == str(target_year)) if report_year is not None else False
                             period_match = (target_period is None or 
-                                          report_period == target_period or 
-                                          report_period.endswith('-12') or
-                                          report_period == '12')
+                                          str(report_period) == str(target_period) or 
+                                          str(report_period).endswith('-12') or
+                                          str(report_period) == '12')
                             
                             if year_match and period_match:
                                 # Extract account codes from this specific report
@@ -111,14 +155,16 @@ def extract_account_codes_from_raw_data(raw_data: str, target_year: int = None, 
                                             amount = acc.get('amount')
                                             if code and amount is not None:
                                                 try:
-                                                    value = float(amount)
+                                                    # Handle both string and numeric amounts
+                                                    value = float(amount) if amount != '' else 0.0
                                                     # Allabolag stores values in thousands of SEK
                                                     # Multiply by 1000 to get actual SEK
                                                     # EXCEPT for employee count (ANT) which is not in thousands
                                                     if code != 'ANT':
                                                         value = value * 1000
                                                     account_codes[code] = value
-                                                except (ValueError, TypeError):
+                                                except (ValueError, TypeError) as e:
+                                                    # Log but continue - some amounts might be invalid
                                                     pass
                                 break  # Found matching report, stop searching
                     else:

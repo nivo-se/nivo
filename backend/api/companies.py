@@ -204,3 +204,66 @@ async def get_companies_batch(request: BatchCompanyRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
 
+
+@router.get("/{orgnr}/financials")
+async def get_company_financials(orgnr: str = Path(..., description="Organization number")):
+    """
+    Get historical financial data for a company (multiple years).
+    Returns revenue, profit, EBIT, EBITDA, and margins for each year.
+    """
+    try:
+        db = get_database_service()
+        
+        # Get historical financial data from financials table
+        # IMPORTANT: Use correct account codes per allabolag_account_code_mapping.json
+        # - Revenue: SI (Nettoomsättning) preferred, SDI fallback
+        # - EBIT: resultat_e_avskrivningar (Rörelseresultat efter avskrivningar) - DO NOT use RG!
+        # - EBITDA: EBITDA preferred, ORS fallback
+        sql = """
+            SELECT 
+                year,
+                COALESCE(si_sek, sdi_sek) as revenue_sek,
+                dr_sek as profit_sek,
+                resultat_e_avskrivningar_sek as ebit_sek,  -- DO NOT fallback to RG (it's working capital!)
+                COALESCE(ebitda_sek, ors_sek) as ebitda_sek,
+                period
+            FROM financials
+            WHERE orgnr = ?
+              AND currency = 'SEK'
+              AND (period = '12' OR period LIKE '%-12')
+              AND year >= 2020
+            ORDER BY year DESC
+            LIMIT 5
+        """
+        
+        rows = db.run_raw_query(sql, params=[orgnr])
+        
+        # Calculate margins for each year
+        financials = []
+        for row in rows:
+            revenue = row.get("revenue_sek")
+            profit = row.get("profit_sek")
+            ebit = row.get("ebit_sek")
+            ebitda = row.get("ebitda_sek")
+            
+            # Calculate margins
+            net_margin = (profit / revenue * 100) if revenue and revenue > 0 and profit is not None else None
+            ebit_margin = (ebit / revenue * 100) if revenue and revenue > 0 and ebit is not None else None
+            ebitda_margin = (ebitda / revenue * 100) if revenue and revenue > 0 and ebitda is not None else None
+            
+            financials.append({
+                "year": row.get("year"),
+                "revenue_sek": revenue,
+                "profit_sek": profit,
+                "ebit_sek": ebit,
+                "ebitda_sek": ebitda,
+                "net_margin": net_margin,
+                "ebit_margin": ebit_margin,
+                "ebitda_margin": ebitda_margin,
+            })
+        
+        return {"financials": financials, "count": len(financials)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching financials: {str(e)}")
+
