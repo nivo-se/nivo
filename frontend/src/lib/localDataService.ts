@@ -66,7 +66,18 @@ export interface CompanyFilter {
 }
 
 class LocalDataService {
-  private baseUrl = 'http://localhost:8000'
+  // Use Railway API in production, localhost in dev
+  private getBaseUrl(): string {
+    if (import.meta.env.VITE_API_BASE_URL) {
+      return import.meta.env.VITE_API_BASE_URL
+    }
+    // In development, use localhost
+    if (import.meta.env.DEV) {
+      return 'http://localhost:8000'
+    }
+    // In production, return empty (will use Supabase directly)
+    return ''
+  }
 
   // Get all companies with pagination and filtering
   async getCompanies(
@@ -83,7 +94,7 @@ class LocalDataService {
         )
       })
 
-      const response = await fetch(`${this.baseUrl}/companies?${params}`)
+      const response = await fetch(`${this.getBaseUrl()}/companies?${params}`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -210,7 +221,7 @@ class LocalDataService {
   // Get company by OrgNr
   async getCompany(orgNr: string): Promise<LocalCompany | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/companies/${orgNr}`)
+      const response = await fetch(`${this.getBaseUrl()}/companies/${orgNr}`)
       
       if (!response.ok) {
         if (response.status === 404) return null
@@ -227,7 +238,7 @@ class LocalDataService {
   // Get dashboard analytics
   async getDashboardAnalytics() {
     try {
-      const response = await fetch(`${this.baseUrl}/analytics/dashboard`)
+      const response = await fetch(`${this.getBaseUrl()}/analytics/dashboard`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -256,7 +267,7 @@ class LocalDataService {
         limit: limit.toString()
       })
 
-      const response = await fetch(`${this.baseUrl}/companies/search?${params}`)
+      const response = await fetch(`${this.getBaseUrl()}/companies/search?${params}`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -273,7 +284,7 @@ class LocalDataService {
   // Get industry statistics
   async getIndustryStats() {
     try {
-      const response = await fetch(`${this.baseUrl}/analytics/industries`)
+      const response = await fetch(`${this.getBaseUrl()}/analytics/industries`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -289,7 +300,7 @@ class LocalDataService {
   // Get city statistics
   async getCityStats() {
     try {
-      const response = await fetch(`${this.baseUrl}/analytics/cities`)
+      const response = await fetch(`${this.getBaseUrl()}/analytics/cities`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

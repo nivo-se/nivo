@@ -35,15 +35,46 @@ const ScraperStatusDashboard: React.FC = () => {
     try {
       setRefreshing(true);
       
-      // Fetch jobs
-      const jobsResponse = await fetch('http://localhost:8000/staging/jobs');
-      const jobsData = await jobsResponse.json();
-      setJobs(jobsData);
+      // Get API base URL (Railway or localhost)
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '');
+      
+      if (!apiBaseUrl) {
+        console.warn('API base URL not configured. Scraper status dashboard requires backend API.');
+        setJobs([]);
+        setCompanies([]);
+        return;
+      }
+      
+      // Fetch jobs - Note: These endpoints may not exist in Railway backend
+      // They appear to be for local scraper staging, not production
+      try {
+        const jobsResponse = await fetch(`${apiBaseUrl}/staging/jobs`);
+        if (jobsResponse.ok) {
+          const jobsData = await jobsResponse.json();
+          setJobs(jobsData);
+        } else {
+          console.warn('Staging jobs endpoint not available');
+          setJobs([]);
+        }
+      } catch (error) {
+        console.warn('Staging jobs endpoint not available:', error);
+        setJobs([]);
+      }
 
       // Fetch companies
-      const companiesResponse = await fetch('http://localhost:8000/staging/companies');
-      const companiesData = await companiesResponse.json();
-      setCompanies(companiesData);
+      try {
+        const companiesResponse = await fetch(`${apiBaseUrl}/staging/companies`);
+        if (companiesResponse.ok) {
+          const companiesData = await companiesResponse.json();
+          setCompanies(companiesData);
+        } else {
+          console.warn('Staging companies endpoint not available');
+          setCompanies([]);
+        }
+      } catch (error) {
+        console.warn('Staging companies endpoint not available:', error);
+        setCompanies([]);
+      }
       
     } catch (error) {
       console.error('Error fetching data:', error);
