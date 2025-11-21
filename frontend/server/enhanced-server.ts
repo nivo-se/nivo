@@ -798,7 +798,7 @@ function transformCompanyData(row: any): any {
     OrgNr: row.orgnr,
     name: row.company_name,
     segment_name: segmentNameJson, // Return as JSON string for frontend to parse
-    city: cityStr || null,
+    city: row.city || cityStr || null,
     employees: row.employees_latest || null,
     // Database stores values in thousands (as-is from Allabolag)
     revenue: row.latest_revenue_sek ? row.latest_revenue_sek.toString() : null,
@@ -815,6 +815,112 @@ function transformCompanyData(row: any): any {
     email: row.email || null,
     homepage: row.homepage || null,
     address: addressStr || null
+  }
+}
+
+function parseNumberParam(value: any): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined
+  }
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function buildCompanyFilterClauses(query: any): { whereSql: string; params: any[] } {
+  const clauses: string[] = []
+  const params: any[] = []
+
+  const addClause = (clause: string, ...values: any[]) => {
+    clauses.push(clause)
+    params.push(...values)
+  }
+
+  const searchTerm = typeof query.search === 'string' ? query.search.trim() : undefined
+  if (searchTerm) {
+    const pattern = `%${searchTerm}%`
+    addClause('(c.company_name LIKE ? OR c.orgnr LIKE ?)', pattern, pattern)
+  }
+
+  const industry = typeof query.industry === 'string' ? query.industry.trim() : undefined
+  if (industry) {
+    const pattern = `%${industry}%`
+    addClause('(c.segment_names LIKE ? OR c.nace_categories LIKE ?)', pattern, pattern)
+  }
+
+  const city = typeof query.city === 'string' ? query.city.trim() : undefined
+  if (city) {
+    const pattern = `%${city}%`
+    addClause('(c.city LIKE ? OR c.address LIKE ?)', pattern, pattern)
+  }
+
+  const minEmployees = parseNumberParam(query.minEmployees)
+  if (minEmployees !== undefined) {
+    addClause('(c.employees_latest IS NOT NULL AND c.employees_latest >= ?)', minEmployees)
+  }
+
+  const maxEmployees = parseNumberParam(query.maxEmployees)
+  if (maxEmployees !== undefined) {
+    addClause('(c.employees_latest IS NOT NULL AND c.employees_latest <= ?)', maxEmployees)
+  }
+
+  const minRevenue = parseNumberParam(query.minRevenue)
+  if (minRevenue !== undefined) {
+    addClause('COALESCE(k.latest_revenue_sek, 0) >= ?', minRevenue)
+  }
+
+  const maxRevenue = parseNumberParam(query.maxRevenue)
+  if (maxRevenue !== undefined) {
+    addClause('COALESCE(k.latest_revenue_sek, 0) <= ?', maxRevenue)
+  }
+
+  const minProfit = parseNumberParam(query.minProfit)
+  if (minProfit !== undefined) {
+    addClause('COALESCE(k.latest_profit_sek, 0) >= ?', minProfit)
+  }
+
+  const maxProfit = parseNumberParam(query.maxProfit)
+  if (maxProfit !== undefined) {
+    addClause('COALESCE(k.latest_profit_sek, 0) <= ?', maxProfit)
+  }
+
+  const minRevenueGrowth = parseNumberParam(query.minRevenueGrowth)
+  if (minRevenueGrowth !== undefined) {
+    addClause('COALESCE(k.revenue_cagr_3y, 0) >= ?', minRevenueGrowth)
+  }
+
+  const maxRevenueGrowth = parseNumberParam(query.maxRevenueGrowth)
+  if (maxRevenueGrowth !== undefined) {
+    addClause('COALESCE(k.revenue_cagr_3y, 0) <= ?', maxRevenueGrowth)
+  }
+
+  const minEbit = parseNumberParam(query.minEBITAmount)
+  if (minEbit !== undefined) {
+    addClause('COALESCE(k.latest_ebit_sek, k.latest_ebitda_sek, 0) >= ?', minEbit)
+  }
+
+  const maxEbit = parseNumberParam(query.maxEBITAmount)
+  if (maxEbit !== undefined) {
+    addClause('COALESCE(k.latest_ebit_sek, k.latest_ebitda_sek, 0) <= ?', maxEbit)
+  }
+
+  const profitability = typeof query.profitability === 'string' ? query.profitability.trim() : undefined
+  if (profitability) {
+    addClause('k.profitability_bucket = ?', profitability)
+  }
+
+  const size = typeof query.size === 'string' ? query.size.trim() : undefined
+  if (size) {
+    addClause('k.company_size_bucket = ?', size)
+  }
+
+  const growthBucket = typeof query.growth === 'string' ? query.growth.trim() : undefined
+  if (growthBucket) {
+    addClause('k.growth_bucket = ?', growthBucket)
+  }
+
+  return {
+    whereSql: clauses.length ? ` WHERE ${clauses.join(' AND ')}` : '',
+    params
   }
 }
 
@@ -839,23 +945,24 @@ app.get('/api/companies', async (req, res) => {
           c.company_name,
           c.segment_names,
           c.address,
+          c.city,
           c.employees_latest,
           c.homepage,
           c.email,
           c.foundation_year,
-          m.latest_revenue_sek,
-          m.latest_profit_sek,
-          m.latest_ebitda_sek,
-          m.revenue_cagr_3y,
-          m.avg_ebitda_margin,
-          m.avg_net_margin,
-          m.digital_presence,
-          m.latest_year,
-          (SELECT raw_json FROM company_financials cf 
-           WHERE cf.orgnr = c.orgnr AND cf.raw_json IS NOT NULL 
-           ORDER BY cf.year DESC, cf.period DESC LIMIT 1) as raw_json
+          k.latest_revenue_sek,
+          k.latest_profit_sek,
+          k.latest_ebitda_sek,
+          k.revenue_cagr_3y,
+          k.avg_ebitda_margin,
+          k.avg_net_margin,
+          k.digital_presence,
+          k.company_size_bucket,
+          k.growth_bucket,
+          k.profitability_bucket,
+          k.latest_year
         FROM companies c
-        INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+        LEFT JOIN company_kpis k ON c.orgnr = k.orgnr
         WHERE c.orgnr = ?
       `
       const companyStmt = db.prepare(companyQuery)
@@ -882,38 +989,23 @@ app.get('/api/companies', async (req, res) => {
       const historicalQuery = `
         SELECT 
           year,
-          account_code,
-          amount_sek
-        FROM financial_accounts
-        WHERE orgnr = ? AND period = '12' AND account_code IN ('SDI', 'RG', 'DR')
+          sdi_sek,
+          rg_sek,
+          dr_sek
+        FROM financials
+        WHERE orgnr = ? AND period = '12'
         ORDER BY year DESC
-        LIMIT 12
+        LIMIT 4
       `
       const historicalStmt = db.prepare(historicalQuery)
-      const historicalRows = historicalStmt.all(orgnr) as Array<{year: number, account_code: string, amount_sek: number}>
+      const historicalRows = historicalStmt.all(orgnr) as Array<{year: number, sdi_sek: number | null, rg_sek: number | null, dr_sek: number | null}>
       
-      // Group by year
-      const historicalByYear = new Map<number, {SDI: number | null, RG: number | null, DR: number | null}>()
-      for (const row of historicalRows) {
-        if (!historicalByYear.has(row.year)) {
-          historicalByYear.set(row.year, { SDI: null, RG: null, DR: null })
-        }
-        const yearData = historicalByYear.get(row.year)!
-        if (row.account_code === 'SDI') yearData.SDI = row.amount_sek
-        else if (row.account_code === 'RG') yearData.RG = row.amount_sek
-        else if (row.account_code === 'DR') yearData.DR = row.amount_sek
-      }
-      
-      // Convert to array and sort
-      const historicalData = Array.from(historicalByYear.entries())
-        .sort((a, b) => b[0] - a[0])
-        .slice(0, 4)
-        .map(([year, data]) => ({
-          year,
-          SDI: data.SDI,
-          RG: data.RG,
-          DR: data.DR
-        }))
+      const historicalData = historicalRows.map(row => ({
+        year: row.year,
+        SDI: row.sdi_sek,
+        RG: row.rg_sek,
+        DR: row.dr_sek
+      }))
 
       // Transform company data
       const transformedCompany = transformCompanyData(companyRow)
@@ -931,58 +1023,47 @@ app.get('/api/companies', async (req, res) => {
     // Otherwise, return list of companies
     const limit = Math.min(Math.max(parseInt(req.query.limit as string || '50', 10) || 50, 1), 200)
     const offset = Math.max(parseInt(req.query.offset as string || '0', 10) || 0, 0)
-    const searchTerm = (req.query.search as string)?.trim()
+    const { whereSql, params: filterParams } = buildCompanyFilterClauses(req.query)
 
-    // Build query with JOIN companies + company_metrics + company_financials (for raw_json with address data)
+    // Build query with JOIN companies + company_kpis
     let query = `
       SELECT 
         c.orgnr,
         c.company_name,
         c.segment_names,
         c.address,
+        c.city,
         c.employees_latest,
         c.homepage,
         c.email,
         c.foundation_year,
-        m.latest_revenue_sek,
-        m.latest_profit_sek,
-        m.latest_ebitda_sek,
-        m.revenue_cagr_3y,
-        m.avg_ebitda_margin,
-        m.avg_net_margin,
-        m.digital_presence,
-        (SELECT raw_json FROM company_financials cf 
-         WHERE cf.orgnr = c.orgnr AND cf.raw_json IS NOT NULL 
-         ORDER BY cf.year DESC, cf.period DESC LIMIT 1) as raw_json
+        k.latest_revenue_sek,
+        k.latest_profit_sek,
+        k.latest_ebitda_sek,
+        k.revenue_cagr_3y,
+        k.avg_ebitda_margin,
+        k.avg_net_margin,
+        k.digital_presence,
+        k.company_size_bucket,
+        k.growth_bucket,
+        k.profitability_bucket
       FROM companies c
-      INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+      LEFT JOIN company_kpis k ON c.orgnr = k.orgnr
     `
-
-    const params: any[] = []
-    
-    if (searchTerm) {
-      query += ` WHERE (c.company_name LIKE ? OR c.orgnr LIKE ?)`
-      const searchPattern = `%${searchTerm}%`
-      params.push(searchPattern, searchPattern)
-    }
-
-    query += ` ORDER BY m.latest_revenue_sek DESC LIMIT ? OFFSET ?`
-    params.push(limit, offset)
+    query += `${whereSql} ORDER BY COALESCE(k.latest_revenue_sek, 0) DESC, c.company_name ASC LIMIT ? OFFSET ?`
 
     const stmt = db.prepare(query)
-    const companies = stmt.all(...params) as any[]
+    const companies = stmt.all(...filterParams, limit, offset) as any[]
 
     // Get total count
     let countQuery = `
       SELECT COUNT(*) as total
       FROM companies c
-      INNER JOIN company_metrics m ON c.orgnr = m.orgnr
+      LEFT JOIN company_kpis k ON c.orgnr = k.orgnr
     `
-    if (searchTerm) {
-      countQuery += ` WHERE (c.company_name LIKE ? OR c.orgnr LIKE ?)`
-    }
+    countQuery += whereSql
     const countStmt = db.prepare(countQuery)
-    const countResult = countStmt.get(...(searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`] : [])) as { total: number }
+    const countResult = countStmt.get(...filterParams) as { total: number }
     const total = countResult.total || 0
 
     // Transform to old format for compatibility
@@ -1001,6 +1082,33 @@ app.get('/api/companies', async (req, res) => {
     })
   } catch (error: any) {
     console.error('Get companies error:', error)
+    res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
+  }
+})
+
+app.get('/api/companies/orgnrs', async (req, res) => {
+  try {
+    if (!localDBExists()) {
+      return res.status(500).json({ success: false, error: 'Local database not found' })
+    }
+
+    const db = getLocalDB()
+    const { whereSql, params } = buildCompanyFilterClauses(req.query)
+    const query = `
+      SELECT c.orgnr
+      FROM companies c
+      LEFT JOIN company_kpis k ON c.orgnr = k.orgnr
+      ${whereSql}
+      ORDER BY c.orgnr ASC
+    `
+    const stmt = db.prepare(query)
+    const rows = stmt.all(...params) as Array<{ orgnr: string }>
+    res.status(200).json({
+      success: true,
+      orgnrs: rows.map(row => row.orgnr)
+    })
+  } catch (error: any) {
+    console.error('Get company orgnrs error:', error)
     res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
   }
 })

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -20,17 +21,33 @@ SELECT DISTINCT c.orgnr
 FROM companies c
 LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
 LEFT JOIN (
-    SELECT orgnr, MAX(sdi_sek) as max_revenue_sek
+    SELECT orgnr, MAX(si_sek) as max_revenue_sek
     FROM financials
     WHERE currency = 'SEK' 
       AND (period = '12' OR period LIKE '%-12')
       AND year >= 2020
-      AND sdi_sek IS NOT NULL
+      AND si_sek IS NOT NULL
     GROUP BY orgnr
 ) f ON f.orgnr = c.orgnr
 WHERE {where_clause}
 ORDER BY COALESCE(k.revenue_cagr_3y, 0) DESC, c.company_name ASC
 LIMIT ? OFFSET ?
+"""
+
+COUNT_SQL = """
+SELECT COUNT(DISTINCT c.orgnr) as total_matches
+FROM companies c
+LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
+LEFT JOIN (
+    SELECT orgnr, MAX(si_sek) as max_revenue_sek
+    FROM financials
+    WHERE currency = 'SEK' 
+      AND (period = '12' OR period LIKE '%-12')
+      AND year >= 2020
+      AND si_sek IS NOT NULL
+    GROUP BY orgnr
+) f ON f.orgnr = c.orgnr
+WHERE {where_clause}
 """
 
 SAFE_KEYWORDS = ("select", "where", "and", "or", "not", "between", "like", "in")
@@ -44,8 +61,12 @@ class AIFilterRequest(BaseModel):
 
 class AIFilterResponse(BaseModel):
     sql: str
+    parsed_where_clause: str
     org_numbers: List[str]
     count: int
+    result_count: int
+    total: int
+    metadata: Dict[str, Any]
 
 
 def _sanitize_where_clause(clause: str) -> str:
@@ -144,21 +165,43 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
     db = get_database_service()
     supabase = get_supabase_client()
 
-    clause = _call_openai_for_where_clause(payload.prompt) or _fallback_where_clause(payload.prompt)
+    used_llm = False
+    clause = _call_openai_for_where_clause(payload.prompt)
+    if clause:
+        used_llm = True
+    else:
+        clause = _fallback_where_clause(payload.prompt)
     try:
         clause = _sanitize_where_clause(clause)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     sql = BASE_SQL.format(where_clause=clause or "1=1")
+    count_sql = COUNT_SQL.format(where_clause=clause or "1=1")
     params: List[Any] = [payload.limit, payload.offset]
+    started = time.perf_counter()
     try:
         rows = db.run_raw_query(sql, params=params)
+        total_row = db.run_raw_query(count_sql)
+        total_matches = total_row[0]["total_matches"] if total_row else len(rows)
     except Exception as exc:
         logger.exception("Failed to execute AI filter query")
         raise HTTPException(status_code=500, detail="Failed to execute query") from exc
-
+    duration_ms = int((time.perf_counter() - started) * 1000)
     org_numbers = [row["orgnr"] for row in rows]
+    result_count = len(org_numbers)
+    metadata: Dict[str, Any] = {
+        "where_clause": clause,
+        "limit": payload.limit,
+        "offset": payload.offset,
+        "prompt": payload.prompt,
+        "used_llm": used_llm,
+        "total_matches": total_matches,
+        "result_count": result_count,
+        "duration_ms": duration_ms,
+        "executor": "openai" if used_llm else "heuristic",
+        "sql": sql.strip(),
+    }
 
     # Log to Supabase (best effort)
     try:
@@ -172,5 +215,13 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
     except Exception as exc:  # pragma: no cover - logging only
         logger.warning("Failed to log AI query: %s", exc)
 
-    return AIFilterResponse(sql=sql, org_numbers=org_numbers, count=len(org_numbers))
+    return AIFilterResponse(
+        sql=sql,
+        parsed_where_clause=clause,
+        org_numbers=org_numbers,
+        count=result_count,
+        result_count=result_count,
+        total=total_matches,
+        metadata=metadata,
+    )
 

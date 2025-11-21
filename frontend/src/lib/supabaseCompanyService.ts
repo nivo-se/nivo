@@ -7,6 +7,14 @@ import { supabase, supabaseConfig } from './supabase'
 // No scaling needed - values are already in the correct format
 const CURRENCY_SCALE = 1  // Database stores in thousands
 
+const EMPTY_SUMMARY = () => ({
+  avgRevenue: 0,
+  avgGrowth: 0,
+  avgMargin: 0,
+  topIndustries: [] as { industry: string; count: number }[],
+  topCities: [] as { city: string; count: number }[]
+})
+
 export interface SupabaseCompany {
   OrgNr: string  // Keep for backward compatibility, maps to orgnr
   name: string   // Maps to company_name
@@ -271,24 +279,162 @@ function extractSegmentName(segmentNames: any): string | undefined {
 }
 
 class SupabaseCompanyService {
+  private isSupabaseReady() {
+    return !!(supabase && supabaseConfig.isConfigured)
+  }
+
+  private buildLocalQueryParams(page: number, limit: number, filters: CompanyFilter = {}) {
+    const params = new URLSearchParams()
+    const normalizedLimit = Math.max(1, Math.min(limit, 200))
+    params.set('limit', normalizedLimit.toString())
+    params.set('offset', Math.max(0, (page - 1) * normalizedLimit).toString())
+
+    if (filters.name) params.set('search', filters.name.trim())
+    if (filters.industry) params.set('industry', filters.industry.trim())
+    if (filters.city) params.set('city', filters.city.trim())
+
+    const setNumberParam = (key: string, value?: number) => {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        params.set(key, value.toString())
+      }
+    }
+
+    setNumberParam('minRevenue', filters.minRevenue)
+    setNumberParam('maxRevenue', filters.maxRevenue)
+    setNumberParam('minProfit', filters.minProfit)
+    setNumberParam('maxProfit', filters.maxProfit)
+    setNumberParam('minRevenueGrowth', filters.minRevenueGrowth)
+    setNumberParam('maxRevenueGrowth', filters.maxRevenueGrowth)
+    setNumberParam('minEBITAmount', filters.minEBITAmount)
+    setNumberParam('maxEBITAmount', filters.maxEBITAmount)
+    setNumberParam('minEmployees', filters.minEmployees)
+    setNumberParam('maxEmployees', filters.maxEmployees)
+
+    if (filters.profitability) params.set('profitability', filters.profitability)
+    if (filters.size) params.set('size', filters.size)
+    if (filters.growth) params.set('growth', filters.growth)
+
+    return params
+  }
+
+  private async fetchLocalCompanies(
+    page: number,
+    limit: number,
+    filters: CompanyFilter = {}
+  ): Promise<SearchResults> {
+    try {
+      const params = this.buildLocalQueryParams(page, limit, filters)
+      const response = await fetch(`/api/companies?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error(`Local API error ${response.status}`)
+      }
+      const data = await response.json()
+      const companies: SupabaseCompany[] = data.companies || []
+      const total = data.pagination?.total ?? companies.length
+      return {
+        companies,
+        total,
+        summary: this.buildLocalSummary(companies)
+      }
+    } catch (error) {
+      console.error('Error fetching companies from local API:', error)
+      return {
+        companies: [],
+        total: 0,
+        summary: EMPTY_SUMMARY()
+      }
+    }
+  }
+
+  private async fetchLocalCompany(orgNr: string): Promise<SupabaseCompany | null> {
+    try {
+      const response = await fetch(`/api/companies?orgnr=${encodeURIComponent(orgNr)}`)
+      if (!response.ok) {
+        return null
+      }
+      const data = await response.json()
+      return data.company || null
+    } catch (error) {
+      console.error('Error fetching local company:', error)
+      return null
+    }
+  }
+
+  private async fetchLocalOrgNumbers(filters: CompanyFilter = {}): Promise<string[]> {
+    try {
+      const params = this.buildLocalQueryParams(1, 1, filters)
+      params.delete('limit')
+      params.delete('offset')
+      const response = await fetch(`/api/companies/orgnrs?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error(`Local orgnr API error ${response.status}`)
+      }
+      const data = await response.json()
+      return data.orgnrs || []
+    } catch (error) {
+      console.error('Error fetching local org numbers:', error)
+      return []
+    }
+  }
+
+  private buildLocalSummary(companies: SupabaseCompany[]): SearchResults['summary'] {
+    if (!companies.length) {
+      return EMPTY_SUMMARY()
+    }
+
+    const revenues = companies
+      .map((company) => company.SDI ?? toNumber(company.revenue ?? null))
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+
+    const growths = companies
+      .map((company) => (typeof company.Revenue_growth === 'number' ? company.Revenue_growth : null))
+      .filter((value): value is number => value !== null && Number.isFinite(value))
+
+    const margins = companies
+      .map((company) => (typeof company.EBIT_margin === 'number' ? company.EBIT_margin : null))
+      .filter((value): value is number => value !== null && Number.isFinite(value))
+
+    const industryCounts: Record<string, number> = {}
+    const cityCounts: Record<string, number> = {}
+
+    companies.forEach((company) => {
+      const segment = extractSegmentName(company.segment_name)
+      if (segment) {
+        industryCounts[segment] = (industryCounts[segment] || 0) + 1
+      }
+      if (company.city) {
+        cityCounts[company.city] = (cityCounts[company.city] || 0) + 1
+      }
+    })
+
+    const average = (values: number[]) => {
+      if (!values.length) return 0
+      const sum = values.reduce((acc, value) => acc + value, 0)
+      return sum / values.length
+    }
+
+    return {
+      avgRevenue: average(revenues),
+      avgGrowth: average(growths),
+      avgMargin: average(margins),
+      topIndustries: Object.entries(industryCounts)
+        .map(([industry, count]) => ({ industry, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5),
+      topCities: Object.entries(cityCounts)
+        .map(([city, count]) => ({ city, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+    }
+  }
   // Get all companies with pagination and filtering
   async getCompanies(
     page: number = 1,
     limit: number = 20,
     filters: CompanyFilter = {}
   ): Promise<SearchResults> {
-    if (!supabase || !supabaseConfig.isConfigured) {
-      return {
-        companies: [],
-        total: 0,
-        summary: {
-          avgRevenue: 0,
-          avgGrowth: 0,
-          avgMargin: 0,
-          topIndustries: [],
-          topCities: []
-        }
-      }
+    if (!this.isSupabaseReady()) {
+      return this.fetchLocalCompanies(page, limit, filters)
     }
 
     try {
@@ -452,8 +598,8 @@ class SupabaseCompanyService {
 
   // Get company by OrgNr
   async getCompany(orgNr: string): Promise<SupabaseCompany | null> {
-    if (!supabase || !supabaseConfig.isConfigured) {
-      return null
+    if (!this.isSupabaseReady()) {
+      return this.fetchLocalCompany(orgNr)
     }
 
     try {
@@ -564,7 +710,7 @@ class SupabaseCompanyService {
 
   // Get industry statistics
   private async getIndustryStats() {
-    if (!supabase) {
+    if (!this.isSupabaseReady() || !supabase) {
       return []
     }
 
@@ -613,7 +759,7 @@ class SupabaseCompanyService {
 
   // Get city statistics
   private async getCityStats() {
-    if (!supabase) {
+    if (!this.isSupabaseReady() || !supabase) {
       return []
     }
 
@@ -648,8 +794,12 @@ class SupabaseCompanyService {
 
   // Get companies by OrgNrs array (without historical data to avoid timeouts)
   async getCompaniesByOrgNrs(orgNrs: string[], includeHistorical: boolean = false): Promise<SupabaseCompany[]> {
-    if (!supabase || !supabaseConfig.isConfigured || orgNrs.length === 0) {
+    if (orgNrs.length === 0) {
       return []
+    }
+    if (!this.isSupabaseReady()) {
+      const companies = await Promise.all(orgNrs.map((orgNr) => this.fetchLocalCompany(orgNr)))
+      return companies.filter((company): company is SupabaseCompany => !!company)
     }
     
     try {
@@ -755,8 +905,8 @@ class SupabaseCompanyService {
 
   // Get all company OrgNrs matching the current filters (for Select All functionality)
   async getAllMatchingCompanyOrgNrs(filters: CompanyFilter = {}): Promise<string[]> {
-    if (!supabase || !supabaseConfig.isConfigured) {
-      return []
+    if (!this.isSupabaseReady()) {
+      return this.fetchLocalOrgNumbers(filters)
     }
 
     try {
@@ -817,4 +967,3 @@ class SupabaseCompanyService {
 
 // Create singleton instance
 export const supabaseCompanyService = new SupabaseCompanyService()
-

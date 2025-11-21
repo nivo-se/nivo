@@ -31,7 +31,7 @@ class SegmentWeighting:
 class PipelineConfig:
     """Top-level configuration for the targeting pipeline."""
 
-    db_path: Path = Path("allabolag.db")
+    db_path: Path = Path("data/nivo_optimized.db")
     shortlist_table: str = "target_company_shortlist"
     shortlist_view_versioned_prefix: str = "target_company_shortlist_v"
     feature_columns: List[str] = field(

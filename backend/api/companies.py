@@ -1,12 +1,15 @@
 """
 Company intelligence endpoints
 """
+import logging
+
 from fastapi import APIRouter, HTTPException, Path
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from .dependencies import get_supabase_client
 from ..services.db_factory import get_database_service
-from supabase import Client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
 
@@ -140,11 +143,12 @@ async def get_companies_batch(request: BatchCompanyRequest):
     Get company details and financial metrics for multiple companies by org numbers.
     Returns company name, revenue, margins, growth, etc.
     """
+    if not request.orgnrs:
+        return {"companies": [], "count": 0}
     try:
         db = get_database_service()
+        supabase = get_supabase_client()
         
-        # Build query to get companies with their KPIs and actual revenue from financials
-        # Use financials table for revenue (more accurate than KPI table which uses incomplete 2024 data)
         placeholders = ",".join("?" for _ in request.orgnrs)
         sql = f"""
             SELECT 
@@ -165,12 +169,12 @@ async def get_companies_batch(request: BatchCompanyRequest):
             FROM companies c
             LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
             LEFT JOIN (
-                SELECT orgnr, MAX(sdi_sek) as max_revenue_sek
+                SELECT orgnr, MAX(si_sek) as max_revenue_sek
                 FROM financials
                 WHERE currency = 'SEK' 
                   AND (period = '12' OR period LIKE '%-12')
                   AND year >= 2020
-                  AND sdi_sek IS NOT NULL
+                  AND si_sek IS NOT NULL
                 GROUP BY orgnr
             ) f ON f.orgnr = c.orgnr
             WHERE c.orgnr IN ({placeholders})
@@ -179,9 +183,29 @@ async def get_companies_batch(request: BatchCompanyRequest):
         
         rows = db.run_raw_query(sql, params=request.orgnrs)
         
-        # Convert to list of dicts
+        ai_profiles_map: Dict[str, Dict[str, Any]] = {}
+        try:
+            if request.orgnrs:
+                profile_response = (
+                    supabase.table("ai_profiles")
+                    .select(
+                        "org_number, website, product_description, end_market, customer_types, "
+                        "strategic_fit_score, defensibility_score, value_chain_position, ai_notes, last_updated"
+                    )
+                    .in_("org_number", request.orgnrs)
+                    .execute()
+                )
+                if profile_response.data:
+                    ai_profiles_map = {
+                        profile["org_number"]: profile for profile in profile_response.data
+                    }
+        except Exception as profile_exc:  # pragma: no cover - best-effort fetch
+            logger.warning("Failed to fetch AI profiles: %s", profile_exc)
+            ai_profiles_map = {}
+        
         companies = []
         for row in rows:
+            profile = ai_profiles_map.get(row.get("orgnr", ""))
             companies.append({
                 "orgnr": row.get("orgnr"),
                 "company_name": row.get("company_name"),
@@ -197,6 +221,15 @@ async def get_companies_batch(request: BatchCompanyRequest):
                 "company_size_bucket": row.get("company_size_bucket"),
                 "growth_bucket": row.get("growth_bucket"),
                 "profitability_bucket": row.get("profitability_bucket"),
+                "ai_strategic_score": profile.get("strategic_fit_score") if profile else None,
+                "ai_defensibility_score": profile.get("defensibility_score") if profile else None,
+                "ai_product_description": profile.get("product_description") if profile else None,
+                "ai_end_market": profile.get("end_market") if profile else None,
+                "ai_customer_types": profile.get("customer_types") if profile else None,
+                "ai_value_chain_position": profile.get("value_chain_position") if profile else None,
+                "ai_notes": profile.get("ai_notes") if profile else None,
+                "ai_profile_last_updated": profile.get("last_updated") if profile else None,
+                "ai_profile_website": profile.get("website") if profile else None,
             })
         
         return {"companies": companies, "count": len(companies)}

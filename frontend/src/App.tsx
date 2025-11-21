@@ -7,7 +7,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import WorkingDashboard from "./pages/WorkingDashboard";
+import AISourcingDashboard from "./pages/AISourcingDashboard";
+import CompanyDetail from "./pages/CompanyDetail";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
@@ -26,14 +27,14 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/styleguide" element={<StyleGuide />} />
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <WorkingDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <AISourcingDashboard />
+                </ProtectedRoute>
+              } 
+            />
             <Route
               path="/admin"
               element={
@@ -47,6 +48,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Valuation />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/companies/:orgnr"
+              element={
+                <ProtectedRoute>
+                  <CompanyDetail />
                 </ProtectedRoute>
               }
             />
