@@ -1,0 +1,13 @@
+Company: {company_name}
+
+Summary JSON:
+{summary_json}
+
+Scraped pages snippet:
+{scraped_pages_excerpt}
+
+Task:
+- Assign industry sector and subsector using European PE taxonomy.
+- Identify the primary geographic markets served (max 5 regions) based on the text.
+- Keep output concise and factual. Use uppercase for sector names when clear (e.g., "INDUSTRIALS / Automation").
+

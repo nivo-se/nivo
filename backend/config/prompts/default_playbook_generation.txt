@@ -1,0 +1,19 @@
+Company: {company_name}
+
+Summary JSON:
+{summary_json}
+
+Industry JSON:
+{industry_json}
+
+Strategic fit JSON:
+{strategic_fit_json}
+
+Financial snapshot:
+{financial_overview}
+
+Task:
+- Produce an actionable 6-12 month strategic playbook. Use markdown headings and bullet lists.
+- Each section should include the goal, key actions, and success metrics.
+- Provide 3-5 concrete next steps (ordered list) that an investment team could start immediately.
+

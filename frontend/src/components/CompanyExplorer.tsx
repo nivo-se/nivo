@@ -3,10 +3,20 @@ import { useEffect, useMemo, useState } from 'react'
 export interface CompanyRow {
   orgnr: string
   company_name?: string
+  homepage?: string
+  employees_latest?: number
+  segment_names?: string[]
+  company_context?: string  // Display-friendly: product description, business model, or industry segments
   latest_revenue_sek?: number
   avg_ebitda_margin?: number
   revenue_cagr_3y?: number
-  ai_score?: number
+  revenue_growth_yoy?: number
+  ai_strategic_score?: number
+  ai_product_description?: string
+  ai_business_model_summary?: string
+  ai_industry_sector?: string
+  has_ai_profile?: boolean
+  ai_score?: number  // Legacy field
 }
 
 interface CompanyExplorerProps {
@@ -74,6 +84,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
     })
   }
 
+  // Sync selected state when companies list changes (preserve selections for companies that still exist)
   useEffect(() => {
     setSelected((prev) => {
       const next = new Set<string>()
@@ -82,13 +93,17 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
           next.add(company.orgnr)
         }
       })
-      if (onSelectionChange) {
-        const selectedRows = companies.filter((company) => next.has(company.orgnr))
-        onSelectionChange(selectedRows)
-      }
       return next
     })
-  }, [companies, onSelectionChange])
+  }, [companies])
+
+  // Notify parent of selection changes (separate effect to avoid setState during render warning)
+  useEffect(() => {
+    if (onSelectionChange) {
+      const selectedRows = companies.filter((company) => selected.has(company.orgnr))
+      onSelectionChange(selectedRows)
+    }
+  }, [selected, companies, onSelectionChange])
 
   const renderedRows = useMemo(() => companies, [companies])
   const selectedRows = useMemo(
@@ -239,11 +254,12 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             <tr>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Select</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Company</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">What they do</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Org.nr</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Revenue</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">EBITDA margin</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Growth</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI strategic score</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-gray-600">Revenue</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-gray-600">EBITDA margin</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-gray-600">Growth</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-gray-600">AI score</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -279,11 +295,29 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                     </>
                   )}
                 </td>
+                <td className="px-4 py-3 max-w-xs">
+                  {company.company_context ? (
+                    <div className="text-xs text-gray-700">
+                      <p className="line-clamp-2">{company.company_context}</p>
+                      {company.has_ai_profile && (
+                        <span className="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                          AI Enriched
+                        </span>
+                      )}
+                    </div>
+                  ) : company.segment_names && company.segment_names.length > 0 ? (
+                    <div className="text-xs text-gray-600">
+                      <p className="line-clamp-2">{company.segment_names.slice(0, 3).join(', ')}</p>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-400 italic">No context available</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-xs text-gray-500">{company.orgnr}</td>
-                <td className="px-4 py-3">{formatMillions(company.latest_revenue_sek)}</td>
-                <td className="px-4 py-3">{formatPercent(company.avg_ebitda_margin)}</td>
-                <td className="px-4 py-3">{formatPercent(company.revenue_growth_yoy ?? company.revenue_cagr_3y)}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-right">{formatMillions(company.latest_revenue_sek)}</td>
+                <td className="px-4 py-3 text-right">{formatPercent(company.avg_ebitda_margin)}</td>
+                <td className="px-4 py-3 text-right">{formatPercent(company.revenue_growth_yoy ?? company.revenue_cagr_3y)}</td>
+                <td className="px-4 py-3 text-right">
                   {company.ai_strategic_score ? (
                     <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                       {company.ai_strategic_score}/10
@@ -296,14 +330,14 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             ))}
             {loading && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
                   Loading company details...
                 </td>
               </tr>
             )}
             {!loading && renderedRows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
                   No companies loaded yet. Run the AI filter to populate this view.
                 </td>
               </tr>

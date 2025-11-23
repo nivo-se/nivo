@@ -1,0 +1,23 @@
+Company: {company_name}
+
+Summary JSON:
+{summary_json}
+
+Industry JSON:
+{industry_json}
+
+Investment criteria:
+{investment_criteria_json}
+
+Baseline heuristic assessment:
+{strategy_baseline_json}
+
+Financial snapshot:
+{financial_overview}
+
+Task:
+- Score strategic fit (1-10) and defensibility (1-10) vs the thesis.
+- Cite 2-3 supporting bullets for the fit_rationale.
+- List up to 4 risk flags (short phrases).
+- Describe upside potential in 1-2 sentences referencing tangible levers.
+

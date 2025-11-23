@@ -1,9 +1,10 @@
 """
 Company intelligence endpoints
 """
+import json
 import logging
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from .dependencies import get_supabase_client
@@ -138,16 +139,32 @@ async def trigger_enrichment(orgnr: str = Path(..., description="Organization nu
 
 
 @router.post("/batch")
-async def get_companies_batch(request: BatchCompanyRequest):
+async def get_companies_batch(
+    request: BatchCompanyRequest,
+    auto_enrich: bool = True,  # Default to True - automatically enrich search results
+):
     """
     Get company details and financial metrics for multiple companies by org numbers.
     Returns company name, revenue, margins, growth, etc.
+    
+    If auto_enrich=True (default), automatically creates lightweight profiles for companies without profiles.
+    This provides company context (what they do) in search results without requiring manual enrichment.
     """
     if not request.orgnrs:
         return {"companies": [], "count": 0}
     try:
         db = get_database_service()
         supabase = get_supabase_client()
+        
+        # Auto-enrich companies without profiles (lightweight, no scraping)
+        if auto_enrich and len(request.orgnrs) <= 50:  # Only for reasonable batch sizes
+            try:
+                from ..workers.lightweight_enrichment import auto_enrich_search_results
+                enrich_result = auto_enrich_search_results(request.orgnrs, max_enrich=50)
+                logger.info("Auto-enriched %s companies (lightweight profiles)", enrich_result.get("enriched", 0))
+            except Exception as enrich_exc:
+                logger.warning("Auto-enrichment failed: %s", enrich_exc)
+                # Continue anyway - will just show companies without profiles
         
         placeholders = ",".join("?" for _ in request.orgnrs)
         sql = f"""
@@ -156,7 +173,9 @@ async def get_companies_batch(request: BatchCompanyRequest):
                 c.company_name,
                 c.homepage,
                 c.employees_latest,
-                COALESCE(f.max_revenue_sek, k.latest_revenue_sek) as latest_revenue_sek,
+                c.segment_names,
+                c.nace_categories,
+                COALESCE(f.latest_revenue_sek, k.latest_revenue_sek) as latest_revenue_sek,
                 k.latest_profit_sek,
                 k.latest_ebitda_sek,
                 k.avg_ebitda_margin,
@@ -169,48 +188,125 @@ async def get_companies_batch(request: BatchCompanyRequest):
             FROM companies c
             LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
             LEFT JOIN (
-                SELECT orgnr, MAX(si_sek) as max_revenue_sek
-                FROM financials
-                WHERE currency = 'SEK' 
-                  AND (period = '12' OR period LIKE '%-12')
-                  AND year >= 2020
-                  AND si_sek IS NOT NULL
-                GROUP BY orgnr
+                SELECT f1.orgnr, 
+                       COALESCE(f1.si_sek, f1.sdi_sek) as latest_revenue_sek
+                FROM financials f1
+                INNER JOIN (
+                    SELECT orgnr, MAX(year) as latest_year
+                    FROM financials
+                    WHERE currency = 'SEK' 
+                      AND (period = '12' OR period LIKE '%-12')
+                      AND year >= 2020
+                      AND (si_sek IS NOT NULL OR sdi_sek IS NOT NULL)
+                    GROUP BY orgnr
+                ) f2 ON f1.orgnr = f2.orgnr AND f1.year = f2.latest_year
+                WHERE f1.currency = 'SEK' 
+                  AND (f1.period = '12' OR f1.period LIKE '%-12')
             ) f ON f.orgnr = c.orgnr
             WHERE c.orgnr IN ({placeholders})
-            ORDER BY COALESCE(f.max_revenue_sek, k.latest_revenue_sek, 0) DESC, c.company_name ASC
+            ORDER BY COALESCE(f.latest_revenue_sek, k.latest_revenue_sek, 0) DESC, c.company_name ASC
         """
         
         rows = db.run_raw_query(sql, params=request.orgnrs)
         
+        # Fetch ai_profiles from both Supabase and local SQLite
         ai_profiles_map: Dict[str, Dict[str, Any]] = {}
+        
+        # Try Supabase first
         try:
             if request.orgnrs:
                 profile_response = (
                     supabase.table("ai_profiles")
                     .select(
                         "org_number, website, product_description, end_market, customer_types, "
-                        "strategic_fit_score, defensibility_score, value_chain_position, ai_notes, last_updated"
+                        "strategic_fit_score, defensibility_score, value_chain_position, ai_notes, "
+                        "business_model_summary, industry_sector, industry_subsector, last_updated"
                     )
                     .in_("org_number", request.orgnrs)
                     .execute()
                 )
                 if profile_response.data:
-                    ai_profiles_map = {
-                        profile["org_number"]: profile for profile in profile_response.data
-                    }
+                    for profile in profile_response.data:
+                        ai_profiles_map[profile["org_number"]] = profile
         except Exception as profile_exc:  # pragma: no cover - best-effort fetch
-            logger.warning("Failed to fetch AI profiles: %s", profile_exc)
-            ai_profiles_map = {}
+            logger.debug("Supabase profiles not available: %s", profile_exc)
+        
+        # Also check local SQLite for ai_profiles (fallback)
+        try:
+            # Check if ai_profiles table exists in local DB
+            check_table = db.run_raw_query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='ai_profiles'"
+            )
+            if check_table:
+                local_placeholders = ",".join("?" * len(request.orgnrs))
+                local_profiles = db.run_raw_query(
+                    f"""
+                    SELECT org_number, website, product_description, end_market, customer_types,
+                           strategic_fit_score, defensibility_score, value_chain_position, ai_notes,
+                           business_model_summary, industry_sector, industry_subsector, last_updated
+                    FROM ai_profiles
+                    WHERE org_number IN ({local_placeholders})
+                    """,
+                    request.orgnrs
+                )
+                for profile in local_profiles:
+                    orgnr = profile.get("org_number")
+                    if orgnr and orgnr not in ai_profiles_map:
+                        # Convert to dict format matching Supabase response
+                        ai_profiles_map[orgnr] = {
+                            "org_number": orgnr,
+                            "website": profile.get("website"),
+                            "product_description": profile.get("product_description"),
+                            "end_market": profile.get("end_market"),
+                            "customer_types": profile.get("customer_types"),
+                            "strategic_fit_score": profile.get("strategic_fit_score"),
+                            "defensibility_score": profile.get("defensibility_score"),
+                            "value_chain_position": profile.get("value_chain_position"),
+                            "ai_notes": profile.get("ai_notes"),
+                            "business_model_summary": profile.get("business_model_summary"),
+                            "industry_sector": profile.get("industry_sector"),
+                            "industry_subsector": profile.get("industry_subsector"),
+                            "last_updated": profile.get("last_updated"),
+                        }
+        except Exception as local_exc:
+            logger.debug("Local ai_profiles check failed: %s", local_exc)
         
         companies = []
         for row in rows:
             profile = ai_profiles_map.get(row.get("orgnr", ""))
+            
+            # Parse segment_names (JSON array stored as TEXT)
+            segment_names = []
+            try:
+                segment_names_raw = row.get("segment_names")
+                if segment_names_raw:
+                    if isinstance(segment_names_raw, str):
+                        segment_names = json.loads(segment_names_raw) if segment_names_raw else []
+                    elif isinstance(segment_names_raw, list):
+                        segment_names = segment_names_raw
+            except Exception:
+                segment_names = []
+            
+            # Get company context - prioritize AI profile, fallback to segment_names
+            company_context = None
+            if profile:
+                # Use AI-generated product description or business model summary
+                company_context = (
+                    profile.get("product_description") or 
+                    profile.get("business_model_summary") or
+                    profile.get("ai_notes")
+                )
+            elif segment_names:
+                # Fallback to industry segments
+                company_context = ", ".join(segment_names[:3])  # First 3 segments
+            
             companies.append({
                 "orgnr": row.get("orgnr"),
                 "company_name": row.get("company_name"),
                 "homepage": row.get("homepage"),
                 "employees_latest": row.get("employees_latest"),
+                "segment_names": segment_names,  # Full array for filtering
+                "company_context": company_context,  # Display-friendly context
                 "latest_revenue_sek": row.get("latest_revenue_sek"),
                 "latest_profit_sek": row.get("latest_profit_sek"),
                 "latest_ebitda_sek": row.get("latest_ebitda_sek"),
@@ -224,12 +320,16 @@ async def get_companies_batch(request: BatchCompanyRequest):
                 "ai_strategic_score": profile.get("strategic_fit_score") if profile else None,
                 "ai_defensibility_score": profile.get("defensibility_score") if profile else None,
                 "ai_product_description": profile.get("product_description") if profile else None,
+                "ai_business_model_summary": profile.get("business_model_summary") if profile else None,
                 "ai_end_market": profile.get("end_market") if profile else None,
                 "ai_customer_types": profile.get("customer_types") if profile else None,
                 "ai_value_chain_position": profile.get("value_chain_position") if profile else None,
+                "ai_industry_sector": profile.get("industry_sector") if profile else None,
+                "ai_industry_subsector": profile.get("industry_subsector") if profile else None,
                 "ai_notes": profile.get("ai_notes") if profile else None,
                 "ai_profile_last_updated": profile.get("last_updated") if profile else None,
                 "ai_profile_website": profile.get("website") if profile else None,
+                "has_ai_profile": profile is not None,  # Flag to indicate if enriched
             })
         
         return {"companies": companies, "count": len(companies)}

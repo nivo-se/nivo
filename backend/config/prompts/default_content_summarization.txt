@@ -1,0 +1,16 @@
+Company: {company_name} ({website})
+
+Scraped pages excerpt:
+{scraped_pages_excerpt}
+
+Combined content (full text excerpt):
+{combined_content}
+
+Financial snapshot:
+{financial_overview}
+
+Instructions:
+- Summarize the offering, end markets, customer types, value-chain position and business model in Swedish/English depending on the input.
+- Output JSON that matches the required schema exactly.
+- Highlight any moat, technology, or regulatory approvals when available.
+

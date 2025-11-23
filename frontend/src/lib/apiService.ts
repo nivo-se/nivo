@@ -66,8 +66,8 @@ export class ApiService {
     })
   }
 
-  async getCompaniesBatch(orgNumbers: string[]): Promise<{ companies: CompanyRow[]; count: number }> {
-    return this.fetch('/api/companies/batch', {
+  async getCompaniesBatch(orgNumbers: string[], autoEnrich: boolean = true): Promise<{ companies: CompanyRow[]; count: number }> {
+    return this.fetch(`/api/companies/batch?auto_enrich=${autoEnrich}`, {
       method: 'POST',
       body: JSON.stringify({ orgnrs: orgNumbers })
     })
@@ -104,13 +104,13 @@ export class ApiService {
 export const apiService = new ApiService()
 
 export interface AIFilterResponse {
-  sql: string
-  parsed_where_clause: string
+  sql?: string
+  parsed_where_clause?: string
   org_numbers: string[]
-  count: number
-  result_count: number
-  total: number
-  metadata: AIFilterMetadata
+  count?: number
+  result_count?: number
+  total?: number
+  metadata?: AIFilterMetadata
 }
 
 export interface AIFilterMetadata {
@@ -150,6 +150,8 @@ export interface CompanyRow {
   company_name?: string
   homepage?: string
   employees_latest?: number
+  segment_names?: string[]
+  company_context?: string  // Display-friendly: product description, business model, or industry segments
   latest_revenue_sek?: number
   latest_profit_sek?: number
   latest_ebitda_sek?: number
@@ -163,11 +165,15 @@ export interface CompanyRow {
   ai_strategic_score?: number
   ai_defensibility_score?: number
   ai_product_description?: string
+  ai_business_model_summary?: string
+  ai_industry_sector?: string
+  ai_industry_subsector?: string
   ai_end_market?: string
   ai_customer_types?: string
   ai_value_chain_position?: string
   ai_notes?: string
   ai_profile_last_updated?: string
   ai_profile_website?: string
+  has_ai_profile?: boolean
 }
 

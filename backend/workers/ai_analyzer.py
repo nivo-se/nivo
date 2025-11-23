@@ -3,88 +3,408 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import Any, Dict, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
+
+from .prompt_config import PromptConfig, PromptConfigError
+from .strategic_fit_analyzer import StrategicFitAnalyzer, StrategicFitResult
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+DEFAULT_AGENT_TYPE = os.getenv("AI_ANALYZER_AGENT", "default")
+MAX_CONTEXT_CHARS = 6000
+MAX_EXCERPT_CHARS = 1200
+
+CONTENT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "product_description": {"type": "string"},
+        "end_market": {"type": "string"},
+        "customer_types": {"type": "string"},
+        "value_chain_position": {"type": "string"},
+        "business_model_summary": {"type": "string"},
+        "ai_notes": {"type": "string"},
+    },
+    "required": [
+        "product_description",
+        "end_market",
+        "customer_types",
+        "value_chain_position",
+        "business_model_summary",
+        "ai_notes",
+    ],
+}
+
+INDUSTRY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "industry_sector": {"type": "string"},
+        "industry_subsector": {"type": "string"},
+        "market_regions": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["industry_sector", "industry_subsector", "market_regions"],
+}
+
+STRATEGIC_FIT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "strategic_fit_score": {"type": "integer"},
+        "defensibility_score": {"type": "integer"},
+        "risk_flags": {"type": "array", "items": {"type": "string"}},
+        "upside_potential": {"type": "string"},
+        "fit_rationale": {"type": "string"},
+    },
+    "required": [
+        "strategic_fit_score",
+        "defensibility_score",
+        "risk_flags",
+        "upside_potential",
+        "fit_rationale",
+    ],
+}
+
+PLAYBOOK_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "strategic_playbook": {"type": "string"},
+        "next_steps": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["strategic_playbook", "next_steps"],
+}
+
+DEFAULT_USER_TEMPLATES = {
+    "content_summarization": (
+        "Company: {company_name} ({website})\n"
+        "Scraped Content:\n{scraped_pages_excerpt}\n\n"
+        "Financial Snapshot:\n{financial_overview}\n\n"
+        "Task: Summarize the company's product offering, end markets, customer types, "
+        "value chain position, and business model. Capture factual highlights only."
+    ),
+    "industry_classification": (
+        "Company: {company_name}\n"
+        "Summary JSON:\n{summary_json}\n"
+        "Scraped Content:\n{scraped_pages_excerpt}\n\n"
+        "Task: Classify sector/subsector and list key geographic markets served."
+    ),
+    "strategic_fit": (
+        "Company: {company_name}\n"
+        "Summary JSON:\n{summary_json}\n"
+        "Industry JSON:\n{industry_json}\n"
+        "Financial Snapshot:\n{financial_overview}\n"
+        "Investment Criteria:\n{investment_criteria_json}\n\n"
+        "Task: Score strategic fit (1-10) and defensibility (1-10) vs the thesis. "
+        "List key risks and upside angles."
+    ),
+    "playbook_generation": (
+        "Company: {company_name}\n"
+        "Summary JSON:\n{summary_json}\n"
+        "Industry JSON:\n{industry_json}\n"
+        "Strategic Fit JSON:\n{strategic_fit_json}\n"
+        "Financial Snapshot:\n{financial_overview}\n\n"
+        "Task: Provide a strategic playbook (markdown) and 3-5 next steps for diligence."
+    ),
+}
+
+
+@dataclass
+class AnalysisStepResult:
+    data: Dict[str, Any]
+    raw_text: str
 
 
 class AIAnalyzer:
-    def __init__(self, api_key: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        agent_type: Optional[str] = None,
+        model: Optional[str] = None,
+    ) -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.client: Optional[OpenAI] = None
         if self.api_key:
             self.client = OpenAI(api_key=self.api_key)
+
+        self.model = model or DEFAULT_MODEL
+        self.temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.1"))
+        self.default_agent_type = agent_type or DEFAULT_AGENT_TYPE or "default"
+        self._prompt_cache: Dict[str, PromptConfig] = {}
+        self._strategic_analyzer = StrategicFitAnalyzer()
 
     def analyze(
         self,
         company_name: str,
         website: Optional[str],
         raw_text: Optional[str],
+        scraped_pages: Optional[Dict[str, str]] = None,
+        financial_metrics: Optional[Dict[str, Any]] = None,
+        investment_criteria: Optional[Dict[str, Any]] = None,
+        agent_type: Optional[str] = None,
     ) -> Dict[str, Any]:
-        if not raw_text:
-            return self._fallback_result(company_name, website)
+        scraped_pages = scraped_pages or {}
+        combined_content = self._build_context_blob(scraped_pages, raw_text)
+        agent_key = agent_type or self.default_agent_type
+        prompt_config = self._get_prompt_config(agent_key)
 
+        if not combined_content or not self.client:
+            if not combined_content:
+                logger.warning("No website content provided for %s, returning fallback analysis", company_name)
+            if not self.client:
+                logger.warning("OPENAI_API_KEY not configured, returning fallback analysis")
+            fallback = self._fallback_result(company_name, website)
+            fallback["agent_type"] = agent_key
+            fallback["scraped_pages"] = self._normalize_list(list(scraped_pages.keys()))
+            fallback["used_llm"] = False
+            return fallback
+
+        financial_overview = self._format_financial_metrics(financial_metrics)
+        context = {
+            "company_name": company_name,
+            "website": website or "N/A",
+            "scraped_pages_excerpt": self._build_scraped_pages_excerpt(scraped_pages, raw_text),
+            "financial_overview": financial_overview,
+            "combined_content": combined_content,
+            "investment_criteria_json": self._format_json(investment_criteria),
+            "agent_metadata": json.dumps(prompt_config.metadata() or {}, ensure_ascii=False),
+        }
+
+        summary = self.analyze_content_summary(prompt_config, context)
+        summary_json = self._format_json(summary.data)
+        context["summary_json"] = summary_json
+
+        industry = self.classify_industry(prompt_config, {**context})
+        industry_json = self._format_json(industry.data)
+        context["industry_json"] = industry_json
+
+        baseline_fit = self._strategic_analyzer.evaluate(
+            company_name=company_name,
+            financial_metrics=financial_metrics,
+            summary=summary.data,
+        )
+        context["strategy_baseline_json"] = self._format_json(
+            {
+                "score": baseline_fit.score,
+                "defensibility": baseline_fit.defensibility,
+                "risk_flags": baseline_fit.risk_flags,
+                "upside": baseline_fit.upside_potential,
+                "rationale": baseline_fit.rationale,
+                "strategy": baseline_fit.matched_strategy,
+            }
+        )
+
+        strategic_fit = self.analyze_strategic_fit(
+            prompt_config,
+            {**context, "investment_criteria_json": self._format_json(investment_criteria)},
+        )
+        strategic_fit_json = self._format_json(strategic_fit.data)
+        context["strategic_fit_json"] = strategic_fit_json
+
+        playbook = self.generate_playbook(prompt_config, context)
+
+        result = {
+            **summary.data,
+            **industry.data,
+            **strategic_fit.data,
+            **playbook.data,
+            "agent_type": agent_key,
+            "scraped_pages": self._normalize_list(list(scraped_pages.keys())),
+            "used_llm": True,
+        }
+        result["strategic_fit_score"] = self._normalize_score(
+            result.get("strategic_fit_score") or baseline_fit.score
+        )
+        result["defensibility_score"] = self._normalize_score(
+            result.get("defensibility_score") or baseline_fit.defensibility
+        )
+        risk_flags = result.get("risk_flags") or baseline_fit.risk_flags
+        if baseline_fit.rationale and not result.get("fit_rationale"):
+            result["fit_rationale"] = baseline_fit.rationale
+        if not result.get("upside_potential"):
+            result["upside_potential"] = baseline_fit.upside_potential
+        result["risk_flags"] = self._normalize_list(risk_flags)
+        result["market_regions"] = self._normalize_list(result.get("market_regions"))
+        result["next_steps"] = self._normalize_list(result.get("next_steps"))
+        return result
+
+    def analyze_content_summary(
+        self,
+        prompt_config: PromptConfig,
+        context: Dict[str, Any],
+    ) -> AnalysisStepResult:
+        return self._invoke_step(
+            step="content_summarization",
+            prompt_config=prompt_config,
+            context=context,
+            schema=CONTENT_SCHEMA,
+        )
+
+    def classify_industry(
+        self,
+        prompt_config: PromptConfig,
+        context: Dict[str, Any],
+    ) -> AnalysisStepResult:
+        return self._invoke_step(
+            step="industry_classification",
+            prompt_config=prompt_config,
+            context=context,
+            schema=INDUSTRY_SCHEMA,
+        )
+
+    def analyze_strategic_fit(
+        self,
+        prompt_config: PromptConfig,
+        context: Dict[str, Any],
+    ) -> AnalysisStepResult:
+        return self._invoke_step(
+            step="strategic_fit",
+            prompt_config=prompt_config,
+            context=context,
+            schema=STRATEGIC_FIT_SCHEMA,
+        )
+
+    def generate_playbook(
+        self,
+        prompt_config: PromptConfig,
+        context: Dict[str, Any],
+    ) -> AnalysisStepResult:
+        return self._invoke_step(
+            step="playbook_generation",
+            prompt_config=prompt_config,
+            context=context,
+            schema=PLAYBOOK_SCHEMA,
+        )
+
+    def _invoke_step(
+        self,
+        step: str,
+        prompt_config: PromptConfig,
+        context: Dict[str, Any],
+        schema: Dict[str, Any],
+    ) -> AnalysisStepResult:
+        system_prompt = prompt_config.get_system_prompt(step)
+        user_prompt = self._build_user_prompt(prompt_config, step, **context)
+        response = self._call_openai(system_prompt, user_prompt, schema)
+        return AnalysisStepResult(data=response["data"], raw_text=response["raw"])
+
+    def _call_openai(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        schema: Dict[str, Any],
+    ) -> Dict[str, Any]:
         if not self.client:
-            logger.warning("OPENAI_API_KEY not configured, returning fallback analysis")
-            return self._fallback_result(company_name, website)
+            raise RuntimeError("OpenAI client not configured")
 
-        prompt = (
-            "You are an investment analyst. Summarize the company using the text "
-            "provided. Return JSON with keys: product_description, end_market, "
-            "customer_types, strategic_fit_score (1-10), defensibility_score (1-10), "
-            "value_chain_position, ai_notes."
-        )
-
-        response = self.client.responses.create(
-            model=DEFAULT_MODEL,
-            input=[
-                {"role": "system", "content": prompt},
-                {
-                    "role": "user",
-                    "content": f"Company: {company_name}\nWebsite: {website}\nContent:\n{raw_text[:6000]}",
-                },
+        formatted_schema = {
+            "name": "ai_analyzer_step",
+            "schema": schema,
+        }
+        response = self.client.chat.completions.create(
+            model=self.model,
+            temperature=self.temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
             ],
-            response_format={
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "ai_profile_schema",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "product_description": {"type": "string"},
-                            "end_market": {"type": "string"},
-                            "customer_types": {"type": "string"},
-                            "strategic_fit_score": {"type": "integer"},
-                            "defensibility_score": {"type": "integer"},
-                            "value_chain_position": {"type": "string"},
-                            "ai_notes": {"type": "string"},
-                        },
-                        "required": [
-                            "product_description",
-                            "end_market",
-                            "customer_types",
-                            "strategic_fit_score",
-                            "defensibility_score",
-                            "value_chain_position",
-                            "ai_notes",
-                        ],
-                    },
-                },
-            },
+            response_format={"type": "json_schema", "json_schema": formatted_schema},
         )
+
+        choice = response.choices[0]
+        content: Any = choice.message.content if choice.message else ""
+        if isinstance(content, list):
+            content = "".join(part.get("text", "") for part in content if isinstance(part, dict))
+
         try:
-            content = response.output[0].content[0].text  # type: ignore[attr-defined]
-            data = json.loads(content)
-            data["strategic_fit_score"] = self._normalize_score(data.get("strategic_fit_score"))
-            data["defensibility_score"] = self._normalize_score(data.get("defensibility_score"))
-            return data
-        except Exception as exc:  # pragma: no cover - fallback path
-            logger.warning("Failed to parse AI response: %s", exc)
-            return self._fallback_result(company_name, website)
+            parsed = json.loads(content or "{}")
+        except json.JSONDecodeError:
+            parsed = {}
+
+        return {"data": parsed, "raw": content or ""}
+
+    def _get_prompt_config(self, agent_type: str) -> PromptConfig:
+        if agent_type not in self._prompt_cache:
+            try:
+                self._prompt_cache[agent_type] = PromptConfig(agent_type=agent_type)
+            except PromptConfigError as exc:
+                logger.warning("Failed to load PromptConfig (%s), falling back to default: %s", agent_type, exc)
+                self._prompt_cache[agent_type] = PromptConfig(agent_type="default")
+        return self._prompt_cache[agent_type]
+
+    @staticmethod
+    def _build_context_blob(scraped_pages: Dict[str, str], raw_text: Optional[str]) -> str:
+        sections: List[str] = []
+        for url, text in (scraped_pages or {}).items():
+            snippet = text.strip()
+            if snippet:
+                sections.append(f"[{url}]\n{snippet}")
+        if not sections and raw_text:
+            sections.append(raw_text.strip())
+        combined = "\n\n".join(sections)
+        return combined[:MAX_CONTEXT_CHARS]
+
+    @staticmethod
+    def _build_scraped_pages_excerpt(
+        scraped_pages: Dict[str, str],
+        raw_text: Optional[str],
+        limit_per_page: int = MAX_EXCERPT_CHARS,
+        max_pages: int = 5,
+    ) -> str:
+        excerpts: List[str] = []
+        for idx, (url, text) in enumerate((scraped_pages or {}).items()):
+            if idx >= max_pages:
+                break
+            snippet = (text or "").strip()
+            if snippet:
+                excerpts.append(f"URL: {url}\n{snippet[:limit_per_page]}")
+        if excerpts:
+            return "\n\n".join(excerpts)
+        if raw_text:
+            return raw_text[: limit_per_page * max_pages]
+        return "Ingen webbplatsdata tillgänglig."
+
+    @staticmethod
+    def _format_financial_metrics(metrics: Optional[Dict[str, Any]]) -> str:
+        if not metrics:
+            return "Inga finansiella nyckeltal tillgängliga."
+
+        parts: List[str] = []
+        for key, value in metrics.items():
+            if isinstance(value, (int, float)):
+                parts.append(f"{key}: {value:,.0f}")
+            elif isinstance(value, dict):
+                parts.append(f"{key}: {json.dumps(value, ensure_ascii=False)}")
+            else:
+                parts.append(f"{key}: {value}")
+        return "\n".join(parts)
+
+    @staticmethod
+    def _build_user_prompt(
+        prompt_config: PromptConfig,
+        step: str,
+        **context: Any,
+    ) -> str:
+        try:
+            return prompt_config.build_user_prompt(step, **context)
+        except PromptConfigError as exc:
+            logger.warning("Missing prompt template for %s: %s. Falling back to default template.", step, exc)
+            template = DEFAULT_USER_TEMPLATES.get(step, DEFAULT_USER_TEMPLATES["content_summarization"])
+            return template.format(**context)
+
+    @staticmethod
+    def _format_json(data: Optional[Dict[str, Any]]) -> str:
+        if not data:
+            return "{}"
+        return json.dumps(data, ensure_ascii=False, indent=2)
+
+    @staticmethod
+    def _normalize_list(value: Any) -> Optional[List[Any]]:
+        if not value:
+            return None
+        if isinstance(value, list):
+            return value
+        return [value]
 
     @staticmethod
     def _fallback_result(company_name: str, website: Optional[str]) -> Dict[str, Any]:
@@ -92,9 +412,17 @@ class AIAnalyzer:
             "product_description": f"Summary unavailable for {company_name}",
             "end_market": "",
             "customer_types": "",
+            "value_chain_position": "",
+            "business_model_summary": "",
+            "industry_sector": "",
+            "industry_subsector": "",
+            "market_regions": None,
             "strategic_fit_score": 5,
             "defensibility_score": 5,
-            "value_chain_position": "",
+            "risk_flags": None,
+            "upside_potential": "",
+            "strategic_playbook": "",
+            "next_steps": None,
             "ai_notes": f"Website: {website or 'N/A'}",
         }
 
@@ -106,3 +434,5 @@ class AIAnalyzer:
             return 5
         return max(1, min(10, number))
 
+
+__all__ = ["AIAnalyzer", "AnalysisStepResult"]

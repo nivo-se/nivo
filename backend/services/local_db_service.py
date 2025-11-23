@@ -47,6 +47,7 @@ class LocalDBService(DatabaseService):
     ) -> List[Dict[str, Any]]:
         with self._lock:
             cursor = self._conn.execute(sql, params or [])
+            self._conn.commit()  # Commit to persist updates
             rows = cursor.fetchall()
         return [dict(row) for row in rows]
 

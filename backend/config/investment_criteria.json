@@ -1,0 +1,64 @@
+{
+  "default_strategy": "core_thesis",
+  "strategies": {
+    "core_thesis": {
+      "name": "Core Lower-Mid Cap Thesis",
+      "revenue_min": 50000000,
+      "revenue_max": 250000000,
+      "ebitda_margin_min": 0.12,
+      "growth_min": 0.05,
+      "preferred_keywords": [
+        "produkt",
+        "plattform",
+        "återkommande",
+        "automation"
+      ],
+      "default_upside": "Kombinera kommersiell acceleration med add-on strategi inom fragmenterade delmarknader."
+    },
+    "tech_rollup": {
+      "name": "Tech & SaaS Roll-Up",
+      "revenue_min": 20000000,
+      "revenue_max": 150000000,
+      "ebitda_margin_min": 0.15,
+      "growth_min": 0.10,
+      "preferred_keywords": [
+        "saas",
+        "subscription",
+        "cloud",
+        "ai",
+        "plattform"
+      ],
+      "default_upside": "Skala ARR via prishöjningar, produktbundling och vertikal expansion."
+    },
+    "industrial_compounder": {
+      "name": "Industrial Automation Compounder",
+      "revenue_min": 75000000,
+      "revenue_max": 400000000,
+      "ebitda_margin_min": 0.1,
+      "growth_min": 0.03,
+      "preferred_keywords": [
+        "automation",
+        "produktion",
+        "maskin",
+        "lean",
+        "systemintegratör"
+      ],
+      "default_upside": "Operativ excellens, capex-optimering och internationell expansion."
+    },
+    "services_platform": {
+      "name": "Specialist Services Platform",
+      "revenue_min": 60000000,
+      "revenue_max": 300000000,
+      "ebitda_margin_min": 0.08,
+      "growth_min": 0.04,
+      "preferred_keywords": [
+        "tjänst",
+        "konsult",
+        "outsourcing",
+        "managed services"
+      ],
+      "default_upside": "Bygg skalbar leveransmodell, öka utilization och genomför bolt-on för att fylla kapabilitetsgap."
+    }
+  }
+}
+

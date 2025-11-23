@@ -150,16 +150,29 @@ const AISourcingDashboard: React.FC = () => {
     try {
       const response = await apiService.aiFilter(prompt, pageSize, (targetPage - 1) * pageSize)
       setCurrentPrompt(prompt)
-      setAIFilterResult(response)
+      // Ensure response has required fields with defaults
+      const safeResponse: AIFilterResponse = {
+        ...response,
+        total: response.total ?? response.count ?? 0,
+        result_count: response.result_count ?? response.count ?? 0,
+        metadata: response.metadata ?? {
+          prompt,
+          limit: pageSize,
+          offset: (targetPage - 1) * pageSize,
+          used_llm: false,
+          total_matches: response.total ?? response.count ?? 0,
+        },
+      }
+      setAIFilterResult(safeResponse)
       setPagination({
         page: targetPage,
-        limit: response.metadata?.limit ?? pageSize,
-        total: response.total,
+        limit: safeResponse.metadata?.limit ?? pageSize,
+        total: safeResponse.total ?? 0,
       })
       if (addToHistory) {
         setPromptHistory((prev) => {
           const next: PromptHistoryItem[] = [
-            { prompt, count: response.total, timestamp: new Date().toISOString() },
+            { prompt, count: safeResponse.total ?? 0, timestamp: new Date().toISOString() },
             ...prev.filter((item) => item.prompt !== prompt),
           ]
           return next.slice(0, 10)
@@ -363,14 +376,14 @@ const AISourcingDashboard: React.FC = () => {
           <div className="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:grid-cols-3">
             <div>
               <p className="text-xs uppercase text-gray-500">Active thesis</p>
-              <p className="text-sm text-gray-900">{aiResult.metadata.prompt}</p>
+              <p className="text-sm text-gray-900">{aiResult.metadata?.prompt || currentPrompt || 'No active search'}</p>
             </div>
             <div>
               <p className="text-xs uppercase text-gray-500">Matches</p>
               <p className="text-lg font-semibold text-gray-900">
-                {aiResult.total.toLocaleString()}{' '}
+                {(aiResult.total ?? 0).toLocaleString()}{' '}
                 <span className="text-xs font-normal text-gray-500">
-                  (showing {(aiResult.result_count ?? aiResult.count).toLocaleString()})
+                  (showing {((aiResult.result_count ?? aiResult.count) ?? 0).toLocaleString()})
                 </span>
               </p>
             </div>
@@ -539,6 +552,7 @@ const AISourcingDashboard: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
