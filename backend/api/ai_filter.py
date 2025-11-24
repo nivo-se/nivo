@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -19,6 +20,7 @@ router = APIRouter(prefix="/api/ai-filter", tags=["ai-filter"])
 BASE_SQL = """
 SELECT DISTINCT c.orgnr
 FROM companies c
+LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
 LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
 LEFT JOIN (
     SELECT orgnr, MAX(si_sek) as max_revenue_sek
@@ -30,13 +32,14 @@ LEFT JOIN (
     GROUP BY orgnr
 ) f ON f.orgnr = c.orgnr
 WHERE {where_clause}
-ORDER BY COALESCE(k.revenue_cagr_3y, 0) DESC, c.company_name ASC
+ORDER BY COALESCE(m.revenue_cagr_3y, 0) DESC, c.company_name ASC
 LIMIT ? OFFSET ?
 """
 
 COUNT_SQL = """
 SELECT COUNT(DISTINCT c.orgnr) as total_matches
 FROM companies c
+LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
 LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
 LEFT JOIN (
     SELECT orgnr, MAX(si_sek) as max_revenue_sek
@@ -57,81 +60,46 @@ class AIFilterRequest(BaseModel):
     prompt: str = Field(..., description="Natural language description of the acquisition target")
     limit: int = Field(50, ge=1, le=200)
     offset: int = Field(0, ge=0)
+    current_where_clause: Optional[str] = Field(None, description="Existing SQL WHERE clause to refine")
 
 
-class AIFilterResponse(BaseModel):
-    sql: str
-    parsed_where_clause: str
-    org_numbers: List[str]
-    count: int
-    result_count: int
-    total: int
-    metadata: Dict[str, Any]
-
-
-def _sanitize_where_clause(clause: str) -> str:
-    lowered = clause.lower()
-    disallowed = ("insert", "update", "delete", "drop", ";", "--", "alter", "create")
-    if any(keyword in lowered for keyword in disallowed):
-        raise ValueError("LLM produced unsafe SQL. Please refine the prompt.")
-    return clause
-
-
-def _fallback_where_clause(prompt: str) -> str:
-    # Simple heuristic parser when OpenAI is unavailable
-    clause_parts = ["1=1"]
-    prompt_lower = prompt.lower()
-    if "sweden" in prompt_lower or "swedish" in prompt_lower:
-        clause_parts.append("c.country = 'SE'")
-    if "logistics" in prompt_lower:
-        clause_parts.append("c.segment_names LIKE '%logistik%'")
-    if "profitable" in prompt_lower:
-        clause_parts.append("COALESCE(k.avg_net_margin, 0) > 0.05")
-    
-    # Parse revenue requirements (100M = 100000000, 10M = 10000000, etc.)
-    import re
-    # Look for patterns like "100M", "100 million", ">100M", "over 100M"
-    revenue_match = re.search(r'(\d+)\s*(?:million|m|msek|m sek)', prompt_lower)
-    if revenue_match:
-        millions = int(revenue_match.group(1))
-        min_revenue = millions * 1_000_000
-        if '>' in prompt_lower or 'over' in prompt_lower or 'above' in prompt_lower:
-            clause_parts.append(f"f.max_revenue_sek >= {min_revenue}")
-        elif '<' in prompt_lower or 'under' in prompt_lower or 'below' in prompt_lower:
-            clause_parts.append(f"f.max_revenue_sek <= {min_revenue}")
-        else:
-            clause_parts.append(f"f.max_revenue_sek >= {min_revenue}")
-    
-    return " AND ".join(clause_parts)
-
-
-def _call_openai_for_where_clause(prompt: str) -> Optional[str]:
+def _call_openai_for_where_clause(prompt: str, current_where_clause: Optional[str] = None) -> Dict[str, Any]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         logger.warning("OPENAI_API_KEY not set, falling back to heuristic filter")
-        return None
+        return {}
     client = OpenAI(api_key=api_key)
+    # Load RAG context dynamically
+    try:
+        from backend.utils.retrieve_context import retrieve_context
+        rag_context = retrieve_context(prompt)
+    except Exception as e:
+        logger.error(f"Failed to load RAG context: {e}")
+        rag_context = "You are a financial sourcing assistant."
+
     system_prompt = (
-        "You translate investor theses into SQL WHERE clauses for SQLite. "
-        "Use columns from tables companies (alias c), company_kpis (alias k), and financials subquery (alias f). "
-        "CRITICAL: For revenue filtering, use f.max_revenue_sek (from financials table, actual SEK). "
-        "Revenue conversion: '100 million SEK' = 100000000, '100M SEK' = 100000000, '10 million' = 10000000. "
-        "When user asks for revenue >100M or >100 million, use: f.max_revenue_sek >= 100000000. "
-        "When user asks for revenue >10M, use: f.max_revenue_sek >= 10000000. "
-        "Available columns: "
-        "- f.max_revenue_sek (use this for revenue filtering - actual SEK from financials) "
-        "- k.avg_ebitda_margin (decimal 0.15 = 15%), k.avg_net_margin "
-        "- k.revenue_cagr_3y (decimal 0.10 = 10%), k.revenue_growth_yoy "
-        "- k.company_size_bucket ('small', 'medium', 'large') "
-        "- k.growth_bucket, k.profitability_bucket "
-        "- c.segment_names (for industry filtering) "
-        "Return ONLY the WHERE clause content (without the word WHERE). "
-        "Example: For 'revenue over 100 million SEK', return: f.max_revenue_sek >= 100000000"
+        f"{rag_context}\n\n"
+        "IMPORTANT: Return JSON with:\n"
+        "- where_clause: The SQL WHERE clause (without the word WHERE).\n"
+        "- explanation: Brief explanation of why these filters were applied (1 sentence).\n"
+        "- suggestions: List of 2-3 short follow-up questions to help the user refine the search.\n"
+        "Example output:\n"
+        "{'where_clause': 'f.max_revenue_sek >= 100000000', 'explanation': 'Filtered for companies with >100M SEK revenue.', 'suggestions': ['Should we filter by profitability?', 'Focus on specific regions?']}"
     )
-    user_prompt = (
-        f"Investor thesis: {prompt}\n"
-        "Return JSON with field where_clause."
-    )
+    
+    if current_where_clause:
+        user_prompt = (
+            f"Current active filter: {current_where_clause}\n"
+            f"User refinement: {prompt}\n"
+            "Task: Update the WHERE clause to incorporate the user's refinement. Keep existing filters unless the user explicitly asks to remove or change them.\n"
+            "Return JSON with fields where_clause, explanation, suggestions."
+        )
+    else:
+        user_prompt = (
+            f"Investor thesis: {prompt}\n"
+            "Return JSON with fields where_clause, explanation, suggestions."
+        )
+
     try:
         response = client.chat.completions.create(
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
@@ -143,21 +111,18 @@ def _call_openai_for_where_clause(prompt: str) -> Optional[str]:
         )
         content = response.choices[0].message.content
         if not content:
-            return None
+            return {}
     except Exception as exc:
         logger.error("OpenAI API error: %s", exc)
-        return None
+        return {}
     
     import json
     try:
         data = json.loads(content)
-        clause = data.get("where_clause")
+        return data
     except Exception as exc:
         logger.error("Failed to parse OpenAI response JSON: %s", exc)
-        return None
-    if not clause:
-        return None
-    return clause
+        return {}
 
 
 @router.post("/", response_model=AIFilterResponse)
@@ -166,11 +131,18 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
     supabase = get_supabase_client()
 
     used_llm = False
-    clause = _call_openai_for_where_clause(payload.prompt)
+    llm_result = _call_openai_for_where_clause(payload.prompt, payload.current_where_clause)
+    clause = llm_result.get("where_clause")
+    explanation = llm_result.get("explanation")
+    suggestions = llm_result.get("suggestions", [])
+
     if clause:
         used_llm = True
     else:
         clause = _fallback_where_clause(payload.prompt)
+        explanation = "Used heuristic keyword matching."
+        suggestions = []
+
     try:
         clause = _sanitize_where_clause(clause)
     except ValueError as exc:
@@ -223,5 +195,7 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
         result_count=result_count,
         total=total_matches,
         metadata=metadata,
+        explanation=explanation,
+        suggestions=suggestions
     )
 

@@ -74,21 +74,39 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
     })
   }
 
+  // Sync selection with available companies
   useEffect(() => {
     setSelected((prev) => {
       const next = new Set<string>()
+      let changed = false
+
+      // Only keep selected companies that are currently in the list
       companies.forEach((company) => {
         if (prev.has(company.orgnr)) {
           next.add(company.orgnr)
         }
       })
-      if (onSelectionChange) {
-        const selectedRows = companies.filter((company) => next.has(company.orgnr))
-        onSelectionChange(selectedRows)
+
+      // Check if selection actually changed
+      if (prev.size !== next.size) {
+        changed = true
       }
-      return next
+
+      return changed ? next : prev
     })
-  }, [companies, onSelectionChange])
+  }, [companies])
+
+  // Notify parent of selection changes
+  useEffect(() => {
+    if (onSelectionChange) {
+      const selectedRows = companies.filter((company) => selected.has(company.orgnr))
+      // Wrap in timeout to avoid "update while rendering" warning if this triggers immediately
+      const timer = setTimeout(() => {
+        onSelectionChange(selectedRows)
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [selected, companies, onSelectionChange])
 
   const renderedRows = useMemo(() => companies, [companies])
   const selectedRows = useMemo(
@@ -98,13 +116,13 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
 
   const handleSaveList = async () => {
     if (!listName.trim() || !onSaveList) return
-    
+
     setSaving(true)
     try {
       const companiesToSave = selected.size > 0
         ? companies.filter(c => selected.has(c.orgnr))
         : companies
-      
+
       await onSaveList(companiesToSave, listName.trim(), listDescription.trim() || undefined)
       setShowSaveDialog(false)
       setListName('')
@@ -193,7 +211,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
           )}
         </div>
       </div>
-      
+
       {showSaveDialog && (
         <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
           <div className="space-y-2">

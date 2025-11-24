@@ -24,15 +24,15 @@ export class ApiService {
 
   private async fetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const baseUrl = this.getBaseUrl()
-    
+
     if (!baseUrl && !import.meta.env.DEV) {
       throw new Error(
         'Backend API is not configured. Please set VITE_API_BASE_URL environment variable.'
       )
     }
-    
+
     const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint
-    
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -40,12 +40,12 @@ export class ApiService {
         ...options?.headers,
       },
     })
-    
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: response.statusText }))
       throw new Error(error.error || error.message || `HTTP ${response.status}`)
     }
-    
+
     return response.json()
   }
 
@@ -59,10 +59,15 @@ export class ApiService {
     return this.fetch('/api/status')
   }
 
-  async aiFilter(prompt: string, limit = 20, offset = 0): Promise<AIFilterResponse> {
+  async aiFilter(prompt: string, limit = 20, offset = 0, currentWhereClause?: string): Promise<AIFilterResponse> {
     return this.fetch('/api/ai-filter/', {
       method: 'POST',
-      body: JSON.stringify({ prompt, limit, offset })
+      body: JSON.stringify({
+        prompt,
+        limit,
+        offset,
+        current_where_clause: currentWhereClause
+      })
     })
   }
 
@@ -73,16 +78,18 @@ export class ApiService {
     })
   }
 
-  async getCompanyFinancials(orgnr: string): Promise<{ financials: Array<{
-    year: number
-    revenue_sek: number | null
-    profit_sek: number | null
-    ebit_sek: number | null
-    ebitda_sek: number | null
-    net_margin: number | null
-    ebit_margin: number | null
-    ebitda_margin: number | null
-  }>; count: number }> {
+  async getCompanyFinancials(orgnr: string): Promise<{
+    financials: Array<{
+      year: number
+      revenue_sek: number | null
+      profit_sek: number | null
+      ebit_sek: number | null
+      ebitda_sek: number | null
+      net_margin: number | null
+      ebit_margin: number | null
+      ebitda_margin: number | null
+    }>; count: number
+  }> {
     return this.fetch(`/api/companies/${orgnr}/financials`)
   }
 
@@ -111,6 +118,8 @@ export interface AIFilterResponse {
   result_count: number
   total: number
   metadata: AIFilterMetadata
+  explanation?: string
+  suggestions?: string[]
 }
 
 export interface AIFilterMetadata {

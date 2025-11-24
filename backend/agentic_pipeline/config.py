@@ -56,6 +56,13 @@ class PipelineConfig:
     excel_filename: str = "agentic_shortlist.xlsx"
     csv_filename: str = "agentic_shortlist.csv"
 
+    # Financial Filtering Criteria
+    min_revenue: float = 10_000_000.0  # 10M SEK
+    min_ebitda: float = 0.0            # Positive EBITDA
+    min_growth: float = 0.05           # 5% Growth
+    min_employees: int = 2
+    excluded_industry_codes: List[str] = field(default_factory=list)
+
     def ensure_output_dirs(self) -> None:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 

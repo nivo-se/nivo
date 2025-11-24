@@ -26,28 +26,46 @@ class FeatureEngineer:
 
     def transform(self, df: pd.DataFrame) -> FeatureEngineeringResult:
         frame = df.copy()
-        frame.rename(
-            columns={
-                "SDI": "revenue",
-                "DR": "ebit",
-                "ORS": "net_income",
-                "AntalAnstallda": "employees",
-                "Omsattning": "revenue",
-            },
-            inplace=True,
-        )
+        
+        # Helper to find column case-insensitive
+        def get_col(candidates):
+            for cand in candidates:
+                for col in frame.columns:
+                    if col.lower() == cand.lower():
+                        return frame[col]
+            return pd.Series(dtype=float)
 
-        if "employees" not in frame and "employees" in frame.columns:
-            frame["employees"] = frame["employees"].fillna(0)
+        # Map columns
+        frame["revenue"] = get_col(["revenue", "latest_revenue_sek", "sdi_sek", "net_turnover", "omsattning"])
+        frame["revenue_growth"] = get_col(["revenue_growth", "revenue_growth_yoy", "revenuegrowth"])
+        frame["ebit_margin"] = get_col(["ebit_margin", "avg_ebit_margin", "ebitmargin"])
+        frame["net_margin"] = get_col(["net_margin", "avg_net_margin", "netprofit_margin"])
+        
+        employees_col = get_col(["employees", "latest_employees", "antalanstallda"])
+        # Handle ranges like "10-19"
+        if employees_col.dtype == 'object':
+            def parse_employees(val):
+                if isinstance(val, str) and '-' in val:
+                    try:
+                        parts = val.split('-')
+                        return (float(parts[0]) + float(parts[1])) / 2
+                    except:
+                        return 0
+                try:
+                    return float(val)
+                except:
+                    return 0
+            employees_col = employees_col.apply(parse_employees)
+            
+        frame["employees"] = employees_col.fillna(0)
+        
+        frame["ebit"] = get_col(["ebit", "latest_ebit_sek", "dr_sek", "ebit_sek"]).fillna(0)
+        frame["assets"] = get_col(["assets", "totalatillgangar", "br_sek"]).fillna(0) 
+        frame["equity"] = get_col(["equity", "latest_equity_sek", "ek_sek", "egetkapital"]).fillna(0)
 
-        frame["revenue"] = frame[[col for col in frame.columns if col.lower() == "revenue" or col == "SDI"]].iloc[:, 0]
-        frame["revenue_growth"] = frame.get("Revenue_growth", frame.get("RevenueGrowth", pd.Series(dtype=float)))
-        frame["ebit_margin"] = frame.get("EBIT_margin", frame.get("EBITMargin", pd.Series(dtype=float)))
-        frame["net_margin"] = frame.get("NetProfit_margin", frame.get("NetProfitMargin", pd.Series(dtype=float)))
-        frame["employees"] = frame.get("employees", frame.get("AntalAnstallda", pd.Series(dtype=float))).fillna(0)
-        frame["ebit"] = frame.get("ebit", frame.get("EBIT", pd.Series(dtype=float))).fillna(0)
-        frame["assets"] = frame.get("TotalaTillgangar", pd.Series(dtype=float)).fillna(0)
-        frame["equity"] = frame.get("EgetKapital", pd.Series(dtype=float)).fillna(0)
+        # If revenue is still empty, try to use sdi_sek directly if it exists with suffix
+        if frame["revenue"].empty and "sdi_sek" in frame.columns:
+             frame["revenue"] = frame["sdi_sek"]
 
         frame["revenue_per_employee"] = self._safe_ratio(frame["revenue"], frame["employees"]).fillna(0)
         frame["ebit_per_employee"] = self._safe_ratio(frame["ebit"], frame["employees"]).fillna(0)
@@ -56,6 +74,7 @@ class FeatureEngineer:
         numeric_cols = [
             "revenue",
             "revenue_growth",
+            "ebit",  # Added for filtering
             "ebit_margin",
             "net_margin",
             "employees",

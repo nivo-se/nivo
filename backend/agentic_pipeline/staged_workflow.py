@@ -9,7 +9,7 @@ select ~100 companies for deeper analysis.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Optional
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -22,8 +22,9 @@ from .orchestrator import AgenticTargetingPipeline, PipelineArtifacts
 class StagePlan:
     """Operator-controlled plan for staged targeting runs."""
 
-    stage_one_size: int = 180
-    stage_two_size: int = 100
+    stage_one_size: int = 500
+    stage_two_size: int = 150
+    stage_three_size: int = 50
     screening_batch_size: int = 10
 
 
@@ -43,8 +44,16 @@ class StageTwoResult:
     screening: ScreeningBatch
 
 
+@dataclass(slots=True)
+class StageThreeResult:
+    """Outputs of the Deep AI analysis stage."""
+
+    shortlist: pd.DataFrame
+    analysis: Any  # AIAnalysisBatch
+
+
 class StagedTargetingWorkflow:
-    """Manual-first orchestration with explicit Stage 1 and Stage 2 hops."""
+    """Manual-first orchestration with explicit Stage 1, 2, and 3 hops."""
 
     def __init__(
         self,
@@ -76,7 +85,7 @@ class StagedTargetingWorkflow:
         initiated_by: Optional[str] = None,
         filters: Optional[dict] = None,
     ) -> StageTwoResult:
-        """Run AI screening on the Stage 1 shortlist to converge on ~100 companies."""
+        """Run AI screening on the Stage 1 shortlist to converge on ~150 companies."""
 
         if stage_one.shortlist.empty:
             raise ValueError("Stage 1 shortlist is empty; run Stage 1 before Stage 2.")
@@ -91,4 +100,35 @@ class StagedTargetingWorkflow:
         )
 
         return StageTwoResult(shortlist=shortlist_for_stage_two, screening=screening)
+
+    def run_stage_three(
+        self,
+        stage_two: StageTwoResult,
+        *,
+        initiated_by: Optional[str] = None,
+        filters: Optional[dict] = None,
+    ) -> StageThreeResult:
+        """Run Deep AI Analysis on the Stage 2 shortlist to produce final investment memos."""
+
+        if stage_two.shortlist.empty:
+            raise ValueError("Stage 2 shortlist is empty; run Stage 2 before Stage 3.")
+
+        # Sort by screening score if available, otherwise take top N
+        shortlist = stage_two.shortlist.copy()
+        
+        # Merge screening results if not already merged (assuming they might be separate)
+        # For now, we assume the shortlist passed from Stage 2 is the one we want to analyze.
+        # In a real app, we might filter based on Stage 2 screening_score > 70.
+        
+        shortlist_for_stage_three = shortlist.head(self.plan.stage_three_size).copy()
+        
+        analyzer = self._analyzer or AgenticLLMAnalyzer(self.analysis_config)
+        analysis = analyzer.run(
+            shortlist_for_stage_three,
+            limit=self.plan.stage_three_size,
+            initiated_by=initiated_by,
+            filters=filters or {"stage": "stage_three_deep_analysis"},
+        )
+
+        return StageThreeResult(shortlist=shortlist_for_stage_three, analysis=analysis)
 

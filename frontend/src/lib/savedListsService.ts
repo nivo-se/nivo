@@ -20,6 +20,7 @@ export class SavedListsService {
       console.log('Fetching saved lists from API...')
 
       // Get auth token from Supabase
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = {}
       if (session?.access_token) {
@@ -27,13 +28,13 @@ export class SavedListsService {
       }
 
       const response = await fetch('/api/saved-lists', { headers })
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch saved lists')
       }
@@ -43,12 +44,12 @@ export class SavedListsService {
       if (!result.data || result.data.length === 0) {
         console.log('No lists in database, trying localStorage fallback')
         const fallbackLists = await this.getSavedListsFallback()
-        
+
         // If we have lists in localStorage but not in database, offer to migrate them
         if (fallbackLists.length > 0) {
           console.log(`Found ${fallbackLists.length} lists in localStorage, consider migrating to database`)
         }
-        
+
         return fallbackLists
       }
 
@@ -76,6 +77,7 @@ export class SavedListsService {
       console.log('Saving list via API:', list.name)
 
       // Get auth token from Supabase
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
@@ -119,7 +121,7 @@ export class SavedListsService {
     } catch (error) {
       console.error('Error in saveList:', error)
       console.log('Falling back to localStorage')
-      
+
       // Fallback to localStorage
       const newList: SavedCompanyList = {
         ...list,
@@ -140,6 +142,7 @@ export class SavedListsService {
       console.log('Updating list via API:', id)
 
       // Get auth token from Supabase
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
@@ -178,7 +181,7 @@ export class SavedListsService {
     } catch (error) {
       console.error('Error in updateList:', error)
       console.log('Falling back to localStorage')
-      
+
       // Fallback to localStorage
       const existingLists = await this.getSavedListsFallback()
       const existingList = existingLists.find(l => l.id === id)
@@ -201,6 +204,7 @@ export class SavedListsService {
    */
   static async addCompaniesToList(listId: string, newCompanies: any[]): Promise<SavedCompanyList | null> {
     try {
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         console.warn('No authenticated user found, using localStorage fallback')
@@ -210,7 +214,7 @@ export class SavedListsService {
           console.error('List not found for adding companies')
           return null
         }
-        
+
         // Merge companies (avoid duplicates)
         const existingOrgNrs = new Set(existingList.companies.map(c => c.OrgNr))
         const uniqueNewCompanies = newCompanies.filter(c => !existingOrgNrs.has(c.OrgNr))
@@ -239,8 +243,8 @@ export class SavedListsService {
       // Merge companies (avoid duplicates based on OrgNr)
       const existingCompanies = currentList.companies || []
       const existingOrgNrs = new Set(existingCompanies.map((c: any) => c.OrgNr))
-      
-      const uniqueNewCompanies = newCompanies.filter(company => 
+
+      const uniqueNewCompanies = newCompanies.filter(company =>
         !existingOrgNrs.has(company.OrgNr)
       )
 
@@ -283,6 +287,7 @@ export class SavedListsService {
    */
   static async removeCompaniesFromList(listId: string, companyOrgNrs: string[]): Promise<SavedCompanyList | null> {
     try {
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         console.warn('No authenticated user found, using localStorage fallback')
@@ -292,7 +297,7 @@ export class SavedListsService {
           console.error('List not found for removing companies')
           return null
         }
-        
+
         // Remove companies
         const updatedList = {
           ...existingList,
@@ -318,7 +323,7 @@ export class SavedListsService {
 
       // Remove companies with matching OrgNrs
       const existingCompanies = currentList.companies || []
-      const filteredCompanies = existingCompanies.filter((company: any) => 
+      const filteredCompanies = existingCompanies.filter((company: any) =>
         !companyOrgNrs.includes(company.OrgNr)
       )
 
@@ -362,6 +367,7 @@ export class SavedListsService {
       console.log('Deleting list via API:', id)
 
       // Get auth token from Supabase
+      if (!supabase) throw new Error('Supabase client not initialized')
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = {}
       if (session?.access_token) {
@@ -388,7 +394,7 @@ export class SavedListsService {
     } catch (error) {
       console.error('Error in deleteList:', error)
       console.log('Falling back to localStorage')
-      
+
       // Fallback to localStorage
       await this.deleteListFallback(id)
       return true
@@ -404,10 +410,10 @@ export class SavedListsService {
       if (saved) {
         return JSON.parse(saved)
       }
-      
+
       // Return empty array - no mock data, use real database data only
       const mockLists: SavedCompanyList[] = []
-      
+
       // Store mock data in localStorage for future use
       localStorage.setItem('savedCompanyLists', JSON.stringify(mockLists))
       return mockLists

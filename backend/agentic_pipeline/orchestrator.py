@@ -50,12 +50,35 @@ class AgenticTargetingPipeline:
         engineered = self.feature_engineer.transform(dataset)
         quality_issues.extend(self.quality_checker.run(engineered.features))
 
+        # --- Financial Filtering ---
+        features = engineered.features
+        mask = (
+            (features["revenue"] >= self.config.min_revenue) &
+            (features["ebit"] >= self.config.min_ebitda) &
+            (features["revenue_growth"] >= self.config.min_growth) &
+            (features["employees"] >= self.config.min_employees)
+        )
+        
+        # Filter both dataset and features
+        dataset = dataset[mask].copy()
+        engineered.features = features[mask].copy()
+        
+        if dataset.empty:
+            raise RuntimeError(f"Filtering resulted in empty dataset. Initial: {len(mask)}, Remaining: 0")
+            
+        print(f"Filtering complete. {len(dataset)} companies remaining (from {len(mask)}).")
+        # ---------------------------
+
         segmentation = self.segmenter.fit_predict(engineered.features[self.config.feature_columns])
         dataset = dataset.join(segmentation.labels)
 
         ranking = self.ranker.score(engineered.features[self.config.feature_columns])
         dataset = dataset.join(ranking.scores)
         dataset = dataset.join(ranking.components.add_prefix("score_component_"))
+
+        # Update dataset with engineered features to ensure analysis uses cleaned data
+        for col in engineered.features.columns:
+            dataset[col] = engineered.features[col]
 
         analysis = self.analyzer.analyze(dataset)
         dataset = dataset.join(analysis.market_summary)

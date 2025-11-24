@@ -25,6 +25,7 @@ const AISourcingDashboard: React.FC = () => {
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [isFiltering, setIsFiltering] = useState(false)
   const [currentPrompt, setCurrentPrompt] = useState('')
+  const [currentWhereClause, setCurrentWhereClause] = useState<string | undefined>(undefined)
   const [promptHistory, setPromptHistory] = useState<PromptHistoryItem[]>([])
   const [savedLists, setSavedLists] = useState<any[]>([])
   const [showLoadDialog, setShowLoadDialog] = useState(false)
@@ -148,9 +149,17 @@ const AISourcingDashboard: React.FC = () => {
     const pageSize = pagination.limit || DEFAULT_PAGE_SIZE
     setIsFiltering(true)
     try {
-      const response = await apiService.aiFilter(prompt, pageSize, (targetPage - 1) * pageSize)
+      // Pass current WHERE clause for stateful filtering
+      const response = await apiService.aiFilter(
+        prompt,
+        pageSize,
+        (targetPage - 1) * pageSize,
+        currentWhereClause
+      )
       setCurrentPrompt(prompt)
       setAIFilterResult(response)
+      // Update the current WHERE clause with the new one from the response
+      setCurrentWhereClause(response.parsed_where_clause)
       setPagination({
         page: targetPage,
         limit: response.metadata?.limit ?? pageSize,
@@ -355,7 +364,7 @@ const AISourcingDashboard: React.FC = () => {
           <p className="text-xs uppercase tracking-wide text-gray-500">Explorer</p>
           <h1 className="text-2xl font-semibold text-gray-900">AI Sourcing Dashboard</h1>
           <p className="text-sm text-gray-500">
-            Describe your acquisition thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
+            Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
           </p>
         </div>
 
@@ -383,13 +392,12 @@ const AISourcingDashboard: React.FC = () => {
 
         {actionFeedback && (
           <div
-            className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${
-              actionFeedback.type === 'success'
-                ? 'border-green-200 bg-green-50 text-green-800'
-                : actionFeedback.type === 'error'
-                  ? 'border-red-200 bg-red-50 text-red-800'
-                  : 'border-blue-200 bg-blue-50 text-blue-800'
-            }`}
+            className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${actionFeedback.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-800'
+              : actionFeedback.type === 'error'
+                ? 'border-red-200 bg-red-50 text-red-800'
+                : 'border-blue-200 bg-blue-50 text-blue-800'
+              }`}
           >
             {actionFeedback.message}
           </div>
@@ -444,6 +452,7 @@ const AISourcingDashboard: React.FC = () => {
             />
           </div>
         </div>
+      </div>
 
       {showLoadDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
