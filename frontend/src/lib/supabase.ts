@@ -5,13 +5,13 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // Check if Supabase is configured
-const isConfigured = !!(supabaseUrl && supabaseAnonKey && 
-  supabaseUrl.length > 0 && 
+const isConfigured = !!(supabaseUrl && supabaseAnonKey &&
+  supabaseUrl.length > 0 &&
   !supabaseUrl.includes('placeholder') &&
   supabaseAnonKey.length > 0)
 
 if (!isConfigured) {
-  console.warn('Supabase environment variables not configured. Some features may be limited.')
+  // console.warn('Supabase environment variables not configured. Some features may be limited.')
 }
 
 // Export configuration info

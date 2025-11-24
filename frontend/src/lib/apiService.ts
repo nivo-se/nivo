@@ -24,15 +24,15 @@ export class ApiService {
 
   private async fetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const baseUrl = this.getBaseUrl()
-    
+
     if (!baseUrl && !import.meta.env.DEV) {
       throw new Error(
         'Backend API is not configured. Please set VITE_API_BASE_URL environment variable.'
       )
     }
-    
+
     const url = baseUrl ? `${baseUrl}${endpoint}` : endpoint
-    
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -40,12 +40,12 @@ export class ApiService {
         ...options?.headers,
       },
     })
-    
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: response.statusText }))
       throw new Error(error.error || error.message || `HTTP ${response.status}`)
     }
-    
+
     return response.json()
   }
 
@@ -59,30 +59,37 @@ export class ApiService {
     return this.fetch('/api/status')
   }
 
-  async aiFilter(prompt: string, limit = 20, offset = 0): Promise<AIFilterResponse> {
+  async aiFilter(prompt: string, limit = 20, offset = 0, currentWhereClause?: string): Promise<AIFilterResponse> {
     return this.fetch('/api/ai-filter/', {
       method: 'POST',
-      body: JSON.stringify({ prompt, limit, offset })
+      body: JSON.stringify({
+        prompt,
+        limit,
+        offset,
+        current_where_clause: currentWhereClause
+      })
     })
   }
 
-  async getCompaniesBatch(orgNumbers: string[], autoEnrich: boolean = true): Promise<{ companies: CompanyRow[]; count: number }> {
-    return this.fetch(`/api/companies/batch?auto_enrich=${autoEnrich}`, {
+  async getCompaniesBatch(orgNumbers: string[]): Promise<{ companies: CompanyRow[]; count: number }> {
+    return this.fetch('/api/companies/batch', {
       method: 'POST',
       body: JSON.stringify({ orgnrs: orgNumbers })
     })
   }
 
-  async getCompanyFinancials(orgnr: string): Promise<{ financials: Array<{
-    year: number
-    revenue_sek: number | null
-    profit_sek: number | null
-    ebit_sek: number | null
-    ebitda_sek: number | null
-    net_margin: number | null
-    ebit_margin: number | null
-    ebitda_margin: number | null
-  }>; count: number }> {
+  async getCompanyFinancials(orgnr: string): Promise<{
+    financials: Array<{
+      year: number
+      revenue_sek: number | null
+      profit_sek: number | null
+      ebit_sek: number | null
+      ebitda_sek: number | null
+      net_margin: number | null
+      ebit_margin: number | null
+      ebitda_margin: number | null
+    }>; count: number
+  }> {
     return this.fetch(`/api/companies/${orgnr}/financials`)
   }
 
@@ -104,13 +111,15 @@ export class ApiService {
 export const apiService = new ApiService()
 
 export interface AIFilterResponse {
-  sql?: string
-  parsed_where_clause?: string
+  sql: string
+  parsed_where_clause: string
   org_numbers: string[]
-  count?: number
-  result_count?: number
-  total?: number
-  metadata?: AIFilterMetadata
+  count: number
+  result_count: number
+  total: number
+  metadata: AIFilterMetadata
+  explanation?: string
+  suggestions?: string[]
 }
 
 export interface AIFilterMetadata {
@@ -150,8 +159,6 @@ export interface CompanyRow {
   company_name?: string
   homepage?: string
   employees_latest?: number
-  segment_names?: string[]
-  company_context?: string  // Display-friendly: product description, business model, or industry segments
   latest_revenue_sek?: number
   latest_profit_sek?: number
   latest_ebitda_sek?: number
@@ -165,15 +172,11 @@ export interface CompanyRow {
   ai_strategic_score?: number
   ai_defensibility_score?: number
   ai_product_description?: string
-  ai_business_model_summary?: string
-  ai_industry_sector?: string
-  ai_industry_subsector?: string
   ai_end_market?: string
   ai_customer_types?: string
   ai_value_chain_position?: string
   ai_notes?: string
   ai_profile_last_updated?: string
   ai_profile_website?: string
-  has_ai_profile?: boolean
 }
 

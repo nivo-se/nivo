@@ -115,83 +115,122 @@ class WebEnrichmentService:
         return enrichment_data
     
     async def _scrape_website(self, url: str) -> Optional[CompanyWebsiteData]:
-        """Scrape company website for relevant information."""
+        """Scrape company website for relevant information, following links to sub-pages."""
         try:
             if not self.session:
                 return None
                 
-            async with self.session.get(url) as response:
+            # 1. Scrape Homepage
+            logger.info(f"Scraping homepage: {url}")
+            async with self.session.get(url, allow_redirects=True) as response:
                 if response.status != 200:
+                    logger.warning(f"Failed to fetch {url}: {response.status}")
                     return None
-                    
                 html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
+                base_url = str(response.url) # Handle redirects
                 
-                website_data = CompanyWebsiteData()
+            soup = BeautifulSoup(html, 'html.parser')
+            website_data = CompanyWebsiteData()
+            
+            # Extract data from homepage
+            self._extract_page_data(soup, website_data)
+            
+            # 2. Find and Scrape Sub-pages (About, Contact)
+            # We only look for these if we missed info on the homepage
+            links_to_visit = {}
+            
+            if not website_data.about_text:
+                about_link = self._find_link(soup, base_url, ['about', 'om-oss', 'om oss', 'vilka vi är'])
+                if about_link: links_to_visit['about'] = about_link
                 
-                # Extract about text
-                about_selectors = [
-                    'section[class*="about"]',
-                    'div[class*="about"]',
-                    'section[id*="about"]',
-                    'div[id*="about"]',
-                    '.about-us',
-                    '#about-us'
-                ]
+            if not website_data.contact_info:
+                contact_link = self._find_link(soup, base_url, ['contact', 'kontakt', 'kontakta'])
+                if contact_link: links_to_visit['contact'] = contact_link
+
+            # Visit sub-pages concurrently
+            if links_to_visit:
+                logger.info(f"Visiting sub-pages for {url}: {list(links_to_visit.keys())}")
+                tasks = [self._scrape_subpage(link, website_data) for link in links_to_visit.values()]
+                await asyncio.gather(*tasks)
                 
-                for selector in about_selectors:
-                    about_section = soup.select_one(selector)
-                    if about_section:
-                        website_data.about_text = about_section.get_text(strip=True)[:1000]
-                        break
-                
-                # Extract products/services
-                product_selectors = [
-                    'section[class*="product"]',
-                    'div[class*="service"]',
-                    'section[class*="service"]',
-                    '.products',
-                    '.services'
-                ]
-                
-                for selector in product_selectors:
-                    product_section = soup.select_one(selector)
-                    if product_section:
-                        products = product_section.find_all(['h2', 'h3', 'li'])
-                        website_data.products_services = [
-                            p.get_text(strip=True) for p in products[:10]
-                            if p.get_text(strip=True) and len(p.get_text(strip=True)) > 10
-                        ]
-                        break
-                
-                # Extract contact information
-                contact_patterns = {
-                    'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-                    'phone': r'(\+46|0)[\s-]?\d{2,3}[\s-]?\d{2,3}[\s-]?\d{2,3}',
-                }
-                
-                page_text = soup.get_text()
-                for info_type, pattern in contact_patterns.items():
-                    matches = re.findall(pattern, page_text)
-                    if matches:
-                        website_data.contact_info[info_type] = matches[0]
-                
-                # Extract social media links
-                social_links = soup.find_all('a', href=True)
-                for link in social_links:
-                    href = link['href']
-                    if 'linkedin.com' in href:
-                        website_data.social_media['linkedin'] = href
-                    elif 'facebook.com' in href:
-                        website_data.social_media['facebook'] = href
-                    elif 'twitter.com' in href or 'x.com' in href:
-                        website_data.social_media['twitter'] = href
-                
-                return website_data
+            return website_data
                 
         except Exception as e:
             logger.error(f"Error scraping website {url}: {e}")
             return None
+
+    def _find_link(self, soup: BeautifulSoup, base_url: str, keywords: List[str]) -> Optional[str]:
+        """Find a link matching keywords."""
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            text = a.get_text().lower()
+            if any(k in text for k in keywords) or any(k in href.lower() for k in keywords):
+                return urljoin(base_url, href)
+        return None
+
+    async def _scrape_subpage(self, url: str, data: CompanyWebsiteData):
+        """Scrape a sub-page and update the data object."""
+        try:
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, 'html.parser')
+                    self._extract_page_data(soup, data)
+        except Exception:
+            pass
+
+    def _extract_page_data(self, soup: BeautifulSoup, data: CompanyWebsiteData):
+        """Extract data from a soup object into the data structure."""
+        # Extract about text (if not already found or if this is better)
+        if not data.about_text:
+            about_selectors = [
+                'section[class*="about"]', 'div[class*="about"]', 
+                'section[id*="about"]', 'div[id*="about"]', 
+                '.about-us', '#about-us', 'main', 'article'
+            ]
+            for selector in about_selectors:
+                section = soup.select_one(selector)
+                if section:
+                    text = section.get_text(strip=True, separator=' ')
+                    if len(text) > 100: # specific enough
+                        data.about_text = text[:1500] # Limit length
+                        break
+        
+        # Extract products/services
+        if not data.products_services:
+            product_selectors = [
+                'section[class*="product"]', 'div[class*="service"]',
+                'section[class*="service"]', '.products', '.services'
+            ]
+            for selector in product_selectors:
+                section = soup.select_one(selector)
+                if section:
+                    items = section.find_all(['h2', 'h3', 'h4', 'li'])
+                    data.products_services = [
+                        p.get_text(strip=True) for p in items[:10]
+                        if p.get_text(strip=True) and len(p.get_text(strip=True)) > 5
+                    ]
+                    if data.products_services: break
+
+        # Extract contact info
+        contact_patterns = {
+            'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+            'phone': r'(\+46|0)[\s-]?\d{2,3}[\s-]?\d{2,3}[\s-]?\d{2,3}',
+        }
+        text = soup.get_text()
+        for info_type, pattern in contact_patterns.items():
+            if info_type not in data.contact_info:
+                matches = re.findall(pattern, text)
+                if matches:
+                    data.contact_info[info_type] = matches[0]
+
+        # Social media
+        for link in soup.find_all('a', href=True):
+            href = link['href']
+            if 'linkedin.com' in href: data.social_media['linkedin'] = href
+            elif 'facebook.com' in href: data.social_media['facebook'] = href
+            elif 'twitter.com' in href or 'x.com' in href: data.social_media['twitter'] = href
+            elif 'instagram.com' in href: data.social_media['instagram'] = href
     
     async def _search_news(self, company_name: str, orgnr: str) -> List[NewsArticle]:
         """Search for recent news articles about the company."""

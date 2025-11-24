@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AISourcingDashboard from "./pages/AISourcingDashboard";
+import AnalysisPage from "./pages/AnalysisPage";
 import CompanyDetail from "./pages/CompanyDetail";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -27,13 +28,13 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/styleguide" element={<StyleGuide />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <AISourcingDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route
               path="/admin"
@@ -56,6 +57,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CompanyDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analysis"
+              element={
+                <ProtectedRoute>
+                  <AnalysisPage />
                 </ProtectedRoute>
               }
             />

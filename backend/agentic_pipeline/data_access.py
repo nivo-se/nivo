@@ -12,8 +12,8 @@ from sqlalchemy import create_engine, inspect
 
 REQUIRED_TABLES: Iterable[str] = (
     "company_kpis",
-    "company_accounts",
-    "companies_enriched",
+    "financials",
+    "companies",
 )
 
 
@@ -52,17 +52,30 @@ class TargetingDataLoader:
             issues.append(f"Missing required tables: {', '.join(missing)}")
             return DataLoadResult(pd.DataFrame(), issues)
 
-        kpis = self.load_latest_by_year("company_kpis", ["OrgNr"])
-        accounts = self.load_latest_by_year("company_accounts", ["OrgNr"])
-        enriched = pd.read_sql_table("companies_enriched", self.engine)
+        # KPIs are already aggregated per company
+        kpis = pd.read_sql_table("company_kpis", self.engine)
+        
+        # Financials have history, get latest
+        accounts = self.load_latest_by_year("financials", ["orgnr"])
+        
+        enriched = pd.read_sql_table("companies", self.engine)
 
         if kpis.empty or accounts.empty or enriched.empty:
             issues.append("One or more source tables are empty.")
             return DataLoadResult(pd.DataFrame(), issues)
 
-        merged = kpis.merge(accounts, on=["OrgNr", "year"], suffixes=("_kpi", "_acc"))
-        merged = merged.merge(enriched, on="OrgNr", how="left", suffixes=(None, None))
-        merged = merged.drop_duplicates(subset=["OrgNr"]).reset_index(drop=True)
+        # Ensure consistent column naming
+        for df in [kpis, accounts, enriched]:
+            df.columns = [c.lower() for c in df.columns]
+
+        # Merge KPIs and Accounts
+        # KPIs don't have 'year' column, but 'latest_year'.
+        # We merge on orgnr.
+        merged = kpis.merge(accounts, on="orgnr", suffixes=("_kpi", "_acc"))
+        
+        # Merge Enriched
+        merged = merged.merge(enriched, on="orgnr", how="left", suffixes=("", "_enriched"))
+        merged = merged.drop_duplicates(subset=["orgnr"]).reset_index(drop=True)
 
         return DataLoadResult(merged, issues)
 

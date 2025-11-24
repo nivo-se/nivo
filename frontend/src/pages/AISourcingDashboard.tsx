@@ -25,6 +25,7 @@ const AISourcingDashboard: React.FC = () => {
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [isFiltering, setIsFiltering] = useState(false)
   const [currentPrompt, setCurrentPrompt] = useState('')
+  const [currentWhereClause, setCurrentWhereClause] = useState<string | undefined>(undefined)
   const [promptHistory, setPromptHistory] = useState<PromptHistoryItem[]>([])
   const [savedLists, setSavedLists] = useState<any[]>([])
   const [showLoadDialog, setShowLoadDialog] = useState(false)
@@ -148,31 +149,26 @@ const AISourcingDashboard: React.FC = () => {
     const pageSize = pagination.limit || DEFAULT_PAGE_SIZE
     setIsFiltering(true)
     try {
-      const response = await apiService.aiFilter(prompt, pageSize, (targetPage - 1) * pageSize)
+      // Pass current WHERE clause for stateful filtering
+      const response = await apiService.aiFilter(
+        prompt,
+        pageSize,
+        (targetPage - 1) * pageSize,
+        currentWhereClause
+      )
       setCurrentPrompt(prompt)
-      // Ensure response has required fields with defaults
-      const safeResponse: AIFilterResponse = {
-        ...response,
-        total: response.total ?? response.count ?? 0,
-        result_count: response.result_count ?? response.count ?? 0,
-        metadata: response.metadata ?? {
-          prompt,
-          limit: pageSize,
-          offset: (targetPage - 1) * pageSize,
-          used_llm: false,
-          total_matches: response.total ?? response.count ?? 0,
-        },
-      }
-      setAIFilterResult(safeResponse)
+      setAIFilterResult(response)
+      // Update the current WHERE clause with the new one from the response
+      setCurrentWhereClause(response.parsed_where_clause)
       setPagination({
         page: targetPage,
-        limit: safeResponse.metadata?.limit ?? pageSize,
-        total: safeResponse.total ?? 0,
+        limit: response.metadata?.limit ?? pageSize,
+        total: response.total,
       })
       if (addToHistory) {
         setPromptHistory((prev) => {
           const next: PromptHistoryItem[] = [
-            { prompt, count: safeResponse.total ?? 0, timestamp: new Date().toISOString() },
+            { prompt, count: response.total, timestamp: new Date().toISOString() },
             ...prev.filter((item) => item.prompt !== prompt),
           ]
           return next.slice(0, 10)
@@ -368,7 +364,7 @@ const AISourcingDashboard: React.FC = () => {
           <p className="text-xs uppercase tracking-wide text-gray-500">Explorer</p>
           <h1 className="text-2xl font-semibold text-gray-900">AI Sourcing Dashboard</h1>
           <p className="text-sm text-gray-500">
-            Describe your acquisition thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
+            Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
           </p>
         </div>
 
@@ -376,14 +372,14 @@ const AISourcingDashboard: React.FC = () => {
           <div className="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:grid-cols-3">
             <div>
               <p className="text-xs uppercase text-gray-500">Active thesis</p>
-              <p className="text-sm text-gray-900">{aiResult.metadata?.prompt || currentPrompt || 'No active search'}</p>
+              <p className="text-sm text-gray-900">{aiResult.metadata.prompt}</p>
             </div>
             <div>
               <p className="text-xs uppercase text-gray-500">Matches</p>
               <p className="text-lg font-semibold text-gray-900">
-                {(aiResult.total ?? 0).toLocaleString()}{' '}
+                {aiResult.total.toLocaleString()}{' '}
                 <span className="text-xs font-normal text-gray-500">
-                  (showing {((aiResult.result_count ?? aiResult.count) ?? 0).toLocaleString()})
+                  (showing {(aiResult.result_count ?? aiResult.count).toLocaleString()})
                 </span>
               </p>
             </div>
@@ -396,13 +392,12 @@ const AISourcingDashboard: React.FC = () => {
 
         {actionFeedback && (
           <div
-            className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${
-              actionFeedback.type === 'success'
-                ? 'border-green-200 bg-green-50 text-green-800'
-                : actionFeedback.type === 'error'
-                  ? 'border-red-200 bg-red-50 text-red-800'
-                  : 'border-blue-200 bg-blue-50 text-blue-800'
-            }`}
+            className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${actionFeedback.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-800'
+              : actionFeedback.type === 'error'
+                ? 'border-red-200 bg-red-50 text-red-800'
+                : 'border-blue-200 bg-blue-50 text-blue-800'
+              }`}
           >
             {actionFeedback.message}
           </div>
@@ -457,6 +452,7 @@ const AISourcingDashboard: React.FC = () => {
             />
           </div>
         </div>
+      </div>
 
       {showLoadDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
@@ -552,7 +548,6 @@ const AISourcingDashboard: React.FC = () => {
           </div>
         </div>
       )}
-      </div>
     </div>
   )
 }

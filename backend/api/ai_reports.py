@@ -25,41 +25,48 @@ class GenerateReportRequest(BaseModel):
 async def generate_and_save_report(orgnr: str, supabase, report_generator: AIReportGenerator):
     """Background task to generate and save AI report"""
     try:
-        # Fetch company data
-        company_response = supabase.table("companies").select(
-            "orgnr, company_id, company_name, segment_names, homepage, email"
-        ).eq("orgnr", orgnr).maybe_single().execute()
+        from ..services.db_factory import get_database_service
+        db = get_database_service()
         
-        if not company_response.data:
-            logger.error(f"Company not found: {orgnr}")
+        # 1. Fetch company data & metrics from Local SQLite
+        # We join companies and company_metrics (or company_kpis)
+        sql = """
+        SELECT 
+            c.orgnr, c.company_id, c.company_name, c.segment_names, c.homepage, c.employees_latest,
+            k.latest_revenue_sek, k.revenue_cagr_3y, k.avg_ebitda_margin, k.avg_net_margin
+        FROM companies c
+        LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
+        WHERE c.orgnr = ?
+        """
+        rows = db.run_raw_query(sql, params=[orgnr])
+        
+        if not rows:
+            logger.error(f"Company not found in local DB: {orgnr}")
             return
-        
-        company = company_response.data
-        
-        # Fetch metrics
-        metrics_response = supabase.table("company_metrics").select(
-            "orgnr, latest_revenue_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, "
-            "companies!inner(employees_latest)"
-        ).eq("orgnr", orgnr).maybe_single().execute()
-        
-        # Fetch intel (if available)
-        intel_response = supabase.table("company_intel").select("*").eq("orgnr", orgnr).maybe_single().execute()
+            
+        data = rows[0]
         
         # Build company data dict
-        metrics = metrics_response.data if metrics_response.data else {}
         company_data = {
             "orgnr": orgnr,
-            "company_id": company.get("company_id"),
-            "company_name": company.get("company_name", "Unknown"),
-            "segment_name": company.get("segment_names"),
-            "revenue": metrics.get("latest_revenue_sek") or 0,
-            "revenue_growth": metrics.get("revenue_cagr_3y") or 0,
-            "ebit_margin": metrics.get("avg_ebitda_margin") or 0,
-            "net_margin": metrics.get("avg_net_margin") or 0,
-            "employees": metrics.get("companies", {}).get("employees_latest") or 0,
+            "company_id": data.get("company_id"),
+            "company_name": data.get("company_name", "Unknown"),
+            "segment_name": data.get("segment_names"),
+            "revenue": data.get("latest_revenue_sek") or 0,
+            "revenue_growth": data.get("revenue_cagr_3y") or 0,
+            "ebit_margin": data.get("avg_ebitda_margin") or 0,
+            "net_margin": data.get("avg_net_margin") or 0,
+            "employees": data.get("employees_latest") or 0,
         }
         
+        # 2. Fetch enrichment data from Supabase ai_profiles
+        # (User calls it ai_profiles, code was using company_intel)
+        intel_response = supabase.table("ai_profiles").select("*").eq("org_number", orgnr).maybe_single().execute()
         intel_data = intel_response.data if intel_response.data else None
+        
+        # Map ai_profiles fields to what generator expects if needed
+        # Generator likely expects 'product_description', 'end_market' etc.
+        # ai_profiles has these fields.
         
         # Generate report
         report = report_generator.generate_report(orgnr, company_data, intel_data)
