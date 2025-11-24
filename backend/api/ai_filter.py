@@ -63,6 +63,54 @@ class AIFilterRequest(BaseModel):
     current_where_clause: Optional[str] = Field(None, description="Existing SQL WHERE clause to refine")
 
 
+class AIFilterResponse(BaseModel):
+    sql: str
+    parsed_where_clause: str
+    org_numbers: List[str]
+    count: int
+    result_count: int
+    total: int
+    metadata: Dict[str, Any]
+    explanation: Optional[str] = None
+    suggestions: List[str] = []
+
+
+def _sanitize_where_clause(clause: str) -> str:
+    lowered = clause.lower()
+    disallowed = ("insert", "update", "delete", "drop", ";", "--", "alter", "create")
+    if any(keyword in lowered for keyword in disallowed):
+        raise ValueError("LLM produced unsafe SQL. Please refine the prompt.")
+    return clause
+
+
+def _fallback_where_clause(prompt: str) -> str:
+    # Simple heuristic parser when OpenAI is unavailable
+    clause_parts = ["1=1"]
+    prompt_lower = prompt.lower()
+    if "sweden" in prompt_lower or "swedish" in prompt_lower:
+        clause_parts.append("c.country = 'SE'")
+    if "logistics" in prompt_lower:
+        clause_parts.append("c.segment_names LIKE '%logistik%'")
+    if "profitable" in prompt_lower:
+        clause_parts.append("COALESCE(k.avg_net_margin, 0) > 5.0")
+    
+    # Parse revenue requirements (100M = 100000000, 10M = 10000000, etc.)
+    import re
+    # Look for patterns like "100M", "100 million", ">100M", "over 100M"
+    revenue_match = re.search(r'(\d+)\s*(?:million|m|msek|m sek)', prompt_lower)
+    if revenue_match:
+        millions = int(revenue_match.group(1))
+        min_revenue = millions * 1_000_000
+        if '>' in prompt_lower or 'over' in prompt_lower or 'above' in prompt_lower:
+            clause_parts.append(f"f.max_revenue_sek >= {min_revenue}")
+        elif '<' in prompt_lower or 'under' in prompt_lower or 'below' in prompt_lower:
+            clause_parts.append(f"f.max_revenue_sek <= {min_revenue}")
+        else:
+            clause_parts.append(f"f.max_revenue_sek >= {min_revenue}")
+    
+    return " AND ".join(clause_parts)
+
+
 def _call_openai_for_where_clause(prompt: str, current_where_clause: Optional[str] = None) -> Dict[str, Any]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
