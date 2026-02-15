@@ -2,6 +2,7 @@
  * Intelligence Service
  * Unified service for all intelligence operations
  */
+import { fetchWithAuth } from './backendFetch'
 
 // API base URL - use environment variable or default based on environment
 const getApiBaseUrl = (): string => {
@@ -157,7 +158,7 @@ class IntelligenceService {
     }
     
     try {
-      const response = await fetch(url, {
+      const response = await fetchWithAuth(url, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
@@ -231,8 +232,11 @@ class IntelligenceService {
     return this.fetch(`/api/search/vector?company_id=${companyId}&query=${encodeURIComponent(query)}&limit=${limit}`)
   }
 
-  // AI Reports
-  async generateAIReport(orgnr: string, forceRegenerate: boolean = false): Promise<{ status: string; message: string; orgnr: string }> {
+  // AI Reports - returns full report when available (cache-first or freshly generated)
+  async generateAIReport(
+    orgnr: string,
+    forceRegenerate: boolean = false
+  ): Promise<AIReport & { cached?: boolean }> {
     return this.fetch('/api/ai-reports/generate', {
       method: 'POST',
       body: JSON.stringify({ orgnr, force_regenerate: forceRegenerate }),

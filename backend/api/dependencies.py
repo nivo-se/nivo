@@ -13,16 +13,30 @@ from typing import Optional
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
+
+def _is_supabase_mode() -> bool:
+    """True only when DATABASE_SOURCE=supabase."""
+    return os.getenv("DATABASE_SOURCE", "local").lower() == "supabase"
+
+
 @lru_cache()
-def get_supabase_client() -> Client:
-    """Get Supabase client (singleton)"""
+def get_supabase_client() -> Optional[Client]:
+    """
+    Get Supabase client (singleton). Returns None unless DATABASE_SOURCE=supabase.
+    Uses SUPABASE_SERVICE_ROLE_KEY server-side only (never expose to frontend).
+    """
+    if not _is_supabase_mode():
+        return None
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
-    
     if not url or not key:
-        raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set")
-    
+        return None
     return create_client(url, key)
+
+
+def require_supabase_message() -> str:
+    """Message for endpoints that require DATABASE_SOURCE=supabase."""
+    return "This feature requires DATABASE_SOURCE=supabase"
 
 @lru_cache()
 def get_redis_client() -> redis.Redis:

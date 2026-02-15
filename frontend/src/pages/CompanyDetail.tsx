@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { apiService, type CompanyRow } from '../lib/apiService'
+import { apiService, type CompanyRow, type StrategicEvaluationResponse } from '../lib/apiService'
 import { ArrowLeft } from 'lucide-react'
 
 interface FinancialYear {
@@ -21,6 +21,9 @@ const CompanyDetail: React.FC = () => {
   const [financials, setFinancials] = useState<FinancialYear[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [evaluation, setEvaluation] = useState<StrategicEvaluationResponse | null>(null)
+  const [evaluating, setEvaluating] = useState(false)
+  const [evaluationError, setEvaluationError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -113,6 +116,23 @@ const CompanyDetail: React.FC = () => {
   }
   
   const calculatedYoY = calculateYoY()
+  const evaluationRiskFlags = evaluation?.risk_flags ?? []
+  const evaluationNextSteps = evaluation?.next_steps ?? []
+
+  const handleStrategicEvaluation = async () => {
+    if (!orgnr) return
+    setEvaluating(true)
+    setEvaluationError(null)
+    try {
+      const response = await apiService.evaluateCompany(orgnr)
+      setEvaluation(response)
+    } catch (err: any) {
+      setEvaluationError(err?.message || 'Failed to run strategic evaluation')
+      setEvaluation(null)
+    } finally {
+      setEvaluating(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -151,9 +171,18 @@ const CompanyDetail: React.FC = () => {
 
       <div className="space-y-6">
         {/* Company Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{company.company_name || company.orgnr}</h1>
-          <p className="text-sm text-gray-500">Org.nr {company.orgnr}</p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{company.company_name || company.orgnr}</h1>
+            <p className="text-sm text-gray-500">Org.nr {company.orgnr}</p>
+          </div>
+          <button
+            onClick={handleStrategicEvaluation}
+            disabled={evaluating}
+            className="inline-flex items-center rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-black/90 disabled:opacity-50"
+          >
+            {evaluating ? 'Evaluating…' : '🧠 Run Strategic Evaluation'}
+          </button>
         </div>
 
         {/* Summary Cards */}
@@ -220,6 +249,88 @@ const CompanyDetail: React.FC = () => {
             </dl>
           </div>
         </div>
+
+        {evaluationError && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {evaluationError}
+          </div>
+        )}
+
+        {evaluation && (
+          <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-6">
+            <h2 className="mb-4 text-lg font-semibold text-indigo-900">AI Strategic Evaluation</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <p className="text-xs uppercase text-indigo-500">Strategic fit</p>
+                <p className="text-2xl font-semibold text-indigo-900">
+                  {evaluation.strategic_fit_score ?? '—'}
+                  <span className="text-base font-normal text-indigo-400">/10</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-indigo-500">Defensibility</p>
+                <p className="text-2xl font-semibold text-indigo-900">
+                  {evaluation.defensibility_score ?? '—'}
+                  <span className="text-base font-normal text-indigo-400">/10</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-indigo-500">Acquisition angle</p>
+                <p className="text-lg font-semibold text-indigo-900">
+                  {evaluation.acquisition_angle || '—'}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="rounded-md border border-white/60 bg-white/80 p-4">
+                <p className="text-xs uppercase text-gray-500">AI Summary</p>
+                <p className="text-sm text-gray-900">{evaluation.business_summary || '—'}</p>
+                <p className="mt-3 text-xs uppercase text-gray-500">Fit rationale</p>
+                <p className="text-sm text-gray-900 whitespace-pre-line">{evaluation.fit_rationale || '—'}</p>
+              </div>
+              <div className="rounded-md border border-white/60 bg-white/80 p-4">
+                <p className="text-xs uppercase text-gray-500">Upside potential</p>
+                <p className="text-sm text-gray-900">{evaluation.upside_potential || '—'}</p>
+                <p className="mt-3 text-xs uppercase text-gray-500">AI notes</p>
+                <p className="text-sm text-gray-900 whitespace-pre-line">{evaluation.notes || '—'}</p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="rounded-md border border-white/60 bg-white/80 p-4">
+                <p className="text-xs uppercase text-gray-500">Risk Flags</p>
+                {evaluationRiskFlags.length ? (
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-900">
+                    {evaluationRiskFlags.map((flag) => (
+                      <li key={flag}>{flag}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-900">No major risks highlighted.</p>
+                )}
+              </div>
+              <div className="rounded-md border border-white/60 bg-white/80 p-4">
+                <p className="text-xs uppercase text-gray-500">Next Steps</p>
+                {evaluationNextSteps.length ? (
+                  <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-gray-900">
+                    {evaluationNextSteps.map((step, idx) => (
+                      <li key={`${step}-${idx}`}>{step}</li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="text-sm text-gray-900">No immediate actions provided.</p>
+                )}
+              </div>
+            </div>
+            {evaluation.strategic_playbook && (
+              <div className="mt-4 rounded-md border border-white/60 bg-white/80 p-4">
+                <p className="text-xs uppercase text-gray-500">Strategic playbook</p>
+                <p className="mt-2 whitespace-pre-line text-sm text-gray-900">
+                  {evaluation.strategic_playbook}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Financial Statement Table (like Allabolag) */}
         {financials.length > 0 && (

@@ -42,10 +42,27 @@ class RAGService:
             logger.warning("OPENAI_API_KEY not set. RAG will fail.")
             self.embedding_fn = None
 
-        self.collection = self.client.get_or_create_collection(
-            name="nivo_context",
-            embedding_function=self.embedding_fn
-        )
+        # Check if collection exists and has correct embedding function
+        collection_name = "nivo_context"
+        try:
+            existing_collection = self.client.get_collection(name=collection_name)
+            # If we have OpenAI key but collection was created without it, delete and recreate
+            if api_key and existing_collection.metadata.get("embedding_function") != "OpenAI":
+                logger.info("Deleting existing collection with wrong embedding function...")
+                self.client.delete_collection(name=collection_name)
+                existing_collection = None
+        except Exception:
+            existing_collection = None
+
+        if existing_collection is None:
+            # Create new collection with correct embedding function
+            self.collection = self.client.create_collection(
+                name=collection_name,
+                embedding_function=self.embedding_fn,
+                metadata={"embedding_function": "OpenAI" if api_key else "default"}
+            )
+        else:
+            self.collection = existing_collection
         
         self._ensure_indexed()
         self._initialized = True

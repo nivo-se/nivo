@@ -1,0 +1,24 @@
+# Local Postgres for Nivo development
+# Usage: docker compose up -d
+# See docs/LOCAL_POSTGRES_SETUP.md
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: nivo-pg
+    ports:
+      - "5433:5432"  # Host 5433 to avoid conflict with local Postgres on 5432
+    environment:
+      POSTGRES_DB: nivo
+      POSTGRES_USER: nivo
+      POSTGRES_PASSWORD: nivo
+    volumes:
+      - nivo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nivo -d nivo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nivo_pg_data:

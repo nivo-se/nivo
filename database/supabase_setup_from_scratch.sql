@@ -152,17 +152,20 @@ CREATE TABLE IF NOT EXISTS public.ai_profiles (
     customer_types TEXT,
     value_chain_position TEXT,
     business_model_summary TEXT,
+    business_summary TEXT,
     
     -- Industry classification
     industry_sector TEXT,
     industry_subsector TEXT,
     market_regions JSONB,  -- Array of regions/markets
+    industry_keywords JSONB,
     
     -- Strategic analysis
     strategic_fit_score INTEGER,      -- 1-10
     defensibility_score INTEGER,      -- 1-10
     risk_flags JSONB,                 -- Array of risk flags
     upside_potential TEXT,
+    acquisition_angle TEXT,
     fit_rationale TEXT,
     
     -- Strategic playbook
@@ -177,6 +180,7 @@ CREATE TABLE IF NOT EXISTS public.ai_profiles (
     
     -- Timestamps
     last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    date_scraped TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     
     UNIQUE(org_number)

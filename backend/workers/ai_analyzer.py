@@ -17,6 +17,7 @@ DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 DEFAULT_AGENT_TYPE = os.getenv("AI_ANALYZER_AGENT", "default")
 MAX_CONTEXT_CHARS = 6000
 MAX_EXCERPT_CHARS = 1200
+INLINE_CONTEXT_LIMIT = 2400
 
 CONTENT_SCHEMA = {
     "type": "object",
@@ -56,6 +57,7 @@ STRATEGIC_FIT_SCHEMA = {
         "risk_flags": {"type": "array", "items": {"type": "string"}},
         "upside_potential": {"type": "string"},
         "fit_rationale": {"type": "string"},
+        "acquisition_angle": {"type": "string"},
     },
     "required": [
         "strategic_fit_score",
@@ -73,6 +75,26 @@ PLAYBOOK_SCHEMA = {
         "next_steps": {"type": "array", "items": {"type": "string"}},
     },
     "required": ["strategic_playbook", "next_steps"],
+}
+
+BUSINESS_SUMMARY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "summary": {"type": "string"},
+    },
+    "required": ["summary"],
+}
+
+INDUSTRY_KEYWORDS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "keywords": {
+            "type": "array",
+            "items": {"type": "string"},
+            "maxItems": 6,
+        }
+    },
+    "required": ["keywords"],
 }
 
 DEFAULT_USER_TEMPLATES = {
@@ -121,10 +143,12 @@ class AIAnalyzer:
         api_key: Optional[str] = None,
         agent_type: Optional[str] = None,
         model: Optional[str] = None,
+        llm_provider=None,
     ) -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.llm_provider = llm_provider
         self.client: Optional[OpenAI] = None
-        if self.api_key:
+        if not llm_provider and self.api_key:
             self.client = OpenAI(api_key=self.api_key)
 
         self.model = model or DEFAULT_MODEL
@@ -148,11 +172,11 @@ class AIAnalyzer:
         agent_key = agent_type or self.default_agent_type
         prompt_config = self._get_prompt_config(agent_key)
 
-        if not combined_content or not self.client:
+        if not combined_content or (not self.client and not self.llm_provider):
             if not combined_content:
                 logger.warning("No website content provided for %s, returning fallback analysis", company_name)
-            if not self.client:
-                logger.warning("OPENAI_API_KEY not configured, returning fallback analysis")
+            if not self.client and not self.llm_provider:
+                logger.warning("OpenAI/LLM not configured, returning fallback analysis")
             fallback = self._fallback_result(company_name, website)
             fallback["agent_type"] = agent_key
             fallback["scraped_pages"] = self._normalize_list(list(scraped_pages.keys()))
@@ -203,6 +227,18 @@ class AIAnalyzer:
 
         playbook = self.generate_playbook(prompt_config, context)
 
+        business_summary_text = self.generate_business_summary(
+            company_name=company_name,
+            combined_content=combined_content,
+            financial_overview=financial_overview,
+        )
+        keywords = self.extract_industry_keywords(
+            company_name=company_name,
+            combined_content=combined_content,
+            summary=summary.data,
+            industry=industry.data,
+        )
+
         result = {
             **summary.data,
             **industry.data,
@@ -211,6 +247,8 @@ class AIAnalyzer:
             "agent_type": agent_key,
             "scraped_pages": self._normalize_list(list(scraped_pages.keys())),
             "used_llm": True,
+            "business_summary": business_summary_text or summary.data.get("business_model_summary"),
+            "industry_keywords": self._normalize_list(keywords),
         }
         result["strategic_fit_score"] = self._normalize_score(
             result.get("strategic_fit_score") or baseline_fit.score
@@ -226,6 +264,8 @@ class AIAnalyzer:
         result["risk_flags"] = self._normalize_list(risk_flags)
         result["market_regions"] = self._normalize_list(result.get("market_regions"))
         result["next_steps"] = self._normalize_list(result.get("next_steps"))
+        if not result.get("acquisition_angle"):
+            result["acquisition_angle"] = baseline_fit.acquisition_angle
         return result
 
     def analyze_content_summary(
@@ -276,6 +316,75 @@ class AIAnalyzer:
             schema=PLAYBOOK_SCHEMA,
         )
 
+    def generate_business_summary(
+        self,
+        company_name: str,
+        combined_content: str,
+        financial_overview: str,
+    ) -> Optional[str]:
+        if (not self.client and not self.llm_provider) or not combined_content:
+            return None
+
+        excerpt = combined_content[:INLINE_CONTEXT_LIMIT]
+        system_prompt = (
+            "You are drafting a concise investment memo summary. "
+            "Write 1-2 factual sentences that describe what the company sells, who they serve, "
+            "and any differentiators. Keep tone neutral and avoid superlatives."
+        )
+        user_prompt = (
+            f"Company: {company_name}\n"
+            f"Financial snapshot:\n{financial_overview}\n\n"
+            f"Website excerpt:\n{excerpt}\n"
+        )
+        try:
+            response = self._call_openai(system_prompt, user_prompt, BUSINESS_SUMMARY_SCHEMA)
+            summary = (response.get("data") or {}).get("summary")
+            return summary.strip() if summary else None
+        except Exception as exc:
+            logger.debug("Business summary generation failed for %s: %s", company_name, exc)
+            return None
+
+    def extract_industry_keywords(
+        self,
+        company_name: str,
+        combined_content: str,
+        summary: Dict[str, Any],
+        industry: Dict[str, Any],
+    ) -> Optional[List[str]]:
+        if (not self.client and not self.llm_provider) or not combined_content:
+            return None
+
+        excerpt = combined_content[:INLINE_CONTEXT_LIMIT]
+        existing_terms = ", ".join(
+            filter(
+                None,
+                [
+                    summary.get("product_description"),
+                    industry.get("industry_sector"),
+                    industry.get("industry_subsector"),
+                ],
+            )
+        )
+        system_prompt = (
+            "You are tagging a company with concise industry keywords. "
+            "Return up to 5 short keywords (1-3 words each) that describe products, technologies, "
+            "or industries relevant for sourcing. Avoid duplicates and generic words like 'company'."
+        )
+        user_prompt = (
+            f"Company: {company_name}\n"
+            f"Existing descriptors: {existing_terms or 'N/A'}\n"
+            f"Website excerpt:\n{excerpt}\n"
+        )
+        try:
+            response = self._call_openai(system_prompt, user_prompt, INDUSTRY_KEYWORDS_SCHEMA)
+            keywords = (response.get("data") or {}).get("keywords")
+            if not keywords:
+                return None
+            return [keyword.strip() for keyword in keywords if keyword and keyword.strip()]
+        except Exception as exc:
+            logger.debug("Industry keyword extraction failed for %s: %s", company_name, exc)
+            return None
+
     def _invoke_step(
         self,
         step: str,
@@ -294,6 +403,14 @@ class AIAnalyzer:
         user_prompt: str,
         schema: Dict[str, Any],
     ) -> Dict[str, Any]:
+        if self.llm_provider:
+            return self.llm_provider.generate_json(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                schema_hint=schema,
+                model=self.model,
+                temperature=self.temperature,
+            )
         if not self.client:
             raise RuntimeError("OpenAI client not configured")
 

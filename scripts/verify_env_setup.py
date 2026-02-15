@@ -125,7 +125,14 @@ def verify_database_setup() -> Tuple[bool, List[str]]:
         else:
             results.append(f"❌ Supabase URL or key missing")
             all_good = False
-    
+
+    elif db_source == "postgres":
+        host = os.getenv("POSTGRES_HOST", "localhost")
+        port = os.getenv("POSTGRES_PORT", "5433")
+        dbname = os.getenv("POSTGRES_DB", "nivo")
+        results.append(f"   Host: {host}:{port}/{dbname}")
+        results.append(f"   Run: docker compose up -d && python scripts/bootstrap_postgres_schema.py")
+
     return all_good, results
 
 

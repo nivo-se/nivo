@@ -132,7 +132,6 @@ def auto_enrich_search_results(
     # Check which companies already have profiles
     existing_profiles: set = set()
     
-    # Check Supabase
     if supabase:
         try:
             response = (
@@ -145,24 +144,15 @@ def auto_enrich_search_results(
                 existing_profiles = {p["org_number"] for p in response.data}
         except Exception:
             pass
-    
-    # Check local SQLite
-    try:
-        check_table = db.run_raw_query(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='ai_profiles'"
-        )
-        if check_table:
-            placeholders = ",".join("?" * min(len(org_numbers), max_enrich))
-            local_profiles = db.run_raw_query(
-                f"SELECT org_number FROM ai_profiles WHERE org_number IN ({placeholders})",
-                org_numbers[:max_enrich]
-            )
-            for profile in local_profiles:
-                orgnr = profile.get("org_number")
+    else:
+        try:
+            profiles = db.fetch_ai_profiles(org_numbers[:max_enrich])
+            for p in profiles:
+                orgnr = p.get("org_number")
                 if orgnr:
                     existing_profiles.add(orgnr)
-    except Exception:
-        pass
+        except Exception:
+            pass
     
     # Get company data for companies that need enrichment
     to_enrich = [org for org in org_numbers[:max_enrich] if org not in existing_profiles]
@@ -220,71 +210,19 @@ def auto_enrich_search_results(
             financial_metrics=financial_metrics,
         )
         
-        # Save profile (same logic as enrichment_worker)
-        saved_to = None
+        # Save profile: Supabase when DATABASE_SOURCE=supabase, else DatabaseService
         if supabase:
             try:
                 supabase.table("ai_profiles").upsert(profile, on_conflict="org_number").execute()
-                saved_to = "supabase"
             except Exception:
                 pass
-        
-        if not saved_to:
-            # Save to local SQLite
+        else:
             try:
-                db.run_raw_query("""
-                    CREATE TABLE IF NOT EXISTS ai_profiles (
-                        org_number TEXT PRIMARY KEY,
-                        website TEXT,
-                        product_description TEXT,
-                        end_market TEXT,
-                        customer_types TEXT,
-                        strategic_fit_score INTEGER,
-                        defensibility_score INTEGER,
-                        value_chain_position TEXT,
-                        ai_notes TEXT,
-                        industry_sector TEXT,
-                        industry_subsector TEXT,
-                        market_regions TEXT,
-                        business_model_summary TEXT,
-                        risk_flags TEXT,
-                        upside_potential TEXT,
-                        strategic_playbook TEXT,
-                        next_steps TEXT,
-                        agent_type TEXT,
-                        scraped_pages TEXT,
-                        fit_rationale TEXT,
-                        enrichment_status TEXT DEFAULT 'complete',
-                        last_updated TEXT
-                    )
-                """)
-                
-                db.run_raw_query("""
-                    INSERT OR REPLACE INTO ai_profiles (
-                        org_number, website, product_description, end_market, customer_types,
-                        value_chain_position, ai_notes, industry_sector, industry_subsector,
-                        market_regions, business_model_summary, enrichment_status, last_updated
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, [
-                    profile["org_number"],
-                    profile.get("website"),
-                    profile.get("product_description"),
-                    profile.get("end_market"),
-                    profile.get("customer_types"),
-                    profile.get("value_chain_position"),
-                    profile.get("ai_notes"),
-                    profile.get("industry_sector"),
-                    profile.get("industry_subsector"),
-                    str(profile.get("market_regions")) if profile.get("market_regions") else None,
-                    profile.get("business_model_summary"),
-                    profile.get("enrichment_status", "lightweight"),
-                    profile.get("last_updated"),
-                ])
-                saved_to = "local_sqlite"
+                db.upsert_ai_profile(profile)
             except Exception as exc:
-                logger.warning("Failed to save lightweight profile to local DB for %s: %s", orgnr, exc)
+                logger.warning("Failed to save lightweight profile for %s: %s", orgnr, exc)
                 continue
-        
+
         enriched_count += 1
     
     return {

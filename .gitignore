@@ -102,3 +102,7 @@ node_modules
 # Generated datasets
 data/new_schema_local.db
 data/csv_export/
+
+# macOS
+.DS_Store
+._*

@@ -5,6 +5,7 @@ Background worker for company enrichment
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
@@ -12,6 +13,7 @@ from rq import get_current_job
 
 from ..api.dependencies import get_supabase_client
 from ..services.db_factory import get_database_service
+from ..llm.provider_factory import get_llm_provider
 from ..workers.ai_analyzer import AIAnalyzer
 from ..workers.scrapers.puppeteer_scraper import PuppeteerScraper
 from ..workers.scrapers.serpapi_scraper import SerpAPIScraper
@@ -20,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 def _update_job_progress(job, progress: int) -> None:
+    if not job:
+        return
     job.meta["progress"] = progress
     job.save_meta()
 
@@ -35,8 +39,7 @@ def _fetch_financial_snapshot(db, orgnr: str) -> Dict[str, Any]:
                    avg_ebitda_margin,
                    avg_net_margin,
                    revenue_cagr_3y,
-                   revenue_growth_yoy,
-                   employee_count
+                   revenue_growth_yoy
             FROM company_kpis
             WHERE orgnr = ?
             """,
@@ -61,13 +64,12 @@ def _combine_scraped_pages(pages: Dict[str, str], limit: int = 12000) -> Optiona
     return combined[:limit] if combined else None
 
 
-def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Dict[str, Any]:
+def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False, run_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Background job to enrich multiple companies end-to-end.
+    If run_id is provided (e.g. from POST /api/enrichment/run), uses it; else creates a new run.
     """
     job = get_current_job()
-    if not job:
-        raise RuntimeError("No job context available")
 
     db = get_database_service()
     
@@ -82,7 +84,8 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Di
     
     serpapi = SerpAPIScraper()
     puppeteer = PuppeteerScraper()
-    analyzer = AIAnalyzer()
+    llm_provider = get_llm_provider()
+    analyzer = AIAnalyzer(llm_provider=llm_provider)
 
     total = len(orgnrs)
     enriched = 0
@@ -91,8 +94,22 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Di
     errors: List[Dict[str, Any]] = []
 
     logger.info("Starting enrichment for %s companies (force_refresh=%s)", total, force_refresh)
-    job.meta["force_refresh"] = force_refresh
-    _update_job_progress(job, 0)
+    if job:
+        job.meta["force_refresh"] = force_refresh
+        _update_job_progress(job, 0)
+
+    if not run_id:
+        try:
+            run_id = db.create_enrichment_run(
+                source="enrichment_worker",
+                model=os.getenv("OPENAI_MODEL"),
+                provider=os.getenv("LLM_PROVIDER", "openai_compat"),
+                meta={"batch_size": total},
+            )
+            if run_id:
+                logger.info("Created enrichment run %s", run_id)
+        except Exception as run_exc:
+            logger.debug("create_enrichment_run failed (tables may not exist): %s", run_exc)
 
     # Check existing profiles and websites to avoid duplicate work
     existing_profiles: Set[str] = set()
@@ -118,31 +135,20 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Di
             except Exception as exc:  # pragma: no cover - best effort
                 logger.warning("Failed to fetch existing profiles from Supabase: %s", exc)
         
-        # Also check local SQLite for ai_profiles (fallback storage)
-        try:
-            # Check if ai_profiles table exists in local DB
-            check_table = db.run_raw_query(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='ai_profiles'"
-            )
-            if check_table:
-                placeholders = ",".join("?" * len(orgnrs))
-                local_profiles = db.run_raw_query(
-                    f"SELECT org_number, website FROM ai_profiles WHERE org_number IN ({placeholders})",
-                    orgnrs
-                )
-                for row in local_profiles:
+        else:
+            try:
+                profiles = db.fetch_ai_profiles(orgnrs)
+                for row in profiles:
                     orgnr_val = row.get("org_number")
-                    if orgnr_val and orgnr_val not in existing_profiles:
+                    if orgnr_val:
                         existing_profiles.add(orgnr_val)
                         website_val = row.get("website")
-                        if website_val and orgnr_val not in existing_websites:
+                        if website_val:
                             existing_websites[orgnr_val] = website_val
-                            logger.debug("Found existing profile in local SQLite for %s", orgnr_val)
-        except Exception as exc:  # pragma: no cover - best effort
-            logger.debug("Local ai_profiles table not found or error: %s", exc)
-            
-            # Also check companies table for homepages (persistent cache)
-            # This ensures we never search for companies we've already found
+            except Exception as exc:
+                logger.debug("fetch_ai_profiles failed: %s", exc)
+        # Always check companies table for homepages (persistent cache)
+        try:
             if orgnrs:
                 placeholders = ",".join("?" * len(orgnrs))
                 companies_with_homepages = db.run_raw_query(
@@ -224,6 +230,8 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Di
                 financial_metrics=financial_metrics,
             )
 
+            scraped_timestamp = datetime.utcnow().isoformat()
+
             profile = {
                 "org_number": orgnr,
                 "website": website,
@@ -238,97 +246,48 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False) -> Di
                 "industry_subsector": analysis.get("industry_subsector"),
                 "market_regions": analysis.get("market_regions"),
                 "business_model_summary": analysis.get("business_model_summary"),
+                "business_summary": analysis.get("business_summary"),
                 "risk_flags": analysis.get("risk_flags"),
                 "upside_potential": analysis.get("upside_potential"),
                 "strategic_playbook": analysis.get("strategic_playbook"),
                 "next_steps": analysis.get("next_steps"),
+                "industry_keywords": analysis.get("industry_keywords"),
+                "acquisition_angle": analysis.get("acquisition_angle"),
                 "agent_type": analysis.get("agent_type"),
                 "scraped_pages": analysis.get("scraped_pages"),
                 "fit_rationale": analysis.get("fit_rationale"),
                 "enrichment_status": "complete",
-                "last_updated": datetime.utcnow().isoformat(),
+                "last_updated": scraped_timestamp,
+                "date_scraped": scraped_timestamp,
             }
             
-            # Save to Supabase if available, otherwise save to local SQLite
-            saved_to = None
+            # Save ai_profile: Supabase when DATABASE_SOURCE=supabase, else DatabaseService
             if supabase:
                 try:
                     supabase.table("ai_profiles").upsert(profile, on_conflict="org_number").execute()
-                    saved_to = "supabase"
                     logger.info("Saved ai_profile to Supabase for %s", orgnr)
                 except Exception as supabase_exc:
-                    logger.warning("Failed to save to Supabase, falling back to local DB: %s", supabase_exc)
-                    saved_to = None  # Will try local fallback
-            
-            # Fallback to local SQLite if Supabase not available or failed
-            if not saved_to:
+                    logger.warning("Failed to save to Supabase: %s", supabase_exc)
+            else:
                 try:
-                    # Ensure ai_profiles table exists in local DB
-                    db.run_raw_query("""
-                        CREATE TABLE IF NOT EXISTS ai_profiles (
-                            org_number TEXT PRIMARY KEY,
-                            website TEXT,
-                            product_description TEXT,
-                            end_market TEXT,
-                            customer_types TEXT,
-                            strategic_fit_score INTEGER,
-                            defensibility_score INTEGER,
-                            value_chain_position TEXT,
-                            ai_notes TEXT,
-                            industry_sector TEXT,
-                            industry_subsector TEXT,
-                            market_regions TEXT,
-                            business_model_summary TEXT,
-                            risk_flags TEXT,
-                            upside_potential TEXT,
-                            strategic_playbook TEXT,
-                            next_steps TEXT,
-                            agent_type TEXT,
-                            scraped_pages TEXT,
-                            fit_rationale TEXT,
-                            enrichment_status TEXT DEFAULT 'complete',
-                            last_updated TEXT
-                        )
-                    """)
-                    
-                    # Insert or update profile
-                    db.run_raw_query("""
-                        INSERT OR REPLACE INTO ai_profiles (
-                            org_number, website, product_description, end_market, customer_types,
-                            strategic_fit_score, defensibility_score, value_chain_position, ai_notes,
-                            industry_sector, industry_subsector, market_regions, business_model_summary,
-                            risk_flags, upside_potential, strategic_playbook, next_steps,
-                            agent_type, scraped_pages, fit_rationale, enrichment_status, last_updated
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, [
-                        profile["org_number"],
-                        profile.get("website"),
-                        profile.get("product_description"),
-                        profile.get("end_market"),
-                        profile.get("customer_types"),
-                        profile.get("strategic_fit_score"),
-                        profile.get("defensibility_score"),
-                        profile.get("value_chain_position"),
-                        profile.get("ai_notes"),
-                        profile.get("industry_sector"),
-                        profile.get("industry_subsector"),
-                        str(profile.get("market_regions")) if profile.get("market_regions") else None,  # JSON as string
-                        profile.get("business_model_summary"),
-                        str(profile.get("risk_flags")) if profile.get("risk_flags") else None,  # JSON as string
-                        profile.get("upside_potential"),
-                        profile.get("strategic_playbook"),
-                        str(profile.get("next_steps")) if profile.get("next_steps") else None,  # JSON as string
-                        profile.get("agent_type"),
-                        str(profile.get("scraped_pages")) if profile.get("scraped_pages") else None,  # JSON as string
-                        profile.get("fit_rationale"),
-                        profile.get("enrichment_status", "complete"),
-                        profile.get("last_updated"),
-                    ])
-                    saved_to = "local_sqlite"
-                    logger.info("💾 Saved ai_profile to local SQLite for %s (Supabase not available)", orgnr)
-                except Exception as local_exc:
-                    logger.error("Failed to save ai_profile to local SQLite for %s: %s", orgnr, local_exc)
-                    # Continue anyway - at least website is saved
+                    db.upsert_ai_profile(profile)
+                    logger.info("Saved ai_profile via DatabaseService for %s", orgnr)
+                except Exception as db_exc:
+                    logger.error("Failed to save ai_profile for %s: %s", orgnr, db_exc)
+
+            if run_id:
+                try:
+                    db.upsert_company_enrichment(
+                        orgnr=orgnr,
+                        run_id=run_id,
+                        kind="llm_analysis",
+                        result=analysis,
+                        score=analysis.get("strategic_fit_score"),
+                        tags={"agent_type": analysis.get("agent_type")},
+                    )
+                    logger.debug("Saved company_enrichment for %s (run %s)", orgnr, run_id)
+                except Exception as ce_exc:
+                    logger.warning("Failed to save company_enrichment for %s: %s", orgnr, ce_exc)
             
             # Also ensure website is saved to companies table (in case it wasn't saved earlier)
             if website and not existing_homepage:

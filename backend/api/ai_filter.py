@@ -20,7 +20,6 @@ router = APIRouter(prefix="/api/ai-filter", tags=["ai-filter"])
 BASE_SQL = """
 SELECT DISTINCT c.orgnr
 FROM companies c
-LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
 LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
 LEFT JOIN (
     SELECT orgnr, MAX(si_sek) as max_revenue_sek
@@ -32,14 +31,13 @@ LEFT JOIN (
     GROUP BY orgnr
 ) f ON f.orgnr = c.orgnr
 WHERE {where_clause}
-ORDER BY COALESCE(m.revenue_cagr_3y, 0) DESC, c.company_name ASC
+ORDER BY COALESCE(k.revenue_cagr_3y, 0) DESC, c.company_name ASC
 LIMIT ? OFFSET ?
 """
 
 COUNT_SQL = """
 SELECT COUNT(DISTINCT c.orgnr) as total_matches
 FROM companies c
-LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
 LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
 LEFT JOIN (
     SELECT orgnr, MAX(si_sek) as max_revenue_sek
@@ -54,6 +52,20 @@ WHERE {where_clause}
 """
 
 SAFE_KEYWORDS = ("select", "where", "and", "or", "not", "between", "like", "in")
+
+EXCLUDED_TYPES = [
+    "real estate/property",
+    "funds/investment companies",
+    "consulting firms",
+]
+
+EXCLUSION_SQL = """
+NOT (
+    (LOWER(c.company_name) LIKE '%fastigheter%' OR LOWER(c.company_name) LIKE '%property%' OR c.nace_categories LIKE '%fastighet%')
+    OR (LOWER(c.company_name) LIKE '%invest%' OR LOWER(c.company_name) LIKE '%fund%' OR LOWER(c.company_name) LIKE '%capital%' OR c.nace_categories LIKE '%fond%' OR c.nace_categories LIKE '%holding%')
+    OR (LOWER(c.company_name) LIKE '%konsult%' OR c.nace_categories LIKE '%consult%')
+)
+"""
 
 
 class AIFilterRequest(BaseModel):
@@ -73,6 +85,9 @@ class AIFilterResponse(BaseModel):
     metadata: Dict[str, Any]
     explanation: Optional[str] = None
     suggestions: List[str] = []
+    capped: bool = False
+    refinement_message: Optional[str] = None
+    excluded_types: List[str] = []
 
 
 def _sanitize_where_clause(clause: str) -> str:
@@ -81,6 +96,15 @@ def _sanitize_where_clause(clause: str) -> str:
     if any(keyword in lowered for keyword in disallowed):
         raise ValueError("LLM produced unsafe SQL. Please refine the prompt.")
     return clause
+
+
+def _apply_automatic_exclusions(clause: str) -> str:
+    """
+    Ensure the WHERE clause always excludes disqualified company types.
+    """
+    base_clause = clause.strip() or "1=1"
+    exclusion = EXCLUSION_SQL.strip()
+    return f"({base_clause}) AND {exclusion}"
 
 
 def _fallback_where_clause(prompt: str) -> str:
@@ -127,12 +151,20 @@ def _call_openai_for_where_clause(prompt: str, current_where_clause: Optional[st
 
     system_prompt = (
         f"{rag_context}\n\n"
-        "IMPORTANT: Return JSON with:\n"
-        "- where_clause: The SQL WHERE clause (without the word WHERE).\n"
-        "- explanation: Brief explanation of why these filters were applied (1 sentence).\n"
-        "- suggestions: List of 2-3 short follow-up questions to help the user refine the search.\n"
-        "Example output:\n"
-        "{'where_clause': 'f.max_revenue_sek >= 100000000', 'explanation': 'Filtered for companies with >100M SEK revenue.', 'suggestions': ['Should we filter by profitability?', 'Focus on specific regions?']}"
+        "TASK: Generate a SQL WHERE clause from the user's natural language prompt.\n\n"
+        "CRITICAL RULES:\n"
+        "1. Use ONLY the columns listed in the 'Valid Fields' section above. Do NOT invent new columns.\n"
+        "2. ALWAYS apply automatic exclusions (real estate, investment funds, consulting) as specified in the context.\n"
+        "3. Keep filters additive unless the user explicitly requests removal.\n"
+        "4. Follow the example prompts in the context for correct SQL patterns.\n\n"
+        "OUTPUT FORMAT (JSON):\n"
+        "- where_clause: SQL WHERE clause (without the word WHERE). Use valid columns from the schema.\n"
+        "- explanation: Brief explanation (1 sentence) including automatic exclusions applied.\n"
+        "- suggestions: 2-3 short follow-up questions to help refine the search.\n\n"
+        "Example:\n"
+        "{'where_clause': 'f.max_revenue_sek >= 100000000 AND k.avg_net_margin > 5.0', "
+        "'explanation': 'Filtered for companies with >100M SEK revenue and profitable margins (excluded real estate/investment/consulting per policy).', "
+        "'suggestions': ['Should we filter by growth rate?', 'Focus on specific industries?']}"
     )
     
     if current_where_clause:
@@ -195,9 +227,22 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
         clause = _sanitize_where_clause(clause)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    clause = _apply_automatic_exclusions(clause)
+    exclusion_message = (
+        "Automatically excluded real estate/property, investment/fund, and consulting firms."
+    )
+    if explanation:
+        explanation = f"{explanation} {exclusion_message}"
+    else:
+        explanation = exclusion_message
 
-    sql = BASE_SQL.format(where_clause=clause or "1=1")
-    count_sql = COUNT_SQL.format(where_clause=clause or "1=1")
+    # Ensure clause is valid SQL
+    clause = clause or "1=1"
+    # Remove any trailing semicolons or invalid characters
+    clause = clause.strip().rstrip(';')
+    
+    sql = BASE_SQL.format(where_clause=clause)
+    count_sql = COUNT_SQL.format(where_clause=clause)
     params: List[Any] = [payload.limit, payload.offset]
     started = time.perf_counter()
     try:
@@ -206,10 +251,19 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
         total_matches = total_row[0]["total_matches"] if total_row else len(rows)
     except Exception as exc:
         logger.exception("Failed to execute AI filter query")
-        raise HTTPException(status_code=500, detail="Failed to execute query") from exc
+        logger.error(f"SQL that failed: {sql}")
+        logger.error(f"Params: {params}")
+        logger.error(f"Where clause: {clause}")
+        raise HTTPException(status_code=500, detail=f"Failed to execute query: {str(exc)}") from exc
     duration_ms = int((time.perf_counter() - started) * 1000)
     org_numbers = [row["orgnr"] for row in rows]
     result_count = len(org_numbers)
+    capped = total_matches > 300
+    refinement_message = None
+    if capped:
+        refinement_message = (
+            f"Found {total_matches} matching companies. Refine your prompt to 300 or fewer results."
+        )
     metadata: Dict[str, Any] = {
         "where_clause": clause,
         "limit": payload.limit,
@@ -221,6 +275,8 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
         "duration_ms": duration_ms,
         "executor": "openai" if used_llm else "heuristic",
         "sql": sql.strip(),
+        "excluded_types": EXCLUDED_TYPES,
+        "capped": capped,
     }
 
     # Log to Supabase (best effort)
@@ -244,6 +300,9 @@ async def run_ai_filter(payload: AIFilterRequest) -> AIFilterResponse:
         total=total_matches,
         metadata=metadata,
         explanation=explanation,
-        suggestions=suggestions
+        suggestions=suggestions,
+        capped=capped,
+        refinement_message=refinement_message,
+        excluded_types=EXCLUDED_TYPES,
     )
 

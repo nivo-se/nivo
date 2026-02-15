@@ -1,13 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-
-export interface CompanyRow {
-  orgnr: string
-  company_name?: string
-  latest_revenue_sek?: number
-  avg_ebitda_margin?: number
-  revenue_cagr_3y?: number
-  ai_score?: number
-}
+import type { CompanyRow } from '../lib/apiService'
 
 interface CompanyExplorerProps {
   companies: CompanyRow[]
@@ -26,6 +18,8 @@ interface CompanyExplorerProps {
   onViewProfile?: (selected: CompanyRow[]) => void
   enriching?: boolean
   exporting?: boolean
+  onEnrichAll?: () => void
+  disableEnrichAll?: boolean
 }
 
 const formatMillions = (value?: number | null): string => {
@@ -51,6 +45,8 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
   onViewProfile,
   enriching = false,
   exporting = false,
+  onEnrichAll,
+  disableEnrichAll = false,
 }) => {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [showSaveDialog, setShowSaveDialog] = useState(false)
@@ -201,6 +197,16 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
           >
             View AI Profile
           </button>
+          {onEnrichAll && (
+            <button
+              type="button"
+              onClick={onEnrichAll}
+              disabled={enriching || disableEnrichAll}
+              className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {disableEnrichAll ? 'Refine to ≤300 to enrich all' : 'Enrich all companies'}
+            </button>
+          )}
           {onSaveList && (
             <button
               onClick={() => setShowSaveDialog(true)}
@@ -261,7 +267,8 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Revenue</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">EBITDA margin</th>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Growth</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI strategic score</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI Summary</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI Fit</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -301,27 +308,61 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                 <td className="px-4 py-3">{formatMillions(company.latest_revenue_sek)}</td>
                 <td className="px-4 py-3">{formatPercent(company.avg_ebitda_margin)}</td>
                 <td className="px-4 py-3">{formatPercent(company.revenue_growth_yoy ?? company.revenue_cagr_3y)}</td>
-                <td className="px-4 py-3">
-                  {company.ai_strategic_score ? (
-                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                      {company.ai_strategic_score}/10
-                    </span>
-                  ) : (
-                    '—'
+                <td className="px-4 py-3 text-xs text-gray-600">
+                  {company.ai_business_summary ||
+                    company.company_context ||
+                    company.ai_product_description ||
+                    'Not enriched'}
+                  {company.ai_industry_keywords && company.ai_industry_keywords.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {company.ai_industry_keywords.slice(0, 3).map((keyword) => (
+                        <span key={keyword} className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-600">
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
                   )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col gap-1">
+                    {company.ai_fit_status && (
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          company.ai_fit_status === 'YES'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : company.ai_fit_status === 'NO'
+                              ? 'bg-red-50 text-red-700'
+                              : 'bg-amber-50 text-amber-700'
+                        }`}
+                      >
+                        {company.ai_fit_status}
+                      </span>
+                    )}
+                    {company.ai_strategic_score ? (
+                      <span className="text-sm font-semibold text-gray-900">
+                        {company.ai_strategic_score}/10
+                        <span className="ml-1 text-xs font-normal text-gray-500">fit score</span>
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">Not scored</span>
+                    )}
+                    {company.ai_acquisition_angle && (
+                      <span className="text-xs text-gray-500">{company.ai_acquisition_angle}</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
             {loading && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
                   Loading company details...
                 </td>
               </tr>
             )}
             {!loading && renderedRows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
                   No companies loaded yet. Run the AI filter to populate this view.
                 </td>
               </tr>

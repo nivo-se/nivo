@@ -22,12 +22,18 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Generate report mutation
+  // Generate report mutation - backend returns full report directly (cache-first)
   const generateMutation = useMutation({
     mutationFn: (forceRegenerate: boolean) => intelligenceService.generateAIReport(orgnr, forceRegenerate),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      // Backend returns full report; update cache immediately, no polling needed
+      if (response?.business_model != null || (response?.weaknesses?.length ?? 0) > 0 || (response?.uplift_ops?.length ?? 0) > 0) {
+        queryClient.setQueryData(['ai-report', orgnr], response)
+        setIsGenerating(false)
+        return
+      }
+      // Fallback: poll if backend returned status-only (legacy)
       setIsGenerating(true)
-      // Poll for report completion
       const pollInterval = setInterval(() => {
         refetch().then((result) => {
           if (result.data && result.data.business_model) {
@@ -36,9 +42,7 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
             queryClient.invalidateQueries({ queryKey: ['ai-report', orgnr] })
           }
         })
-      }, 2000) // Poll every 2 seconds
-
-      // Timeout after 60 seconds
+      }, 2000)
       setTimeout(() => {
         clearInterval(pollInterval)
         setIsGenerating(false)

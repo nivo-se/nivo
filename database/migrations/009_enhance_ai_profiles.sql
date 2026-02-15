@@ -20,3 +20,4 @@ create index if not exists idx_ai_profiles_industry_sector
 create index if not exists idx_ai_profiles_agent_type
     on public.ai_profiles(agent_type nulls last);
 
+

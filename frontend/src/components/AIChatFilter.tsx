@@ -51,6 +51,13 @@ export const AIChatFilter: React.FC<AIChatFilterProps> = ({
     await onSubmitPrompt(historyPrompt)
   }
 
+  const handleSuggestionClick = async (suggestion: string) => {
+    if (!suggestion) return
+    setPrompt(suggestion)
+    setJustSubmittedPrompt(suggestion)
+    await onSubmitPrompt(suggestion)
+  }
+
   const copyWhereClause = async () => {
     if (!lastResult?.parsed_where_clause || typeof navigator === 'undefined' || !navigator.clipboard) {
       return
@@ -138,7 +145,7 @@ export const AIChatFilter: React.FC<AIChatFilterProps> = ({
               <p className="text-xs text-gray-500">Parsed SQL preview generated from your thesis.</p>
             )}
           </div>
-          <div>
+          <div className="space-y-3">
             <div className="mb-2 flex items-center justify-between text-sm font-semibold text-gray-800">
               SQL WHERE clause
               <button
@@ -153,6 +160,36 @@ export const AIChatFilter: React.FC<AIChatFilterProps> = ({
             <pre className="max-h-56 overflow-auto rounded-lg bg-gray-900 p-3 text-xs text-white">
               {lastResult.parsed_where_clause}
             </pre>
+            {lastResult.capped && lastResult.refinement_message && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                {lastResult.refinement_message}
+              </div>
+            )}
+            {lastResult.suggestions && lastResult.suggestions.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500">Refinement ideas</p>
+                <div className="flex flex-wrap gap-2">
+                  {lastResult.suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {lastResult.excluded_types && lastResult.excluded_types.length > 0 && (
+              <p className="text-[11px] text-gray-500">
+                Automatically excluding:{' '}
+                <span className="font-semibold text-gray-700">
+                  {lastResult.excluded_types.join(', ')}
+                </span>
+              </p>
+            )}
           </div>
         </div>
       )}

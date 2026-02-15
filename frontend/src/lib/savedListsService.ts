@@ -39,10 +39,13 @@ export class SavedListsService {
         throw new Error(result.error || 'Failed to fetch saved lists')
       }
 
-      console.log('Found', result.data?.length || 0, 'saved lists from API')
+      // Only log if we actually have lists
+      if (result.data && result.data.length > 0) {
+        console.log('Found', result.data.length, 'saved lists from API')
+      }
 
       if (!result.data || result.data.length === 0) {
-        console.log('No lists in database, trying localStorage fallback')
+        // Silently fall back to localStorage - no need to log this
         const fallbackLists = await this.getSavedListsFallback()
 
         // If we have lists in localStorage but not in database, offer to migrate them

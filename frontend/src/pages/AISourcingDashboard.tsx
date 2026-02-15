@@ -36,6 +36,21 @@ const AISourcingDashboard: React.FC = () => {
   const [activeProfile, setActiveProfile] = useState<CompanyRow | null>(null)
   const [selectedCompanies, setSelectedCompanies] = useState<CompanyRow[]>([])
 
+  const clearAllData = () => {
+    // Clear all session storage
+    Object.values(SESSION_KEYS).forEach((key) => {
+      sessionStorage.removeItem(key)
+    })
+    // Reset all state
+    setAIFilterResult(null)
+    setCompanies([])
+    setCurrentPrompt('')
+    setPromptHistory([])
+    setPagination({ page: 1, limit: DEFAULT_PAGE_SIZE, total: 0 })
+    setSelectedCompanies([])
+    setActionFeedback({ type: 'success', message: 'Search cleared. Ready for new search.' })
+  }
+
   useEffect(() => {
     try {
       const savedAiResult = sessionStorage.getItem(SESSION_KEYS.RESULT)
@@ -44,6 +59,7 @@ const AISourcingDashboard: React.FC = () => {
       const savedHistory = sessionStorage.getItem(SESSION_KEYS.HISTORY)
       const savedPagination = sessionStorage.getItem(SESSION_KEYS.PAGINATION)
 
+      // Only restore if we have data (optional: could add timestamp check for stale data)
       if (savedAiResult) {
         setAIFilterResult(JSON.parse(savedAiResult))
       }
@@ -132,8 +148,13 @@ const AISourcingDashboard: React.FC = () => {
       try {
         const lists = await SavedListsService.getSavedLists()
         setSavedLists(lists)
+        // Only log if there are actually lists, otherwise it's just noise
+        if (lists.length > 0) {
+          console.log(`Loaded ${lists.length} saved lists`)
+        }
       } catch (error) {
-        console.error('Failed to load saved lists:', error)
+        // Silently handle - already falls back to localStorage
+        console.debug('Saved lists not available (Supabase not configured)')
       }
     }
     loadSavedLists()
@@ -287,22 +308,36 @@ const AISourcingDashboard: React.FC = () => {
     setEnriching(true)
     try {
       const response = await apiService.startEnrichment(selection.map((company) => company.orgnr))
-      if (response.status === 'skipped') {
-        setActionFeedback({
-          type: 'info',
-          message: 'Selected companies already have AI profiles. Use force refresh if you need to overwrite.',
-        })
-      } else {
-        const skipped = response.skipped ? ` • ${response.skipped} already enriched` : ''
-        setActionFeedback({
-          type: 'success',
-          message: `Enrichment job ${response.job_id} queued (${response.count} companies${skipped}).`,
-        })
-      }
+      setActionFeedback({
+        type: 'success',
+        message: response.message || 'Enrichment complete.',
+      })
     } catch (error: any) {
       setActionFeedback({
         type: 'error',
         message: error?.message || 'Failed to start enrichment.',
+      })
+    } finally {
+      setEnriching(false)
+    }
+  }
+
+  const handleEnrichAllCompanies = async () => {
+    if (!aiResult?.org_numbers?.length) {
+      setActionFeedback({ type: 'info', message: 'Run a search before enriching all companies.' })
+      return
+    }
+    setEnriching(true)
+    try {
+      const response = await apiService.startEnrichment(aiResult.org_numbers)
+      setActionFeedback({
+        type: 'success',
+        message: response.message || 'Batch enrichment started.',
+      })
+    } catch (error: any) {
+      setActionFeedback({
+        type: 'error',
+        message: error?.message || 'Failed to enrich all companies.',
       })
     } finally {
       setEnriching(false)
@@ -357,22 +392,40 @@ const AISourcingDashboard: React.FC = () => {
 
   const closeProfileModal = () => setActiveProfile(null)
 
+  const isResultCapped = Boolean(
+    aiResult?.capped || ((aiResult?.total ?? 0) > 300)
+  )
+
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-10">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Explorer</p>
-          <h1 className="text-2xl font-semibold text-gray-900">AI Sourcing Dashboard</h1>
-          <p className="text-sm text-gray-500">
-            Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
-          </p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-xs uppercase tracking-wide text-gray-500">Explorer</p>
+              <h1 className="text-2xl font-semibold text-gray-900">AI Sourcing Dashboard</h1>
+              <p className="text-sm text-gray-500">
+                Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
+              </p>
+            </div>
+            {aiResult && (
+              <button
+                type="button"
+                onClick={clearAllData}
+                className="ml-4 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                title="Clear all search results and start fresh"
+              >
+                Clear Search
+              </button>
+            )}
+          </div>
         </div>
 
         {aiResult && (
           <div className="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:grid-cols-3">
             <div>
               <p className="text-xs uppercase text-gray-500">Active thesis</p>
-              <p className="text-sm text-gray-900">{aiResult.metadata.prompt}</p>
+              <p className="text-sm text-gray-900">{aiResult.metadata?.prompt || currentPrompt || '—'}</p>
             </div>
             <div>
               <p className="text-xs uppercase text-gray-500">Matches</p>
@@ -400,6 +453,29 @@ const AISourcingDashboard: React.FC = () => {
               }`}
           >
             {actionFeedback.message}
+          </div>
+        )}
+
+        {isResultCapped && aiResult?.refinement_message && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <p className="font-medium">{aiResult.refinement_message}</p>
+            {aiResult.suggestions && aiResult.suggestions.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {aiResult.suggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => setCurrentPrompt(`${currentPrompt ? `${currentPrompt}\n` : ''}${suggestion}`)}
+                    className="rounded-full border border-amber-300 px-3 py-1 text-xs font-semibold text-amber-800 hover:bg-white"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+            <p className="mt-2 text-xs text-amber-700">
+              Refine the thesis to 300 companies or fewer to enable batch enrichment.
+            </p>
           </div>
         )}
 
@@ -449,6 +525,8 @@ const AISourcingDashboard: React.FC = () => {
               onSelectionChange={setSelectedCompanies}
               enriching={enriching}
               exporting={exporting}
+              onEnrichAll={handleEnrichAllCompanies}
+              disableEnrichAll={isResultCapped}
             />
           </div>
         </div>

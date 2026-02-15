@@ -21,6 +21,7 @@ class StrategicFitResult:
     upside_potential: str
     rationale: str
     matched_strategy: str
+    acquisition_angle: str
 
 
 class StrategicFitAnalyzer:
@@ -112,6 +113,12 @@ class StrategicFitAnalyzer:
             upside_potential=upside_text,
             rationale=rationale,
             matched_strategy=strategy.get("name", strategy_key or self._default_strategy),
+            acquisition_angle=self._determine_acquisition_angle(
+                ebitda_margin=ebitda_margin,
+                target_margin=strategy.get("ebitda_margin_min"),
+                growth=cagr,
+                growth_target=strategy.get("growth_min"),
+            ),
         )
 
     def _get_strategy(self, strategy_key: Optional[str]) -> Dict[str, Any]:
@@ -140,6 +147,21 @@ class StrategicFitAnalyzer:
         if value > 1.5:  # Likely stored as percent (e.g., 15 instead of .15)
             return value / 100
         return value
+
+    @staticmethod
+    def _determine_acquisition_angle(
+        ebitda_margin: Optional[float],
+        target_margin: Optional[float],
+        growth: Optional[float],
+        growth_target: Optional[float],
+    ) -> str:
+        if ebitda_margin is not None and target_margin and ebitda_margin < target_margin:
+            return "Margin expansion"
+        if growth is not None and growth_target and growth >= (growth_target + 0.05):
+            return "Growth acceleration"
+        if growth is not None and growth < (growth_target or 0.05):
+            return "Turnaround"
+        return "Consolidation platform"
 
     @staticmethod
     def _resolve_config_path(config_path: Optional[str]) -> Path:

@@ -44,6 +44,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# JWT auth when REQUIRE_AUTH=true (prod)
+from .auth import JWTAuthMiddleware
+app.add_middleware(JWTAuthMiddleware)
+
 # Health check
 @app.get("/health")
 async def health_check():

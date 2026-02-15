@@ -3,16 +3,39 @@ Company intelligence endpoints
 """
 import json
 import logging
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
-from .dependencies import get_supabase_client
+
 from ..services.db_factory import get_database_service
+from ..services.ai_summary_service import build_ai_summary
+from .dependencies import get_supabase_client
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
+
+AI_INTEL_KINDS = ["company_profile", "website_insights", "about_summary", "llm_analysis"]
+
+
+def _to_list(value: Any) -> List[str]:
+    if not value:
+        return []
+    if isinstance(value, list):
+        return [str(item) for item in value if item]
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return []
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return [str(item) for item in parsed if item]
+        except json.JSONDecodeError:
+            pass
+        return [item.strip() for item in value.split(",") if item.strip()]
+    return [str(value)]
 
 
 class BatchCompanyRequest(BaseModel):
@@ -23,39 +46,90 @@ class BatchCompanyRequest(BaseModel):
 async def get_company_intel(orgnr: str = Path(..., description="Organization number")):
     """
     Get all intelligence data for a company.
-    Returns company_intel, artifacts, and related data.
+    Uses DatabaseService (ai_profiles + company_enrichment) when DATABASE_SOURCE=postgres.
+    Falls back to Supabase (company_intel, intel_artifacts) when DATABASE_SOURCE=supabase.
     """
+    supabase = get_supabase_client()
+    if supabase:
+        try:
+            intel_response = supabase.table("company_intel").select("*").eq("orgnr", orgnr).maybe_single().execute()
+            artifacts_response = supabase.table("intel_artifacts").select("*").eq("orgnr", orgnr).order("created_at", desc=True).limit(50).execute()
+            intel_data = intel_response.data if intel_response.data else None
+            artifacts = artifacts_response.data if artifacts_response.data else []
+            tech_stack = []
+            if intel_data and intel_data.get("tech_stack_json"):
+                tech_stack_json = intel_data["tech_stack_json"]
+                if isinstance(tech_stack_json, dict):
+                    tech_stack = list(tech_stack_json.keys())
+                elif isinstance(tech_stack_json, list):
+                    tech_stack = tech_stack_json
+            return {
+                "orgnr": orgnr,
+                "company_id": intel_data.get("company_id") if intel_data else None,
+                "domain": intel_data.get("domain") if intel_data else None,
+                "industry": intel_data.get("industry") if intel_data else None,
+                "tech_stack": tech_stack,
+                "digital_maturity_score": intel_data.get("digital_maturity_score") if intel_data else None,
+                "artifacts": artifacts,
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error fetching company intel: {str(e)}")
+
     try:
-        supabase = get_supabase_client()
-        
-        # Get company intel
-        intel_response = supabase.table("company_intel").select("*").eq("orgnr", orgnr).maybe_single().execute()
-        
-        # Get artifacts
-        artifacts_response = supabase.table("intel_artifacts").select("*").eq("orgnr", orgnr).order("created_at", desc=True).limit(50).execute()
-        
-        intel_data = intel_response.data if intel_response.data else None
-        artifacts = artifacts_response.data if artifacts_response.data else []
-        
-        # Parse tech stack from JSONB
+        db = get_database_service()
+        profiles = db.fetch_ai_profiles([orgnr])
+        profile = profiles[0] if profiles else None
+        enrichment_by_kind = db.fetch_company_enrichment_single(
+            orgnr, kinds=AI_INTEL_KINDS, latest_run_only=True
+        )
+
+        enrichment = {k: v.get("result") for k, v in enrichment_by_kind.items() if v.get("result")}
+        for k in AI_INTEL_KINDS:
+            if k not in enrichment:
+                enrichment[k] = None
+
+        # Map to CompanyIntel shape for frontend compatibility (intelligenceService.getCompanyIntel)
         tech_stack = []
-        if intel_data and intel_data.get("tech_stack_json"):
-            tech_stack_json = intel_data["tech_stack_json"]
-            if isinstance(tech_stack_json, dict):
-                tech_stack = list(tech_stack_json.keys())
-            elif isinstance(tech_stack_json, list):
-                tech_stack = tech_stack_json
-        
+        if profile and profile.get("scraped_pages"):
+            sp = profile["scraped_pages"]
+            if isinstance(sp, (list, dict)):
+                tech_stack = list(sp) if isinstance(sp, list) else list(sp.keys())
+        artifacts = []
+        for kind, res in enrichment.items():
+            if res and isinstance(res, dict):
+                content = json.dumps(res) if res else ""
+                meta = enrichment_by_kind.get(kind, {})
+                artifacts.append({
+                    "id": f"{orgnr}-{kind}",
+                    "source": kind,
+                    "artifact_type": kind,
+                    "url": None,
+                    "content": content[:5000] if len(content) > 5000 else content,
+                    "created_at": str(meta.get("created_at", "")),
+                })
+        ai_summary = build_ai_summary(orgnr, profile, enrichment)
+        run_id_by_kind = {
+            k: str(v.get("run_id")) for k, v in enrichment_by_kind.items()
+            if v.get("run_id")
+        }
         return {
             "orgnr": orgnr,
-            "company_id": intel_data.get("company_id") if intel_data else None,
-            "domain": intel_data.get("domain") if intel_data else None,
-            "industry": intel_data.get("industry") if intel_data else None,
+            "company_id": None,
+            "domain": profile.get("website") if profile else None,
+            "industry": profile.get("industry_sector") if profile else None,
             "tech_stack": tech_stack,
-            "digital_maturity_score": intel_data.get("digital_maturity_score") if intel_data else None,
+            "digital_maturity_score": profile.get("strategic_fit_score") if profile else None,
             "artifacts": artifacts,
+            "ai_profile": profile,
+            "enrichment": {
+                "company_profile": enrichment.get("company_profile"),
+                "website_insights": enrichment.get("website_insights"),
+                "about_summary": enrichment.get("about_summary"),
+                "llm_analysis": enrichment.get("llm_analysis"),
+            },
+            "ai_summary": ai_summary,
+            "run_id_by_kind": run_id_by_kind,
         }
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching company intel: {str(e)}")
 
@@ -64,47 +138,54 @@ async def get_company_intel(orgnr: str = Path(..., description="Organization num
 async def get_ai_report(orgnr: str = Path(..., description="Organization number")):
     """
     Get latest AI analysis report for a company.
+
+    Uses shared ai_report_service.build_ai_report_from_db (same as POST /generate).
+    Falls back to Supabase ai_reports when build returns None and Supabase is configured.
     """
-    try:
-        supabase = get_supabase_client()
-        
-        response = supabase.table("ai_reports").select("*").eq("orgnr", orgnr).order("generated_at", desc=True).limit(1).execute()
-        
-        # Get first result if exists
-        if not response.data or len(response.data) == 0:
-            return {
-                "orgnr": orgnr,
-                "business_model": None,
-                "weaknesses": [],
-                "uplift_ops": [],
-                "impact_range": None,
-                "outreach_angle": None,
-            }
-        
-        data = response.data[0]
-        
-        # Parse JSONB fields
-        weaknesses = data.get("weaknesses_json", [])
-        if isinstance(weaknesses, dict):
-            weaknesses = list(weaknesses.values()) if isinstance(weaknesses, dict) else []
-        elif not isinstance(weaknesses, list):
-            weaknesses = []
-        
-        uplift_ops = data.get("uplift_ops_json", [])
-        if not isinstance(uplift_ops, list):
-            uplift_ops = []
-        
-        return {
-            "orgnr": orgnr,
-            "business_model": data.get("business_model"),
-            "weaknesses": weaknesses,
-            "uplift_ops": uplift_ops,
-            "impact_range": data.get("impact_range"),
-            "outreach_angle": data.get("outreach_angle"),
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
+    db = get_database_service()
+    if db:
+        try:
+            from ..services import ai_report_service
+            report = ai_report_service.build_ai_report_from_db(orgnr, db, include_extras=True)
+            if report is not None:
+                return report
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
+
+    # Fallback: Supabase ai_reports when configured
+    supabase = get_supabase_client()
+    if supabase:
+        try:
+            response = supabase.table("ai_reports").select("*").eq("orgnr", orgnr).order("generated_at", desc=True).limit(1).execute()
+            if response.data and len(response.data) > 0:
+                data = response.data[0]
+                weaknesses = data.get("weaknesses_json", [])
+                if isinstance(weaknesses, dict):
+                    weaknesses = list(weaknesses.values())
+                elif not isinstance(weaknesses, list):
+                    weaknesses = []
+                uplift_ops = data.get("uplift_ops_json", [])
+                if not isinstance(uplift_ops, list):
+                    uplift_ops = []
+                return {
+                    "orgnr": orgnr,
+                    "business_model": data.get("business_model"),
+                    "weaknesses": weaknesses,
+                    "uplift_ops": uplift_ops,
+                    "impact_range": data.get("impact_range"),
+                    "outreach_angle": data.get("outreach_angle"),
+                }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
+
+    return {
+        "orgnr": orgnr,
+        "business_model": None,
+        "weaknesses": [],
+        "uplift_ops": [],
+        "impact_range": None,
+        "outreach_angle": None,
+    }
 
 
 @router.post("/{orgnr}/enrich")
@@ -141,20 +222,20 @@ async def trigger_enrichment(orgnr: str = Path(..., description="Organization nu
 @router.post("/batch")
 async def get_companies_batch(
     request: BatchCompanyRequest,
-    auto_enrich: bool = True,  # Default to True - automatically enrich search results
+    auto_enrich: bool = True,
+    include_ai: bool = False,
 ):
     """
     Get company details and financial metrics for multiple companies by org numbers.
     Returns company name, revenue, margins, growth, etc.
     
-    If auto_enrich=True (default), automatically creates lightweight profiles for companies without profiles.
-    This provides company context (what they do) in search results without requiring manual enrichment.
+    auto_enrich: Create lightweight profiles for companies without profiles (default True).
+    include_ai: Also fetch company_enrichment summary per company (default False, for speed).
     """
     if not request.orgnrs:
         return {"companies": [], "count": 0}
     try:
         db = get_database_service()
-        supabase = get_supabase_client()
         
         # Auto-enrich companies without profiles (lightweight, no scraping)
         if auto_enrich and len(request.orgnrs) <= 50:  # Only for reasonable batch sizes
@@ -209,104 +290,62 @@ async def get_companies_batch(
         
         rows = db.run_raw_query(sql, params=request.orgnrs)
         
-        # Fetch ai_profiles from both Supabase and local SQLite
         ai_profiles_map: Dict[str, Dict[str, Any]] = {}
-        
-        # Try Supabase first
+        enrichment_map: Dict[str, Dict[str, Any]] = {}
         try:
-            if request.orgnrs:
-                profile_response = (
-                    supabase.table("ai_profiles")
-                    .select(
-                        "org_number, website, product_description, end_market, customer_types, "
-                        "strategic_fit_score, defensibility_score, value_chain_position, ai_notes, "
-                        "business_model_summary, industry_sector, industry_subsector, last_updated"
-                    )
-                    .in_("org_number", request.orgnrs)
-                    .execute()
+            profiles = db.fetch_ai_profiles(request.orgnrs)
+            for profile in profiles:
+                orgnr = profile.get("org_number")
+                if orgnr:
+                    ai_profiles_map[orgnr] = profile
+        except Exception as profile_exc:  # pragma: no cover - best-effort
+            logger.debug("fetch_ai_profiles failed: %s", profile_exc)
+        if include_ai and len(request.orgnrs) <= 50:
+            try:
+                enrichment_map = db.fetch_company_enrichment(
+                    request.orgnrs, kinds=AI_INTEL_KINDS, latest_run_only=True
                 )
-                if profile_response.data:
-                    for profile in profile_response.data:
-                        ai_profiles_map[profile["org_number"]] = profile
-        except Exception as profile_exc:  # pragma: no cover - best-effort fetch
-            logger.debug("Supabase profiles not available: %s", profile_exc)
-        
-        # Also check local SQLite for ai_profiles (fallback)
-        try:
-            # Check if ai_profiles table exists in local DB
-            check_table = db.run_raw_query(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='ai_profiles'"
-            )
-            if check_table:
-                local_placeholders = ",".join("?" * len(request.orgnrs))
-                local_profiles = db.run_raw_query(
-                    f"""
-                    SELECT org_number, website, product_description, end_market, customer_types,
-                           strategic_fit_score, defensibility_score, value_chain_position, ai_notes,
-                           business_model_summary, industry_sector, industry_subsector, last_updated
-                    FROM ai_profiles
-                    WHERE org_number IN ({local_placeholders})
-                    """,
-                    request.orgnrs
-                )
-                for profile in local_profiles:
-                    orgnr = profile.get("org_number")
-                    if orgnr and orgnr not in ai_profiles_map:
-                        # Convert to dict format matching Supabase response
-                        ai_profiles_map[orgnr] = {
-                            "org_number": orgnr,
-                            "website": profile.get("website"),
-                            "product_description": profile.get("product_description"),
-                            "end_market": profile.get("end_market"),
-                            "customer_types": profile.get("customer_types"),
-                            "strategic_fit_score": profile.get("strategic_fit_score"),
-                            "defensibility_score": profile.get("defensibility_score"),
-                            "value_chain_position": profile.get("value_chain_position"),
-                            "ai_notes": profile.get("ai_notes"),
-                            "business_model_summary": profile.get("business_model_summary"),
-                            "industry_sector": profile.get("industry_sector"),
-                            "industry_subsector": profile.get("industry_subsector"),
-                            "last_updated": profile.get("last_updated"),
-                        }
-        except Exception as local_exc:
-            logger.debug("Local ai_profiles check failed: %s", local_exc)
+            except Exception as enrich_exc:  # pragma: no cover - best-effort
+                logger.debug("fetch_company_enrichment failed: %s", enrich_exc)
         
         companies = []
         for row in rows:
             profile = ai_profiles_map.get(row.get("orgnr", ""))
-            
-            # Parse segment_names (JSON array stored as TEXT)
-            segment_names = []
-            try:
-                segment_names_raw = row.get("segment_names")
-                if segment_names_raw:
-                    if isinstance(segment_names_raw, str):
-                        segment_names = json.loads(segment_names_raw) if segment_names_raw else []
-                    elif isinstance(segment_names_raw, list):
-                        segment_names = segment_names_raw
-            except Exception:
-                segment_names = []
-            
-            # Get company context - prioritize AI profile, fallback to segment_names
+            segment_names = _to_list(row.get("segment_names"))
+            profile_market_regions = _to_list(profile.get("market_regions")) if profile else []
+            profile_risk_flags = _to_list(profile.get("risk_flags")) if profile else []
+            profile_next_steps = _to_list(profile.get("next_steps")) if profile else []
+            profile_keywords = _to_list(profile.get("industry_keywords")) if profile else []
+            scraped_pages = _to_list(profile.get("scraped_pages")) if profile else []
+
             company_context = None
             if profile:
-                # Use AI-generated product description or business model summary
                 company_context = (
-                    profile.get("product_description") or 
-                    profile.get("business_model_summary") or
-                    profile.get("ai_notes")
+                    profile.get("business_summary")
+                    or profile.get("product_description")
+                    or profile.get("business_model_summary")
+                    or profile.get("ai_notes")
                 )
             elif segment_names:
-                # Fallback to industry segments
-                company_context = ", ".join(segment_names[:3])  # First 3 segments
-            
+                company_context = ", ".join(segment_names[:3])
+
+            ai_fit = profile.get("strategic_fit_score") if profile else None
+            ai_fit_status = None
+            if isinstance(ai_fit, (int, float)):
+                if ai_fit >= 7:
+                    ai_fit_status = "YES"
+                elif ai_fit <= 4:
+                    ai_fit_status = "NO"
+                else:
+                    ai_fit_status = "UNCLEAR"
+
             companies.append({
                 "orgnr": row.get("orgnr"),
                 "company_name": row.get("company_name"),
                 "homepage": row.get("homepage"),
                 "employees_latest": row.get("employees_latest"),
-                "segment_names": segment_names,  # Full array for filtering
-                "company_context": company_context,  # Display-friendly context
+                "segment_names": segment_names,
+                "company_context": company_context,
                 "latest_revenue_sek": row.get("latest_revenue_sek"),
                 "latest_profit_sek": row.get("latest_profit_sek"),
                 "latest_ebitda_sek": row.get("latest_ebitda_sek"),
@@ -329,7 +368,25 @@ async def get_companies_batch(
                 "ai_notes": profile.get("ai_notes") if profile else None,
                 "ai_profile_last_updated": profile.get("last_updated") if profile else None,
                 "ai_profile_website": profile.get("website") if profile else None,
-                "has_ai_profile": profile is not None,  # Flag to indicate if enriched
+                "ai_business_summary": profile.get("business_summary") if profile else None,
+                "ai_market_regions": profile_market_regions,
+                "ai_risk_flags": profile_risk_flags,
+                "ai_next_steps": profile_next_steps,
+                "ai_industry_keywords": profile_keywords,
+                "ai_acquisition_angle": profile.get("acquisition_angle") if profile else None,
+                "ai_fit_status": ai_fit_status,
+                "ai_scraped_pages": scraped_pages,
+                "ai_upside_potential": profile.get("upside_potential") if profile else None,
+                "ai_fit_rationale": profile.get("fit_rationale") if profile else None,
+                "ai_strategic_playbook": profile.get("strategic_playbook") if profile else None,
+                "ai_agent_type": profile.get("agent_type") if profile else None,
+                "ai_date_scraped": profile.get("date_scraped") if profile else None,
+                "has_ai_profile": profile is not None,
+                "enrichment_summary": (
+                    {k: (v.get("result") if isinstance(v, dict) else None)
+                     for k, v in enrichment_map.get(row.get("orgnr", ""), {}).items()}
+                    if include_ai else None
+                ),
             })
         
         return {"companies": companies, "count": len(companies)}

@@ -15,7 +15,7 @@ from typing import Literal
 from .database_service import DatabaseService
 
 
-DatabaseSource = Literal["local", "supabase"]
+DatabaseSource = Literal["local", "supabase", "postgres"]
 
 
 def _get_source() -> DatabaseSource:
@@ -36,6 +36,11 @@ def get_database_service() -> DatabaseService:
         from .supabase_db_service import SupabaseDBService
 
         return SupabaseDBService()
+
+    if source == "postgres":
+        from .postgres_db_service import PostgresDBService
+
+        return PostgresDBService()
 
     raise ValueError(f"Unsupported DATABASE_SOURCE '{source}'")
 

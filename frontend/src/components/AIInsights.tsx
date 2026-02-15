@@ -34,6 +34,7 @@ export const AIInsights: React.FC = () => {
   const riskFlags = useMemo(() => toArray(profile?.risk_flags), [profile])
   const nextSteps = useMemo(() => toArray(profile?.next_steps), [profile])
   const scrapedPages = useMemo(() => toArray(profile?.scraped_pages), [profile])
+  const industryKeywords = useMemo(() => toArray(profile?.industry_keywords), [profile])
 
   const handleLoadProfile = async () => {
     if (!orgnr.trim()) {
@@ -95,6 +96,17 @@ export const AIInsights: React.FC = () => {
               </p>
             </div>
             <div className="rounded-md border border-gray-100 p-3">
+              <p className="text-xs uppercase text-gray-500">Business Summary</p>
+              <p className="text-sm text-gray-900">
+                {profile.business_summary || profile.business_model_summary || 'N/A'}
+              </p>
+              {profile.date_scraped && (
+                <p className="mt-2 text-[11px] uppercase tracking-wide text-gray-400">
+                  Scraped {new Date(profile.date_scraped).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+            <div className="rounded-md border border-gray-100 p-3">
               <p className="text-xs uppercase text-gray-500">End market</p>
               <p className="text-sm text-gray-900">{profile.end_market || 'N/A'}</p>
               <p className="mt-2 text-xs text-gray-500">
@@ -107,6 +119,15 @@ export const AIInsights: React.FC = () => {
                 {profile.industry_sector || 'N/A'}
                 {profile.industry_subsector ? ` / ${profile.industry_subsector}` : ''}
               </p>
+              {industryKeywords.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {industryKeywords.map((keyword) => (
+                    <span key={keyword} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              )}
               {marketRegions.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {marketRegions.map((region) => (
@@ -130,6 +151,9 @@ export const AIInsights: React.FC = () => {
                 <span className="text-base font-normal text-gray-500">/10</span>
               </p>
               <p className="mt-1 text-xs text-gray-500">{profile.fit_rationale || '—'}</p>
+              {profile.acquisition_angle && (
+                <p className="mt-2 text-xs text-gray-500">Angle: {profile.acquisition_angle}</p>
+              )}
             </div>
             <div className="rounded-md border border-gray-100 p-3">
               <p className="text-xs uppercase text-gray-500">Defensibility</p>

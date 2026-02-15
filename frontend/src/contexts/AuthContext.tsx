@@ -10,6 +10,8 @@ interface AuthContextType {
   isApproved: boolean
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
 }
 
@@ -33,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [isApproved, setIsApproved] = useState(false)
-  const authEnabled = false // TEMPORARY: Disable auth for testing
+  const authEnabled = supabaseConfig.isConfigured
 
   const createAuthDisabledError = (): AuthError => ({
     name: 'AuthNotConfigured',
@@ -205,8 +207,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { error }
   }
 
+  const signInWithMagicLink = async (email: string) => {
+    if (!supabase) {
+      return { error: createAuthDisabledError() }
+    }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin + '/auth' },
+    })
+    return { error }
+  }
+
+  const signInWithGoogle = async () => {
+    if (!supabase) {
+      return { error: createAuthDisabledError() }
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + '/auth' },
+    })
+    return { error }
+  }
+
   const signOut = async () => {
-    if (!authEnabled || !supabase) {
+    if (!supabase) {
       return { error: createAuthDisabledError() }
     }
 
@@ -236,6 +260,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isApproved,
     signUp,
     signIn,
+    signInWithMagicLink,
+    signInWithGoogle,
     signOut,
   }
 
