@@ -28,14 +28,18 @@ def get_database_service() -> DatabaseService:
     source = _get_source()
 
     if source == "local":
-        from .local_db_service import LocalDBService
-
-        return LocalDBService()
+        raise ValueError(
+            "SQLite (DATABASE_SOURCE=local) is disabled. Use Postgres for local development.\n"
+            "  1. Set DATABASE_SOURCE=postgres in .env\n"
+            "  2. Run: docker compose up -d\n"
+            "  3. Run: python scripts/bootstrap_postgres_schema.py && ./scripts/run_postgres_migrations.sh\n"
+            "See docs/LOCAL_POSTGRES_SETUP.md"
+        )
 
     if source == "supabase":
         raise ValueError(
             "Supabase backend (DATABASE_SOURCE=supabase) is not implemented. "
-            "Use DATABASE_SOURCE=postgres with a Supabase connection string, or DATABASE_SOURCE=local."
+            "Use DATABASE_SOURCE=postgres with POSTGRES_* vars or SUPABASE_DB_URL."
         )
 
     if source == "postgres":

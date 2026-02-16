@@ -12,9 +12,9 @@ openpyxl>=3.1.0
 
 # FastAPI and API dependencies
 fastapi>=0.115.0
+pydantic[email]>=2.0.0
 pyjwt>=2.8.0
 uvicorn[standard]>=0.30.0
-pydantic>=2.0.0
 python-multipart>=0.0.9
 
 # Redis and job queue

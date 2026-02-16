@@ -23,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 def _make_conn():
+    """Use DATABASE_URL or SUPABASE_DB_URL if set; otherwise POSTGRES_* vars."""
+    url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")
+    if url:
+        return psycopg2.connect(url, connect_timeout=5)
     return psycopg2.connect(
         host=os.getenv("POSTGRES_HOST", "localhost"),
         port=int(os.getenv("POSTGRES_PORT", "5433")),
@@ -51,12 +55,8 @@ class PostgresDBService(DatabaseService):
         self._lock = Lock()
         self._conn = _make_conn()
         self._conn.autocommit = False
-        logger.info(
-            "Connected to Postgres at %s:%s/%s",
-            os.getenv("POSTGRES_HOST", "localhost"),
-            os.getenv("POSTGRES_PORT", "5433"),
-            os.getenv("POSTGRES_DB", "nivo"),
-        )
+        conn_display = "DATABASE_URL/SUPABASE_DB_URL" if (os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")) else f"{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'nivo')}"
+        logger.info("Connected to Postgres (%s)", conn_display)
 
     def _execute(
         self,
@@ -121,6 +121,18 @@ class PostgresDBService(DatabaseService):
         params: Optional[Sequence[Any]] = None,
     ) -> List[Dict[str, Any]]:
         return self._execute(sql, params)
+
+    def run_execute_values(self, sql: str, values: List[tuple]) -> int:
+        """Bulk insert using psycopg2.extras.execute_values. Returns rowcount."""
+        from psycopg2.extras import execute_values
+
+        sql = _sqlite_to_psycopg(sql)
+        with self._lock:
+            with self._conn.cursor() as cur:
+                execute_values(cur, sql, values, page_size=2000)
+                rowcount = cur.rowcount
+            self._conn.commit()
+        return rowcount
 
     def table_exists(self, table_name: str) -> bool:
         rows = self._execute(

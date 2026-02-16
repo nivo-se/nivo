@@ -15,8 +15,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
 
-# Paths that bypass auth when REQUIRE_AUTH=true
-PUBLIC_PATHS = {"/health", "/api/status", "/docs", "/redoc", "/openapi.json"}
+# Paths that bypass auth when REQUIRE_AUTH=true (Universe query/filters are read-only)
+PUBLIC_PATHS = {
+    "/ping", "/health", "/api/status", "/docs", "/redoc", "/openapi.json",
+    "/api/universe/filters", "/api/universe/query",
+    "/api/coverage/snapshot", "/api/coverage/list", "/api/home/dashboard",
+}
 
 
 def _should_require_auth() -> bool:

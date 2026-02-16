@@ -9,6 +9,8 @@ from pathlib import Path
 import os
 from typing import Optional
 
+from fastapi import Request
+
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -34,9 +36,34 @@ def get_supabase_client() -> Optional[Client]:
     return create_client(url, key)
 
 
+@lru_cache()
+def get_supabase_admin_client() -> Optional[Client]:
+    """
+    Get Supabase client with service role for auth admin (create users, etc.).
+    Used when SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set, regardless of DATABASE_SOURCE.
+    """
+    url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    if not url or not key:
+        return None
+    return create_client(url, key)
+
+
 def require_supabase_message() -> str:
     """Message for endpoints that require DATABASE_SOURCE=supabase."""
     return "This feature requires DATABASE_SOURCE=supabase"
+
+
+def get_current_user_id(request: Request) -> Optional[str]:
+    """
+    Get current user ID (sub) from request.state.user set by JWTAuthMiddleware.
+    Returns None when auth is disabled or no user.
+    """
+    user = getattr(request.state, "user", None)
+    if not user or not isinstance(user, dict):
+        return None
+    sub = user.get("sub")
+    return str(sub) if sub else None
 
 @lru_cache()
 def get_redis_client() -> redis.Redis:

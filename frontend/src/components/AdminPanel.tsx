@@ -4,9 +4,13 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Loader2, Users, CheckCircle, XCircle, Clock, Shield, Mail, Calendar, Database, BarChart3, Globe, TrendingUp, Eye, Info } from 'lucide-react';
+import { Loader2, Users, CheckCircle, XCircle, Clock, Shield, Mail, Calendar, Database, BarChart3, Globe, TrendingUp, Eye, Info, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { supabaseDataService } from '../lib/supabaseDataService';
+import { createUser, type UserRole } from '../lib/services/adminService';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface User {
   id: string;
@@ -40,12 +44,37 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [addEmail, setAddEmail] = useState('');
+  const [addPassword, setAddPassword] = useState('');
+  const [addRole, setAddRole] = useState<UserRole>('approved');
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   // Fetch all users
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      
+
+      if (!supabase) {
+        setError('Supabase is not configured (auth disabled or paused). User management unavailable.');
+        if (currentUser?.email === 'jesper@rgcapital.se') {
+          setUsers([{
+            id: 'fallback-admin',
+            user_id: currentUser.id,
+            role: 'admin' as const,
+            email: currentUser.email,
+            approved_by: 'system',
+            approved_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }]);
+        } else {
+          setUsers([]);
+        }
+        return;
+      }
+
       // Get user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
@@ -125,6 +154,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   // Approve user
   const approveUser = async (userId: string) => {
+    if (!supabase) {
+      setError('Supabase not configured');
+      return;
+    }
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -138,7 +171,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('Användare godkänd framgångsrikt!');
+      setSuccess('User approved successfully!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -149,6 +182,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   // Reject user
   const rejectUser = async (userId: string) => {
+    if (!supabase) {
+      setError('Supabase not configured');
+      return;
+    }
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -158,7 +195,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('Användare avvisad och borttagen!');
+      setSuccess('User rejected and removed!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -169,6 +206,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   // Make user admin
   const makeAdmin = async (userId: string) => {
+    if (!supabase) {
+      setError('Supabase not configured');
+      return;
+    }
     try {
       setActionLoading(userId);
       const { error } = await supabase
@@ -182,7 +223,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       if (error) throw error;
       
-      setSuccess('Användare befordrad till admin!');
+      setSuccess('User promoted to admin!');
       await fetchUsers();
     } catch (err: any) {
       setError(err.message);
@@ -196,16 +237,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       case 'admin':
         return <Badge variant="default" className="bg-red-500"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
       case 'approved':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Godkänd</Badge>;
+        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
       case 'pending':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Väntar</Badge>;
+        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       default:
-        return <Badge variant="outline">Okänd</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('sv-SE', {
+    return new Date(dateString).toLocaleDateString('en-GB', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -219,6 +260,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     setIsUserDialogOpen(true);
   };
 
+  const handleAddUser = async () => {
+    if (!addEmail.trim() || !addPassword) {
+      setAddError('Email and password are required');
+      return;
+    }
+    if (addPassword.length < 8) {
+      setAddError('Password must be at least 8 characters');
+      return;
+    }
+    setAddError(null);
+    setAddSubmitting(true);
+    try {
+      await createUser(addEmail.trim(), addPassword, addRole);
+      setSuccess('User created!');
+      setIsAddUserDialogOpen(false);
+      setAddEmail('');
+      setAddPassword('');
+      setAddRole('approved');
+      await fetchUsers();
+    } catch (err: unknown) {
+      setAddError(err instanceof Error ? err.message : 'Could not create user');
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
   const pendingUsers = users.filter(user => user.role === 'pending');
   const approvedUsers = users.filter(user => user.role === 'approved');
   const adminUsers = users.filter(user => user.role === 'admin');
@@ -227,7 +294,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Laddar användare och hämtar e-postadresser...</span>
+        <span className="ml-2">Loading users and fetching emails...</span>
       </div>
     );
   }
@@ -237,13 +304,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Användaradministration</h2>
-          <p className="text-gray-600">Hantera användaråtkomst och behörigheter</p>
+          <h2 className="text-2xl font-bold text-gray-900">User administration</h2>
+          <p className="text-gray-600">Manage user access and permissions</p>
         </div>
-        <Button onClick={fetchUsers} variant="outline">
-          <Users className="w-4 h-4 mr-2" />
-          Uppdatera
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsAddUserDialogOpen(true)}>
+            <UserPlus className="w-4 h-4 mr-2" />
+            Add user
+          </Button>
+          <Button onClick={fetchUsers} variant="outline">
+            <Users className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -261,119 +334,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </Alert>
       )}
 
-      {/* System Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Totalt antal användare</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.totalUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">Registrerade användare</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Väntande användare</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.pendingUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">Behöver godkännande</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Godkända användare</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.approvedUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">Aktiva användare</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administratörer</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{systemMetrics?.adminUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">Admin-behörighet</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Database Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Database className="h-5 w-5 mr-2" />
-            Databasstatus
-          </CardTitle>
-          <CardDescription>Realtidsanslutning och prestandamått</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-medium">Anslutningsstatus</h4>
-              <p className="text-sm text-gray-600">Supabase databasanslutning</p>
-            </div>
-            <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-green-500" : "bg-red-500"}>
-              {systemMetrics?.databaseConnected ? "Ansluten" : "Frånkopplad"}
-            </Badge>
-          </div>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <div className="text-lg font-bold text-green-600">Live</div>
-              <div className="text-xs text-gray-600">Realtidsdata</div>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <div className="text-lg font-bold text-blue-600">Snabb</div>
-              <div className="text-xs text-gray-600">Svarstid</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* User Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Väntar på godkännande</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{pendingUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Väntar på ditt godkännande</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Godkända användare</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{approvedUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Aktiva användare</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administratörer</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{adminUsers.length}</div>
-            <p className="text-xs text-muted-foreground">Administratörer</p>
-          </CardContent>
-        </Card>
+      {/* System metrics - stacked rows */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Total users</span>
+          <span className="font-medium">{systemMetrics?.totalUsers || 0}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Pending</span>
+          <span className="font-medium">{systemMetrics?.pendingUsers || 0}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Approved</span>
+          <span className="font-medium">{systemMetrics?.approvedUsers || 0}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Administrators</span>
+          <span className="font-medium">{systemMetrics?.adminUsers || 0}</span>
+        </div>
+        <div className="flex justify-between text-sm pt-2 border-t">
+          <span className="text-muted-foreground">Database</span>
+          <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-green-500" : "bg-red-500"}>
+            {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
+          </Badge>
+        </div>
       </div>
 
       {/* Pending Users */}
@@ -382,10 +366,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Clock className="w-5 h-5 mr-2 text-orange-500" />
-              Väntar på godkännande ({pendingUsers.length})
+              Pending approval ({pendingUsers.length})
             </CardTitle>
             <CardDescription>
-              Nya användare som väntar på ditt godkännande för att komma åt plattformen
+              New users waiting for your approval to access the platform
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -399,7 +383,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     <div>
                       <p className="font-medium">{user.email}</p>
                       <p className="text-sm text-gray-500">
-                        Registrerad: {formatDate(user.created_at)}
+                        Registered: {formatDate(user.created_at)}
                       </p>
                     </div>
                   </div>
@@ -411,7 +395,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       onClick={() => handleUserClick(user)}
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      Visa detaljer
+                      View details
                     </Button>
                     <Button
                       size="sm"
@@ -423,7 +407,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       ) : (
                         <>
                           <CheckCircle className="w-4 h-4 mr-1" />
-                          Godkänn
+                          Approve
                         </>
                       )}
                     </Button>
@@ -438,7 +422,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       ) : (
                         <>
                           <XCircle className="w-4 h-4 mr-1" />
-                          Avvisa
+                          Reject
                         </>
                       )}
                     </Button>
@@ -455,10 +439,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="w-5 h-5 mr-2" />
-            Alla användare ({users.length})
+            All users ({users.length})
           </CardTitle>
           <CardDescription>
-            Komplett lista över alla användare i systemet
+            Complete list of all users in the system
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -472,11 +456,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                   <div>
                     <p className="font-medium">{user.email}</p>
                     <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <span>Gick med: {formatDate(user.created_at)}</span>
+                      <span>Joined: {formatDate(user.created_at)}</span>
                       {user.approved_at && (
                         <>
                           <span>•</span>
-                          <span>Godkänd: {formatDate(user.approved_at)}</span>
+                          <span>Approved: {formatDate(user.approved_at)}</span>
                         </>
                       )}
                     </div>
@@ -484,29 +468,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   {getRoleBadge(user.role)}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleUserClick(user)}
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Visa detaljer
-                  </Button>
-                  {user.role === 'approved' && (
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => makeAdmin(user.id)}
-                      disabled={actionLoading === user.id}
+                      onClick={() => handleUserClick(user)}
                     >
-                      {actionLoading === user.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Shield className="w-4 h-4 mr-1" />
-                          Gör till admin
-                        </>
-                      )}
+                      <Eye className="w-4 h-4 mr-1" />
+                      View details
+                    </Button>
+                    {user.role === 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => makeAdmin(user.id)}
+                        disabled={actionLoading === user.id}
+                      >
+                        {actionLoading === user.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Shield className="w-4 h-4 mr-1" />
+                            Make admin
+                          </>
+                        )}
                     </Button>
                   )}
                 </div>
@@ -522,10 +506,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Info className="h-5 w-5 mr-2" />
-              Användardetaljer
+              User details
             </DialogTitle>
             <DialogDescription>
-              Detaljerad information om den valda användaren
+              Detailed information about the selected user
             </DialogDescription>
           </DialogHeader>
           
@@ -534,7 +518,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {/* User Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">E-postadress</label>
+                  <label className="text-sm font-medium text-gray-500">Email</label>
                   <p className="text-lg font-semibold">{selectedUser.email}</p>
                 </div>
                 <div>
@@ -547,18 +531,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* User ID */}
               <div>
-                <label className="text-sm font-medium text-gray-500">Användar-ID</label>
+                  <label className="text-sm font-medium text-gray-500">User ID</label>
                 <p className="text-sm font-mono bg-gray-100 p-2 rounded">{selectedUser.user_id}</p>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Gick med datum</label>
+                  <label className="text-sm font-medium text-gray-500">Joined date</label>
                   <p className="text-sm">{formatDate(selectedUser.created_at)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Senast uppdaterad</label>
+                  <label className="text-sm font-medium text-gray-500">Last updated</label>
                   <p className="text-sm">{formatDate(selectedUser.updated_at)}</p>
                 </div>
               </div>
@@ -567,11 +551,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {selectedUser.approved_at && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Godkänd datum</label>
+                    <label className="text-sm font-medium text-gray-500">Approved date</label>
                     <p className="text-sm">{formatDate(selectedUser.approved_at)}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Godkänd av</label>
+                    <label className="text-sm font-medium text-gray-500">Approved by</label>
                     <p className="text-sm">{selectedUser.approved_by || 'System'}</p>
                   </div>
                 </div>
@@ -579,23 +563,104 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* Status Summary */}
               <div className="border-t pt-4">
-                <h4 className="font-medium mb-2">Statussammanfattning</h4>
+                <h4 className="font-medium mb-2">Status summary</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
-                    <span>Kontostatus:</span>
+                    <span>Account status:</span>
                     <span className="font-medium">
-                      {selectedUser.role === 'pending' ? 'Väntar på godkännande' : 
-                       selectedUser.role === 'approved' ? 'Aktiv' : 'Administratör'}
+                      {selectedUser.role === 'pending' ? 'Pending approval' : 
+                       selectedUser.role === 'approved' ? 'Active' : 'Administrator'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Åtkomstnivå:</span>
+                    <span>Access level:</span>
                     <span className="font-medium capitalize">{selectedUser.role}</span>
                   </div>
                 </div>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Dialog */}
+      <Dialog open={isAddUserDialogOpen} onOpenChange={(open) => {
+        setIsAddUserDialogOpen(open);
+        if (!open) {
+          setAddEmail('');
+          setAddPassword('');
+          setAddRole('approved');
+          setAddError(null);
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <UserPlus className="h-5 w-5 mr-2" />
+              Add user
+            </DialogTitle>
+            <DialogDescription>
+              Create a new user with email, password and role
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {addError && (
+              <Alert variant="destructive">
+                <XCircle className="h-4 w-4" />
+                <AlertDescription>{addError}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="add-email">Email</Label>
+              <Input
+                id="add-email"
+                type="email"
+                placeholder="name@example.com"
+                value={addEmail}
+                onChange={(e) => setAddEmail(e.target.value)}
+                disabled={addSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-password">Password</Label>
+              <Input
+                id="add-password"
+                type="password"
+                placeholder="At least 8 characters"
+                value={addPassword}
+                onChange={(e) => setAddPassword(e.target.value)}
+                disabled={addSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-role">Role</Label>
+              <Select value={addRole} onValueChange={(v) => setAddRole(v as UserRole)} disabled={addSubmitting}>
+                <SelectTrigger id="add-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setIsAddUserDialogOpen(false)} disabled={addSubmitting}>
+                Cancel
+              </Button>
+              <Button onClick={handleAddUser} disabled={addSubmitting}>
+                {addSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create user'
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

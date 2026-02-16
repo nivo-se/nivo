@@ -21,6 +21,14 @@ export type CoverageRow = {
   last_enriched_at?: string | null;
   is_stale: boolean;
   data_quality_score: number;
+  /** Revenue latest (SEK) */
+  revenue_latest?: number | null;
+  /** EBITDA margin latest (%) */
+  ebitda_margin_latest?: number | null;
+  /** Revenue CAGR 3y (%) */
+  revenue_cagr_3y?: number | null;
+  /** Employees latest */
+  employees_latest?: number | null;
 };
 
 export type CoverageListResponse = {
@@ -43,6 +51,8 @@ export async function getCoverageList(params: {
   stale_only?: boolean;
   limit?: number;
   offset?: number;
+  sort_by?: string;
+  sort_dir?: "asc" | "desc";
 }): Promise<CoverageListResponse> {
   const usp = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {

@@ -1,6 +1,9 @@
 -- Extend coverage_metrics view with name and segment_names for Universe page
+-- Idempotent: DROP before CREATE
 
-CREATE OR REPLACE VIEW public.coverage_metrics AS
+DROP VIEW IF EXISTS public.coverage_metrics CASCADE;
+
+CREATE VIEW public.coverage_metrics AS
 SELECT
   c.orgnr,
   c.company_name AS name,

@@ -1,9 +1,12 @@
 -- Migration: Coverage metrics view for Data Coverage Mode
 -- Powers "what do we know vs don't know" in Universe and Home
+-- Idempotent: DROP before CREATE so re-running migrations works (014/016/017 extend this view)
+
+DROP VIEW IF EXISTS public.coverage_metrics CASCADE;
 
 -- View: coverage_metrics
 -- Columns: orgnr, has_homepage, has_ai_profile, has_3y_financials, last_enriched_at, data_quality_score
-CREATE OR REPLACE VIEW public.coverage_metrics AS
+CREATE VIEW public.coverage_metrics AS
 SELECT
   c.orgnr,
   (c.homepage IS NOT NULL AND c.homepage != '') AS has_homepage,
