@@ -49,6 +49,8 @@ venv.bak/
 
 # Database files
 *.db
+*.db.backup
+*.db.backup_*
 *.sqlite
 *.sqlite3
 allabolag.db

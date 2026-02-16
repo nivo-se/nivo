@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"tsx server/enhanced-server.ts\"",
+    "start": "tsx server/enhanced-server.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

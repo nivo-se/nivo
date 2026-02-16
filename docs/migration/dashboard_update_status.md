@@ -40,8 +40,7 @@
 - `frontend/src/components/IndustryFilter.tsx` - May reference old tables
 
 ### Server-Side
-- `frontend/server/enhanced-server.ts` - Multiple endpoints need updates
-- `frontend/server/server.ts` - May have old table references
+- `frontend/server/enhanced-server.ts` - Multiple endpoints need updates (active server; see `npm run start`)
 - `frontend/server/industry-benchmarks.ts` - Uses `master_analytics`
 - `frontend/server/data-enrichment.ts` - Uses `master_analytics`
 

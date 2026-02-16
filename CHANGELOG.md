@@ -2,6 +2,19 @@
 
 ## [Latest] - 2025-01-XX
 
+### Migration Nightly Audit Fixes (P0–P2)
+
+- **P0**: Postgres `_execute()` no longer calls `fetchall()` for `INSERT`/`UPDATE` without `RETURNING`.
+- **P1**: Enrichment `kinds` passed to worker; only writes requested kinds (e.g. `llm_analysis`).
+- **P1**: `POST /api/enrichment/run` enqueues to RQ and returns immediately with `run_id` and `job_id`; falls back to sync when queue unavailable.
+- **P1**: `DATABASE_SOURCE=supabase` now fails fast with clear message; use `postgres` or `local`.
+- **P1**: CORS Vercel regex opt-in via `CORS_ALLOW_VERCEL_PREVIEWS`; no wildcard when credentials enabled by default.
+- **P2**: `failures` in enrichment status always returns array (never `null`).
+- **P2**: `generate-batch` returns generic 503 message; raw exception logged server-side only.
+- **P2**: API key / Supabase URL logs in `enhanced-server.ts` guarded behind `DEBUG=true`.
+- **P2**: `*.db.backup_*` added to `.gitignore`; existing backups untracked.
+- **P2**: `frontend/server/server.ts` deprecated; `enhanced-server.ts` is the active server.
+
 ### 🎯 Major Features
 
 #### 1. **Company Context in Search Results**

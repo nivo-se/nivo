@@ -69,7 +69,7 @@ class PostgresDBService(DatabaseService):
             with self._conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
                 cur.execute(sql, params or [])
                 self._conn.commit()
-                rows = cur.fetchall()
+                rows = cur.fetchall() if cur.description else []
         return [dict(row) for row in rows]
 
     def fetch_companies(

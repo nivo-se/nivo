@@ -8,7 +8,14 @@ from ..services.db_factory import get_database_service
 
 router = APIRouter(prefix="/api", tags=["status"])
 
-TABLES_FOR_STATUS = ["companies", "financials", "company_kpis", "enrichment_runs", "company_enrichment"]
+TABLES_FOR_STATUS = [
+    "companies",
+    "financials",
+    "company_kpis",
+    "enrichment_runs",
+    "company_enrichment",
+    "ai_profiles",
+]
 
 
 @router.get("/status")
@@ -87,5 +94,48 @@ async def get_status():
     return {
         "status": "healthy" if all_healthy else "degraded",
         **status,
+    }
+
+
+@router.get("/status/config")
+async def get_config():
+    """
+    Effective config (no secrets). For ops verification.
+    """
+    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    require_auth = os.getenv("REQUIRE_AUTH", "false").lower() in ("1", "true", "yes")
+
+    # CORS origins count (from default + CORS_ORIGINS)
+    default_count = 10  # localhost ports in main.py
+    cors_extra = os.getenv("CORS_ORIGINS", "")
+    cors_origins_count = default_count + (
+        len([o for o in cors_extra.split(",") if o.strip()]) if cors_extra else 0
+    )
+    if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
+        cors_origins_count = str(cors_origins_count) + "+vercel_regex"
+
+    redis_connected = "no"
+    try:
+        r = get_redis_client()
+        r.ping()
+        redis_connected = "yes"
+    except Exception:
+        pass
+
+    llm_provider = "not configured"
+    try:
+        from ..llm.provider_factory import get_llm_provider
+
+        p = get_llm_provider()
+        llm_provider = p.__class__.__name__ if p else "none"
+    except Exception:
+        pass
+
+    return {
+        "db_source": db_source,
+        "require_auth": require_auth,
+        "cors_origins_count": cors_origins_count,
+        "redis_connected": redis_connected,
+        "llm_provider": llm_provider,
     }
 

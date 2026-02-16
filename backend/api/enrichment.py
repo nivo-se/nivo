@@ -23,7 +23,7 @@ class EnrichmentStartRequest(BaseModel):
     force_refresh: bool = False
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 class EnrichmentStartResponse(BaseModel):
@@ -143,6 +143,7 @@ class EnrichmentRunResponse(BaseModel):
     """Response from batch enrichment run"""
     run_id: str
     queued_count: int
+    job_id: Optional[str] = None
 
 
 class EnrichmentRunStatusResponse(BaseModel):
@@ -151,7 +152,7 @@ class EnrichmentRunStatusResponse(BaseModel):
     counts_by_kind: Dict[str, int]
     completed: int
     failed: int
-    failures: Optional[List[Dict[str, Any]]] = None
+    failures: List[Dict[str, Any]] = []
 
 
 def _resolve_orgnrs(db, orgnrs: Optional[List[str]], list_id: Optional[str]) -> List[str]:
@@ -183,8 +184,8 @@ def _resolve_orgnrs(db, orgnrs: Optional[List[str]], list_id: Optional[str]) -> 
 @router.post("/run", response_model=EnrichmentRunResponse)
 async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse:
     """
-    Create enrichment run and process batch. Uses orgnrs or list_id.
-    Processes synchronously when no job queue; logs progress.
+    Create enrichment run and enqueue batch to RQ. Returns immediately with run_id and job_id.
+    Poll GET /run/{run_id}/status for progress.
     """
     db = get_database_service()
     if not db:
@@ -195,31 +196,51 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
         raise HTTPException(status_code=400, detail="Provide orgnrs or list_id with companies")
 
     kinds = request.kinds or DEFAULT_ENRICHMENT_KINDS
+    batch = orgnrs[:500]
 
     run_id = db.create_enrichment_run(
         source="enrichment-run-api",
         provider="openai_compat",
-        meta={"orgnrs": orgnrs[:500], "kinds": kinds},
+        meta={"orgnrs": batch, "kinds": kinds},
     )
     if not run_id:
         raise HTTPException(status_code=500, detail="Failed to create enrichment run")
 
-    logger.info("Enrichment run %s: processing %d companies (kinds=%s)", run_id, len(orgnrs), kinds)
-
     try:
-        result = enrich_companies_batch(orgnrs[:500], force_refresh=False, run_id=run_id)
+        from .jobs import get_enrichment_queue
+
+        queue = get_enrichment_queue()
+        job = queue.enqueue(
+            enrich_companies_batch,
+            batch,
+            force_refresh=False,
+            run_id=run_id,
+            kinds=kinds,
+            job_timeout="2h",
+            job_id=f"enrich_{run_id[:8]}_{hash(tuple(batch)) % 10000}",
+        )
+        logger.info("Enrichment run %s enqueued (job %s): %d companies, kinds=%s", run_id, job.id, len(batch), kinds)
+        return EnrichmentRunResponse(run_id=run_id, queued_count=len(batch), job_id=job.id)
+    except (ConnectionError, OSError) as exc:
+        logger.warning("Job queue unavailable, falling back to synchronous run: %s", exc)
+    except Exception as exc:
+        logger.warning("Failed to enqueue enrichment job, falling back to sync: %s", exc)
+
+    # Fallback: run synchronously when queue unavailable
+    try:
+        result = enrich_companies_batch(batch, force_refresh=False, run_id=run_id, kinds=kinds)
         errors = result.get("errors", [])
         if errors:
             db.update_enrichment_run_meta(run_id, errors)
         logger.info(
-            "Enrichment run %s complete: enriched=%d, errors=%d",
+            "Enrichment run %s complete (sync): enriched=%d, errors=%d",
             run_id, result.get("enriched", 0), len(errors),
         )
     except Exception as exc:
         logger.exception("Enrichment run %s failed", run_id)
         raise HTTPException(status_code=500, detail=f"Enrichment failed: {exc}") from exc
 
-    return EnrichmentRunResponse(run_id=run_id, queued_count=len(orgnrs[:500]))
+    return EnrichmentRunResponse(run_id=run_id, queued_count=len(batch))
 
 
 @router.get("/run/{run_id}/status", response_model=EnrichmentRunStatusResponse)
@@ -236,7 +257,7 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
             if run_rows and run_rows[0].get("meta"):
                 meta = run_rows[0]["meta"]
                 failures = meta.get("failures", []) if isinstance(meta, dict) else []
-        return EnrichmentRunStatusResponse(run_id=run_id, counts_by_kind={}, completed=0, failed=len(failures), failures=failures)
+        return EnrichmentRunStatusResponse(run_id=run_id, counts_by_kind={}, completed=0, failed=len(failures), failures=failures or [])
 
     # Count by kind for this run
     rows = db.run_raw_query(
@@ -273,7 +294,7 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
         counts_by_kind=counts_by_kind,
         completed=completed,
         failed=failed,
-        failures=failures if failures else None,
+        failures=failures or [],
     )
 
 

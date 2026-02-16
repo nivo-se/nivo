@@ -102,7 +102,8 @@ async def generate_reports_batch(orgnrs: list[str]):
         from ..llm.provider_factory import get_llm_provider
         provider = get_llm_provider()
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"LLM provider not available: {e}") from e
+        logger.warning("LLM provider not available for generate-batch: %s", e)
+        raise HTTPException(status_code=503, detail="Service temporarily unavailable") from e
 
     from ..services import ai_report_service
 

@@ -33,9 +33,10 @@ def get_database_service() -> DatabaseService:
         return LocalDBService()
 
     if source == "supabase":
-        from .supabase_db_service import SupabaseDBService
-
-        return SupabaseDBService()
+        raise ValueError(
+            "Supabase backend (DATABASE_SOURCE=supabase) is not implemented. "
+            "Use DATABASE_SOURCE=postgres with a Supabase connection string, or DATABASE_SOURCE=local."
+        )
 
     if source == "postgres":
         from .postgres_db_service import PostgresDBService

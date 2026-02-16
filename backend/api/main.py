@@ -35,14 +35,18 @@ cors_origins_env = os.getenv("CORS_ORIGINS", "")
 if cors_origins_env:
     default_origins.extend([origin.strip() for origin in cors_origins_env.split(",") if origin.strip()])
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=default_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel preview deployments
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Restrict to explicit origins when credentials enabled; no wildcard regex.
+cors_config: dict = {
+    "allow_origins": default_origins,
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+# Opt-in: add Vercel preview regex only when explicitly enabled (security: avoids trusting any *.vercel.app)
+if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
+    cors_config["allow_origin_regex"] = r"https://.*\.vercel\.app"
+
+app.add_middleware(CORSMiddleware, **cors_config)
 
 # JWT auth when REQUIRE_AUTH=true (prod)
 from .auth import JWTAuthMiddleware

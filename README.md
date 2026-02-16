@@ -111,6 +111,8 @@ npm run dev
 
 ## 🚀 Deployment
 
+**Production env checklist:** See [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md) for required env vars (DB, CORS, RQ, LLM). Use `GET /api/status/config` to verify effective config after deploy.
+
 ### Vercel (Full-Stack)
 ```bash
 # Deploy to Vercel

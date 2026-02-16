@@ -64,10 +64,16 @@ def _combine_scraped_pages(pages: Dict[str, str], limit: int = 12000) -> Optiona
     return combined[:limit] if combined else None
 
 
-def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False, run_id: Optional[str] = None) -> Dict[str, Any]:
+def enrich_companies_batch(
+    orgnrs: List[str],
+    force_refresh: bool = False,
+    run_id: Optional[str] = None,
+    kinds: Optional[List[str]] = None,
+) -> Dict[str, Any]:
     """
     Background job to enrich multiple companies end-to-end.
     If run_id is provided (e.g. from POST /api/enrichment/run), uses it; else creates a new run.
+    kinds: if set, only write enrichment for these kinds (e.g. ["llm_analysis"]). Worker produces llm_analysis.
     """
     job = get_current_job()
 
@@ -276,18 +282,20 @@ def enrich_companies_batch(orgnrs: List[str], force_refresh: bool = False, run_i
                     logger.error("Failed to save ai_profile for %s: %s", orgnr, db_exc)
 
             if run_id:
-                try:
-                    db.upsert_company_enrichment(
-                        orgnr=orgnr,
-                        run_id=run_id,
-                        kind="llm_analysis",
-                        result=analysis,
-                        score=analysis.get("strategic_fit_score"),
-                        tags={"agent_type": analysis.get("agent_type")},
-                    )
-                    logger.debug("Saved company_enrichment for %s (run %s)", orgnr, run_id)
-                except Exception as ce_exc:
-                    logger.warning("Failed to save company_enrichment for %s: %s", orgnr, ce_exc)
+                write_kinds = kinds if kinds else ["llm_analysis"]
+                if "llm_analysis" in write_kinds:
+                    try:
+                        db.upsert_company_enrichment(
+                            orgnr=orgnr,
+                            run_id=run_id,
+                            kind="llm_analysis",
+                            result=analysis,
+                            score=analysis.get("strategic_fit_score"),
+                            tags={"agent_type": analysis.get("agent_type")},
+                        )
+                        logger.debug("Saved company_enrichment for %s (run %s)", orgnr, run_id)
+                    except Exception as ce_exc:
+                        logger.warning("Failed to save company_enrichment for %s: %s", orgnr, ce_exc)
             
             # Also ensure website is saved to companies table (in case it wasn't saved earlier)
             if website and not existing_homepage:

@@ -1,3 +1,7 @@
+/**
+ * @deprecated Legacy server. Use enhanced-server.ts instead (see package.json "dev" script).
+ * This file is no longer invoked by dev or deployment. Kept for reference; may be removed.
+ */
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'

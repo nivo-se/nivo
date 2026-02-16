@@ -1,5 +1,7 @@
 # Start All Servers - Quick Guide
 
+**Local dev mode (no Supabase):** See [docs/LOCAL_DEV_MODE.md](docs/LOCAL_DEV_MODE.md) — auth bypassed, SQLite DB.
+
 ## Current Status
 
 ✅ **Backend:** Running on http://localhost:8000
@@ -12,11 +14,10 @@
 
 ## Start Frontend
 
-Open a **new terminal** and run:
+Open a **new terminal** (from project root) and run:
 
 ```bash
-cd /Users/jesper/nivo/frontend
-npm run dev
+cd frontend && npm run dev
 ```
 
 Wait for output like:
@@ -66,10 +67,11 @@ Once frontend is running, test the main dashboard:
 
 ### Terminal 1: Backend
 ```bash
-cd /Users/jesper/nivo/backend
-source venv/bin/activate
+cd backend
+source venv/bin/activate   # or: . venv/bin/activate
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
+*(Or from project root: `uvicorn backend.api.main:app --reload --host 0.0.0.0 --port 8000`)*
 
 ### Terminal 2: Redis (if not running as service)
 ```bash
@@ -78,15 +80,14 @@ redis-server
 
 ### Terminal 3: RQ Worker
 ```bash
-cd /Users/jesper/nivo/backend
+cd backend
 source venv/bin/activate
 rq worker --url redis://localhost:6379/0
 ```
 
 ### Terminal 4: Frontend
 ```bash
-cd /Users/jesper/nivo/frontend
-npm run dev
+cd frontend && npm run dev
 ```
 
 ---

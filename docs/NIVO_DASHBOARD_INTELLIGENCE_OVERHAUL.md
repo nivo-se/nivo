@@ -80,7 +80,7 @@ async def _search_news(self, company_name: str, orgnr: str) -> List[NewsArticle]
 
 **Problem Areas:**
 - **Backend pipeline not exposed to UI**: `StagedTargetingWorkflow` exists but no API endpoints call it
-- **No background workers**: All AI analysis runs synchronously in Express server (`frontend/server/server.ts`)
+- **No background workers**: All AI analysis runs synchronously in Express server (`frontend/server/enhanced-server.ts`)
 - **No job queue**: Cannot trigger enrichment jobs and check status asynchronously
 - **No orchestration UI**: Operators cannot trigger Stage 1/Stage 2 workflows from dashboard
 - **Results not linked**: AI analysis results in `ai_ops` schema are not displayed in company detail views

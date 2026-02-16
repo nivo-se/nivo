@@ -47,9 +47,11 @@ const __dirname = path.dirname(__filename)
 // Load environment variables from .env.local
 config({ path: path.resolve(__dirname, '../.env.local') })
 
-// Debug: Check if environment variables are loaded
-console.log('Supabase URL:', process.env.VITE_SUPABASE_URL ? 'Loaded' : 'Missing')
-console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Loaded' : 'Missing')
+// Environment check (only when DEBUG=true to avoid leaking operational hints)
+if (process.env.DEBUG === 'true' || process.env.DEBUG === '1') {
+  console.log('Supabase URL:', process.env.VITE_SUPABASE_URL ? 'Loaded' : 'Missing')
+  console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Loaded' : 'Missing')
+}
 
 const app = express()
 const port = process.env.PORT ? Number(process.env.PORT) : 3001

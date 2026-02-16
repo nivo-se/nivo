@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 // Supabase configuration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Set VITE_AUTH_DISABLED=true for local dev when Supabase is unreachable (e.g. NXDOMAIN)
+const authDisabled = import.meta.env.VITE_AUTH_DISABLED === 'true' || import.meta.env.VITE_AUTH_DISABLED === '1'
 
 // Check if Supabase is configured
-const isConfigured = !!(supabaseUrl && supabaseAnonKey &&
+const isConfigured = !authDisabled && !!(supabaseUrl && supabaseAnonKey &&
   supabaseUrl.length > 0 &&
   !supabaseUrl.includes('placeholder') &&
   supabaseAnonKey.length > 0)
