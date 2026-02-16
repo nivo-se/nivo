@@ -2,9 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AppLayout } from "@/app/AppLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AISourcingDashboard from "./pages/AISourcingDashboard";
@@ -14,8 +15,20 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import Valuation from "./pages/Valuation";
+import { HomePage } from "@/pages/app/HomePage";
+import { UniversePage } from "@/pages/app/UniversePage";
+import { PipelinePage } from "@/pages/app/PipelinePage";
+import { CompanyPage } from "@/pages/app/CompanyPage";
+import { ReportsPage } from "@/pages/app/ReportsPage";
+import { RunsPage } from "@/pages/app/RunsPage";
+import { AdminPage } from "@/pages/app/AdminPage";
 
 const queryClient = new QueryClient();
+
+function RedirectToAppCompany() {
+  const { orgnr } = useParams<{ orgnr: string }>();
+  return <Navigate to={orgnr ? `/app/companies/${orgnr}` : "/app/home"} replace />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,46 +41,38 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/styleguide" element={<StyleGuide />} />
+
+            {/* Legacy routes — redirect to new backend app */}
+            <Route path="/dashboard" element={<Navigate to="/app/home" replace />} />
+            <Route path="/admin" element={<Navigate to="/app/admin" replace />} />
+            <Route path="/valuation" element={<Navigate to="/app/reports" replace />} />
+            <Route path="/analysis" element={<Navigate to="/app/pipeline" replace />} />
+
+            {/* New backend app shell */}
             <Route
-              path="/dashboard"
+              path="/app"
               element={
                 <ProtectedRoute>
-                  <AISourcingDashboard />
+                  <AppLayout />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <Admin />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/valuation"
-              element={
-                <ProtectedRoute>
-                  <Valuation />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route index element={<Navigate to="/app/home" replace />} />
+              <Route path="home" element={<HomePage />} />
+              <Route path="universe" element={<UniversePage />} />
+              <Route path="pipeline" element={<PipelinePage />} />
+              <Route path="companies/:orgnr" element={<CompanyPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="runs" element={<RunsPage />} />
+              <Route path="admin" element={<AdminPage />} />
+            </Route>
+
+            {/* Legacy companies route — redirect to app */}
             <Route
               path="/companies/:orgnr"
-              element={
-                <ProtectedRoute>
-                  <CompanyDetail />
-                </ProtectedRoute>
-              }
+              element={<RedirectToAppCompany />}
             />
-            <Route
-              path="/analysis"
-              element={
-                <ProtectedRoute>
-                  <AnalysisPage />
-                </ProtectedRoute>
-              }
-            />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -296,4 +296,13 @@ Sidebar with tabs:
 
 ---
 
+---
+
+## 10. Related Design Documents
+
+- **[BACKEND_APP_UX_CONCEPT.md](BACKEND_APP_UX_CONCEPT.md)** – IA + UX concept (Discover → Shortlist → Enrich → Decide → Execute)
+- **[BACKEND_APP_IMPLEMENTATION_PLAN.md](BACKEND_APP_IMPLEMENTATION_PLAN.md)** – Route map, component list, queries, MVP sequence (4 weeks)
+
+---
+
 *End of schematic. Use this to propose a reorganized backend UX workflow.*
