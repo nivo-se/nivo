@@ -92,6 +92,7 @@
     "vite": "^7.1.11"
   },
   "overrides": {
+    "ajv": "^8.18.0",
     "esbuild": "^0.25.0",
     "path-to-regexp": "^6.2.3",
     "undici": "^6.0.0"
