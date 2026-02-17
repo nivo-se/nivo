@@ -261,7 +261,6 @@ const AnalyzedCompanies: React.FC = () => {
         </div>
         <Button 
           onClick={() => window.location.href = '/dashboard?page=ai-insights'}
-          className="bg-chart-2 hover:bg-chart-2/90 text-primary-foreground"
         >
           <FileText className="w-4 h-4 mr-2" />
           Ny Analys
@@ -420,7 +419,6 @@ const AnalyzedCompanies: React.FC = () => {
                   {!searchTerm && analysisMode === 'all' && templateFilter === 'all' && statusFilter === 'all' && (
                     <Button 
                       onClick={() => window.location.href = '/dashboard?page=ai-insights'}
-                      className="bg-chart-2 hover:bg-chart-2/90 text-primary-foreground"
                     >
                       <FileText className="w-4 h-4 mr-2" />
                       Starta första analysen
@@ -513,10 +511,9 @@ const AnalyzedCompanies: React.FC = () => {
                                   </Button>
                                 )}
                                 <Button
-                                  variant="outline"
+                                  variant="destructive"
                                   size="sm"
                                   onClick={() => handleDeleteRun(run.id)}
-                                  className="border-destructive text-destructive hover:bg-destructive hover:text-primary-foreground"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>

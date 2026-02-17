@@ -50,7 +50,7 @@ const ScraperInterface: React.FC = () => {
               onClick={handleOpenScraper}
               disabled={isLoading}
               variant="secondary"
-              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-5 py-2 text-primary-foreground transition hover:bg-muted/30"
+              className="flex items-center gap-2 rounded-full px-5 py-2"
             >
               <Database className="h-4 w-4 text-emerald-300" />
               {isLoading ? 'Opening...' : 'Open scraper'}

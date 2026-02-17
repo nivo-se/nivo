@@ -110,7 +110,7 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                   <div className="flex justify-center mb-6">
                     <Button
                       variant="outline"
-                      className="min-h-[3.5rem] min-w-[220px] justify-center bg-card/60 text-primary hover:bg-card md:min-w-[280px]"
+                      className="min-h-[3.5rem] min-w-[220px] justify-center md:min-w-[280px]"
                     >
                       <span
                         className="transition-opacity duration-1000 ease-in-out"

@@ -106,7 +106,6 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-muted-foreground hover:text-primary-foreground"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -207,7 +206,7 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                 <div key={index} className="border border-border rounded-lg">
                   <Button
                     variant="ghost"
-                    className="w-full justify-between p-4 text-left hover:bg-muted/40"
+                    className="w-full justify-between p-4 text-left"
                     onClick={() => toggleSection(section.section_type)}
                   >
                     <div className="flex items-center">

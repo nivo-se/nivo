@@ -212,7 +212,6 @@ export default function NewListDetail() {
               variant="outline"
               disabled={selectedCompanies.size === 0}
               onClick={handleAddToProspects}
-              className="hover:bg-muted hover:text-foreground"
             >
               Add to Prospects ({selectedCompanies.size})
             </Button>
@@ -227,7 +226,7 @@ export default function NewListDetail() {
               onApply={handleUpdateList}
             />
             <div className="mt-3 flex gap-2">
-              <Button variant="outline" onClick={handleUpdateList} className="hover:bg-muted hover:text-foreground">Update List</Button>
+              <Button variant="outline" onClick={handleUpdateList}>Update List</Button>
               <Button variant="outline" onClick={() => setShowFilterBuilder(false)}>
                 Cancel
               </Button>
@@ -279,7 +278,7 @@ export default function NewListDetail() {
             description="Add companies from Universe or Company detail"
             action={
               <Link to="/universe">
-                <Button variant="outline" size="sm" className="hover:bg-muted hover:text-foreground">Browse Universe</Button>
+                <Button variant="outline" size="sm">Browse Universe</Button>
               </Link>
             }
           />
@@ -371,7 +370,6 @@ export default function NewListDetail() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => handleRemove(company.orgnr)}
                           disabled={removeMutation.isPending}
                         >

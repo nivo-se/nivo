@@ -95,7 +95,7 @@ export default function CreateRun() {
               : "Template or list not found"}
           </p>
           <Link to="/ai">
-            <Button variant="outline" className="hover:bg-muted hover:text-foreground">Back to AI Lab</Button>
+            <Button variant="outline">Back to AI Lab</Button>
           </Link>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function CreateRun() {
       <div className="max-w-4xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/ai">
-            <Button variant="ghost" size="sm" className="mb-4 hover:bg-muted hover:text-foreground">
+            <Button variant="ghost" size="sm" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-1" /> Back to AI Lab
             </Button>
           </Link>
@@ -203,7 +203,7 @@ export default function CreateRun() {
                     id="auto-approve"
                     checked={autoApprove}
                     onCheckedChange={(c) => handleAutoApproveChange(c === true)}
-                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-accent data-[state=checked]:text-foreground"
+                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground"
                   />
                   <div>
                     <label
@@ -223,7 +223,7 @@ export default function CreateRun() {
                     id="overwrite"
                     checked={overwriteExisting}
                     onCheckedChange={(c) => handleOverwriteChange(c === true)}
-                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-accent data-[state=checked]:text-foreground"
+                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground"
                   />
                   <div>
                     <label
@@ -278,14 +278,13 @@ export default function CreateRun() {
 
           <div className="flex items-center justify-between pt-4 border-t">
             <Link to="/ai">
-              <Button variant="outline" className="hover:bg-muted">Cancel</Button>
+              <Button variant="outline">Cancel</Button>
             </Link>
             <Button
               variant="outline"
               size="lg"
               onClick={handleCreateRun}
               disabled={!runName.trim() || createRunMutation.isPending}
-              className="hover:bg-muted hover:text-foreground"
             >
               <Play className="w-4 h-4 mr-2" />
               {createRunMutation.isPending ? "Creating Run..." : "Start Analysis"}

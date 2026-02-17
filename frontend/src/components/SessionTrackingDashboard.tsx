@@ -568,7 +568,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
               disabled={refreshing}
               variant="secondary"
               size="sm"
-              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-5 py-2 text-primary-foreground transition hover:bg-muted/30"
+              className="flex items-center gap-2 rounded-full px-5 py-2"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-emerald-300' : 'text-emerald-200'}`} />
               Refresh
@@ -724,7 +724,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             selectedSession === session.sessionId ? null : session.sessionId
                           )
                         }
-                        className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground hover:bg-muted/30"
+                        className="flex items-center gap-2 rounded-full px-4 py-2"
                       >
                         <Eye className="h-4 w-4" />
                         {selectedSession === session.sessionId ? 'Hide' : 'View'}
@@ -805,7 +805,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('pause')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
+                              className="flex items-center gap-2 rounded-full px-4 py-2"
                             >
                               {processActionLoading === 'pause' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -821,7 +821,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('resume')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-border/20 bg-emerald-500/20 px-4 py-2 text-primary-foreground transition hover:bg-emerald-500/30"
+                              className="flex items-center gap-2 rounded-full px-4 py-2"
                             >
                               {processActionLoading === 'resume' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -838,7 +838,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('stop')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
+                              className="flex items-center gap-2 rounded-full px-4 py-2"
                             >
                               {processActionLoading === 'stop' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -854,7 +854,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             size="sm"
                             onClick={() => handleProcessControl('restart')}
                             disabled={processActionLoading !== null}
-                            className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
+                            className="flex items-center gap-2 rounded-full px-4 py-2"
                           >
                             {processActionLoading === 'restart' ? (
                               <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -935,7 +935,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                           size="sm"
                                           variant="secondary"
                                           onClick={() => handleStageControl(stage.key === 'stage2' ? 2 : 3, 'start')}
-                                          className="flex w-full items-center justify-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
+                                          className="flex w-full items-center justify-center gap-2 rounded-full px-4 py-2"
                                         >
                                           <Play className="h-3 w-3" />
                                           Start {stage.label.split(':')[0]}
@@ -1130,7 +1130,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                         variant="secondary"
                                         onClick={() => handleRetryError(error.id)}
                                         disabled={retryingErrorId === error.id}
-                                        className="mt-2 flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30 md:mt-0"
+                                        className="mt-2 flex items-center gap-2 rounded-full px-4 py-2 md:mt-0"
                                       >
                                         {retryingErrorId === error.id ? (
                                           <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />

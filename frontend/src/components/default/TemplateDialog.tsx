@@ -169,7 +169,6 @@ export function TemplateDialog({
                 onClick={handleAddVariable}
                 size="sm"
                 variant="outline"
-                className="hover:bg-muted hover:text-foreground"
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -226,7 +225,7 @@ export function TemplateDialog({
                 onClick={handleAddDimension}
                 size="sm"
                 variant="outline"
-                className="col-span-1 hover:bg-muted hover:text-foreground"
+                className="col-span-1"
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -274,7 +273,7 @@ export function TemplateDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="hover:bg-muted hover:text-foreground">
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
@@ -288,7 +287,6 @@ export function TemplateDialog({
               scoringDimensions.length === 0 ||
               Math.abs(totalWeight - 1.0) > 0.01
             }
-            className="hover:bg-muted hover:text-foreground"
           >
             {mode === "edit" ? "Save Changes" : "Create Template"}
           </Button>

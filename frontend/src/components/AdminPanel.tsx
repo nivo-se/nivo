@@ -241,9 +241,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Badge variant="default" className="bg-destructive"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
+        return <Badge variant="destructive"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
       case 'approved':
-        return <Badge variant="default" className="bg-primary"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
+        return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
       case 'pending':
         return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       default:
@@ -345,11 +345,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">User administration</h2>
-          <p className="text-muted-foreground">Manage user access and permissions</p>
+          <h2 className="text-base font-semibold text-foreground">User administration</h2>
+          <p className="text-sm text-muted-foreground">Manage user access and permissions</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setIsAddUserDialogOpen(true)}>
+          <Button variant="outline" onClick={() => setIsAddUserDialogOpen(true)}>
             <UserPlus className="w-4 h-4 mr-2" />
             Add user
           </Button>
@@ -395,7 +395,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </div>
         <div className="flex justify-between text-sm pt-2 border-t">
           <span className="text-foreground">Database</span>
-          <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-primary" : "bg-destructive"}>
+          <Badge variant={systemMetrics?.databaseConnected ? "secondary" : "destructive"}>
             {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
           </Badge>
         </div>
@@ -440,6 +440,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     </Button>
                     <Button
                       size="sm"
+                      variant="outline"
                       onClick={() => approveUser(user.id)}
                       disabled={actionLoading === user.id}
                     >
@@ -562,7 +563,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground">Email</label>
-                  <p className="text-lg font-semibold">{selectedUser.email}</p>
+                  <p className="text-base font-semibold">{selectedUser.email}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground">Role</label>
@@ -600,7 +601,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 <div className="flex justify-end">
                   <Button
                     size="sm"
-                    variant="default"
+                    variant="outline"
                     onClick={handleUpdateName}
                     disabled={actionLoading === selectedUser.id}
                   >
@@ -756,7 +757,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               <Button variant="outline" onClick={() => setIsAddUserDialogOpen(false)} disabled={addSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleAddUser} disabled={addSubmitting}>
+              <Button variant="outline" onClick={handleAddUser} disabled={addSubmitting}>
                 {addSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

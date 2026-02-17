@@ -272,7 +272,6 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="hover:bg-muted"
                       onClick={removeSelectedCompanies}
                     >
                       <X className="h-3 w-3 mr-1" />
@@ -401,7 +400,6 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => deleteList(list.id)}
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>

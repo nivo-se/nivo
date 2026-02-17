@@ -332,14 +332,14 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
             
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
+                variant="destructive"
                 onClick={() => {
                   if (window.confirm('Är du säker på att du vill ta bort denna analys?')) {
                     // Delete functionality would be implemented here
                     alert('Borttagning kommer snart')
                   }
                 }}
-                className="flex items-center gap-2 border-destructive text-destructive hover:bg-destructive hover:text-primary-foreground"
+                className="flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Ta bort

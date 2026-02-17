@@ -24,8 +24,8 @@ const Button: React.FC<ButtonProps> = ({
         {
           'bg-foreground/70 text-primary-foreground hover:bg-foreground/80': variant === 'primary',
           'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
-          'border border-input bg-transparent hover:bg-accent/10': variant === 'outline',
-          'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
+          'border border-input bg-transparent hover:bg-muted': variant === 'outline',
+          'hover:bg-muted hover:text-foreground': variant === 'ghost',
           'text-muted-foreground underline-offset-4 hover:underline': variant === 'link',
           'h-9 px-4 py-2 text-sm': size === 'sm',
           'h-10 px-4 py-2 text-sm': size === 'md',

@@ -162,7 +162,7 @@ export function FilterRow({
         variant="ghost"
         size="icon"
         onClick={() => onRemove(rowIndex)}
-        className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive rounded-md w-8"
+        className="h-7 w-7 shrink-0 rounded-md w-8"
         aria-label="Remove row"
       >
         <Trash2 className="h-3.5 w-3.5" />

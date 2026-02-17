@@ -594,7 +594,6 @@ const EnhancedCompanySearch: React.FC = () => {
               <div className="flex justify-end mb-4">
                 <Button 
                   onClick={() => setShowAddToListsDialog(true)}
-                  className="bg-primary hover:bg-primary/90"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Lägg till i listor ({selectedCompanies.size} företag)
@@ -926,7 +925,7 @@ const EnhancedCompanySearch: React.FC = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => setShowCompanyDetail(false)}
-                  className="bg-muted/20 border-border/20 text-primary-foreground hover:bg-muted/30 rounded-full w-10 h-10 p-0"
+                  className="rounded-full w-10 h-10 p-0"
                 >
                   <X className="h-5 w-5" />
                 </Button>

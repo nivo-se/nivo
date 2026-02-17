@@ -164,7 +164,7 @@ const Auth: React.FC = () => {
 
           <Button 
             type="submit" 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-12"
+            className="w-full font-semibold rounded-lg h-12"
             disabled={loading}
           >
             {loading ? (

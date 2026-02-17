@@ -529,7 +529,7 @@ const WorkingDashboard: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden text-foreground hover:bg-primary/10"
+                className="md:hidden"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -544,7 +544,7 @@ const WorkingDashboard: React.FC = () => {
                 <User className="h-4 w-4" />
                 <span>{user?.email}</span>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="border-border text-foreground hover:bg-primary/10">
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
@@ -568,14 +568,14 @@ const WorkingDashboard: React.FC = () => {
                 return (
                   <Button
                     key={item.id}
-                    variant={currentPage === item.id ? 'default' : 'ghost'}
+                    variant={currentPage === item.id ? 'secondary' : 'ghost'}
                     disabled={isDisabled}
                     className={`w-full justify-start ${
                       isDisabled
-                        ? 'text-muted-foreground cursor-not-allowed opacity-50'
-                        : currentPage === item.id 
-                          ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                          : 'text-foreground hover:bg-primary/10'
+                        ? 'cursor-not-allowed opacity-50'
+                        : currentPage === item.id
+                          ? 'bg-muted'
+                          : ''
                     }`}
                     onClick={() => {
                       if (!isDisabled) {

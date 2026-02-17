@@ -157,7 +157,6 @@ export function ChatInterface({ onCriteriaChange, onStartAnalysis, isRunning }: 
                         size="sm"
                         onClick={onStartAnalysis}
                         disabled={isRunning || matchCount === 0}
-                        className="bg-primary hover:bg-primary/90"
                     >
                         {isRunning ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
                         Run Deep Analysis

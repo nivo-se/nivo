@@ -9,6 +9,7 @@ import { runDefaultUniverseUrlStateDevTest } from "@/lib/defaultUniverseUrlState
 import { API_BASE } from "@/lib/apiClient";
 import AdminPanel from "@/components/AdminPanel";
 import { AdminSettings } from "@/components/AdminSettings";
+import ScraperInterface from "@/components/ScraperInterface";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -106,6 +107,7 @@ export default function NewAdmin() {
             <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Overview</TabsTrigger>
             <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Team</TabsTrigger>
             <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Settings</TabsTrigger>
+            <TabsTrigger value="scraper" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Scraper</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
@@ -244,6 +246,10 @@ export default function NewAdmin() {
 
           <TabsContent value="settings" className="mt-6">
             <AdminSettings />
+          </TabsContent>
+
+          <TabsContent value="scraper" className="mt-6">
+            <ScraperInterface />
           </TabsContent>
         </Tabs>
       </div>

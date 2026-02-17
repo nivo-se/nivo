@@ -570,14 +570,12 @@ function ResultDetail({
           <Button
             variant="outline"
             onClick={() => onReject(result.id)}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             <ThumbsDown className="w-4 h-4 mr-2" />
             Reject
           </Button>
           <Button
             onClick={() => onApprove(result.id)}
-            className="bg-primary hover:bg-primary/90"
           >
             <ThumbsUp className="w-4 h-4 mr-2" />
             Approve

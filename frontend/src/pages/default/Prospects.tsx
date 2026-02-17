@@ -256,14 +256,14 @@ function ProspectCard({
                             <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleStartEdit(prospect.companyId, i, note.text)}
-                                className="text-muted-foreground hover:text-primary"
+                                className="text-muted-foreground hover:text-foreground"
                                 title="Edit note"
                               >
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleRemoveNote(prospect.companyId, i)}
-                                className="text-muted-foreground hover:text-destructive"
+                                className="text-muted-foreground hover:text-foreground"
                                 title="Delete note"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
