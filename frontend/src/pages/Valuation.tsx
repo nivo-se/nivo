@@ -854,15 +854,15 @@ const ValuationPage: React.FC = () => {
                 {activeChartCompany && activeChartCompany.chartSeries.length ? (
                   <ResponsiveContainer width="100%" height={320}>
                     <LineChart data={activeChartCompany.chartSeries} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="year" stroke="#94a3b8" />
-                      <YAxis yAxisId="left" stroke="#94a3b8" tickFormatter={(value) => `${Math.round(value / 1_000_000)} M`} />
-                      <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" tickFormatter={(value) => `${value?.toFixed?.(1) ?? value}`}/>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" tickFormatter={(value) => `${Math.round(value / 1_000_000)} M`} />
+                      <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" tickFormatter={(value) => `${value?.toFixed?.(1) ?? value}`}/>
                       <Tooltip formatter={(value: number) => `${(value / 1_000_000).toFixed(1)} MSEK`} />
                       <Legend />
-                      <Line type="monotone" dataKey="revenue" name="Omsättning" stroke="#2563eb" yAxisId="left" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="ebit" name="EBIT" stroke="#16a34a" yAxisId="left" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="ebitda" name="EBITDA" stroke="#9333ea" yAxisId="left" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="revenue" name="Omsättning" stroke="hsl(var(--chart-1))" yAxisId="left" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="ebit" name="EBIT" stroke="hsl(var(--chart-2))" yAxisId="left" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="ebitda" name="EBITDA" stroke="hsl(var(--chart-3))" yAxisId="left" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
@@ -882,12 +882,12 @@ const ValuationPage: React.FC = () => {
                 {activeChartCompany && activeChartCompany.chartSeries.length ? (
                   <ResponsiveContainer width="100%" height={320}>
                     <BarChart data={activeChartCompany.chartSeries}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="year" stroke="#94a3b8" />
-                      <YAxis stroke="#94a3b8" tickFormatter={(value) => `${value?.toFixed?.(1) ?? value}`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" tickFormatter={(value) => `${value?.toFixed?.(1) ?? value}`} />
                       <Tooltip formatter={(value: number) => `${value.toFixed(1)}x`} />
                       <Legend />
-                      <Bar dataKey="evToEbitda" name="EV/EBITDA" fill="#fb7185" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="evToEbitda" name="EV/EBITDA" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (

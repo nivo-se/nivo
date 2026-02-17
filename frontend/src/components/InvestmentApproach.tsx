@@ -35,11 +35,11 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className, id }
   ];
 
   return (
-    <section id={id} className={cn('py-20 bg-platinum/70', className)}>
+    <section id={id} className={cn('py-20 bg-muted/70', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-8 text-center">Vårt Tillvägagångssätt</h2>
+            <h2 className="text-3xl md:text-4xl font-heading text-foreground mb-8 text-center">Vårt Tillvägagångssätt</h2>
           </FadeIn>
         </div>
 
@@ -56,8 +56,8 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className, id }
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
                       <IconComponent className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-heading font-semibold text-jetBlack">{area.title}</h3>
-                    <p className="text-sm leading-relaxed text-jetBlack/75">{area.description}</p>
+                    <h3 className="text-xl font-heading font-semibold text-foreground">{area.title}</h3>
+                    <p className="text-sm leading-relaxed text-foreground/75">{area.description}</p>
                   </CardContent>
                 </Card>
               </FadeIn>

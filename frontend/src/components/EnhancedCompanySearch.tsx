@@ -384,13 +384,13 @@ const EnhancedCompanySearch: React.FC = () => {
   const getGrowthIcon = (growth?: number) => {
     if (!growth) return null
     return growth > 0 ? 
-      <TrendingUp className="h-4 w-4 text-green-500" /> : 
-      <TrendingDown className="h-4 w-4 text-red-500" />
+      <TrendingUp className="h-4 w-4 text-primary" /> : 
+      <TrendingDown className="h-4 w-4 text-destructive" />
   }
 
   const getGrowthColor = (growth?: number) => {
-    if (!growth) return 'text-gray-500'
-    return growth > 0 ? 'text-green-600' : 'text-red-600'
+    if (!growth) return 'text-muted-foreground'
+    return growth > 0 ? 'text-primary' : 'text-destructive'
   }
 
   return (
@@ -398,7 +398,7 @@ const EnhancedCompanySearch: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
                 <h2 className="text-2xl font-bold">Avancerad företagssökning</h2>
-                <p className="text-gray-600">Avancerad sökning och analys av företagsdata</p>
+                <p className="text-muted-foreground">Avancerad sökning och analys av företagsdata</p>
         </div>
         <div className="flex gap-2">
           <Button 
@@ -543,7 +543,7 @@ const EnhancedCompanySearch: React.FC = () => {
                     Rensa filter
               </Button>
               {searchResults && (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {searchResults.total.toLocaleString()} företag hittade
                 </div>
               )}
@@ -572,7 +572,7 @@ const EnhancedCompanySearch: React.FC = () => {
           <TabsContent value="list" className="space-y-4">
             {/* Select All Header */}
             {searchResults.companies.length > 0 && (
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+              <div className="flex items-center justify-between p-4 bg-muted/40 rounded-lg border">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="select-all"
@@ -583,7 +583,7 @@ const EnhancedCompanySearch: React.FC = () => {
                     Välj alla företag ({allMatchingCompanyOrgNrs.size})
                   </label>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {selectedCompanies.size} företag valda
                 </div>
               </div>
@@ -594,7 +594,7 @@ const EnhancedCompanySearch: React.FC = () => {
               <div className="flex justify-end mb-4">
                 <Button 
                   onClick={() => setShowAddToListsDialog(true)}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-primary hover:bg-primary/90"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Lägg till i listor ({selectedCompanies.size} företag)
@@ -617,7 +617,7 @@ const EnhancedCompanySearch: React.FC = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 
-                              className="font-semibold text-lg cursor-pointer hover:text-blue-600"
+                              className="font-semibold text-lg cursor-pointer hover:text-primary"
                               onClick={async () => {
                                 // Fetch full company data with historicalData
                                 try {
@@ -643,7 +643,7 @@ const EnhancedCompanySearch: React.FC = () => {
                             <Badge variant="secondary">{company.OrgNr}</Badge>
                           </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2 flex-wrap">
                             <Building2 className="h-4 w-4" />
                             {(() => {
@@ -663,7 +663,7 @@ const EnhancedCompanySearch: React.FC = () => {
                               }
                               
                               if (industries.length === 0) {
-                                return <span className="text-gray-500">Okänd bransch</span>
+                                return <span className="text-muted-foreground">Okänd bransch</span>
                               }
                               
                               return (
@@ -685,7 +685,7 @@ const EnhancedCompanySearch: React.FC = () => {
                             <div className="flex items-center gap-1">
                               <Globe className="h-4 w-4" />
                               <a href={company.homepage} target="_blank" rel="noopener noreferrer" 
-                                 className="text-blue-600 hover:underline">
+                                 className="text-primary hover:underline">
                                 Website
                               </a>
                             </div>
@@ -694,14 +694,14 @@ const EnhancedCompanySearch: React.FC = () => {
 
                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-3">
                              <div className="flex items-center gap-2">
-                               <DollarSign className="h-4 w-4 text-green-600" />
+                               <DollarSign className="h-4 w-4 text-primary" />
                                <span className="text-sm">
                                  Omsättning:{' '}
                                  <span className="font-medium">{formatCurrency(company.SDI)}</span>
                                </span>
                              </div>
                              <div className="flex items-center gap-2">
-                               <DollarSign className="h-4 w-4 text-blue-600" />
+                               <DollarSign className="h-4 w-4 text-primary" />
                                <span className="text-sm">
                                  Vinst:{' '}
                                  <span className="font-medium">{formatCurrency(company.DR)}</span>
@@ -716,7 +716,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                </span>
                              </div>
                              <div className="flex items-center gap-2">
-                               <Target className="h-4 w-4 text-purple-600" />
+                               <Target className="h-4 w-4 text-primary" />
                                <span className="text-sm">
                                  Marginal: <span className="font-medium">
                                    {company.EBIT_margin ? `${(company.EBIT_margin * 100).toFixed(1)}%` : 'N/A'}
@@ -724,7 +724,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                </span>
                              </div>
                              <div className="flex items-center gap-2">
-                               <Users className="h-4 w-4 text-orange-600" />
+                               <Users className="h-4 w-4 text-foreground" />
                                <span className="text-sm">
                                  Anställda: <span className="font-medium">{company.employees || 'N/A'}</span>
                                </span>
@@ -747,7 +747,7 @@ const EnhancedCompanySearch: React.FC = () => {
               >
                 Previous
               </Button>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 Page {currentPage} of {Math.ceil(searchResults.total / itemsPerPage)}
               </span>
               <Button 
@@ -770,10 +770,10 @@ const EnhancedCompanySearch: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-primary">
                     {formatCurrency(searchResults.summary.avgRevenue)}
                   </div>
-                  <p className="text-xs text-gray-600">Genomsnittlig omsättning</p>
+                  <p className="text-xs text-muted-foreground">Genomsnittlig omsättning</p>
                 </CardContent>
               </Card>
 
@@ -785,10 +785,10 @@ const EnhancedCompanySearch: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-primary">
                     {searchResults.summary.avgGrowth.toFixed(1)}%
                   </div>
-                  <p className="text-xs text-gray-600">Genomsnittlig tillväxttakt</p>
+                  <p className="text-xs text-muted-foreground">Genomsnittlig tillväxttakt</p>
                 </CardContent>
               </Card>
 
@@ -800,10 +800,10 @@ const EnhancedCompanySearch: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-2xl font-bold text-primary">
                     {searchResults.summary.avgMargin.toFixed(1)}%
                   </div>
-                  <p className="text-xs text-gray-600">Genomsnittlig EBIT-marginal</p>
+                  <p className="text-xs text-muted-foreground">Genomsnittlig EBIT-marginal</p>
                 </CardContent>
               </Card>
 
@@ -816,7 +816,7 @@ const EnhancedCompanySearch: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{searchResults.total.toLocaleString()}</div>
-                  <p className="text-xs text-gray-600">Matchande kriterier</p>
+                  <p className="text-xs text-muted-foreground">Matchande kriterier</p>
                 </CardContent>
               </Card>
             </div>
@@ -862,15 +862,15 @@ const EnhancedCompanySearch: React.FC = () => {
 
       {/* Company Detail Modal - Modern Financial Dashboard Design */}
       {showCompanyDetail && selectedCompany && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-[#F7F7F7] rounded-2xl shadow-2xl">
+        <div className="fixed inset-0 bg-card bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-background rounded-2xl shadow-2xl">
             {/* Header - Charcoal Background */}
-            <div className="bg-[#2E2A2B] text-white p-6 rounded-t-2xl">
+            <div className="bg-card text-primary-foreground p-6 rounded-t-2xl">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h1 className="text-3xl font-bold mb-2">{selectedCompany.name}</h1>
-                  <p className="text-[#E6E6E6] text-sm mb-4">Företagsinformation och finansiell analys</p>
-                  <div className="grid grid-cols-2 gap-4 text-[#E6E6E6] text-sm">
+                  <p className="text-muted-foreground text-sm mb-4">Företagsinformation och finansiell analys</p>
+                  <div className="grid grid-cols-2 gap-4 text-muted-foreground text-sm">
                     <div><strong>Org.nr:</strong> {selectedCompany.OrgNr}</div>
                     <div>
                       <strong>Bransch:</strong>{' '}
@@ -897,7 +897,7 @@ const EnhancedCompanySearch: React.FC = () => {
                         return (
                           <span className="flex flex-wrap gap-1 mt-1">
                             {industries.map((industry, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+                              <Badge key={idx} variant="secondary" className="text-xs bg-card/20 text-primary-foreground border-border/30">
                                 {industry}
                               </Badge>
                             ))}
@@ -914,7 +914,7 @@ const EnhancedCompanySearch: React.FC = () => {
                           href={selectedCompany.homepage} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="ml-2 text-white hover:text-[#E6E6E6] underline"
+                          className="ml-2 text-primary-foreground hover:text-muted-foreground underline"
                         >
                           {selectedCompany.homepage}
                         </a>
@@ -926,7 +926,7 @@ const EnhancedCompanySearch: React.FC = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => setShowCompanyDetail(false)}
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-full w-10 h-10 p-0"
+                  className="bg-muted/20 border-border/20 text-primary-foreground hover:bg-muted/30 rounded-full w-10 h-10 p-0"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -938,12 +938,12 @@ const EnhancedCompanySearch: React.FC = () => {
               {/* Financial Chart Section */}
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-[#2E2A2B]">Finansiell utveckling</h2>
-                  <p className="text-[#596152] text-sm">Senaste 4 åren</p>
+                  <h2 className="text-2xl font-bold text-foreground">Finansiell utveckling</h2>
+                  <p className="text-primary text-sm">Senaste 4 åren</p>
                 </div>
                 
                 {/* Chart Container */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                   <div className="h-48 mb-4">
                     <div className="flex items-end justify-between h-full">
                       {/* Chart bars with real data from company_accounts_by_id */}
@@ -990,7 +990,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                     >
                                       {/* Revenue (SDI) - full bar height (bottom segment) */}
                                       <div 
-                                        className="bg-[#596152] w-full absolute bottom-0 rounded-t"
+                                        className="bg-primary w-full absolute bottom-0 rounded-t"
                                         style={{ 
                                           height: '100%',
                                           minHeight: '4px'
@@ -1000,7 +1000,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                       {/* EBIT (RG) - middle segment, visible as overlay on Revenue */}
                                       {rgHeight > 0 && safeData.RG > 0 && (
                                         <div 
-                                          className="bg-[#7A8B7A] w-full absolute bottom-0 rounded"
+                                          className="bg-chart-2 w-full absolute bottom-0 rounded"
                                           style={{ 
                                             height: `${Math.max(rgHeight, 3)}%`,
                                             minHeight: '4px',
@@ -1013,7 +1013,7 @@ const EnhancedCompanySearch: React.FC = () => {
                                       {/* Profit (DR) - top segment, visible as overlay */}
                                       {drHeight > 0 && safeData.DR > 0 && (
                                         <div 
-                                          className="bg-[#9BAF9B] w-full absolute bottom-0 rounded-t"
+                                          className="bg-chart-3 w-full absolute bottom-0 rounded-t"
                                           style={{ 
                                             height: `${Math.max(drHeight, 3)}%`,
                                             minHeight: '4px',
@@ -1026,13 +1026,13 @@ const EnhancedCompanySearch: React.FC = () => {
                                     </div>
                                   )}
                                 </div>
-                                <div className="text-xs text-[#2E2A2B] font-medium mt-1">{safeData.year ? `${safeData.year}-12-31` : 'N/A'}</div>
-                                <div className="text-xs font-bold text-[#596152] mt-0.5">{formatCurrency(safeData.SDI, 1)}</div>
+                                <div className="text-xs text-foreground font-medium mt-1">{safeData.year ? `${safeData.year}-12-31` : 'N/A'}</div>
+                                <div className="text-xs font-bold text-primary mt-0.5">{formatCurrency(safeData.SDI, 1)}</div>
                                 {(safeData.RG !== null && safeData.RG !== undefined && safeData.RG !== 0) && (
-                                  <div className="text-xs font-bold text-[#7A8B7A]">{formatEBIT(safeData.RG, 1)}</div>
+                                  <div className="text-xs font-bold text-chart-2">{formatEBIT(safeData.RG, 1)}</div>
                                 )}
                                 {(safeData.DR !== null && safeData.DR !== undefined && safeData.DR !== 0) && (
-                                  <div className="text-xs font-bold text-[#9BAF9B]">{formatCurrency(safeData.DR, 1)}</div>
+                                  <div className="text-xs font-bold text-chart-3">{formatCurrency(safeData.DR, 1)}</div>
                                 )}
                               </div>
                             )
@@ -1042,24 +1042,24 @@ const EnhancedCompanySearch: React.FC = () => {
                         // Fallback to mock data if no historical data
                         <>
                           <div className="flex flex-col items-center">
-                            <div className="bg-[#596152] w-12 h-20 mb-2 rounded-t-lg"></div>
-                            <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatCurrency(selectedCompany.SDI, 1)}</div>
+                            <div className="bg-primary w-12 h-20 mb-2 rounded-t-lg"></div>
+                            <div className="text-xs text-foreground font-medium">{selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</div>
+                            <div className="text-xs font-bold text-primary">{formatCurrency(selectedCompany.SDI, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
-                            <div className="bg-[#596152]/80 w-12 h-16 mb-2 rounded-t-lg"></div>
-                            <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 1}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.95, 1)}</div>
+                            <div className="bg-primary/80 w-12 h-16 mb-2 rounded-t-lg"></div>
+                            <div className="text-xs text-foreground font-medium">{selectedCompany.year ? `${selectedCompany.year - 1}-12-31` : 'N/A'}</div>
+                            <div className="text-xs font-bold text-primary">{formatCurrency((selectedCompany.SDI || 0) * 0.95, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
-                            <div className="bg-[#596152]/60 w-12 h-12 mb-2 rounded-t-lg"></div>
-                            <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 2}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.9, 1)}</div>
+                            <div className="bg-primary/60 w-12 h-12 mb-2 rounded-t-lg"></div>
+                            <div className="text-xs text-foreground font-medium">{selectedCompany.year ? `${selectedCompany.year - 2}-12-31` : 'N/A'}</div>
+                            <div className="text-xs font-bold text-primary">{formatCurrency((selectedCompany.SDI || 0) * 0.9, 1)}</div>
                           </div>
                           <div className="flex flex-col items-center">
-                            <div className="bg-[#596152]/40 w-12 h-8 mb-2 rounded-t-lg"></div>
-                            <div className="text-xs text-[#2E2A2B] font-medium">{selectedCompany.year ? `${selectedCompany.year - 3}-12-31` : 'N/A'}</div>
-                            <div className="text-xs font-bold text-[#596152]">{formatCurrency((selectedCompany.SDI || 0) * 0.85, 1)}</div>
+                            <div className="bg-primary/40 w-12 h-8 mb-2 rounded-t-lg"></div>
+                            <div className="text-xs text-foreground font-medium">{selectedCompany.year ? `${selectedCompany.year - 3}-12-31` : 'N/A'}</div>
+                            <div className="text-xs font-bold text-primary">{formatCurrency((selectedCompany.SDI || 0) * 0.85, 1)}</div>
                           </div>
                         </>
                       )}
@@ -1069,16 +1069,16 @@ const EnhancedCompanySearch: React.FC = () => {
                   {/* Chart Legend */}
                   <div className="flex gap-8 text-sm">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#596152] rounded"></div>
-                      <span className="font-medium text-[#2E2A2B]">Omsättning</span>
+                      <div className="w-4 h-4 bg-primary rounded"></div>
+                      <span className="font-medium text-foreground">Omsättning</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#7A8B7A] rounded"></div>
-                      <span className="font-medium text-[#2E2A2B]">EBIT</span>
+                      <div className="w-4 h-4 bg-chart-2 rounded"></div>
+                      <span className="font-medium text-foreground">EBIT</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-[#9BAF9B] rounded"></div>
-                      <span className="font-medium text-[#2E2A2B]">Vinst</span>
+                      <div className="w-4 h-4 bg-chart-3 rounded"></div>
+                      <span className="font-medium text-foreground">Vinst</span>
                     </div>
                   </div>
                 </div>
@@ -1086,56 +1086,56 @@ const EnhancedCompanySearch: React.FC = () => {
 
               {/* Summary Cards */}
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-[#2E2A2B] mb-4">Sammanfattning {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
+                <h3 className="text-xl font-bold text-foreground mb-4">Sammanfattning {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
                 <div className="grid grid-cols-5 gap-4">
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                  <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
-                        <DollarSign className="h-5 w-5 text-[#596152]" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-sm text-[#2E2A2B]/70">Omsättning</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">{formatCurrency(selectedCompany.SDI, 1)}</div>
+                        <div className="text-sm text-muted-foreground">Omsättning</div>
+                        <div className="text-2xl font-bold text-foreground">{formatCurrency(selectedCompany.SDI, 1)}</div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                  <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
-                        <DollarSign className="h-5 w-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-sm text-[#2E2A2B]/70">EBIT</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                        <div className="text-sm text-muted-foreground">EBIT</div>
+                        <div className="text-2xl font-bold text-foreground">
                           {selectedCompany.ORS ? formatEBIT(selectedCompany.ORS, 1) : 'N/A'}
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                  <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
-                        <DollarSign className="h-5 w-5 text-green-600" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-sm text-[#2E2A2B]/70">Vinst</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                        <div className="text-sm text-muted-foreground">Vinst</div>
+                        <div className="text-2xl font-bold text-foreground">
                           {selectedCompany.DR ? formatCurrency(selectedCompany.DR, 1) : 'N/A'}
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                  <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
-                        <TrendingUp className="h-5 w-5 text-[#596152]" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-sm text-[#2E2A2B]/70">Tillväxt</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                        <div className="text-sm text-muted-foreground">Tillväxt</div>
+                        <div className="text-2xl font-bold text-foreground">
                           {(() => {
                             // Calculate year-over-year growth from historical data
                             // Use the same data points as shown in the chart (historicalData array)
@@ -1184,14 +1184,14 @@ const EnhancedCompanySearch: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
+                  <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#596152]/10 rounded-lg flex items-center justify-center">
-                        <Target className="h-5 w-5 text-[#596152]" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <Target className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="text-sm text-[#2E2A2B]/70">EBIT-marginal</div>
-                        <div className="text-2xl font-bold text-[#2E2A2B]">
+                        <div className="text-sm text-muted-foreground">EBIT-marginal</div>
+                        <div className="text-2xl font-bold text-foreground">
                           {selectedCompany.EBIT_margin != null 
                             ? `${(selectedCompany.EBIT_margin * 100).toFixed(1)}%`
                             : 'N/A'}
@@ -1205,72 +1205,72 @@ const EnhancedCompanySearch: React.FC = () => {
               {/* Information Grid */}
               <div className="grid grid-cols-2 gap-6">
                 {/* Company Information */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
-                  <h3 className="text-lg font-bold text-[#2E2A2B] mb-4">Företagsinformation</h3>
+                <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
+                  <h3 className="text-lg font-bold text-foreground mb-4">Företagsinformation</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Bolagsform:</span>
-                      <span className="font-semibold text-[#2E2A2B] text-sm">Aktiebolag</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">Bolagsform:</span>
+                      <span className="font-semibold text-foreground text-sm">Aktiebolag</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Registreringsår:</span>
-                      <span className="font-semibold text-[#2E2A2B] text-sm">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">Registreringsår:</span>
+                      <span className="font-semibold text-foreground text-sm">
                         {selectedCompany.incorporation_date ? new Date(selectedCompany.incorporation_date).getFullYear() : 'N/A'}
                       </span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Antal anställda:</span>
-                      <span className="font-semibold text-[#2E2A2B] text-sm">{selectedCompany.employees || 'N/A'}</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">Antal anställda:</span>
+                      <span className="font-semibold text-foreground text-sm">{selectedCompany.employees || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between py-2">
-                      <span className="text-[#2E2A2B]/70 text-sm">Företagsstorlek:</span>
-                      <span className="font-semibold text-[#2E2A2B] text-sm">{selectedCompany.company_size_category || 'N/A'}</span>
+                      <span className="text-muted-foreground text-sm">Företagsstorlek:</span>
+                      <span className="font-semibold text-foreground text-sm">{selectedCompany.company_size_category || 'N/A'}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Financial KPIs */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E6E6E6]">
-                  <h3 className="text-lg font-bold text-[#2E2A2B] mb-4">Finansiella nyckeltal {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
+                <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
+                  <h3 className="text-lg font-bold text-foreground mb-4">Finansiella nyckeltal {selectedCompany.year ? `${selectedCompany.year}-12-31` : 'N/A'}</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">EBIT:</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">EBIT:</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                        <span className="font-semibold text-foreground text-sm">
                           {selectedCompany.ORS ? formatEBIT(selectedCompany.ORS, 1) : 'N/A'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">EBIT-marginal:</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">EBIT-marginal:</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                        <span className="font-semibold text-foreground text-sm">
                           {selectedCompany.EBIT_margin != null 
                             ? `${(selectedCompany.EBIT_margin * 100).toFixed(1)}%`
                             : 'N/A'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Vinst (Nettoresultat):</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">Vinst (Nettoresultat):</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                        <span className="font-semibold text-foreground text-sm">
                           {selectedCompany.DR ? formatCurrency(selectedCompany.DR, 1) : 'N/A'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-[#E6E6E6]">
-                      <span className="text-[#2E2A2B]/70 text-sm">Vinstmarginal:</span>
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground text-sm">Vinstmarginal:</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                        <span className="font-semibold text-foreground text-sm">
                           {selectedCompany.NetProfit_margin ? `${(selectedCompany.NetProfit_margin * 100).toFixed(1)}%` : 'N/A'}
                         </span>
                       </div>
                     </div>
                     <div className="flex justify-between py-2">
-                      <span className="text-[#2E2A2B]/70 text-sm">Tillväxt:</span>
+                      <span className="text-muted-foreground text-sm">Tillväxt:</span>
                       <div className="text-right">
-                        <span className="font-semibold text-[#2E2A2B] text-sm">
+                        <span className="font-semibold text-foreground text-sm">
                           {(() => {
                             // Calculate year-over-year growth from historical data
                             // Use the same data points as shown in the chart (historicalData array)

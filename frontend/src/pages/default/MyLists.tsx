@@ -13,8 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { EmptyState } from "@/components/new/EmptyState";
-import { ErrorState } from "@/components/new/ErrorState";
+import { EmptyState } from "@/components/default/EmptyState";
+import { ErrorState } from "@/components/default/ErrorState";
 import { Trash2, ExternalLink } from "lucide-react";
 
 function getStageLabel(stage: string) {
@@ -51,30 +51,30 @@ function ListCard({
   onDeleteClick: (id: string, name: string) => void;
 }) {
   return (
-    <Card className="new-card hover:shadow-md transition-shadow">
+    <Card className="app-card hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">{list.name}</h3>
-              <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{getStageLabel(list.stage)}</span>
+              <h3 className="text-lg font-semibold text-foreground">{list.name}</h3>
+              <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">{getStageLabel(list.stage)}</span>
               {list.scope === "team" && (
-                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">Shareable</span>
+                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">Shareable</span>
               )}
             </div>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               {list.companyIds.length} companies • Stage: {getStageLabel(list.stage)}
               {list.created_by && ` • Created by ${list.created_by}`}
               {" • Last edited "}
               {getTimeAgo(list.updated_at ?? list.created_at)}
             </p>
             {list.filters && (
-              <p className="text-xs text-gray-500 mb-3">✓ Created from filters</p>
+              <p className="text-xs text-muted-foreground mb-3">✓ Created from filters</p>
             )}
           </div>
           <div className="flex gap-2 ml-4">
             <Link to={`/lists/${list.id}`}>
-              <Button size="sm">
+              <Button variant="outline" size="sm">
                 Open <ExternalLink className="w-4 h-4 ml-1" />
               </Button>
             </Link>
@@ -113,7 +113,7 @@ export default function NewMyLists() {
 
   if (isError) {
     return (
-      <div className="h-full overflow-auto new-bg flex items-center justify-center p-8">
+      <div className="h-full overflow-auto app-bg flex items-center justify-center p-8">
         <ErrorState
           message={error?.message ?? "Failed to load lists"}
           retry={() => refetch()}
@@ -125,28 +125,28 @@ export default function NewMyLists() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading lists...</p>
+        <p className="text-muted-foreground">Loading lists...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto new-bg">
+    <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">My Lists</h1>
-          <p className="text-sm text-gray-600">Manage your saved company lists</p>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">My Lists</h1>
+          <p className="text-sm text-muted-foreground">Manage your saved company lists</p>
         </div>
 
         <div className="mb-8">
-          <h2 className="text-base font-medium text-gray-900 mb-4">Private Lists</h2>
+          <h2 className="text-base font-medium text-foreground mb-4">Private Lists</h2>
           {privateLists.length === 0 ? (
             <EmptyState
               title="No private lists yet"
               description="Create a list from Universe to get started"
               action={
                 <Link to="/universe">
-                  <Button size="sm">Create Your First List</Button>
+                  <Button variant="outline" size="sm">Create Your First List</Button>
                 </Link>
               }
             />
@@ -160,7 +160,7 @@ export default function NewMyLists() {
         </div>
 
         <div>
-          <h2 className="text-base font-medium text-gray-900 mb-4">Shareable Lists</h2>
+          <h2 className="text-base font-medium text-foreground mb-4">Shareable Lists</h2>
           {sharedLists.length === 0 ? (
             <EmptyState
               title="No shared lists yet"
@@ -186,7 +186,7 @@ export default function NewMyLists() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

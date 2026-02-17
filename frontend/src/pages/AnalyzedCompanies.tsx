@@ -254,14 +254,14 @@ const AnalyzedCompanies: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analyser</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Analyser</h1>
+          <p className="text-muted-foreground mt-1">
             Översikt över alla genomförda AI-analyser, sorterade per analysomgång
           </p>
         </div>
         <Button 
           onClick={() => window.location.href = '/dashboard?page=ai-insights'}
-          className="bg-[#4A9B8E] hover:bg-[#3d8277] text-white"
+          className="bg-chart-2 hover:bg-chart-2/90 text-primary-foreground"
         >
           <FileText className="w-4 h-4 mr-2" />
           Ny Analys
@@ -288,7 +288,7 @@ const AnalyzedCompanies: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     placeholder="Sök företag, run ID, eller analysfokus..."
                     value={searchTerm}
@@ -394,7 +394,7 @@ const AnalyzedCompanies: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Analysomgångar ({totalRuns})</span>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-muted-foreground">
                   Sida {currentPage} av {totalPages}
                 </div>
               </CardTitle>
@@ -402,16 +402,16 @@ const AnalyzedCompanies: React.FC = () => {
             <CardContent>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4A9B8E]"></div>
-                  <span className="ml-2 text-gray-600">Laddar analyser...</span>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-chart-2"></div>
+                  <span className="ml-2 text-muted-foreground">Laddar analyser...</span>
                 </div>
               ) : runs.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                    <FileText className="h-8 w-8 text-gray-400" />
+                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                    <FileText className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Inga analyser hittades</h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  <h3 className="text-lg font-medium text-foreground mb-2">Inga analyser hittades</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                     {searchTerm || analysisMode !== 'all' || templateFilter !== 'all' || statusFilter !== 'all'
                       ? 'Inga analyser matchar dina filter. Prova att ändra söktermerna.'
                       : 'Du har inte genomfört några analyser än. Kom igång med din första analys!'
@@ -420,7 +420,7 @@ const AnalyzedCompanies: React.FC = () => {
                   {!searchTerm && analysisMode === 'all' && templateFilter === 'all' && statusFilter === 'all' && (
                     <Button 
                       onClick={() => window.location.href = '/dashboard?page=ai-insights'}
-                      className="bg-[#4A9B8E] hover:bg-[#3d8277] text-white"
+                      className="bg-chart-2 hover:bg-chart-2/90 text-primary-foreground"
                     >
                       <FileText className="w-4 h-4 mr-2" />
                       Starta första analysen
@@ -444,7 +444,7 @@ const AnalyzedCompanies: React.FC = () => {
                     <TableBody>
                       {runs.map((run) => (
                         <React.Fragment key={run.id}>
-                          <TableRow className="hover:bg-gray-50">
+                          <TableRow className="hover:bg-muted/40">
                             <TableCell>
                               <Button
                                 variant="ghost"
@@ -461,8 +461,8 @@ const AnalyzedCompanies: React.FC = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
-                                <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                                <span className="text-gray-700">{formatDate(run.startedAt)}</span>
+                                <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
+                                <span className="text-foreground">{formatDate(run.startedAt)}</span>
                               </div>
                             </TableCell>
                             <TableCell>
@@ -471,15 +471,15 @@ const AnalyzedCompanies: React.FC = () => {
                             <TableCell>
                               <div className="max-w-xs">
                                 {run.templateName ? (
-                                  <span className="font-medium text-gray-900">
+                                  <span className="font-medium text-foreground">
                                     {truncateText(run.templateName)}
                                   </span>
                                 ) : run.customInstructions ? (
-                                  <span className="italic text-gray-600">
+                                  <span className="italic text-muted-foreground">
                                     {truncateText(run.customInstructions)}
                                   </span>
                                 ) : (
-                                  <span className="text-gray-400">Ingen fokus</span>
+                                  <span className="text-muted-foreground">Ingen fokus</span>
                                 )}
                               </div>
                             </TableCell>
@@ -516,7 +516,7 @@ const AnalyzedCompanies: React.FC = () => {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => handleDeleteRun(run.id)}
-                                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                                  className="border-destructive text-destructive hover:bg-destructive hover:text-primary-foreground"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -527,16 +527,16 @@ const AnalyzedCompanies: React.FC = () => {
                           {/* Expanded Row Details */}
                           {expandedRuns.has(run.id) && (
                             <TableRow>
-                              <TableCell colSpan={7} className="bg-gray-50 p-4">
+                              <TableCell colSpan={7} className="bg-muted/40 p-4">
                                 <div className="space-y-4">
                                   <div>
-                                    <h4 className="font-medium text-gray-900 mb-2">Analyserade företag</h4>
+                                    <h4 className="font-medium text-foreground mb-2">Analyserade företag</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                                       {run.companies.map((company) => (
-                                        <div key={company.orgnr} className="flex items-center justify-between p-2 bg-white rounded border">
+                                        <div key={company.orgnr} className="flex items-center justify-between p-2 bg-card rounded border">
                                           <div>
                                             <div className="font-medium text-sm">{company.name}</div>
-                                            <div className="text-xs text-gray-500">{company.orgnr}</div>
+                                            <div className="text-xs text-muted-foreground">{company.orgnr}</div>
                                           </div>
                                           <Button
                                             variant="ghost"
@@ -552,8 +552,8 @@ const AnalyzedCompanies: React.FC = () => {
                                   
                                   {run.customInstructions && (
                                     <div>
-                                      <h4 className="font-medium text-gray-900 mb-2">Anpassade instruktioner</h4>
-                                      <p className="text-sm text-gray-600 bg-white p-3 rounded border">
+                                      <h4 className="font-medium text-foreground mb-2">Anpassade instruktioner</h4>
+                                      <p className="text-sm text-muted-foreground bg-card p-3 rounded border">
                                         {run.customInstructions}
                                       </p>
                                     </div>
@@ -561,22 +561,22 @@ const AnalyzedCompanies: React.FC = () => {
                                   
                                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                     <div>
-                                      <span className="font-medium text-gray-900">Modell:</span>
-                                      <div className="text-gray-600">{run.modelVersion}</div>
+                                      <span className="font-medium text-foreground">Modell:</span>
+                                      <div className="text-muted-foreground">{run.modelVersion}</div>
                                     </div>
                                     <div>
-                                      <span className="font-medium text-gray-900">Startad:</span>
-                                      <div className="text-gray-600">{formatDate(run.startedAt)}</div>
+                                      <span className="font-medium text-foreground">Startad:</span>
+                                      <div className="text-muted-foreground">{formatDate(run.startedAt)}</div>
                                     </div>
                                     {run.completedAt && (
                                       <div>
-                                        <span className="font-medium text-gray-900">Slutförd:</span>
-                                        <div className="text-gray-600">{formatDate(run.completedAt)}</div>
+                                        <span className="font-medium text-foreground">Slutförd:</span>
+                                        <div className="text-muted-foreground">{formatDate(run.completedAt)}</div>
                                       </div>
                                     )}
                                     <div>
-                                      <span className="font-medium text-gray-900">Initierad av:</span>
-                                      <div className="text-gray-600">{run.initiatedBy || 'Okänd'}</div>
+                                      <span className="font-medium text-foreground">Initierad av:</span>
+                                      <div className="text-muted-foreground">{run.initiatedBy || 'Okänd'}</div>
                                     </div>
                                   </div>
                                 </div>
@@ -603,7 +603,7 @@ const AnalyzedCompanies: React.FC = () => {
               >
                 Föregående
               </Button>
-              <span className="text-gray-700 px-4">
+              <span className="text-foreground px-4">
                 Sida {currentPage} av {totalPages}
               </span>
               <Button
@@ -622,14 +622,14 @@ const AnalyzedCompanies: React.FC = () => {
           <Card>
             <CardContent className="p-6">
               <div className="text-center py-12">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                  <Users className="h-8 w-8 text-gray-400" />
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <Users className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Företagsvy kommer snart</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <h3 className="text-lg font-medium text-foreground mb-2">Företagsvy kommer snart</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   Denna vy kommer att visa alla analyserade företag individuellt, sorterade efter analysdatum och rekommendation.
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Använd "Analysomgångar"-vyn för att se analyser grupperade per körning.
                 </p>
               </div>

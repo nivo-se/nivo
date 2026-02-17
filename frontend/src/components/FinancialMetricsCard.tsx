@@ -15,42 +15,42 @@ interface FinancialMetricsCardProps {
 
 export const FinancialMetricsCard: React.FC<FinancialMetricsCardProps> = ({ company }) => {
   const getGradeColor = (grade?: string | null) => {
-    if (!grade) return 'text-gray-500'
+    if (!grade) return 'text-muted-foreground'
     switch (grade.toUpperCase()) {
       case 'A':
-        return 'text-green-600'
+        return 'text-primary'
       case 'B':
-        return 'text-blue-600'
+        return 'text-primary'
       case 'C':
-        return 'text-yellow-600'
+        return 'text-foreground'
       case 'D':
-        return 'text-red-600'
+        return 'text-destructive'
       default:
-        return 'text-gray-500'
+        return 'text-muted-foreground'
     }
   }
 
   const getGradeIcon = (grade?: string | null) => {
-    if (!grade) return <Minus className="h-4 w-4 text-gray-400" />
+    if (!grade) return <Minus className="h-4 w-4 text-muted-foreground" />
     switch (grade.toUpperCase()) {
       case 'A':
-        return <TrendingUp className="h-4 w-4 text-green-600" />
+        return <TrendingUp className="h-4 w-4 text-primary" />
       case 'B':
-        return <TrendingUp className="h-4 w-4 text-blue-600" />
+        return <TrendingUp className="h-4 w-4 text-primary" />
       case 'C':
-        return <Minus className="h-4 w-4 text-yellow-600" />
+        return <Minus className="h-4 w-4 text-foreground" />
       case 'D':
-        return <TrendingDown className="h-4 w-4 text-red-600" />
+        return <TrendingDown className="h-4 w-4 text-destructive" />
       default:
-        return <Minus className="h-4 w-4 text-gray-400" />
+        return <Minus className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   const getRiskColor = (score?: number | null) => {
-    if (!score) return 'text-gray-500'
-    if (score <= 2) return 'text-green-600'
-    if (score <= 3) return 'text-yellow-600'
-    return 'text-red-600'
+    if (!score) return 'text-muted-foreground'
+    if (score <= 2) return 'text-primary'
+    if (score <= 3) return 'text-foreground'
+    return 'text-destructive'
   }
 
   const getRiskLabel = (score?: number | null) => {
@@ -86,8 +86,8 @@ export const FinancialMetricsCard: React.FC<FinancialMetricsCardProps> = ({ comp
       label: 'Riskbedömning',
       value: company.riskScore ? `${company.riskScore}/5` : 'Ej bedömd',
       icon: company.riskScore && company.riskScore > 3 ? 
-        <TrendingDown className="h-4 w-4 text-red-600" /> : 
-        <TrendingUp className="h-4 w-4 text-green-600" />,
+        <TrendingDown className="h-4 w-4 text-destructive" /> : 
+        <TrendingUp className="h-4 w-4 text-primary" />,
       color: getRiskColor(company.riskScore),
       description: getRiskLabel(company.riskScore)
     }
@@ -106,18 +106,18 @@ export const FinancialMetricsCard: React.FC<FinancialMetricsCardProps> = ({ comp
           {metrics.map((metric, index) => (
             <div
               key={index}
-              className="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+              className="p-4 border rounded-lg bg-muted/40 hover:bg-muted transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {metric.icon}
-                  <span className="font-medium text-gray-700">{metric.label}</span>
+                  <span className="font-medium text-foreground">{metric.label}</span>
                 </div>
                 <span className={`font-semibold ${metric.color}`}>
                   {metric.value}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {metric.description}
               </p>
             </div>
@@ -128,15 +128,15 @@ export const FinancialMetricsCard: React.FC<FinancialMetricsCardProps> = ({ comp
         {company.confidence && (
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Analyskvalitet</span>
+              <span className="text-sm font-medium text-muted-foreground">Analyskvalitet</span>
               <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
+                <div className="w-20 bg-muted rounded-full h-2">
                   <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-primary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(company.confidence / 5) * 100}%` }}
                   />
                 </div>
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="text-sm font-semibold text-primary">
                   {(company.confidence / 5 * 100).toFixed(0)}%
                 </span>
               </div>

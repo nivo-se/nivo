@@ -197,8 +197,8 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="ml-3 text-gray-600">Loading industries...</span>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-3 text-muted-foreground">Loading industries...</span>
           </div>
         </CardContent>
       </Card>
@@ -242,7 +242,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
       <CardContent className="space-y-4">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search industries..."
             value={searchTerm}
@@ -257,7 +257,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
             <span>
               {selectedIndustries.length} industries selected
             </span>
-            <span className="text-gray-500">
+            <span className="text-muted-foreground">
               {selectedCompanies.toLocaleString()} companies
             </span>
           </div>
@@ -300,7 +300,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
             return (
               <div key={category} className="border rounded-lg">
                 <div 
-                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/40"
                   onClick={() => toggleCategory(category)}
                 >
                   <div className="flex items-center">
@@ -309,7 +309,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
                     ) : (
                       <ChevronRight className="h-4 w-4 mr-2" />
                     )}
-                    <Building2 className="h-4 w-4 mr-2 text-blue-500" />
+                    <Building2 className="h-4 w-4 mr-2 text-primary" />
                     <span className="font-medium">{category}</span>
                     <Badge variant="outline" className="ml-2">
                       {categoryCompanyCount.toLocaleString()} companies
@@ -349,14 +349,14 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t bg-gray-50 p-3">
+                  <div className="border-t bg-muted/40 p-3">
                     <div className="space-y-2">
                       {categoryIndustries
                         .sort((a, b) => (b.companyCount || 0) - (a.companyCount || 0))
                         .map(industry => (
                         <div 
                           key={industry.code}
-                          className="flex items-center justify-between p-2 rounded hover:bg-white cursor-pointer"
+                          className="flex items-center justify-between p-2 rounded hover:bg-card cursor-pointer"
                           onClick={() => toggleIndustry(industry.code)}
                         >
                           <div className="flex items-center">
@@ -367,7 +367,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
                             />
                             <div>
                               <div className="font-medium">{industry.name}</div>
-                              <div className="text-sm text-gray-500">{industry.code}</div>
+                              <div className="text-sm text-muted-foreground">{industry.code}</div>
                             </div>
                           </div>
                           <Badge variant="outline">

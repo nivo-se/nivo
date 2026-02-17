@@ -178,7 +178,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
           {/* Total weight indicator */}
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <span className="text-sm font-medium">Total Weight</span>
-            <span className={`text-sm font-bold ${totalWeight === 100 ? 'text-green-600' : 'text-orange-600'}`}>
+            <span className={`text-sm font-bold ${totalWeight === 100 ? 'text-primary' : 'text-foreground'}`}>
               {totalWeight}%
             </span>
           </div>
@@ -239,7 +239,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
           )}
 
           {applyFiltersMutation.isSuccess && (
-            <div className="p-3 bg-green-50 text-green-800 rounded-md text-sm">
+            <div className="p-3 bg-primary/10 text-primary rounded-md text-sm">
               ✅ Generated shortlist with {applyFiltersMutation.data?.total || 0} companies
             </div>
           )}
@@ -339,7 +339,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
                       if (active && payload && payload[0]) {
                         const data = payload[0].payload
                         return (
-                          <div className="bg-white p-3 border rounded shadow-lg">
+                          <div className="bg-card p-3 border border-border rounded shadow-lg text-card-foreground">
                             <p className="font-semibold">{data.name}</p>
                             <p className="text-sm">Growth: {(data.x * 100).toFixed(1)}%</p>
                             <p className="text-sm">EBITDA Margin: {(data.y * 100).toFixed(1)}%</p>
@@ -350,9 +350,9 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
                       return null
                     }}
                   />
-                  <Scatter name="Companies" data={analytics.scatter_data} fill="#8884d8">
+                  <Scatter name="Companies" data={analytics.scatter_data} fill="hsl(var(--chart-1))">
                     {analytics.scatter_data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill="#8884d8" />
+                      <Cell key={`cell-${index}`} fill="hsl(var(--chart-1))" />
                     ))}
                   </Scatter>
                 </ScatterChart>
@@ -383,4 +383,3 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
     </div>
   )
 }
-

@@ -168,19 +168,19 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
   }
 
   const getRecommendationColor = (recommendation: string) => {
-    if (recommendation.toLowerCase().includes('köp')) return 'text-green-600 bg-green-100'
-    if (recommendation.toLowerCase().includes('håll')) return 'text-yellow-600 bg-yellow-100'
-    if (recommendation.toLowerCase().includes('sälj')) return 'text-red-600 bg-red-100'
-    return 'text-gray-600 bg-gray-100'
+    if (recommendation.toLowerCase().includes('köp')) return 'text-primary bg-primary/15'
+    if (recommendation.toLowerCase().includes('håll')) return 'text-foreground bg-accent'
+    if (recommendation.toLowerCase().includes('sälj')) return 'text-destructive bg-destructive/15'
+    return 'text-muted-foreground bg-muted'
   }
 
   if (savedLists.length === 0) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <Brain className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <Brain className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">Inga sparade listor hittades</h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             Skapa en sparad företagslista i "Företagssökning" för att köra AI-analys
           </p>
         </CardContent>
@@ -194,10 +194,10 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-2xl font-bold">AI-analys Workflow</h2>
-          <p className="text-gray-600">Stegvis process för att välja företag, köra analys och spara insikter</p>
+          <p className="text-muted-foreground">Stegvis process för att välja företag, köra analys och spara insikter</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 bg-[#E6E6E6] px-3 py-2 rounded-md">
-          <Info className="h-4 w-4 text-[#596152]" />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
+          <Info className="h-4 w-4 text-primary" />
           <span>Beräknad OpenAI-kostnad: ~${estimatedCost.toFixed(2)}</span>
         </div>
       </div>
@@ -216,22 +216,22 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
               <button
                 key={list.id}
                 type="button"
-                className={`text-left p-4 border rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#596152] ${
+                className={`text-left p-4 border rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring ${
                   selectedList?.id === list.id
-                    ? 'border-[#596152] bg-[#E6E6E6]'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-primary bg-muted'
+                    : 'border-border hover:border-border'
                 }`}
                 onClick={() => onSelectList(list.id)}
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-[#2E2A2B]">{list.name}</h4>
+                  <h4 className="font-semibold text-foreground">{list.name}</h4>
                   <Badge variant="secondary">{list.companies.length} bolag</Badge>
                 </div>
                 {list.description && (
-                  <p className="text-xs text-gray-500 mt-2">{list.description}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{list.description}</p>
                 )}
                 {list.filters?.name && (
-                  <p className="mt-3 text-xs text-gray-500">Filter: {list.filters.name}</p>
+                  <p className="mt-3 text-xs text-muted-foreground">Filter: {list.filters.name}</p>
                 )}
               </button>
             ))}
@@ -268,7 +268,7 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
               {selectedList.companies.map((company) => (
                 <div
                   key={company.OrgNr}
-                  className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50"
+                  className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/40"
                 >
                   <Checkbox
                     checked={selectedCompanies.has(company.OrgNr)}
@@ -279,10 +279,10 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium truncate">{company.name}</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {company.segment_name} • {formatCurrency(company.SDI || 0)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {(company.Revenue_growth || 0) * 100}% tillväxt • {company.employees} anställda
                     </p>
                   </div>
@@ -314,14 +314,14 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Analyserar företag...</span>
-                  <span className="text-sm text-gray-600">{analysisProgress}%</span>
+                  <span className="text-sm text-muted-foreground">{analysisProgress}%</span>
                 </div>
                 <Progress value={analysisProgress} className="w-full" />
               </div>
             )}
 
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 <div className="flex items-center space-x-4">
                   <span className="flex items-center">
                     <Brain className="h-4 w-4 mr-1" />
@@ -360,7 +360,7 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              <CheckCircle className="h-5 w-5 mr-2 text-primary" />
               AI-analys Resultat
             </CardTitle>
             <CardDescription>
@@ -374,7 +374,7 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h4 className="font-semibold">{result.name}</h4>
-                      <p className="text-sm text-gray-600">{result.executiveSummary}</p>
+                      <p className="text-sm text-muted-foreground">{result.executiveSummary}</p>
                     </div>
                     <Badge className={getRecommendationColor(result.recommendation)}>
                       {result.recommendation}
@@ -382,50 +382,50 @@ const AIAnalysisWorkflow: React.FC<AIAnalysisWorkflowProps> = ({
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                    <div className="text-center p-2 bg-blue-50 rounded">
-                      <div className="text-lg font-bold text-blue-600">
+                    <div className="text-center p-2 bg-primary/10 rounded">
+                      <div className="text-lg font-bold text-primary">
                         {result.financialHealth}/10
                       </div>
-                      <div className="text-xs text-blue-800">Finansiell hälsa</div>
+                      <div className="text-xs text-primary">Finansiell hälsa</div>
                     </div>
-                    <div className="text-center p-2 bg-green-50 rounded">
-                      <div className="text-lg font-bold text-green-600">
+                    <div className="text-center p-2 bg-primary/10 rounded">
+                      <div className="text-lg font-bold text-primary">
                         {result.growthPotential}
                       </div>
-                      <div className="text-xs text-green-800">Tillväxtpotential</div>
+                      <div className="text-xs text-primary">Tillväxtpotential</div>
                     </div>
-                    <div className="text-center p-2 bg-purple-50 rounded">
-                      <div className="text-lg font-bold text-purple-600">
+                    <div className="text-center p-2 bg-accent/60 rounded">
+                      <div className="text-lg font-bold text-primary">
                         {result.marketPosition}
                       </div>
-                      <div className="text-xs text-purple-800">Marknadsposition</div>
+                      <div className="text-xs text-primary">Marknadsposition</div>
                     </div>
-                    <div className="text-center p-2 bg-orange-50 rounded">
-                      <div className="text-lg font-bold text-orange-600">
+                    <div className="text-center p-2 bg-accent/60 rounded">
+                      <div className="text-lg font-bold text-foreground">
                         {result.confidence}%
                       </div>
-                      <div className="text-xs text-orange-800">Konfidens</div>
+                      <div className="text-xs text-foreground">Konfidens</div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h5 className="font-medium text-green-700 mb-2">Styrkor</h5>
+                      <h5 className="font-medium text-primary mb-2">Styrkor</h5>
                       <ul className="text-sm space-y-1">
                         {result.strengths.map((strength, i) => (
                           <li key={i} className="flex items-start">
-                            <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
+                            <CheckCircle className="h-3 w-3 text-primary mt-1 mr-2 flex-shrink-0" />
                             {strength}
                           </li>
                         ))}
                       </ul>
                     </div>
                     <div>
-                      <h5 className="font-medium text-red-700 mb-2">Svagheter</h5>
+                      <h5 className="font-medium text-destructive mb-2">Svagheter</h5>
                       <ul className="text-sm space-y-1">
                         {result.weaknesses.map((weakness, i) => (
                           <li key={i} className="flex items-start">
-                            <AlertTriangle className="h-3 w-3 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                            <AlertTriangle className="h-3 w-3 text-destructive mt-1 mr-2 flex-shrink-0" />
                             {weakness}
                           </li>
                         ))}

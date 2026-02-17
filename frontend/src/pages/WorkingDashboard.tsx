@@ -100,12 +100,12 @@ const WorkingDashboard: React.FC = () => {
     return `${(value * 100).toFixed(1)}%`
   }
 
-  const industryColors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-red-500']
+  const industryColors = ['bg-primary', 'bg-chart-2', 'bg-primary', 'bg-accent', 'bg-destructive']
   const sizeColorMap: Record<string, string> = {
-    'Mikro (1-9)': 'bg-gray-400',
-    'Små (10-49)': 'bg-gray-500',
-    'Medelstora (50-249)': 'bg-gray-600',
-    'Stora (250+)': 'bg-gray-700',
+    'Mikro (1-9)': 'bg-muted/70',
+    'Små (10-49)': 'bg-muted-foreground',
+    'Medelstora (50-249)': 'bg-foreground/70',
+    'Stora (250+)': 'bg-foreground/80',
   }
 
   const digitalPresenceShare =
@@ -143,28 +143,28 @@ const WorkingDashboard: React.FC = () => {
             label: 'Genomsnittlig omsättning',
             value: formatMillion(analytics?.averageRevenue),
             icon: DollarSign,
-            iconClass: 'text-green-600',
+            iconClass: 'text-primary',
           },
           {
             key: 'avgRevenueGrowth',
             label: 'Genomsnittlig tillväxt (3 år CAGR)',
             value: formatPercent(analytics?.averageRevenueGrowth),
             icon: TrendingUp,
-            iconClass: 'text-purple-600',
+            iconClass: 'text-primary',
           },
           {
             key: 'avgEbitMargin',
             label: 'Genomsnittlig EBIT-marginal',
             value: formatPercent(analytics?.averageEBITMargin),
             icon: BarChart3,
-            iconClass: 'text-blue-600',
+            iconClass: 'text-primary',
           },
           {
             key: 'avgNetMargin',
             label: 'Genomsnittlig vinstmarginal',
             value: formatPercent(analytics?.averageNetProfitMargin),
             icon: Target,
-            iconClass: 'text-orange-600',
+            iconClass: 'text-foreground',
           },
           {
             key: 'totalCompanies',
@@ -189,9 +189,9 @@ const WorkingDashboard: React.FC = () => {
 
         return (
           <div className="space-y-6">
-            <div className="bg-[#2E2A2B] rounded-lg p-6 text-white">
+            <div className="bg-card rounded-lg p-6 text-primary-foreground">
               <h2 className="text-2xl font-bold mb-2">Välkommen till Nivo Dashboard</h2>
-              <p className="text-[#E6E6E6]">
+              <p className="text-muted-foreground">
                 Din omfattande affärsintelligensplattform med realtidsdata och insikter.
               </p>
             </div>
@@ -207,20 +207,20 @@ const WorkingDashboard: React.FC = () => {
             
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-[#596152]" />
-                <span className="ml-3 text-[#2E2A2B]/70">Laddar instrumentpanelsdata...</span>
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Laddar instrumentpanelsdata...</span>
               </div>
             ) : (
               <>
                 {/* Key Metrics - Using Analytics Tab Style */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                   {metricCards.map(({ key, label, value, icon: Icon, iconClass }) => (
-                    <Card key={key} className="border-[#E6E6E6]">
+                    <Card key={key} className="border-border">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-[#2E2A2B]/70">{label}</p>
-                            <p className="text-2xl font-bold text-[#2E2A2B]">{value}</p>
+                            <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                            <p className="text-2xl font-bold text-foreground">{value}</p>
                           </div>
                           <Icon className={`h-8 w-8 ${iconClass}`} />
                         </div>
@@ -231,15 +231,15 @@ const WorkingDashboard: React.FC = () => {
 
                 {/* Industry and Market Analysis */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="border-[#E6E6E6]">
+                  <Card className="border-border">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Branschfördelning</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Företag efter branschsegment</CardDescription>
+                      <CardTitle className="text-foreground">Branschfördelning</CardTitle>
+                      <CardDescription className="text-muted-foreground">Företag efter branschsegment</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {industryDistribution.length === 0 ? (
-                          <p className="text-sm text-[#2E2A2B]/60">Ingen branschdata tillgänglig.</p>
+                          <p className="text-sm text-muted-foreground">Ingen branschdata tillgänglig.</p>
                         ) : (
                           <>
                             {industryDistribution.map((industry, index) => (
@@ -250,27 +250,27 @@ const WorkingDashboard: React.FC = () => {
                                       industryColors[index % industryColors.length]
                                     }`}
                                   ></div>
-                                  <span className="text-sm font-medium text-[#2E2A2B]">
+                                  <span className="text-sm font-medium text-foreground">
                                     {industry.name}
                                   </span>
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-sm font-bold text-[#2E2A2B]">
+                                  <div className="text-sm font-bold text-foreground">
                                     {industry.count.toLocaleString('sv-SE')}
                                   </div>
-                                  <div className="text-xs text-[#2E2A2B]/70">
+                                  <div className="text-xs text-muted-foreground">
                                     {industry.percentage ? industry.percentage.toFixed(1) : '0.0'}%
                                   </div>
                                 </div>
                               </div>
                             ))}
-                            <div className="pt-3 mt-3 border-t border-[#E6E6E6] flex items-center justify-between">
-                              <span className="text-sm font-semibold text-[#2E2A2B]">Totalt</span>
+                            <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
+                              <span className="text-sm font-semibold text-foreground">Totalt</span>
                               <div className="text-right">
-                                <div className="text-sm font-bold text-[#2E2A2B]">
+                                <div className="text-sm font-bold text-foreground">
                                   {analytics?.totalCompanies?.toLocaleString('sv-SE') || '0'}
                                 </div>
-                                <div className="text-xs text-[#2E2A2B]/70">100.0%</div>
+                                <div className="text-xs text-muted-foreground">100.0%</div>
                               </div>
                             </div>
                           </>
@@ -279,15 +279,15 @@ const WorkingDashboard: React.FC = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="border-[#E6E6E6]">
+                  <Card className="border-border">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Företagsstorleksfördelning</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Företag efter omsättning</CardDescription>
+                      <CardTitle className="text-foreground">Företagsstorleksfördelning</CardTitle>
+                      <CardDescription className="text-muted-foreground">Företag efter omsättning</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {sizeDistribution.length === 0 ? (
-                          <p className="text-sm text-[#2E2A2B]/60">Ingen storleksdata tillgänglig.</p>
+                          <p className="text-sm text-muted-foreground">Ingen storleksdata tillgänglig.</p>
                         ) : (
                           <>
                             {sizeDistribution.map((size) => (
@@ -295,28 +295,28 @@ const WorkingDashboard: React.FC = () => {
                                 <div className="flex items-center space-x-3">
                                   <div
                                     className={`w-3 h-3 rounded-full ${
-                                      sizeColorMap[size.name] || 'bg-gray-500'
+                                      sizeColorMap[size.name] || 'bg-muted-foreground'
                                     }`}
                                   ></div>
-                                  <span className="text-sm font-medium text-[#2E2A2B]">{size.name}</span>
+                                  <span className="text-sm font-medium text-foreground">{size.name}</span>
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-sm font-bold text-[#2E2A2B]">
+                                  <div className="text-sm font-bold text-foreground">
                                     {size.count.toLocaleString('sv-SE')}
                                   </div>
-                                  <div className="text-xs text-[#2E2A2B]/70">
+                                  <div className="text-xs text-muted-foreground">
                                     {size.percentage ? size.percentage.toFixed(1) : '0.0'}%
                                   </div>
                                 </div>
                               </div>
                             ))}
-                            <div className="pt-3 mt-3 border-t border-[#E6E6E6] flex items-center justify-between">
-                              <span className="text-sm font-semibold text-[#2E2A2B]">Totalt</span>
+                            <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
+                              <span className="text-sm font-semibold text-foreground">Totalt</span>
                               <div className="text-right">
-                                <div className="text-sm font-bold text-[#2E2A2B]">
+                                <div className="text-sm font-bold text-foreground">
                                   {analytics?.totalCompanies?.toLocaleString('sv-SE') || '0'}
                                 </div>
-                                <div className="text-xs text-[#2E2A2B]/70">100.0%</div>
+                                <div className="text-xs text-muted-foreground">100.0%</div>
                               </div>
                             </div>
                           </>
@@ -329,46 +329,46 @@ const WorkingDashboard: React.FC = () => {
 
                 {/* Margin Analysis Card */}
                 {analytics?.marginAnalysis && (
-                  <Card className="border-[#E6E6E6]">
+                  <Card className="border-border">
                     <CardHeader>
-                      <CardTitle className="text-[#2E2A2B]">Finansiell analys - Detaljerad översikt</CardTitle>
-                      <CardDescription className="text-[#2E2A2B]/70">Fördelning av lönsamhet och marginaler</CardDescription>
+                      <CardTitle className="text-foreground">Finansiell analys - Detaljerad översikt</CardTitle>
+                      <CardDescription className="text-muted-foreground">Fördelning av lönsamhet och marginaler</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Profit Analysis */}
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">Vinst (Nettoresultat)</h4>
+                          <h4 className="font-semibold text-foreground text-sm mb-3">Vinst (Nettoresultat)</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Negativ vinst:</span>
+                              <span className="text-sm text-muted-foreground">Negativ vinst:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-red-600">
+                                <span className="text-sm font-bold text-destructive">
                                   {analytics.marginAnalysis.profit.negative.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.profit.negative / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Positiv vinst:</span>
+                              <span className="text-sm text-muted-foreground">Positiv vinst:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-green-600">
+                                <span className="text-sm font-bold text-primary">
                                   {analytics.marginAnalysis.profit.positive.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.profit.positive / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Saknar data:</span>
+                              <span className="text-sm text-muted-foreground">Saknar data:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-[#2E2A2B]">
+                                <span className="text-sm font-bold text-foreground">
                                   {analytics.marginAnalysis.profit.null.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.profit.null / analytics.marginAnalysis.profit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
@@ -378,37 +378,37 @@ const WorkingDashboard: React.FC = () => {
 
                         {/* EBIT Analysis */}
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">EBIT (Rörelseresultat)</h4>
+                          <h4 className="font-semibold text-foreground text-sm mb-3">EBIT (Rörelseresultat)</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Negativ EBIT:</span>
+                              <span className="text-sm text-muted-foreground">Negativ EBIT:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-red-600">
+                                <span className="text-sm font-bold text-destructive">
                                   {analytics.marginAnalysis.ebit.negative.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebit.negative / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Positiv EBIT:</span>
+                              <span className="text-sm text-muted-foreground">Positiv EBIT:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-green-600">
+                                <span className="text-sm font-bold text-primary">
                                   {analytics.marginAnalysis.ebit.positive.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebit.positive / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Saknar data:</span>
+                              <span className="text-sm text-muted-foreground">Saknar data:</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-[#2E2A2B]">
+                                <span className="text-sm font-bold text-foreground">
                                   {analytics.marginAnalysis.ebit.null.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebit.null / analytics.marginAnalysis.ebit.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
@@ -418,48 +418,48 @@ const WorkingDashboard: React.FC = () => {
 
                         {/* EBIT Margin Analysis */}
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-[#2E2A2B] text-sm mb-3">EBIT-marginal</h4>
+                          <h4 className="font-semibold text-foreground text-sm mb-3">EBIT-marginal</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Extrem negativ (&lt; -100%):</span>
+                              <span className="text-sm text-muted-foreground">Extrem negativ (&lt; -100%):</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-red-700">
+                                <span className="text-sm font-bold text-destructive">
                                   {analytics.marginAnalysis.ebitdaMargin.extremeNegative.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebitdaMargin.extremeNegative / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Negativ (-100% till 0%):</span>
+                              <span className="text-sm text-muted-foreground">Negativ (-100% till 0%):</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-orange-600">
+                                <span className="text-sm font-bold text-foreground">
                                   {analytics.marginAnalysis.ebitdaMargin.negative.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebitdaMargin.negative / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Positiv (0% till 100%):</span>
+                              <span className="text-sm text-muted-foreground">Positiv (0% till 100%):</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-green-600">
+                                <span className="text-sm font-bold text-primary">
                                   {analytics.marginAnalysis.ebitdaMargin.positive.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebitdaMargin.positive / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-[#2E2A2B]/70">Extrem positiv (&gt; 100%):</span>
+                              <span className="text-sm text-muted-foreground">Extrem positiv (&gt; 100%):</span>
                               <div className="text-right">
-                                <span className="text-sm font-bold text-purple-600">
+                                <span className="text-sm font-bold text-primary">
                                   {analytics.marginAnalysis.ebitdaMargin.extremePositive.toLocaleString('sv-SE')}
                                 </span>
-                                <span className="text-xs text-[#2E2A2B]/70 ml-2">
+                                <span className="text-xs text-muted-foreground ml-2">
                                   ({((analytics.marginAnalysis.ebitdaMargin.extremePositive / analytics.marginAnalysis.ebitdaMargin.total) * 100).toFixed(1)}%)
                                 </span>
                               </div>
@@ -467,8 +467,8 @@ const WorkingDashboard: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="mt-4 pt-4 border-t border-[#E6E6E6]">
-                        <p className="text-xs text-[#2E2A2B]/60">
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <p className="text-xs text-muted-foreground">
                           <strong>Totalt:</strong> {analytics.marginAnalysis.profit.total.toLocaleString('sv-SE')} företag. 
                           Extremvärden (&lt; -100% eller &gt; 100%) filtreras bort vid beräkning av genomsnittlig EBIT-marginal för att undvika snedvridning.
                         </p>
@@ -477,9 +477,9 @@ const WorkingDashboard: React.FC = () => {
                   </Card>
                 )}
 
-                <div className="bg-[#596152]/10 p-4 rounded-lg border border-[#596152]/20">
-                  <h3 className="font-semibold text-[#596152] mb-2">✅ Dashboard ansluten till livedata</h3>
-                  <p className="text-[#2E2A2B]/80">
+                <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                  <h3 className="font-semibold text-primary mb-2">✅ Dashboard ansluten till livedata</h3>
+                  <p className="text-foreground">
                     All statistik hämtas nu från den nya company_metrics-datamodellen i realtid.
                     Navigera till Företagssökning för att utforska data i detalj.
                   </p>
@@ -520,31 +520,31 @@ const WorkingDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#E6E6E6]">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden text-[#2E2A2B] hover:bg-[#596152]/10"
+                className="md:hidden text-foreground hover:bg-primary/10"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
-              <h1 className="ml-2 text-xl font-semibold text-[#2E2A2B]">
+              <h1 className="ml-2 text-xl font-semibold text-foreground">
                 Nivo Dashboard
               </h1>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-[#2E2A2B]/70">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <User className="h-4 w-4" />
                 <span>{user?.email}</span>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="border-[#E6E6E6] text-[#2E2A2B] hover:bg-[#596152]/10">
+              <Button variant="outline" size="sm" onClick={handleSignOut} className="border-border text-foreground hover:bg-primary/10">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
@@ -556,7 +556,7 @@ const WorkingDashboard: React.FC = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-[#E6E6E6] transform transition-transform duration-300 ease-in-out
+          fixed inset-y-0 left-0 z-50 w-64 bg-card shadow-lg border-r border-border transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:static md:inset-0
         `}>
@@ -572,10 +572,10 @@ const WorkingDashboard: React.FC = () => {
                     disabled={isDisabled}
                     className={`w-full justify-start ${
                       isDisabled
-                        ? 'text-gray-400 cursor-not-allowed opacity-50'
+                        ? 'text-muted-foreground cursor-not-allowed opacity-50'
                         : currentPage === item.id 
-                          ? 'bg-[#596152] text-white hover:bg-[#596152]/90' 
-                          : 'text-[#2E2A2B] hover:bg-[#596152]/10'
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                          : 'text-foreground hover:bg-primary/10'
                     }`}
                     onClick={() => {
                       if (!isDisabled) {
@@ -605,7 +605,7 @@ const WorkingDashboard: React.FC = () => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
+          className="fixed inset-0 z-40 bg-card bg-opacity-50 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

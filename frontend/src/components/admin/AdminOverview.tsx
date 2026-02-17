@@ -15,21 +15,21 @@ const ROLE_TIERS = [
     label: "Admin",
     description: "Full access. Manage users, settings, and system configuration.",
     icon: Shield,
-    color: "text-red-600",
+    color: "text-destructive",
   },
   {
     id: "approved",
     label: "Approved",
     description: "Standard access. Browse universe, use lists, and run enrichment.",
     icon: CheckCircle,
-    color: "text-green-600",
+    color: "text-primary",
   },
   {
     id: "pending",
     label: "Pending",
     description: "Awaiting approval. No platform access until approved.",
     icon: Clock,
-    color: "text-amber-600",
+    color: "text-foreground",
   },
 ] as const;
 
@@ -96,7 +96,7 @@ export function AdminOverview({ onNavigateToUsers }: AdminOverviewProps) {
                 <p className="text-2xl font-bold">{dbOk ? "Healthy" : "Degraded"}</p>
                 <p className="text-xs text-muted-foreground">Database connection</p>
               </div>
-              <Badge variant={dbOk ? "default" : "destructive"} className={dbOk ? "bg-green-500" : ""}>
+              <Badge variant={dbOk ? "default" : "destructive"} className={dbOk ? "bg-primary" : ""}>
                 {dbOk ? "Connected" : "Error"}
               </Badge>
             </div>

@@ -5,7 +5,7 @@ import { getLastApiErrors } from "@/lib/services/figmaApi";
 import * as api from "@/lib/services/figmaApi";
 import { getListItems } from "@/lib/services/listsService";
 import { fetchWhoAmI, type WhoAmI } from "@/lib/services/whoamiService";
-import { runNewUniverseUrlStateDevTest } from "@/lib/newUniverseUrlState";
+import { runDefaultUniverseUrlStateDevTest } from "@/lib/defaultUniverseUrlState";
 import { API_BASE } from "@/lib/apiClient";
 import AdminPanel from "@/components/AdminPanel";
 import { AdminSettings } from "@/components/AdminSettings";
@@ -91,75 +91,75 @@ export default function NewAdmin() {
   };
 
   const runUrlStateTest = () => {
-    const pass = runNewUniverseUrlStateDevTest();
+    const pass = runDefaultUniverseUrlStateDevTest();
     setUrlTestPass(pass);
   };
 
   return (
-    <div className="h-full overflow-auto new-bg">
+    <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Admin Panel</h1>
-        <p className="text-sm text-gray-700 mb-6">System configuration and team management</p>
+        <h1 className="text-2xl font-semibold text-foreground mb-2">Admin Panel</h1>
+        <p className="text-sm text-foreground mb-6">System configuration and team management</p>
 
         <Tabs defaultValue="overview" className="mb-8">
-          <TabsList className="w-full justify-start h-auto p-0 bg-white border border-gray-200 rounded-lg overflow-hidden text-gray-700">
-            <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Overview</TabsTrigger>
-            <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Team</TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Settings</TabsTrigger>
+          <TabsList className="w-full justify-start h-auto p-0 bg-card border border-border rounded-lg overflow-hidden text-foreground">
+            <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Overview</TabsTrigger>
+            <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Team</TabsTrigger>
+            <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
-        <Card className="new-card mb-8">
+        <Card className="app-card mb-8">
           <CardHeader>
             <CardTitle className="text-lg">Contracts</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {whoami ? (
-              <div className="p-3 rounded bg-gray-50 border border-gray-200 mb-3">
-                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">System overview (truth source)</p>
-                <p className="font-mono text-sm text-gray-900">
+              <div className="p-3 rounded bg-muted/40 border border-border mb-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">System overview (truth source)</p>
+                <p className="font-mono text-sm text-foreground">
                   Backend: <strong>{whoami.port}</strong>
                   {" · "}Postgres: <strong>{whoami.db_host}:{whoami.db_port}</strong>
                   {" · "}SHA: <strong>{whoami.git_sha}</strong>
                 </p>
-                <p className="text-xs text-gray-500 mt-1">API: {whoami.api_base} · started {whoami.started_at}</p>
+                <p className="text-xs text-muted-foreground mt-1">API: {whoami.api_base} · started {whoami.started_at}</p>
               </div>
             ) : whoamiError ? (
-              <p className="text-amber-600 text-sm">Backend unreachable: {whoamiError}</p>
+              <p className="text-destructive text-sm">Backend unreachable: {whoamiError}</p>
             ) : (
-              <p className="text-gray-500 text-sm">Loading backend info…</p>
+              <p className="text-muted-foreground text-sm">Loading backend info…</p>
             )}
             <div>
-              <span className="text-gray-700">API base URL: </span>
-              <code className="font-mono text-gray-900">{API_BASE}</code>
+              <span className="text-foreground">API base URL: </span>
+              <code className="font-mono text-foreground">{API_BASE}</code>
             </div>
             <div>
-              <span className="text-gray-700">Auth: </span>
-              <span className={session ? "text-green-600" : "text-amber-600"}>
+              <span className="text-foreground">Auth: </span>
+              <span className={session ? "text-foreground" : "text-destructive"}>
                 {session ? `Signed in (${user?.email ?? "user"})` : "Not signed in"}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-4 pt-2">
               <div>
-                <span className="text-gray-700">getCompanies(): </span>
+                <span className="text-foreground">getCompanies(): </span>
                 <span className="font-mono font-medium">{companies.length}</span>
               </div>
               <div>
-                <span className="text-gray-700">getLists(): </span>
+                <span className="text-foreground">getLists(): </span>
                 <span className="font-mono font-medium">{lists.length}</span>
               </div>
               <div>
-                <span className="text-gray-700">getAIRuns(): </span>
+                <span className="text-foreground">getAIRuns(): </span>
                 <span className="font-mono font-medium">{runs.length}</span>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-700 mb-2">MVP Smoke Test</p>
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm font-medium text-foreground mb-2">MVP Smoke Test</p>
               <div className="flex flex-wrap gap-2 items-center">
                 <Button size="sm" variant="outline" onClick={runSmokeTests} disabled={smokeState.step1 === "running"}>
                   Run smoke tests
                 </Button>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   1) getCompanies {smokeState.step1 === "pass" ? "✓" : smokeState.step1 === "fail" ? "✗" : ""}
                   {" "}2) getLists {smokeState.step2 === "pass" ? "✓" : smokeState.step2 === "fail" ? "✗" : ""}
                   {" "}3) getListItems {smokeState.step3 === "pass" ? "✓" : smokeState.step3 === "fail" ? "✗" : ""}
@@ -168,11 +168,11 @@ export default function NewAdmin() {
                 </span>
               </div>
               {smokeState.lastError && (
-                <p className="text-xs text-red-600 mt-1">Last: {smokeState.lastError}</p>
+                <p className="text-xs text-destructive mt-1">Last: {smokeState.lastError}</p>
               )}
             </div>
-            <div className="mt-2 pt-2 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-700 mb-2">URL state decode test (dev)</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <p className="text-sm font-medium text-foreground mb-2">URL state decode test (dev)</p>
               <Button size="sm" variant="ghost" onClick={runUrlStateTest}>
                 Run URL decode test
               </Button>
@@ -181,15 +181,15 @@ export default function NewAdmin() {
               )}
             </div>
             {hasError && (
-              <div className="mt-3 p-3 rounded bg-red-50 border border-red-200 text-sm">
-                <span className="text-red-800 font-medium">
+              <div className="mt-3 p-3 rounded bg-destructive/10 border border-destructive/40 text-sm">
+                <span className="text-destructive font-medium">
                   {apiErrors.length > 0 ? `Last ${apiErrors.length} API error${apiErrors.length > 1 ? "s" : ""}` : "Query error"}
                 </span>
                 {apiErrors.length > 0 ? (
                   <>
-                    <ul className="mt-2 space-y-2 text-red-700">
+                    <ul className="mt-2 space-y-2 text-destructive">
                       {apiErrors.map((err, i) => (
-                        <li key={i} className="border-b border-red-200 last:border-0 pb-2 last:pb-0">
+                        <li key={i} className="border-b border-destructive/40 last:border-0 pb-2 last:pb-0">
                           <div><strong>Message:</strong> {err.message}</div>
                           <div><strong>Endpoint:</strong> <code className="font-mono">{err.endpoint}</code></div>
                           {err.status != null && <div><strong>Status:</strong> {err.status}</div>}
@@ -198,18 +198,18 @@ export default function NewAdmin() {
                       ))}
                     </ul>
                     {(apiErrors.some(e => e.message.includes("Cannot reach backend") || e.message.includes("Failed to fetch") || e.message.includes("Is the backend running"))) && (
-                      <div className="mt-3 pt-3 border-t border-red-200 text-red-800">
+                      <div className="mt-3 pt-3 border-t border-destructive/40 text-destructive">
                         <p className="font-medium mb-1">Troubleshooting (network/CORS):</p>
                         <ol className="list-decimal list-inside text-xs space-y-0.5">
-                          <li>Start backend: <code className="bg-red-100 px-1 rounded">./scripts/start_backend.sh</code> (default port 8000)</li>
-                          <li>Ensure <code className="bg-red-100 px-1 rounded">VITE_API_BASE_URL</code> in frontend <code className="bg-red-100 px-1 rounded">.env</code> matches backend (local: <code className="bg-red-100 px-1 rounded">http://127.0.0.1:8000</code>)</li>
-                          <li>For Universe/Lists: set <code className="bg-red-100 px-1 rounded">DATABASE_SOURCE=postgres</code> and run migrations</li>
+                          <li>Start backend: <code className="bg-destructive/15 px-1 rounded">./scripts/start_backend.sh</code> (default port 8000)</li>
+                          <li>Ensure <code className="bg-destructive/15 px-1 rounded">VITE_API_BASE_URL</code> in frontend <code className="bg-destructive/15 px-1 rounded">.env</code> matches backend (local: <code className="bg-destructive/15 px-1 rounded">http://127.0.0.1:8000</code>)</li>
+                          <li>For Universe/Lists: set <code className="bg-destructive/15 px-1 rounded">DATABASE_SOURCE=postgres</code> and run migrations</li>
                         </ol>
                       </div>
                     )}
                   </>
                 ) : (
-                  <span className="text-red-700 block mt-1">Query error (see console)</span>
+                  <span className="text-destructive block mt-1">Query error (see console)</span>
                 )}
               </div>
             )}
@@ -217,21 +217,21 @@ export default function NewAdmin() {
         </Card>
 
         <div className="grid grid-cols-3 gap-6">
-          <Card className="new-card">
+          <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-700 mb-1">Companies (sample)</p>
+              <p className="text-sm text-foreground mb-1">Companies (sample)</p>
               <p className="text-2xl font-semibold">{companies.length}</p>
             </CardContent>
           </Card>
-          <Card className="new-card">
+          <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-700 mb-1">Lists</p>
+              <p className="text-sm text-foreground mb-1">Lists</p>
               <p className="text-2xl font-semibold">{lists.length}</p>
             </CardContent>
           </Card>
-          <Card className="new-card">
+          <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-700 mb-1">AI Runs</p>
+              <p className="text-sm text-foreground mb-1">AI Runs</p>
               <p className="text-2xl font-semibold">{runs.length}</p>
             </CardContent>
           </Card>

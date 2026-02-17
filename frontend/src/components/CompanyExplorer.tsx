@@ -163,11 +163,11 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
   }
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white">
-      <div className="flex flex-col gap-4 border-b border-gray-200 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex h-full flex-col rounded-2xl border border-border bg-card">
+      <div className="flex flex-col gap-4 border-b border-border px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-semibold text-gray-900">Explorer View</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm font-semibold text-foreground">Explorer View</p>
+          <p className="text-xs text-muted-foreground">
             {pagination ? pagination.total.toLocaleString() : companies.length} companies •{' '}
             {totalSelected} selected
           </p>
@@ -177,7 +177,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             type="button"
             onClick={handleEnrich}
             disabled={totalSelected === 0 || enriching}
-            className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40 disabled:opacity-50"
           >
             {enriching ? 'Enriching…' : 'Enrich selection'}
           </button>
@@ -185,7 +185,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             type="button"
             onClick={handleExport}
             disabled={totalSelected === 0 || exporting}
-            className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40 disabled:opacity-50"
           >
             {exporting ? 'Exporting…' : 'Export to CRM'}
           </button>
@@ -193,7 +193,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             type="button"
             onClick={handleViewProfile}
             disabled={totalSelected === 0}
-            className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40 disabled:opacity-50"
           >
             View AI Profile
           </button>
@@ -202,7 +202,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
               type="button"
               onClick={onEnrichAll}
               disabled={enriching || disableEnrichAll}
-              className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40 disabled:opacity-50"
             >
               {disableEnrichAll ? 'Refine to ≤300 to enrich all' : 'Enrich all companies'}
             </button>
@@ -210,7 +210,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
           {onSaveList && (
             <button
               onClick={() => setShowSaveDialog(true)}
-              className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/90"
+              className="inline-flex items-center rounded-md bg-card px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-card/90"
             >
               Save List
             </button>
@@ -219,27 +219,27 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
       </div>
 
       {showSaveDialog && (
-        <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
+        <div className="border-b border-border bg-muted/40 px-4 py-3">
           <div className="space-y-2">
             <input
               type="text"
               value={listName}
               onChange={(e) => setListName(e.target.value)}
               placeholder="List name (required)"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+              className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-border focus:outline-none"
             />
             <textarea
               value={listDescription}
               onChange={(e) => setListDescription(e.target.value)}
               placeholder="Description (optional)"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+              className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-border focus:outline-none"
               rows={2}
             />
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSaveList}
                 disabled={!listName.trim() || saving}
-                className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-black/90 disabled:opacity-50"
+                className="inline-flex items-center rounded-md bg-card px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-card/90 disabled:opacity-50"
               >
                 {saving ? 'Saving...' : `Save ${selected.size > 0 ? `${selected.size} selected` : 'all'} companies`}
               </button>
@@ -249,7 +249,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                   setListName('')
                   setListDescription('')
                 }}
-                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
               >
                 Cancel
               </button>
@@ -259,25 +259,25 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
       )}
       <div className="flex-1 overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-muted/40">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Select</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Company</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Org.nr</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Revenue</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">EBITDA margin</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Growth</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI Summary</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">AI Fit</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Select</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Company</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Org.nr</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Revenue</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">EBITDA margin</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Growth</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">AI Summary</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">AI Fit</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {renderedRows.map((company) => (
-              <tr key={company.orgnr} className="hover:bg-gray-50">
+              <tr key={company.orgnr} className="hover:bg-muted/40">
                 <td className="px-4 py-3">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                    className="h-4 w-4 rounded border-border text-foreground focus:ring-black"
                     checked={selected.has(company.orgnr)}
                     onChange={() => handleToggle(company.orgnr)}
                   />
@@ -288,27 +288,27 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                       onClick={() => onCompanyClick(company)}
                       className="cursor-pointer text-left hover:underline"
                     >
-                      <div className="font-medium text-gray-800 hover:text-black">
+                      <div className="font-medium text-foreground hover:text-foreground">
                         {company.company_name || company.orgnr}
                       </div>
                       {company.homepage && (
-                        <p className="text-xs text-blue-600">{company.homepage.replace(/^https?:\/\//, '')}</p>
+                        <p className="text-xs text-primary">{company.homepage.replace(/^https?:\/\//, '')}</p>
                       )}
                     </button>
                   ) : (
                     <>
-                      <div className="font-medium text-gray-800">{company.company_name || company.orgnr}</div>
+                      <div className="font-medium text-foreground">{company.company_name || company.orgnr}</div>
                       {company.homepage && (
-                        <p className="text-xs text-blue-600">{company.homepage.replace(/^https?:\/\//, '')}</p>
+                        <p className="text-xs text-primary">{company.homepage.replace(/^https?:\/\//, '')}</p>
                       )}
                     </>
                   )}
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{company.orgnr}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{company.orgnr}</td>
                 <td className="px-4 py-3">{formatMillions(company.latest_revenue_sek)}</td>
                 <td className="px-4 py-3">{formatPercent(company.avg_ebitda_margin)}</td>
                 <td className="px-4 py-3">{formatPercent(company.revenue_growth_yoy ?? company.revenue_cagr_3y)}</td>
-                <td className="px-4 py-3 text-xs text-gray-600">
+                <td className="px-4 py-3 text-xs text-muted-foreground">
                   {company.ai_business_summary ||
                     company.company_context ||
                     company.ai_product_description ||
@@ -316,7 +316,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                   {company.ai_industry_keywords && company.ai_industry_keywords.length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {company.ai_industry_keywords.slice(0, 3).map((keyword) => (
-                        <span key={keyword} className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-600">
+                        <span key={keyword} className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
                           {keyword}
                         </span>
                       ))}
@@ -331,23 +331,23 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                           company.ai_fit_status === 'YES'
                             ? 'bg-emerald-50 text-emerald-700'
                             : company.ai_fit_status === 'NO'
-                              ? 'bg-red-50 text-red-700'
-                              : 'bg-amber-50 text-amber-700'
+                              ? 'bg-destructive/10 text-destructive'
+                              : 'bg-accent/60 text-foreground'
                         }`}
                       >
                         {company.ai_fit_status}
                       </span>
                     )}
                     {company.ai_strategic_score ? (
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-foreground">
                         {company.ai_strategic_score}/10
-                        <span className="ml-1 text-xs font-normal text-gray-500">fit score</span>
+                        <span className="ml-1 text-xs font-normal text-muted-foreground">fit score</span>
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">Not scored</span>
+                      <span className="text-sm text-muted-foreground">Not scored</span>
                     )}
                     {company.ai_acquisition_angle && (
-                      <span className="text-xs text-gray-500">{company.ai_acquisition_angle}</span>
+                      <span className="text-xs text-muted-foreground">{company.ai_acquisition_angle}</span>
                     )}
                   </div>
                 </td>
@@ -355,14 +355,14 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
             ))}
             {loading && (
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-muted-foreground">
                   Loading company details...
                 </td>
               </tr>
             )}
             {!loading && renderedRows.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-muted-foreground">
                   No companies loaded yet. Run the AI filter to populate this view.
                 </td>
               </tr>
@@ -372,7 +372,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
       </div>
 
       {pagination && (
-        <div className="flex flex-col items-start gap-3 border-t border-gray-200 px-4 py-3 text-xs text-gray-600 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col items-start gap-3 border-t border-border px-4 py-3 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <span>
             Showing {startRange}-{endRange} of {pagination.total.toLocaleString()}
           </span>
@@ -381,11 +381,11 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
               type="button"
               onClick={() => pagination.onPageChange?.(Math.max(1, pagination.page - 1))}
               disabled={pagination.page === 1}
-              className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted/40 disabled:opacity-50"
             >
               Previous
             </button>
-            <span className="text-gray-500">
+            <span className="text-muted-foreground">
               Page {pagination.page} / {totalPages}
             </span>
             <button
@@ -394,7 +394,7 @@ export const CompanyExplorer: React.FC<CompanyExplorerProps> = ({
                 pagination.onPageChange?.(Math.min(totalPages, pagination.page + 1))
               }
               disabled={pagination.page >= totalPages}
-              className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted/40 disabled:opacity-50"
             >
               Next
             </button>

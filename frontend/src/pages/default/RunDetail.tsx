@@ -19,7 +19,7 @@ import {
   Ban,
   Download,
 } from "lucide-react";
-import { ErrorState } from "@/components/new/ErrorState";
+import { ErrorState } from "@/components/default/ErrorState";
 import * as api from "@/lib/services/figmaApi";
 import { toast } from "sonner";
 
@@ -34,7 +34,7 @@ export default function NewRunDetail() {
   if (isLoading && !run) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading run...</p>
+        <p className="text-muted-foreground">Loading run...</p>
       </div>
     );
   }
@@ -66,31 +66,31 @@ export default function NewRunDetail() {
     switch (run.status) {
       case "completed":
         return (
-          <Badge className="bg-green-100 text-green-800">
+          <Badge className="bg-primary/15 text-primary">
             <CheckCircle className="w-3 h-3 mr-1" /> Completed
           </Badge>
         );
       case "running":
         return (
-          <Badge className="bg-blue-100 text-blue-800">
+          <Badge className="bg-primary/15 text-primary">
             <Loader className="w-3 h-3 mr-1 animate-spin" /> Running
           </Badge>
         );
       case "queued":
         return (
-          <Badge className="bg-gray-100 text-gray-800">
+          <Badge className="bg-muted text-foreground">
             <Clock className="w-3 h-3 mr-1" /> Queued
           </Badge>
         );
       case "failed":
         return (
-          <Badge className="bg-red-100 text-red-800">
+          <Badge className="bg-destructive/15 text-destructive">
             <XCircle className="w-3 h-3 mr-1" /> Failed
           </Badge>
         );
       case "cancelled":
         return (
-          <Badge className="bg-gray-100 text-gray-800">
+          <Badge className="bg-muted text-foreground">
             <Ban className="w-3 h-3 mr-1" /> Cancelled
           </Badge>
         );
@@ -135,7 +135,7 @@ export default function NewRunDetail() {
     run.status === "completed" || run.processed_companies > 0;
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-5xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/ai">
@@ -145,10 +145,10 @@ export default function NewRunDetail() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {run.name}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Created by {run.created_by} •{" "}
                 {new Date(run.created_at).toLocaleDateString()} at{" "}
                 {new Date(run.created_at).toLocaleTimeString()}
@@ -200,10 +200,10 @@ export default function NewRunDetail() {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-foreground">
                       Analyzing companies...
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-muted-foreground">
                       {run.processed_companies} / {run.total_companies}
                     </span>
                   </div>
@@ -211,12 +211,12 @@ export default function NewRunDetail() {
                 </div>
                 {run.status === "running" && (
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader className="w-4 h-4 animate-spin" />
                       <span>Processing... This may take a few minutes.</span>
                     </div>
                     {run.total_companies > 0 && run.processed_companies < run.total_companies && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         ~{Math.max(1, Math.ceil((run.total_companies - run.processed_companies) * 0.5))} minutes remaining
                       </p>
                     )}
@@ -230,38 +230,38 @@ export default function NewRunDetail() {
         <div className="grid grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Total Companies</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm text-muted-foreground mb-1">Total Companies</p>
+              <p className="text-2xl font-bold text-foreground">
                 {run.total_companies}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Processed</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-sm text-muted-foreground mb-1">Processed</p>
+              <p className="text-2xl font-bold text-primary">
                 {run.processed_companies}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Failed</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-sm text-muted-foreground mb-1">Failed</p>
+              <p className="text-2xl font-bold text-destructive">
                 {run.failed_companies}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Cost</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm text-muted-foreground mb-1">Cost</p>
+              <p className="text-2xl font-bold text-foreground">
                 $
                 {run.status === "completed"
                   ? run.actual_cost.toFixed(2)
                   : run.estimated_cost.toFixed(2)}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {run.status === "completed" ? "Actual" : "Estimated"}
               </p>
             </CardContent>
@@ -276,20 +276,20 @@ export default function NewRunDetail() {
             <CardContent>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-medium text-gray-600">Template</dt>
-                  <dd className="text-sm text-gray-900 mt-1">
+                  <dt className="text-sm font-medium text-muted-foreground">Template</dt>
+                  <dd className="text-sm text-foreground mt-1">
                     {template?.name ?? run.template_id}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-600">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Target List
                   </dt>
-                  <dd className="text-sm text-gray-900 mt-1">
+                  <dd className="text-sm text-foreground mt-1">
                     {list ? (
                       <Link
                         to={`/lists/${list.id}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-primary hover:underline"
                       >
                         {list.name}
                       </Link>
@@ -299,20 +299,20 @@ export default function NewRunDetail() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-600">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Auto-approve Results
                   </dt>
-                  <dd className="text-sm text-gray-900 mt-1">
+                  <dd className="text-sm text-foreground mt-1">
                     {run.config.auto_approve
                       ? "Yes"
                       : "No (manual review required)"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-600">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Overwrite Existing
                   </dt>
-                  <dd className="text-sm text-gray-900 mt-1">
+                  <dd className="text-sm text-foreground mt-1">
                     {run.config.overwrite_existing ? "Yes" : "No"}
                   </dd>
                 </div>
@@ -327,37 +327,37 @@ export default function NewRunDetail() {
             <CardContent>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-medium text-gray-600">Created</dt>
-                  <dd className="text-sm text-gray-900 mt-1">
+                  <dt className="text-sm font-medium text-muted-foreground">Created</dt>
+                  <dd className="text-sm text-foreground mt-1">
                     {new Date(run.created_at).toLocaleString()}
                   </dd>
                 </div>
                 {run.started_at && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-600">
+                    <dt className="text-sm font-medium text-muted-foreground">
                       Started
                     </dt>
-                    <dd className="text-sm text-gray-900 mt-1">
+                    <dd className="text-sm text-foreground mt-1">
                       {new Date(run.started_at).toLocaleString()}
                     </dd>
                   </div>
                 )}
                 {run.completed_at && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-600">
+                    <dt className="text-sm font-medium text-muted-foreground">
                       Completed
                     </dt>
-                    <dd className="text-sm text-gray-900 mt-1">
+                    <dd className="text-sm text-foreground mt-1">
                       {new Date(run.completed_at).toLocaleString()}
                     </dd>
                   </div>
                 )}
                 {run.started_at && run.completed_at && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-600">
+                    <dt className="text-sm font-medium text-muted-foreground">
                       Duration
                     </dt>
-                    <dd className="text-sm text-gray-900 mt-1">
+                    <dd className="text-sm text-foreground mt-1">
                       {Math.ceil(
                         (new Date(run.completed_at).getTime() -
                           new Date(run.started_at).getTime()) /

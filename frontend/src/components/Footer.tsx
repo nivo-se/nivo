@@ -46,31 +46,31 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:gap-6">
             <button
               onClick={() => scrollToSection('about-nivo')}
-              className="text-platinum/70 transition-colors hover:text-platinum"
+              className="text-primary-foreground/70 transition-colors hover:text-primary-foreground"
             >
               Om oss
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="text-platinum/70 transition-colors hover:text-platinum"
+              className="text-primary-foreground/70 transition-colors hover:text-primary-foreground"
             >
               Tjänster
             </button>
             <button
               onClick={() => scrollToSection('team')}
-              className="text-platinum/70 transition-colors hover:text-platinum"
+              className="text-primary-foreground/70 transition-colors hover:text-primary-foreground"
             >
               Team
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-platinum/70 transition-colors hover:text-platinum"
+              className="text-primary-foreground/70 transition-colors hover:text-primary-foreground"
             >
               Kontakt
             </button>
           </div>
 
-          <div className="text-center text-xs text-platinum/60 md:text-right">
+          <div className="text-center text-xs text-primary-foreground/60 md:text-right">
             &copy; {new Date().getFullYear()} Nivo. Alla rättigheter förbehållna.
           </div>
         </div>

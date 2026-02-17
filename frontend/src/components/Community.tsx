@@ -10,15 +10,15 @@ interface CommunityProps {
 
 const Community: React.FC<CommunityProps> = ({ className }) => {
   return (
-    <section id="contact" className={cn('py-16 md:py-20 bg-platinum', className)}>
+    <section id="contact" className={cn('py-16 md:py-20 bg-muted', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid md:grid-cols-2 grid-gap-nivo items-start max-w-6xl mx-auto">
           <FadeIn>
             <div className="space-y-6">
-              <h2 className="text-3xl font-heading text-jetBlack sm:text-4xl">
+              <h2 className="text-3xl font-heading text-foreground sm:text-4xl">
                 Är ditt företag redo för nästa steg?
               </h2>
-              <p className="text-base leading-relaxed text-jetBlack/80 sm:text-lg">
+              <p className="text-base leading-relaxed text-foreground/80 sm:text-lg">
                 Nivo är ständigt på jakt efter kvalitetsföretag och intressanta förvärvsmöjligheter. Om du är företagare som funderar på nästa steg för ditt bolag, eller om du är branschexpert med insikter om potentiella förvärv, tveka inte att höra av dig! Vi ser fram emot att höra från dig och utforska hur vi tillsammans kan utveckla framgångsrika verksamheter.
               </p>
             </div>
@@ -28,7 +28,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
             <div className="card-elevated max-w-xl md:ml-auto">
               <form className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-jetBlack mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
                     Namn
                   </label>
                   <input
@@ -39,7 +39,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-jetBlack mb-1">
+                  <label htmlFor="company" className="block text-sm font-medium text-foreground mb-1">
                     Företag
                   </label>
                   <input
@@ -50,7 +50,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-jetBlack mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
                     E-post
                   </label>
                   <input
@@ -61,7 +61,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-jetBlack mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1">
                     Meddelande
                   </label>
                   <textarea

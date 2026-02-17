@@ -13,9 +13,9 @@ import type { Company } from "@/types/figma";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FilterBuilder } from "@/components/new/FilterBuilder";
-import { EmptyState } from "@/components/new/EmptyState";
-import { ErrorState } from "@/components/new/ErrorState";
+import { FilterBuilder } from "@/components/default/FilterBuilder";
+import { EmptyState } from "@/components/default/EmptyState";
+import { ErrorState } from "@/components/default/ErrorState";
 import { ArrowLeft, Trash2, RefreshCw, Brain, ExternalLink, Download } from "lucide-react";
 import { toast } from "sonner";
 import * as api from "@/lib/services/figmaApi";
@@ -56,7 +56,7 @@ export default function NewListDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading list...</p>
+        <p className="text-muted-foreground">Loading list...</p>
       </div>
     );
   }
@@ -170,7 +170,7 @@ export default function NewListDetail() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="bg-white border-b border-gray-200 px-8 py-6">
+      <div className="bg-card border-b border-border px-8 py-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-4">
             <Link to="/lists">
@@ -180,17 +180,17 @@ export default function NewListDetail() {
             </Link>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
+                <h1 className="text-2xl font-bold text-foreground">{list.name}</h1>
                 {list.scope === "team" && (
-                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                  <span className="text-xs px-2 py-1 bg-primary/15 text-primary rounded">
                     Shareable
                   </span>
                 )}
-                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
                   {getStageLabel(list.stage)}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {list.companyIds.length} companies
                 {list.created_by && ` • Created by ${list.created_by}`} •{" "}
                 {new Date(list.created_at).toLocaleDateString()}
@@ -234,8 +234,8 @@ export default function NewListDetail() {
         )}
 
         {list.filters && !showFilterBuilder && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-            <p className="text-blue-900">
+          <div className="mt-4 p-3 bg-primary/10 border border-primary/40 rounded text-sm">
+            <p className="text-primary">
               ✓ This list was created from filters and can be reloaded to see updated
               results
             </p>
@@ -260,7 +260,7 @@ export default function NewListDetail() {
 
       <div className="flex-1 overflow-auto px-8 py-4">
         {isTruncated && (
-          <div className="mb-4 px-4 py-2 rounded bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          <div className="mb-4 px-4 py-2 rounded bg-accent border border-accent text-sm text-accent-foreground">
             Showing first 500 companies for performance. List has {orgnrs.length} total.
           </div>
         )}
@@ -270,7 +270,7 @@ export default function NewListDetail() {
             retry={() => refetchCompanies()}
           />
         ) : companiesLoading && companies.length === 0 ? (
-          <p className="text-gray-500">Loading companies...</p>
+          <p className="text-muted-foreground">Loading companies...</p>
         ) : companies.length === 0 ? (
           <EmptyState
             title="No companies in this list"
@@ -282,9 +282,9 @@ export default function NewListDetail() {
             }
           />
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/40 border-b border-border">
                 <tr>
                   <th className="px-4 py-3 text-left w-12">
                     <Checkbox
@@ -307,7 +307,7 @@ export default function NewListDetail() {
                   const latest = getLatestFinancials(company);
                   const cagr = calculateRevenueCagr(company) ?? 0;
                   return (
-                    <tr key={company.orgnr} className="hover:bg-gray-50">
+                    <tr key={company.orgnr} className="hover:bg-muted/40">
                       <td className="px-4 py-3">
                         <Checkbox
                           checked={selectedCompanies.has(company.orgnr)}
@@ -317,16 +317,16 @@ export default function NewListDetail() {
                       <td className="px-4 py-3">
                         <Link
                           to={`/company/${company.orgnr}`}
-                          className="font-medium text-blue-600 hover:text-blue-800 flex items-center gap-2"
+                          className="font-medium text-primary hover:text-primary flex items-center gap-2"
                         >
                           {company.display_name}
                           <ExternalLink className="w-3 h-3" />
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-foreground">
                         {company.industry_label ?? "—"}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">{company.region ?? "—"}</td>
+                      <td className="px-4 py-3 text-foreground">{company.region ?? "—"}</td>
                       <td className="px-4 py-3 text-right font-mono text-sm">
                         {formatRevenueSEK(latest.revenue)}
                       </td>
@@ -334,10 +334,10 @@ export default function NewListDetail() {
                         <span
                           className={
                             cagr > 0.15
-                              ? "text-green-600"
+                              ? "text-primary"
                               : cagr < 0
-                                ? "text-red-600"
-                                : "text-gray-700"
+                                ? "text-destructive"
+                                : "text-foreground"
                           }
                         >
                           {formatPercent(cagr)}
@@ -351,23 +351,23 @@ export default function NewListDetail() {
                           <span
                             className={`font-semibold ${
                               company.ai_profile.ai_fit_score >= 75
-                                ? "text-green-600"
+                                ? "text-primary"
                                 : company.ai_profile.ai_fit_score >= 50
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
+                                  ? "text-foreground"
+                                  : "text-destructive"
                             }`}
                           >
                             {company.ai_profile.ai_fit_score}
                           </span>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-red-600 hover:text-red-800"
+                          className="text-destructive hover:text-destructive"
                           onClick={() => handleRemove(company.orgnr)}
                           disabled={removeMutation.isPending}
                         >

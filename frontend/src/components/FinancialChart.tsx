@@ -26,7 +26,7 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
 
   if (chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         <div className="text-center">
           <p className="text-lg font-medium">No Financial Data Available</p>
           <p className="text-sm">Historical data not available for this company</p>
@@ -38,8 +38,8 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{`Year: ${label}`}</p>
+        <div className="bg-card p-3 border border-border rounded-lg shadow-lg">
+          <p className="font-medium text-foreground">{`Year: ${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.dataKey === 'revenue' ? 'Revenue' : 'EBIT'}: {entry.value ? `${(entry.value / 1_000_000).toFixed(1)} mSEK` : 'N/A'}
@@ -79,16 +79,16 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
             bottom: 10,
           }}
         >
-          <CartesianGrid strokeDasharray="2 2" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="2 2" stroke="hsl(var(--border))" />
           <XAxis 
             dataKey="year" 
-            stroke="#666"
+            stroke="hsl(var(--muted-foreground))"
             fontSize={10}
             tickLine={false}
             axisLine={false}
           />
           <YAxis 
-            stroke="#666"
+            stroke="hsl(var(--muted-foreground))"
             fontSize={10}
             tickLine={false}
             axisLine={false}
@@ -103,14 +103,14 @@ const FinancialChart: React.FC<FinancialChartProps> = ({ data, companyName }) =>
           />
           <Bar 
             dataKey="revenue" 
-            fill="#3b82f6" 
+            fill="hsl(var(--chart-1))" 
             name="Revenue"
             radius={[1, 1, 0, 0]}
             maxBarSize={40}
           />
           <Bar 
             dataKey="ebit" 
-            fill="#10b981" 
+            fill="hsl(var(--chart-2))" 
             name="EBIT"
             radius={[1, 1, 0, 0]}
             maxBarSize={40}

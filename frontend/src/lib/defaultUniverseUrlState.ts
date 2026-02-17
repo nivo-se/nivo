@@ -1,8 +1,8 @@
 /**
- * URL state for /new Universe. Persists q, page, sort, filters via ?u= JSON.
- * decodeNewUniverseState is fully defensive: invalid/malformed input returns null or safe defaults.
+ * URL state for the default Universe page. Persists q, page, sort, filters via ?u= JSON.
+ * decodeDefaultUniverseState is fully defensive: invalid/malformed input returns null or safe defaults.
  */
-export type NewUniverseUrlState = {
+export type DefaultUniverseUrlState = {
   v: 1;
   q?: string;
   page?: number;
@@ -14,7 +14,7 @@ export type NewUniverseUrlState = {
 
 const PARAM_KEY = "u";
 
-const SAFE_DEFAULTS: Partial<NewUniverseUrlState> = {
+const SAFE_DEFAULTS: Partial<DefaultUniverseUrlState> = {
   q: undefined,
   page: 1,
   sortField: "name",
@@ -39,7 +39,7 @@ function isValidFilterRule(r: unknown): r is { field: string; operator: string; 
   );
 }
 
-export function decodeNewUniverseState(encoded: string | null): Partial<NewUniverseUrlState> | null {
+export function decodeDefaultUniverseState(encoded: string | null): Partial<DefaultUniverseUrlState> | null {
   if (encoded == null) return null;
   if (typeof encoded !== "string") return null;
   const trimmed = encoded.trim();
@@ -57,7 +57,7 @@ export function decodeNewUniverseState(encoded: string | null): Partial<NewUnive
 
   if (p.v !== 1) return null;
 
-  const result: Partial<NewUniverseUrlState> = { v: 1 };
+  const result: Partial<DefaultUniverseUrlState> = { v: 1 };
 
   if (typeof p.q === "string") result.q = p.q;
   else result.q = SAFE_DEFAULTS.q;
@@ -81,7 +81,7 @@ export function decodeNewUniverseState(encoded: string | null): Partial<NewUnive
 }
 
 /** Dev-only: run decode against malformed examples. Returns true if no throw. */
-export function runNewUniverseUrlStateDevTest(): boolean {
+export function runDefaultUniverseUrlStateDevTest(): boolean {
   if (import.meta.env.PROD) return true;
   const cases: { name: string; input: string | null }[] = [
     { name: "non-JSON", input: "not-valid-json{{" },
@@ -90,20 +90,20 @@ export function runNewUniverseUrlStateDevTest(): boolean {
   ];
   for (const c of cases) {
     try {
-      decodeNewUniverseState(c.input);
+      decodeDefaultUniverseState(c.input);
     } catch (e) {
-      console.error(`[newUniverseUrlState] Dev test FAIL: ${c.name}`, e);
+      console.error(`[defaultUniverseUrlState] Dev test FAIL: ${c.name}`, e);
       return false;
     }
   }
   return true;
 }
 
-export function getNewUniverseStateFromUrl(searchParams: URLSearchParams): Partial<NewUniverseUrlState> | null {
-  return decodeNewUniverseState(searchParams.get(PARAM_KEY));
+export function getDefaultUniverseStateFromUrl(searchParams: URLSearchParams): Partial<DefaultUniverseUrlState> | null {
+  return decodeDefaultUniverseState(searchParams.get(PARAM_KEY));
 }
 
-function encodeState(state: Omit<NewUniverseUrlState, "v">): string {
+function encodeState(state: Omit<DefaultUniverseUrlState, "v">): string {
   try {
     const obj: Record<string, unknown> = { v: 1 };
     if (state.q) obj.q = state.q;
@@ -117,8 +117,8 @@ function encodeState(state: Omit<NewUniverseUrlState, "v">): string {
   }
 }
 
-export function buildNewUniverseSearchParams(
-  state: Omit<NewUniverseUrlState, "v">
+export function buildDefaultUniverseSearchParams(
+  state: Omit<DefaultUniverseUrlState, "v">
 ): URLSearchParams {
   const params = new URLSearchParams();
   const encoded = encodeState(state);

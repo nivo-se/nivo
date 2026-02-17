@@ -117,7 +117,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
           <h2 className="text-2xl font-bold">Advanced Analytics</h2>
           <div className="flex items-center space-x-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            <span className="text-sm text-gray-600">Loading analytics...</span>
+            <span className="text-sm text-muted-foreground">Loading analytics...</span>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -125,8 +125,8 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
                 </div>
               </CardContent>
             </Card>
@@ -144,7 +144,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-2xl font-bold">Advanced Analytics</h2>
-          <p className="text-gray-600">Comprehensive business intelligence and market insights</p>
+          <p className="text-muted-foreground">Comprehensive business intelligence and market insights</p>
         </div>
         <div className="flex items-center space-x-4">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
@@ -175,15 +175,15 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Companies</p>
+                <p className="text-sm font-medium text-muted-foreground">Total Companies</p>
                 <p className="text-2xl font-bold">{data.totalCompanies.toLocaleString()}</p>
               </div>
-              <Building2 className="h-8 w-8 text-blue-600" />
+              <Building2 className="h-8 w-8 text-primary" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500">+12.3%</span>
-              <span className="text-gray-500 ml-1">vs last period</span>
+              <TrendingUp className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">+12.3%</span>
+              <span className="text-muted-foreground ml-1">vs last period</span>
             </div>
           </CardContent>
         </Card>
@@ -192,15 +192,15 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold">{formatCurrency(data.totalRevenue)}</p>
               </div>
-              <DollarSign className="h-8 w-8 text-green-600" />
+              <DollarSign className="h-8 w-8 text-primary" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500">+8.7%</span>
-              <span className="text-gray-500 ml-1">vs last period</span>
+              <TrendingUp className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">+8.7%</span>
+              <span className="text-muted-foreground ml-1">vs last period</span>
             </div>
           </CardContent>
         </Card>
@@ -209,15 +209,15 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg Growth Rate</p>
+                <p className="text-sm font-medium text-muted-foreground">Avg Growth Rate</p>
                 <p className="text-2xl font-bold">{data.avgGrowthRate}%</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-purple-600" />
+              <TrendingUp className="h-8 w-8 text-primary" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500">+2.1%</span>
-              <span className="text-gray-500 ml-1">vs last period</span>
+              <TrendingUp className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">+2.1%</span>
+              <span className="text-muted-foreground ml-1">vs last period</span>
             </div>
           </CardContent>
         </Card>
@@ -226,14 +226,14 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Market Segments</p>
+                <p className="text-sm font-medium text-muted-foreground">Market Segments</p>
                 <p className="text-2xl font-bold">{data.marketSegments.length}</p>
               </div>
-              <PieChart className="h-8 w-8 text-orange-600" />
+              <PieChart className="h-8 w-8 text-foreground" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500">Active</span>
+              <CheckCircle className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">Active</span>
             </div>
           </CardContent>
         </Card>
@@ -264,12 +264,12 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                   {data.topIndustries.map((industry, index) => (
                     <div key={industry.name} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                          <span className="text-sm font-medium text-blue-600">{index + 1}</span>
+                        <div className="flex items-center justify-center w-8 h-8 bg-primary/15 rounded-full">
+                          <span className="text-sm font-medium text-primary">{index + 1}</span>
                         </div>
                         <div>
                           <p className="font-medium">{industry.name}</p>
-                          <p className="text-sm text-gray-600">{industry.count} companies</p>
+                          <p className="text-sm text-muted-foreground">{industry.count} companies</p>
                         </div>
                       </div>
                       <Badge variant="secondary">{formatCurrency(industry.revenue)}</Badge>
@@ -322,12 +322,12 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                   {data.topCities.map((city, index) => (
                     <div key={city.name} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
-                          <span className="text-sm font-medium text-green-600">{index + 1}</span>
+                        <div className="flex items-center justify-center w-8 h-8 bg-primary/15 rounded-full">
+                          <span className="text-sm font-medium text-primary">{index + 1}</span>
                         </div>
                         <div>
                           <p className="font-medium">{city.name}</p>
-                          <p className="text-sm text-gray-600">{city.count} companies</p>
+                          <p className="text-sm text-muted-foreground">{city.count} companies</p>
                         </div>
                       </div>
                       <Badge variant="outline">{formatCurrency(city.avgRevenue)} avg</Badge>
@@ -379,19 +379,19 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                 {data.growthTrends.map((trend, index) => (
                   <div key={trend.period} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
-                        <Calendar className="h-4 w-4 text-purple-600" />
+                      <div className="flex items-center justify-center w-8 h-8 bg-accent rounded-full">
+                        <Calendar className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="font-medium">{trend.period}</p>
-                        <p className="text-sm text-gray-600">Quarterly growth</p>
+                        <p className="text-sm text-muted-foreground">Quarterly growth</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       {trend.growth >= 8 ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-4 w-4 text-primary" />
                       ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
+                        <TrendingDown className="h-4 w-4 text-destructive" />
                       )}
                       <Badge variant={trend.growth >= 8 ? "default" : "secondary"}>
                         {trend.growth}%
@@ -417,10 +417,10 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { label: 'Excellent', count: data.financialHealth.excellent, color: 'bg-green-500' },
-                    { label: 'Good', count: data.financialHealth.good, color: 'bg-blue-500' },
-                    { label: 'Fair', count: data.financialHealth.fair, color: 'bg-yellow-500' },
-                    { label: 'Poor', count: data.financialHealth.poor, color: 'bg-red-500' }
+                    { label: 'Excellent', count: data.financialHealth.excellent, color: 'bg-primary' },
+                    { label: 'Good', count: data.financialHealth.good, color: 'bg-primary' },
+                    { label: 'Fair', count: data.financialHealth.fair, color: 'bg-accent' },
+                    { label: 'Poor', count: data.financialHealth.poor, color: 'bg-destructive' }
                   ].map((health) => {
                     const percentage = (health.count / data.totalCompanies) * 100
                     return (
@@ -429,7 +429,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                           <span className="font-medium">{health.label}</span>
                           <span>{health.count} ({percentage.toFixed(1)}%)</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div 
                             className={`${health.color} h-2 rounded-full`}
                             style={{ width: `${percentage}%` }}
@@ -452,23 +452,23 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="p-4 bg-green-50 rounded-lg">
+                  <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                      <CheckCircle className="h-5 w-5 text-primary mr-2" />
                       <div>
-                        <p className="font-medium text-green-900">Strong Performance</p>
-                        <p className="text-sm text-green-700">
+                        <p className="font-medium text-primary">Strong Performance</p>
+                        <p className="text-sm text-primary">
                           {data.financialHealth.excellent + data.financialHealth.good} companies show good financial health
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 bg-yellow-50 rounded-lg">
+                  <div className="p-4 bg-accent/60 rounded-lg">
                     <div className="flex items-center">
-                      <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
+                      <AlertTriangle className="h-5 w-5 text-foreground mr-2" />
                       <div>
-                        <p className="font-medium text-yellow-900">Attention Needed</p>
-                        <p className="text-sm text-yellow-700">
+                        <p className="font-medium text-foreground">Attention Needed</p>
+                        <p className="text-sm text-foreground">
                           {data.financialHealth.poor} companies require immediate attention
                         </p>
                       </div>
@@ -499,10 +499,10 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                         {segment.avgGrowth > 0 ? '+' : ''}{segment.avgGrowth}%
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{segment.companies} companies</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <p className="text-sm text-muted-foreground mb-3">{segment.companies} companies</p>
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div 
-                        className={`${segment.avgGrowth > 10 ? 'bg-green-500' : segment.avgGrowth > 0 ? 'bg-blue-500' : 'bg-red-500'} h-2 rounded-full`}
+                        className={`${segment.avgGrowth > 10 ? 'bg-primary' : segment.avgGrowth > 0 ? 'bg-primary' : 'bg-destructive'} h-2 rounded-full`}
                         style={{ width: `${(segment.companies / data.totalCompanies) * 100}%` }}
                       ></div>
                     </div>

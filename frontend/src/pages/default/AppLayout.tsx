@@ -1,7 +1,6 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Home, Globe, List, Target, Cpu, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import "@/styles/newTheme.css";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: Home },
@@ -12,7 +11,7 @@ const navItems = [
   { path: "/admin", label: "Admin", icon: Settings },
 ];
 
-export default function NewAppLayout() {
+export default function AppLayout() {
   const location = useLocation();
   const { user } = useAuth();
 
@@ -22,7 +21,7 @@ export default function NewAppLayout() {
   };
 
   return (
-    <div className="new-theme flex h-screen bg-page-bg">
+    <div className="flex h-screen bg-background text-foreground">
       <aside className="w-56 bg-sidebar-bg border-r border-sidebar-border flex flex-col">
         <div className="p-6 border-b border-sidebar-border">
           <div className="text-sm font-medium text-foreground">
@@ -39,7 +38,9 @@ export default function NewAppLayout() {
                 key={item.path}
                 to={item.path === "/" ? "/" : item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  active ? "bg-sidebar-active-bg text-sidebar-active-fg font-medium" : "text-sidebar-inactive-fg hover:bg-sidebar-hover-bg hover:text-foreground"
+                  active
+                    ? "bg-sidebar-hover-bg !text-sidebar-fg font-medium"
+                    : "!text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
                 } ${item.indent ? "pl-6" : ""}`}
               >
                 <Icon className="w-4 h-4" />
@@ -49,7 +50,7 @@ export default function NewAppLayout() {
           })}
         </nav>
       </aside>
-      <main className="flex-1 overflow-auto bg-page-bg">
+      <main className="flex-1 overflow-auto bg-background">
         <Outlet />
       </main>
     </div>

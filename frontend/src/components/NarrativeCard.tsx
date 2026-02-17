@@ -27,10 +27,10 @@ export const NarrativeCard: React.FC<NarrativeCardProps> = ({ company }) => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-purple-600" />
+            <FileText className="h-5 w-5 text-primary" />
             Detaljerad Analys
           </div>
-          <div className="flex items-center gap-1 text-sm text-gray-500">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             {readTime} min läsning
           </div>
@@ -38,7 +38,7 @@ export const NarrativeCard: React.FC<NarrativeCardProps> = ({ company }) => {
       </CardHeader>
       <CardContent>
         <div className="prose prose-sm max-w-none">
-          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <div className="text-foreground leading-relaxed whitespace-pre-wrap">
             {narrative}
           </div>
         </div>

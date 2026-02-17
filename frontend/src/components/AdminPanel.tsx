@@ -241,9 +241,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Badge variant="default" className="bg-red-500"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
+        return <Badge variant="default" className="bg-destructive"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
       case 'approved':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
+        return <Badge variant="default" className="bg-primary"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
       case 'pending':
         return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       default:
@@ -345,8 +345,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">User administration</h2>
-          <p className="text-gray-600">Manage user access and permissions</p>
+          <h2 className="text-2xl font-bold text-foreground">User administration</h2>
+          <p className="text-muted-foreground">Manage user access and permissions</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setIsAddUserDialogOpen(true)}>
@@ -378,24 +378,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* System metrics - stacked rows */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-700">Total users</span>
+          <span className="text-foreground">Total users</span>
           <span className="font-medium">{systemMetrics?.totalUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-700">Pending</span>
+          <span className="text-foreground">Pending</span>
           <span className="font-medium">{systemMetrics?.pendingUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-700">Approved</span>
+          <span className="text-foreground">Approved</span>
           <span className="font-medium">{systemMetrics?.approvedUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-700">Administrators</span>
+          <span className="text-foreground">Administrators</span>
           <span className="font-medium">{systemMetrics?.adminUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm pt-2 border-t">
-          <span className="text-gray-700">Database</span>
-          <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-green-500" : "bg-red-500"}>
+          <span className="text-foreground">Database</span>
+          <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-primary" : "bg-destructive"}>
             {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
           </Badge>
         </div>
@@ -406,7 +406,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-orange-500" />
+              <Clock className="w-5 h-5 mr-2 text-foreground" />
               Pending approval ({pendingUsers.length})
             </CardTitle>
             <CardDescription>
@@ -416,14 +416,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <CardContent>
             <div className="space-y-4">
               {pendingUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors">
                   <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => handleUserClick(user)}>
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div>
                       <p className="font-medium">{displayName(user)}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         {user.email} · Registered: {formatDate(user.created_at)}
                       </p>
                     </div>
@@ -489,14 +489,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         <CardContent>
           <div className="space-y-4">
             {users.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors">
                 <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => handleUserClick(user)}>
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-gray-600" />
+                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="font-medium">{displayName(user)}</p>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                       <span>{user.email}</span>
                       <span>·</span>
                       <span>Joined: {formatDate(user.created_at)}</span>
@@ -545,7 +545,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       {/* User Details Dialog */}
       <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white text-gray-900 border-gray-200 shadow-xl">
+        <DialogContent className="max-w-2xl bg-card text-foreground border-border shadow-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Info className="h-5 w-5 mr-2" />
@@ -561,11 +561,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {/* User Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Email</label>
+                  <label className="text-sm font-medium text-foreground">Email</label>
                   <p className="text-lg font-semibold">{selectedUser.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Role</label>
+                  <label className="text-sm font-medium text-foreground">Role</label>
                   <div className="mt-1">
                     {getRoleBadge(selectedUser.role)}
                   </div>
@@ -574,7 +574,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* First and Last Name (editable) */}
               <div className="space-y-3 border-t pt-4">
-                <Label className="text-sm font-medium text-gray-700">Name</Label>
+                <Label className="text-sm font-medium text-foreground">Name</Label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="edit-first-name">First name</Label>
@@ -614,18 +614,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
               {/* User ID */}
               <div>
-                  <label className="text-sm font-medium text-gray-700">User ID</label>
-                <p className="text-sm font-mono bg-gray-100 p-2 rounded">{selectedUser.user_id}</p>
+                  <label className="text-sm font-medium text-foreground">User ID</label>
+                <p className="text-sm font-mono bg-muted p-2 rounded">{selectedUser.user_id}</p>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Joined date</label>
+                  <label className="text-sm font-medium text-foreground">Joined date</label>
                   <p className="text-sm">{formatDate(selectedUser.created_at)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Last updated</label>
+                  <label className="text-sm font-medium text-foreground">Last updated</label>
                   <p className="text-sm">{formatDate(selectedUser.updated_at)}</p>
                 </div>
               </div>
@@ -634,11 +634,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {selectedUser.approved_at && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Approved date</label>
+                    <label className="text-sm font-medium text-foreground">Approved date</label>
                     <p className="text-sm">{formatDate(selectedUser.approved_at)}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Approved by</label>
+                    <label className="text-sm font-medium text-foreground">Approved by</label>
                     <p className="text-sm">{selectedUser.approved_by || 'System'}</p>
                   </div>
                 </div>
@@ -678,7 +678,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           setAddError(null);
         }
       }}>
-        <DialogContent className="max-w-md text-gray-900">
+        <DialogContent className="max-w-md text-foreground">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <UserPlus className="h-5 w-5 mr-2" />

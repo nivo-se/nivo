@@ -38,7 +38,7 @@ export function AdminPage() {
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Database</span>
-            <span className={`text-sm font-medium ${dbOk ? "text-green-600" : "text-destructive"}`}>
+            <span className={`text-sm font-medium ${dbOk ? "text-primary" : "text-destructive"}`}>
               {dbOk ? "Connected" : "Error"}
             </span>
           </div>

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AddToListDropdown } from "@/components/new/AddToListDropdown";
+import { AddToListDropdown } from "@/components/default/AddToListDropdown";
 import {
   useCompaniesBatch,
   useCompany,
@@ -186,7 +186,7 @@ export function CompanySnapshotModal({
                     href={company.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
                     <Globe className="h-4 w-4" />
@@ -197,7 +197,7 @@ export function CompanySnapshotModal({
                 {company.email && (
                   <a
                     href={`mailto:${company.email}`}
-                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
                     <Mail className="h-4 w-4" />
@@ -207,7 +207,7 @@ export function CompanySnapshotModal({
                 {company.phone && (
                   <a
                     href={`tel:${company.phone.replace(/\s/g, "")}`}
-                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
                     <Phone className="h-4 w-4" />
@@ -274,7 +274,7 @@ export function CompanySnapshotModal({
               <Link
                 to={`/company/${company.orgnr}`}
                 onClick={() => onOpenChange(false)}
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
               >
                 <ExternalLink className="h-4 w-4" />
                 View Full Profile

@@ -147,12 +147,12 @@ const CompanyDetail: React.FC = () => {
       <div className="mx-auto max-w-6xl p-6">
         <button
           onClick={() => navigate('/dashboard')}
-          className="mb-4 flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="mb-4 flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </button>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive">
           {error || 'Company not found'}
         </div>
       </div>
@@ -163,7 +163,7 @@ const CompanyDetail: React.FC = () => {
     <div className="mx-auto max-w-6xl p-6">
       <button
         onClick={() => navigate('/dashboard')}
-        className="mb-6 flex items-center text-sm text-gray-600 hover:text-gray-900"
+        className="mb-6 flex items-center text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Dashboard
@@ -173,13 +173,13 @@ const CompanyDetail: React.FC = () => {
         {/* Company Header */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{company.company_name || company.orgnr}</h1>
-            <p className="text-sm text-gray-500">Org.nr {company.orgnr}</p>
+            <h1 className="text-3xl font-bold text-foreground">{company.company_name || company.orgnr}</h1>
+            <p className="text-sm text-muted-foreground">Org.nr {company.orgnr}</p>
           </div>
           <button
             onClick={handleStrategicEvaluation}
             disabled={evaluating}
-            className="inline-flex items-center rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-black/90 disabled:opacity-50"
+            className="inline-flex items-center rounded-md bg-card px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-card/90 disabled:opacity-50"
           >
             {evaluating ? 'Evaluating…' : '🧠 Run Strategic Evaluation'}
           </button>
@@ -187,63 +187,63 @@ const CompanyDetail: React.FC = () => {
 
         {/* Summary Cards */}
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-lg border border-gray-200 p-4">
-            <h2 className="mb-4 text-sm font-semibold text-gray-700">Financial Metrics</h2>
+          <div className="rounded-lg border border-border p-4">
+            <h2 className="mb-4 text-sm font-semibold text-foreground">Financial Metrics</h2>
             <dl className="space-y-2">
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Revenue</dt>
+                <dt className="text-sm text-muted-foreground">Revenue</dt>
                 <dd className="text-sm font-medium">{formatMillions(latestFinancial?.revenue_sek)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Net Profit</dt>
+                <dt className="text-sm text-muted-foreground">Net Profit</dt>
                 <dd className="text-sm font-medium">{formatMillions(latestFinancial?.profit_sek)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">EBIT</dt>
+                <dt className="text-sm text-muted-foreground">EBIT</dt>
                 <dd className="text-sm font-medium">{formatMillions(latestFinancial?.ebit_sek)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">EBITDA</dt>
+                <dt className="text-sm text-muted-foreground">EBITDA</dt>
                 <dd className="text-sm font-medium">{formatMillions(latestFinancial?.ebitda_sek)}</dd>
               </div>
             </dl>
           </div>
 
-          <div className="rounded-lg border border-gray-200 p-4">
-            <h2 className="mb-4 text-sm font-semibold text-gray-700">Margins</h2>
+          <div className="rounded-lg border border-border p-4">
+            <h2 className="mb-4 text-sm font-semibold text-foreground">Margins</h2>
             <dl className="space-y-2">
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Net Margin</dt>
+                <dt className="text-sm text-muted-foreground">Net Margin</dt>
                 <dd className="text-sm font-medium">{formatPercent(latestFinancial?.net_margin)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">EBIT Margin</dt>
+                <dt className="text-sm text-muted-foreground">EBIT Margin</dt>
                 <dd className="text-sm font-medium">{formatPercent(latestFinancial?.ebit_margin)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">EBITDA Margin</dt>
+                <dt className="text-sm text-muted-foreground">EBITDA Margin</dt>
                 <dd className="text-sm font-medium">{formatPercent(latestFinancial?.ebitda_margin)}</dd>
               </div>
             </dl>
           </div>
 
-          <div className="rounded-lg border border-gray-200 p-4">
-            <h2 className="mb-4 text-sm font-semibold text-gray-700">Growth & Info</h2>
+          <div className="rounded-lg border border-border p-4">
+            <h2 className="mb-4 text-sm font-semibold text-foreground">Growth & Info</h2>
             <dl className="space-y-2">
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">3Y CAGR</dt>
+                <dt className="text-sm text-muted-foreground">3Y CAGR</dt>
                 <dd className="text-sm font-medium">{formatPercent(calculatedCAGR)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">YoY Growth</dt>
+                <dt className="text-sm text-muted-foreground">YoY Growth</dt>
                 <dd className="text-sm font-medium">{formatPercent(calculatedYoY)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Employees</dt>
+                <dt className="text-sm text-muted-foreground">Employees</dt>
                 <dd className="text-sm font-medium">{company.employees_latest || 'N/A'}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-sm text-gray-600">Size</dt>
+                <dt className="text-sm text-muted-foreground">Size</dt>
                 <dd className="text-sm font-medium capitalize">{company.company_size_bucket || 'N/A'}</dd>
               </div>
             </dl>
@@ -251,7 +251,7 @@ const CompanyDetail: React.FC = () => {
         </div>
 
         {evaluationError && (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             {evaluationError}
           </div>
         )}
@@ -282,49 +282,49 @@ const CompanyDetail: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="rounded-md border border-white/60 bg-white/80 p-4">
-                <p className="text-xs uppercase text-gray-500">AI Summary</p>
-                <p className="text-sm text-gray-900">{evaluation.business_summary || '—'}</p>
-                <p className="mt-3 text-xs uppercase text-gray-500">Fit rationale</p>
-                <p className="text-sm text-gray-900 whitespace-pre-line">{evaluation.fit_rationale || '—'}</p>
+              <div className="rounded-md border border-white/60 bg-card/80 p-4">
+                <p className="text-xs uppercase text-muted-foreground">AI Summary</p>
+                <p className="text-sm text-foreground">{evaluation.business_summary || '—'}</p>
+                <p className="mt-3 text-xs uppercase text-muted-foreground">Fit rationale</p>
+                <p className="text-sm text-foreground whitespace-pre-line">{evaluation.fit_rationale || '—'}</p>
               </div>
-              <div className="rounded-md border border-white/60 bg-white/80 p-4">
-                <p className="text-xs uppercase text-gray-500">Upside potential</p>
-                <p className="text-sm text-gray-900">{evaluation.upside_potential || '—'}</p>
-                <p className="mt-3 text-xs uppercase text-gray-500">AI notes</p>
-                <p className="text-sm text-gray-900 whitespace-pre-line">{evaluation.notes || '—'}</p>
+              <div className="rounded-md border border-white/60 bg-card/80 p-4">
+                <p className="text-xs uppercase text-muted-foreground">Upside potential</p>
+                <p className="text-sm text-foreground">{evaluation.upside_potential || '—'}</p>
+                <p className="mt-3 text-xs uppercase text-muted-foreground">AI notes</p>
+                <p className="text-sm text-foreground whitespace-pre-line">{evaluation.notes || '—'}</p>
               </div>
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="rounded-md border border-white/60 bg-white/80 p-4">
-                <p className="text-xs uppercase text-gray-500">Risk Flags</p>
+              <div className="rounded-md border border-white/60 bg-card/80 p-4">
+                <p className="text-xs uppercase text-muted-foreground">Risk Flags</p>
                 {evaluationRiskFlags.length ? (
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-900">
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
                     {evaluationRiskFlags.map((flag) => (
                       <li key={flag}>{flag}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-gray-900">No major risks highlighted.</p>
+                  <p className="text-sm text-foreground">No major risks highlighted.</p>
                 )}
               </div>
-              <div className="rounded-md border border-white/60 bg-white/80 p-4">
-                <p className="text-xs uppercase text-gray-500">Next Steps</p>
+              <div className="rounded-md border border-white/60 bg-card/80 p-4">
+                <p className="text-xs uppercase text-muted-foreground">Next Steps</p>
                 {evaluationNextSteps.length ? (
-                  <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-gray-900">
+                  <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-foreground">
                     {evaluationNextSteps.map((step, idx) => (
                       <li key={`${step}-${idx}`}>{step}</li>
                     ))}
                   </ol>
                 ) : (
-                  <p className="text-sm text-gray-900">No immediate actions provided.</p>
+                  <p className="text-sm text-foreground">No immediate actions provided.</p>
                 )}
               </div>
             </div>
             {evaluation.strategic_playbook && (
-              <div className="mt-4 rounded-md border border-white/60 bg-white/80 p-4">
-                <p className="text-xs uppercase text-gray-500">Strategic playbook</p>
-                <p className="mt-2 whitespace-pre-line text-sm text-gray-900">
+              <div className="mt-4 rounded-md border border-white/60 bg-card/80 p-4">
+                <p className="text-xs uppercase text-muted-foreground">Strategic playbook</p>
+                <p className="mt-2 whitespace-pre-line text-sm text-foreground">
                   {evaluation.strategic_playbook}
                 </p>
               </div>
@@ -334,37 +334,37 @@ const CompanyDetail: React.FC = () => {
 
         {/* Financial Statement Table (like Allabolag) */}
         {financials.length > 0 && (
-          <div className="rounded-lg border border-gray-200 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">Resultaträkning (Belopp i 1000)</h2>
+          <div className="rounded-lg border border-border p-6">
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Resultaträkning (Belopp i 1000)</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-muted/40">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">År</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Nettoomsättning</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Rörelseresultat (EBIT)</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Årets resultat</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">Nettoresultat %</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600">EBIT-marginal %</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">År</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">Nettoomsättning</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">Rörelseresultat (EBIT)</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">Årets resultat</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">Nettoresultat %</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">EBIT-marginal %</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <tbody className="divide-y divide-gray-100 bg-card">
                   {financials.map((fin) => (
-                    <tr key={fin.year} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{fin.year}</td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-700">
+                    <tr key={fin.year} className="hover:bg-muted/40">
+                      <td className="px-4 py-3 text-sm font-medium text-foreground">{fin.year}</td>
+                      <td className="px-4 py-3 text-right text-sm text-foreground">
                         {formatThousands(fin.revenue_sek)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-700">
+                      <td className="px-4 py-3 text-right text-sm text-foreground">
                         {formatThousands(fin.ebit_sek)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-700">
+                      <td className="px-4 py-3 text-right text-sm text-foreground">
                         {formatThousands(fin.profit_sek)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-700">
+                      <td className="px-4 py-3 text-right text-sm text-foreground">
                         {formatPercent(fin.net_margin)}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-700">
+                      <td className="px-4 py-3 text-right text-sm text-foreground">
                         {formatPercent(fin.ebit_margin)}
                       </td>
                     </tr>

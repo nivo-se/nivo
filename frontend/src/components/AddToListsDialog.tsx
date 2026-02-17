@@ -184,11 +184,11 @@ const AddToListsDialog: React.FC<AddToListsDialogProps> = ({
         </DialogHeader>
 
         {/* Company Summary */}
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-muted/40 rounded-lg">
           <h4 className="font-medium mb-2">Valda företag ({summary.count})</h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Branscher:</span>
+              <span className="text-muted-foreground">Branscher:</span>
               <div className="flex flex-wrap gap-1 mt-1">
                 {summary.industries.map(industry => (
                   <Badge key={industry} variant="outline" className="text-xs">
@@ -198,13 +198,13 @@ const AddToListsDialog: React.FC<AddToListsDialogProps> = ({
               </div>
             </div>
             <div>
-              <span className="text-gray-600">Total omsättning:</span>
+              <span className="text-muted-foreground">Total omsättning:</span>
               <div className="font-medium">
                 {summary.totalRevenue.toLocaleString('sv-SE')} SEK
               </div>
             </div>
             <div>
-              <span className="text-gray-600">Total anställda:</span>
+              <span className="text-muted-foreground">Total anställda:</span>
               <div className="font-medium">
                 {summary.totalEmployees.toLocaleString('sv-SE')}
               </div>
@@ -221,8 +221,8 @@ const AddToListsDialog: React.FC<AddToListsDialogProps> = ({
 
           <TabsContent value="existing" className="space-y-4">
             {savedLists.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p>Inga sparade listor än.</p>
                 <p className="text-sm">Skapa din första lista för att komma igång.</p>
               </div>
@@ -231,7 +231,7 @@ const AddToListsDialog: React.FC<AddToListsDialogProps> = ({
                 {savedLists.map((list) => (
                   <div
                     key={list.id}
-                    className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50"
+                    className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/40"
                   >
                     <Checkbox
                       id={list.id}
@@ -248,7 +248,7 @@ const AddToListsDialog: React.FC<AddToListsDialogProps> = ({
                         </Badge>
                       </div>
                       {list.description && (
-                        <p className="text-sm text-gray-600 mt-1">{list.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{list.description}</p>
                       )}
                     </div>
                   </div>

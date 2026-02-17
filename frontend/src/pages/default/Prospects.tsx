@@ -26,15 +26,15 @@ const statusConfig: Record<
   string,
   { label: string; color: string }
 > = {
-  new: { label: "New", color: "bg-blue-100 text-blue-800" },
-  researching: { label: "Researching", color: "bg-purple-100 text-purple-800" },
-  contacted: { label: "Contacted", color: "bg-yellow-100 text-yellow-800" },
-  in_discussion: { label: "In Discussion", color: "bg-orange-100 text-orange-800" },
-  meeting_scheduled: { label: "Meeting Scheduled", color: "bg-indigo-100 text-indigo-800" },
-  interested: { label: "Interested", color: "bg-green-100 text-green-800" },
-  not_interested: { label: "Not Interested", color: "bg-gray-100 text-gray-800" },
-  passed: { label: "Passed", color: "bg-red-100 text-red-800" },
-  deal_in_progress: { label: "Deal in Progress", color: "bg-emerald-100 text-emerald-800" },
+  new: { label: "New", color: "bg-primary/15 text-primary" },
+  researching: { label: "Researching", color: "bg-accent text-accent-foreground" },
+  contacted: { label: "Contacted", color: "bg-accent text-foreground" },
+  in_discussion: { label: "In Discussion", color: "bg-accent text-foreground" },
+  meeting_scheduled: { label: "Meeting Scheduled", color: "bg-accent text-accent-foreground" },
+  interested: { label: "Interested", color: "bg-primary/15 text-primary" },
+  not_interested: { label: "Not Interested", color: "bg-muted text-foreground" },
+  passed: { label: "Passed", color: "bg-destructive/15 text-destructive" },
+  deal_in_progress: { label: "Deal in Progress", color: "bg-primary/15 text-primary" },
 };
 
 function ProspectCard({
@@ -61,7 +61,7 @@ function ProspectCard({
   const queryClient = useQueryClient();
   const { data: company, isLoading } = useCompany(prospect.companyId);
   const isExpanded = expandedId === prospect.companyId;
-  const config = statusConfig[prospect.status] ?? { label: prospect.status, color: "bg-gray-100 text-gray-800" };
+  const config = statusConfig[prospect.status] ?? { label: prospect.status, color: "bg-muted text-foreground" };
 
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
@@ -120,29 +120,29 @@ function ProspectCard({
 
   if (isLoading || !company) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-5 animate-pulse">
-        <div className="h-5 bg-gray-200 rounded w-1/3 mb-2" />
-        <div className="h-4 bg-gray-100 rounded w-1/2" />
+      <div className="bg-card rounded-lg border border-border p-5 animate-pulse">
+        <div className="h-5 bg-muted rounded w-1/3 mb-2" />
+        <div className="h-4 bg-muted rounded w-1/2" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
+    <div className="bg-card rounded-lg border border-border">
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-1">
               <Link
                 to={`/company/${company.orgnr}`}
-                className="text-base font-medium text-gray-900 hover:text-blue-600 flex items-center gap-2"
+                className="text-base font-medium text-foreground hover:text-primary flex items-center gap-2"
               >
                 {company.display_name}
                 <ExternalLink className="w-3.5 h-3.5" />
               </Link>
               <span className={`text-xs px-2 py-0.5 rounded ${config.color}`}>{config.label}</span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-gray-500">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span>{company.industry_label}</span>
               <span>•</span>
               <span>{company.region ?? "—"}</span>
@@ -173,7 +173,7 @@ function ProspectCard({
             </Select>
             <button
               type="button"
-              className="text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-medium"
+              className="text-sm text-foreground hover:text-foreground cursor-pointer font-medium"
               onClick={() => onToggleExpand(isExpanded ? null : prospect.companyId)}
             >
               {prospect.notes.length} {prospect.notes.length === 1 ? "note" : "notes"}
@@ -181,14 +181,14 @@ function ProspectCard({
           </div>
         </div>
 
-        <div className="flex gap-6 text-xs text-gray-700 mb-3">
+        <div className="flex gap-6 text-xs text-foreground mb-3">
           <span>Revenue: {formatRevenueSEK(getLatestFinancials(company).revenue ?? company.revenue_latest)}</span>
           <span>EBITDA: {formatRevenueSEK(getLatestFinancials(company).ebitda)}</span>
           <span>Employees: {company.employees_latest ?? "—"}</span>
           {(() => {
             const cagr = calculateRevenueCagr(company);
             return cagr != null ? (
-              <span className={cagr >= 0 ? "text-green-600 font-medium" : "text-red-600"}>
+              <span className={cagr >= 0 ? "text-primary font-medium" : "text-destructive"}>
                 Growth: {formatPercent(cagr)}
               </span>
             ) : null;
@@ -196,9 +196,9 @@ function ProspectCard({
         </div>
 
         {!isExpanded && prospect.notes.length > 0 && (
-          <div className="bg-gray-50 rounded-md p-3 mb-2">
-            <p className="text-sm text-gray-900 mb-1 line-clamp-2">{prospect.notes[prospect.notes.length - 1].text}</p>
-            <p className="text-xs text-gray-500">
+          <div className="bg-muted/40 rounded-md p-3 mb-2">
+            <p className="text-sm text-foreground mb-1 line-clamp-2">{prospect.notes[prospect.notes.length - 1].text}</p>
+            <p className="text-xs text-muted-foreground">
               {prospect.notes[prospect.notes.length - 1].author} • {new Date(prospect.notes[prospect.notes.length - 1].date).toLocaleString()}
             </p>
           </div>
@@ -211,15 +211,15 @@ function ProspectCard({
         )}
 
         {isExpanded && (
-          <div className="border-t border-gray-200 pt-4 mt-3 space-y-4">
+          <div className="border-t border-border pt-4 mt-3 space-y-4">
             {prospect.notes.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Activity History</h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">Activity History</h4>
                 <div className="space-y-2">
                   {prospect.notes.map((note, i) => {
                     const isEditing = editingNote?.companyId === prospect.companyId && editingNote?.noteIndex === i;
                     return (
-                      <div key={i} className="bg-gray-50 rounded-md p-3 relative group">
+                      <div key={i} className="bg-muted/40 rounded-md p-3 relative group">
                         {isEditing ? (
                           <>
                             <Textarea
@@ -229,40 +229,41 @@ function ProspectCard({
                               rows={3}
                             />
                             <div className="flex gap-2">
-                              <button
+                              <Button
+                                size="xs"
                                 onClick={handleSaveEdit}
                                 disabled={!editNoteText.trim()}
-                                className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <Check className="w-3 h-3" />
                                 Save
-                              </button>
-                              <button
+                              </Button>
+                              <Button
+                                size="xs"
+                                variant="outline"
                                 onClick={handleCancelEdit}
-                                className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                               >
                                 <X className="w-3 h-3" />
                                 Cancel
-                              </button>
+                              </Button>
                             </div>
                           </>
                         ) : (
                           <>
-                            <p className="text-sm text-gray-900 mb-1 pr-16">{note.text}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm text-foreground mb-1 pr-16">{note.text}</p>
+                            <p className="text-xs text-muted-foreground">
                               {note.author} • {new Date(note.date).toLocaleString()}
                             </p>
                             <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleStartEdit(prospect.companyId, i, note.text)}
-                                className="text-gray-400 hover:text-blue-600"
+                                className="text-muted-foreground hover:text-primary"
                                 title="Edit note"
                               >
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleRemoveNote(prospect.companyId, i)}
-                                className="text-gray-400 hover:text-red-600"
+                                className="text-muted-foreground hover:text-destructive"
                                 title="Delete note"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -278,7 +279,7 @@ function ProspectCard({
             )}
 
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Add Note</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">Add Note</h4>
               <Textarea
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
@@ -308,15 +309,15 @@ export default function NewProspects() {
     filterStatus === "all" ? prospects : prospects.filter((p) => p.status === filterStatus);
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Prospects</h1>
-          <p className="text-sm text-gray-600">Team pipeline • {prospects.length} companies</p>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Prospects</h1>
+          <p className="text-sm text-muted-foreground">Team pipeline • {prospects.length} companies</p>
         </div>
 
         <div className="mb-6 flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-700">Filter by status:</span>
+          <span className="text-sm font-medium text-foreground">Filter by status:</span>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-48 h-9">
               <SelectValue />
@@ -328,23 +329,23 @@ export default function NewProspects() {
               ))}
             </SelectContent>
           </Select>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-foreground">
             Showing {filteredProspects.length} of {prospects.length}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="text-sm text-gray-500">Loading prospects...</div>
+          <div className="text-sm text-muted-foreground">Loading prospects...</div>
         ) : filteredProspects.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <p className="text-gray-500 mb-4">
+              <p className="text-muted-foreground mb-4">
                 {prospects.length === 0
                   ? "No prospects yet. Add companies from Universe or Lists to your pipeline."
                   : "No prospects found with this status"}
               </p>
               <Link to="/universe">
-                <Button>Go to Universe</Button>
+                <Button variant="outline">Go to Universe</Button>
               </Link>
             </CardContent>
           </Card>

@@ -252,7 +252,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
       case 'error':
         return <AlertCircle className="h-4 w-4 text-rose-400" />;
       default:
-        return <Clock className="h-4 w-4 text-slate-500" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -289,7 +289,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
         return (
           <Badge
             variant="outline"
-            className="border-slate-500/40 bg-slate-500/10 text-slate-200"
+            className="border-border/40 bg-muted/20 text-muted-foreground"
           >
             Unknown
           </Badge>
@@ -320,7 +320,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
         );
       default:
         return (
-          <span className={`${baseClasses} border-slate-500/40 bg-slate-500/10 text-slate-300`}>
+          <span className={`${baseClasses} border-border/40 bg-muted/20 text-muted-foreground`}>
             {stage}
           </span>
         );
@@ -468,8 +468,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
   }, [monitoringData, sessionDetails]);
 
   const glassPanelClass =
-    'rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-[0_28px_60px_-35px_rgba(15,23,42,0.8)]';
-  const subtleLabelClass = 'text-xs uppercase tracking-[0.3em] text-slate-400';
+    'rounded-2xl border border-border/20 bg-muted/10 backdrop-blur-md shadow-[0_28px_60px_-35px_hsl(var(--border) / 0.35)]';
+  const subtleLabelClass = 'text-xs uppercase tracking-[0.3em] text-muted-foreground';
 
   const isRunning = monitoringData?.status?.isRunning ?? sessionDetails?.status === 'active';
   const isCompleted = monitoringData?.status?.isCompleted ?? sessionDetails?.status === 'completed';
@@ -525,14 +525,14 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
   if (loading) {
     return (
-      <div className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-[#0B121F] p-10 text-slate-100 shadow-2xl">
+      <div className="relative isolate overflow-hidden rounded-3xl border border-border/20 bg-card p-10 text-primary-foreground shadow-2xl">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 -right-16 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
           <div className="absolute -bottom-20 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-sky-500/15 blur-3xl" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-transparent" />
         </div>
         <div className="relative flex items-center justify-center py-16">
-          <div className="flex items-center gap-3 text-sm text-slate-300">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
             <span>Preparing live session data...</span>
           </div>
@@ -542,7 +542,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
   }
 
   return (
-    <div className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-[#0B121F] p-8 text-slate-100 shadow-2xl md:p-12">
+    <div className="relative isolate overflow-hidden rounded-3xl border border-border/20 bg-card p-8 text-primary-foreground shadow-2xl md:p-12">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -right-24 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
         <div className="absolute -bottom-32 -left-10 h-64 w-64 rounded-full bg-sky-500/15 blur-3xl" />
@@ -554,10 +554,10 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
             <span className={subtleLabelClass}>Scraper Control</span>
-            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-primary-foreground md:text-4xl">
               Live session overview
             </h2>
-            <p className="max-w-xl text-sm text-slate-300">
+            <p className="max-w-xl text-sm text-muted-foreground">
               Monitor the pipeline in real time, follow stage progress, and respond quickly to any
               errors.
             </p>
@@ -568,7 +568,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
               disabled={refreshing}
               variant="secondary"
               size="sm"
-              className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-slate-100 transition hover:bg-white/20"
+              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-5 py-2 text-primary-foreground transition hover:bg-muted/30"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-emerald-300' : 'text-emerald-200'}`} />
               Refresh
@@ -579,34 +579,34 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
         {/* Session Selector */}
         <Card className={`${glassPanelClass} p-6`}> 
           <CardHeader className="border-none p-0 pb-6">
-            <CardTitle className="flex items-center gap-3 text-lg font-semibold text-white">
+            <CardTitle className="flex items-center gap-3 text-lg font-semibold text-primary-foreground">
               <Settings className="h-5 w-5 text-emerald-300" />
               Session selection & controls
             </CardTitle>
-            <CardDescription className="text-sm text-slate-300">
+            <CardDescription className="text-sm text-muted-foreground">
               Choose a session and configure real-time refresh behaviour.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-end">
               <div className="w-full flex-1">
-                <label className="mb-2 block text-sm font-medium text-slate-200">Select session</label>
+                <label className="mb-2 block text-sm font-medium text-muted-foreground">Select session</label>
                 <Select value={selectedSession || ''} onValueChange={handleSessionSelect}>
-                  <SelectTrigger className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-slate-100 shadow-inner shadow-black/20 focus:ring-2 focus:ring-emerald-400/60 focus:ring-offset-0">
+                  <SelectTrigger className="w-full rounded-xl border border-border/20 bg-muted/15 px-4 py-3 text-left text-primary-foreground shadow-inner shadow-black/20 focus:ring-2 focus:ring-emerald-400/60 focus:ring-offset-0">
                     <SelectValue placeholder="Choose a session to monitor" />
                   </SelectTrigger>
-                  <SelectContent className="border border-white/10 bg-[#0B121F] text-slate-100">
+                  <SelectContent className="border border-border/20 bg-card text-primary-foreground">
                     {sessions.map((session) => (
                       <SelectItem
                         key={session.sessionId}
                         value={session.sessionId}
-                        className="flex items-center justify-between gap-3 rounded-lg text-sm hover:bg-white/5"
+                        className="flex items-center justify-between gap-3 rounded-lg text-sm hover:bg-muted/15"
                       >
                         <div className="flex items-center justify-between w-full gap-3">
-                          <span className="font-medium text-slate-100">
+                          <span className="font-medium text-primary-foreground">
                             Session {session.sessionId.slice(0, 8)}...
                           </span>
-                          <div className="flex items-center gap-2 text-xs text-slate-300">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             {getStatusBadge(session.status)}
                             <span>{session.totalCompanies} companies</span>
                           </div>
@@ -617,7 +617,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                 </Select>
               </div>
 
-              <div className="flex flex-col gap-3 text-slate-300">
+              <div className="flex flex-col gap-3 text-muted-foreground">
                 <div className="flex items-center gap-3">
                   <Switch
                     checked={enableAutoRefresh}
@@ -626,7 +626,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                   <span className="text-sm">Auto-refresh</span>
                 </div>
                 {lastUpdated && (
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Timer className="h-3 w-3 text-emerald-300" />
                     Last updated: {lastUpdated.toLocaleTimeString()}
                   </div>
@@ -641,40 +641,40 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
         <Card className={`${glassPanelClass} relative overflow-hidden p-6`}>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent" />
           <CardHeader className="relative flex flex-row items-center justify-between space-y-0 p-0">
-            <CardTitle className="text-sm font-medium text-slate-200">Total sessions</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total sessions</CardTitle>
             <Database className="h-4 w-4 text-emerald-300" />
           </CardHeader>
           <CardContent className="relative p-0 pt-4">
-            <div className="text-3xl font-semibold text-white">{sessions.length}</div>
-            <p className="text-xs text-slate-400">All time</p>
+            <div className="text-3xl font-semibold text-primary-foreground">{sessions.length}</div>
+            <p className="text-xs text-muted-foreground">All time</p>
           </CardContent>
         </Card>
 
         <Card className={`${glassPanelClass} relative overflow-hidden p-6`}>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-transparent" />
           <CardHeader className="relative flex flex-row items-center justify-between space-y-0 p-0">
-            <CardTitle className="text-sm font-medium text-slate-200">Active sessions</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active sessions</CardTitle>
             <Clock className="h-4 w-4 text-sky-300" />
           </CardHeader>
           <CardContent className="relative p-0 pt-4">
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-primary-foreground">
               {sessions.filter(s => s.status === 'active').length}
             </div>
-            <p className="text-xs text-slate-400">Currently running</p>
+            <p className="text-xs text-muted-foreground">Currently running</p>
           </CardContent>
         </Card>
 
         <Card className={`${glassPanelClass} relative overflow-hidden p-6`}>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-transparent" />
           <CardHeader className="relative flex flex-row items-center justify-between space-y-0 p-0">
-            <CardTitle className="text-sm font-medium text-slate-200">Completed sessions</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Completed sessions</CardTitle>
             <CheckCircle className="h-4 w-4 text-violet-300" />
           </CardHeader>
           <CardContent className="relative p-0 pt-4">
-            <div className="text-3xl font-semibold text-white">
+            <div className="text-3xl font-semibold text-primary-foreground">
               {sessions.filter(s => s.status === 'completed').length}
             </div>
-            <p className="text-xs text-slate-400">Successfully finished</p>
+            <p className="text-xs text-muted-foreground">Successfully finished</p>
           </CardContent>
         </Card>
       </div>
@@ -682,34 +682,34 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
       {/* Sessions List */}
       <Card className={`${glassPanelClass} p-6`}>
         <CardHeader className="border-none p-0 pb-6">
-          <CardTitle className="text-lg font-semibold text-white">Recent sessions</CardTitle>
-          <CardDescription className="text-sm text-slate-300">
+          <CardTitle className="text-lg font-semibold text-primary-foreground">Recent sessions</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
             Latest scraping runs with three-stage progress tracking.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="space-y-4">
             {sessions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] py-10 text-slate-400">
-                <Database className="mb-4 h-12 w-12 text-slate-500" />
-                <p className="text-sm text-slate-300">No scraping sessions found</p>
-                <p className="text-xs text-slate-500">Start a new scraping session to see it here.</p>
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/20 bg-card/[0.03] py-10 text-muted-foreground">
+                <Database className="mb-4 h-12 w-12 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No scraping sessions found</p>
+                <p className="text-xs text-muted-foreground">Start a new scraping session to see it here.</p>
               </div>
             ) : (
               sessions.map((session) => (
                 <div
                   key={session.sessionId}
-                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 transition hover:border-white/20 hover:bg-white/[0.05]"
+                  className="rounded-2xl border border-border/20 bg-card/[0.02] p-5 transition hover:border-border/20 hover:bg-card/[0.05]"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-3">
                       {getStatusIcon(session.status)}
                       <div>
-                        <div className="text-xs uppercase tracking-[0.35em] text-slate-400">Session</div>
-                        <div className="text-lg font-semibold text-white">
+                        <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Session</div>
+                        <div className="text-lg font-semibold text-primary-foreground">
                           {session.sessionId.slice(0, 8)}…
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-muted-foreground">
                           Created {formatDate(session.createdAt)}
                         </div>
                       </div>
@@ -724,7 +724,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             selectedSession === session.sessionId ? null : session.sessionId
                           )
                         }
-                        className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 hover:bg-white/20"
+                        className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground hover:bg-muted/30"
                       >
                         <Eye className="h-4 w-4" />
                         {selectedSession === session.sessionId ? 'Hide' : 'View'}
@@ -735,33 +735,33 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                   {/* 3-Stage Progress */}
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-slate-200">Progress</span>
-                      <span className="text-sm text-slate-300">{getOverallProgress(session)}%</span>
+                      <span className="text-sm font-medium text-muted-foreground">Progress</span>
+                      <span className="text-sm text-muted-foreground">{getOverallProgress(session)}%</span>
                     </div>
-                    <Progress value={getOverallProgress(session)} className="mb-3 h-2 bg-white/10" />
+                    <Progress value={getOverallProgress(session)} className="mb-3 h-2 bg-muted/20" />
                     
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center space-x-1">
                         {getStageBadge('Stage 1', session.stages.stage1.status)}
-                        <span className="text-slate-400">({session.totalCompanies} companies)</span>
+                        <span className="text-muted-foreground">({session.totalCompanies} companies)</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         {getStageBadge('Stage 2', session.stages.stage2.status)}
-                        <span className="text-slate-400">({session.totalCompanyIds} IDs)</span>
+                        <span className="text-muted-foreground">({session.totalCompanyIds} IDs)</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         {getStageBadge('Stage 3', session.stages.stage3.status)}
-                        <span className="text-slate-400">({session.totalFinancials} financials)</span>
+                        <span className="text-muted-foreground">({session.totalFinancials} financials)</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Session Details */}
                   {selectedSession === session.sessionId && sessionDetails && (
-                    <div className="mt-6 space-y-6 border-t border-white/10 pt-6">
+                    <div className="mt-6 space-y-6 border-t border-border/20 pt-6">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
                             <ActivitySquare className="h-3 w-3" />
                             <span>
                               Last update:{' '}
@@ -771,7 +771,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             </span>
                           </div>
                           <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 text-lg font-semibold text-white">
+                            <div className="flex items-center gap-2 text-lg font-semibold text-primary-foreground">
                               {getStatusIcon(monitoringData?.status?.current || sessionDetails.status)}
                               <span className="capitalize">
                                 {(monitoringData?.status?.current || sessionDetails.status || '').replace(/_/g, ' ')}
@@ -779,20 +779,20 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             </div>
                             {getStatusBadge(sessionDetails.status)}
                           </div>
-                          <div className="flex flex-wrap gap-4 text-sm text-slate-300">
+                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
-                              <CalendarClock className="h-4 w-4 text-slate-400" />
+                              <CalendarClock className="h-4 w-4 text-muted-foreground" />
                               ETA: {formattedEta}
                             </span>
                             {estimatedCompletionTime && (
                               <span className="flex items-center gap-1">
-                                <Clock className="h-4 w-4 text-slate-400" />
+                                <Clock className="h-4 w-4 text-muted-foreground" />
                                 Est. completion{' '}
                                 {new Date(estimatedCompletionTime).toLocaleString('sv-SE')}
                               </span>
                             )}
                             <span className="flex items-center gap-1">
-                              <Activity className="h-4 w-4 text-slate-400" />
+                              <Activity className="h-4 w-4 text-muted-foreground" />
                               Overall progress {formatPercentage(sessionDetails.progress?.overallProgress)}
                             </span>
                           </div>
@@ -805,12 +805,12 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('pause')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 transition hover:bg-white/20"
+                              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
                             >
                               {processActionLoading === 'pause' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
                               ) : (
-                                <PauseCircle className="h-4 w-4 text-slate-200" />
+                                <PauseCircle className="h-4 w-4 text-muted-foreground" />
                               )}
                               Pause
                             </Button>
@@ -821,7 +821,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('resume')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-white/20 bg-emerald-500/20 px-4 py-2 text-slate-100 transition hover:bg-emerald-500/30"
+                              className="flex items-center gap-2 rounded-full border border-border/20 bg-emerald-500/20 px-4 py-2 text-primary-foreground transition hover:bg-emerald-500/30"
                             >
                               {processActionLoading === 'resume' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -838,7 +838,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                               size="sm"
                               onClick={() => handleProcessControl('stop')}
                               disabled={processActionLoading !== null}
-                              className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 transition hover:bg-white/20"
+                              className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
                             >
                               {processActionLoading === 'stop' ? (
                                 <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -854,12 +854,12 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                             size="sm"
                             onClick={() => handleProcessControl('restart')}
                             disabled={processActionLoading !== null}
-                            className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 transition hover:bg-white/20"
+                            className="flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
                           >
                             {processActionLoading === 'restart' ? (
                               <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
                             ) : (
-                              <RotateCcw className="h-4 w-4 text-slate-200" />
+                              <RotateCcw className="h-4 w-4 text-muted-foreground" />
                             )}
                             Restart
                           </Button>
@@ -868,12 +868,12 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
                       <div className="space-y-4">
                         <div>
-                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-200 mb-3">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-3">
                             <BarChart2 className="h-4 w-4" />
                             Stage performance
                           </div>
                           {monitoringLoading ? (
-                            <div className="flex items-center gap-2 text-sm text-slate-400">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <RefreshCw className="h-4 w-4 animate-spin" />
                               Updating metrics...
                             </div>
@@ -889,20 +889,20 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                 return (
                                   <Card key={stage.key} className={`${glassPanelClass} p-5`}>
                                     <CardHeader className="border-none p-0 pb-4">
-                                      <CardTitle className="text-sm font-semibold text-white">
+                                      <CardTitle className="text-sm font-semibold text-primary-foreground">
                                         {stage.label}
                                       </CardTitle>
-                                      <CardDescription className="flex items-center gap-2 text-slate-300">
+                                      <CardDescription className="flex items-center gap-2 text-muted-foreground">
                                         {getStageBadge(stage.label, stageInfo?.status || 'pending')}
-                                        <span className="text-xs text-slate-400">
+                                        <span className="text-xs text-muted-foreground">
                                           {stageInfo?.status?.toUpperCase() || 'PENDING'}
                                         </span>
                                       </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-3 p-0">
                                       <div>
-                                        <Progress value={stage.progress ?? 0} className="mb-2 h-2 bg-white/10" />
-                                        <div className="flex items-center justify-between text-xs text-slate-300">
+                                        <Progress value={stage.progress ?? 0} className="mb-2 h-2 bg-muted/20" />
+                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
                                           <span>{formatPercentage(stage.progress)}</span>
                                           <span>
                                             {formatNumber(stage.completed ?? 0)} /{' '}
@@ -910,16 +910,16 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                           </span>
                                         </div>
                                       </div>
-                                      <div className="grid grid-cols-1 gap-2 text-xs text-slate-300">
+                                      <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground">
                                         <div className="flex items-center justify-between">
                                           <span>Rate</span>
-                                          <span className="font-medium text-white">
+                                          <span className="font-medium text-primary-foreground">
                                             {stage.rate ? `${stage.rate.toFixed(1)}/min` : '—'}
                                           </span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                           <span>ETA</span>
-                                          <span className="font-medium text-white">
+                                          <span className="font-medium text-primary-foreground">
                                             {stage.eta ? `${Math.round(stage.eta)} min` : '—'}
                                           </span>
                                         </div>
@@ -935,7 +935,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                           size="sm"
                                           variant="secondary"
                                           onClick={() => handleStageControl(stage.key === 'stage2' ? 2 : 3, 'start')}
-                                          className="flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 transition hover:bg-white/20"
+                                          className="flex w-full items-center justify-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30"
                                         >
                                           <Play className="h-3 w-3" />
                                           Start {stage.label.split(':')[0]}
@@ -952,61 +952,61 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <Card className={`${glassPanelClass} p-6`}>
                             <CardHeader className="border-none p-0 pb-4">
-                              <CardTitle className="text-sm font-semibold text-white">Throughput & timing</CardTitle>
-                              <CardDescription className="text-sm text-slate-300">Real-time processing rates</CardDescription>
+                              <CardTitle className="text-sm font-semibold text-primary-foreground">Throughput & timing</CardTitle>
+                              <CardDescription className="text-sm text-muted-foreground">Real-time processing rates</CardDescription>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-1 gap-4 text-sm text-slate-300 sm:grid-cols-3">
+                            <CardContent className="grid grid-cols-1 gap-4 text-sm text-muted-foreground sm:grid-cols-3">
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Stage 1</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Stage 1</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {monitoringData?.progress?.rates?.companiesPerMinute
                                     ? `${monitoringData.progress.rates.companiesPerMinute.toFixed(1)}`
                                     : '—'}
                                 </div>
-                                <div className="text-xs text-slate-400">companies / min</div>
+                                <div className="text-xs text-muted-foreground">companies / min</div>
                               </div>
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Stage 2</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Stage 2</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {monitoringData?.progress?.rates?.idsPerMinute
                                     ? `${monitoringData.progress.rates.idsPerMinute.toFixed(1)}`
                                     : '—'}
                                 </div>
-                                <div className="text-xs text-slate-400">IDs / min</div>
+                                <div className="text-xs text-muted-foreground">IDs / min</div>
                               </div>
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Stage 3</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Stage 3</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {monitoringData?.progress?.rates?.financialsPerMinute
                                     ? `${monitoringData.progress.rates.financialsPerMinute.toFixed(1)}`
                                     : '—'}
                                 </div>
-                                <div className="text-xs text-slate-400">records / min</div>
+                                <div className="text-xs text-muted-foreground">records / min</div>
                               </div>
                             </CardContent>
                           </Card>
 
                           <Card className={`${glassPanelClass} p-6`}>
                             <CardHeader className="border-none p-0 pb-4">
-                              <CardTitle className="text-sm font-semibold text-white">Session totals</CardTitle>
-                              <CardDescription className="text-sm text-slate-300">Processed entities across stages</CardDescription>
+                              <CardTitle className="text-sm font-semibold text-primary-foreground">Session totals</CardTitle>
+                              <CardDescription className="text-sm text-muted-foreground">Processed entities across stages</CardDescription>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-1 gap-4 text-sm text-slate-300 sm:grid-cols-3">
+                            <CardContent className="grid grid-cols-1 gap-4 text-sm text-muted-foreground sm:grid-cols-3">
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Companies</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Companies</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {formatNumber(sessionDetails.totalCompanies)}
                                 </div>
                               </div>
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Company IDs</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Company IDs</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {formatNumber(sessionDetails.totalCompanyIds)}
                                 </div>
                               </div>
                               <div>
-                                <div className="text-xs uppercase text-slate-400">Financials</div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-xs uppercase text-muted-foreground">Financials</div>
+                                <div className="text-lg font-semibold text-primary-foreground">
                                   {formatNumber(sessionDetails.totalFinancials)}
                                 </div>
                               </div>
@@ -1017,7 +1017,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
                       {monitoringData?.errors && (
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                             <AlertTriangle className="h-4 w-4 text-rose-400" />
                             Error monitoring
                           </div>
@@ -1025,34 +1025,34 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                             <Card className={`${glassPanelClass} p-6`}>
                               <CardHeader className="border-none p-0 pb-4">
-                                <CardTitle className="text-sm font-semibold text-white">Active errors</CardTitle>
-                                <CardDescription className="text-sm text-slate-300">Issues requiring attention</CardDescription>
+                                <CardTitle className="text-sm font-semibold text-primary-foreground">Active errors</CardTitle>
+                                <CardDescription className="text-sm text-muted-foreground">Issues requiring attention</CardDescription>
                               </CardHeader>
                               <CardContent className="p-0">
                                 <div className="text-3xl font-bold text-rose-400">
                                   {monitoringData.errors.total ?? 0}
                                 </div>
-                                <p className="text-xs text-slate-400 mt-1">Across all stages</p>
+                                <p className="text-xs text-muted-foreground mt-1">Across all stages</p>
                               </CardContent>
                             </Card>
 
                             <Card className={`${glassPanelClass} p-6`}>
                               <CardHeader className="border-none p-0 pb-4">
-                                <CardTitle className="text-sm font-semibold text-white">By stage</CardTitle>
-                                <CardDescription className="text-sm text-slate-300">Distribution of failures</CardDescription>
+                                <CardTitle className="text-sm font-semibold text-primary-foreground">By stage</CardTitle>
+                                <CardDescription className="text-sm text-muted-foreground">Distribution of failures</CardDescription>
                               </CardHeader>
-                              <CardContent className="space-y-2 p-0 text-sm text-slate-300">
+                              <CardContent className="space-y-2 p-0 text-sm text-muted-foreground">
                                 {(['stage1', 'stage2', 'stage3'] as const).map((stage) => (
-                                  <div key={stage} className="flex items-center justify-between text-slate-300">
+                                  <div key={stage} className="flex items-center justify-between text-muted-foreground">
                                     <span className="flex items-center gap-2">
                                       <Badge
                                         variant="outline"
-                                        className="rounded-full border-white/20 bg-white/10 text-xs text-slate-200"
+                                        className="rounded-full border-border/20 bg-muted/20 text-xs text-muted-foreground"
                                       >
                                         {getStageDisplayName(stage)}
                                       </Badge>
                                     </span>
-                                    <span className="font-medium text-white">
+                                    <span className="font-medium text-primary-foreground">
                                       {monitoringData.errors?.byStage?.[stage] ?? 0}
                                     </span>
                                   </div>
@@ -1062,10 +1062,10 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
                             <Card className={`${glassPanelClass} p-6`}>
                               <CardHeader className="border-none p-0 pb-4">
-                                <CardTitle className="text-sm font-semibold text-white">By type</CardTitle>
-                                <CardDescription className="text-sm text-slate-300">Top error categories</CardDescription>
+                                <CardTitle className="text-sm font-semibold text-primary-foreground">By type</CardTitle>
+                                <CardDescription className="text-sm text-muted-foreground">Top error categories</CardDescription>
                               </CardHeader>
-                              <CardContent className="space-y-2 p-0 text-sm text-slate-300">
+                              <CardContent className="space-y-2 p-0 text-sm text-muted-foreground">
                                 {monitoringData.errors.byType &&
                                   Object.entries(monitoringData.errors.byType)
                                     .sort((a, b) => b[1] - a[1])
@@ -1073,11 +1073,11 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                     .map(([type, count]) => (
                                       <div key={type} className="flex items-center justify-between">
                                         <span className="capitalize">{type.replace(/_/g, ' ')}</span>
-                                        <span className="font-medium text-white">{count}</span>
+                                        <span className="font-medium text-primary-foreground">{count}</span>
                                       </div>
                                     ))}
                                 {(!monitoringData.errors.byType || Object.keys(monitoringData.errors.byType).length === 0) && (
-                                  <div className="text-xs text-slate-400">No error data available</div>
+                                  <div className="text-xs text-muted-foreground">No error data available</div>
                                 )}
                               </CardContent>
                             </Card>
@@ -1086,30 +1086,30 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                           {monitoringData.errors.recent && monitoringData.errors.recent.length > 0 && (
                             <Card className={`${glassPanelClass} p-6`}>
                               <CardHeader className="border-none p-0 pb-4">
-                                <CardTitle className="text-sm font-semibold text-white">Recent errors</CardTitle>
-                                <CardDescription className="text-sm text-slate-300">Latest retryable failures</CardDescription>
+                                <CardTitle className="text-sm font-semibold text-primary-foreground">Recent errors</CardTitle>
+                                <CardDescription className="text-sm text-muted-foreground">Latest retryable failures</CardDescription>
                               </CardHeader>
                               <CardContent className="space-y-4 p-0">
                                 {monitoringData.errors.recent.map((error) => (
                                   <div
                                     key={error.id}
-                                    className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/20 hover:bg-white/[0.05] md:flex-row md:items-center md:justify-between"
+                                    className="flex flex-col gap-2 rounded-2xl border border-border/20 bg-card/[0.03] p-4 transition hover:border-border/20 hover:bg-card/[0.05] md:flex-row md:items-center md:justify-between"
                                   >
                                     <div className="space-y-1">
-                                      <div className="font-medium text-white">
+                                      <div className="font-medium text-primary-foreground">
                                         {error.companyName || 'Unknown company'}
                                         {error.orgnr && (
-                                          <span className="ml-2 font-mono text-xs text-slate-400">{error.orgnr}</span>
+                                          <span className="ml-2 font-mono text-xs text-muted-foreground">{error.orgnr}</span>
                                         )}
                                       </div>
-                                      <div className="text-sm text-slate-300">
+                                      <div className="text-sm text-muted-foreground">
                                         {error.message}
                                       </div>
-                                      <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+                                      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                                         <span className="flex items-center gap-1">
                                           <Badge
                                             variant="outline"
-                                            className="rounded-full border-white/20 bg-white/10 text-xs text-slate-200"
+                                            className="rounded-full border-border/20 bg-muted/20 text-xs text-muted-foreground"
                                           >
                                             {getStageDisplayName(error.stage)}
                                           </Badge>
@@ -1119,7 +1119,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                           {error.errorType.replace(/_/g, ' ')}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                          <Clock className="h-3 w-3 text-slate-400" />
+                                          <Clock className="h-3 w-3 text-muted-foreground" />
                                           {new Date(error.occurredAt).toLocaleString('sv-SE')}
                                         </span>
                                       </div>
@@ -1130,7 +1130,7 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                                         variant="secondary"
                                         onClick={() => handleRetryError(error.id)}
                                         disabled={retryingErrorId === error.id}
-                                        className="mt-2 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-slate-100 transition hover:bg-white/20 md:mt-0"
+                                        className="mt-2 flex items-center gap-2 rounded-full border border-border/20 bg-muted/20 px-4 py-2 text-primary-foreground transition hover:bg-muted/30 md:mt-0"
                                       >
                                         {retryingErrorId === error.id ? (
                                           <RefreshCw className="h-4 w-4 animate-spin text-emerald-300" />
@@ -1151,11 +1151,11 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
                       {sessionDetails.filters && (
                         <Card className={`${glassPanelClass} p-6`}>
                           <CardHeader className="border-none p-0 pb-4">
-                            <CardTitle className="text-sm font-semibold text-white">Filters applied</CardTitle>
-                            <CardDescription className="text-sm text-slate-300">Source criteria for this session</CardDescription>
+                            <CardTitle className="text-sm font-semibold text-primary-foreground">Filters applied</CardTitle>
+                            <CardDescription className="text-sm text-muted-foreground">Source criteria for this session</CardDescription>
                           </CardHeader>
                           <CardContent className="p-0">
-                            <pre className="overflow-x-auto rounded-2xl bg-white/[0.03] p-4 text-xs text-slate-300">
+                            <pre className="overflow-x-auto rounded-2xl bg-card/[0.03] p-4 text-xs text-muted-foreground">
                               {JSON.stringify(sessionDetails.filters, null, 2)}
                             </pre>
                           </CardContent>

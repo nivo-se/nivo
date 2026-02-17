@@ -125,17 +125,17 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
 
   const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-500" />
-      case 'down': return <TrendingDown className="h-4 w-4 text-red-500" />
-      default: return <div className="h-4 w-4 bg-gray-400 rounded-full"></div>
+      case 'up': return <TrendingUp className="h-4 w-4 text-primary" />
+      case 'down': return <TrendingDown className="h-4 w-4 text-destructive" />
+      default: return <div className="h-4 w-4 bg-muted/70 rounded-full"></div>
     }
   }
 
   const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case 'up': return 'text-green-600 bg-green-50'
-      case 'down': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      case 'up': return 'text-primary bg-primary/10'
+      case 'down': return 'text-destructive bg-destructive/10'
+      default: return 'text-muted-foreground bg-muted/40'
     }
   }
 
@@ -146,7 +146,7 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
           <h2 className="text-2xl font-bold">Trend Analysis</h2>
           <div className="flex items-center space-x-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            <span className="text-sm text-gray-600">Loading trends...</span>
+            <span className="text-sm text-muted-foreground">Loading trends...</span>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -154,8 +154,8 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
                 </div>
               </CardContent>
             </Card>
@@ -178,7 +178,7 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-2xl font-bold">Trend Analysis</h2>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {selectedCompany ? `Analyzing trends for ${selectedCompany}` : 
              selectedIndustry ? `Industry trends for ${selectedIndustry}` : 
              'Market-wide trend analysis'}
@@ -219,27 +219,27 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Current Value</p>
+                <p className="text-sm font-medium text-muted-foreground">Current Value</p>
                 <p className="text-2xl font-bold">
                   {selectedMetric === 'revenue' ? formatCurrency(latestValue?.value || 0) :
                    selectedMetric === 'profit' ? formatCurrency(latestValue?.value || 0) :
                    formatNumber(latestValue?.value || 0)}
                 </p>
               </div>
-              {selectedMetric === 'revenue' ? <DollarSign className="h-8 w-8 text-green-600" /> :
-               selectedMetric === 'profit' ? <TrendingUp className="h-8 w-8 text-blue-600" /> :
-               <Users className="h-8 w-8 text-purple-600" />}
+              {selectedMetric === 'revenue' ? <DollarSign className="h-8 w-8 text-primary" /> :
+               selectedMetric === 'profit' ? <TrendingUp className="h-8 w-8 text-primary" /> :
+               <Users className="h-8 w-8 text-primary" />}
             </div>
             <div className="mt-2 flex items-center text-sm">
               {growthRate > 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                <TrendingUp className="h-4 w-4 text-primary mr-1" />
               ) : (
-                <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                <TrendingDown className="h-4 w-4 text-destructive mr-1" />
               )}
-              <span className={growthRate > 0 ? 'text-green-500' : 'text-red-500'}>
+              <span className={growthRate > 0 ? 'text-primary' : 'text-destructive'}>
                 {growthRate > 0 ? '+' : ''}{growthRate}%
               </span>
-              <span className="text-gray-500 ml-1">vs previous period</span>
+              <span className="text-muted-foreground ml-1">vs previous period</span>
             </div>
           </CardContent>
         </Card>
@@ -248,16 +248,16 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Average Growth</p>
+                <p className="text-sm font-medium text-muted-foreground">Average Growth</p>
                 <p className="text-2xl font-bold">
                   {currentData.reduce((acc, curr) => acc + curr.growth, 0) / currentData.length}%
                 </p>
               </div>
-              <Target className="h-8 w-8 text-orange-600" />
+              <Target className="h-8 w-8 text-foreground" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500">Consistent</span>
+              <CheckCircle className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">Consistent</span>
             </div>
           </CardContent>
         </Card>
@@ -266,14 +266,14 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Data Points</p>
+                <p className="text-sm font-medium text-muted-foreground">Data Points</p>
                 <p className="text-2xl font-bold">{currentData.length}</p>
               </div>
               <Calendar className="h-8 w-8 text-indigo-600" />
             </div>
             <div className="mt-2 flex items-center text-sm">
-              <Clock className="h-4 w-4 text-blue-500 mr-1" />
-              <span className="text-blue-500">{selectedTimeframe}</span>
+              <Clock className="h-4 w-4 text-primary mr-1" />
+              <span className="text-primary">{selectedTimeframe}</span>
             </div>
           </CardContent>
         </Card>
@@ -304,12 +304,12 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
                 {currentData.map((point, index) => (
                   <div key={point.period} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-                        <span className="text-sm font-medium text-blue-600">{index + 1}</span>
+                      <div className="flex items-center justify-center w-10 h-10 bg-primary/15 rounded-full">
+                        <span className="text-sm font-medium text-primary">{index + 1}</span>
                       </div>
                       <div>
                         <p className="font-medium">{point.period}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {selectedMetric === 'revenue' ? formatCurrency(point.value) :
                            selectedMetric === 'profit' ? formatCurrency(point.value) :
                            formatNumber(point.value)}
@@ -318,9 +318,9 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
                     </div>
                     <div className="flex items-center space-x-3">
                       {point.growth > 0 ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-4 w-4 text-primary" />
                       ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
+                        <TrendingDown className="h-4 w-4 text-destructive" />
                       )}
                       <Badge variant={point.growth > 0 ? "default" : "destructive"}>
                         {point.growth > 0 ? '+' : ''}{point.growth}%
@@ -382,12 +382,12 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
                 {data.predictions.map((prediction, index) => (
                   <div key={prediction.period} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full">
-                        <Target className="h-4 w-4 text-purple-600" />
+                      <div className="flex items-center justify-center w-10 h-10 bg-accent rounded-full">
+                        <Target className="h-4 w-4 text-primary" />
                       </div>
                       <div>
                         <p className="font-medium">{prediction.period}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           Predicted: {formatCurrency(prediction.predicted)}
                         </p>
                       </div>
@@ -395,8 +395,8 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-2">
                         <div className={`w-3 h-3 rounded-full ${
-                          prediction.confidence >= 80 ? 'bg-green-500' :
-                          prediction.confidence >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                          prediction.confidence >= 80 ? 'bg-primary' :
+                          prediction.confidence >= 60 ? 'bg-accent' : 'bg-destructive'
                         }`}></div>
                         <span className="text-sm font-medium">
                           {prediction.confidence}% confidence
@@ -422,34 +422,34 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="p-4 bg-green-50 rounded-lg">
+                  <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                      <CheckCircle className="h-5 w-5 text-primary mr-2" />
                       <div>
-                        <p className="font-medium text-green-900">Positive Growth Trend</p>
-                        <p className="text-sm text-green-700">
+                        <p className="font-medium text-primary">Positive Growth Trend</p>
+                        <p className="text-sm text-primary">
                           {selectedMetric} has shown consistent growth over the analyzed period
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 bg-blue-50 rounded-lg">
+                  <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="flex items-center">
-                      <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
+                      <TrendingUp className="h-5 w-5 text-primary mr-2" />
                       <div>
-                        <p className="font-medium text-blue-900">Above Average Performance</p>
-                        <p className="text-sm text-blue-700">
+                        <p className="font-medium text-primary">Above Average Performance</p>
+                        <p className="text-sm text-primary">
                           Current growth rate exceeds market average
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 bg-yellow-50 rounded-lg">
+                  <div className="p-4 bg-accent/60 rounded-lg">
                     <div className="flex items-center">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                      <AlertCircle className="h-5 w-5 text-foreground mr-2" />
                       <div>
-                        <p className="font-medium text-yellow-900">Monitor Volatility</p>
-                        <p className="text-sm text-yellow-700">
+                        <p className="font-medium text-foreground">Monitor Volatility</p>
+                        <p className="text-sm text-foreground">
                           Some periods show higher volatility than others
                         </p>
                       </div>
@@ -471,19 +471,19 @@ const TrendAnalysis: React.FC<TrendAnalysisProps> = ({
                 <div className="space-y-4">
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Growth Strategy</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Consider investing in high-growth sectors to capitalize on current trends
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Risk Management</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Diversify portfolio to reduce exposure to volatile segments
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Timing</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Current market conditions favor expansion in technology and healthcare sectors
                     </p>
                   </div>

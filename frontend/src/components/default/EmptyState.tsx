@@ -9,9 +9,9 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, action, className = "" }: EmptyStateProps) {
   return (
-    <div className={`new-card p-8 text-center ${className}`}>
-      <p className="text-gray-600 font-medium">{title}</p>
-      {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+    <div className={`app-card p-8 text-center ${className}`}>
+      <p className="text-muted-foreground font-medium">{title}</p>
+      {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

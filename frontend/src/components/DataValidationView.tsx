@@ -133,11 +133,11 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary" className="bg-gray-100 text-gray-700">Pending</Badge>;
+        return <Badge variant="secondary" className="bg-muted text-foreground">Pending</Badge>;
       case 'id_resolved':
-        return <Badge variant="default" className="bg-blue-100 text-blue-700">ID Resolved</Badge>;
+        return <Badge variant="default" className="bg-primary/15 text-primary">ID Resolved</Badge>;
       case 'financials_fetched':
-        return <Badge variant="default" className="bg-green-100 text-green-700">Complete</Badge>;
+        return <Badge variant="default" className="bg-primary/15 text-primary">Complete</Badge>;
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       default:
@@ -155,7 +155,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
     return (
       <div className="flex items-center space-x-2">
         {stages.map((stage, index) => (
-          <div key={index} className={`flex items-center space-x-1 ${stage.completed ? 'text-green-600' : 'text-gray-400'}`}>
+          <div key={index} className={`flex items-center space-x-1 ${stage.completed ? 'text-primary' : 'text-muted-foreground'}`}>
             {stage.icon}
             <span className="text-xs">{stage.name}</span>
           </div>
@@ -213,7 +213,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
               <Database className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{summary.companiesWithIds}</div>
+              <div className="text-2xl font-bold text-primary">{summary.companiesWithIds}</div>
               <p className="text-xs text-muted-foreground">
                 {summary.stage2Progress}% complete
               </p>
@@ -227,7 +227,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{summary.companiesWithFinancials}</div>
+              <div className="text-2xl font-bold text-primary">{summary.companiesWithFinancials}</div>
               <p className="text-xs text-muted-foreground">
                 {summary.stage3Progress}% complete
               </p>
@@ -260,7 +260,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search companies..."
                   value={filters.searchTerm}
@@ -309,7 +309,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
               <TableBody>
                 {companies.map((company) => (
                   <React.Fragment key={company.orgnr}>
-                    <TableRow className="cursor-pointer hover:bg-gray-50" onClick={() => toggleRowExpansion(company.orgnr)}>
+                    <TableRow className="cursor-pointer hover:bg-muted/40" onClick={() => toggleRowExpansion(company.orgnr)}>
                       <TableCell>
                         {expandedRows.has(company.orgnr) ? (
                           <ChevronDown className="h-4 w-4" />
@@ -341,12 +341,12 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
                     {/* Expanded Row Details */}
                     {expandedRows.has(company.orgnr) && (
                       <TableRow>
-                        <TableCell colSpan={7} className="bg-gray-50 p-4">
+                        <TableCell colSpan={7} className="bg-muted/40 p-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Stage 1 Data */}
                             <div>
                               <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                <CheckCircle className="h-4 w-4 text-primary" />
                                 Stage 1: Segmentation
                               </h4>
                               <div className="space-y-2 text-sm">
@@ -355,7 +355,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
                                 <div><strong>Founded:</strong> {company.stage1Data.foundedYear || 'N/A'}</div>
                                 <div><strong>Homepage:</strong> 
                                   {company.stage1Data.homepage ? (
-                                    <a href={company.stage1Data.homepage} target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-600 hover:underline">
+                                    <a href={company.stage1Data.homepage} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">
                                       <ExternalLink className="h-3 w-3 inline" />
                                     </a>
                                   ) : ' N/A'}
@@ -369,9 +369,9 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
                             <div>
                               <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
                                 {company.stage2Data.companyId ? (
-                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                  <CheckCircle className="h-4 w-4 text-primary" />
                                 ) : (
-                                  <Clock className="h-4 w-4 text-gray-400" />
+                                  <Clock className="h-4 w-4 text-muted-foreground" />
                                 )}
                                 Stage 2: Company ID
                               </h4>
@@ -385,9 +385,9 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
                             <div>
                               <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
                                 {company.stage3Data.recordCount > 0 ? (
-                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                  <CheckCircle className="h-4 w-4 text-primary" />
                                 ) : (
-                                  <Clock className="h-4 w-4 text-gray-400" />
+                                  <Clock className="h-4 w-4 text-muted-foreground" />
                                 )}
                                 Stage 3: Financial Data
                               </h4>
@@ -410,7 +410,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
           {/* Pagination */}
           {pagination.pages > 1 && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} companies
               </div>
               <div className="flex gap-2">

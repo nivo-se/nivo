@@ -126,10 +126,10 @@ const gradeBadge = (label: string | null) => {
   const variants: Record<string, string> = {
     A: 'bg-emerald-100 text-emerald-800 border-emerald-200',
     B: 'bg-sky-100 text-sky-800 border-sky-200',
-    C: 'bg-amber-100 text-amber-800 border-amber-200',
+    C: 'bg-accent text-foreground border-accent',
     D: 'bg-rose-100 text-rose-800 border-rose-200',
   }
-  const variant = variants[normalized[0]] || 'bg-slate-100 text-slate-700 border-slate-200'
+  const variant = variants[normalized[0]] || 'bg-muted text-foreground border-border'
   return <Badge className={variant}>{normalized}</Badge>
 }
 
@@ -149,7 +149,7 @@ const confidenceLabel = (value: Nullable<number>) => {
 const riskBadge = (value: Nullable<number>) => {
   if (!value && value !== 0) return <Badge variant="outline">Unknown risk</Badge>
   if (value <= 2) return <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">Low risk</Badge>
-  if (value <= 3.5) return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Moderate risk</Badge>
+  if (value <= 3.5) return <Badge className="bg-accent text-foreground border-accent">Moderate risk</Badge>
   return <Badge className="bg-rose-100 text-rose-800 border-rose-200">Elevated risk</Badge>
 }
 
@@ -213,23 +213,23 @@ const ScreeningResultCard: React.FC<{
   onToggle: (orgnr: string) => void
 }> = ({ result, selected, onToggle }) => {
   const getScoreColor = (score: number | null) => {
-    if (!score) return 'text-gray-500'
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-yellow-600'
-    return 'text-red-600'
+    if (!score) return 'text-muted-foreground'
+    if (score >= 80) return 'text-primary'
+    if (score >= 60) return 'text-foreground'
+    return 'text-destructive'
   }
 
   const getRiskColor = (risk: string | null) => {
     switch (risk) {
-      case 'Low': return 'bg-green-100 text-green-800 border-green-200'
-      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'High': return 'bg-red-100 text-red-800 border-red-200'
-      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+      case 'Low': return 'bg-primary/15 text-primary border-primary/40'
+      case 'Medium': return 'bg-accent text-foreground border-accent'
+      case 'High': return 'bg-destructive/15 text-destructive border-destructive/40'
+      default: return 'bg-muted text-foreground border-border'
     }
   }
 
   return (
-    <Card className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-purple-500 bg-purple-50' : 'hover:shadow-md'}`}>
+    <Card className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-purple-500 bg-accent/60' : 'hover:shadow-md'}`}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <Checkbox
@@ -279,7 +279,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
           <CardDescription>Organisation number: {company.orgnr}</CardDescription>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          {company.recommendation && <Badge className="bg-purple-100 text-purple-700 border-purple-200">{company.recommendation}</Badge>}
+          {company.recommendation && <Badge className="bg-accent text-primary border-accent">{company.recommendation}</Badge>}
           <Badge variant="outline">Confidence: {confidenceLabel(company.confidence)}</Badge>
         </div>
       </div>
@@ -611,7 +611,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-3 text-purple-600">
+          <div className="flex items-center gap-3 text-primary">
             <Sparkles className="h-6 w-6" />
             <div>
               <CardTitle>AI-insikter</CardTitle>
@@ -772,7 +772,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
                         setSelectedTemplate(template)
                         setInstructions(template.query)
                       }}
-                      className="rounded-lg border p-4 text-left transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm"
+                      className="rounded-lg border p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/10 hover:shadow-sm"
                     >
                       <p className="text-sm font-semibold text-foreground">{template.name}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{template.description}</p>
@@ -796,7 +796,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
                   Analyser sparas och kan återbesökas i historikpanelen nedan.
                   {((analysisMode === 'screening' && selectedCompanies.size > 0) || 
                     (analysisMode === 'deep' && selectedForDeepAnalysis.size > 0)) && (
-                    <div className="mt-1 text-xs font-medium text-blue-600">
+                    <div className="mt-1 text-xs font-medium text-primary">
                       Uppskattad kostnad: ${estimateCost().toFixed(3)}
                     </div>
                   )}
@@ -891,7 +891,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
             </CardHeader>
             <CardContent>
               {currentRun.run.errorMessage && (
-                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                <div className="rounded-md border border-accent bg-accent/60 p-3 text-sm text-foreground">
                   {currentRun.run.errorMessage}
                       </div>
               )}

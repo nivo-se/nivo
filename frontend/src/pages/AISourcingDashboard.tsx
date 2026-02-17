@@ -397,14 +397,14 @@ const AISourcingDashboard: React.FC = () => {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-muted/40 px-4 py-6 sm:px-6 lg:px-10">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <div className="space-y-2">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Explorer</p>
-              <h1 className="text-2xl font-semibold text-gray-900">AI Sourcing Dashboard</h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Explorer</p>
+              <h1 className="text-2xl font-semibold text-foreground">AI Sourcing Dashboard</h1>
+              <p className="text-sm text-muted-foreground">
                 Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
               </p>
             </div>
@@ -412,7 +412,7 @@ const AISourcingDashboard: React.FC = () => {
               <button
                 type="button"
                 onClick={clearAllData}
-                className="ml-4 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="ml-4 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 title="Clear all search results and start fresh"
               >
                 Clear Search
@@ -422,23 +422,23 @@ const AISourcingDashboard: React.FC = () => {
         </div>
 
         {aiResult && (
-          <div className="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:grid-cols-3">
+          <div className="grid gap-3 rounded-2xl border border-border bg-card p-4 md:grid-cols-3">
             <div>
-              <p className="text-xs uppercase text-gray-500">Active thesis</p>
-              <p className="text-sm text-gray-900">{aiResult.metadata?.prompt || currentPrompt || '—'}</p>
+              <p className="text-xs uppercase text-muted-foreground">Active thesis</p>
+              <p className="text-sm text-foreground">{aiResult.metadata?.prompt || currentPrompt || '—'}</p>
             </div>
             <div>
-              <p className="text-xs uppercase text-gray-500">Matches</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-xs uppercase text-muted-foreground">Matches</p>
+              <p className="text-lg font-semibold text-foreground">
                 {aiResult.total.toLocaleString()}{' '}
-                <span className="text-xs font-normal text-gray-500">
+                <span className="text-xs font-normal text-muted-foreground">
                   (showing {(aiResult.result_count ?? aiResult.count).toLocaleString()})
                 </span>
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase text-gray-500">Selection</p>
-              <p className="text-lg font-semibold text-gray-900">{selectedCompanies.length} companies</p>
+              <p className="text-xs uppercase text-muted-foreground">Selection</p>
+              <p className="text-lg font-semibold text-foreground">{selectedCompanies.length} companies</p>
             </div>
           </div>
         )}
@@ -446,10 +446,10 @@ const AISourcingDashboard: React.FC = () => {
         {actionFeedback && (
           <div
             className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${actionFeedback.type === 'success'
-              ? 'border-green-200 bg-green-50 text-green-800'
+              ? 'border-primary/40 bg-primary/10 text-primary'
               : actionFeedback.type === 'error'
-                ? 'border-red-200 bg-red-50 text-red-800'
-                : 'border-blue-200 bg-blue-50 text-blue-800'
+                ? 'border-destructive/40 bg-destructive/10 text-destructive'
+                : 'border-primary/40 bg-primary/10 text-primary'
               }`}
           >
             {actionFeedback.message}
@@ -457,7 +457,7 @@ const AISourcingDashboard: React.FC = () => {
         )}
 
         {isResultCapped && aiResult?.refinement_message && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <div className="rounded-xl border border-accent bg-accent/60 p-4 text-sm text-foreground">
             <p className="font-medium">{aiResult.refinement_message}</p>
             {aiResult.suggestions && aiResult.suggestions.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
@@ -466,14 +466,14 @@ const AISourcingDashboard: React.FC = () => {
                     key={suggestion}
                     type="button"
                     onClick={() => setCurrentPrompt(`${currentPrompt ? `${currentPrompt}\n` : ''}${suggestion}`)}
-                    className="rounded-full border border-amber-300 px-3 py-1 text-xs font-semibold text-amber-800 hover:bg-white"
+                    className="rounded-full border border-accent px-3 py-1 text-xs font-semibold text-foreground hover:bg-card"
                   >
                     {suggestion}
                   </button>
                 ))}
               </div>
             )}
-            <p className="mt-2 text-xs text-amber-700">
+            <p className="mt-2 text-xs text-foreground">
               Refine the thesis to 300 companies or fewer to enable batch enrichment.
             </p>
           </div>
@@ -481,16 +481,16 @@ const AISourcingDashboard: React.FC = () => {
 
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="lg:w-[360px] lg:flex-shrink-0">
-            <div className="space-y-4 rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="space-y-4 rounded-2xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">AI Chat Filter</h2>
-                  <p className="text-sm text-gray-500">Describe the type of target you are looking for.</p>
+                  <h2 className="text-lg font-semibold text-foreground">AI Chat Filter</h2>
+                  <p className="text-sm text-muted-foreground">Describe the type of target you are looking for.</p>
                 </div>
                 {savedLists.length > 0 && (
                   <button
                     onClick={() => setShowLoadDialog(true)}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted/40"
                   >
                     Load list
                   </button>
@@ -533,24 +533,24 @@ const AISourcingDashboard: React.FC = () => {
       </div>
 
       {showLoadDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-card/60 p-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl">
             <h3 className="mb-4 text-lg font-semibold">Load Saved List</h3>
             {savedLists.length === 0 ? (
-              <p className="text-sm text-gray-500">No saved lists available.</p>
+              <p className="text-sm text-muted-foreground">No saved lists available.</p>
             ) : (
               <div className="max-h-80 space-y-2 overflow-y-auto">
                 {savedLists.map((list) => (
                   <button
                     key={list.id}
                     onClick={() => handleLoadList(list)}
-                    className="w-full rounded-md border border-gray-200 p-3 text-left text-sm hover:bg-gray-50"
+                    className="w-full rounded-md border border-border p-3 text-left text-sm hover:bg-muted/40"
                   >
-                    <div className="font-medium text-gray-900">{list.name}</div>
+                    <div className="font-medium text-foreground">{list.name}</div>
                     {list.description && (
-                      <div className="text-xs text-gray-500">{list.description}</div>
+                      <div className="text-xs text-muted-foreground">{list.description}</div>
                     )}
-                    <div className="mt-1 text-xs text-gray-400">
+                    <div className="mt-1 text-xs text-muted-foreground">
                       {list.companies?.length || 0} companies •{' '}
                       {list.createdAt ? new Date(list.createdAt).toLocaleDateString() : ''}
                     </div>
@@ -560,7 +560,7 @@ const AISourcingDashboard: React.FC = () => {
             )}
             <button
               onClick={() => setShowLoadDialog(false)}
-              className="mt-4 w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="mt-4 w-full rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40"
             >
               Close
             </button>
@@ -569,47 +569,47 @@ const AISourcingDashboard: React.FC = () => {
       )}
 
       {activeProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-card/70 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-foreground">
                   {activeProfile.company_name || activeProfile.orgnr}
                 </h3>
-                <p className="text-sm text-gray-500">{activeProfile.orgnr}</p>
+                <p className="text-sm text-muted-foreground">{activeProfile.orgnr}</p>
               </div>
               <button
                 onClick={closeProfileModal}
-                className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-500 hover:bg-gray-50"
+                className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground hover:bg-muted/40"
               >
                 Close
               </button>
             </div>
-            <div className="mt-4 space-y-3 text-sm text-gray-700">
+            <div className="mt-4 space-y-3 text-sm text-foreground">
               <div>
-                <p className="text-xs uppercase text-gray-400">Product Description</p>
+                <p className="text-xs uppercase text-muted-foreground">Product Description</p>
                 <p>{activeProfile.ai_product_description || 'No AI summary yet.'}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs uppercase text-gray-400">End Market</p>
+                  <p className="text-xs uppercase text-muted-foreground">End Market</p>
                   <p>{activeProfile.ai_end_market || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase text-gray-400">Customer Types</p>
+                  <p className="text-xs uppercase text-muted-foreground">Customer Types</p>
                   <p>{activeProfile.ai_customer_types || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase text-gray-400">Value Chain Position</p>
+                  <p className="text-xs uppercase text-muted-foreground">Value Chain Position</p>
                   <p>{activeProfile.ai_value_chain_position || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase text-gray-400">Strategic Fit Score</p>
+                  <p className="text-xs uppercase text-muted-foreground">Strategic Fit Score</p>
                   <p>{activeProfile.ai_strategic_score ? `${activeProfile.ai_strategic_score}/10` : '—'}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs uppercase text-gray-400">AI Notes</p>
+                <p className="text-xs uppercase text-muted-foreground">AI Notes</p>
                 <p>{activeProfile.ai_notes || '—'}</p>
               </div>
               {activeProfile.ai_profile_website && (
@@ -617,7 +617,7 @@ const AISourcingDashboard: React.FC = () => {
                   href={activeProfile.ai_profile_website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="text-sm font-medium text-primary hover:underline"
                 >
                   Visit website
                 </a>

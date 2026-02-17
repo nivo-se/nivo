@@ -22,10 +22,10 @@ export function AdminSettings() {
   const { theme, setTheme, resolvedTheme } = useTheme();
 
   return (
-    <Card className="new-card">
+    <Card className="app-card">
       <CardHeader>
         <CardTitle>General Settings</CardTitle>
-        <p className="text-sm text-gray-700">Appearance and preferences</p>
+        <p className="text-sm text-foreground">Appearance and preferences</p>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -51,7 +51,7 @@ export function AdminSettings() {
               })}
             </SelectContent>
           </Select>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-muted-foreground">
             Current: {resolvedTheme ?? "system"} — affects UI components and
             toasts
           </p>

@@ -68,61 +68,61 @@ export const AIInsights: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 rounded-lg border border-gray-200 p-4">
+    <div className="space-y-4 rounded-lg border border-border p-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           value={orgnr}
           onChange={(e) => setOrgnr(e.target.value)}
           placeholder="Enter org number (e.g. 5560001421)"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+          className="flex-1 rounded-md border border-border px-3 py-2 text-sm focus:border-border focus:outline-none"
         />
         <button
           onClick={handleLoadProfile}
-          className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-black/90 disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-md bg-card px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-card/90 disabled:opacity-50"
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Load insights'}
         </button>
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       {profile && (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Product</p>
-              <p className="text-sm text-gray-900">{profile.product_description || 'N/A'}</p>
-              <p className="mt-2 text-xs text-gray-500">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Product</p>
+              <p className="text-sm text-foreground">{profile.product_description || 'N/A'}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
                 {profile.business_model_summary || profile.value_chain_position || ''}
               </p>
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Business Summary</p>
-              <p className="text-sm text-gray-900">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Business Summary</p>
+              <p className="text-sm text-foreground">
                 {profile.business_summary || profile.business_model_summary || 'N/A'}
               </p>
               {profile.date_scraped && (
-                <p className="mt-2 text-[11px] uppercase tracking-wide text-gray-400">
+                <p className="mt-2 text-[11px] uppercase tracking-wide text-muted-foreground">
                   Scraped {new Date(profile.date_scraped).toLocaleDateString()}
                 </p>
               )}
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">End market</p>
-              <p className="text-sm text-gray-900">{profile.end_market || 'N/A'}</p>
-              <p className="mt-2 text-xs text-gray-500">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">End market</p>
+              <p className="text-sm text-foreground">{profile.end_market || 'N/A'}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
                 Customer types: {profile.customer_types || 'N/A'}
               </p>
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Industry & Regions</p>
-              <p className="text-sm font-medium text-gray-900">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Industry & Regions</p>
+              <p className="text-sm font-medium text-foreground">
                 {profile.industry_sector || 'N/A'}
                 {profile.industry_subsector ? ` / ${profile.industry_subsector}` : ''}
               </p>
               {industryKeywords.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {industryKeywords.map((keyword) => (
-                    <span key={keyword} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                    <span key={keyword} className="rounded-full bg-muted px-2 py-0.5 text-xs text-foreground">
                       {keyword}
                     </span>
                   ))}
@@ -131,81 +131,81 @@ export const AIInsights: React.FC = () => {
               {marketRegions.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {marketRegions.map((region) => (
-                    <span key={region} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                    <span key={region} className="rounded-full bg-muted px-2 py-0.5 text-xs text-foreground">
                       {region}
                     </span>
                   ))}
                 </div>
               )}
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Value chain position</p>
-              <p className="text-sm text-gray-900">{profile.value_chain_position || 'N/A'}</p>
-              <p className="mt-2 text-xs uppercase text-gray-500">Agent</p>
-              <p className="text-sm text-gray-900">{profile.agent_type || 'default'}</p>
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Value chain position</p>
+              <p className="text-sm text-foreground">{profile.value_chain_position || 'N/A'}</p>
+              <p className="mt-2 text-xs uppercase text-muted-foreground">Agent</p>
+              <p className="text-sm text-foreground">{profile.agent_type || 'default'}</p>
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Strategic fit</p>
-              <p className="text-2xl font-semibold text-gray-900">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Strategic fit</p>
+              <p className="text-2xl font-semibold text-foreground">
                 {profile.strategic_fit_score ?? '—'}
-                <span className="text-base font-normal text-gray-500">/10</span>
+                <span className="text-base font-normal text-muted-foreground">/10</span>
               </p>
-              <p className="mt-1 text-xs text-gray-500">{profile.fit_rationale || '—'}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{profile.fit_rationale || '—'}</p>
               {profile.acquisition_angle && (
-                <p className="mt-2 text-xs text-gray-500">Angle: {profile.acquisition_angle}</p>
+                <p className="mt-2 text-xs text-muted-foreground">Angle: {profile.acquisition_angle}</p>
               )}
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Defensibility</p>
-              <p className="text-2xl font-semibold text-gray-900">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Defensibility</p>
+              <p className="text-2xl font-semibold text-foreground">
                 {profile.defensibility_score ?? '—'}
-                <span className="text-base font-normal text-gray-500">/10</span>
+                <span className="text-base font-normal text-muted-foreground">/10</span>
               </p>
-              <p className="mt-2 text-xs text-gray-500">Upside: {profile.upside_potential || '—'}</p>
+              <p className="mt-2 text-xs text-muted-foreground">Upside: {profile.upside_potential || '—'}</p>
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Risk flags</p>
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Risk flags</p>
               {riskFlags.length > 0 ? (
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-900">
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
                   {riskFlags.map((flag) => (
                     <li key={flag}>{flag}</li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-gray-900">No major risks flagged.</p>
+                <p className="text-sm text-foreground">No major risks flagged.</p>
               )}
             </div>
-            <div className="rounded-md border border-gray-100 p-3">
-              <p className="text-xs uppercase text-gray-500">Next steps</p>
+            <div className="rounded-md border border-border p-3">
+              <p className="text-xs uppercase text-muted-foreground">Next steps</p>
               {nextSteps.length > 0 ? (
-                <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-gray-900">
+                <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-foreground">
                   {nextSteps.map((step, idx) => (
                     <li key={`${step}-${idx}`}>{step}</li>
                   ))}
                 </ol>
               ) : (
-                <p className="text-sm text-gray-900">No playbook actions yet.</p>
+                <p className="text-sm text-foreground">No playbook actions yet.</p>
               )}
             </div>
           </div>
 
-          <div className="rounded-md border border-gray-100 p-4">
-            <p className="text-xs uppercase text-gray-500">Strategic playbook</p>
-            <p className="mt-2 whitespace-pre-line text-sm text-gray-900">
+          <div className="rounded-md border border-border p-4">
+            <p className="text-xs uppercase text-muted-foreground">Strategic playbook</p>
+            <p className="mt-2 whitespace-pre-line text-sm text-foreground">
               {profile.strategic_playbook || 'Playbook not generated yet.'}
             </p>
           </div>
 
-          <div className="rounded-md border border-gray-100 p-3">
-            <p className="text-xs uppercase text-gray-500">AI Notes</p>
-            <p className="text-sm text-gray-900 whitespace-pre-line">{profile.ai_notes || 'N/A'}</p>
+          <div className="rounded-md border border-border p-3">
+            <p className="text-xs uppercase text-muted-foreground">AI Notes</p>
+            <p className="text-sm text-foreground whitespace-pre-line">{profile.ai_notes || 'N/A'}</p>
             {scrapedPages.length > 0 && (
               <div className="mt-3">
-                <p className="text-xs uppercase text-gray-500">Scraped pages</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-gray-600">
+                <p className="text-xs uppercase text-muted-foreground">Scraped pages</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-muted-foreground">
                   {scrapedPages.map((url) => (
                     <li key={url} className="truncate">
                       <a href={url.startsWith('http') ? url : `https://${url}`} target="_blank" rel="noreferrer">

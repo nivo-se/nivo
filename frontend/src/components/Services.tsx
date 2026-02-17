@@ -34,7 +34,7 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
   ];
 
   return (
-    <section id={id} className={cn('py-16 md:py-24 bg-white', className)}>
+    <section id={id} className={cn('py-16 md:py-24 bg-card', className)}>
       <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
         <StaggeredContainer
           staggerDelay={150}
@@ -46,7 +46,7 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
             return (
               <Card
                 key={index}
-                className="group h-full border-primary/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl"
+                className="group h-full border-primary/20 bg-card/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl"
               >
                 <CardContent className="p-6 sm:p-8">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -54,10 +54,10 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
                       <IconComponent className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="mb-2 text-lg font-heading font-semibold text-jetBlack sm:text-xl">
+                      <h3 className="mb-2 text-lg font-heading font-semibold text-foreground sm:text-xl">
                         {service.title}
                       </h3>
-                      <p className="text-sm leading-relaxed text-jetBlack/75 sm:text-base">
+                      <p className="text-sm leading-relaxed text-foreground/75 sm:text-base">
                         {service.description}
                       </p>
                     </div>

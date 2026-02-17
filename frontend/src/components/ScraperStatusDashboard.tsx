@@ -93,22 +93,22 @@ const ScraperStatusDashboard: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'running':
-        return <Clock className="h-4 w-4 text-blue-500" />;
+        return <Clock className="h-4 w-4 text-primary" />;
       case 'done':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-primary" />;
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'running':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800">Running</Badge>;
+        return <Badge variant="default" className="bg-primary/15 text-primary">Running</Badge>;
       case 'done':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Completed</Badge>;
+        return <Badge variant="default" className="bg-primary/15 text-primary">Completed</Badge>;
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       default:
@@ -144,7 +144,7 @@ const ScraperStatusDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Scraper Status Dashboard</h2>
-          <p className="text-gray-600">Monitor scraping jobs and review company data</p>
+          <p className="text-muted-foreground">Monitor scraping jobs and review company data</p>
         </div>
         <Button 
           onClick={fetchData} 
@@ -176,7 +176,7 @@ const ScraperStatusDashboard: React.FC = () => {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{formatNumber(pendingCompanies)}</div>
+            <div className="text-2xl font-bold text-foreground">{formatNumber(pendingCompanies)}</div>
             <p className="text-xs text-muted-foreground">Awaiting approval</p>
           </CardContent>
         </Card>
@@ -187,7 +187,7 @@ const ScraperStatusDashboard: React.FC = () => {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatNumber(approvedCompanies)}</div>
+            <div className="text-2xl font-bold text-primary">{formatNumber(approvedCompanies)}</div>
             <p className="text-xs text-muted-foreground">Ready for migration</p>
           </CardContent>
         </Card>
@@ -198,7 +198,7 @@ const ScraperStatusDashboard: React.FC = () => {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{formatNumber(rejectedCompanies)}</div>
+            <div className="text-2xl font-bold text-destructive">{formatNumber(rejectedCompanies)}</div>
             <p className="text-xs text-muted-foreground">Not suitable</p>
           </CardContent>
         </Card>
@@ -218,7 +218,7 @@ const ScraperStatusDashboard: React.FC = () => {
                   {getStatusIcon(job.status)}
                   <div>
                     <div className="font-medium">Job {job.id.slice(0, 8)}...</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-muted-foreground">
                       {job.totalCompanies} companies found • Page {job.lastPage} • {formatDate(job.createdAt)}
                     </div>
                   </div>
@@ -252,7 +252,7 @@ const ScraperStatusDashboard: React.FC = () => {
               <div key={company.orgnr} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <div className="font-medium">{company.company_name}</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     Org: {company.orgnr} • Revenue: {formatNumber(company.revenue_sek)} SEK • Profit: {formatNumber(company.profit_sek)} SEK
                   </div>
                 </div>

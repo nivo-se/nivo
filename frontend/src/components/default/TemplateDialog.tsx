@@ -150,7 +150,7 @@ export function TemplateDialog({
               rows={10}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Use double curly braces for variables: {`{{company_name}}, {{revenue_latest}}, etc.`}
             </p>
           </div>
@@ -175,7 +175,7 @@ export function TemplateDialog({
                   <button
                     type="button"
                     onClick={() => handleRemoveVariable(variable)}
-                    className="ml-1 hover:text-red-600"
+                    className="ml-1 hover:text-destructive"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -229,11 +229,11 @@ export function TemplateDialog({
                 {scoringDimensions.map((dim) => (
                   <div
                     key={dim.id}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded border"
+                    className="flex items-center justify-between p-2 bg-muted/40 rounded border"
                   >
                     <div className="flex-1">
                       <div className="font-medium text-sm">{dim.name}</div>
-                      <div className="text-xs text-gray-500">{dim.description}</div>
+                      <div className="text-xs text-muted-foreground">{dim.description}</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">
@@ -242,7 +242,7 @@ export function TemplateDialog({
                       <button
                         type="button"
                         onClick={() => handleRemoveDimension(dim.id)}
-                        className="text-gray-400 hover:text-red-600"
+                        className="text-muted-foreground hover:text-destructive"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -254,8 +254,8 @@ export function TemplateDialog({
                   <span
                     className={
                       totalWeight === 1.0
-                        ? "text-green-600 font-medium"
-                        : "text-red-600 font-medium"
+                        ? "text-primary font-medium"
+                        : "text-destructive font-medium"
                     }
                   >
                     {(totalWeight * 100).toFixed(0)}%

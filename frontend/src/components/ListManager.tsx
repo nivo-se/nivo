@@ -284,7 +284,7 @@ const ListManager: React.FC<ListManagerProps> = ({
           {loading ? (
             <div className="text-center py-8">Laddar listor...</div>
           ) : lists.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               Inga listor skapade än. Skapa din första lista för att komma igång.
             </div>
           ) : (
@@ -293,7 +293,7 @@ const ListManager: React.FC<ListManagerProps> = ({
                 <Card 
                   key={list.id}
                   className={`cursor-pointer transition-all ${
-                    selectedList?.id === list.id ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-300'
+                    selectedList?.id === list.id ? 'border-primary bg-primary/10' : 'hover:border-border'
                   }`}
                   onClick={() => {
                     setSelectedList(list)
@@ -305,7 +305,7 @@ const ListManager: React.FC<ListManagerProps> = ({
                       <div>
                         <h3 className="font-medium">{list.name}</h3>
                         {list.description && (
-                          <p className="text-sm text-gray-600 mt-1">{list.description}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{list.description}</p>
                         )}
                       </div>
                       {allowEditing && (
@@ -385,7 +385,7 @@ const ListManager: React.FC<ListManagerProps> = ({
               </div>
             </div>
             {selectedList.description && (
-              <p className="text-gray-600">{selectedList.description}</p>
+              <p className="text-muted-foreground">{selectedList.description}</p>
             )}
           </CardHeader>
           <CardContent>
@@ -435,7 +435,7 @@ const ListManager: React.FC<ListManagerProps> = ({
             {/* Companies List */}
             <div className="space-y-2">
               {filteredCompanies.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   {selectedList.companies.length === 0 
                     ? 'Inga företag i denna lista än.' 
                     : 'Inga företag matchar de valda filtren.'
@@ -445,7 +445,7 @@ const ListManager: React.FC<ListManagerProps> = ({
                 filteredCompanies.map((company) => (
                   <div
                     key={company.OrgNr}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/40"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -454,10 +454,10 @@ const ListManager: React.FC<ListManagerProps> = ({
                           {company.OrgNr}
                         </Badge>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         {company.segment_name} • {company.city} • {company.employees} anställda
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         Omsättning: {(company.SDI || 0).toLocaleString('sv-SE')} SEK
                       </div>
                     </div>

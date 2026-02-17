@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AddToListDropdown } from "@/components/new/AddToListDropdown";
-import { ErrorState } from "@/components/new/ErrorState";
+import { AddToListDropdown } from "@/components/default/AddToListDropdown";
+import { ErrorState } from "@/components/default/ErrorState";
 import {
   ArrowLeft,
   MapPin,
@@ -56,7 +56,7 @@ export default function NewCompanyDetail() {
   if (isLoading && !company) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading company...</p>
+        <p className="text-muted-foreground">Loading company...</p>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function NewCompanyDetail() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Company not found</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Company not found</h2>
           <Link to="/universe">
             <Button>Back to Universe</Button>
           </Link>
@@ -114,7 +114,7 @@ export default function NewCompanyDetail() {
   }, [company.financials, financialsData?.financials]);
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/universe">
@@ -124,10 +124,10 @@ export default function NewCompanyDetail() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {company.display_name}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span>{company.industry_label}</span>
                 <span>|</span>
                 <span>{company.region ?? "—"}</span>
@@ -138,7 +138,7 @@ export default function NewCompanyDetail() {
                       href={company.website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       Website
                     </a>
@@ -172,12 +172,12 @@ export default function NewCompanyDetail() {
             <div className="grid grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     Revenue (Latest)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {formatRevenueSEK(latest.revenue)}
                   </p>
                 </CardContent>
@@ -185,14 +185,14 @@ export default function NewCompanyDetail() {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     3Y CAGR
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p
                     className={`text-2xl font-bold ${
-                      cagrNum > 0.15 ? "text-green-600" : "text-gray-900"
+                      cagrNum > 0.15 ? "text-primary" : "text-foreground"
                     }`}
                   >
                     {formatPercent(cagr)}
@@ -202,12 +202,12 @@ export default function NewCompanyDetail() {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     EBITDA Margin
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {formatPercent(latest.ebitdaMargin)}
                   </p>
                 </CardContent>
@@ -215,12 +215,12 @@ export default function NewCompanyDetail() {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     EBITDA (Latest)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {formatRevenueSEK(
                       latest.ebitda ?? (latest.revenue != null && latest.ebitdaMargin != null
                         ? (latest.revenue * latest.ebitdaMargin)
@@ -239,9 +239,9 @@ export default function NewCompanyDetail() {
                 <CardContent>
                   <div className="grid grid-cols-3 gap-6">
                     <div>
-                      <p className="text-sm text-gray-600 mb-2">Revenue Growth YoY</p>
+                      <p className="text-sm text-muted-foreground mb-2">Revenue Growth YoY</p>
                       {company.revenue_growth_yoy_latest != null ? (
-                        <p className={`text-lg font-semibold ${company.revenue_growth_yoy_latest >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        <p className={`text-lg font-semibold ${company.revenue_growth_yoy_latest >= 0 ? "text-primary" : "text-destructive"}`}>
                           {(company.revenue_growth_yoy_latest >= 0 ? "+" : "")}{formatPercent(company.revenue_growth_yoy_latest)}
                         </p>
                       ) : financials.length >= 2 ? (
@@ -250,37 +250,37 @@ export default function NewCompanyDetail() {
                           const curr = financials[financials.length - 1];
                           const yoy = prev?.revenue ? ((curr.revenue - prev.revenue) / prev.revenue) : null;
                           return yoy != null ? (
-                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
                               {(yoy >= 0 ? "+" : "")}{formatPercent(yoy)}
                             </p>
                           ) : (
-                            <p className="text-gray-500">—</p>
+                            <p className="text-muted-foreground">—</p>
                           );
                         })()
                       ) : (
-                        <p className="text-gray-500">—</p>
+                        <p className="text-muted-foreground">—</p>
                       )}
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 mb-2">EBITDA Growth YoY</p>
+                      <p className="text-sm text-muted-foreground mb-2">EBITDA Growth YoY</p>
                       {financials.length >= 2 && financials[financials.length - 2].ebitda ? (
                         (() => {
                           const prev = financials[financials.length - 2];
                           const curr = financials[financials.length - 1];
                           const yoy = ((curr.ebitda - prev.ebitda) / prev.ebitda);
                           return (
-                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
                               {(yoy >= 0 ? "+" : "")}{formatPercent(yoy)}
                             </p>
                           );
                         })()
                       ) : (
-                        <p className="text-gray-500">—</p>
+                        <p className="text-muted-foreground">—</p>
                       )}
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 mb-2">Employee Growth YoY</p>
-                      <p className="text-gray-500">—</p>
+                      <p className="text-sm text-muted-foreground mb-2">Employee Growth YoY</p>
+                      <p className="text-muted-foreground">—</p>
                     </div>
                   </div>
                 </CardContent>
@@ -294,35 +294,35 @@ export default function NewCompanyDetail() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Org nr</p>
-                    <p className="text-gray-900 font-mono">{company.orgnr}</p>
+                    <p className="text-sm text-muted-foreground mb-1">Org nr</p>
+                    <p className="text-foreground font-mono">{company.orgnr}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Industry</p>
-                    <p className="text-gray-900">{company.industry_label}</p>
+                    <p className="text-sm text-muted-foreground mb-1">Industry</p>
+                    <p className="text-foreground">{company.industry_label}</p>
                   </div>
                   {company.region && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Region</p>
-                      <p className="text-gray-900">{company.region}</p>
+                      <p className="text-sm text-muted-foreground mb-1">Region</p>
+                      <p className="text-foreground">{company.region}</p>
                     </div>
                   )}
                   {company.employees_latest != null && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Employees</p>
-                      <p className="text-gray-900">~{company.employees_latest}</p>
+                      <p className="text-sm text-muted-foreground mb-1">Employees</p>
+                      <p className="text-foreground">~{company.employees_latest}</p>
                     </div>
                   )}
                   {company.equity_ratio_latest != null && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Equity Ratio</p>
-                      <p className="text-gray-900 font-mono">{formatPercent(company.equity_ratio_latest)}</p>
+                      <p className="text-sm text-muted-foreground mb-1">Equity Ratio</p>
+                      <p className="text-foreground font-mono">{formatPercent(company.equity_ratio_latest)}</p>
                     </div>
                   )}
                   {company.debt_to_equity_latest != null && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Debt / Equity</p>
-                      <p className="text-gray-900 font-mono">{formatNum(company.debt_to_equity_latest)}</p>
+                      <p className="text-sm text-muted-foreground mb-1">Debt / Equity</p>
+                      <p className="text-foreground font-mono">{formatNum(company.debt_to_equity_latest)}</p>
                     </div>
                   )}
                 </div>
@@ -332,7 +332,7 @@ export default function NewCompanyDetail() {
                       href={company.website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                     >
                       <Globe className="h-4 w-4" />
                       {company.website_url.replace(/^https?:\/\//, "")}
@@ -342,7 +342,7 @@ export default function NewCompanyDetail() {
                   {company.email && (
                     <a
                       href={`mailto:${company.email}`}
-                      className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                     >
                       <Mail className="h-4 w-4" />
                       {company.email}
@@ -351,7 +351,7 @@ export default function NewCompanyDetail() {
                   {company.phone && (
                     <a
                       href={`tel:${company.phone.replace(/\s/g, "")}`}
-                      className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                     >
                       <Phone className="h-4 w-4" />
                       {company.phone}
@@ -367,22 +367,22 @@ export default function NewCompanyDetail() {
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span className="flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-blue-600" />
+                        <Sparkles className="w-5 h-5 text-primary" />
                         AI Investment Score
                       </span>
                       <div className="text-right">
                         <span
                           className={`text-4xl font-bold ${
                             (aiProfile.ai_fit_score ?? 0) >= 75
-                              ? "text-green-600"
+                              ? "text-primary"
                               : (aiProfile.ai_fit_score ?? 0) >= 50
-                                ? "text-yellow-600"
-                                : "text-red-600"
+                                ? "text-foreground"
+                                : "text-destructive"
                           }`}
                         >
                           {aiProfile.ai_fit_score ?? 0}
                         </span>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {aiProfile.latest_result.recommendation === "strong_fit"
                             ? "Strong Fit"
                             : aiProfile.latest_result.recommendation === "potential_fit"
@@ -395,10 +395,10 @@ export default function NewCompanyDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                    <p className="text-foreground whitespace-pre-line leading-relaxed">
                       {aiProfile.latest_result.summary}
                     </p>
-                    <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
                       <span>
                         Last analyzed:{" "}
                         {new Date(aiProfile.last_analyzed).toLocaleDateString()}
@@ -412,7 +412,7 @@ export default function NewCompanyDetail() {
                     {aiProfile.latest_result.strengths?.length > 0 && (
                       <Card>
                         <CardHeader>
-                          <CardTitle className="flex items-center gap-2 text-green-700">
+                          <CardTitle className="flex items-center gap-2 text-primary">
                             <CheckCircle className="w-5 h-5" />
                             Key Strengths
                           </CardTitle>
@@ -421,8 +421,8 @@ export default function NewCompanyDetail() {
                           <ul className="space-y-2">
                             {aiProfile.latest_result.strengths.map((s, i) => (
                               <li key={i} className="flex items-start gap-2 text-sm">
-                                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                                <span className="text-gray-700">{s}</span>
+                                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground">{s}</span>
                               </li>
                             ))}
                           </ul>
@@ -432,7 +432,7 @@ export default function NewCompanyDetail() {
                     {aiProfile.latest_result.concerns?.length > 0 && (
                       <Card>
                         <CardHeader>
-                          <CardTitle className="flex items-center gap-2 text-red-700">
+                          <CardTitle className="flex items-center gap-2 text-destructive">
                             <AlertTriangle className="w-5 h-5" />
                             Concerns
                           </CardTitle>
@@ -441,8 +441,8 @@ export default function NewCompanyDetail() {
                           <ul className="space-y-2">
                             {aiProfile.latest_result.concerns.map((c, i) => (
                               <li key={i} className="flex items-start gap-2 text-sm">
-                                <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                                <span className="text-gray-700">{c}</span>
+                                <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground">{c}</span>
                               </li>
                             ))}
                           </ul>
@@ -455,13 +455,13 @@ export default function NewCompanyDetail() {
             ) : (
               <Card>
                 <CardContent className="p-8 text-center">
-                  <Sparkles className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500 mb-2">No AI analysis available</p>
-                  <p className="text-sm text-gray-400 mb-4">
+                  <Sparkles className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground mb-2">No AI analysis available</p>
+                  <p className="text-sm text-muted-foreground mb-4">
                     Run an AI analysis for investment insights and recommendations
                   </p>
                   <Link to="/ai">
-                    <Button size="sm">
+                    <Button variant="outline" size="sm">
                       <Sparkles className="w-4 h-4 mr-2" />
                       Go to AI Lab
                     </Button>
@@ -478,30 +478,30 @@ export default function NewCompanyDetail() {
               </CardHeader>
               <CardContent>
                 {financials.length === 0 ? (
-                  <p className="text-gray-500 py-8 text-center">
+                  <p className="text-muted-foreground py-8 text-center">
                     No multi-year financial data available. Latest: Revenue {formatRevenueSEK(latest.revenue)},
                     EBITDA Margin {formatPercent(latest.ebitdaMargin)}.
                   </p>
                 ) : (
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-muted/40">
                       <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                           Year
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                           Revenue (SEK)
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                           EBITDA (SEK)
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                           Gross Margin
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                           EBITDA Margin
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                           YoY Growth
                         </th>
                       </tr>
@@ -515,34 +515,34 @@ export default function NewCompanyDetail() {
                               100
                             : null;
                         return (
-                          <tr key={fin.year} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 font-medium text-gray-900">
+                          <tr key={fin.year} className="hover:bg-muted/40">
+                            <td className="px-4 py-3 font-medium text-foreground">
                               {fin.year}
                             </td>
-                            <td className="px-4 py-3 text-right font-mono text-gray-900">
+                            <td className="px-4 py-3 text-right font-mono text-foreground">
                               {formatRevenueSEK(fin.revenue)}
                             </td>
-                            <td className="px-4 py-3 text-right font-mono text-gray-900">
+                            <td className="px-4 py-3 text-right font-mono text-foreground">
                               {formatRevenueSEK(fin.ebitda)}
                             </td>
-                            <td className="px-4 py-3 text-right font-mono text-gray-900">
+                            <td className="px-4 py-3 text-right font-mono text-foreground">
                               {((fin.gross_margin ?? 0) * 100).toFixed(1)}%
                             </td>
-                            <td className="px-4 py-3 text-right font-mono text-gray-900">
+                            <td className="px-4 py-3 text-right font-mono text-foreground">
                               {((fin.ebitda_margin ?? 0) * 100).toFixed(1)}%
                             </td>
                             <td className="px-4 py-3 text-right font-mono">
                               {yoyGrowth != null ? (
                                 <span
                                   className={
-                                    yoyGrowth > 0 ? "text-green-600" : "text-red-600"
+                                    yoyGrowth > 0 ? "text-primary" : "text-destructive"
                                   }
                                 >
                                   {yoyGrowth > 0 ? "+" : ""}
                                   {yoyGrowth.toFixed(1)}%
                                 </span>
                               ) : (
-                                <span className="text-gray-400">—</span>
+                                <span className="text-muted-foreground">—</span>
                               )}
                             </td>
                           </tr>

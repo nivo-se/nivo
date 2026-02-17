@@ -147,13 +147,13 @@ const DataExport: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Calendar className="h-4 w-4 text-yellow-500" />
+        return <Calendar className="h-4 w-4 text-foreground" />
       case 'processing':
-        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+        return <Loader2 className="h-4 w-4 animate-spin text-primary" />
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-primary" />
       case 'failed':
-        return <div className="h-4 w-4 bg-red-500 rounded-full" />
+        return <div className="h-4 w-4 bg-destructive rounded-full" />
       default:
         return null
     }
@@ -166,7 +166,7 @@ const DataExport: React.FC = () => {
       case 'processing':
         return <Badge variant="default">Bearbetar</Badge>
       case 'completed':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Klar</Badge>
+        return <Badge variant="default" className="bg-primary/15 text-primary">Klar</Badge>
       case 'failed':
         return <Badge variant="destructive">Misslyckades</Badge>
       default:
@@ -186,7 +186,7 @@ const DataExport: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Dataexport</h2>
-        <p className="text-gray-600">Exportera data från dina sparade företagslistor i olika format</p>
+        <p className="text-muted-foreground">Exportera data från dina sparade företagslistor i olika format</p>
       </div>
 
       <Tabs defaultValue="export" className="space-y-4">
@@ -244,11 +244,11 @@ const DataExport: React.FC = () => {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Välj sparad lista</label>
                   {savedLists.length === 0 ? (
-                    <div className="flex items-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                    <div className="flex items-center p-4 border border-accent rounded-lg bg-accent/60">
+                      <AlertCircle className="h-5 w-5 text-foreground mr-2" />
                       <div>
-                        <p className="text-sm font-medium text-yellow-800">Inga sparade listor hittades</p>
-                        <p className="text-xs text-yellow-600">Skapa och spara företagslistor i sök- eller analyssektionerna först.</p>
+                        <p className="text-sm font-medium text-foreground">Inga sparade listor hittades</p>
+                        <p className="text-xs text-foreground">Skapa och spara företagslistor i sök- eller analyssektionerna först.</p>
                       </div>
                     </div>
                   ) : (
@@ -265,7 +265,7 @@ const DataExport: React.FC = () => {
                               <List className="h-4 w-4 mr-2" />
                               <div>
                                 <div className="font-medium">{list.name}</div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-muted-foreground">
                                   {list.companies.length} företag • {new Date(list.updatedAt).toLocaleDateString()}
                                 </div>
                               </div>
@@ -331,26 +331,26 @@ const DataExport: React.FC = () => {
                       return selectedList ? (
                         <div className="space-y-3">
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Vald lista:</span>
+                            <span className="text-sm text-muted-foreground">Vald lista:</span>
                             <span className="font-medium">{selectedList.name}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Poster att exportera:</span>
+                            <span className="text-sm text-muted-foreground">Poster att exportera:</span>
                             <span className="font-medium">{recordCount.toLocaleString()}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Format:</span>
+                            <span className="text-sm text-muted-foreground">Format:</span>
                             <span className="font-medium capitalize">{exportOptions.format}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Uppskattad storlek:</span>
+                            <span className="text-sm text-muted-foreground">Uppskattad storlek:</span>
                             <span className="font-medium">
                               {formatFileSize(recordCount * (exportOptions.includeKPIs ? 2 : 1) * 100)}
                             </span>
                           </div>
                           {selectedList.description && (
                             <div className="pt-2 border-t">
-                              <p className="text-xs text-gray-500">{selectedList.description}</p>
+                              <p className="text-xs text-muted-foreground">{selectedList.description}</p>
                             </div>
                           )}
                         </div>
@@ -359,8 +359,8 @@ const DataExport: React.FC = () => {
                   </>
                 ) : (
                   <div className="text-center py-4">
-                    <List className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-500">Välj en sparad lista för att se exportförhandsvisning</p>
+                    <List className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Välj en sparad lista för att se exportförhandsvisning</p>
                   </div>
                 )}
 
@@ -384,7 +384,7 @@ const DataExport: React.FC = () => {
                   </Button>
                 </div>
 
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   Stora export kan ta flera minuter att bearbeta. Du kommer att bli meddelad när det är klart.
                 </div>
               </CardContent>
@@ -400,7 +400,7 @@ const DataExport: React.FC = () => {
             </CardHeader>
             <CardContent>
               {exportJobs.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Inga exportjobb ännu</p>
                   <p className="text-sm">Starta en export för att se dina jobb här</p>
@@ -415,7 +415,7 @@ const DataExport: React.FC = () => {
                           <div className="font-medium">
                             {job.listName} export ({job.format.toUpperCase()})
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             {job.recordCount.toLocaleString()} poster • {new Date(job.createdAt).toLocaleString()}
                           </div>
                         </div>
@@ -444,7 +444,7 @@ const DataExport: React.FC = () => {
               <CardDescription>Ställ in automatiserade export enligt schema</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Schemalagda export kommer snart</p>
                 <p className="text-sm">Ställ in automatiserade export som körs dagligen, veckovis eller månadsvis</p>

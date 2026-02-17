@@ -75,7 +75,7 @@ export function SaveListDialog({ open, onClose, onSave, companyCount = 0, descri
             </RadioGroup>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-900">
+          <div className="bg-primary/10 border border-primary/40 rounded p-3 text-sm text-primary">
             ✓ Filters will be saved with this list so you can reload and modify them later
           </div>
         </div>

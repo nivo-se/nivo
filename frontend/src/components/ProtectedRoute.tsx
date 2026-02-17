@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     )
@@ -37,12 +37,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // Check if user is approved
   if (!isApproved) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted/40">
         <div className="max-w-md w-full mx-auto p-6">
           <div className="text-center mb-6">
-            <Clock className="h-16 w-16 text-orange-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Pending</h1>
-            <p className="text-gray-600">
+            <Clock className="h-16 w-16 text-foreground mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-foreground mb-2">Access Pending</h1>
+            <p className="text-muted-foreground">
               Your account is waiting for administrator approval.
             </p>
           </div>

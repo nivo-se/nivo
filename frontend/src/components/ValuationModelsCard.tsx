@@ -203,9 +203,9 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
   }
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'bg-green-100 text-green-800 border-green-200'
-    if (confidence >= 60) return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-    return 'bg-red-100 text-red-800 border-red-200'
+    if (confidence >= 80) return 'bg-primary/15 text-primary border-primary/40'
+    if (confidence >= 60) return 'bg-accent text-foreground border-accent'
+    return 'bg-destructive/15 text-destructive border-destructive/40'
   }
 
   const formatValue = (value: number | null) => {
@@ -235,7 +235,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-500">Laddar värderingsmodeller...</div>
+            <div className="text-muted-foreground">Laddar värderingsmodeller...</div>
           </div>
         </CardContent>
       </Card>
@@ -253,7 +253,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="text-red-500 flex items-center gap-2">
+            <div className="text-destructive flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               {error}
             </div>
@@ -274,7 +274,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-500">Inga värderingsmodeller tillgängliga</div>
+            <div className="text-muted-foreground">Inga värderingsmodeller tillgängliga</div>
           </div>
         </CardContent>
       </Card>
@@ -317,8 +317,8 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
                   key={valuation.modelKey}
                   className={`p-4 border rounded-lg cursor-pointer transition-all ${
                     isSelected 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-border hover:border-border'
                   }`}
                   onClick={() => handleModelSelect(valuation.modelKey)}
                 >
@@ -333,19 +333,19 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
                       </div>
                     </div>
                     {isSelected && (
-                      <CheckCircle className="h-4 w-4 text-blue-600" />
+                      <CheckCircle className="h-4 w-4 text-primary" />
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {getModelDescription(valuation.modelKey)}
                     </p>
 
                     <div className="flex items-center justify-between">
                       <div className="text-lg font-semibold">
                         {isNull ? (
-                          <span className="text-gray-400">N/A</span>
+                          <span className="text-muted-foreground">N/A</span>
                         ) : (
                           formatValue(displayValue)
                         )}
@@ -356,7 +356,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
                     </div>
 
                     {valuation.multipleUsed && (
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         Multiple: {valuation.multipleUsed}x
                       </div>
                     )}
@@ -364,7 +364,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
                     {getNetDebtBadge(valuation.inputs)}
 
                     {valuation.inputs.reason && (
-                      <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                      <div className="text-xs text-foreground bg-accent/60 p-2 rounded">
                         <AlertTriangle className="h-3 w-3 inline mr-1" />
                         {valuation.inputs.reason}
                       </div>
@@ -378,9 +378,9 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
 
         {/* Summary */}
         {selectedModelKey || valuationRun?.selectedModelKey ? (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-medium text-gray-800 mb-2">Vald modell</h4>
-            <p className="text-sm text-gray-600">
+          <div className="p-4 bg-muted/40 rounded-lg">
+            <h4 className="font-medium text-foreground mb-2">Vald modell</h4>
+            <p className="text-sm text-muted-foreground">
               {(() => {
                 const selected = valuations.find(v => v.modelKey === (selectedModelKey || valuationRun?.selectedModelKey))
                 if (!selected) return 'Ingen modell vald'

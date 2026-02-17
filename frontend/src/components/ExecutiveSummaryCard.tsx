@@ -21,38 +21,38 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
     switch (interest?.toLowerCase()) {
       case 'hög':
       case 'high':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-primary/15 text-primary border-primary/40'
       case 'medel':
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-accent text-foreground border-accent'
       case 'låg':
       case 'low':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-destructive/15 text-destructive border-destructive/40'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-muted text-foreground border-border'
     }
   }
 
   const getFinancialHealthColor = (score?: number | null) => {
-    if (!score) return 'text-gray-500'
-    if (score >= 8) return 'text-green-600'
-    if (score >= 6) return 'text-yellow-600'
-    return 'text-red-600'
+    if (!score) return 'text-muted-foreground'
+    if (score >= 8) return 'text-primary'
+    if (score >= 6) return 'text-foreground'
+    return 'text-destructive'
   }
 
   const getGrowthPotentialIcon = (potential?: string | null) => {
     switch (potential?.toLowerCase()) {
       case 'hög':
       case 'high':
-        return <TrendingUp className="h-4 w-4 text-green-600" />
+        return <TrendingUp className="h-4 w-4 text-primary" />
       case 'medel':
       case 'medium':
-        return <Target className="h-4 w-4 text-yellow-600" />
+        return <Target className="h-4 w-4 text-foreground" />
       case 'låg':
       case 'low':
-        return <TrendingDown className="h-4 w-4 text-red-600" />
+        return <TrendingDown className="h-4 w-4 text-destructive" />
       default:
-        return <Target className="h-4 w-4 text-gray-500" />
+        return <Target className="h-4 w-4 text-muted-foreground" />
     }
   }
 
@@ -65,11 +65,11 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
           <Star
             key={i}
             className={`h-3 w-3 ${
-              i < stars ? 'text-yellow-400 fill-current' : 'text-gray-300'
+              i < stars ? 'text-primary fill-current' : 'text-muted-foreground'
             }`}
           />
         ))}
-        <span className="text-xs text-gray-600 ml-1">({confidence.toFixed(1)}/5)</span>
+        <span className="text-xs text-muted-foreground ml-1">({confidence.toFixed(1)}/5)</span>
       </div>
     )
   }
@@ -79,7 +79,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-blue-600" />
+            <Shield className="h-5 w-5 text-primary" />
             Executive Summary
           </span>
           <Badge className={getAcquisitionInterestColor(company.acquisitionInterest)}>
@@ -90,7 +90,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
       <CardContent className="space-y-4">
         {/* Executive Summary Text */}
         <div className="prose prose-sm max-w-none">
-          <p className="text-gray-700 leading-relaxed">
+          <p className="text-foreground leading-relaxed">
             {company.executiveSummary || 
               'Ingen executive summary tillgänglig för denna analys. Sammanfattningen kommer att visas här när djupanalysen är klar.'}
           </p>
@@ -100,14 +100,14 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
         <div className="grid grid-cols-2 gap-4 pt-4 border-t">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Finansiell Hälsa</span>
+              <span className="text-sm font-medium text-muted-foreground">Finansiell Hälsa</span>
               <span className={`text-sm font-semibold ${getFinancialHealthColor(company.financialHealth)}`}>
                 {company.financialHealth ? `${company.financialHealth}/10` : 'Ej bedömd'}
               </span>
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Tillväxtpotential</span>
+              <span className="text-sm font-medium text-muted-foreground">Tillväxtpotential</span>
               <div className="flex items-center gap-1">
                 {getGrowthPotentialIcon(company.growthPotential)}
                 <span className="text-sm font-medium">
@@ -119,7 +119,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Marknadsposition</span>
+              <span className="text-sm font-medium text-muted-foreground">Marknadsposition</span>
               <span className="text-sm font-medium">
                 {company.marketPosition || 'Ej bedömd'}
               </span>
@@ -127,8 +127,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
             
             {company.targetPrice && (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">Målpris</span>
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="text-sm font-medium text-muted-foreground">Målpris</span>
+                <span className="text-sm font-semibold text-primary">
                   {company.targetPrice.toLocaleString('sv-SE')} MSEK
                 </span>
               </div>
@@ -139,7 +139,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ comp
         {/* Confidence Rating */}
         {company.confidence && (
           <div className="flex items-center justify-between pt-4 border-t">
-            <span className="text-sm font-medium text-gray-600">Analyskvalitet</span>
+            <span className="text-sm font-medium text-muted-foreground">Analyskvalitet</span>
             {getConfidenceStars(company.confidence)}
           </div>
         )}

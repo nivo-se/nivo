@@ -63,15 +63,15 @@ const Gap: React.FC<GapProps> = ({ className }) => {
   ];
 
   return (
-    <section id="gap" className={cn('py-20 bg-platinum/80', className)}>
+    <section id="gap" className={cn('py-20 bg-muted/80', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-8 text-center">Låt oss diskutera</h2>
+            <h2 className="text-3xl md:text-4xl font-heading text-foreground mb-8 text-center">Låt oss diskutera</h2>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <p className="text-xl text-center text-jetBlack/80 mb-8">
+            <p className="text-xl text-center text-foreground/80 mb-8">
               Vi på Project Nico är ständigt på jakt efter spännande samarbeten och nya möjligheter
             </p>
           </FadeIn>
@@ -82,8 +82,8 @@ const Gap: React.FC<GapProps> = ({ className }) => {
             <FadeIn key={index} delay={150 + index * 50}>
               <Card className="h-full">
                 <CardContent className="p-6 space-y-3">
-                  <h3 className="text-xl font-heading font-semibold text-jetBlack">{stat.title}</h3>
-                  <p className="text-jetBlack/75">{stat.description}</p>
+                  <h3 className="text-xl font-heading font-semibold text-foreground">{stat.title}</h3>
+                  <p className="text-foreground/75">{stat.description}</p>
                 </CardContent>
               </Card>
             </FadeIn>
@@ -99,18 +99,18 @@ const Gap: React.FC<GapProps> = ({ className }) => {
                   alt="Beautiful orangery with palm trees and plants"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-jetBlack/40"></div>
+                <div className="absolute inset-0 bg-card/40"></div>
               </div>
 
               {/* Centered newsletter box overlaid on the image */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="mx-4 w-full max-w-md rounded-2xl bg-platinum/95 p-8 text-jetBlack shadow-2xl shadow-jetBlack/20 backdrop-blur">
+                <div className="mx-4 w-full max-w-md rounded-2xl bg-muted/95 p-8 text-foreground shadow-2xl shadow-jetBlack/20 backdrop-blur">
                   <h3 className="text-2xl font-heading mb-6 text-center">Kontakta oss</h3>
 
                   <div className="flex justify-center mb-6">
                     <Button
                       variant="outline"
-                      className="min-h-[3.5rem] min-w-[220px] justify-center bg-white/60 text-primary hover:bg-white md:min-w-[280px]"
+                      className="min-h-[3.5rem] min-w-[220px] justify-center bg-card/60 text-primary hover:bg-card md:min-w-[280px]"
                     >
                       <span
                         className="transition-opacity duration-1000 ease-in-out"

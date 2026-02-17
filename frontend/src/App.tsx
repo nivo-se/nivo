@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 
-function RedirectFromNew({ to, param }: { to: string; param: string }) {
+function RedirectWithParam({ to, param }: { to: string; param: string }) {
   const params = useParams();
   const value = params[param];
   const target = to.replace(`:${param}`, value ?? "");
@@ -17,18 +17,19 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
-import NewAppLayout from "./pages/new/NewAppLayout";
-import NewWorkDashboard from "./pages/new/WorkDashboard";
-import NewUniverse from "./pages/new/Universe";
-import NewMyLists from "./pages/new/MyLists";
-import NewListDetail from "./pages/new/ListDetail";
-import NewAILab from "./pages/new/AILab";
-import NewCreateRun from "./pages/new/CreateRun";
-import NewRunDetail from "./pages/new/RunDetail";
-import NewRunResults from "./pages/new/RunResults";
-import NewCompanyDetail from "./pages/new/CompanyDetail";
-import NewAdmin from "./pages/new/Admin";
-import NewProspects from "./pages/new/Prospects";
+import AppLayout from "./pages/default/AppLayout";
+import WorkDashboard from "./pages/default/WorkDashboard";
+import Universe from "./pages/default/Universe";
+import MyLists from "./pages/default/MyLists";
+import ListDetail from "./pages/default/ListDetail";
+import AILab from "./pages/default/AILab";
+import CreateRun from "./pages/default/CreateRun";
+import RunDetail from "./pages/default/RunDetail";
+import RunResults from "./pages/default/RunResults";
+import CompanyDetail from "./pages/default/CompanyDetail";
+import Admin from "./pages/default/Admin";
+import Prospects from "./pages/default/Prospects";
+import ThemeSanityPage from "./pages/default/ThemeSanityPage";
 import WorkingDashboard from "./pages/WorkingDashboard";
 import { PipelinePage } from "./pages/app/PipelinePage";
 import { UniversePage } from "./pages/app/UniversePage";
@@ -45,7 +46,7 @@ function RedirectToCompany() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <AuthProvider>
         <TooltipProvider>
         <Toaster />
@@ -56,49 +57,60 @@ const App = () => (
             <Route path="/styleguide" element={<StyleGuide />} />
             <Route path="/landing" element={<Index />} />
 
-            {/* Main app — Figma UX (default at /) */}
+            {/* Default UI */}
             <Route
               path="/"
               element={
                 <ProtectedRoute>
-                  <NewAppLayout />
+                  <AppLayout />
                 </ProtectedRoute>
               }
             >
-              <Route index element={<NewWorkDashboard />} />
-              <Route path="prospects" element={<NewProspects />} />
-              <Route path="universe" element={<NewUniverse />} />
-              <Route path="lists" element={<NewMyLists />} />
-              <Route path="lists/:listId" element={<NewListDetail />} />
-              <Route path="company/:companyId" element={<NewCompanyDetail />} />
-              <Route path="ai" element={<NewAILab />} />
-              <Route path="ai/run/create" element={<NewCreateRun />} />
-              <Route path="ai/runs/:runId" element={<NewRunDetail />} />
-              <Route path="ai/runs/:runId/results" element={<NewRunResults />} />
-              <Route path="admin" element={<NewAdmin />} />
+              <Route index element={<WorkDashboard />} />
+              <Route path="prospects" element={<Prospects />} />
+              <Route path="universe" element={<Universe />} />
+              <Route path="lists" element={<MyLists />} />
+              <Route path="lists/:listId" element={<ListDetail />} />
+              <Route path="company/:companyId" element={<CompanyDetail />} />
+              <Route path="ai" element={<AILab />} />
+              <Route path="ai/run/create" element={<CreateRun />} />
+              <Route path="ai/runs/:runId" element={<RunDetail />} />
+              <Route path="ai/runs/:runId/results" element={<RunResults />} />
+              <Route path="admin" element={<Admin />} />
+              <Route path="app/theme" element={<ThemeSanityPage />} />
             </Route>
 
-            {/* Legacy UI — old pages (may use mock/sample data). More specific paths first. */}
-            <Route path="/legacy/dashboard" element={<ProtectedRoute><WorkingDashboard /></ProtectedRoute>} />
-            <Route path="/legacy/app" element={<Navigate to="/legacy/app/home" replace />} />
-            <Route path="/legacy/app/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path="/legacy/app/pipeline" element={<ProtectedRoute><PipelinePage /></ProtectedRoute>} />
-            <Route path="/legacy/app/universe" element={<ProtectedRoute><UniversePage /></ProtectedRoute>} />
-            <Route path="/legacy/app/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-            <Route path="/legacy/app/companies/:orgnr" element={<ProtectedRoute><CompanyPage /></ProtectedRoute>} />
-            <Route path="/legacy" element={<ProtectedRoute><div className="p-4"><a href="/" className="text-blue-600">← Back to app</a></div></ProtectedRoute>} />
+            {/* Old UI (may use mock/sample data). More specific paths first. */}
+            <Route path="/old/dashboard" element={<ProtectedRoute><WorkingDashboard /></ProtectedRoute>} />
+            <Route path="/old/app" element={<Navigate to="/old/app/home" replace />} />
+            <Route path="/old/app/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/old/app/pipeline" element={<ProtectedRoute><PipelinePage /></ProtectedRoute>} />
+            <Route path="/old/app/universe" element={<ProtectedRoute><UniversePage /></ProtectedRoute>} />
+            <Route path="/old/app/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+            <Route path="/old/app/companies/:orgnr" element={<ProtectedRoute><CompanyPage /></ProtectedRoute>} />
+            <Route path="/old" element={<ProtectedRoute><div className="p-4"><a href="/" className="text-primary">← Back to app</a></div></ProtectedRoute>} />
+
+            {/* Backward compat: /legacy/* redirects to /old/* */}
+            <Route path="/legacy" element={<Navigate to="/old" replace />} />
+            <Route path="/legacy/dashboard" element={<Navigate to="/old/dashboard" replace />} />
+            <Route path="/legacy/app" element={<Navigate to="/old/app" replace />} />
+            <Route path="/legacy/app/home" element={<Navigate to="/old/app/home" replace />} />
+            <Route path="/legacy/app/pipeline" element={<Navigate to="/old/app/pipeline" replace />} />
+            <Route path="/legacy/app/universe" element={<Navigate to="/old/app/universe" replace />} />
+            <Route path="/legacy/app/admin" element={<Navigate to="/old/app/admin" replace />} />
+            <Route path="/legacy/app/companies/:orgnr" element={<RedirectWithParam to="/old/app/companies/:orgnr" param="orgnr" />} />
 
             {/* Backward compat: /new/* redirects to equivalent /* routes */}
             <Route path="/new" element={<Navigate to="/" replace />} />
             <Route path="/new/prospects" element={<Navigate to="/prospects" replace />} />
             <Route path="/new/universe" element={<Navigate to="/universe" replace />} />
             <Route path="/new/lists" element={<Navigate to="/lists" replace />} />
-            <Route path="/new/lists/:listId" element={<RedirectFromNew to="/lists/:listId" param="listId" />} />
-            <Route path="/new/company/:companyId" element={<RedirectFromNew to="/company/:companyId" param="companyId" />} />
+            <Route path="/new/lists/:listId" element={<RedirectWithParam to="/lists/:listId" param="listId" />} />
+            <Route path="/new/company/:companyId" element={<RedirectWithParam to="/company/:companyId" param="companyId" />} />
             <Route path="/new/ai" element={<Navigate to="/ai" replace />} />
             <Route path="/new/ai/run/create" element={<Navigate to="/ai/run/create" replace />} />
-            <Route path="/new/ai/runs/:runId" element={<RedirectFromNew to="/ai/runs/:runId" param="runId" />} />
-            <Route path="/new/ai/runs/:runId/results" element={<RedirectFromNew to="/ai/runs/:runId/results" param="runId" />} />
+            <Route path="/new/ai/runs/:runId" element={<RedirectWithParam to="/ai/runs/:runId" param="runId" />} />
+            <Route path="/new/ai/runs/:runId/results" element={<RedirectWithParam to="/ai/runs/:runId/results" param="runId" />} />
             <Route path="/new/*" element={<Navigate to="/" replace />} />
             <Route path="/new/admin" element={<Navigate to="/admin" replace />} />
             <Route path="/dashboard" element={<Navigate to="/" replace />} />

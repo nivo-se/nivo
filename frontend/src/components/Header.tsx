@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled 
-          ? 'py-3 bg-white/90 backdrop-blur-md border-b border-gray-200/20 shadow-sm'
+          ? 'py-3 bg-card/90 backdrop-blur-md border-b border-border/20 shadow-sm'
           : 'py-5 bg-transparent',
         className
       )}
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           to="/"
           className={cn(
             "flex items-center space-x-2 transition-all duration-300 hover:opacity-80",
-            isScrolled ? "text-foreground" : "text-white"
+            isScrolled ? "text-foreground" : "text-primary-foreground"
           )}
         >
           <img
@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                     size="sm"
                     className={cn(
                       "flex items-center space-x-1",
-                      isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                      isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
                     )}
                   >
                     <User className="h-4 w-4" />
@@ -104,7 +104,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                   onClick={handleSignOut}
                   className={cn(
                     "flex items-center space-x-1",
-                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                    isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
                   )}
                 >
                   <LogOut className="h-4 w-4" />
@@ -118,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                   size="sm"
                   className={cn(
                     "flex items-center space-x-1",
-                    isScrolled ? "text-foreground hover:text-accent" : "text-white hover:text-white/80"
+                    isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
                   )}
                 >
                   <LogIn className="h-4 w-4" />
@@ -138,16 +138,16 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             "block w-6 transition-all duration-300",
             isMobileMenuOpen ? "opacity-0" : "opacity-100"
           )}>
-            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
-            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-white")} />
-            <span className={cn("block w-4 h-0.5", isScrolled ? "bg-foreground" : "bg-white")} />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-card")} />
+            <span className={cn("block w-6 h-0.5 mb-1.5", isScrolled ? "bg-foreground" : "bg-card")} />
+            <span className={cn("block w-4 h-0.5", isScrolled ? "bg-foreground" : "bg-card")} />
           </span>
         </button>
       </div>
       
       <div 
         className={cn(
-          "fixed inset-0 bg-white z-40 flex flex-col pt-24 px-6 transition-transform duration-500 ease-in-out transform md:hidden",
+          "fixed inset-0 bg-card z-40 flex flex-col pt-24 px-6 transition-transform duration-500 ease-in-out transform md:hidden",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -246,7 +246,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
     <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+        isScrolled ? "hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
       )}
       onClick={() => scrollToSection('about-nivo')}
     >
@@ -255,7 +255,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
     <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+        isScrolled ? "hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
       )}
       onClick={() => scrollToSection('services')}
     >
@@ -264,7 +264,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
     <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+        isScrolled ? "hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
       )}
       onClick={() => scrollToSection('team')}
     >
@@ -273,7 +273,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ scrollToSection, isScrolled }) => (
     <button 
       className={cn(
         "text-sm font-medium transition-colors",
-        isScrolled ? "hover:text-accent" : "text-white hover:text-white/80"
+        isScrolled ? "hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
       )}
       onClick={() => scrollToSection('contact')}
     >

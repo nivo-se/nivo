@@ -50,22 +50,22 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
         variant: 'default' as const, 
         icon: CheckCircle, 
         text: 'Slutförd',
-        color: 'text-green-600',
-        bgColor: 'bg-green-50'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10'
       },
       'running': { 
         variant: 'secondary' as const, 
         icon: Play, 
         text: 'Pågår',
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        color: 'text-primary',
+        bgColor: 'bg-primary/10'
       },
       'failed': { 
         variant: 'destructive' as const, 
         icon: XCircle, 
         text: 'Misslyckad',
-        color: 'text-red-600',
-        bgColor: 'bg-red-50'
+        color: 'text-destructive',
+        bgColor: 'bg-destructive/10'
       }
     }
     
@@ -106,7 +106,7 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
             </div>
             <div>
               <div className="text-xl font-semibold">Analysdetaljer</div>
-              <div className="text-sm font-normal text-gray-500">
+              <div className="text-sm font-normal text-muted-foreground">
                 {formatDate(analysis.startedAt)}
               </div>
             </div>
@@ -125,25 +125,25 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Typ:</span>
+                  <span className="text-sm font-medium text-muted-foreground">Typ:</span>
                   <Badge variant={modeConfig.variant}>{modeConfig.text}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Status:</span>
+                  <span className="text-sm font-medium text-muted-foreground">Status:</span>
                   <Badge variant={statusConfig.variant} className="flex items-center gap-1">
                     <StatusIcon className="w-3 h-3" />
                     {statusConfig.text}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Modell:</span>
-                  <span className="text-sm text-gray-900">{analysis.modelVersion}</span>
+                  <span className="text-sm font-medium text-muted-foreground">Modell:</span>
+                  <span className="text-sm text-foreground">{analysis.modelVersion}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Antal företag:</span>
+                  <span className="text-sm font-medium text-muted-foreground">Antal företag:</span>
                   <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-900">{analysis.companyCount}</span>
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">{analysis.companyCount}</span>
                   </div>
                 </div>
               </CardContent>
@@ -158,32 +158,32 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Startad:</span>
+                  <span className="text-sm font-medium text-muted-foreground">Startad:</span>
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-900">{formatDate(analysis.startedAt)}</span>
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">{formatDate(analysis.startedAt)}</span>
                   </div>
                 </div>
                 {analysis.completedAt && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Slutförd:</span>
+                    <span className="text-sm font-medium text-muted-foreground">Slutförd:</span>
                     <div className="flex items-center gap-1">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-gray-900">{formatDate(analysis.completedAt)}</span>
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm text-foreground">{formatDate(analysis.completedAt)}</span>
                     </div>
                   </div>
                 )}
                 {analysis.completedAt && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Varaktighet:</span>
-                    <span className="text-sm text-gray-900">
+                    <span className="text-sm font-medium text-muted-foreground">Varaktighet:</span>
+                    <span className="text-sm text-foreground">
                       {Math.round((new Date(analysis.completedAt).getTime() - new Date(analysis.startedAt).getTime()) / 1000 / 60)} min
                     </span>
                   </div>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Initierad av:</span>
-                  <span className="text-sm text-gray-900">{analysis.initiatedBy || 'Okänd'}</span>
+                  <span className="text-sm font-medium text-muted-foreground">Initierad av:</span>
+                  <span className="text-sm text-foreground">{analysis.initiatedBy || 'Okänd'}</span>
                 </div>
               </CardContent>
             </Card>
@@ -202,23 +202,23 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="default">Mall</Badge>
-                    <span className="font-medium text-gray-900">{analysis.templateName}</span>
+                    <span className="font-medium text-foreground">{analysis.templateName}</span>
                   </div>
-                  <p className="text-sm text-gray-600">{modeConfig.description}</p>
+                  <p className="text-sm text-muted-foreground">{modeConfig.description}</p>
                 </div>
               ) : analysis.customInstructions ? (
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">Anpassad</Badge>
-                    <span className="font-medium text-gray-900">Anpassade instruktioner</span>
+                    <span className="font-medium text-foreground">Anpassade instruktioner</span>
                   </div>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded border">
+                  <p className="text-sm text-muted-foreground bg-muted/40 p-3 rounded border">
                     {analysis.customInstructions}
                   </p>
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-sm text-gray-500">Ingen specifik analysfokus angiven</p>
+                  <p className="text-sm text-muted-foreground">Ingen specifik analysfokus angiven</p>
                 </div>
               )}
             </CardContent>
@@ -239,14 +239,14 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
                     key={company.orgnr} 
                     className={`p-3 rounded-lg border transition-colors ${
                       analysis.selectedCompany?.orgnr === company.orgnr 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:border-border hover:bg-muted/40'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">{company.name}</h4>
-                        <p className="text-sm text-gray-500">{company.orgnr}</p>
+                        <h4 className="font-medium text-foreground truncate">{company.name}</h4>
+                        <p className="text-sm text-muted-foreground">{company.orgnr}</p>
                       </div>
                       <Button
                         variant="ghost"
@@ -277,28 +277,28 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">{analysis.companyCount}</div>
-                    <div className="text-sm text-gray-600">Företag analyserade</div>
+                  <div className="text-center p-3 bg-muted/40 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">{analysis.companyCount}</div>
+                    <div className="text-sm text-muted-foreground">Företag analyserade</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-center p-3 bg-muted/40 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">
                       {analysis.analysisMode === 'screening' ? 'Screening' : 'Djupanalys'}
                     </div>
-                    <div className="text-sm text-gray-600">Analystyp</div>
+                    <div className="text-sm text-muted-foreground">Analystyp</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">{analysis.modelVersion}</div>
-                    <div className="text-sm text-gray-600">AI-modell</div>
+                  <div className="text-center p-3 bg-muted/40 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">{analysis.modelVersion}</div>
+                    <div className="text-sm text-muted-foreground">AI-modell</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-center p-3 bg-muted/40 rounded-lg">
+                    <div className="text-2xl font-bold text-foreground">
                       {analysis.completedAt ? 
                         Math.round((new Date(analysis.completedAt).getTime() - new Date(analysis.startedAt).getTime()) / 1000 / 60) 
                         : 'N/A'
                       }
                     </div>
-                    <div className="text-sm text-gray-600">Minuter</div>
+                    <div className="text-sm text-muted-foreground">Minuter</div>
                   </div>
                 </div>
               </CardContent>
@@ -339,7 +339,7 @@ export const AnalysisRunDetail: React.FC<AnalysisRunDetailProps> = ({
                     alert('Borttagning kommer snart')
                   }
                 }}
-                className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                className="flex items-center gap-2 border-destructive text-destructive hover:bg-destructive hover:text-primary-foreground"
               >
                 <Trash2 className="w-4 h-4" />
                 Ta bort

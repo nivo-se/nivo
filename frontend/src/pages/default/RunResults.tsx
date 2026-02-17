@@ -35,8 +35,8 @@ import {
   formatPercent,
   calculateRevenueCagr,
 } from "@/lib/utils/figmaCompanyUtils";
-import { ErrorState } from "@/components/new/ErrorState";
-import { EmptyState } from "@/components/new/EmptyState";
+import { ErrorState } from "@/components/default/ErrorState";
+import { EmptyState } from "@/components/default/EmptyState";
 import * as api from "@/lib/services/figmaApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -87,7 +87,7 @@ export default function NewRunResults() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading results...</p>
+        <p className="text-muted-foreground">Loading results...</p>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function NewRunResults() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Run not found</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Run not found</h2>
           <Link to="/ai">
             <Button>Back to AI Lab</Button>
           </Link>
@@ -124,13 +124,13 @@ export default function NewRunResults() {
   const getRecommendationBadge = (rec: string) => {
     switch (rec) {
       case "strong_fit":
-        return <Badge className="bg-green-100 text-green-800">Strong Fit</Badge>;
+        return <Badge className="bg-primary/15 text-primary">Strong Fit</Badge>;
       case "potential_fit":
-        return <Badge className="bg-yellow-100 text-yellow-800">Potential Fit</Badge>;
+        return <Badge className="bg-accent text-foreground">Potential Fit</Badge>;
       case "weak_fit":
-        return <Badge className="bg-orange-100 text-orange-800">Weak Fit</Badge>;
+        return <Badge className="bg-accent text-foreground">Weak Fit</Badge>;
       case "pass":
-        return <Badge className="bg-red-100 text-red-800">Pass</Badge>;
+        return <Badge className="bg-destructive/15 text-destructive">Pass</Badge>;
       default:
         return null;
     }
@@ -163,7 +163,7 @@ export default function NewRunResults() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-6">
           <Link to={`/ai/runs/${run.id}`}>
@@ -173,10 +173,10 @@ export default function NewRunResults() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+              <h1 className="text-2xl font-semibold text-foreground mb-1">
                 {run.name}
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {template.name} • {run.total_companies} companies • Completed {run.completed_at ? (() => {
                   const d = new Date(run.completed_at);
                   const now = new Date();
@@ -190,22 +190,22 @@ export default function NewRunResults() {
             </div>
             <div className="flex gap-3">
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-foreground">
                   {approvedResults.length}
                 </p>
-                <p className="text-xs text-gray-600">Approved</p>
+                <p className="text-xs text-muted-foreground">Approved</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-yellow-600">
+                <p className="text-2xl font-bold text-foreground">
                   {pendingResults.length}
                 </p>
-                <p className="text-xs text-gray-600">Pending</p>
+                <p className="text-xs text-muted-foreground">Pending</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-400">
+                <p className="text-2xl font-bold text-muted-foreground">
                   {rejectedResults.length}
                 </p>
-                <p className="text-xs text-gray-600">Rejected</p>
+                <p className="text-xs text-muted-foreground">Rejected</p>
               </div>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function NewRunResults() {
         ) : (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Filter:</span>
+              <span className="text-sm font-medium text-foreground">Filter:</span>
               <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
                 <SelectTrigger className="w-56 h-9">
                   <SelectValue placeholder="Sort by" />
@@ -249,7 +249,7 @@ export default function NewRunResults() {
 
                 <TabsContent value="pending" className="space-y-2 mt-4">
                   {pendingResults.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
+                    <p className="text-sm text-muted-foreground text-center py-8">
                       No pending results
                     </p>
                   ) : (
@@ -260,7 +260,7 @@ export default function NewRunResults() {
                         selectedId={selectedResultId}
                         onSelect={setSelectedResultId}
                         badge={getRecommendationBadge(result.recommendation)}
-                        scoreClass="text-gray-900"
+                        scoreClass="text-foreground"
                       />
                     ))
                   )}
@@ -274,8 +274,8 @@ export default function NewRunResults() {
                       selectedId={selectedResultId}
                       onSelect={setSelectedResultId}
                       badge={getRecommendationBadge(result.recommendation)}
-                      scoreClass="text-green-600"
-                      icon={<CheckCircle className="w-4 h-4 text-green-600" />}
+                      scoreClass="text-primary"
+                      icon={<CheckCircle className="w-4 h-4 text-primary" />}
                     />
                   ))}
                 </TabsContent>
@@ -288,8 +288,8 @@ export default function NewRunResults() {
                       selectedId={selectedResultId}
                       onSelect={setSelectedResultId}
                       badge={getRecommendationBadge(result.recommendation)}
-                      scoreClass="text-gray-400"
-                      icon={<XCircle className="w-4 h-4 text-gray-400" />}
+                      scoreClass="text-muted-foreground"
+                      icon={<XCircle className="w-4 h-4 text-muted-foreground" />}
                       opacity
                     />
                   ))}
@@ -308,7 +308,7 @@ export default function NewRunResults() {
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
-                    <p className="text-gray-500">Select a result to view details</p>
+                    <p className="text-muted-foreground">Select a result to view details</p>
                   </CardContent>
                 </Card>
               )}
@@ -346,7 +346,7 @@ function ResultCard({
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <p className="font-medium text-sm text-gray-900">
+          <p className="font-medium text-sm text-foreground">
             {company?.display_name ?? result.company_orgnr}
           </p>
           <span className={`text-lg font-bold ${scoreClass}`}>
@@ -356,7 +356,7 @@ function ResultCard({
         <div className="flex items-center justify-between">
           {badge}
           {icon ?? (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               {company?.industry_label}
             </span>
           )}
@@ -382,13 +382,13 @@ function ResultDetail({
   const getRecommendationBadge = (rec: string) => {
     switch (rec) {
       case "strong_fit":
-        return <Badge className="bg-green-100 text-green-800">Strong Fit</Badge>;
+        return <Badge className="bg-primary/15 text-primary">Strong Fit</Badge>;
       case "potential_fit":
-        return <Badge className="bg-yellow-100 text-yellow-800">Potential Fit</Badge>;
+        return <Badge className="bg-accent text-foreground">Potential Fit</Badge>;
       case "weak_fit":
-        return <Badge className="bg-orange-100 text-orange-800">Weak Fit</Badge>;
+        return <Badge className="bg-accent text-foreground">Weak Fit</Badge>;
       case "pass":
-        return <Badge className="bg-red-100 text-red-800">Pass</Badge>;
+        return <Badge className="bg-destructive/15 text-destructive">Pass</Badge>;
       default:
         return null;
     }
@@ -401,25 +401,25 @@ function ResultDetail({
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   {company?.display_name ?? result.company_orgnr}
                 </h2>
                 <Link
                   to={`/company/${result.company_orgnr}`}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-primary hover:text-primary"
                 >
                   <ExternalLink className="w-5 h-5" />
                 </Link>
               </div>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {company?.industry_label} • {company?.region ?? ""}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-4xl font-bold text-gray-900 mb-1">
+              <p className="text-4xl font-bold text-foreground mb-1">
                 {result.overall_score}
               </p>
-              <p className="text-sm text-gray-600">AI Fit Score</p>
+              <p className="text-sm text-muted-foreground">AI Fit Score</p>
               {getRecommendationBadge(result.recommendation)}
             </div>
           </div>
@@ -442,31 +442,31 @@ function ResultDetail({
                   <div key={dim.id}>
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-medium text-gray-900">{dim.name}</p>
+                        <p className="font-medium text-foreground">{dim.name}</p>
                         {dim.description && (
-                          <p className="text-xs text-gray-600">{dim.description}</p>
+                          <p className="text-xs text-muted-foreground">{dim.description}</p>
                         )}
                       </div>
                       <span
                         className={`text-2xl font-bold ${
                           score >= 75
-                            ? "text-green-600"
+                            ? "text-primary"
                             : score >= 50
-                              ? "text-yellow-600"
-                              : "text-red-600"
+                              ? "text-foreground"
+                              : "text-destructive"
                         }`}
                       >
                         {Math.round(score)}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
                           score >= 75
-                            ? "bg-green-600"
+                            ? "bg-primary"
                             : score >= 50
-                              ? "bg-yellow-600"
-                              : "bg-red-600"
+                              ? "bg-accent"
+                              : "bg-destructive"
                         }`}
                         style={{ width: `${score}%` }}
                       />
@@ -487,20 +487,20 @@ function ResultDetail({
           <CardContent>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-gray-600 mb-1">Revenue</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-muted-foreground mb-1">Revenue</p>
+                <p className="font-medium text-foreground">
                   {formatRevenueSEK(getLatestFinancials(company).revenue ?? company.revenue_latest)}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">EBITDA</p>
-                <p className="font-medium text-gray-900">
+                <p className="text-muted-foreground mb-1">EBITDA</p>
+                <p className="font-medium text-foreground">
                   {formatRevenueSEK(getLatestFinancials(company).ebitda)}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 mb-1">Growth</p>
-                <p className={`font-medium ${(calculateRevenueCagr(company) ?? 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
+                <p className="text-muted-foreground mb-1">Growth</p>
+                <p className={`font-medium ${(calculateRevenueCagr(company) ?? 0) >= 0 ? "text-primary" : "text-destructive"}`}>
                   {calculateRevenueCagr(company) != null ? formatPercent(calculateRevenueCagr(company)!) : "—"}
                 </p>
               </div>
@@ -514,7 +514,7 @@ function ResultDetail({
           <CardTitle>AI Analysis Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+          <p className="text-foreground whitespace-pre-line leading-relaxed">
             {result.summary || "No summary available."}
           </p>
         </CardContent>
@@ -525,7 +525,7 @@ function ResultDetail({
           {result.strengths?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-700">
+                <CardTitle className="flex items-center gap-2 text-primary">
                   <TrendingUp className="w-5 h-5" />
                   Key Strengths
                 </CardTitle>
@@ -534,8 +534,8 @@ function ResultDetail({
                 <ul className="space-y-2">
                   {result.strengths.map((s, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{s}</span>
+                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground">{s}</span>
                     </li>
                   ))}
                 </ul>
@@ -545,7 +545,7 @@ function ResultDetail({
           {result.concerns?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-700">
+                <CardTitle className="flex items-center gap-2 text-destructive">
                   <AlertTriangle className="w-5 h-5" />
                   Concerns & Red Flags
                 </CardTitle>
@@ -554,8 +554,8 @@ function ResultDetail({
                 <ul className="space-y-2">
                   {result.concerns.map((c, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{c}</span>
+                      <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground">{c}</span>
                     </li>
                   ))}
                 </ul>
@@ -570,14 +570,14 @@ function ResultDetail({
           <Button
             variant="outline"
             onClick={() => onReject(result.id)}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             <ThumbsDown className="w-4 h-4 mr-2" />
             Reject
           </Button>
           <Button
             onClick={() => onApprove(result.id)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
           >
             <ThumbsUp className="w-4 h-4 mr-2" />
             Approve

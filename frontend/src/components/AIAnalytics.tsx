@@ -696,17 +696,17 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-100'
-    if (score >= 60) return 'text-blue-600 bg-blue-100'
-    if (score >= 40) return 'text-yellow-600 bg-yellow-100'
-    return 'text-red-600 bg-red-100'
+    if (score >= 80) return 'text-primary bg-primary/15'
+    if (score >= 60) return 'text-primary bg-primary/15'
+    if (score >= 40) return 'text-foreground bg-accent'
+    return 'text-destructive bg-destructive/15'
   }
 
   const getPrimeTargetBadge = (score: number) => {
-    if (score >= 80) return { text: 'TOP TARGET', color: 'bg-red-500 text-white' }
-    if (score >= 60) return { text: 'HÖG POTENTIAL', color: 'bg-orange-500 text-white' }
-    if (score >= 40) return { text: 'INTEGRATION', color: 'bg-blue-500 text-white' }
-    return { text: 'LÅG PRIORITET', color: 'bg-gray-500 text-white' }
+    if (score >= 80) return { text: 'TOP TARGET', color: 'bg-destructive text-primary-foreground' }
+    if (score >= 60) return { text: 'HÖG POTENTIAL', color: 'bg-accent text-primary-foreground' }
+    if (score >= 40) return { text: 'INTEGRATION', color: 'bg-primary text-primary-foreground' }
+    return { text: 'LÅG PRIORITET', color: 'bg-muted-foreground text-primary-foreground' }
   }
 
   if (savedLists.length === 0) {
@@ -714,9 +714,9 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
       <div className="space-y-6">
         <Card>
           <CardContent className="p-8 text-center">
-            <Brain className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+            <Brain className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-xl font-semibold mb-2">Inga sparade listor hittades</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               Skapa en sparad företagslista i "Företagssökning" för att köra AI-analys
             </p>
             <Button onClick={() => (window.location.href = '/dashboard?view=companies')}>
@@ -733,8 +733,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-[#2E2A2B]">AI-insikter</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-foreground">AI-insikter</h2>
+          <p className="text-muted-foreground">
             Utforska sparade bolagslistor med AI för att generera investeringshypoteser, risker och nästa steg.
           </p>
         </div>
@@ -750,39 +750,39 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
         </div>
       </div>
 
-      <Card className="border-[#596152]/30 bg-[#E6E6E6]/40">
+      <Card className="border-primary/30 bg-muted/40">
         <CardHeader>
-          <CardTitle className="text-lg text-[#2E2A2B]">Hur använder jag AI-insikter?</CardTitle>
+          <CardTitle className="text-lg text-foreground">Hur använder jag AI-insikter?</CardTitle>
           <CardDescription>
             Följ den föreslagna loopen för att gå från sparad lista till beslutbara rekommendationer.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+            <div className="rounded-lg border border-primary/20 bg-card/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <List className="h-4 w-4" />
                 1. Förbered input
               </div>
-              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Välj en sparad lista från Företagssökning och ange eventuell frågeställning eller fokusområde.
               </p>
             </div>
-            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+            <div className="rounded-lg border border-primary/20 bg-card/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Brain className="h-4 w-4" />
                 2. Kör analys
               </div>
-              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Starta AI-flödet, följ kostnadsindikatorn och granska de genererade insikterna för varje bolag.
               </p>
             </div>
-            <div className="rounded-lg border border-[#596152]/20 bg-white/80 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#2E2A2B]">
+            <div className="rounded-lg border border-primary/20 bg-card/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Target className="h-4 w-4" />
                 3. Förfina & spara
               </div>
-              <p className="mt-2 text-sm text-[#2E2A2B]/70">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Justera frågorna, spara de viktigaste insikterna till listor eller exportera dem för vidare beslut.
               </p>
             </div>
@@ -918,9 +918,9 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
       {loading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <Brain className="h-12 w-12 mx-auto text-blue-600 mb-4 animate-pulse" />
+            <Brain className="h-12 w-12 mx-auto text-primary mb-4 animate-pulse" />
             <h3 className="text-lg font-semibold mb-2">Kör AI-analys...</h3>
-            <p className="text-gray-600 mb-4">Analyserar företagsdata och genererar insikter</p>
+            <p className="text-muted-foreground mb-4">Analyserar företagsdata och genererar insikter</p>
             <Progress value={66} className="w-full max-w-xs mx-auto" />
           </CardContent>
         </Card>
@@ -934,10 +934,10 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Analyserade företag</p>
+                    <p className="text-sm font-medium text-muted-foreground">Analyserade företag</p>
                     <p className="text-2xl font-bold">{analysisResults.length}</p>
                   </div>
-                  <Building2 className="h-8 w-8 text-blue-600" />
+                  <Building2 className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -946,12 +946,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Prime targets</p>
-                    <p className="text-2xl font-bold text-red-600">
+                    <p className="text-sm font-medium text-muted-foreground">Prime targets</p>
+                    <p className="text-2xl font-bold text-destructive">
                       {analysisResults.filter(r => r.primeTargetScore >= 70).length}
                     </p>
                   </div>
-                  <Target className="h-8 w-8 text-red-600" />
+                  <Target className="h-8 w-8 text-destructive" />
                 </div>
               </CardContent>
             </Card>
@@ -960,12 +960,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Genomsnittlig score</p>
+                    <p className="text-sm font-medium text-muted-foreground">Genomsnittlig score</p>
                     <p className="text-2xl font-bold">
                       {Math.round(analysisResults.reduce((sum, r) => sum + r.overallScore, 0) / analysisResults.length)}
                     </p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-green-600" />
+                  <TrendingUp className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -974,12 +974,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Högsta potential</p>
-                    <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-sm font-medium text-muted-foreground">Högsta potential</p>
+                    <p className="text-2xl font-bold text-primary">
                       {Math.round(Math.max(...analysisResults.map(r => r.primeTargetScore)))}
                     </p>
                   </div>
-                  <Zap className="h-8 w-8 text-purple-600" />
+                  <Zap className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -989,7 +989,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Target className="h-5 w-5 mr-2 text-red-600" />
+                <Target className="h-5 w-5 mr-2 text-destructive" />
                 Prime Targets - Rankade efter potential
               </CardTitle>
               <CardDescription>
@@ -1003,7 +1003,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                   return (
                     <div 
                       key={analysis.company.OrgNr}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 cursor-pointer"
                       onClick={() => {
                         setSelectedCompany(analysis)
                         setIsDetailModalOpen(true)
@@ -1011,12 +1011,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
                             {index + 1}
                           </div>
                           <div>
                             <h4 className="font-semibold">{analysis.company.name}</h4>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-muted-foreground">
                               {analysis.company.segment_name} • {formatCurrency(analysis.company.SDI || 0)} • {(analysis.company.Revenue_growth || 0) * 100}% tillväxt
                             </p>
                           </div>
@@ -1038,7 +1038,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                           <Badge className={primeBadge.color}>
                             {primeBadge.text}
                           </Badge>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-muted-foreground">
                             Prime Target Score: {Math.round(analysis.primeTargetScore)}
                           </span>
                         </div>
@@ -1046,12 +1046,12 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                       
                       <div className="flex items-center space-x-2">
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-purple-600">
+                          <div className="text-2xl font-bold text-primary">
                             {Math.round(analysis.primeTargetScore)}
                           </div>
-                          <div className="text-xs text-gray-500">Prime Score</div>
+                          <div className="text-xs text-muted-foreground">Prime Score</div>
                         </div>
-                        <ArrowUpRight className="h-5 w-5 text-gray-400" />
+                        <ArrowUpRight className="h-5 w-5 text-muted-foreground" />
                       </div>
                     </div>
                   )
@@ -1088,7 +1088,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                       </div>
                       <div className="flex justify-between">
                         <span>Top performers:</span>
-                        <span className="font-medium text-green-600">{benchmark.topPerformers}</span>
+                        <span className="font-medium text-primary">{benchmark.topPerformers}</span>
                       </div>
                     </div>
                   </div>
@@ -1119,7 +1119,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
             
             // Ensure aiAnalysis is not undefined
             if (!aiAnalysis) {
-              return <div className="p-4 text-center text-gray-500">No analysis available</div>
+              return <div className="p-4 text-center text-muted-foreground">No analysis available</div>
             }
             
             return (
@@ -1136,51 +1136,51 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">AI-analys sammanfattning</h4>
-                          <p className="text-sm text-gray-600">{aiAnalysis?.executiveSummary || 'No summary available'}</p>
+                          <h4 className="font-semibold text-foreground mb-2">AI-analys sammanfattning</h4>
+                          <p className="text-sm text-muted-foreground">{aiAnalysis?.executiveSummary || 'No summary available'}</p>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Investeringsargument</h4>
-                          <p className="text-sm text-gray-600">{aiAnalysis?.investmentThesis || 'No investment thesis available'}</p>
+                          <h4 className="font-semibold text-foreground mb-2">Investeringsargument</h4>
+                          <p className="text-sm text-muted-foreground">{aiAnalysis?.investmentThesis || 'No investment thesis available'}</p>
                         </div>
                       </div>
                       
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="text-center p-3 bg-blue-50 rounded-lg">
-                            <div className="text-lg font-bold text-blue-600">
+                          <div className="text-center p-3 bg-primary/10 rounded-lg">
+                            <div className="text-lg font-bold text-primary">
                               {(aiAnalysis?.financialHealth || 'unknown').toUpperCase()}
                             </div>
-                            <div className="text-xs text-blue-800">Finansiell Hälsa</div>
+                            <div className="text-xs text-primary">Finansiell Hälsa</div>
                           </div>
-                          <div className="text-center p-3 bg-green-50 rounded-lg">
-                            <div className="text-lg font-bold text-green-600">
+                          <div className="text-center p-3 bg-primary/10 rounded-lg">
+                            <div className="text-lg font-bold text-primary">
                               {(aiAnalysis?.growthPotential || 'unknown').toUpperCase()}
                             </div>
-                            <div className="text-xs text-green-800">Tillväxtpotential</div>
+                            <div className="text-xs text-primary">Tillväxtpotential</div>
                           </div>
                         </div>
                         
-                        <div className="text-center p-4 bg-purple-50 rounded-lg">
-                          <div className="text-xl font-bold text-purple-600 mb-1">
+                        <div className="text-center p-4 bg-accent/60 rounded-lg">
+                          <div className="text-xl font-bold text-primary mb-1">
                             {(aiAnalysis?.recommendation || 'hold').replace('_', ' ').toUpperCase()}
                           </div>
-                          <div className="text-xs text-purple-800">AI Rekommendation</div>
-                          <div className="text-xs text-gray-600 mt-1">
+                          <div className="text-xs text-primary">AI Rekommendation</div>
+                          <div className="text-xs text-muted-foreground mt-1">
                             Confidence: {Math.round(aiAnalysis?.confidence || 0)}%
                           </div>
                         </div>
                       </div>
                       
                       <div className="space-y-4">
-                        <div className="text-center p-3 bg-orange-50 rounded-lg">
-                          <div className="text-lg font-bold text-orange-600">
+                        <div className="text-center p-3 bg-accent/60 rounded-lg">
+                          <div className="text-lg font-bold text-foreground">
                             {(aiAnalysis?.marketOutlook || 'neutral').toUpperCase()}
                           </div>
-                          <div className="text-xs text-orange-800">Marknadsutsikt</div>
+                          <div className="text-xs text-foreground">Marknadsutsikt</div>
                         </div>
                         
-                        <div className="text-center p-2 bg-gray-100 rounded text-xs text-gray-600">
+                        <div className="text-center p-2 bg-muted rounded text-xs text-muted-foreground">
                           Analysdatum: {aiAnalysis?.analysisDate || new Date().toISOString().split('T')[0]}
                         </div>
                       </div>
@@ -1200,8 +1200,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       {/* Profitability Ratios */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-700 flex items-center">
-                          <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                        <h4 className="font-semibold text-foreground flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2 text-primary" />
                           Lönsamhet
                         </h4>
                         <div className="space-y-2 text-sm">
@@ -1230,8 +1230,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
 
                       {/* Liquidity Ratios */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-700 flex items-center">
-                          <Activity className="h-4 w-4 mr-2 text-blue-600" />
+                        <h4 className="font-semibold text-foreground flex items-center">
+                          <Activity className="h-4 w-4 mr-2 text-primary" />
                           Likviditet
                         </h4>
                         <div className="space-y-2 text-sm">
@@ -1256,8 +1256,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
 
                       {/* Efficiency Ratios */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-700 flex items-center">
-                          <Zap className="h-4 w-4 mr-2 text-purple-600" />
+                        <h4 className="font-semibold text-foreground flex items-center">
+                          <Zap className="h-4 w-4 mr-2 text-primary" />
                           Effektivitet
                         </h4>
                         <div className="space-y-2 text-sm">
@@ -1282,8 +1282,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
 
                       {/* Valuation Metrics */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-700 flex items-center">
-                          <DollarSign className="h-4 w-4 mr-2 text-orange-600" />
+                        <h4 className="font-semibold text-foreground flex items-center">
+                          <DollarSign className="h-4 w-4 mr-2 text-foreground" />
                           Värdering
                         </h4>
                         <div className="space-y-2 text-sm">
@@ -1321,18 +1321,18 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Marknadsposition</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Marknadsposition</h4>
                           <Badge className={`${
-                            softFactors.marketPosition === 'leader' ? 'bg-green-500' :
-                            softFactors.marketPosition === 'challenger' ? 'bg-blue-500' :
-                            softFactors.marketPosition === 'follower' ? 'bg-yellow-500' : 'bg-gray-500'
-                          } text-white`}>
+                            softFactors.marketPosition === 'leader' ? 'bg-primary' :
+                            softFactors.marketPosition === 'challenger' ? 'bg-primary' :
+                            softFactors.marketPosition === 'follower' ? 'bg-accent' : 'bg-muted-foreground'
+                          } text-primary-foreground`}>
                             {softFactors.marketPosition.toUpperCase()}
                           </Badge>
                         </div>
                         
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Konkurrensfördelar</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Konkurrensfördelar</h4>
                           <div className="space-y-1">
                             {softFactors.competitiveAdvantage.map((advantage, index) => (
                               <Badge key={index} variant="outline" className="mr-1 mb-1">
@@ -1345,32 +1345,32 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
 
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="text-center p-3 bg-blue-50 rounded-lg">
-                            <div className="text-lg font-bold text-blue-600">
+                          <div className="text-center p-3 bg-primary/10 rounded-lg">
+                            <div className="text-lg font-bold text-primary">
                               {Math.round(softFactors.digitalMaturity)}%
                             </div>
-                            <div className="text-xs text-blue-800">Digital Mognad</div>
+                            <div className="text-xs text-primary">Digital Mognad</div>
                           </div>
-                          <div className="text-center p-3 bg-purple-50 rounded-lg">
-                            <div className="text-lg font-bold text-purple-600">
+                          <div className="text-center p-3 bg-accent/60 rounded-lg">
+                            <div className="text-lg font-bold text-primary">
                               {Math.round(softFactors.innovationScore)}%
                             </div>
-                            <div className="text-xs text-purple-800">Innovation</div>
+                            <div className="text-xs text-primary">Innovation</div>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="text-center p-3 bg-green-50 rounded-lg">
-                            <div className="text-lg font-bold text-green-600">
+                          <div className="text-center p-3 bg-primary/10 rounded-lg">
+                            <div className="text-lg font-bold text-primary">
                               {Math.round(softFactors.brandStrength)}%
                             </div>
-                            <div className="text-xs text-green-800">Varumärke</div>
+                            <div className="text-xs text-primary">Varumärke</div>
                           </div>
-                          <div className="text-center p-3 bg-orange-50 rounded-lg">
-                            <div className="text-lg font-bold text-orange-600">
+                          <div className="text-center p-3 bg-accent/60 rounded-lg">
+                            <div className="text-lg font-bold text-foreground">
                               {Math.round(softFactors.customerSatisfaction)}%
                             </div>
-                            <div className="text-xs text-orange-800">Kundnöjdhet</div>
+                            <div className="text-xs text-foreground">Kundnöjdhet</div>
                           </div>
                         </div>
                       </div>
@@ -1392,17 +1392,17 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <div className="text-lg font-bold text-gray-600">
+                          <div className="text-center p-3 bg-muted/40 rounded-lg">
+                            <div className="text-lg font-bold text-muted-foreground">
                               {Math.round(softFactors.governanceQuality)}%
                             </div>
-                            <div className="text-xs text-gray-800">Styrning</div>
+                            <div className="text-xs text-foreground">Styrning</div>
                           </div>
-                          <div className="text-center p-3 bg-red-50 rounded-lg">
-                            <div className="text-lg font-bold text-red-600">
+                          <div className="text-center p-3 bg-destructive/10 rounded-lg">
+                            <div className="text-lg font-bold text-destructive">
                               {Math.round(softFactors.riskManagement)}%
                             </div>
-                            <div className="text-xs text-red-800">Riskhantering</div>
+                            <div className="text-xs text-destructive">Riskhantering</div>
                           </div>
                         </div>
                       </div>
@@ -1415,7 +1415,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                   {/* Strengths & Opportunities */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center text-green-700">
+                      <CardTitle className="flex items-center text-primary">
                         <CheckCircle className="h-5 w-5 mr-2" />
                         Styrkor & Möjligheter
                       </CardTitle>
@@ -1423,24 +1423,24 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <CardContent>
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Nyckelfördelar</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Nyckelfördelar</h4>
                           <div className="space-y-2">
                             {(aiAnalysis?.keyStrengths || []).map((strength, index) => (
                               <div key={index} className="flex items-start space-x-2">
-                                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                <span className="text-sm text-gray-700">{strength}</span>
+                                <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-foreground">{strength}</span>
                               </div>
                             ))}
                           </div>
                         </div>
                         
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Strategiska Möjligheter</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Strategiska Möjligheter</h4>
                           <div className="space-y-2">
                             {(aiAnalysis?.strategicOpportunities || []).map((opportunity, index) => (
                               <div key={index} className="flex items-start space-x-2">
-                                <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                                <span className="text-sm text-gray-700">{opportunity}</span>
+                                <Lightbulb className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-foreground">{opportunity}</span>
                               </div>
                             ))}
                           </div>
@@ -1452,7 +1452,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                   {/* Weaknesses & Risks */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center text-red-700">
+                      <CardTitle className="flex items-center text-destructive">
                         <AlertTriangle className="h-5 w-5 mr-2" />
                         Utmaningar & Risker
                       </CardTitle>
@@ -1460,28 +1460,28 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <CardContent>
                       <div className="space-y-4">
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Svagheter</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Svagheter</h4>
                           <div className="space-y-2">
                             {(aiAnalysis?.keyWeaknesses || []).length > 0 ? (
                               (aiAnalysis?.keyWeaknesses || []).map((weakness, index) => (
                                 <div key={index} className="flex items-start space-x-2">
-                                  <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-sm text-gray-700">{weakness}</span>
+                                  <AlertTriangle className="h-4 w-4 text-foreground mt-0.5 flex-shrink-0" />
+                                  <span className="text-sm text-foreground">{weakness}</span>
                                 </div>
                               ))
                             ) : (
-                              <span className="text-sm text-gray-500 italic">Inga betydande svagheter identifierade</span>
+                              <span className="text-sm text-muted-foreground italic">Inga betydande svagheter identifierade</span>
                             )}
                           </div>
                         </div>
                         
                         <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Stora Risker</h4>
+                          <h4 className="font-semibold text-foreground mb-2">Stora Risker</h4>
                           <div className="space-y-2">
                             {(aiAnalysis?.majorRisks || []).map((risk, index) => (
                               <div key={index} className="flex items-start space-x-2">
-                                <Shield className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                                <span className="text-sm text-gray-700">{risk}</span>
+                                <Shield className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-foreground">{risk}</span>
                               </div>
                             ))}
                           </div>
@@ -1503,47 +1503,47 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Adress:</span>
                         </div>
-                        <p className="text-sm text-gray-600 ml-6">{selectedCompany.company.address || 'Ej tillgänglig'}</p>
+                        <p className="text-sm text-muted-foreground ml-6">{selectedCompany.company.address || 'Ej tillgänglig'}</p>
                       </div>
                       
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Stad:</span>
                         </div>
-                        <p className="text-sm text-gray-600 ml-6">{selectedCompany.company.city || 'Ej tillgänglig'}</p>
+                        <p className="text-sm text-muted-foreground ml-6">{selectedCompany.company.city || 'Ej tillgänglig'}</p>
                       </div>
                       
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Users className="h-4 w-4 text-gray-500" />
+                          <Users className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Anställda:</span>
                         </div>
-                        <p className="text-sm text-gray-600 ml-6">{selectedCompany.company.employees || 'Ej tillgänglig'}</p>
+                        <p className="text-sm text-muted-foreground ml-6">{selectedCompany.company.employees || 'Ej tillgänglig'}</p>
                       </div>
                       
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4 text-gray-500" />
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Grundat:</span>
                         </div>
-                        <p className="text-sm text-gray-600 ml-6">{selectedCompany.company.incorporation_date || 'Ej tillgänglig'}</p>
+                        <p className="text-sm text-muted-foreground ml-6">{selectedCompany.company.incorporation_date || 'Ej tillgänglig'}</p>
                       </div>
                     </div>
                     
                     {selectedCompany.company.homepage && (
                       <div className="mt-4 pt-4 border-t">
                         <div className="flex items-center space-x-2">
-                          <ExternalLink className="h-4 w-4 text-gray-500" />
+                          <ExternalLink className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Webbplats:</span>
                           <a 
                             href={selectedCompany.company.homepage} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-sm underline"
+                            className="text-primary hover:text-primary text-sm underline"
                           >
                             {selectedCompany.company.homepage}
                           </a>

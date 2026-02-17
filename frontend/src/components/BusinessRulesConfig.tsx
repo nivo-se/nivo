@@ -54,7 +54,7 @@ const BusinessRulesConfig: React.FC = () => {
             <Settings className="h-6 w-6" />
             Business Rules Configuration
           </h2>
-          <p className="text-gray-600">Define thresholds for categorizing companies</p>
+          <p className="text-muted-foreground">Define thresholds for categorizing companies</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={resetRules}>
@@ -69,9 +69,9 @@ const BusinessRulesConfig: React.FC = () => {
       </div>
 
       {hasChanges && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800 font-medium">You have unsaved changes</p>
-          <p className="text-yellow-700 text-sm">Click "Save Changes" to apply your modifications</p>
+        <div className="bg-accent/60 border border-accent rounded-lg p-4">
+          <p className="text-foreground font-medium">You have unsaved changes</p>
+          <p className="text-foreground text-sm">Click "Save Changes" to apply your modifications</p>
         </div>
       )}
 
@@ -98,7 +98,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.profitability.high.min}
                   onChange={(e) => updateRule('profitability', 'high', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.profitability.high.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.profitability.high.min)}</p>
               </div>
               <div>
                 <Label htmlFor="good-profit-min">Good Profitability (≥)</Label>
@@ -111,7 +111,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.profitability.good.min}
                   onChange={(e) => updateRule('profitability', 'good', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.profitability.good.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.profitability.good.min)}</p>
               </div>
               <div>
                 <Label htmlFor="low-profit-min">Low Profitability (≥)</Label>
@@ -124,7 +124,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.profitability.low.min}
                   onChange={(e) => updateRule('profitability', 'low', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.profitability.low.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.profitability.low.min)}</p>
               </div>
             </div>
             <Separator />
@@ -160,7 +160,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.growth.high.min}
                   onChange={(e) => updateRule('growth', 'high', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.growth.high.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.growth.high.min)}</p>
               </div>
               <div>
                 <Label htmlFor="medium-growth-min">Medium Growth (≥)</Label>
@@ -171,7 +171,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.growth.medium.min}
                   onChange={(e) => updateRule('growth', 'medium', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.growth.medium.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.growth.medium.min)}</p>
               </div>
               <div>
                 <Label htmlFor="low-growth-min">Low Growth (≥)</Label>
@@ -182,7 +182,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.growth.low.min}
                   onChange={(e) => updateRule('growth', 'low', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.growth.low.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.growth.low.min)}</p>
               </div>
               <div>
                 <Label htmlFor="declining-min">Declining (≥)</Label>
@@ -193,7 +193,7 @@ const BusinessRulesConfig: React.FC = () => {
                   value={rules.growth.declining.min}
                   onChange={(e) => updateRule('growth', 'declining', 'min', parseFloat(e.target.value) || 0)}
                 />
-                <p className="text-xs text-gray-500 mt-1">{formatPercentage(rules.growth.declining.min)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatPercentage(rules.growth.declining.min)}</p>
               </div>
             </div>
             <Separator />
@@ -230,7 +230,7 @@ const BusinessRulesConfig: React.FC = () => {
                     value={rules.companySize.micro.maxRevenue}
                     onChange={(e) => updateRule('companySize', 'micro', 'maxRevenue', parseInt(e.target.value) || 0)}
                   />
-                  <p className="text-xs text-gray-500 mt-1">{formatRevenue(rules.companySize.micro.maxRevenue)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatRevenue(rules.companySize.micro.maxRevenue)}</p>
                 </div>
                 <div>
                   <Label htmlFor="micro-max-employees">Micro Max Employees</Label>
@@ -253,7 +253,7 @@ const BusinessRulesConfig: React.FC = () => {
                     value={rules.companySize.small.maxRevenue}
                     onChange={(e) => updateRule('companySize', 'small', 'maxRevenue', parseInt(e.target.value) || 0)}
                   />
-                  <p className="text-xs text-gray-500 mt-1">{formatRevenue(rules.companySize.small.maxRevenue)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatRevenue(rules.companySize.small.maxRevenue)}</p>
                 </div>
                 <div>
                   <Label htmlFor="small-max-employees">Small Max Employees</Label>

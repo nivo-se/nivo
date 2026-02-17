@@ -77,7 +77,7 @@ export function AddToListDropdown({
               disabled={addMutation.isPending}
             >
               {list.name}
-              <span className="text-gray-400 ml-1">({list.companyIds.length})</span>
+              <span className="text-muted-foreground ml-1">({list.companyIds.length})</span>
             </DropdownMenuItem>
           ))
         )}

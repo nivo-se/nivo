@@ -16,21 +16,21 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
     if (lowerFinding.includes('styrka') || lowerFinding.includes('positiv') || 
         lowerFinding.includes('bra') || lowerFinding.includes('hög') ||
         lowerFinding.includes('tillväxt') || lowerFinding.includes('förbättring')) {
-      return <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+      return <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
     }
     
     if (lowerFinding.includes('risk') || lowerFinding.includes('negativ') || 
         lowerFinding.includes('problem') || lowerFinding.includes('låg') ||
         lowerFinding.includes('brist') || lowerFinding.includes('utmaning')) {
-      return <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+      return <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
     }
     
     if (lowerFinding.includes('trend') || lowerFinding.includes('förändring') ||
         lowerFinding.includes('utveckling') || lowerFinding.includes('möjlighet')) {
-      return <TrendingUp className="h-4 w-4 text-blue-600 flex-shrink-0" />
+      return <TrendingUp className="h-4 w-4 text-primary flex-shrink-0" />
     }
     
-    return <Info className="h-4 w-4 text-gray-600 flex-shrink-0" />
+    return <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
   }
 
   const getFindingColor = (finding: string) => {
@@ -39,16 +39,16 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
     if (lowerFinding.includes('styrka') || lowerFinding.includes('positiv') || 
         lowerFinding.includes('bra') || lowerFinding.includes('hög') ||
         lowerFinding.includes('tillväxt') || lowerFinding.includes('förbättring')) {
-      return 'border-l-green-500 bg-green-50'
+      return 'border-l-green-500 bg-primary/10'
     }
     
     if (lowerFinding.includes('risk') || lowerFinding.includes('negativ') || 
         lowerFinding.includes('problem') || lowerFinding.includes('låg') ||
         lowerFinding.includes('brist') || lowerFinding.includes('utmaning')) {
-      return 'border-l-red-500 bg-red-50'
+      return 'border-l-red-500 bg-destructive/10'
     }
     
-    return 'border-l-blue-500 bg-blue-50'
+    return 'border-l-blue-500 bg-primary/10'
   }
 
   const findings = company.keyFindings || [
@@ -61,7 +61,7 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Info className="h-5 w-5 text-blue-600" />
+          <Info className="h-5 w-5 text-primary" />
           Nyckelfynd
         </CardTitle>
       </CardHeader>
@@ -73,7 +73,7 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
               className={`flex items-start gap-3 p-3 rounded-lg border-l-4 ${getFindingColor(finding)}`}
             >
               {getFindingIcon(finding)}
-              <p className="text-sm text-gray-700 leading-relaxed flex-1">
+              <p className="text-sm text-foreground leading-relaxed flex-1">
                 {finding}
               </p>
             </div>
@@ -81,8 +81,8 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
         </div>
         
         {findings.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <Info className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+          <div className="text-center py-8 text-muted-foreground">
+            <Info className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
             <p className="text-sm">Inga nyckelfynd tillgängliga</p>
           </div>
         )}

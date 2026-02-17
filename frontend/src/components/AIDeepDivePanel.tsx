@@ -57,26 +57,26 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
   const getImpactColor = (range: string | null | undefined) => {
     switch (range) {
       case 'High':
-        return 'bg-green-100 text-green-800 border-green-300'
+        return 'bg-primary/15 text-primary border-primary/50'
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300'
+        return 'bg-accent text-foreground border-accent'
       case 'Low':
-        return 'bg-blue-100 text-blue-800 border-blue-300'
+        return 'bg-primary/15 text-primary border-primary/50'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300'
+        return 'bg-muted text-foreground border-border'
     }
   }
 
   const getEffortColor = (effort: string) => {
     switch (effort) {
       case 'Low':
-        return 'bg-green-100 text-green-800'
+        return 'bg-primary/15 text-primary'
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-accent text-foreground'
       case 'High':
-        return 'bg-red-100 text-red-800'
+        return 'bg-destructive/15 text-destructive'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-muted text-foreground'
     }
   }
 
@@ -179,7 +179,7 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-600" />
+              <AlertCircle className="h-5 w-5 text-foreground" />
               Key Weaknesses
             </CardTitle>
           </CardHeader>
@@ -187,7 +187,7 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
             <ul className="space-y-2">
               {report.weaknesses.map((weakness, index) => (
                 <li key={index} className="flex items-start gap-2">
-                  <span className="text-orange-600 mt-1">•</span>
+                  <span className="text-foreground mt-1">•</span>
                   <span className="text-sm">{weakness}</span>
                 </li>
               ))}
@@ -201,7 +201,7 @@ export const AIDeepDivePanel: React.FC<AIDeepDivePanelProps> = ({ orgnr, company
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
+              <TrendingUp className="h-5 w-5 text-primary" />
               Operational Uplift Opportunities
             </CardTitle>
             {report.impact_range && (

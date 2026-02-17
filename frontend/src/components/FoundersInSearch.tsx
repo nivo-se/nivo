@@ -28,11 +28,11 @@ const FoundersInSearch: React.FC<FoundersInSearchProps> = ({ className }) => {
   ];
 
   return (
-    <section id="founders" className={cn('py-20 bg-platinum/70', className)}>
+    <section id="founders" className={cn('py-20 bg-muted/70', className)}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-heading text-jetBlack mb-8 text-center">Grundare vi stödjer</h2>
+            <h2 className="text-3xl md:text-4xl font-heading text-foreground mb-8 text-center">Grundare vi stödjer</h2>
           </FadeIn>
         </div>
 
@@ -41,8 +41,8 @@ const FoundersInSearch: React.FC<FoundersInSearchProps> = ({ className }) => {
             <FadeIn key={index} delay={150 + index * 50}>
               <Card className="h-full">
                 <CardContent className="p-6 space-y-3">
-                  <h3 className="text-xl font-heading font-semibold text-jetBlack">{type.title}</h3>
-                  <p className="text-jetBlack/75">{type.description}</p>
+                  <h3 className="text-xl font-heading font-semibold text-foreground">{type.title}</h3>
+                  <p className="text-foreground/75">{type.description}</p>
                 </CardContent>
               </Card>
             </FadeIn>

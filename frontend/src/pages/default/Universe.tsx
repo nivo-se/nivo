@@ -12,19 +12,19 @@ import { toast } from "@/hooks/use-toast";
 import type { Company } from "@/types/figma";
 import type { UniverseQueryPayload } from "@/lib/services/universeQueryService";
 import {
-  getNewUniverseStateFromUrl,
-  buildNewUniverseSearchParams,
-} from "@/lib/newUniverseUrlState";
+  getDefaultUniverseStateFromUrl,
+  buildDefaultUniverseSearchParams,
+} from "@/lib/defaultUniverseUrlState";
 import { includeRulesToBackendFilters } from "@/lib/filterConversion";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FilterBuilder } from "@/components/new/FilterBuilder";
-import { SaveListDialog } from "@/components/new/SaveListDialog";
-import { AddToListDropdown } from "@/components/new/AddToListDropdown";
-import { CompanySnapshotModal } from "@/components/new/CompanySnapshotModal";
-import { EmptyState } from "@/components/new/EmptyState";
-import { ErrorState } from "@/components/new/ErrorState";
+import { FilterBuilder } from "@/components/default/FilterBuilder";
+import { SaveListDialog } from "@/components/default/SaveListDialog";
+import { AddToListDropdown } from "@/components/default/AddToListDropdown";
+import { CompanySnapshotModal } from "@/components/default/CompanySnapshotModal";
+import { EmptyState } from "@/components/default/EmptyState";
+import { ErrorState } from "@/components/default/ErrorState";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const COMPANIES_PER_PAGE = 50;
@@ -110,7 +110,7 @@ function SortableHeader({
   return (
     <button
       type="button"
-      className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900"
+      className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
       onClick={() => onClick(field)}
     >
       {label}
@@ -128,7 +128,7 @@ export default function NewUniverse() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const urlState = useMemo(() => getNewUniverseStateFromUrl(searchParams), [searchParams]);
+  const urlState = useMemo(() => getDefaultUniverseStateFromUrl(searchParams), [searchParams]);
   const [initialUrlState] = useState(() => urlState ?? null);
 
   const [searchInput, setSearchInput] = useState(initialUrlState?.q ?? "");
@@ -165,7 +165,7 @@ export default function NewUniverse() {
     const filters = includeRules
       .filter((r) => r.field && r.operator != null)
       .map((r) => ({ field: r.field!, operator: r.operator!, value: r.value }));
-    const next = buildNewUniverseSearchParams({
+    const next = buildDefaultUniverseSearchParams({
       q: debouncedQ || undefined,
       page: currentPage > 1 ? currentPage : undefined,
       sortField: sortField !== "name" ? sortField : undefined,
@@ -287,11 +287,11 @@ export default function NewUniverse() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="new-header border-b px-8 py-6">
+      <div className="app-header border-b px-8 py-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Universe</h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Universe</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               {showLoading
                 ? "Loading..."
                 : filteredCompanies.length > 0
@@ -341,12 +341,12 @@ export default function NewUniverse() {
 
         {!showFilters && (activeFilters.include.rules.length > 0 || activeFilters.exclude.rules.length > 0) && (
           <div className="mt-4 flex items-center gap-2 text-xs">
-            <span className="text-gray-600">Active filters:</span>
-            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">
+            <span className="text-muted-foreground">Active filters:</span>
+            <span className="px-2 py-1 bg-muted text-foreground rounded">
               {activeFilters.include.rules.length} include
             </span>
             {activeFilters.exclude.rules.length > 0 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">
+              <span className="px-2 py-1 bg-muted text-foreground rounded">
                 {activeFilters.exclude.rules.length} exclude
               </span>
             )}
@@ -359,10 +359,10 @@ export default function NewUniverse() {
 
       <div className="flex-1 overflow-auto px-8 py-4">
         {showLoading ? (
-          <div className="new-card p-12 text-center">
-            <div className="inline-block w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-sm text-gray-600">Loading companies...</p>
-            <p className="text-xs text-gray-500 mt-1">Fetching from database</p>
+          <div className="app-card p-12 text-center">
+            <div className="inline-block w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-sm text-muted-foreground">Loading companies...</p>
+            <p className="text-xs text-muted-foreground mt-1">Fetching from database</p>
           </div>
         ) : showError ? (
           <ErrorState
@@ -386,35 +386,35 @@ export default function NewUniverse() {
             }
           />
         ) : (
-        <div className="new-card overflow-hidden text-sm">
+        <div className="app-card overflow-hidden text-sm">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted/40 border-b border-border">
               <tr>
-                <th className="px-3 py-2 text-left w-10 text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-left w-10 text-xs font-medium text-muted-foreground">
                   <Checkbox
                     checked={filteredCompanies.length > 0 && selectedCompanies.size === filteredCompanies.length}
                     onCheckedChange={toggleSelectAll}
                   />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
                   <SortableHeader label="Company Name" field="name" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
                   <SortableHeader label="Industry" field="industry" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Geography</th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Geography</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
                   <SortableHeader label="Revenue" field="revenue" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
                   <SortableHeader label="3Y CAGR" field="cagr" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
                   <SortableHeader label="EBITDA Margin" field="margin" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-gray-600">Flags</th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-gray-600">AI</th>
-                <th className="px-3 py-2 w-20 text-xs font-medium text-gray-600">Actions</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground">Flags</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground">AI</th>
+                <th className="px-3 py-2 w-20 text-xs font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -423,7 +423,7 @@ export default function NewUniverse() {
                 const cagr = calculateRevenueCagr(company);
                 const cagrNum = cagr ?? 0;
                 return (
-                  <tr key={company.orgnr} className="hover:bg-gray-50 transition-colors">
+                  <tr key={company.orgnr} className="hover:bg-muted/40 transition-colors">
                     <td className="px-3 py-2">
                       <Checkbox
                         checked={selectedCompanies.has(company.orgnr)}
@@ -434,31 +434,31 @@ export default function NewUniverse() {
                       <button
                         type="button"
                         onClick={() => setSnapshotOrgnr(company.orgnr)}
-                        className="font-medium text-gray-700 hover:text-gray-900 text-left"
+                        className="font-medium text-foreground hover:text-foreground text-left"
                       >
                         {company.display_name}
                       </button>
                     </td>
-                    <td className="px-3 py-2 text-gray-700">{company.industry_label}</td>
-                    <td className="px-3 py-2 text-gray-700">{company.region ?? "—"}</td>
-                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
+                    <td className="px-3 py-2 text-foreground">{company.industry_label}</td>
+                    <td className="px-3 py-2 text-foreground">{company.region ?? "—"}</td>
+                    <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums">
                       {formatRevenueSEK(latest.revenue)}
                     </td>
-                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
+                    <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums">
                       {formatPercent(cagr)}
                     </td>
-                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
+                    <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums">
                       {formatPercent(latest.ebitdaMargin)}
                     </td>
-                    <td className="px-3 py-2 text-center text-xs text-gray-600">
+                    <td className="px-3 py-2 text-center text-xs text-muted-foreground">
                       {company.status === "inactive" && <span title="Inactive">INA</span>}
                       {!company.has_3y_financials && <span title="Incomplete financials"> INC</span>}
                     </td>
-                    <td className="px-3 py-2 text-center text-gray-600">
+                    <td className="px-3 py-2 text-center text-muted-foreground">
                       {company.ai_profile ? (
                         <span title={`Score: ${company.ai_profile.ai_fit_score}`}>✓</span>
                       ) : (
-                        <span className="text-gray-400">—</span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </td>
                     <td className="px-3 py-2">
@@ -474,7 +474,7 @@ export default function NewUniverse() {
 
         {filteredCompanies.length > 0 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-muted-foreground">
             Showing {(currentPage - 1) * COMPANIES_PER_PAGE + 1}–{Math.min(currentPage * COMPANIES_PER_PAGE, filteredCompanies.length)} of {filteredCompanies.length} on this page
           </p>
           <div className="flex gap-2">

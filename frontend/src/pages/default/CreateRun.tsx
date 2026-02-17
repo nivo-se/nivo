@@ -63,10 +63,10 @@ export default function NewCreateRun() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Invalid Configuration
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             {lists.length === 0
               ? "Create a list first in Universe or My Lists"
               : "Template or list not found"}
@@ -80,7 +80,7 @@ export default function NewCreateRun() {
   }
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-4xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/ai">
@@ -88,10 +88,10 @@ export default function NewCreateRun() {
               <ArrowLeft className="w-4 h-4 mr-1" /> Back to AI Lab
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Create AI Analysis Run
           </h1>
-          <p className="text-gray-600">Configure and launch your analysis</p>
+          <p className="text-muted-foreground">Configure and launch your analysis</p>
         </div>
 
         <div className="space-y-6">
@@ -120,15 +120,15 @@ export default function NewCreateRun() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-muted/40 rounded-lg">
                 <div>
-                  <p className="font-medium text-gray-900">{list.name}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-medium text-foreground">{list.name}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {list.companyIds.length} companies • Created{" "}
                     {new Date(list.created_at).toLocaleDateString()}
                   </p>
                 </div>
-                <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded">
+                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
                   {list.companyIds.length} companies
                 </span>
               </div>
@@ -142,21 +142,21 @@ export default function NewCreateRun() {
             <CardContent>
               <div className="space-y-3">
                 <div>
-                  <p className="font-medium text-gray-900">{template.name}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-medium text-foreground">{template.name}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {template.description}
                   </p>
                 </div>
                 {template.scoringDimensions.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">
+                    <p className="text-sm font-medium text-foreground mb-2">
                       Scoring Dimensions:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {template.scoringDimensions.map((dim) => (
                         <span
                           key={dim.id}
-                          className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded"
+                          className="text-xs px-2 py-1 bg-muted text-foreground rounded"
                         >
                           {dim.name} ({(dim.weight * 100).toFixed(0)}%)
                         </span>
@@ -184,11 +184,11 @@ export default function NewCreateRun() {
                   <div>
                     <label
                       htmlFor="auto-approve"
-                      className="text-sm font-medium text-gray-900 cursor-pointer"
+                      className="text-sm font-medium text-foreground cursor-pointer"
                     >
                       Auto-approve results
                     </label>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Automatically approve all AI results without manual review.
                     </p>
                   </div>
@@ -203,11 +203,11 @@ export default function NewCreateRun() {
                   <div>
                     <label
                       htmlFor="overwrite"
-                      className="text-sm font-medium text-gray-900 cursor-pointer"
+                      className="text-sm font-medium text-foreground cursor-pointer"
                     >
                       Overwrite existing AI profiles
                     </label>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Replace existing AI analysis results for companies in this
                       list
                     </p>
@@ -226,19 +226,19 @@ export default function NewCreateRun() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Estimated Cost</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="p-4 bg-primary/10 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Estimated Cost</p>
+                  <p className="text-2xl font-bold text-foreground">
                     ${estimatedCost.toFixed(2)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">~$0.20 per company</p>
+                  <p className="text-xs text-muted-foreground mt-1">~$0.20 per company</p>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Estimated Time</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="p-4 bg-primary/10 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Estimated Time</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {estimatedTime} min
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     ~10 companies per minute
                   </p>
                 </div>

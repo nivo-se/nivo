@@ -293,7 +293,7 @@ const SegmentationTiers: React.FC<SegmentationTiersProps> = ({ onCompanyClick })
                     type="checkbox"
                     checked={allSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-border"
                   />
                   <label className="text-sm text-muted-foreground">
                     Select all ({currentTierCompanies.length} companies)
@@ -319,7 +319,7 @@ const SegmentationTiers: React.FC<SegmentationTiersProps> = ({ onCompanyClick })
                         e.stopPropagation()
                         handleCompanySelect(company.OrgNr, e.target.checked)
                       }}
-                      className="mt-1 h-4 w-4 rounded border-gray-300"
+                      className="mt-1 h-4 w-4 rounded border-border"
                       onClick={(e) => e.stopPropagation()}
                     />
                     <div className="flex-1 min-w-0">

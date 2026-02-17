@@ -11,7 +11,7 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
   return (
     <section
       className={cn(
-        'relative flex min-h-[100svh] w-full items-stretch overflow-hidden bg-jetBlack md:min-h-screen',
+        'relative flex min-h-[100svh] w-full items-stretch overflow-hidden bg-card md:min-h-screen',
         className
       )}
     >
@@ -44,14 +44,14 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
 
           <FadeIn delay={300} duration={900} direction="up">
             <TextReveal delay={300} duration={1000}>
-              <p className="text-balance text-base font-heading font-medium text-white/90 sm:text-lg md:text-xl">
+              <p className="text-balance text-base font-heading font-medium text-primary-foreground/90 sm:text-lg md:text-xl">
                 Förvärv som skapar värde – tillväxt som består.
               </p>
             </TextReveal>
           </FadeIn>
 
           <FadeIn delay={600} duration={900} direction="up">
-            <p className="text-pretty text-sm text-white/80 sm:text-base md:text-lg">
+            <p className="text-pretty text-sm text-primary-foreground/80 sm:text-base md:text-lg">
               Vi investerar i nordiska kvalitetsbolag och tillför operativ expertis,
               teknologi och kapital för att accelerera hållbar tillväxt.
             </p>

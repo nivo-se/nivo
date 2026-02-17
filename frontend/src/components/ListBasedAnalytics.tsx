@@ -194,10 +194,10 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
           name: size, 
           count, 
           percentage: (count / totalCompanies) * 100,
-          color: size === 'Large (250+)' ? 'bg-gray-700' :
-                 size === 'Medium (50-249)' ? 'bg-gray-600' :
-                 size === 'Small (10-49)' ? 'bg-gray-500' :
-                 size === 'Micro (1-9)' ? 'bg-gray-400' : 'bg-gray-300'
+          color: size === 'Large (250+)' ? 'bg-foreground/80' :
+                 size === 'Medium (50-249)' ? 'bg-foreground/70' :
+                 size === 'Small (10-49)' ? 'bg-muted-foreground' :
+                 size === 'Micro (1-9)' ? 'bg-muted/70' : 'bg-muted/90'
         }))
         .sort((a, b) => b.count - a.count)
 
@@ -242,9 +242,9 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
     return (
       <div className="space-y-6">
         <div className="text-center py-12">
-          <List className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Inga sparade listor</h3>
-          <p className="text-gray-600 mb-4">
+          <List className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Inga sparade listor</h3>
+          <p className="text-muted-foreground mb-4">
             Du behöver spara företagslistor i Företagssökning för att kunna analysera dem här.
           </p>
           <Button 
@@ -264,7 +264,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
           <h2 className="text-2xl font-bold">Listbaserad Analys</h2>
-          <p className="text-gray-600">Analysera dina sparade företagslistor</p>
+          <p className="text-muted-foreground">Analysera dina sparade företagslistor</p>
         </div>
         <div className="flex items-center space-x-4">
           <Select value={selectedList?.id || ''} onValueChange={(value) => {
@@ -332,8 +332,8 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
       {/* Analytics Content */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
-          <span className="ml-3 text-gray-600">Beräknar analys...</span>
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="ml-3 text-muted-foreground">Beräknar analys...</span>
         </div>
       ) : analyticsData ? (
         <>
@@ -343,7 +343,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Genomsnittlig Omsättning</p>
+                    <p className="text-sm font-medium text-muted-foreground">Genomsnittlig Omsättning</p>
                     <p className="text-2xl font-bold">{formatCurrency(analyticsData.avgRevenue)}</p>
                   </div>
                 </div>
@@ -354,7 +354,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Median Omsättning</p>
+                    <p className="text-sm font-medium text-muted-foreground">Median Omsättning</p>
                     <p className="text-2xl font-bold">{formatCurrency(analyticsData.medianRevenue)}</p>
                   </div>
                 </div>
@@ -365,10 +365,10 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Genomsnittlig Tillväxt</p>
+                    <p className="text-sm font-medium text-muted-foreground">Genomsnittlig Tillväxt</p>
                     <p className="text-2xl font-bold">{analyticsData.avgGrowthRate.toFixed(1)}%</p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-purple-600" />
+                  <TrendingUp className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -377,10 +377,10 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Genomsnittlig EBIT Marginal</p>
+                    <p className="text-sm font-medium text-muted-foreground">Genomsnittlig EBIT Marginal</p>
                     <p className="text-2xl font-bold">{analyticsData.avgEBITMargin.toFixed(1)}%</p>
                   </div>
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
+                  <BarChart3 className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -402,19 +402,19 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
                   {analyticsData.topIndustries.map((industry: any, index: number) => (
                     <div 
                       key={industry.name} 
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/40 cursor-pointer transition-colors"
                       onClick={() => {
                         setSelectedIndustry(industry.name)
                         setIsIndustryModalOpen(true)
                       }}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                          <span className="text-sm font-medium text-blue-600">{index + 1}</span>
+                        <div className="flex items-center justify-center w-8 h-8 bg-primary/15 rounded-full">
+                          <span className="text-sm font-medium text-primary">{index + 1}</span>
                         </div>
                         <div>
                           <p className="font-medium">{industry.name}</p>
-                          <p className="text-sm text-gray-600">{industry.count} företag</p>
+                          <p className="text-sm text-muted-foreground">{industry.count} företag</p>
                         </div>
                       </div>
                       <Badge variant="secondary">{industry.percentage.toFixed(1)}%</Badge>
@@ -437,19 +437,19 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
                   {analyticsData.topCities.map((city: any, index: number) => (
                     <div 
                       key={city.name} 
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/40 cursor-pointer transition-colors"
                       onClick={() => {
                         setSelectedCity(city.name)
                         setIsCityModalOpen(true)
                       }}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
-                          <span className="text-sm font-medium text-green-600">{index + 1}</span>
+                        <div className="flex items-center justify-center w-8 h-8 bg-primary/15 rounded-full">
+                          <span className="text-sm font-medium text-primary">{index + 1}</span>
                         </div>
                         <div>
                           <p className="font-medium">{city.name}</p>
-                          <p className="text-sm text-gray-600">{city.count} företag</p>
+                          <p className="text-sm text-muted-foreground">{city.count} företag</p>
                         </div>
                       </div>
                       <Badge variant="outline">{formatCurrency(city.avgRevenue)} snitt</Badge>
@@ -478,7 +478,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
                         <span className="font-medium">{size.name}</span>
                         <span>{size.count} ({size.percentage.toFixed(1)}%)</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-muted rounded-full h-2">
                         <div 
                           className={`${size.color} h-2 rounded-full`}
                           style={{ width: `${size.percentage}%` }}
@@ -501,10 +501,10 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { label: 'Utmärkt', count: analyticsData.financialHealth.excellent, color: 'bg-green-500' },
-                    { label: 'Bra', count: analyticsData.financialHealth.good, color: 'bg-blue-500' },
-                    { label: 'Acceptabel', count: analyticsData.financialHealth.fair, color: 'bg-yellow-500' },
-                    { label: 'Dålig', count: analyticsData.financialHealth.poor, color: 'bg-red-500' }
+                    { label: 'Utmärkt', count: analyticsData.financialHealth.excellent, color: 'bg-primary' },
+                    { label: 'Bra', count: analyticsData.financialHealth.good, color: 'bg-primary' },
+                    { label: 'Acceptabel', count: analyticsData.financialHealth.fair, color: 'bg-accent' },
+                    { label: 'Dålig', count: analyticsData.financialHealth.poor, color: 'bg-destructive' }
                   ].map((health) => {
                     const percentage = (health.count / analyticsData.totalCompanies) * 100
                     return (
@@ -513,7 +513,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
                           <span className="font-medium">{health.label}</span>
                           <span>{health.count} ({percentage.toFixed(1)}%)</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div 
                             className={`${health.color} h-2 rounded-full`}
                             style={{ width: `${percentage}%` }}
@@ -529,9 +529,9 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
         </>
       ) : (
         <div className="text-center py-12">
-          <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Välj en lista för att börja analysera</h3>
-          <p className="text-gray-600">
+          <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Välj en lista för att börja analysera</h3>
+          <p className="text-muted-foreground">
             Välj en sparad företagslista från dropdown-menyn ovan för att se analysdata.
           </p>
         </div>

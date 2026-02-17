@@ -258,7 +258,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                 className="mt-1"
               />
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted-foreground">
               <p><strong>Företag:</strong> {editingList ? editingList.companies.length : currentCompanies.length}</p>
               <p><strong>Filter:</strong> {Object.keys(currentFilters).length > 0 ? 'Aktiva' : 'Inga'}</p>
             </div>
@@ -286,28 +286,28 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       key={company.OrgNr}
                       className={`flex items-center gap-3 p-2 rounded border cursor-pointer transition-colors ${
                         selectedCompanies.has(company.OrgNr)
-                          ? 'bg-red-50 border-red-200'
-                          : 'hover:bg-gray-50'
+                          ? 'bg-destructive/10 border-destructive/40'
+                          : 'hover:bg-muted/40'
                       }`}
                       onClick={() => toggleCompanySelection(company.OrgNr)}
                     >
                       <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
                         selectedCompanies.has(company.OrgNr)
-                          ? 'bg-red-500 border-red-500'
-                          : 'border-gray-300'
+                          ? 'bg-destructive border-destructive'
+                          : 'border-border'
                       }`}>
                         {selectedCompanies.has(company.OrgNr) && (
-                          <X className="h-3 w-3 text-white" />
+                          <X className="h-3 w-3 text-primary-foreground" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm truncate">{company.name}</div>
-                        <div className="text-xs text-gray-500">{company.OrgNr}</div>
+                        <div className="text-xs text-muted-foreground">{company.OrgNr}</div>
                         {company.segment_name && (
-                          <div className="text-xs text-gray-400">{company.segment_name}</div>
+                          <div className="text-xs text-muted-foreground">{company.segment_name}</div>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted-foreground">
                         {company.SDI ? `${(company.SDI / 1000).toFixed(0)} TSEK` : 'N/A'}
                       </div>
                     </div>
@@ -315,7 +315,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                 </div>
                 
                 {editingList.companies.length === 0 && (
-                  <div className="text-center py-4 text-gray-500 text-sm">
+                  <div className="text-center py-4 text-muted-foreground text-sm">
                     Inga företag i denna lista
                   </div>
                 )}
@@ -356,7 +356,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
               {savedLists.map((list) => (
                 <div 
                   key={list.id} 
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/40 cursor-pointer transition-colors"
                   onClick={() => onListSelect(list)}
                 >
                   <div className="flex-1">
@@ -365,9 +365,9 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       <Badge variant="secondary">{list.companies.length} företag</Badge>
                     </div>
                     {list.description && (
-                      <p className="text-sm text-gray-600 mb-2">{list.description}</p>
+                      <p className="text-sm text-muted-foreground mb-2">{list.description}</p>
                     )}
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         Skapad: {formatDate(list.createdAt)}
@@ -400,7 +400,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => deleteList(list.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>

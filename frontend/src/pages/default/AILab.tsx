@@ -8,9 +8,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { TemplateDialog } from "@/components/new/TemplateDialog";
-import { EmptyState } from "@/components/new/EmptyState";
-import { ErrorState } from "@/components/new/ErrorState";
+import { TemplateDialog } from "@/components/default/TemplateDialog";
+import { EmptyState } from "@/components/default/EmptyState";
+import { ErrorState } from "@/components/default/ErrorState";
 import {
   ChevronDown,
   CheckCircle,
@@ -49,15 +49,15 @@ export default function NewAILab() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-primary" />;
       case "running":
-        return <Loader className="w-4 h-4 text-blue-600 animate-spin" />;
+        return <Loader className="w-4 h-4 text-primary animate-spin" />;
       case "queued":
-        return <Clock className="w-4 h-4 text-gray-400" />;
+        return <Clock className="w-4 h-4 text-muted-foreground" />;
       case "failed":
-        return <XCircle className="w-4 h-4 text-red-600" />;
+        return <XCircle className="w-4 h-4 text-destructive" />;
       case "cancelled":
-        return <XCircle className="w-4 h-4 text-gray-400" />;
+        return <XCircle className="w-4 h-4 text-muted-foreground" />;
       default:
         return null;
     }
@@ -114,21 +114,21 @@ export default function NewAILab() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
+    <div className="h-full overflow-auto bg-muted/40">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">AI Lab</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">AI Lab</h1>
+          <p className="text-sm text-muted-foreground">
             Analyze companies using AI-powered prompt templates
           </p>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-base font-medium text-gray-900 mb-1">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-base font-medium text-foreground mb-1">
               Create New Run
             </h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {selectedTemplate
                 ? "Select a list to analyze with the chosen template"
                 : "Select a template below to get started"}
@@ -136,11 +136,11 @@ export default function NewAILab() {
             {selectedTemplate ? (
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-2">
+                  <label className="text-sm font-medium text-foreground block mb-2">
                     Select List to Analyze
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     onChange={(e) => {
                       if (e.target.value) {
                         navigate(
@@ -160,21 +160,21 @@ export default function NewAILab() {
                     ))}
                   </select>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Estimated cost: ~$0.20 per company
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Select a template below to continue
               </p>
             )}
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-card rounded-lg border border-border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-medium text-gray-900">Recent Runs</h2>
-              <span className="text-xs text-gray-500">{recentRuns.length} runs</span>
+              <h2 className="text-base font-medium text-foreground">Recent Runs</h2>
+              <span className="text-xs text-muted-foreground">{recentRuns.length} runs</span>
             </div>
             {runsError ? (
               <ErrorState
@@ -182,7 +182,7 @@ export default function NewAILab() {
                 retry={() => refetchRuns()}
               />
             ) : recentRuns.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-8">No analysis runs yet. Create your first run to get started.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">No analysis runs yet. Create your first run to get started.</p>
             ) : (
               <div className="space-y-3">
                 {recentRuns.map((run) => {
@@ -190,26 +190,26 @@ export default function NewAILab() {
                   return (
                     <div
                       key={run.id}
-                      className="p-5 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-colors"
+                      className="p-5 border border-border rounded-lg bg-card hover:border-border transition-colors"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-sm text-gray-900">{run.name}</span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+                        <span className="font-medium text-sm text-foreground">{run.name}</span>
+                        <span className="text-xs px-2 py-0.5 rounded bg-muted text-foreground">
                           {run.status === "running" ? "Running" : run.status === "completed" ? "Completed" : run.status === "failed" ? "Failed" : run.status === "queued" ? "Queued" : run.status}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600 mb-3">
+                      <div className="text-sm text-muted-foreground mb-3">
                         {template?.name ?? "Template"} • {run.total_companies} companies • {new Date(run.created_at).toLocaleString()}
                       </div>
                       {(run.status === "running" || run.status === "queued") && (
                         <div className="mb-3">
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-blue-500 transition-all"
+                              className="h-full bg-primary transition-all"
                               style={{ width: `${run.total_companies > 0 ? (run.processed_companies / run.total_companies) * 100 : 0}%` }}
                             />
                           </div>
-                          <p className="text-xs text-gray-600 mt-1">{run.processed_companies} of {run.total_companies} analyzed</p>
+                          <p className="text-xs text-muted-foreground mt-1">{run.processed_companies} of {run.total_companies} analyzed</p>
                         </div>
                       )}
                       <div className="flex gap-2">
@@ -235,10 +235,10 @@ export default function NewAILab() {
 
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-medium text-gray-900">
+              <h2 className="text-base font-medium text-foreground">
                 Prompt Templates
               </h2>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {templates.length} templates
               </span>
             </div>
@@ -249,9 +249,9 @@ export default function NewAILab() {
                 retry={() => refetchTemplates()}
               />
             ) : templatesLoading && templates.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">Loading templates...</p>
+              <p className="text-sm text-muted-foreground py-4">Loading templates...</p>
             ) : templates.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-card rounded-lg border border-border p-6">
                 <EmptyState
                   title="No templates yet"
                   description="Create a template or wait for backend implementation"
@@ -276,10 +276,10 @@ export default function NewAILab() {
                     onOpenChange={() => toggleTemplateExpansion(template.id)}
                   >
                     <div
-                      className={`bg-white rounded-lg border transition-all ${
+                      className={`bg-card rounded-lg border transition-all ${
                         selectedTemplate === template.id
-                          ? "border-blue-500 shadow-sm"
-                          : "border-gray-200"
+                          ? "border-primary shadow-sm"
+                          : "border-border"
                       }`}
                     >
                       <div className="p-4">
@@ -287,7 +287,7 @@ export default function NewAILab() {
                           <CollapsibleTrigger className="flex items-start gap-3 flex-1 text-left">
                             <div className="mt-0.5">
                               <ChevronDown
-                                className={`w-4 h-4 text-gray-400 transition-transform ${
+                                className={`w-4 h-4 text-muted-foreground transition-transform ${
                                   expandedTemplates.has(template.id)
                                     ? "transform rotate-180"
                                     : ""
@@ -295,10 +295,10 @@ export default function NewAILab() {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-sm font-medium text-gray-900 mb-1">
+                              <h3 className="text-sm font-medium text-foreground mb-1">
                                 {template.name}
                               </h3>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-muted-foreground">
                                 {template.description}
                               </p>
                             </div>
@@ -348,17 +348,17 @@ export default function NewAILab() {
                       </div>
 
                       <CollapsibleContent>
-                        <div className="px-4 pb-4 pt-0 space-y-3 border-t border-gray-100">
+                        <div className="px-4 pb-4 pt-0 space-y-3 border-t border-border">
                           <div className="pt-3">
                             <div className="mb-3">
-                              <p className="text-xs font-medium text-gray-700 mb-2">
+                              <p className="text-xs font-medium text-foreground mb-2">
                                 Scoring Dimensions
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {template.scoringDimensions.map((dim) => (
                                   <span
                                     key={dim.id}
-                                    className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded"
+                                    className="text-xs px-2 py-1 bg-muted text-foreground rounded"
                                   >
                                     {dim.name} ({(dim.weight * 100).toFixed(0)}%)
                                   </span>
@@ -367,14 +367,14 @@ export default function NewAILab() {
                             </div>
 
                             <div>
-                              <p className="text-xs font-medium text-gray-700 mb-2">
+                              <p className="text-xs font-medium text-foreground mb-2">
                                 Data Fields
                               </p>
                               <div className="flex flex-wrap gap-1">
                                 {template.variables.map((variable) => (
                                   <span
                                     key={variable}
-                                    className="text-xs px-2 py-0.5 bg-gray-50 text-gray-600 rounded font-mono border border-gray-200"
+                                    className="text-xs px-2 py-0.5 bg-muted/40 text-muted-foreground rounded font-mono border border-border"
                                   >
                                     {variable}
                                   </span>

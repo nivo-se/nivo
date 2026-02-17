@@ -97,9 +97,9 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
   const hasActiveFilters = filters.include.rules.length > 0 || filters.exclude.rules.length > 0;
 
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <div className="bg-muted/40 border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Filter Builder</h3>
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Filter Builder</h3>
         <div className="flex gap-2">
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearAllFilters}>
@@ -114,13 +114,13 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-gray-900">INCLUDE ALL of the following:</h4>
+          <h4 className="text-sm font-medium text-foreground">INCLUDE ALL of the following:</h4>
           <Button variant="outline" size="sm" onClick={() => addRule("include")}>
             <Plus className="w-4 h-4 mr-1" /> Add Rule
           </Button>
         </div>
         {filters.include.rules.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No filters applied</p>
+          <p className="text-sm text-muted-foreground italic">No filters applied</p>
         ) : (
           <div className="space-y-2">
             {filters.include.rules.map((rule) => (
@@ -137,13 +137,13 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-gray-900">EXCLUDE ANY of the following:</h4>
+          <h4 className="text-sm font-medium text-foreground">EXCLUDE ANY of the following:</h4>
           <Button variant="outline" size="sm" onClick={() => addRule("exclude")}>
             <Plus className="w-4 h-4 mr-1" /> Add Rule
           </Button>
         </div>
         {filters.exclude.rules.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No exclusions</p>
+          <p className="text-sm text-muted-foreground italic">No exclusions</p>
         ) : (
           <div className="space-y-2">
             {filters.exclude.rules.map((rule) => (
@@ -185,7 +185,7 @@ function FilterRuleRow({
             : numberOperators;
 
   return (
-    <div className="flex items-center gap-2 bg-white p-3 rounded border border-gray-200">
+    <div className="flex items-center gap-2 bg-card p-3 rounded border border-border">
       <Select value={rule.field} onValueChange={(value) => onUpdate({ field: value })}>
         <SelectTrigger className="w-48">
           <SelectValue />

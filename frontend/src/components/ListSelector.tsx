@@ -160,14 +160,14 @@ const ListSelector: React.FC<ListSelectorProps> = ({
                   <Label htmlFor="existing" className="text-sm font-medium">
                     Lägg till i befintlig lista
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Välj en av dina sparade listor att lägga till företagen i.
                   </p>
                   
                   {selectedOption === 'existing' && (
                     <div className="mt-3 space-y-2">
                       {savedLists.length === 0 ? (
-                        <p className="text-sm text-gray-500 italic">
+                        <p className="text-sm text-muted-foreground italic">
                           Inga sparade listor hittades. Skapa en ny lista istället.
                         </p>
                       ) : (
@@ -177,8 +177,8 @@ const ListSelector: React.FC<ListSelectorProps> = ({
                               key={list.id}
                               className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                                 selectedListId === list.id
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-border hover:border-border'
                               }`}
                               onClick={() => setSelectedListId(list.id)}
                             >
@@ -186,10 +186,10 @@ const ListSelector: React.FC<ListSelectorProps> = ({
                                 <div>
                                   <h4 className="font-medium text-sm">{list.name}</h4>
                                   {list.description && (
-                                    <p className="text-xs text-gray-600 mt-1">{list.description}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{list.description}</p>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                   <Users className="h-3 w-3" />
                                   {list.companies.length}
                                   <Calendar className="h-3 w-3" />
@@ -212,7 +212,7 @@ const ListSelector: React.FC<ListSelectorProps> = ({
                   <Label htmlFor="new" className="text-sm font-medium">
                     Skapa ny lista
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Skapa en ny lista med de valda företagen.
                   </p>
                   
