@@ -1,6 +1,5 @@
 import { fetchWithAuth } from "@/lib/backendFetch";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+import { API_BASE } from "@/lib/apiClient";
 
 export type SavedList = {
   id: string;
@@ -13,9 +12,15 @@ export type SavedList = {
   item_count?: number;
 };
 
+function throwApiError(msg: string, res: Response): never {
+  const err = new Error(msg || "Request failed") as Error & { status?: number };
+  err.status = res.status;
+  throw err;
+}
+
 export async function getLists(scope: "private" | "team" | "all"): Promise<{ items: SavedList[] }> {
   const res = await fetchWithAuth(`${API_BASE}/api/lists?scope=${scope}`);
-  if (!res.ok) throw new Error("Failed to fetch lists");
+  if (!res.ok) throwApiError(await res.text() || "Failed to fetch lists", res);
   return res.json();
 }
 
@@ -29,7 +34,7 @@ export async function createList(payload: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("Failed to create list");
+  if (!res.ok) throwApiError(await res.text() || "Failed to create list", res);
   return res.json();
 }
 
@@ -58,10 +63,7 @@ export async function createListFromQuery(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err || "Failed to create list from query");
-  }
+  if (!res.ok) throwApiError(await res.text() || "Failed to create list from query", res);
   return res.json();
 }
 
@@ -71,7 +73,7 @@ export async function addListItems(listId: string, orgnrs: string[]): Promise<{ 
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orgnrs }),
   });
-  if (!res.ok) throw new Error("Failed to add items");
+  if (!res.ok) throwApiError(await res.text() || "Failed to add items", res);
   return res.json();
 }
 
@@ -79,7 +81,7 @@ export async function removeListItem(listId: string, orgnr: string): Promise<voi
   const res = await fetchWithAuth(`${API_BASE}/api/lists/${listId}/items/${encodeURIComponent(orgnr)}`, {
     method: "DELETE",
   });
-  if (!res.ok) throw new Error("Failed to remove item");
+  if (!res.ok) throwApiError(await res.text() || "Failed to remove item", res);
 }
 
 export async function getListItems(listId: string): Promise<{
@@ -87,11 +89,11 @@ export async function getListItems(listId: string): Promise<{
   items: { orgnr: string; added_by: string; added_at: string }[];
 }> {
   const res = await fetchWithAuth(`${API_BASE}/api/lists/${listId}/items`);
-  if (!res.ok) throw new Error("Failed to fetch list items");
+  if (!res.ok) throwApiError(await res.text() || "Failed to fetch list items", res);
   return res.json();
 }
 
 export async function deleteList(listId: string): Promise<void> {
   const res = await fetchWithAuth(`${API_BASE}/api/lists/${listId}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Failed to delete list");
+  if (!res.ok) throwApiError(await res.text() || "Failed to delete list", res);
 }

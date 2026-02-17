@@ -73,7 +73,10 @@ export async function getUniverseFilters(): Promise<FilterTaxonomy> {
   return res.json();
 }
 
-export async function queryUniverse(payload: UniverseQueryPayload): Promise<UniverseQueryResponse> {
+export async function queryUniverse(
+  payload: UniverseQueryPayload,
+  signal?: AbortSignal
+): Promise<UniverseQueryResponse> {
   const res = await fetchWithAuth(`${API_BASE}/api/universe/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -85,6 +88,7 @@ export async function queryUniverse(payload: UniverseQueryPayload): Promise<Univ
       offset: payload.offset ?? 0,
       q: payload.q ?? undefined,
     }),
+    signal,
   });
   if (!res.ok) {
     if (res.status === 401) throw new Error("Sign in required to query universe");

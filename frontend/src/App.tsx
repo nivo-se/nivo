@@ -22,6 +22,17 @@ import { CompanyPage } from "@/pages/app/CompanyPage";
 import { ReportsPage } from "@/pages/app/ReportsPage";
 import { RunsPage } from "@/pages/app/RunsPage";
 import { AdminPage } from "@/pages/app/AdminPage";
+import NewAppLayout from "./pages/new/NewAppLayout";
+import NewWorkDashboard from "./pages/new/WorkDashboard";
+import NewUniverse from "./pages/new/Universe";
+import NewMyLists from "./pages/new/MyLists";
+import NewListDetail from "./pages/new/ListDetail";
+import NewAILab from "./pages/new/AILab";
+import NewCreateRun from "./pages/new/CreateRun";
+import NewRunDetail from "./pages/new/RunDetail";
+import NewRunResults from "./pages/new/RunResults";
+import NewCompanyDetail from "./pages/new/CompanyDetail";
+import NewAdmin from "./pages/new/Admin";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +83,27 @@ const App = () => (
               path="/companies/:orgnr"
               element={<RedirectToAppCompany />}
             />
+
+            {/* New Figma UX — parallel under /new/* */}
+            <Route
+              path="/new"
+              element={
+                <ProtectedRoute>
+                  <NewAppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<NewWorkDashboard />} />
+              <Route path="universe" element={<NewUniverse />} />
+              <Route path="lists" element={<NewMyLists />} />
+              <Route path="lists/:listId" element={<NewListDetail />} />
+              <Route path="company/:companyId" element={<NewCompanyDetail />} />
+              <Route path="ai" element={<NewAILab />} />
+              <Route path="ai/run/create" element={<NewCreateRun />} />
+              <Route path="ai/runs/:runId" element={<NewRunDetail />} />
+              <Route path="ai/runs/:runId/results" element={<NewRunResults />} />
+              <Route path="admin" element={<NewAdmin />} />
+            </Route>
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
