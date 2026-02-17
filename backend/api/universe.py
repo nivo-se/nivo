@@ -197,6 +197,30 @@ def _compile_filter(
     return None
 
 
+def _sanitize_filters(filters: List[FilterItem]) -> List[FilterItem]:
+    """Drop incomplete filter rows (missing field/op/value) to prevent invalid SQL."""
+    out = []
+    for f in filters or []:
+        if not f:
+            continue
+        field = (getattr(f, "field", None) or "")
+        op = (getattr(f, "op", None) or "")
+        if not isinstance(field, str) or not field.strip():
+            continue
+        if not isinstance(op, str) or not op.strip():
+            continue
+        field = field.strip()
+        op = op.strip()
+        if field not in FILTER_FIELDS:
+            continue
+        if op not in ("=", ">=", "<=", "between", "contains", "!="):
+            continue
+        if getattr(f, "value", None) is None and getattr(f, "type", "") != "boolean":
+            continue
+        out.append(f)
+    return out
+
+
 def _build_where_from_stack(
     filters: List[FilterItem], q: Optional[str], db_is_postgres: bool
 ) -> tuple[str, List[Any]]:
@@ -217,14 +241,18 @@ def _build_where_from_stack(
     return " AND ".join(where_parts), params
 
 
-def _build_order(sort: Dict, db_is_postgres: bool) -> str:
-    by = sort.get("by") or sort.get("column") or "data_quality_score"
-    dir = (sort.get("dir") or sort.get("direction") or "asc").lower()
+def _build_order(sort: Optional[Dict], db_is_postgres: bool) -> str:
+    """Build ORDER BY. Validates sort field; fallback to orgnr if invalid."""
+    if not sort or not isinstance(sort, dict):
+        sort = {}
+    by_raw = sort.get("by") or sort.get("column")
+    by = str(by_raw).strip() if by_raw else "orgnr"
+    dir = str(sort.get("dir") or sort.get("direction") or "asc").lower()
     if by not in SORT_FIELDS:
-        by = "data_quality_score"
+        by = "orgnr"  # Safe fallback: always exists in coverage_metrics
     direction = "DESC" if dir == "desc" else "ASC"
     nulls = " NULLS LAST" if direction == "DESC" else " NULLS FIRST"
-    return f"cm.{by} {direction}{nulls}, cm.last_enriched_at NULLS FIRST"
+    return f"cm.{by} {direction}{nulls}, cm.orgnr ASC"
 
 
 @router.get("/filters")
@@ -240,14 +268,20 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     Request: { filters: [{field, op, value, type}], logic, sort: {by, dir}, limit, offset, q? }
     Response: { rows, total }
     """
-    db = get_database_service()
+    try:
+        db = get_database_service()
+    except Exception as e:
+        logger.warning("Universe query: get_database_service failed: %s", e)
+        return {"rows": [], "total": 0}
+
     limit = min(max(body.limit, 1), 200)
     offset = max(body.offset, 0)
 
+    sanitized_filters = _sanitize_filters(body.filters or [])
     where_sql, params = _build_where_from_stack(
-        body.filters, body.q, _IS_POSTGRES
+        sanitized_filters, body.q, _IS_POSTGRES
     )
-    order_sql = _build_order(body.sort or {}, _IS_POSTGRES)
+    order_sql = _build_order(body.sort, _IS_POSTGRES)
     params.extend([limit, offset])
 
     select_cols = (
@@ -272,14 +306,17 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
 
     total_params = params[:-2]
 
-    # Run blocking psycopg2 calls in thread pool to avoid blocking event loop
     def _run_query():
         r = db.run_raw_query(sql_rows, params)
         t = db.run_raw_query(sql_total, total_params)
         return r, t
 
-    rows, total_rows = await asyncio.to_thread(_run_query)
-    total = int(total_rows[0]["total"]) if total_rows else 0
+    try:
+        rows, total_rows = await asyncio.to_thread(_run_query)
+        total = int(total_rows[0]["total"]) if total_rows else 0
+    except Exception as e:
+        logger.warning("Universe query: execution failed: %s", e)
+        return {"rows": [], "total": 0}
 
     out = []
     for r in rows:

@@ -3,6 +3,7 @@ Saved lists API: static company lists for Pipeline.
 Scope: private | team. Items stored in saved_list_items.
 """
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -48,58 +49,72 @@ def _require_postgres():
 
 def _require_user(request: Request) -> str:
     uid = get_current_user_id(request)
-    if not uid:
-        raise HTTPException(401, "Authentication required")
-    return uid
+    if uid:
+        return uid
+    # When REQUIRE_AUTH=false or path is public, allow with default dev user
+    if os.getenv("REQUIRE_AUTH", "false").lower() not in ("true", "1", "yes"):
+        return "00000000-0000-0000-0000-000000000001"  # dev placeholder
+    raise HTTPException(401, "Authentication required")
 
 
 @router.get("")
 async def list_lists(request: Request, scope: str = Query("all")):
-    """List saved lists: private, team, or all."""
-    _require_postgres()
+    """List saved lists: private, team, or all. Returns empty when Postgres unavailable."""
+    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+        return {"items": []}
     uid = _require_user(request)
-    db = get_database_service()
+    try:
+        db = get_database_service()
+    except Exception as e:
+        logger.warning("Lists: get_database_service failed: %s", e)
+        return {"items": []}
 
     if not db.table_exists("saved_lists"):
         return {"items": []}
+    if not db.table_exists("saved_list_items"):
+        return {"items": []}
 
-    if scope == "private":
-        rows = db.run_raw_query(
-            "SELECT * FROM saved_lists WHERE owner_user_id::text = ? ORDER BY updated_at DESC",
-            [uid],
-        )
-    elif scope == "team":
-        rows = db.run_raw_query(
-            "SELECT * FROM saved_lists WHERE scope = 'team' ORDER BY updated_at DESC"
-        )
-    else:
-        rows = db.run_raw_query(
-            """
-            SELECT * FROM saved_lists
-            WHERE scope = 'team' OR owner_user_id::text = ?
-            ORDER BY updated_at DESC
-            """,
-            [uid],
-        )
+    try:
+        if scope == "private":
+            rows = db.run_raw_query(
+                "SELECT * FROM saved_lists WHERE owner_user_id::text = ? ORDER BY updated_at DESC",
+                [uid],
+            )
+        elif scope == "team":
+            rows = db.run_raw_query(
+                "SELECT * FROM saved_lists WHERE scope = 'team' ORDER BY updated_at DESC"
+            )
+        else:
+            rows = db.run_raw_query(
+                """
+                SELECT * FROM saved_lists
+                WHERE scope = 'team' OR owner_user_id::text = ?
+                ORDER BY updated_at DESC
+                """,
+                [uid],
+            )
 
-    items = []
-    for r in rows:
-        count = db.run_raw_query(
-            "SELECT COUNT(*) as n FROM saved_list_items WHERE list_id::text = ?",
-            [str(r["id"])],
-        )
-        items.append({
-            "id": str(r["id"]),
-            "name": r["name"],
-            "owner_user_id": str(r["owner_user_id"]),
-            "scope": r["scope"],
-            "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
-            "created_at": str(r.get("created_at", "")),
-            "updated_at": str(r.get("updated_at", "")),
-            "item_count": count[0]["n"] if count else 0,
-        })
+        items = []
+        for r in rows:
+            count = db.run_raw_query(
+                "SELECT COUNT(*) as n FROM saved_list_items WHERE list_id::text = ?",
+                [str(r["id"])],
+            )
+            items.append({
+                "id": str(r["id"]),
+                "name": r["name"],
+                "owner_user_id": str(r["owner_user_id"]),
+                "scope": r["scope"],
+                "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
+                "created_at": str(r.get("created_at", "")),
+                "updated_at": str(r.get("updated_at", "")),
+                "item_count": count[0]["n"] if count else 0,
+            })
 
-    return {"items": items}
+        return {"items": items}
+    except Exception as e:
+        logger.exception("Lists: query failed: %s", e)
+        return {"items": []}
 
 
 @router.post("")

@@ -1,11 +1,15 @@
 """
 FastAPI application for Nivo Intelligence API
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / '.env'
@@ -28,6 +32,12 @@ default_origins = [
     "http://localhost:8082",
     "http://localhost:8083",
     "http://localhost:8084",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
+    "http://127.0.0.1:8082",
+    "http://127.0.0.1:8083",
     "http://127.0.0.1:8084",
 ]
 
@@ -48,6 +58,30 @@ if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
 
 app.add_middleware(CORSMiddleware, **cors_config)
 
+
+def _cors_headers_for_request(request: Request) -> dict:
+    """Return CORS headers for the requesting origin (so error responses are not blocked)."""
+    origin = request.headers.get("origin", "")
+    if origin in default_origins:
+        return {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    return {}
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Log unhandled exceptions and return 500 with JSON. Add CORS headers so browser receives response."""
+    logger.exception("Unhandled exception: %s", exc)
+    response = JSONResponse(status_code=500, content={"detail": str(exc)})
+    for k, v in _cors_headers_for_request(request).items():
+        response.headers[k] = v
+    return response
+
+
 # JWT auth when REQUIRE_AUTH=true (prod)
 from .auth import JWTAuthMiddleware
 app.add_middleware(JWTAuthMiddleware)
@@ -64,7 +98,7 @@ async def health_check():
     return {"status": "healthy", "service": "nivo-intelligence-api"}
 
 # Import routers
-from . import admin_users, ai_filter, ai_reports, companies, coverage, enrichment, export, filters, home, jobs, labels, lists, shortlists, status, analysis, saved_lists, universe, views
+from . import admin_users, ai_filter, ai_reports, companies, coverage, db, enrichment, export, filters, home, jobs, labels, lists, shortlists, status, analysis, saved_lists, universe, views
 from .chat import router as chat_router
 from .enrichment import router as enrichment_router
 
@@ -75,6 +109,7 @@ app.include_router(views.router)
 app.include_router(lists.router)
 app.include_router(labels.router)
 app.include_router(universe.router)
+app.include_router(db.router)
 app.include_router(filters.router)
 app.include_router(ai_filter.router)
 app.include_router(enrichment_router)

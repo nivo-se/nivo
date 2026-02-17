@@ -15,11 +15,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
 
-# Paths that bypass auth when REQUIRE_AUTH=true (Universe query/filters are read-only)
+# Paths that bypass auth when REQUIRE_AUTH=true (Universe, Lists, Analysis - dev convenience)
 PUBLIC_PATHS = {
-    "/ping", "/health", "/api/status", "/docs", "/redoc", "/openapi.json",
+    "/ping", "/health", "/api/status", "/api/db/ping", "/docs", "/redoc", "/openapi.json",
     "/api/universe/filters", "/api/universe/query",
     "/api/coverage/snapshot", "/api/coverage/list", "/api/home/dashboard",
+    "/api/lists", "/api/views", "/api/labels",
+    "/api/analysis/runs", "/api/analysis/run", "/api/saved-lists",
 }
 
 
@@ -59,6 +61,18 @@ def _is_public_path(path: str) -> bool:
     return False
 
 
+def _json_401(request: Request) -> Response:
+    """Return 401 JSON with CORS headers so the browser can read the response."""
+    origin = request.headers.get("origin", "")
+    allowed = ("http://localhost:8080", "http://localhost:8081", "http://127.0.0.1:8080", "http://127.0.0.1:8081",
+               "http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000")
+    headers = {"Content-Type": "application/json"}
+    if origin in allowed:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+    return Response(status_code=401, content='{"error":"unauthorized"}', headers=headers)
+
+
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     """
     Verifies Supabase JWT on /api routes when REQUIRE_AUTH=true.
@@ -78,27 +92,15 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
 
         auth_header = request.headers.get("Authorization", "")
         if not auth_header.lower().startswith("bearer "):
-            return Response(
-                status_code=401,
-                content='{"error":"unauthorized"}',
-                media_type="application/json",
-            )
+            return _json_401(request)
 
         token = auth_header[7:].strip()
         if not token:
-            return Response(
-                status_code=401,
-                content='{"error":"unauthorized"}',
-                media_type="application/json",
-            )
+            return _json_401(request)
 
         payload = _verify_token(token)
         if not payload:
-            return Response(
-                status_code=401,
-                content='{"error":"unauthorized"}',
-                media_type="application/json",
-            )
+            return _json_401(request)
 
         request.state.user = {
             "sub": payload.get("sub"),

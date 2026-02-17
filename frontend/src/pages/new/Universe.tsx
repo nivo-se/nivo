@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useCompanies, useCreateList, useCreateListFromQuery } from "@/lib/hooks/figmaQueries";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useCompaniesWithTotal, useCreateList, useCreateListFromQuery } from "@/lib/hooks/figmaQueries";
 import {
   calculateRevenueCagr,
   getLatestFinancials,
@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { FilterBuilder } from "@/components/new/FilterBuilder";
 import { SaveListDialog } from "@/components/new/SaveListDialog";
 import { AddToListDropdown } from "@/components/new/AddToListDropdown";
+import { CompanySnapshotModal } from "@/components/new/CompanySnapshotModal";
 import { EmptyState } from "@/components/new/EmptyState";
 import { ErrorState } from "@/components/new/ErrorState";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -109,11 +110,11 @@ function SortableHeader({
   return (
     <button
       type="button"
-      className="flex items-center gap-1 font-semibold text-gray-700 hover:text-gray-900"
+      className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900"
       onClick={() => onClick(field)}
     >
       {label}
-      {isActive && (direction === "asc" ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />)}
+      {isActive && (direction === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
     </button>
   );
 }
@@ -139,6 +140,7 @@ export default function NewUniverse() {
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showSaveViewDialog, setShowSaveViewDialog] = useState(false);
+  const [snapshotOrgnr, setSnapshotOrgnr] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     include: { id?: string; type: string; rules: unknown[] };
     exclude: { id?: string; type: string; rules: unknown[] };
@@ -193,7 +195,9 @@ export default function NewUniverse() {
     [debouncedQ, currentPage, sortBy, sortDirection, backendFilters]
   );
 
-  const { data: companies = [], isLoading, isError, error, refetch } = useCompanies(queryPayload);
+  const { data: universeData, isLoading, isError, error, refetch } = useCompaniesWithTotal(queryPayload);
+  const companies = universeData?.companies ?? [];
+  const totalCount = universeData?.total ?? 0;
   const createListMutation = useCreateList();
   const createListFromQueryMutation = useCreateListFromQuery();
 
@@ -238,7 +242,7 @@ export default function NewUniverse() {
         companyIds,
       });
       setShowSaveDialog(false);
-      navigate(`/new/lists/${list.id}`);
+      navigate(`/lists/${list.id}`);
     } catch {
       // Error handled by mutation
     }
@@ -261,7 +265,7 @@ export default function NewUniverse() {
         },
       });
       setShowSaveViewDialog(false);
-      navigate(`/new/lists/${res.listId}`);
+      navigate(`/lists/${res.listId}`);
       toast({
         title: "List created",
         description: `Added ${res.insertedCount.toLocaleString()} companies to list.`,
@@ -275,24 +279,11 @@ export default function NewUniverse() {
     }
   };
 
-  if (isLoading && companies.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading universe...</p>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 px-8">
-        <ErrorState
-          message={error?.message ?? "Failed to load universe"}
-          retry={() => refetch()}
-        />
-      </div>
-    );
-  }
+  const showError = isError;
+  const showLoading = isLoading && companies.length === 0;
+  const hasFilters = activeFilters.include.rules.length > 0 || activeFilters.exclude.rules.length > 0;
+  const isEmpty = !showLoading && !showError && filteredCompanies.length === 0;
+  const isEmptyDueToNoData = isEmpty && totalCount === 0 && !hasFilters && !debouncedQ;
 
   return (
     <div className="h-full flex flex-col">
@@ -301,12 +292,16 @@ export default function NewUniverse() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Universe</h1>
             <p className="text-sm text-gray-600 mt-1">
-              Page {currentPage} • {filteredCompanies.length} companies
+              {showLoading
+                ? "Loading..."
+                : filteredCompanies.length > 0
+                  ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
+                  : `${totalCount.toLocaleString()} companies`}
             </p>
           </div>
           <div className="flex gap-3">
             <Input
-              placeholder="Search companies..."
+              placeholder="Search by name..."
               value={searchInput}
               onChange={(e) => {
                 setSearchInput(e.target.value);
@@ -345,13 +340,13 @@ export default function NewUniverse() {
         )}
 
         {!showFilters && (activeFilters.include.rules.length > 0 || activeFilters.exclude.rules.length > 0) && (
-          <div className="mt-4 flex items-center gap-2 text-sm">
+          <div className="mt-4 flex items-center gap-2 text-xs">
             <span className="text-gray-600">Active filters:</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">
               {activeFilters.include.rules.length} include
             </span>
             {activeFilters.exclude.rules.length > 0 && (
-              <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded">
+              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">
                 {activeFilters.exclude.rules.length} exclude
               </span>
             )}
@@ -363,41 +358,63 @@ export default function NewUniverse() {
       </div>
 
       <div className="flex-1 overflow-auto px-8 py-4">
-        {filteredCompanies.length === 0 && !isLoading ? (
+        {showLoading ? (
+          <div className="new-card p-12 text-center">
+            <div className="inline-block w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-sm text-gray-600">Loading companies...</p>
+            <p className="text-xs text-gray-500 mt-1">Fetching from database</p>
+          </div>
+        ) : showError ? (
+          <ErrorState
+            message={error?.message ?? "Failed to load companies from database"}
+            retry={() => refetch()}
+          />
+        ) : isEmpty ? (
           <EmptyState
-            title="No companies match your filters"
-            description="Try adjusting search or filters"
+            title={isEmptyDueToNoData ? "No companies in database" : "No companies match your filters"}
+            description={
+              isEmptyDueToNoData
+                ? "The database may be empty or there may be a connection issue. Check that Postgres is configured and the coverage_metrics view exists."
+                : "Try adjusting search or filters"
+            }
+            action={
+              isEmptyDueToNoData ? (
+                <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  Retry
+                </Button>
+              ) : undefined
+            }
           />
         ) : (
-        <div className="new-card overflow-hidden">
+        <div className="new-card overflow-hidden text-sm">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left w-12">
+                <th className="px-3 py-2 text-left w-10 text-xs font-medium text-gray-600">
                   <Checkbox
                     checked={filteredCompanies.length > 0 && selectedCompanies.size === filteredCompanies.length}
                     onCheckedChange={toggleSelectAll}
                   />
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">
                   <SortableHeader label="Company Name" field="name" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">
                   <SortableHeader label="Industry" field="industry" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-4 py-3 text-left">Geography</th>
-                <th className="px-4 py-3 text-right">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Geography</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
                   <SortableHeader label="Revenue" field="revenue" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-4 py-3 text-right">
+                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
                   <SortableHeader label="3Y CAGR" field="cagr" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-4 py-3 text-right">
+                <th className="px-3 py-2 text-right text-xs font-medium text-gray-600">
                   <SortableHeader label="EBITDA Margin" field="margin" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-4 py-3 text-center">Flags</th>
-                <th className="px-4 py-3 text-center">AI</th>
-                <th className="px-4 py-3 w-24">Actions</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-gray-600">Flags</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-gray-600">AI</th>
+                <th className="px-3 py-2 w-20 text-xs font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -407,42 +424,44 @@ export default function NewUniverse() {
                 const cagrNum = cagr ?? 0;
                 return (
                   <tr key={company.orgnr} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2">
                       <Checkbox
                         checked={selectedCompanies.has(company.orgnr)}
                         onCheckedChange={() => toggleSelectCompany(company.orgnr)}
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <Link to={`/new/company/${company.orgnr}`} className="font-medium text-blue-600 hover:text-blue-800">
+                    <td className="px-3 py-2">
+                      <button
+                        type="button"
+                        onClick={() => setSnapshotOrgnr(company.orgnr)}
+                        className="font-medium text-gray-700 hover:text-gray-900 text-left"
+                      >
                         {company.display_name}
-                      </Link>
+                      </button>
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{company.industry_label}</td>
-                    <td className="px-4 py-3 text-gray-700">{company.region ?? "—"}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 font-mono">
+                    <td className="px-3 py-2 text-gray-700">{company.industry_label}</td>
+                    <td className="px-3 py-2 text-gray-700">{company.region ?? "—"}</td>
+                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
                       {formatRevenueSEK(latest.revenue)}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono">
-                      <span className={cagrNum > 0.15 ? "text-green-600" : cagrNum < 0 ? "text-red-600" : "text-gray-700"}>
-                        {formatPercent(cagr)}
-                      </span>
+                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
+                      {formatPercent(cagr)}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-900 font-mono">
+                    <td className="px-3 py-2 text-right text-gray-700 font-mono tabular-nums">
                       {formatPercent(latest.ebitdaMargin)}
                     </td>
-                    <td className="px-4 py-3 text-center text-xs">
-                      {company.status === "inactive" && <span className="text-orange-600" title="Inactive">INA</span>}
-                      {!company.has_3y_financials && <span className="text-orange-600" title="Incomplete financials"> INC</span>}
+                    <td className="px-3 py-2 text-center text-xs text-gray-600">
+                      {company.status === "inactive" && <span title="Inactive">INA</span>}
+                      {!company.has_3y_financials && <span title="Incomplete financials"> INC</span>}
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-3 py-2 text-center text-gray-600">
                       {company.ai_profile ? (
-                        <span className="text-green-600 font-semibold" title={`Score: ${company.ai_profile.ai_fit_score}`}>✓</span>
+                        <span title={`Score: ${company.ai_profile.ai_fit_score}`}>✓</span>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2">
                       <AddToListDropdown orgnrs={[company.orgnr]} />
                     </td>
                   </tr>
@@ -455,7 +474,7 @@ export default function NewUniverse() {
 
         {filteredCompanies.length > 0 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-xs text-gray-600">
             Showing {(currentPage - 1) * COMPANIES_PER_PAGE + 1}–{Math.min(currentPage * COMPANIES_PER_PAGE, filteredCompanies.length)} of {filteredCompanies.length} on this page
           </p>
           <div className="flex gap-2">
@@ -495,6 +514,13 @@ export default function NewUniverse() {
           onSave={handleSaveViewAsList}
           description="Create a list from all companies matching your current filters, search, and sort. Server-side query may differ if you use exclude filters."
           isLoading={createListFromQueryMutation.isPending}
+        />
+      )}
+      {snapshotOrgnr && (
+        <CompanySnapshotModal
+          open={!!snapshotOrgnr}
+          onOpenChange={(open) => !open && setSnapshotOrgnr(null)}
+          orgnr={snapshotOrgnr}
         />
       )}
     </div>

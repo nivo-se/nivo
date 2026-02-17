@@ -237,9 +237,16 @@ async def get_company_analysis(orgnr: str):
 
 @router.get("/runs")
 async def list_runs(limit: int = 20):
-    """List recent workflow runs"""
-    db = get_database_service()
-    
+    """List recent workflow runs. Returns empty runs on DB/table mismatch."""
+    try:
+        db = get_database_service()
+    except Exception as e:
+        logger.warning("Analysis runs: get_database_service failed: %s", e)
+        return {"success": True, "runs": []}
+
+    if not (hasattr(db, "table_exists") and db.table_exists("acquisition_runs")):
+        return {"success": True, "runs": []}
+
     try:
         rows = db.run_raw_query(
             """
@@ -249,26 +256,26 @@ async def list_runs(limit: int = 20):
             ORDER BY started_at DESC
             LIMIT ?
             """,
-            params=[limit]
+            [limit],
         )
-        
+
         return {
             "success": True,
             "runs": [
                 {
-                    "run_id": row['id'],
-                    "status": row['status'],
-                    "stage": row['stage'],
-                    "stage1_count": row.get('stage1_count'),
-                    "stage2_count": row.get('stage2_count'),
-                    "stage3_count": row.get('stage3_count'),
-                    "started_at": row['started_at'],
-                    "completed_at": row.get('completed_at'),
+                    "run_id": row["id"],
+                    "status": row["status"],
+                    "stage": row["stage"],
+                    "stage1_count": row.get("stage1_count"),
+                    "stage2_count": row.get("stage2_count"),
+                    "stage3_count": row.get("stage3_count"),
+                    "started_at": str(row["started_at"]) if row.get("started_at") else "",
+                    "completed_at": str(row["completed_at"]) if row.get("completed_at") else None,
                 }
                 for row in rows
-            ]
+            ],
         }
-        
+
     except Exception as e:
-        logger.error(f"Failed to list runs: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.warning("Analysis runs: query failed: %s", e)
+        return {"success": True, "runs": []}

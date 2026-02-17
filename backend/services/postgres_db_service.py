@@ -3,6 +3,8 @@ Postgres implementation of the DatabaseService.
 
 Uses local Postgres (e.g. Docker via docker-compose). Connection from env:
   POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+
+Ensures rollback on exception to prevent "current transaction is aborted" cascade.
 """
 
 from __future__ import annotations
@@ -20,6 +22,22 @@ from psycopg2 import extras
 from .database_service import DatabaseService
 
 logger = logging.getLogger(__name__)
+
+_FIRST_DB_ERROR_LOGGED = False
+
+
+def _log_db_exception(op_name: str, exc: BaseException) -> None:
+    """Log first DB exception with full detail (class, message, op)."""
+    global _FIRST_DB_ERROR_LOGGED
+    exc_class = type(exc).__module__ + "." + type(exc).__name__
+    logger.error(
+        "Postgres error [%s]: %s: %s",
+        op_name,
+        exc_class,
+        str(exc),
+        exc_info=not _FIRST_DB_ERROR_LOGGED,
+    )
+    _FIRST_DB_ERROR_LOGGED = True
 
 
 def _make_conn():
@@ -62,15 +80,24 @@ class PostgresDBService(DatabaseService):
         self,
         sql: str,
         params: Optional[Sequence[Any]] = None,
+        op_name: str = "execute",
     ) -> List[Dict[str, Any]]:
         sql = _sqlite_to_psycopg(sql)
         sql = _fix_limit_for_postgres(sql)
         with self._lock:
-            with self._conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
-                cur.execute(sql, params or [])
-                self._conn.commit()
-                rows = cur.fetchall() if cur.description else []
-        return [dict(row) for row in rows]
+            try:
+                with self._conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                    cur.execute(sql, params or [])
+                    self._conn.commit()
+                    rows = cur.fetchall() if cur.description else []
+                return [dict(row) for row in rows]
+            except Exception as e:
+                try:
+                    self._conn.rollback()
+                except Exception as rollback_err:
+                    logger.warning("Rollback failed: %s", rollback_err)
+                _log_db_exception(op_name, e)
+                raise
 
     def fetch_companies(
         self,
@@ -120,7 +147,10 @@ class PostgresDBService(DatabaseService):
         sql: str,
         params: Optional[Sequence[Any]] = None,
     ) -> List[Dict[str, Any]]:
-        return self._execute(sql, params)
+        op_name = "run_raw_query"
+        if sql.strip():
+            op_name = "run_raw_query:" + sql.strip()[:60].replace("\n", " ")
+        return self._execute(sql, params, op_name=op_name)
 
     def run_execute_values(self, sql: str, values: List[tuple]) -> int:
         """Bulk insert using psycopg2.extras.execute_values. Returns rowcount."""
@@ -128,11 +158,19 @@ class PostgresDBService(DatabaseService):
 
         sql = _sqlite_to_psycopg(sql)
         with self._lock:
-            with self._conn.cursor() as cur:
-                execute_values(cur, sql, values, page_size=2000)
-                rowcount = cur.rowcount
-            self._conn.commit()
-        return rowcount
+            try:
+                with self._conn.cursor() as cur:
+                    execute_values(cur, sql, values, page_size=2000)
+                    rowcount = cur.rowcount
+                self._conn.commit()
+                return rowcount
+            except Exception as e:
+                try:
+                    self._conn.rollback()
+                except Exception as rollback_err:
+                    logger.warning("Rollback failed: %s", rollback_err)
+                _log_db_exception("run_execute_values", e)
+                raise
 
     def table_exists(self, table_name: str) -> bool:
         rows = self._execute(
@@ -352,6 +390,19 @@ class PostgresDBService(DatabaseService):
             [patch, run_id],
         )
 
+    def ping(self) -> bool:
+        """Lightweight health check: runs SELECT 1. Returns True if OK."""
+        try:
+            rows = self._execute("SELECT 1 AS ok", op_name="ping")
+            return bool(rows and rows[0].get("ok") == 1)
+        except Exception as e:
+            _log_db_exception("ping", e)
+            return False
+
     def close(self) -> None:
         with self._lock:
+            try:
+                self._conn.rollback()
+            except Exception:
+                pass
             self._conn.close()

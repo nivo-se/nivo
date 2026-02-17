@@ -10,15 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-grayOlive text-white hover:opacity-90 focus-visible:ring-grayOlive/40 focus-visible:ring-offset-platinum",
+          "border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-300 focus-visible:ring-offset-2",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/40 focus-visible:ring-offset-platinum",
+          "border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-300 focus-visible:ring-offset-2",
         outline:
-          "border border-grayOlive bg-transparent text-grayOlive hover:bg-grayOlive/10 focus-visible:ring-grayOlive/30 focus-visible:ring-offset-platinum",
+          "border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-300 focus-visible:ring-offset-2",
         secondary:
-          "bg-jetBlack text-white hover:bg-jetBlack/90 focus-visible:ring-grayOlive/30 focus-visible:ring-offset-platinum",
-        ghost: "text-grayOlive hover:bg-grayOlive/10 focus-visible:ring-grayOlive/30 focus-visible:ring-offset-platinum",
-        link: "text-grayOlive underline-offset-4 hover:underline",
+          "border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-300 focus-visible:ring-offset-2",
+        ghost:
+          "border border-gray-200 bg-transparent text-gray-900 hover:bg-gray-100 focus-visible:ring-gray-300 focus-visible:ring-offset-2",
+        link: "border-0 text-gray-900 underline-offset-4 hover:underline hover:bg-transparent",
       },
       size: {
         default: "h-11 px-6",

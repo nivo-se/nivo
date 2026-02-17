@@ -4,6 +4,7 @@ Scope: private (owner only) | team (all authenticated).
 """
 import json
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -41,9 +42,11 @@ def _require_postgres():
 
 def _require_user(request: Request) -> str:
     uid = get_current_user_id(request)
-    if not uid:
-        raise HTTPException(401, "Authentication required")
-    return uid
+    if uid:
+        return uid
+    if os.getenv("REQUIRE_AUTH", "false").lower() not in ("true", "1", "yes"):
+        return "00000000-0000-0000-0000-000000000001"  # dev placeholder
+    raise HTTPException(401, "Authentication required")
 
 
 @router.get("")
