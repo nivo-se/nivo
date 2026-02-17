@@ -309,10 +309,10 @@ export default function NewProspects() {
     filterStatus === "all" ? prospects : prospects.filter((p) => p.status === filterStatus);
 
   return (
-    <div className="h-full overflow-auto bg-muted/40">
+    <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Prospects</h1>
+          <h1 className="text-base font-semibold text-foreground mb-2">Prospects</h1>
           <p className="text-sm text-muted-foreground">Team pipeline • {prospects.length} companies</p>
         </div>
 

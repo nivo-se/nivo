@@ -53,7 +53,7 @@ export default function ThemeSanityPage() {
     <div className="min-h-full bg-background text-foreground p-6 md:p-8 space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Theme Sanity</h1>
+          <h1 className="text-base font-semibold tracking-tight">Theme Sanity</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Current theme: <span className="text-foreground font-medium">{resolvedTheme ?? "light"}</span>
           </p>

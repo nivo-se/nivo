@@ -247,7 +247,7 @@ function Section<T extends { id: string; name: string; item_count?: number }>({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onDelete?.(item.id)} className="text-destructive">
+                <DropdownMenuItem onClick={() => onDelete?.(item.id)}>
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -270,8 +270,9 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                   <h4 className="text-sm font-medium">Hantera företag i listan</h4>
                   {selectedCompanies.size > 0 && (
                     <Button
-                      variant="destructive"
+                      variant="outline"
                       size="sm"
+                      className="hover:bg-muted"
                       onClick={removeSelectedCompanies}
                     >
                       <X className="h-3 w-3 mr-1" />
@@ -286,18 +287,18 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       key={company.OrgNr}
                       className={`flex items-center gap-3 p-2 rounded border cursor-pointer transition-colors ${
                         selectedCompanies.has(company.OrgNr)
-                          ? 'bg-destructive/10 border-destructive/40'
+                          ? 'bg-muted border-border'
                           : 'hover:bg-muted/40'
                       }`}
                       onClick={() => toggleCompanySelection(company.OrgNr)}
                     >
                       <div className={`w-4 h-4 border-2 rounded flex items-center justify-center ${
                         selectedCompanies.has(company.OrgNr)
-                          ? 'bg-destructive border-destructive'
+                          ? 'bg-foreground border-foreground'
                           : 'border-border'
                       }`}>
                         {selectedCompanies.has(company.OrgNr) && (
-                          <X className="h-3 w-3 text-primary-foreground" />
+                          <X className="h-3 w-3 text-background" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -400,7 +401,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => deleteList(list.id)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -416,4 +417,3 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
 }
 
 export default CompanyListManager
-

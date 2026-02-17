@@ -13,9 +13,9 @@ const StyleGuide = () => {
         <section>
           <p className="text-sm uppercase tracking-widest text-primary">Typografi</p>
           <div className="mt-6 space-y-4">
-            <h1 className="text-4xl font-heading">Rubrik 1 – Zapf Humanist</h1>
-            <h2 className="text-3xl font-heading">Rubrik 2 – Zapf Humanist</h2>
-            <h3 className="text-2xl font-heading">Rubrik 3 – Zapf Humanist</h3>
+            <h1 className="text-base font-heading">Rubrik 1 – Zapf Humanist</h1>
+            <h2 className="text-base font-heading">Rubrik 2 – Zapf Humanist</h2>
+            <h3 className="text-base font-heading">Rubrik 3 – Zapf Humanist</h3>
             <p className="text-base text-foreground/80">
               Brödtext använder Poppins i vikterna 300–700. Den nya paletten ger hög kontrast mot Platinum-bakgrunden och säkerställer läsbarhet i alla storlekar.
             </p>
@@ -58,7 +58,7 @@ const StyleGuide = () => {
             </CardContent>
           </Card>
           <div className="card-elevated space-y-4">
-            <h3 className="font-heading text-xl">Tillgänglighetskontroller</h3>
+            <h3 className="font-heading text-base">Tillgänglighetskontroller</h3>
             <div className="flex items-center justify-between">
               <span className="text-foreground/80">E-postutskick</span>
               <Switch defaultChecked aria-label="Aktivera e-postutskick" />

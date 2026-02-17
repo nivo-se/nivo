@@ -287,18 +287,22 @@ export default function NewUniverse() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="app-header border-b px-8 py-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Universe</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {showLoading
-                ? "Loading..."
-                : filteredCompanies.length > 0
-                  ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
-                  : `${totalCount.toLocaleString()} companies`}
-            </p>
-          </div>
+      <div className="shrink-0">
+        <div className="max-w-5xl mx-auto px-8 pt-8 pb-2">
+          <h1 className="text-base font-semibold text-foreground mb-2">Universe</h1>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-5xl mx-auto px-8 pb-8 flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap shrink-0">
+          <p className="text-sm text-muted-foreground">
+            {showLoading
+              ? "Loading..."
+              : filteredCompanies.length > 0
+                ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
+                : `${totalCount.toLocaleString()} companies`}
+          </p>
           <div className="flex gap-3">
             <Input
               placeholder="Search by name..."
@@ -330,7 +334,7 @@ export default function NewUniverse() {
         </div>
 
         {showFilters && (
-          <div className="mt-4">
+          <div className="shrink-0">
             <FilterBuilder
               filters={activeFilters}
               onChange={setActiveFilters}
@@ -340,7 +344,7 @@ export default function NewUniverse() {
         )}
 
         {!showFilters && (activeFilters.include.rules.length > 0 || activeFilters.exclude.rules.length > 0) && (
-          <div className="mt-4 flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs shrink-0">
             <span className="text-muted-foreground">Active filters:</span>
             <span className="px-2 py-1 bg-muted text-foreground rounded">
               {activeFilters.include.rules.length} include
@@ -355,9 +359,8 @@ export default function NewUniverse() {
             </Button>
           </div>
         )}
-      </div>
 
-      <div className="flex-1 overflow-auto px-8 py-4">
+        <div className="flex-1 min-h-0 overflow-auto">
         {showLoading ? (
           <div className="app-card p-12 text-center">
             <div className="inline-block w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin mb-4" />
@@ -386,9 +389,10 @@ export default function NewUniverse() {
             }
           />
         ) : (
-        <div className="app-card overflow-hidden text-sm">
+        <div className="app-card text-sm flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-auto">
           <table className="w-full">
-            <thead className="bg-muted/40 border-b border-border">
+            <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-sm">
               <tr>
                 <th className="px-3 py-2 text-left w-10 text-xs font-medium text-muted-foreground">
                   <Checkbox
@@ -469,6 +473,7 @@ export default function NewUniverse() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
         )}
 
@@ -496,6 +501,8 @@ export default function NewUniverse() {
           </div>
         </div>
         )}
+        </div>
+        </div>
       </div>
 
       {showSaveDialog && (

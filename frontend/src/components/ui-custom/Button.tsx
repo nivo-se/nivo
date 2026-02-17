@@ -28,8 +28,8 @@ const Button: React.FC<ButtonProps> = ({
           'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
           'text-muted-foreground underline-offset-4 hover:underline': variant === 'link',
           'h-9 px-4 py-2 text-sm': size === 'sm',
-          'h-10 px-5 py-2': size === 'md',
-          'h-11 px-6 py-3 text-base': size === 'lg',
+          'h-10 px-4 py-2 text-sm': size === 'md',
+          'h-11 px-6 py-2 text-base': size === 'lg',
           'w-full': fullWidth,
         },
         className

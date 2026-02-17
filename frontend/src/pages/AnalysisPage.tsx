@@ -164,7 +164,7 @@ export default function AnalysisPage() {
                 {/* Header */}
                 <div className="space-y-2">
                     <p className="text-xs uppercase tracking-wide text-muted-foreground">Workflow</p>
-                    <h1 className="text-2xl font-semibold text-foreground">Search & Analysis</h1>
+                    <h1 className="text-base font-semibold text-foreground">Search & Analysis</h1>
                     <p className="text-sm text-muted-foreground">
                         Chat with the AI to filter companies, then run deep analysis to generate investment memos.
                     </p>
@@ -192,7 +192,7 @@ export default function AnalysisPage() {
                         </div>
                         <div>
                             <p className="text-xs uppercase text-muted-foreground">Selection</p>
-                            <p className="text-lg font-semibold text-foreground">{selectedCompanies.size} companies</p>
+                            <p className="text-base font-semibold text-foreground">{selectedCompanies.size} companies</p>
                         </div>
                     </div>
                 )}
@@ -254,7 +254,7 @@ export default function AnalysisPage() {
                                         <div className="w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center mb-4">
                                             <Loader2 className="w-8 h-8 text-muted-foreground" />
                                         </div>
-                                        <p className="text-lg font-medium text-foreground">Ready to Analyze</p>
+                                        <p className="text-base font-medium text-foreground">Ready to Analyze</p>
                                         <p className="text-sm text-center max-w-xs mt-1">
                                             Chat with the AI to define your target, then run the analysis to see investment memos here.
                                         </p>
@@ -339,7 +339,7 @@ export default function AnalysisPage() {
                     <div className="w-full max-w-4xl max-h-[90vh] rounded-2xl bg-card shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="flex items-start justify-between border-b border-border p-6 bg-muted/40">
                             <div>
-                                <h3 className="text-xl font-bold text-foreground">{selectedCompany.company_name}</h3>
+                                <h3 className="text-base font-bold text-foreground">{selectedCompany.company_name}</h3>
                                 <p className="text-sm text-muted-foreground">{selectedCompany.orgnr}</p>
                             </div>
                             <div className="flex gap-3">

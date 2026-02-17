@@ -173,12 +173,6 @@ export function CompanySnapshotModal({
                 <div>
                   <span className="text-muted-foreground">Currency</span> SEK
                 </div>
-                <div>
-                  <span className="text-muted-foreground">Data quality</span>{" "}
-                  {company.data_quality_score != null
-                    ? `${company.data_quality_score}/4`
-                    : "—"}
-                </div>
               </div>
               <div className="flex flex-wrap gap-4 pt-1">
                 {company.website_url && (

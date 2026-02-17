@@ -403,7 +403,7 @@ const AISourcingDashboard: React.FC = () => {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Explorer</p>
-              <h1 className="text-2xl font-semibold text-foreground">AI Sourcing Dashboard</h1>
+              <h1 className="text-base font-semibold text-foreground">AI Sourcing Dashboard</h1>
               <p className="text-sm text-muted-foreground">
                 Describe your investment thesis, let the AI translate it into SQL, then triage and enrich the resulting companies.
               </p>
@@ -429,7 +429,7 @@ const AISourcingDashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-xs uppercase text-muted-foreground">Matches</p>
-              <p className="text-lg font-semibold text-foreground">
+              <p className="text-base font-semibold text-foreground">
                 {aiResult.total.toLocaleString()}{' '}
                 <span className="text-xs font-normal text-muted-foreground">
                   (showing {(aiResult.result_count ?? aiResult.count).toLocaleString()})
@@ -438,7 +438,7 @@ const AISourcingDashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-xs uppercase text-muted-foreground">Selection</p>
-              <p className="text-lg font-semibold text-foreground">{selectedCompanies.length} companies</p>
+              <p className="text-base font-semibold text-foreground">{selectedCompanies.length} companies</p>
             </div>
           </div>
         )}
@@ -484,7 +484,7 @@ const AISourcingDashboard: React.FC = () => {
             <div className="space-y-4 rounded-2xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">AI Chat Filter</h2>
+                  <h2 className="text-base font-semibold text-foreground">AI Chat Filter</h2>
                   <p className="text-sm text-muted-foreground">Describe the type of target you are looking for.</p>
                 </div>
                 {savedLists.length > 0 && (
@@ -535,7 +535,7 @@ const AISourcingDashboard: React.FC = () => {
       {showLoadDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-card/60 p-4">
           <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl">
-            <h3 className="mb-4 text-lg font-semibold">Load Saved List</h3>
+            <h3 className="mb-4 text-base font-semibold">Load Saved List</h3>
             {savedLists.length === 0 ? (
               <p className="text-sm text-muted-foreground">No saved lists available.</p>
             ) : (
@@ -573,7 +573,7 @@ const AISourcingDashboard: React.FC = () => {
           <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-base font-semibold text-foreground">
                   {activeProfile.company_name || activeProfile.orgnr}
                 </h3>
                 <p className="text-sm text-muted-foreground">{activeProfile.orgnr}</p>

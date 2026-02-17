@@ -20,7 +20,7 @@ export function AdminPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Admin</h1>
+        <h1 className="text-base font-semibold tracking-tight">Admin</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
           System overview, user management, and settings
         </p>

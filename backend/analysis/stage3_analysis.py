@@ -10,7 +10,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from openai import OpenAI
 
@@ -67,7 +67,8 @@ class AIAnalyzer:
         orgnr: str,
         company_name: str,
         financial_data: dict,
-        research_data: Optional[ResearchData] = None
+        research_data: Optional[ResearchData] = None,
+        template_prompt: Optional[str] = None,
     ) -> AnalysisResult:
         """
         Analyze a company and generate investment memo
@@ -84,7 +85,12 @@ class AIAnalyzer:
         logger.info(f"Analyzing company: {company_name} ({orgnr})")
         
         # Build prompt
-        prompt = self._build_prompt(company_name, financial_data, research_data)
+        prompt = self._build_prompt(
+            company_name=company_name,
+            financial_data=financial_data,
+            research_data=research_data,
+            template_prompt=template_prompt,
+        )
         
         try:
             # Call OpenAI
@@ -136,11 +142,24 @@ class AIAnalyzer:
         self,
         company_name: str,
         financial_data: dict,
-        research_data: Optional[ResearchData]
+        research_data: Optional[ResearchData],
+        template_prompt: Optional[str] = None,
     ) -> str:
         """Build analysis prompt"""
         
         prompt_parts = [f"Company: {company_name}\n"]
+
+        if template_prompt:
+            rendered_template = self._render_template_prompt(
+                template_prompt=template_prompt,
+                company_name=company_name,
+                financial_data=financial_data,
+            )
+            prompt_parts.append("CUSTOM TEMPLATE INSTRUCTIONS:")
+            prompt_parts.append(rendered_template[:3500])
+            prompt_parts.append(
+                "Apply the template instructions above while still returning the required JSON schema.\n"
+            )
         
         # Financial data
         prompt_parts.append("FINANCIAL DATA:")
@@ -195,6 +214,37 @@ Strategic fit score must be 1-10 (10 = perfect acquisition target)
 """)
         
         return "\n".join(prompt_parts)
+
+    def _render_template_prompt(
+        self, template_prompt: str, company_name: str, financial_data: dict
+    ) -> str:
+        revenue = self._fmt_number(financial_data.get("revenue"))
+        growth = self._fmt_percent(financial_data.get("growth"))
+        ebitda_margin = self._fmt_percent(financial_data.get("ebitda_margin"))
+        employees = self._fmt_number(financial_data.get("employees"))
+        replacements = {
+            "company_name": company_name,
+            "industry_label": str(financial_data.get("industry_label") or "Unknown industry"),
+            "region": str(financial_data.get("region") or "Unknown region"),
+            "revenue_latest": revenue,
+            "revenue_cagr": growth,
+            "ebitda_margin": ebitda_margin,
+            "employees_latest": employees,
+        }
+        rendered = template_prompt
+        for key, value in replacements.items():
+            rendered = rendered.replace(f"{{{{{key}}}}}", value)
+        return rendered
+
+    def _fmt_percent(self, value: Any) -> str:
+        if isinstance(value, (int, float)):
+            return f"{float(value) * 100:.1f}"
+        return "N/A"
+
+    def _fmt_number(self, value: Any) -> str:
+        if isinstance(value, (int, float)):
+            return f"{float(value):.0f}"
+        return "N/A"
     
     def _generate_memo(self, company_name: str, analysis: dict) -> str:
         """Generate markdown investment memo"""

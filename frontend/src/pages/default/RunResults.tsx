@@ -96,7 +96,7 @@ export default function NewRunResults() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Run not found</h2>
+          <h2 className="text-base font-bold text-foreground mb-2">Run not found</h2>
           <Link to="/ai">
             <Button>Back to AI Lab</Button>
           </Link>
@@ -173,7 +173,7 @@ export default function NewRunResults() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground mb-1">
+              <h1 className="text-base font-semibold text-foreground mb-1">
                 {run.name}
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -190,19 +190,19 @@ export default function NewRunResults() {
             </div>
             <div className="flex gap-3">
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-base font-bold text-foreground">
                   {approvedResults.length}
                 </p>
                 <p className="text-xs text-muted-foreground">Approved</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-base font-bold text-foreground">
                   {pendingResults.length}
                 </p>
                 <p className="text-xs text-muted-foreground">Pending</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-muted-foreground">
+                <p className="text-base font-bold text-muted-foreground">
                   {rejectedResults.length}
                 </p>
                 <p className="text-xs text-muted-foreground">Rejected</p>
@@ -349,7 +349,7 @@ function ResultCard({
           <p className="font-medium text-sm text-foreground">
             {company?.display_name ?? result.company_orgnr}
           </p>
-          <span className={`text-lg font-bold ${scoreClass}`}>
+          <span className={`text-base font-bold ${scoreClass}`}>
             {result.overall_score}
           </span>
         </div>
@@ -401,7 +401,7 @@ function ResultDetail({
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-base font-bold text-foreground">
                   {company?.display_name ?? result.company_orgnr}
                 </h2>
                 <Link
@@ -416,7 +416,7 @@ function ResultDetail({
               </p>
             </div>
             <div className="text-right">
-              <p className="text-4xl font-bold text-foreground mb-1">
+              <p className="text-base font-bold text-foreground mb-1">
                 {result.overall_score}
               </p>
               <p className="text-sm text-muted-foreground">AI Fit Score</p>
@@ -448,7 +448,7 @@ function ResultDetail({
                         )}
                       </div>
                       <span
-                        className={`text-2xl font-bold ${
+                        className={`text-base font-bold ${
                           score >= 75
                             ? "text-primary"
                             : score >= 50

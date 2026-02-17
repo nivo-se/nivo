@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Play, DollarSign, ListChecks } from "lucide-react";
 
-export default function NewCreateRun() {
+export default function CreateRun() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const templateId = searchParams.get("template");
@@ -25,10 +25,11 @@ export default function NewCreateRun() {
     ? templates.find((t) => t.id === templateId) ?? templates[0]
     : templates[0];
   const list = listId ? lists.find((l) => l.id === listId) ?? lists[0] : lists[0];
+  const companyCount = list?.companyIds.length ?? 0;
 
   const [runName, setRunName] = useState("");
   const [autoApprove, setAutoApprove] = useState(false);
-  const [overwriteExisting, setOverwriteExisting] = useState(true);
+  const [overwriteExisting, setOverwriteExisting] = useState(false);
 
   useEffect(() => {
     if (list && template) {
@@ -36,10 +37,32 @@ export default function NewCreateRun() {
     }
   }, [list, template]);
 
-  const estimatedCost = list ? list.companyIds.length * 0.2 : 0;
-  const estimatedTime = list
-    ? Math.ceil(list.companyIds.length / 10)
-    : 0;
+  const dimensionCount = template?.scoringDimensions.length ?? 0;
+  const baseCostPerCompany = 0.02;
+  const perDimensionCost = 0.003;
+  const overwriteSurcharge = overwriteExisting ? 0.004 : 0;
+  const autoApproveDiscount = autoApprove ? 0.001 : 0;
+  const estimatedCostPerCompany = Math.max(
+    0.01,
+    baseCostPerCompany + dimensionCount * perDimensionCost + overwriteSurcharge - autoApproveDiscount
+  );
+  const estimatedCost = companyCount * estimatedCostPerCompany;
+
+  const companiesPerMinute = Math.max(
+    4,
+    12 - dimensionCount - (overwriteExisting ? 2 : 0)
+  );
+  const estimatedTime = companyCount > 0 ? Math.ceil(companyCount / companiesPerMinute) : 0;
+
+  const handleAutoApproveChange = (checked: boolean) => {
+    setAutoApprove(checked);
+    if (checked) setOverwriteExisting(false);
+  };
+
+  const handleOverwriteChange = (checked: boolean) => {
+    setOverwriteExisting(checked);
+    if (checked) setAutoApprove(false);
+  };
 
   const handleCreateRun = async () => {
     if (!list || !template || !runName.trim()) return;
@@ -63,7 +86,7 @@ export default function NewCreateRun() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
+          <h2 className="text-base font-bold text-foreground mb-2">
             Invalid Configuration
           </h2>
           <p className="text-muted-foreground mb-4">
@@ -72,7 +95,7 @@ export default function NewCreateRun() {
               : "Template or list not found"}
           </p>
           <Link to="/ai">
-            <Button>Back to AI Lab</Button>
+            <Button variant="outline" className="hover:bg-muted hover:text-foreground">Back to AI Lab</Button>
           </Link>
         </div>
       </div>
@@ -84,11 +107,11 @@ export default function NewCreateRun() {
       <div className="max-w-4xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/ai">
-            <Button variant="ghost" size="sm" className="mb-4">
+            <Button variant="ghost" size="sm" className="mb-4 hover:bg-muted hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-1" /> Back to AI Lab
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-base font-bold text-foreground mb-2">
             Create AI Analysis Run
           </h1>
           <p className="text-muted-foreground">Configure and launch your analysis</p>
@@ -107,7 +130,7 @@ export default function NewCreateRun() {
                 value={runName}
                 onChange={(e) => setRunName(e.target.value)}
                 placeholder="e.g., Q1 2026 - Manufacturing Batch"
-                className="max-w-xl"
+                className="max-w-xl focus-visible:ring-border"
               />
             </CardContent>
           </Card>
@@ -179,7 +202,8 @@ export default function NewCreateRun() {
                   <Checkbox
                     id="auto-approve"
                     checked={autoApprove}
-                    onCheckedChange={(c) => setAutoApprove(c === true)}
+                    onCheckedChange={(c) => handleAutoApproveChange(c === true)}
+                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-accent data-[state=checked]:text-foreground"
                   />
                   <div>
                     <label
@@ -198,7 +222,8 @@ export default function NewCreateRun() {
                   <Checkbox
                     id="overwrite"
                     checked={overwriteExisting}
-                    onCheckedChange={(c) => setOverwriteExisting(c === true)}
+                    onCheckedChange={(c) => handleOverwriteChange(c === true)}
+                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-accent data-[state=checked]:text-foreground"
                   />
                   <div>
                     <label
@@ -213,6 +238,9 @@ export default function NewCreateRun() {
                     </p>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  These options are mutually exclusive, so only one can be enabled at a time.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -226,20 +254,22 @@ export default function NewCreateRun() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-primary/10 rounded-lg">
+                <div className="p-4 rounded-lg border border-border bg-muted/40">
                   <p className="text-sm text-muted-foreground mb-1">Estimated Cost</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-base font-bold text-foreground">
                     ${estimatedCost.toFixed(2)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">~$0.20 per company</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ~${estimatedCostPerCompany.toFixed(3)} per company
+                  </p>
                 </div>
-                <div className="p-4 bg-primary/10 rounded-lg">
+                <div className="p-4 rounded-lg border border-border bg-muted/40">
                   <p className="text-sm text-muted-foreground mb-1">Estimated Time</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-base font-bold text-foreground">
                     {estimatedTime} min
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    ~10 companies per minute
+                    ~{companiesPerMinute} companies per minute
                   </p>
                 </div>
               </div>
@@ -248,12 +278,14 @@ export default function NewCreateRun() {
 
           <div className="flex items-center justify-between pt-4 border-t">
             <Link to="/ai">
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="hover:bg-muted">Cancel</Button>
             </Link>
             <Button
+              variant="outline"
               size="lg"
               onClick={handleCreateRun}
               disabled={!runName.trim() || createRunMutation.isPending}
+              className="hover:bg-muted hover:text-foreground"
             >
               <Play className="w-4 h-4 mr-2" />
               {createRunMutation.isPending ? "Creating Run..." : "Start Analysis"}

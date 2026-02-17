@@ -145,7 +145,7 @@ export default function NewRunDetail() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-base font-bold text-foreground mb-2">
                 {run.name}
               </h1>
               <p className="text-muted-foreground">
@@ -231,7 +231,7 @@ export default function NewRunDetail() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground mb-1">Total Companies</p>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-base font-bold text-foreground">
                 {run.total_companies}
               </p>
             </CardContent>
@@ -239,7 +239,7 @@ export default function NewRunDetail() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground mb-1">Processed</p>
-              <p className="text-2xl font-bold text-primary">
+              <p className="text-base font-bold text-primary">
                 {run.processed_companies}
               </p>
             </CardContent>
@@ -247,7 +247,7 @@ export default function NewRunDetail() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground mb-1">Failed</p>
-              <p className="text-2xl font-bold text-destructive">
+              <p className="text-base font-bold text-destructive">
                 {run.failed_companies}
               </p>
             </CardContent>
@@ -255,7 +255,7 @@ export default function NewRunDetail() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground mb-1">Cost</p>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-base font-bold text-foreground">
                 $
                 {run.status === "completed"
                   ? run.actual_cost.toFixed(2)

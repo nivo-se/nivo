@@ -58,7 +58,7 @@ export function HomePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Home</h1>
+          <h1 className="text-base font-semibold tracking-tight">Home</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             CEO view: universe snapshot, pipeline snapshot, active runs
           </p>
@@ -78,7 +78,7 @@ export function HomePage() {
     <div className="space-y-6 max-w-3xl">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Home</h1>
+        <h1 className="text-base font-semibold tracking-tight">Home</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
           CEO view: universe snapshot, pipeline snapshot, active runs
         </p>

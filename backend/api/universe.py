@@ -1,12 +1,12 @@
 """
 Universe query API: structured filter stack for Universe page.
-Uses coverage_metrics view; supports filters + sort + pagination.
+Builds a schema-compatible source from base tables and supports filters + sort + pagination.
 """
 import asyncio
 import json
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
@@ -17,6 +17,10 @@ from .coverage import _parse_segment_names, _IS_POSTGRES
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/universe", tags=["universe"])
+
+KNOWN_FINANCIAL_TABLES = ("financials", "company_financials")
+KNOWN_METRICS_TABLES = ("company_kpis", "company_metrics")
+MIN_VALID_REVENUE_SEK = 50_000_000
 
 # Whitelist: field -> SQL column (coverage_metrics)
 FILTER_FIELDS = {
@@ -71,6 +75,206 @@ FILTER_TAXONOMY = {
         },
     ],
 }
+
+
+def _table_exists(db: Any, table_name: str) -> bool:
+    if not hasattr(db, "table_exists"):
+        return False
+    try:
+        return bool(db.table_exists(table_name))
+    except Exception:
+        return False
+
+
+def _count_distinct_orgnrs(db: Any, table_name: str) -> int:
+    if table_name not in KNOWN_FINANCIAL_TABLES + KNOWN_METRICS_TABLES:
+        return 0
+    if not _table_exists(db, table_name):
+        return 0
+    try:
+        rows = db.run_raw_query(f"SELECT COUNT(DISTINCT orgnr)::int AS n FROM {table_name}")
+        return int(rows[0].get("n", 0)) if rows else 0
+    except Exception:
+        return 0
+
+
+def _pick_best_table(db: Any, candidates: Sequence[str]) -> Optional[str]:
+    scores: List[Tuple[int, str]] = []
+    for name in candidates:
+        count = _count_distinct_orgnrs(db, name)
+        if count > 0:
+            scores.append((count, name))
+    if not scores:
+        for name in candidates:
+            if _table_exists(db, name):
+                return name
+        return None
+    scores.sort(key=lambda x: x[0], reverse=True)
+    return scores[0][1]
+
+
+def _annual_period_predicate(financials_table: Optional[str], alias: str = "f") -> str:
+    if financials_table == "financials":
+        return (
+            f"({alias}.currency IS NULL OR {alias}.currency = 'SEK') "
+            f"AND ({alias}.period = '12' OR RIGHT({alias}.period, 2) = '12')"
+        )
+    if financials_table == "company_financials":
+        return f"({alias}.period = '12' OR RIGHT({alias}.period, 2) = '12')"
+    return "FALSE"
+
+
+def _financial_base_predicate(financials_table: Optional[str], alias: str = "f") -> str:
+    if financials_table == "financials":
+        return f"({alias}.currency IS NULL OR {alias}.currency = 'SEK')"
+    if financials_table == "company_financials":
+        return "TRUE"
+    return "FALSE"
+
+
+def _financial_revenue_expr(financials_table: Optional[str], alias: str = "f") -> str:
+    if financials_table == "financials":
+        return f"COALESCE({alias}.si_sek, {alias}.sdi_sek)"
+    if financials_table == "company_financials":
+        return f"{alias}.revenue_sek"
+    return "NULL"
+
+
+def _financial_ebitda_expr(financials_table: Optional[str], alias: str = "f") -> str:
+    if financials_table == "financials":
+        return f"COALESCE({alias}.ebitda_sek, {alias}.ors_sek)"
+    if financials_table == "company_financials":
+        return f"{alias}.ebitda_sek"
+    return "NULL"
+
+
+def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
+    metrics_table = _pick_best_table(db, KNOWN_METRICS_TABLES)
+    financials_table = _pick_best_table(db, KNOWN_FINANCIAL_TABLES)
+
+    annual_period_filter = _annual_period_predicate(financials_table, alias="f")
+    base_financial_filter = _financial_base_predicate(financials_table, alias="f")
+    fin_revenue_expr = _financial_revenue_expr(financials_table, alias="f")
+    fin_ebitda_expr = _financial_ebitda_expr(financials_table, alias="f")
+
+    has_3y_expr = "FALSE"
+    if financials_table:
+        has_3y_expr = (
+            f"(SELECT COUNT(DISTINCT f.year) FROM {financials_table} f "
+            f"WHERE f.orgnr = c.orgnr) >= 3"
+        )
+
+    metrics_join = ""
+    metrics_revenue = "NULL"
+    metrics_margin = "NULL"
+    metrics_cagr = "NULL"
+    metrics_equity_ratio = "NULL"
+    metrics_debt_to_equity = "NULL"
+    if metrics_table:
+        metrics_join = f"LEFT JOIN {metrics_table} m ON m.orgnr = c.orgnr"
+        metrics_revenue = "m.latest_revenue_sek"
+        metrics_margin = "m.avg_ebitda_margin"
+        metrics_cagr = "m.revenue_cagr_3y"
+        metrics_equity_ratio = "m.equity_ratio_latest"
+        metrics_debt_to_equity = "m.debt_to_equity_latest"
+
+    fin_latest_annual_join = ""
+    fin_latest_any_join = ""
+    fin_latest_annual_revenue = "NULL"
+    fin_latest_annual_margin = "NULL"
+    fin_latest_any_revenue = "NULL"
+    fin_latest_any_margin = "NULL"
+    if financials_table:
+        fin_latest_annual_join = f"""
+      LEFT JOIN (
+        SELECT DISTINCT ON (f.orgnr)
+          f.orgnr,
+          {fin_revenue_expr} AS revenue_latest_annual,
+          {fin_ebitda_expr} AS ebitda_latest_annual
+        FROM {financials_table} f
+        WHERE {annual_period_filter}
+        ORDER BY f.orgnr, f.year DESC, COALESCE(f.period, '') DESC
+      ) fa ON fa.orgnr = c.orgnr
+"""
+        fin_latest_any_join = f"""
+      LEFT JOIN (
+        SELECT DISTINCT ON (f.orgnr)
+          f.orgnr,
+          {fin_revenue_expr} AS revenue_latest_any,
+          {fin_ebitda_expr} AS ebitda_latest_any
+        FROM {financials_table} f
+        WHERE {base_financial_filter}
+        ORDER BY f.orgnr, f.year DESC, COALESCE(f.period, '') DESC
+      ) fn ON fn.orgnr = c.orgnr
+"""
+        fin_latest_annual_revenue = "fa.revenue_latest_annual"
+        fin_latest_any_revenue = "fn.revenue_latest_any"
+        fin_latest_annual_margin = (
+            "CASE WHEN fa.revenue_latest_annual IS NOT NULL "
+            "AND fa.revenue_latest_annual > 0 "
+            "AND fa.ebitda_latest_annual IS NOT NULL "
+            "THEN fa.ebitda_latest_annual / fa.revenue_latest_annual "
+            "ELSE NULL END"
+        )
+        fin_latest_any_margin = (
+            "CASE WHEN fn.revenue_latest_any IS NOT NULL "
+            "AND fn.revenue_latest_any > 0 "
+            "AND fn.ebitda_latest_any IS NOT NULL "
+            "THEN fn.ebitda_latest_any / fn.revenue_latest_any "
+            "ELSE NULL END"
+        )
+
+    raw_revenue_latest_expr = (
+        f"COALESCE({metrics_revenue}, {fin_latest_annual_revenue}, {fin_latest_any_revenue})"
+    )
+    raw_ebitda_margin_latest_expr = (
+        f"COALESCE({metrics_margin}, {fin_latest_annual_margin}, {fin_latest_any_margin})"
+    )
+    revenue_latest_expr = (
+        f"CASE WHEN ({raw_revenue_latest_expr}) >= {MIN_VALID_REVENUE_SEK} "
+        f"THEN ({raw_revenue_latest_expr}) ELSE NULL END"
+    )
+    ebitda_margin_latest_expr = (
+        f"CASE WHEN ({raw_revenue_latest_expr}) >= {MIN_VALID_REVENUE_SEK} "
+        f"THEN ({raw_ebitda_margin_latest_expr}) ELSE NULL END"
+    )
+
+    source_sql = f"""
+    (
+      SELECT
+        c.orgnr,
+        c.company_name AS name,
+        c.segment_names,
+        (c.homepage IS NOT NULL AND c.homepage != '') AS has_homepage,
+        (a.org_number IS NOT NULL) AS has_ai_profile,
+        ({has_3y_expr}) AS has_3y_financials,
+        a.last_updated AS last_enriched_at,
+        (
+          CASE WHEN (c.homepage IS NOT NULL AND c.homepage != '') THEN 1 ELSE 0 END +
+          CASE WHEN a.org_number IS NOT NULL THEN 2 ELSE 0 END +
+          CASE WHEN ({has_3y_expr}) THEN 1 ELSE 0 END
+        )::int AS data_quality_score,
+        {revenue_latest_expr} AS revenue_latest,
+        {ebitda_margin_latest_expr} AS ebitda_margin_latest,
+        {metrics_cagr} AS revenue_cagr_3y,
+        c.employees_latest AS employees_latest,
+        (a.last_updated IS NULL OR a.last_updated < NOW() - INTERVAL '180 days') AS is_stale,
+        COALESCE(c.address->>'municipality', c.address->>'region') AS municipality,
+        c.homepage,
+        c.email,
+        c.phone,
+        a.strategic_fit_score AS ai_strategic_fit_score,
+        {metrics_equity_ratio} AS equity_ratio_latest,
+        {metrics_debt_to_equity} AS debt_to_equity_latest
+      FROM companies c
+      LEFT JOIN ai_profiles a ON c.orgnr = a.org_number
+      {metrics_join}
+      {fin_latest_annual_join}
+      {fin_latest_any_join}
+    ) cm
+    """
+
+    return source_sql, metrics_table or "none", financials_table or "none"
 
 
 class FilterItem(BaseModel):
@@ -293,14 +497,20 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     )
 
     if _IS_POSTGRES:
+        source_sql, metrics_table, financials_table = _build_universe_source_subquery(db)
+        logger.debug(
+            "Universe source tables: metrics=%s financials=%s",
+            metrics_table,
+            financials_table,
+        )
         sql_rows = f"""
         SELECT {select_cols}
-        FROM coverage_metrics cm
+        FROM {source_sql}
         WHERE {where_sql}
         ORDER BY {order_sql}
         LIMIT ? OFFSET ?
         """
-        sql_total = f"SELECT COUNT(*)::int AS total FROM coverage_metrics cm WHERE {where_sql}"
+        sql_total = f"SELECT COUNT(*)::int AS total FROM {source_sql} WHERE {where_sql}"
     else:
         # SQLite: Universe query requires Postgres (coverage_metrics + financial cols)
         sql_rows = "SELECT 1 AS _ LIMIT 0"

@@ -114,10 +114,10 @@ export default function NewAILab() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-muted/40">
+    <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">AI Lab</h1>
+          <h1 className="text-base font-semibold text-foreground mb-2">AI Lab</h1>
           <p className="text-sm text-muted-foreground">
             Analyze companies using AI-powered prompt templates
           </p>
@@ -161,7 +161,7 @@ export default function NewAILab() {
                   </select>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Estimated cost: ~$0.20 per company
+                  Cost estimate is shown after you pick list + run configuration
                 </p>
               </div>
             ) : (
@@ -215,13 +215,13 @@ export default function NewAILab() {
                       <div className="flex gap-2">
                         {(run.status === "completed" || run.processed_companies > 0) && (
                           <Link to={`/ai/runs/${run.id}/results`}>
-                            <Button variant="outline" size="sm" className="h-8 text-sm">
+                            <Button variant="outline" size="sm" className="h-8 text-sm hover:bg-muted hover:text-foreground">
                               View Results
                             </Button>
                           </Link>
                         )}
                         <Link to={`/ai/runs/${run.id}`}>
-                          <Button variant="ghost" size="sm" className="h-8 text-sm">
+                          <Button variant="ghost" size="sm" className="h-8 text-sm hover:bg-muted hover:text-foreground">
                             View Details
                           </Button>
                         </Link>
@@ -260,6 +260,7 @@ export default function NewAILab() {
                       size="sm"
                       variant="outline"
                       onClick={handleTemplateCreate}
+                      className="hover:bg-muted hover:text-foreground"
                     >
                       <Plus className="w-4 h-4 mr-1.5" />
                       Create New Template
@@ -306,16 +307,14 @@ export default function NewAILab() {
                           <div className="flex gap-2">
                             <Button
                               size="sm"
-                              variant={
-                                selectedTemplate === template.id
-                                  ? "default"
-                                  : "outline"
-                              }
+                              variant="outline"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedTemplate(template.id);
                               }}
-                              className="text-xs h-8"
+                              className={`text-xs h-8 hover:bg-muted hover:text-foreground ${
+                                selectedTemplate === template.id ? "bg-muted text-foreground" : ""
+                              }`}
                             >
                               {selectedTemplate === template.id
                                 ? "Selected"
@@ -328,7 +327,7 @@ export default function NewAILab() {
                                 e.stopPropagation();
                                 handleTemplateEdit(template);
                               }}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 hover:bg-muted hover:text-foreground"
                             >
                               <Pencil className="w-3 h-3" />
                             </Button>
@@ -339,7 +338,7 @@ export default function NewAILab() {
                                 e.stopPropagation();
                                 handleTemplateDuplicate(template);
                               }}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 hover:bg-muted hover:text-foreground"
                             >
                               <Copy className="w-3 h-3" />
                             </Button>
@@ -389,7 +388,7 @@ export default function NewAILab() {
                                 e.stopPropagation();
                                 handleTemplateEdit(template);
                               }}
-                              className="mt-3 text-xs h-8"
+                              className="mt-3 text-xs h-8 hover:bg-muted hover:text-foreground"
                             >
                               <FileText className="w-3 h-3 mr-1.5" />
                               View Full Prompt
@@ -405,7 +404,7 @@ export default function NewAILab() {
                   size="sm"
                   variant="outline"
                   onClick={handleTemplateCreate}
-                  className="w-full text-sm h-9"
+                  className="w-full text-sm h-9 hover:bg-muted hover:text-foreground"
                 >
                   <Plus className="w-4 h-4 mr-1.5" />
                   Create New Template

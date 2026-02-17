@@ -106,7 +106,7 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
               Clear All
             </Button>
           )}
-          <Button size="sm" onClick={onApply}>
+          <Button variant="outline" size="sm" onClick={onApply}>
             Apply Filters
           </Button>
         </div>

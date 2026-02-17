@@ -83,7 +83,7 @@ export default function NewCompanyDetail() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Company not found</h2>
+          <h2 className="text-base font-bold text-foreground mb-2">Company not found</h2>
           <Link to="/universe">
             <Button>Back to Universe</Button>
           </Link>
@@ -124,7 +124,7 @@ export default function NewCompanyDetail() {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-base font-bold text-foreground mb-2">
                 {company.display_name}
               </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -177,7 +177,7 @@ export default function NewCompanyDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-base font-bold text-foreground">
                     {formatRevenueSEK(latest.revenue)}
                   </p>
                 </CardContent>
@@ -191,7 +191,7 @@ export default function NewCompanyDetail() {
                 </CardHeader>
                 <CardContent>
                   <p
-                    className={`text-2xl font-bold ${
+                    className={`text-base font-bold ${
                       cagrNum > 0.15 ? "text-primary" : "text-foreground"
                     }`}
                   >
@@ -207,7 +207,7 @@ export default function NewCompanyDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-base font-bold text-foreground">
                     {formatPercent(latest.ebitdaMargin)}
                   </p>
                 </CardContent>
@@ -220,7 +220,7 @@ export default function NewCompanyDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-base font-bold text-foreground">
                     {formatRevenueSEK(
                       latest.ebitda ?? (latest.revenue != null && latest.ebitdaMargin != null
                         ? (latest.revenue * latest.ebitdaMargin)
@@ -241,7 +241,7 @@ export default function NewCompanyDetail() {
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">Revenue Growth YoY</p>
                       {company.revenue_growth_yoy_latest != null ? (
-                        <p className={`text-lg font-semibold ${company.revenue_growth_yoy_latest >= 0 ? "text-primary" : "text-destructive"}`}>
+                        <p className={`text-base font-semibold ${company.revenue_growth_yoy_latest >= 0 ? "text-primary" : "text-destructive"}`}>
                           {(company.revenue_growth_yoy_latest >= 0 ? "+" : "")}{formatPercent(company.revenue_growth_yoy_latest)}
                         </p>
                       ) : financials.length >= 2 ? (
@@ -250,7 +250,7 @@ export default function NewCompanyDetail() {
                           const curr = financials[financials.length - 1];
                           const yoy = prev?.revenue ? ((curr.revenue - prev.revenue) / prev.revenue) : null;
                           return yoy != null ? (
-                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
+                            <p className={`text-base font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
                               {(yoy >= 0 ? "+" : "")}{formatPercent(yoy)}
                             </p>
                           ) : (
@@ -269,7 +269,7 @@ export default function NewCompanyDetail() {
                           const curr = financials[financials.length - 1];
                           const yoy = ((curr.ebitda - prev.ebitda) / prev.ebitda);
                           return (
-                            <p className={`text-lg font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
+                            <p className={`text-base font-semibold ${yoy >= 0 ? "text-primary" : "text-destructive"}`}>
                               {(yoy >= 0 ? "+" : "")}{formatPercent(yoy)}
                             </p>
                           );
@@ -372,7 +372,7 @@ export default function NewCompanyDetail() {
                       </span>
                       <div className="text-right">
                         <span
-                          className={`text-4xl font-bold ${
+                          className={`text-base font-bold ${
                             (aiProfile.ai_fit_score ?? 0) >= 75
                               ? "text-primary"
                               : (aiProfile.ai_fit_score ?? 0) >= 50

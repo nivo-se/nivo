@@ -39,22 +39,22 @@ export default function NewWorkDashboard() {
     <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Dashboard</h1>
+          <h1 className="text-base font-semibold text-foreground mb-2">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Here&apos;s what&apos;s happening with your investment pipeline</p>
         </div>
 
         <div className="grid grid-cols-3 gap-6 mb-8">
           <div className="app-card p-6">
             <p className="text-sm text-muted-foreground mb-2">Total Companies</p>
-            <p className="text-2xl font-semibold text-foreground">{totalCompanies.toLocaleString()}</p>
+            <p className="text-base font-semibold text-foreground">{totalCompanies.toLocaleString()}</p>
           </div>
           <div className="app-card p-6">
             <p className="text-sm text-muted-foreground mb-2">Active Lists</p>
-            <p className="text-2xl font-semibold text-foreground">{lists.length}</p>
+            <p className="text-base font-semibold text-foreground">{lists.length}</p>
           </div>
           <div className="app-card p-6">
             <p className="text-sm text-muted-foreground mb-2">Prospects</p>
-            <p className="text-2xl font-semibold text-foreground">{prospects.length}</p>
+            <p className="text-base font-semibold text-foreground">{prospects.length}</p>
           </div>
         </div>
 
@@ -150,23 +150,23 @@ export default function NewWorkDashboard() {
             </div>
             <div className="grid grid-cols-5 gap-6">
               <div>
-                <p className="text-2xl font-semibold text-foreground">{prospectsByStatus.new}</p>
+                <p className="text-base font-semibold text-foreground">{prospectsByStatus.new}</p>
                 <p className="text-sm text-muted-foreground mt-2">New</p>
               </div>
               <div>
-                <p className="text-2xl font-semibold text-foreground">{prospectsByStatus.contacted}</p>
+                <p className="text-base font-semibold text-foreground">{prospectsByStatus.contacted}</p>
                 <p className="text-sm text-muted-foreground mt-2">Contacted</p>
               </div>
               <div>
-                <p className="text-2xl font-semibold text-foreground">{prospectsByStatus.in_discussion}</p>
+                <p className="text-base font-semibold text-foreground">{prospectsByStatus.in_discussion}</p>
                 <p className="text-sm text-muted-foreground mt-2">In Discussion</p>
               </div>
               <div>
-                <p className="text-2xl font-semibold text-foreground">{prospectsByStatus.interested}</p>
+                <p className="text-base font-semibold text-foreground">{prospectsByStatus.interested}</p>
                 <p className="text-sm text-muted-foreground mt-2">Interested</p>
               </div>
               <div>
-                <p className="text-2xl font-semibold text-muted-foreground">{prospectsByStatus.not_interested}</p>
+                <p className="text-base font-semibold text-muted-foreground">{prospectsByStatus.not_interested}</p>
                 <p className="text-sm text-muted-foreground mt-2">Not Interested</p>
               </div>
             </div>

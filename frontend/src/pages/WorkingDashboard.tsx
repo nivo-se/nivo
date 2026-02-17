@@ -190,7 +190,7 @@ const WorkingDashboard: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="bg-card rounded-lg p-6 text-primary-foreground">
-              <h2 className="text-2xl font-bold mb-2">Välkommen till Nivo Dashboard</h2>
+              <h2 className="text-base font-bold mb-2">Välkommen till Nivo Dashboard</h2>
               <p className="text-muted-foreground">
                 Din omfattande affärsintelligensplattform med realtidsdata och insikter.
               </p>
@@ -220,7 +220,7 @@ const WorkingDashboard: React.FC = () => {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-                            <p className="text-2xl font-bold text-foreground">{value}</p>
+                            <p className="text-base font-bold text-foreground">{value}</p>
                           </div>
                           <Icon className={`h-8 w-8 ${iconClass}`} />
                         </div>
@@ -534,7 +534,7 @@ const WorkingDashboard: React.FC = () => {
               >
                 {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
-              <h1 className="ml-2 text-xl font-semibold text-foreground">
+              <h1 className="ml-2 text-base font-semibold text-foreground">
                 Nivo Dashboard
               </h1>
             </div>

@@ -87,7 +87,7 @@ const Auth: React.FC = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-card rounded-2xl p-8 shadow-2xl border border-border text-center">
-          <h1 className="text-xl font-bold text-foreground mb-2">Auth Not Configured</h1>
+          <h1 className="text-base font-bold text-foreground mb-2">Auth Not Configured</h1>
           <p className="text-muted-foreground">
             Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for login. Local dev may work without auth.
           </p>
@@ -114,7 +114,7 @@ const Auth: React.FC = () => {
               <Building2 className="h-10 w-10 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Log In</h1>
+          <h1 className="text-base font-bold text-foreground mb-2">Log In</h1>
         </div>
 
         <form onSubmit={handleSignIn} className="space-y-6">

@@ -536,7 +536,7 @@ const ValuationPage: React.FC = () => {
       <header className="space-y-2">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">AI-stödd värdering</h1>
+            <h1 className="text-base font-bold tracking-tight">AI-stödd värdering</h1>
             <p className="text-muted-foreground">
               Välj svenska bolag för att jämföra multiplar, historik och AI-genererade insikter.
             </p>
@@ -899,7 +899,7 @@ const ValuationPage: React.FC = () => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <CardTitle className="text-xl">AI-insikter</CardTitle>
+              <CardTitle className="text-base">AI-insikter</CardTitle>
               <Badge variant="secondary">GPT-4.1 mini</Badge>
               {valuation.mode === 'deep' && <Badge variant="default">Fördjupad GPT-4o</Badge>}
             </div>

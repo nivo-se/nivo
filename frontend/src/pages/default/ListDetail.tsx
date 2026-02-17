@@ -180,9 +180,9 @@ export default function NewListDetail() {
             </Link>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{list.name}</h1>
+                <h1 className="text-base font-bold text-foreground">{list.name}</h1>
                 {list.scope === "team" && (
-                  <span className="text-xs px-2 py-1 bg-primary/15 text-primary rounded">
+                  <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
                     Shareable
                   </span>
                 )}
@@ -209,8 +209,10 @@ export default function NewListDetail() {
               </Button>
             </Link>
             <Button
+              variant="outline"
               disabled={selectedCompanies.size === 0}
               onClick={handleAddToProspects}
+              className="hover:bg-muted hover:text-foreground"
             >
               Add to Prospects ({selectedCompanies.size})
             </Button>
@@ -225,7 +227,7 @@ export default function NewListDetail() {
               onApply={handleUpdateList}
             />
             <div className="mt-3 flex gap-2">
-              <Button onClick={handleUpdateList}>Update List</Button>
+              <Button variant="outline" onClick={handleUpdateList} className="hover:bg-muted hover:text-foreground">Update List</Button>
               <Button variant="outline" onClick={() => setShowFilterBuilder(false)}>
                 Cancel
               </Button>
@@ -234,8 +236,8 @@ export default function NewListDetail() {
         )}
 
         {list.filters && !showFilterBuilder && (
-          <div className="mt-4 p-3 bg-primary/10 border border-primary/40 rounded text-sm">
-            <p className="text-primary">
+          <div className="mt-4 p-3 bg-muted/40 border border-border rounded text-sm">
+            <p className="text-foreground">
               ✓ This list was created from filters and can be reloaded to see updated
               results
             </p>
@@ -277,7 +279,7 @@ export default function NewListDetail() {
             description="Add companies from Universe or Company detail"
             action={
               <Link to="/universe">
-                <Button size="sm">Browse Universe</Button>
+                <Button variant="outline" size="sm" className="hover:bg-muted hover:text-foreground">Browse Universe</Button>
               </Link>
             }
           />
@@ -290,6 +292,7 @@ export default function NewListDetail() {
                     <Checkbox
                       checked={companies.length > 0 && selectedCompanies.size === companies.length}
                       onCheckedChange={toggleSelectAll}
+                      className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
                     />
                   </th>
                   <th className="px-4 py-3 text-left">Company Name</th>
@@ -302,7 +305,7 @@ export default function NewListDetail() {
                   <th className="px-4 py-3 w-16">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {filteredCompaniesList.map((company: Company) => {
                   const latest = getLatestFinancials(company);
                   const cagr = calculateRevenueCagr(company) ?? 0;
@@ -312,12 +315,13 @@ export default function NewListDetail() {
                         <Checkbox
                           checked={selectedCompanies.has(company.orgnr)}
                           onCheckedChange={() => toggleSelectCompany(company.orgnr)}
+                          className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
                         />
                       </td>
                       <td className="px-4 py-3">
                         <Link
                           to={`/company/${company.orgnr}`}
-                          className="font-medium text-primary hover:text-primary flex items-center gap-2"
+                          className="font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
                         >
                           {company.display_name}
                           <ExternalLink className="w-3 h-3" />
@@ -334,7 +338,7 @@ export default function NewListDetail() {
                         <span
                           className={
                             cagr > 0.15
-                              ? "text-primary"
+                              ? "text-foreground"
                               : cagr < 0
                                 ? "text-destructive"
                                 : "text-foreground"
@@ -351,7 +355,7 @@ export default function NewListDetail() {
                           <span
                             className={`font-semibold ${
                               company.ai_profile.ai_fit_score >= 75
-                                ? "text-primary"
+                                ? "text-foreground"
                                 : company.ai_profile.ai_fit_score >= 50
                                   ? "text-foreground"
                                   : "text-destructive"
@@ -367,7 +371,7 @@ export default function NewListDetail() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-destructive hover:text-destructive"
+                          className="text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => handleRemove(company.orgnr)}
                           disabled={removeMutation.isPending}
                         >

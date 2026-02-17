@@ -173,7 +173,7 @@ const CompanyDetail: React.FC = () => {
         {/* Company Header */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{company.company_name || company.orgnr}</h1>
+            <h1 className="text-base font-bold text-foreground">{company.company_name || company.orgnr}</h1>
             <p className="text-sm text-muted-foreground">Org.nr {company.orgnr}</p>
           </div>
           <button
@@ -258,25 +258,25 @@ const CompanyDetail: React.FC = () => {
 
         {evaluation && (
           <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-indigo-900">AI Strategic Evaluation</h2>
+            <h2 className="mb-4 text-base font-semibold text-indigo-900">AI Strategic Evaluation</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <p className="text-xs uppercase text-indigo-500">Strategic fit</p>
-                <p className="text-2xl font-semibold text-indigo-900">
+                <p className="text-base font-semibold text-indigo-900">
                   {evaluation.strategic_fit_score ?? '—'}
                   <span className="text-base font-normal text-indigo-400">/10</span>
                 </p>
               </div>
               <div>
                 <p className="text-xs uppercase text-indigo-500">Defensibility</p>
-                <p className="text-2xl font-semibold text-indigo-900">
+                <p className="text-base font-semibold text-indigo-900">
                   {evaluation.defensibility_score ?? '—'}
                   <span className="text-base font-normal text-indigo-400">/10</span>
                 </p>
               </div>
               <div>
                 <p className="text-xs uppercase text-indigo-500">Acquisition angle</p>
-                <p className="text-lg font-semibold text-indigo-900">
+                <p className="text-base font-semibold text-indigo-900">
                   {evaluation.acquisition_angle || '—'}
                 </p>
               </div>
@@ -335,7 +335,7 @@ const CompanyDetail: React.FC = () => {
         {/* Financial Statement Table (like Allabolag) */}
         {financials.length > 0 && (
           <div className="rounded-lg border border-border p-6">
-            <h2 className="mb-4 text-lg font-semibold text-foreground">Resultaträkning (Belopp i 1000)</h2>
+            <h2 className="mb-4 text-base font-semibold text-foreground">Resultaträkning (Belopp i 1000)</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-muted/40">

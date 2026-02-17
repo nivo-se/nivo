@@ -98,7 +98,7 @@ export default function NewAdmin() {
   return (
     <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
-        <h1 className="text-2xl font-semibold text-foreground mb-2">Admin Panel</h1>
+        <h1 className="text-base font-semibold text-foreground mb-2">Admin Panel</h1>
         <p className="text-sm text-foreground mb-6">System configuration and team management</p>
 
         <Tabs defaultValue="overview" className="mb-8">
@@ -111,7 +111,7 @@ export default function NewAdmin() {
           <TabsContent value="overview" className="mt-6 space-y-6">
         <Card className="app-card mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">Contracts</CardTitle>
+            <CardTitle className="text-base">Contracts</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {whoami ? (
@@ -220,19 +220,19 @@ export default function NewAdmin() {
           <Card className="app-card">
             <CardContent className="p-6">
               <p className="text-sm text-foreground mb-1">Companies (sample)</p>
-              <p className="text-2xl font-semibold">{companies.length}</p>
+              <p className="text-base font-semibold">{companies.length}</p>
             </CardContent>
           </Card>
           <Card className="app-card">
             <CardContent className="p-6">
               <p className="text-sm text-foreground mb-1">Lists</p>
-              <p className="text-2xl font-semibold">{lists.length}</p>
+              <p className="text-base font-semibold">{lists.length}</p>
             </CardContent>
           </Card>
           <Card className="app-card">
             <CardContent className="p-6">
               <p className="text-sm text-foreground mb-1">AI Runs</p>
-              <p className="text-2xl font-semibold">{runs.length}</p>
+              <p className="text-base font-semibold">{runs.length}</p>
             </CardContent>
           </Card>
         </div>

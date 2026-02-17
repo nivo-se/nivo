@@ -15,6 +15,7 @@ from .universe import (
     FilterItem,
     UniverseQueryPayload,
     _build_order,
+    _build_universe_source_subquery,
     _build_where_from_stack,
 )
 
@@ -168,9 +169,10 @@ async def create_list_from_query(request: Request, body: ListFromQuery):
     order_sql = _build_order(payload.sort or {}, db_is_postgres=True)
     params.append(MAX_ORGNR_FROM_QUERY)
 
+    source_sql, _, _ = _build_universe_source_subquery(db)
     sql_orgnrs = f"""
     SELECT cm.orgnr
-    FROM coverage_metrics cm
+    FROM {source_sql}
     WHERE {where_sql}
     ORDER BY {order_sql}
     LIMIT ?

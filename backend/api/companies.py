@@ -16,6 +16,7 @@ from .dependencies import get_supabase_client
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
+MIN_VALID_REVENUE_SEK = 50_000_000
 
 AI_INTEL_KINDS = ["company_profile", "website_insights", "about_summary", "llm_analysis"]
 
@@ -282,13 +283,13 @@ async def get_companies_batch(
                     SELECT orgnr, MAX(year) as latest_year
                     FROM financials
                     WHERE currency = 'SEK' 
-                      AND (period = '12' OR period LIKE '%-12')
+                      AND (period = '12' OR RIGHT(period, 2) = '12')
                       AND year >= 2020
                       AND (si_sek IS NOT NULL OR sdi_sek IS NOT NULL)
                     GROUP BY orgnr
                 ) f2 ON f1.orgnr = f2.orgnr AND f1.year = f2.latest_year
                 WHERE f1.currency = 'SEK' 
-                  AND (f1.period = '12' OR f1.period LIKE '%-12')
+                  AND (f1.period = '12' OR RIGHT(f1.period, 2) = '12')
             ) f ON f.orgnr = c.orgnr
             WHERE c.orgnr IN ({placeholders})
             ORDER BY COALESCE(f.latest_revenue_sek, k.latest_revenue_sek, 0) DESC, c.company_name ASC
@@ -358,6 +359,13 @@ async def get_companies_batch(
         
         companies = []
         for row in rows:
+            latest_revenue = row.get("latest_revenue_sek")
+            try:
+                revenue_num = float(latest_revenue) if latest_revenue is not None else None
+            except (TypeError, ValueError):
+                revenue_num = None
+            has_valid_revenue = revenue_num is not None and revenue_num >= MIN_VALID_REVENUE_SEK
+
             profile = ai_profiles_map.get(row.get("orgnr", ""))
             segment_names = _to_list(row.get("segment_names"))
             profile_market_regions = _to_list(profile.get("market_regions")) if profile else []
@@ -396,10 +404,10 @@ async def get_companies_batch(
                 "employees_latest": row.get("employees_latest"),
                 "segment_names": segment_names,
                 "company_context": company_context,
-                "latest_revenue_sek": row.get("latest_revenue_sek"),
+                "latest_revenue_sek": revenue_num if has_valid_revenue else None,
                 "latest_profit_sek": row.get("latest_profit_sek"),
                 "latest_ebitda_sek": row.get("latest_ebitda_sek"),
-                "avg_ebitda_margin": row.get("avg_ebitda_margin"),
+                "avg_ebitda_margin": row.get("avg_ebitda_margin") if has_valid_revenue else None,
                 "avg_net_margin": row.get("avg_net_margin"),
                 "revenue_cagr_3y": row.get("revenue_cagr_3y"),
                 "revenue_growth_yoy": row.get("revenue_growth_yoy"),
@@ -479,7 +487,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             FROM financials
             WHERE orgnr = ?
               AND (currency IS NULL OR currency = 'SEK')
-              AND (period = '12' OR period LIKE '%-12')
+              AND (period = '12' OR RIGHT(period, 2) = '12')
               AND year >= 2018
             ORDER BY year DESC
             LIMIT 5
@@ -558,4 +566,3 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
     except Exception as e:
         logger.warning("get_company_financials failed: %s", e)
         return {"financials": [], "count": 0}
-

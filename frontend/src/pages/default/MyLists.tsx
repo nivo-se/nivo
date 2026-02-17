@@ -56,7 +56,7 @@ function ListCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-foreground">{list.name}</h3>
+              <h3 className="text-base font-semibold text-foreground">{list.name}</h3>
               <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">{getStageLabel(list.stage)}</span>
               {list.scope === "team" && (
                 <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">Shareable</span>
@@ -134,7 +134,7 @@ export default function NewMyLists() {
     <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">My Lists</h1>
+          <h1 className="text-base font-semibold text-foreground mb-2">My Lists</h1>
           <p className="text-sm text-muted-foreground">Manage your saved company lists</p>
         </div>
 
@@ -186,7 +186,10 @@ export default function NewMyLists() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="border border-border bg-transparent text-foreground hover:bg-muted hover:text-foreground"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

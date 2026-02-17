@@ -478,7 +478,7 @@ export async function duplicatePromptTemplate(_templateId: string): Promise<Prom
 
 // ---- AI Runs (mapped to Nivo /api/analysis) ----
 
-function mapAnalysisRunToAIRun(r: {
+type AnalysisRunApi = {
   run_id: string;
   status: string;
   stage: number;
@@ -487,30 +487,46 @@ function mapAnalysisRunToAIRun(r: {
   stage3_count?: number;
   started_at: string;
   completed_at?: string;
-}): AIRun {
-  const total = r.stage3_count ?? r.stage2_count ?? r.stage1_count ?? 0;
+  name?: string;
+  list_id?: string;
+  template_id?: string;
+  template_name?: string;
+  config?: { auto_approve?: boolean; overwrite_existing?: boolean };
+};
+
+function mapAnalysisRunToAIRun(r: AnalysisRunApi): AIRun {
+  const total = r.stage1_count ?? r.stage2_count ?? r.stage3_count ?? 0;
+  const processed = r.stage3_count ?? 0;
   const statusMap: Record<string, AIRun["status"]> = {
     running: "running",
+    stage_1_complete: "running",
+    stage_2_complete: "running",
+    complete: "completed",
     completed: "completed",
     failed: "failed",
     queued: "queued",
   };
+  const cfg = r.config ?? {};
+  const perCompanyEstimate = 0.02;
   return {
     id: r.run_id,
-    name: `Run ${r.run_id.slice(0, 8)}`,
-    list_id: "",
-    template_id: "",
+    name: r.name?.trim() || `Run ${r.run_id.slice(0, 8)}`,
+    list_id: r.list_id ?? "",
+    template_id: r.template_id ?? "",
     status: statusMap[r.status] ?? "queued",
     created_at: r.started_at,
     created_by: "system",
     started_at: r.started_at,
     completed_at: r.completed_at,
     total_companies: total,
-    processed_companies: total,
+    processed_companies: processed,
     failed_companies: 0,
-    estimated_cost: 0,
-    actual_cost: 0,
-    config: { auto_approve: false, overwrite_existing: false },
+    estimated_cost: total * perCompanyEstimate,
+    actual_cost: (r.status === "complete" || r.status === "completed") ? processed * perCompanyEstimate : 0,
+    config: {
+      auto_approve: cfg.auto_approve === true,
+      overwrite_existing: cfg.overwrite_existing === true,
+    },
   };
 }
 
@@ -518,7 +534,7 @@ export async function getAIRuns(): Promise<AIRun[]> {
   try {
     const res = await apiFetch<unknown>("/api/analysis/runs?limit=50");
     guardAnalysisRunsResponse(res);
-    const r = res as { success: boolean; runs?: Array<{ run_id: string; status: string; stage: number; stage1_count?: number; stage2_count?: number; stage3_count?: number; started_at: string; completed_at?: string }> };
+    const r = res as { success: boolean; runs?: AnalysisRunApi[] };
     setLastApiError(null);
     if (!r.runs) return [];
     return r.runs.map(mapAnalysisRunToAIRun);
@@ -530,10 +546,10 @@ export async function getAIRuns(): Promise<AIRun[]> {
 
 export async function getAIRun(runId: string): Promise<AIRun | null> {
   try {
-    const r = await apiFetch<unknown>(`/api/analysis/runs/${runId}`);
+    const r = await apiFetch<AnalysisRunApi>(`/api/analysis/runs/${runId}`);
     guardAnalysisRunResponse(r);
     setLastApiError(null);
-    return mapAnalysisRunToAIRun(r as Parameters<typeof mapAnalysisRunToAIRun>[0]);
+    return mapAnalysisRunToAIRun(r);
   } catch (e) {
     setLastApiError(e instanceof Error ? e.message : String(e), "GET /api/analysis/runs/:id");
     return null;
@@ -541,32 +557,49 @@ export async function getAIRun(runId: string): Promise<AIRun | null> {
 }
 
 export async function createAIRun(data: CreateAIRunDTO): Promise<AIRun> {
-  // Nivo analysis/start uses filter criteria, not list_id/template_id.
-  // Start with default criteria; full list/template support would need backend changes.
+  const template = DEFAULT_PROMPT_TEMPLATES.find((t) => t.id === data.template_id);
   const res = await apiFetch<{
     success: boolean;
     run_id: string;
     status: string;
+    started_at?: string;
     stage1_count?: number;
     stage2_count?: number;
     stage3_count?: number;
+    name?: string;
+    list_id?: string;
+    template_id?: string;
+    template_name?: string;
+    config?: { auto_approve?: boolean; overwrite_existing?: boolean };
   }>("/api/analysis/start", {
     method: "POST",
     body: JSON.stringify({
-      min_revenue: 10_000_000,
-      min_ebitda_margin: 0.05,
-      min_growth: 0.1,
+      name: data.name,
+      list_id: data.list_id,
+      template_id: data.template_id,
+      template_name: template?.name ?? data.template_id,
+      template_prompt: template?.prompt ?? "",
+      config: data.config,
+      run_async: true,
+      min_revenue: 0,
+      min_ebitda_margin: -1,
+      min_growth: -1,
       max_results: 500,
     }),
   });
   return mapAnalysisRunToAIRun({
     run_id: res.run_id,
     status: res.status ?? "running",
-    stage: 1,
+    stage: 0,
     stage1_count: res.stage1_count,
     stage2_count: res.stage2_count,
     stage3_count: res.stage3_count,
-    started_at: new Date().toISOString(),
+    started_at: res.started_at ?? new Date().toISOString(),
+    name: res.name,
+    list_id: res.list_id,
+    template_id: res.template_id,
+    template_name: res.template_name,
+    config: res.config,
   });
 }
 
@@ -582,6 +615,7 @@ function mapCompanyAnalysisToAIResult(
     company_name?: string;
     strategic_fit_score?: number;
     recommendation?: string;
+    result_status?: string;
     investment_memo?: string;
     swot_strengths?: string[];
     swot_weaknesses?: string[];
@@ -602,13 +636,20 @@ function mapCompanyAnalysisToAIResult(
     strong_fit: "strong_fit",
     potential_fit: "potential_fit",
     weak_fit: "weak_fit",
+    buy: "strong_fit",
+    watch: "potential_fit",
     pass: "pass",
   };
   return {
     id: `${runId}-${row.orgnr}`,
     run_id: runId,
     company_orgnr: row.orgnr,
-    status: "pending",
+    status:
+      row.result_status === "approved"
+        ? "approved"
+        : row.result_status === "rejected"
+          ? "rejected"
+          : "pending",
     overall_score: row.strategic_fit_score ?? 0,
     dimension_scores: {},
     summary: row.investment_memo ?? "",
@@ -626,7 +667,7 @@ export async function getRunResults(runId: string): Promise<AIResult[]> {
   try {
     const res = await apiFetch<unknown>(`/api/analysis/runs/${runId}/companies`);
     guardAnalysisRunCompaniesResponse(res);
-    const r = res as { success: boolean; companies?: Array<{ orgnr: string; company_name?: string; strategic_fit_score?: number; recommendation?: string; investment_memo?: string; swot_strengths?: string[]; swot_weaknesses?: string[]; swot_opportunities?: string[]; swot_threats?: string[] }> };
+    const r = res as { success: boolean; companies?: Array<{ orgnr: string; company_name?: string; strategic_fit_score?: number; recommendation?: string; result_status?: string; investment_memo?: string; swot_strengths?: string[]; swot_weaknesses?: string[]; swot_opportunities?: string[]; swot_threats?: string[] }> };
     setLastApiError(null);
     if (!r.companies) return [];
     return r.companies.map((c) => mapCompanyAnalysisToAIResult(c, runId));

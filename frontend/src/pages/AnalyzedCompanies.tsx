@@ -254,7 +254,7 @@ const AnalyzedCompanies: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Analyser</h1>
+          <h1 className="text-base font-bold text-foreground">Analyser</h1>
           <p className="text-muted-foreground mt-1">
             Översikt över alla genomförda AI-analyser, sorterade per analysomgång
           </p>
@@ -410,7 +410,7 @@ const AnalyzedCompanies: React.FC = () => {
                   <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                     <FileText className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Inga analyser hittades</h3>
+                  <h3 className="text-base font-medium text-foreground mb-2">Inga analyser hittades</h3>
                   <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                     {searchTerm || analysisMode !== 'all' || templateFilter !== 'all' || statusFilter !== 'all'
                       ? 'Inga analyser matchar dina filter. Prova att ändra söktermerna.'
@@ -625,7 +625,7 @@ const AnalyzedCompanies: React.FC = () => {
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                   <Users className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Företagsvy kommer snart</h3>
+                <h3 className="text-base font-medium text-foreground mb-2">Företagsvy kommer snart</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   Denna vy kommer att visa alla analyserade företag individuellt, sorterade efter analysdatum och rekommendation.
                 </p>
