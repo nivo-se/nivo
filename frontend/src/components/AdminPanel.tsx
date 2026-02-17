@@ -16,6 +16,8 @@ interface User {
   id: string;
   user_id: string;
   email: string;
+  first_name?: string | null;
+  last_name?: string | null;
   role: 'admin' | 'approved' | 'pending';
   created_at: string;
   updated_at: string;
@@ -47,9 +49,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [addEmail, setAddEmail] = useState('');
   const [addPassword, setAddPassword] = useState('');
+  const [addFirstName, setAddFirstName] = useState('');
+  const [addLastName, setAddLastName] = useState('');
   const [addRole, setAddRole] = useState<UserRole>('approved');
   const [addSubmitting, setAddSubmitting] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
 
   // Fetch all users
   const fetchUsers = async () => {
@@ -257,7 +263,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
+    setEditFirstName(user.first_name ?? '');
+    setEditLastName(user.last_name ?? '');
     setIsUserDialogOpen(true);
+  };
+
+  const handleUpdateName = async () => {
+    if (!selectedUser || !supabase) return;
+    setActionLoading(selectedUser.id);
+    try {
+      const { error: updateError } = await supabase
+        .from('user_roles')
+        .update({
+          first_name: editFirstName.trim() || null,
+          last_name: editLastName.trim() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', selectedUser.user_id);
+      if (updateError) throw updateError;
+      setSuccess('Name updated');
+      await fetchUsers();
+      setSelectedUser({ ...selectedUser, first_name: editFirstName.trim() || null, last_name: editLastName.trim() || null });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update name');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleAddUser = async () => {
@@ -272,11 +303,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     setAddError(null);
     setAddSubmitting(true);
     try {
-      await createUser(addEmail.trim(), addPassword, addRole);
+      await createUser(addEmail.trim(), addPassword, addRole, {
+        first_name: addFirstName.trim() || undefined,
+        last_name: addLastName.trim() || undefined,
+      });
       setSuccess('User created!');
       setIsAddUserDialogOpen(false);
       setAddEmail('');
       setAddPassword('');
+      setAddFirstName('');
+      setAddLastName('');
       setAddRole('approved');
       await fetchUsers();
     } catch (err: unknown) {
@@ -289,6 +325,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const pendingUsers = users.filter(user => user.role === 'pending');
   const approvedUsers = users.filter(user => user.role === 'approved');
   const adminUsers = users.filter(user => user.role === 'admin');
+
+  const displayName = (u: User) => {
+    const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
+    return name || u.email;
+  };
 
   if (loading) {
     return (
@@ -337,23 +378,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       {/* System metrics - stacked rows */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Total users</span>
+          <span className="text-gray-700">Total users</span>
           <span className="font-medium">{systemMetrics?.totalUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Pending</span>
+          <span className="text-gray-700">Pending</span>
           <span className="font-medium">{systemMetrics?.pendingUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Approved</span>
+          <span className="text-gray-700">Approved</span>
           <span className="font-medium">{systemMetrics?.approvedUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Administrators</span>
+          <span className="text-gray-700">Administrators</span>
           <span className="font-medium">{systemMetrics?.adminUsers || 0}</span>
         </div>
         <div className="flex justify-between text-sm pt-2 border-t">
-          <span className="text-muted-foreground">Database</span>
+          <span className="text-gray-700">Database</span>
           <Badge variant="default" className={systemMetrics?.databaseConnected ? "bg-green-500" : "bg-red-500"}>
             {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
           </Badge>
@@ -381,9 +422,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                       <Mail className="w-5 h-5 text-gray-600" />
                     </div>
                     <div>
-                      <p className="font-medium">{user.email}</p>
-                      <p className="text-sm text-gray-500">
-                        Registered: {formatDate(user.created_at)}
+                      <p className="font-medium">{displayName(user)}</p>
+                      <p className="text-sm text-gray-600">
+                        {user.email} · Registered: {formatDate(user.created_at)}
                       </p>
                     </div>
                   </div>
@@ -454,8 +495,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                     <Mail className="w-5 h-5 text-gray-600" />
                   </div>
                   <div>
-                    <p className="font-medium">{user.email}</p>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <p className="font-medium">{displayName(user)}</p>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <span>{user.email}</span>
+                      <span>·</span>
                       <span>Joined: {formatDate(user.created_at)}</span>
                       {user.approved_at && (
                         <>
@@ -502,7 +545,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
 
       {/* User Details Dialog */}
       <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-white text-gray-900 border-gray-200 shadow-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Info className="h-5 w-5 mr-2" />
@@ -518,31 +561,71 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {/* User Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Email</label>
+                  <label className="text-sm font-medium text-gray-700">Email</label>
                   <p className="text-lg font-semibold">{selectedUser.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Roll</label>
+                  <label className="text-sm font-medium text-gray-700">Role</label>
                   <div className="mt-1">
                     {getRoleBadge(selectedUser.role)}
                   </div>
                 </div>
               </div>
 
+              {/* First and Last Name (editable) */}
+              <div className="space-y-3 border-t pt-4">
+                <Label className="text-sm font-medium text-gray-700">Name</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="edit-first-name">First name</Label>
+                    <Input
+                      id="edit-first-name"
+                      value={editFirstName}
+                      onChange={(e) => setEditFirstName(e.target.value)}
+                      placeholder="First name"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-last-name">Last name</Label>
+                    <Input
+                      id="edit-last-name"
+                      value={editLastName}
+                      onChange={(e) => setEditLastName(e.target.value)}
+                      placeholder="Last name"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={handleUpdateName}
+                    disabled={actionLoading === selectedUser.id}
+                  >
+                    {actionLoading === selectedUser.id ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : null}
+                    Save name
+                  </Button>
+                </div>
+              </div>
+
               {/* User ID */}
               <div>
-                  <label className="text-sm font-medium text-gray-500">User ID</label>
+                  <label className="text-sm font-medium text-gray-700">User ID</label>
                 <p className="text-sm font-mono bg-gray-100 p-2 rounded">{selectedUser.user_id}</p>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Joined date</label>
+                  <label className="text-sm font-medium text-gray-700">Joined date</label>
                   <p className="text-sm">{formatDate(selectedUser.created_at)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Last updated</label>
+                  <label className="text-sm font-medium text-gray-700">Last updated</label>
                   <p className="text-sm">{formatDate(selectedUser.updated_at)}</p>
                 </div>
               </div>
@@ -551,11 +634,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               {selectedUser.approved_at && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Approved date</label>
+                    <label className="text-sm font-medium text-gray-700">Approved date</label>
                     <p className="text-sm">{formatDate(selectedUser.approved_at)}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Approved by</label>
+                    <label className="text-sm font-medium text-gray-700">Approved by</label>
                     <p className="text-sm">{selectedUser.approved_by || 'System'}</p>
                   </div>
                 </div>
@@ -589,11 +672,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         if (!open) {
           setAddEmail('');
           setAddPassword('');
+          setAddFirstName('');
+          setAddLastName('');
           setAddRole('approved');
           setAddError(null);
         }
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md text-gray-900">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <UserPlus className="h-5 w-5 mr-2" />
@@ -620,6 +705,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 onChange={(e) => setAddEmail(e.target.value)}
                 disabled={addSubmitting}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="add-first-name">First name</Label>
+                <Input
+                  id="add-first-name"
+                  placeholder="First name"
+                  value={addFirstName}
+                  onChange={(e) => setAddFirstName(e.target.value)}
+                  disabled={addSubmitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-last-name">Last name</Label>
+                <Input
+                  id="add-last-name"
+                  placeholder="Last name"
+                  value={addLastName}
+                  onChange={(e) => setAddLastName(e.target.value)}
+                  disabled={addSubmitting}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-password">Password</Label>

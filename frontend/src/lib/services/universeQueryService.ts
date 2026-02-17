@@ -50,6 +50,13 @@ export type UniverseRow = {
   ebitda_margin_latest?: number | null;
   revenue_cagr_3y?: number | null;
   employees_latest?: number | null;
+  municipality?: string | null;
+  homepage?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  ai_strategic_fit_score?: number | null;
+  equity_ratio_latest?: number | null;
+  debt_to_equity_latest?: number | null;
 };
 
 export type UniverseQueryResponse = {

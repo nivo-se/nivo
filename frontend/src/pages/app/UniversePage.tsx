@@ -62,6 +62,15 @@ const DEFAULT_SORT: { by: SortColumn; dir: "asc" | "desc" } = {
 
 const PRESETS = [
   {
+    id: "websites_present_ai_missing",
+    label: "Websites present, AI missing",
+    filters: [
+      { field: "has_homepage", op: "=", value: true, type: "boolean" as const },
+      { field: "has_ai_profile", op: "=", value: false, type: "boolean" as const },
+    ],
+    sort: { by: "data_quality_score" as const, dir: "asc" as const },
+  },
+  {
     id: "coverage_gaps",
     label: "Coverage gaps",
     filters: [{ field: "has_ai_profile", op: "=", value: false, type: "boolean" as const }],

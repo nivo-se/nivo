@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 # Paths that bypass auth when REQUIRE_AUTH=true (Universe, Lists, Analysis - dev convenience)
 PUBLIC_PATHS = {
-    "/ping", "/health", "/api/status", "/api/db/ping", "/docs", "/redoc", "/openapi.json",
+    "/ping", "/health", "/api/status", "/api/db/ping", "/api/debug/whoami", "/docs", "/redoc", "/openapi.json",
     "/api/universe/filters", "/api/universe/query",
-    "/api/coverage/snapshot", "/api/coverage/list", "/api/home/dashboard",
+    "/api/coverage/snapshot", "/api/coverage/list", "/api/home/dashboard", "/api/companies",
     "/api/lists", "/api/views", "/api/labels",
-    "/api/analysis/runs", "/api/analysis/run", "/api/saved-lists",
+    "/api/analysis/runs", "/api/analysis/run", "/api/analysis/status", "/api/analysis/companies", "/api/saved-lists",
 }
 
 

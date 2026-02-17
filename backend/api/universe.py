@@ -287,7 +287,9 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     select_cols = (
         "cm.orgnr, cm.name, cm.segment_names, cm.has_homepage, cm.has_ai_profile, "
         "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
-        "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest"
+        "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
+        "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "
+        "cm.equity_ratio_latest, cm.debt_to_equity_latest"
     )
 
     if _IS_POSTGRES:
@@ -322,6 +324,7 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     for r in rows:
         seg = r.get("segment_names")
         rev = r.get("revenue_latest")
+        ai_score = r.get("ai_strategic_fit_score")
         out.append({
             "orgnr": str(r.get("orgnr", "")),
             "name": r.get("name"),
@@ -336,6 +339,13 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
             "ebitda_margin_latest": float(r.get("ebitda_margin_latest")) if r.get("ebitda_margin_latest") is not None else None,
             "revenue_cagr_3y": float(r.get("revenue_cagr_3y")) if r.get("revenue_cagr_3y") is not None else None,
             "employees_latest": int(r.get("employees_latest")) if r.get("employees_latest") is not None else None,
+            "municipality": r.get("municipality"),
+            "homepage": r.get("homepage"),
+            "email": r.get("email"),
+            "phone": r.get("phone"),
+            "ai_strategic_fit_score": int(ai_score) if ai_score is not None else None,
+            "equity_ratio_latest": float(r.get("equity_ratio_latest")) if r.get("equity_ratio_latest") is not None else None,
+            "debt_to_equity_latest": float(r.get("debt_to_equity_latest")) if r.get("debt_to_equity_latest") is not None else None,
         })
 
     return {"rows": out, "total": total}

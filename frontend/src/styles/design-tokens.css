@@ -1,0 +1,142 @@
+/**
+ * Nivo design tokens - SINGLE SOURCE OF TRUTH for colors, fonts, radii.
+ * All components use these via Tailwind semantic classes (bg-background, text-foreground, etc.)
+ *
+ * Light mode: warm off-white backgrounds, soft gray text, blue-lavender primary.
+ * Dark mode: warm near-black backgrounds, soft gray-white text, blue primary, cyan chart.
+ */
+
+/* ========================
+   LIGHT THEME (daily theme)
+   ======================== */
+
+:root {
+  /* ---- Fonts ---- */
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, 'Segoe UI', Arial, sans-serif;
+  --font-heading: var(--font-sans);
+
+  /* ---- Raw palette (keep) ---- */
+  --bg: #F7F7F4;
+  --surface: #F2F1ED;
+  --surface-2: #EAEAE6;
+  --border-default: #CBCAC6;
+  --border-subtle: #D8DCDC;
+  --grid: #D7D9DB;
+  --text: #6E6D67;
+  --text-muted: #95938E;
+  --text-subtle: #888682;
+  --accent-chart: #A6B7E9;
+  --accent-chart-2: #8DBBCC;
+  --accent-muted: #D4DAEB;
+
+  /* ---- Semantic tokens (shadcn / Tailwind) ---- */
+  --background: 60 14% 96%;
+  --foreground: 50 6% 26%;
+
+  --card: 50 18% 94%;
+  --card-foreground: 50 6% 26%;
+  --popover: 50 18% 94%;
+  --popover-foreground: 50 6% 26%;
+
+  --muted: 60 10% 91%;
+  --muted-foreground: 45 5% 45%;
+
+  --border: 45 6% 79%;
+  --input: 45 6% 79%;
+  --ring: 224 62% 78%;
+
+  --primary: 224 62% 78%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 60 10% 91%;
+  --secondary-foreground: 50 6% 26%;
+  --accent: 224 42% 88%;
+  --accent-foreground: 50 6% 26%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --chart-1: 224 62% 78%;
+  --chart-2: 195 36% 68%;
+  --chart-3: 224 42% 88%;
+
+  --radius: 0.5rem;
+
+  /* ---- Page / sidebar ---- */
+  --page-bg: #F7F7F4;
+  --sidebar-bg: #F2F1ED;
+  --sidebar-border: #CBCAC6;
+  --sidebar-fg: #6E6D67;
+  --sidebar-muted: #95938E;
+  --sidebar-hover-bg: #EAEAE6;
+  --sidebar-active-bg: #D4DAEB;
+  --sidebar-active-fg: #6E6D67;
+  --sidebar-inactive-fg: 45 5% 45%;
+  --sidebar-active-bg-hsl: 224 42% 88%;
+  --sidebar-active-fg-hsl: 55 3% 42%;
+  --sidebar-hover-bg-hsl: 60 10% 91%;
+}
+
+/* ========================
+   DARK THEME
+   ======================== */
+
+.dark {
+  /* ---- Raw palette ---- */
+  --bg: #14120C;
+  --sidebar: #1C1A16;
+  --sidebar-item-active: #1A1812;
+  --surface: #242320;
+  --surface-2: #2C2B28;
+  --border: #1B1A16;
+  --grid: #1A1816;
+  --text: #DCDCDB;
+  --text-2: #B6B5B2;
+  --text-3: #9A9894;
+  --accent: #3662E3;
+  --accent-2: #92BBCA;
+  --accent-muted: #6F7783;
+
+  /* ---- Semantic tokens ---- */
+  --background: 30 20% 6%;
+  --foreground: 0 0% 86%;
+
+  --card: 40 6% 13%;
+  --card-foreground: 0 0% 86%;
+  --popover: 40 6% 13%;
+  --popover-foreground: 0 0% 86%;
+
+  --muted: 40 5% 17%;
+  --muted-foreground: 40 4% 70%;
+
+  --border: 40 6% 9%;
+  --input: 40 6% 9%;
+  --ring: 224 76% 55%;
+
+  --primary: 224 76% 55%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 40 5% 17%;
+  --secondary-foreground: 0 0% 86%;
+
+  --accent: 40 5% 17%;
+  --accent-foreground: 0 0% 86%;
+
+  --chart-1: 224 76% 55%;
+  --chart-2: 195 30% 68%;
+  --chart-3: 215 8% 46%;
+
+  /* ---- Page / sidebar ---- */
+  --page-bg: #14120C;
+  --sidebar-bg: #1C1A16;
+  --sidebar-border: #1B1A16;
+  --sidebar-fg: #DCDCDB;
+  --sidebar-muted: #B6B5B2;
+  --sidebar-hover-bg: #242320;
+  --sidebar-active-bg: #1A1812;
+  --sidebar-active-fg: #DCDCDB;
+  --sidebar-inactive-fg: 40 4% 70%;
+  --sidebar-active-bg-hsl: 40 18% 9%;
+  --sidebar-active-fg-hsl: 0 0% 86%;
+  --sidebar-hover-bg-hsl: 40 6% 13%;
+}

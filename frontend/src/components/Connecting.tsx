@@ -29,7 +29,7 @@ const Connecting: React.FC<ConnectingProps> = ({ className }) => {
             {founderTypes.map((type, index) => (
               <FadeIn key={index} delay={150 + index * 50}>
                 <div className="flex items-start">
-                  <span className="text-grayOlive mr-3 mt-1">—</span>
+                  <span className="text-primary mr-3 mt-1">—</span>
                   <p className="text-jetBlack/80">{type}</p>
                 </div>
               </FadeIn>

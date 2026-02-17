@@ -29,7 +29,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
     <footer
       id="contact"
       className={cn(
-        'py-16 md:py-24 bg-jetBlack text-platinum border-t border-grayOlive/40',
+        'py-16 md:py-24 bg-background text-foreground border-t border-border',
         className
       )}
     >

@@ -1,7 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLists, useDeleteList } from "@/lib/hooks/figmaQueries";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { EmptyState } from "@/components/new/EmptyState";
 import { ErrorState } from "@/components/new/ErrorState";
 import { Trash2, ExternalLink } from "lucide-react";
@@ -19,12 +30,25 @@ function getStageLabel(stage: string) {
   }
 }
 
+function getTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  if (diffDays === 1) return "yesterday";
+  return `${diffDays} days ago`;
+}
+
 function ListCard({
   list,
-  onDelete,
+  onDeleteClick,
 }: {
-  list: { id: string; name: string; scope: string; stage: string; companyIds: string[]; created_at: string; created_by?: string; filters?: unknown };
-  onDelete: (id: string) => void;
+  list: { id: string; name: string; scope: string; stage: string; companyIds: string[]; created_at: string; updated_at?: string; created_by?: string; filters?: unknown };
+  onDeleteClick: (id: string, name: string) => void;
 }) {
   return (
     <Card className="new-card hover:shadow-md transition-shadow">
@@ -39,14 +63,17 @@ function ListCard({
               )}
             </div>
             <p className="text-sm text-gray-600 mb-3">
-              {list.companyIds.length} companies • {new Date(list.created_at).toLocaleDateString()}
+              {list.companyIds.length} companies • Stage: {getStageLabel(list.stage)}
+              {list.created_by && ` • Created by ${list.created_by}`}
+              {" • Last edited "}
+              {getTimeAgo(list.updated_at ?? list.created_at)}
             </p>
             {list.filters && (
               <p className="text-xs text-gray-500 mb-3">✓ Created from filters</p>
             )}
           </div>
           <div className="flex gap-2 ml-4">
-            <Link to={`/new/lists/${list.id}`}>
+            <Link to={`/lists/${list.id}`}>
               <Button size="sm">
                 Open <ExternalLink className="w-4 h-4 ml-1" />
               </Button>
@@ -54,11 +81,7 @@ function ListCard({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => {
-                if (confirm(`Delete "${list.name}"?`)) {
-                  onDelete(list.id);
-                }
-              }}
+              onClick={() => onDeleteClick(list.id, list.name)}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -72,12 +95,20 @@ function ListCard({
 export default function NewMyLists() {
   const { data: lists = [], isLoading, isError, error, refetch } = useLists();
   const deleteListMutation = useDeleteList();
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const privateLists = lists.filter((l) => l.scope === "private");
   const sharedLists = lists.filter((l) => l.scope === "team");
 
-  const handleDelete = (id: string) => {
-    deleteListMutation.mutate(id);
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteConfirm({ id, name });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteConfirm) {
+      deleteListMutation.mutate(deleteConfirm.id);
+      setDeleteConfirm(null);
+    }
   };
 
   if (isError) {
@@ -114,7 +145,7 @@ export default function NewMyLists() {
               title="No private lists yet"
               description="Create a list from Universe to get started"
               action={
-                <Link to="/new/universe">
+                <Link to="/universe">
                   <Button size="sm">Create Your First List</Button>
                 </Link>
               }
@@ -122,7 +153,7 @@ export default function NewMyLists() {
           ) : (
             <div className="grid gap-3">
               {privateLists.map((list) => (
-                <ListCard key={list.id} list={list} onDelete={handleDelete} />
+                <ListCard key={list.id} list={list} onDeleteClick={handleDeleteClick} />
               ))}
             </div>
           )}
@@ -138,12 +169,29 @@ export default function NewMyLists() {
           ) : (
             <div className="grid gap-3">
               {sharedLists.map((list) => (
-                <ListCard key={list.id} list={list} onDelete={handleDelete} />
+                <ListCard key={list.id} list={list} onDeleteClick={handleDeleteClick} />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete list?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove the list. Companies won&apos;t be affected.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

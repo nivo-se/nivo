@@ -31,6 +31,21 @@ export function useCompanies(payload?: Partial<UniverseQueryPayload>) {
   });
 }
 
+/** Like useCompanies but also returns total from universe query. */
+export function useCompaniesWithTotal(payload?: Partial<UniverseQueryPayload>) {
+  return useQuery({
+    queryKey: [
+      "figma", "companies", "withTotal",
+      payload?.offset ?? 0,
+      payload?.limit ?? 50,
+      payload?.q ?? "",
+      JSON.stringify(payload?.sort ?? {}),
+      JSON.stringify(payload?.filters ?? []),
+    ],
+    queryFn: async ({ signal }) => api.getCompaniesWithTotal(payload, signal),
+  });
+}
+
 export function useCompany(orgnr: string, enabled = true) {
   return useQuery({
     queryKey: ["figma", "companies", orgnr],
@@ -127,12 +142,15 @@ export function useRemoveFromList() {
 
 const BATCH_ORGNRS_MAX = 500;
 
-export function useCompaniesBatch(orgnrs: string[]) {
+export function useCompaniesBatch(
+  orgnrs: string[],
+  options?: { autoEnrich?: boolean }
+) {
   const capped = orgnrs.length > BATCH_ORGNRS_MAX ? orgnrs.slice(0, BATCH_ORGNRS_MAX) : orgnrs;
   const isTruncated = orgnrs.length > BATCH_ORGNRS_MAX;
   const query = useQuery({
-    queryKey: ["figma", "companies", "batch", capped.slice().sort()],
-    queryFn: () => api.getCompaniesBatch(capped),
+    queryKey: ["figma", "companies", "batch", capped.slice().sort(), options?.autoEnrich],
+    queryFn: () => api.getCompaniesBatch(capped, options),
     enabled: capped.length > 0,
   });
   return { ...query, isTruncated, totalRequested: orgnrs.length };
@@ -210,6 +228,17 @@ export function useCreateAIRun(
   });
 }
 
+export function useCancelAIRun() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (runId: string) => api.cancelAIRun(runId),
+    onSuccess: (_, runId) => {
+      qc.invalidateQueries({ queryKey: ["figma", "aiRuns", runId] });
+      qc.invalidateQueries({ queryKey: ["figma", "aiRuns"] });
+    },
+  });
+}
+
 export function useRunResults(runId: string | undefined, enabled = true) {
   return useQuery({
     queryKey: ["figma", "aiRuns", runId ?? "", "results"],
@@ -222,6 +251,15 @@ export function useCompanyAIProfile(orgnr: string | undefined, enabled = true) {
   return useQuery({
     queryKey: ["figma", "aiProfiles", orgnr ?? ""],
     queryFn: () => api.getCompanyAIProfile(orgnr!),
+    enabled: !!orgnr && enabled,
+    retry: false, // 404 is expected when no analysis exists
+  });
+}
+
+export function useCompanyFinancials(orgnr: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: ["figma", "companies", orgnr ?? "", "financials"],
+    queryFn: () => api.getCompanyFinancials(orgnr!),
     enabled: !!orgnr && enabled,
   });
 }

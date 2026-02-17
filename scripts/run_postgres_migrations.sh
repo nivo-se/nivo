@@ -22,7 +22,9 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/014_coverage_view_add_name_segments.sql \
          database/migrations/015_views_lists_labels.sql \
          database/migrations/016_extend_coverage_metrics_financial_cols.sql \
-         database/migrations/017_coverage_metrics_add_is_stale.sql; do
+         database/migrations/017_coverage_metrics_add_is_stale.sql \
+         database/migrations/018_create_analysis_tables.sql \
+         database/migrations/019_coverage_metrics_add_municipality_contact_ai.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     psql "$URL" -f "$f" -v ON_ERROR_STOP=1

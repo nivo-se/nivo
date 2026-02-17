@@ -53,8 +53,8 @@ const InvestmentApproach: React.FC<InvestmentApproachProps> = ({ className, id }
               <FadeIn key={index} delay={150 + index * 100}>
                 <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                   <CardContent className="p-6 text-center space-y-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-grayOlive/15">
-                      <IconComponent className="h-6 w-6 text-grayOlive" />
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
+                      <IconComponent className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="text-xl font-heading font-semibold text-jetBlack">{area.title}</h3>
                     <p className="text-sm leading-relaxed text-jetBlack/75">{area.description}</p>

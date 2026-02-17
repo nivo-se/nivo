@@ -11,7 +11,7 @@ const StyleGuide = () => {
     <main className="min-h-screen bg-platinum px-6 py-16 text-jetBlack">
       <div className="mx-auto flex max-w-5xl flex-col gap-12">
         <section>
-          <p className="text-sm uppercase tracking-widest text-grayOlive">Typografi</p>
+          <p className="text-sm uppercase tracking-widest text-primary">Typografi</p>
           <div className="mt-6 space-y-4">
             <h1 className="text-4xl font-heading">Rubrik 1 – Zapf Humanist</h1>
             <h2 className="text-3xl font-heading">Rubrik 2 – Zapf Humanist</h2>
@@ -22,11 +22,11 @@ const StyleGuide = () => {
           </div>
         </section>
 
-        <Separator className="bg-grayOlive/20" />
+        <Separator className="bg-primary/20" />
 
         <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>
-            <p className="text-sm uppercase tracking-widest text-grayOlive">Knappar</p>
+            <p className="text-sm uppercase tracking-widest text-primary">Knappar</p>
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Button>Primär</Button>
               <Button variant="outline">Sekundär</Button>
@@ -35,7 +35,7 @@ const StyleGuide = () => {
             </div>
           </div>
           <div>
-            <p className="text-sm uppercase tracking-widest text-grayOlive">Formfält</p>
+            <p className="text-sm uppercase tracking-widest text-primary">Formfält</p>
             <div className="mt-6 space-y-4">
               <Input placeholder="E-post" />
               <Textarea placeholder="Meddelande" />
@@ -43,7 +43,7 @@ const StyleGuide = () => {
           </div>
         </section>
 
-        <Separator className="bg-grayOlive/20" />
+        <Separator className="bg-primary/20" />
 
         <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <Card>

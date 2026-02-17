@@ -1,23 +1,57 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useList, useCompaniesBatch, useRemoveFromList } from "@/lib/hooks/figmaQueries";
 import {
   getLatestFinancials,
   formatRevenueSEK,
   formatPercent,
   formatNum,
+  calculateRevenueCagr,
 } from "@/lib/utils/figmaCompanyUtils";
 import type { Company } from "@/types/figma";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { FilterBuilder } from "@/components/new/FilterBuilder";
 import { EmptyState } from "@/components/new/EmptyState";
 import { ErrorState } from "@/components/new/ErrorState";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, RefreshCw, Brain, ExternalLink, Download } from "lucide-react";
+import { toast } from "sonner";
+import * as api from "@/lib/services/figmaApi";
+
+function getStageLabel(stage: string): string {
+  switch (stage) {
+    case "research":
+      return "🔍 Research";
+    case "ai_analysis":
+      return "🤖 AI Analysis";
+    case "prospects":
+      return "🎯 Prospects";
+    default:
+      return stage;
+  }
+}
 
 export default function NewListDetail() {
   const { listId } = useParams<{ listId: string }>();
+  const queryClient = useQueryClient();
   const { data: list, isLoading, isError, error, refetch } = useList(listId ?? "");
   const orgnrs = list?.companyIds ?? [];
-  const { data: companies = [], isLoading: companiesLoading, isTruncated, isError: companiesError, error: companiesErrorObj, refetch: refetchCompanies } = useCompaniesBatch(orgnrs);
+  const {
+    data: companies = [],
+    isLoading: companiesLoading,
+    isTruncated,
+    isError: companiesError,
+    error: companiesErrorObj,
+    refetch: refetchCompanies,
+  } = useCompaniesBatch(orgnrs);
   const removeMutation = useRemoveFromList();
+
+  const [showFilterBuilder, setShowFilterBuilder] = useState(false);
+  const [editedFilters, setEditedFilters] = useState(list?.filters);
+  const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
   if (isLoading) {
     return (
@@ -34,8 +68,10 @@ export default function NewListDetail() {
           message={error?.message ?? "List not found"}
           retry={() => refetch()}
           action={
-            <Link to="/new/lists">
-              <Button variant="outline" size="sm">Back to Lists</Button>
+            <Link to="/lists">
+              <Button variant="outline" size="sm">
+                Back to Lists
+              </Button>
             </Link>
           }
         />
@@ -43,29 +79,185 @@ export default function NewListDetail() {
     );
   }
 
+  const handleReloadFilters = () => {
+    setShowFilterBuilder(true);
+    setEditedFilters(list.filters ?? undefined);
+  };
+
+  const handleUpdateList = async () => {
+    if (!editedFilters) return;
+    try {
+      await api.updateList(list.id, { filters: editedFilters });
+      setShowFilterBuilder(false);
+      refetch();
+      toast.success("List updated");
+    } catch {
+      toast.error("Filter reload not yet implemented in backend");
+    }
+  };
+
+  const handleAddToProspects = async () => {
+    const companyIds = Array.from(selectedCompanies);
+    if (companyIds.length === 0) return;
+    try {
+      for (const id of companyIds) {
+        await api.createProspect(id);
+      }
+      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      setSelectedCompanies(new Set());
+      toast.success(`Added ${companyIds.length} companies to Prospects`);
+    } catch {
+      toast.error("Prospects not yet implemented in backend");
+    }
+  };
+
+  const toggleSelectCompany = (orgnr: string) => {
+    const next = new Set(selectedCompanies);
+    if (next.has(orgnr)) next.delete(orgnr);
+    else next.add(orgnr);
+    setSelectedCompanies(next);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedCompanies.size === companies.length) {
+      setSelectedCompanies(new Set());
+    } else {
+      setSelectedCompanies(new Set(companies.map((c) => c.orgnr)));
+    }
+  };
+
   const handleRemove = (orgnr: string) => {
     if (confirm("Remove this company from the list?")) {
       removeMutation.mutate({ listId: list.id, orgnr });
     }
   };
 
+  const searchLower = searchQuery.trim().toLowerCase();
+  const filteredCompaniesList = searchLower
+    ? companies.filter(
+        (c) =>
+          (c.display_name?.toLowerCase().includes(searchLower)) ||
+          (c.orgnr?.includes(searchQuery)) ||
+          (c.industry_label?.toLowerCase().includes(searchLower))
+      )
+    : companies;
+
+  const handleExportCsv = () => {
+    const headers = ["Org nr", "Company", "Industry", "Region", "Revenue", "3Y CAGR", "EBITDA Margin"];
+    const rows = filteredCompaniesList.map((c) => {
+      const latest = getLatestFinancials(c);
+      const cagr = calculateRevenueCagr(c);
+      return [
+        c.orgnr,
+        c.display_name ?? "",
+        c.industry_label ?? "",
+        c.region ?? "",
+        latest.revenue ?? "",
+        cagr != null ? `${(cagr * 100).toFixed(1)}%` : "",
+        latest.ebitdaMargin != null ? `${(latest.ebitdaMargin * 100).toFixed(1)}%` : "",
+      ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+    });
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${list.name.replace(/[^a-z0-9]/gi, "_")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Exported CSV");
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
-        <div className="flex items-center gap-4 mb-4">
-          <Link to="/new/lists">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <Link to="/lists">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-1" /> Back
+              </Button>
+            </Link>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
+                {list.scope === "team" && (
+                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                    Shareable
+                  </span>
+                )}
+                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                  {getStageLabel(list.stage)}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">
+                {list.companyIds.length} companies
+                {list.created_by && ` • Created by ${list.created_by}`} •{" "}
+                {new Date(list.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            {list.filters && (
+              <Button variant="outline" onClick={handleReloadFilters}>
+                <RefreshCw className="w-4 h-4 mr-2" /> Reload & Modify Filters
+              </Button>
+            )}
+            <Link to={`/ai/run/create?template=default&list=${list.id}`}>
+              <Button variant="outline">
+                <Brain className="w-4 h-4 mr-2" /> Run AI Analysis
+              </Button>
+            </Link>
+            <Button
+              disabled={selectedCompanies.size === 0}
+              onClick={handleAddToProspects}
+            >
+              Add to Prospects ({selectedCompanies.size})
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
-            <p className="text-sm text-gray-600">
-              {list.companyIds.length} companies • {list.scope === "team" ? "Shareable" : "Private"}
+          </div>
+        </div>
+
+        {showFilterBuilder && editedFilters && (
+          <div className="mt-4">
+            <FilterBuilder
+              filters={editedFilters}
+              onChange={setEditedFilters}
+              onApply={handleUpdateList}
+            />
+            <div className="mt-3 flex gap-2">
+              <Button onClick={handleUpdateList}>Update List</Button>
+              <Button variant="outline" onClick={() => setShowFilterBuilder(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {list.filters && !showFilterBuilder && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+            <p className="text-blue-900">
+              ✓ This list was created from filters and can be reloaded to see updated
+              results
             </p>
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <Input
+            placeholder="Search companies..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-64"
+          />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCsv}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
           </div>
         </div>
       </div>
+
       <div className="flex-1 overflow-auto px-8 py-4">
         {isTruncated && (
           <div className="mb-4 px-4 py-2 rounded bg-amber-50 border border-amber-200 text-sm text-amber-800">
@@ -84,47 +276,92 @@ export default function NewListDetail() {
             title="No companies in this list"
             description="Add companies from Universe or Company detail"
             action={
-              <Link to="/new/universe">
+              <Link to="/universe">
                 <Button size="sm">Browse Universe</Button>
               </Link>
             }
           />
         ) : (
-          <div className="new-card overflow-hidden">
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left">Company</th>
+                  <th className="px-4 py-3 text-left w-12">
+                    <Checkbox
+                      checked={companies.length > 0 && selectedCompanies.size === companies.length}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-left">Company Name</th>
                   <th className="px-4 py-3 text-left">Industry</th>
+                  <th className="px-4 py-3 text-left">Geography</th>
                   <th className="px-4 py-3 text-right">Revenue</th>
-                  <th className="px-4 py-3 text-right">EBITDA %</th>
-                  <th className="px-4 py-3 text-right">Employees</th>
+                  <th className="px-4 py-3 text-right">3Y CAGR</th>
+                  <th className="px-4 py-3 text-right">EBITDA Margin</th>
+                  <th className="px-4 py-3 text-center">AI Score</th>
                   <th className="px-4 py-3 w-16">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {companies.map((company: Company) => {
+                {filteredCompaniesList.map((company: Company) => {
                   const latest = getLatestFinancials(company);
+                  const cagr = calculateRevenueCagr(company) ?? 0;
                   return (
                     <tr key={company.orgnr} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
+                        <Checkbox
+                          checked={selectedCompanies.has(company.orgnr)}
+                          onCheckedChange={() => toggleSelectCompany(company.orgnr)}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
                         <Link
-                          to={`/new/company/${company.orgnr}`}
-                          className="font-medium text-blue-600 hover:text-blue-800"
+                          to={`/company/${company.orgnr}`}
+                          className="font-medium text-blue-600 hover:text-blue-800 flex items-center gap-2"
                         >
                           {company.display_name}
+                          <ExternalLink className="w-3 h-3" />
                         </Link>
-                        <p className="text-xs text-gray-500">{company.orgnr}</p>
                       </td>
-                      <td className="px-4 py-3 text-gray-700">{company.industry_label ?? "—"}</td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {company.industry_label ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">{company.region ?? "—"}</td>
                       <td className="px-4 py-3 text-right font-mono text-sm">
                         {formatRevenueSEK(latest.revenue)}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono">
+                        <span
+                          className={
+                            cagr > 0.15
+                              ? "text-green-600"
+                              : cagr < 0
+                                ? "text-red-600"
+                                : "text-gray-700"
+                          }
+                        >
+                          {formatPercent(cagr)}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm">
                         {formatPercent(latest.ebitdaMargin)}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-sm">
-                        {formatNum(company.employees_latest)}
+                      <td className="px-4 py-3 text-center">
+                        {company.ai_profile?.ai_fit_score != null ? (
+                          <span
+                            className={`font-semibold ${
+                              company.ai_profile.ai_fit_score >= 75
+                                ? "text-green-600"
+                                : company.ai_profile.ai_fit_score >= 50
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
+                            }`}
+                          >
+                            {company.ai_profile.ai_fit_score}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <Button

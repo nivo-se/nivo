@@ -22,13 +22,13 @@ export default function NewAppLayout() {
   };
 
   return (
-    <div className="new-theme flex h-screen bg-gray-50">
-      <aside className="w-56 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-100">
-          <div className="text-sm font-medium text-gray-900">
+    <div className="new-theme flex h-screen bg-page-bg">
+      <aside className="w-56 bg-sidebar-bg border-r border-sidebar-border flex flex-col">
+        <div className="p-6 border-b border-sidebar-border">
+          <div className="text-sm font-medium text-foreground">
             {user?.email ?? "User"}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">Team Plan</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Team Plan</div>
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
           {navItems.map((item) => {
@@ -39,7 +39,7 @@ export default function NewAppLayout() {
                 key={item.path}
                 to={item.path === "/" ? "/" : item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  active ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  active ? "bg-sidebar-active-bg text-sidebar-active-fg font-medium" : "text-sidebar-inactive-fg hover:bg-sidebar-hover-bg hover:text-foreground"
                 } ${item.indent ? "pl-6" : ""}`}
               >
                 <Icon className="w-4 h-4" />
@@ -49,7 +49,7 @@ export default function NewAppLayout() {
           })}
         </nav>
       </aside>
-      <main className="flex-1 overflow-auto bg-gray-50">
+      <main className="flex-1 overflow-auto bg-page-bg">
         <Outlet />
       </main>
     </div>

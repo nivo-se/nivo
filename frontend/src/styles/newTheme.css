@@ -1,35 +1,22 @@
-/* New /new theme: warm off-white, light sidebar, soft bordered cards */
-
-.new-theme {
-  --new-bg: #faf8f5;
-  --new-sidebar-bg: #f5f2ed;
-  --new-sidebar-border: #e8e4dd;
-  --new-card-bg: #ffffff;
-  --new-card-border: #e5e2db;
-  --new-header-bg: #ffffff;
-  --new-header-border: #e5e2db;
-}
-
-.new-theme {
-  background: var(--new-bg);
-}
-
-.new-theme .new-sidebar {
-  background: var(--new-sidebar-bg);
-  border-right: 1px solid var(--new-sidebar-border);
-}
+/* New app layout - uses design tokens from design-tokens.css */
+/* All colors come from :root / .dark in design-tokens.css */
 
 .new-theme .new-bg {
-  background: var(--new-bg);
+  background: var(--page-bg);
 }
 
 .new-theme .new-card {
-  background: var(--new-card-bg);
-  border: 1px solid var(--new-card-border);
-  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
 }
 
 .new-theme .new-header {
-  background: var(--new-header-bg);
-  border-color: var(--new-header-border);
+  background: var(--sidebar-bg);
+  border-color: var(--sidebar-border);
+}
+
+/* Muted text uses semantic token */
+.new-theme .text-muted-foreground {
+  color: hsl(var(--muted-foreground));
 }

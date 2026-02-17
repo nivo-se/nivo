@@ -23,10 +23,9 @@ export default {
                                 heading: ['var(--font-zapf)', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial'],
                                 sans: ['var(--font-poppins)', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Arial'],
                         },
-                        colors: {
+			colors: {
                                 transparent: 'transparent',
                                 current: 'currentColor',
-                                grayOlive: '#596152',
                                 jetBlack: '#2E2A2B',
                                 platinum: '#E6E6E6',
                                 border: 'hsl(var(--border))',
@@ -71,6 +70,26 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				/* New app layout tokens */
+				'page-bg': 'var(--page-bg)',
+				/* Chart colors (theme-aware) */
+				chart: {
+					1: 'hsl(var(--chart-1))',
+					2: 'hsl(var(--chart-2))',
+					3: 'hsl(var(--chart-3))',
+				},
+				'chart-primary': 'var(--accent-chart)',
+				'chart-secondary': 'var(--accent-chart-2)',
+				'chart-muted': 'var(--accent-muted)',
+				'grid-line': 'var(--grid)',
+				sidebar: {
+					'bg': 'var(--sidebar-bg)',
+					'border': 'var(--sidebar-border)',
+					'active-bg': 'hsl(var(--sidebar-active-bg-hsl))',
+					'active-fg': 'hsl(var(--sidebar-active-fg-hsl))',
+					'inactive-fg': 'hsl(var(--sidebar-inactive-fg))',
+					'hover-bg': 'hsl(var(--sidebar-hover-bg-hsl))',
 				},
 				orangery: {
 					50: '#f9fafb',

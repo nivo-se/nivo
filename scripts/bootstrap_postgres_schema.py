@@ -29,7 +29,7 @@ MIGRATIONS_DIR = REPO_ROOT / "database" / "migrations"
 LOCAL_MIGRATIONS = [
     "012_add_ai_enrichment_tables.sql",
     "013_add_performance_indexes.sql",
-]  # Applied after schema for upgrade
+]  # Applied after schema. Run ./scripts/run_postgres_migrations.sh for coverage_metrics (013_add_coverage_view..017)
 
 
 def load_dotenv() -> None:

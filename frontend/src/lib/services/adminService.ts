@@ -7,12 +7,16 @@ export type UserRole = "pending" | "approved" | "admin";
 export async function createUser(
   email: string,
   password: string,
-  role: UserRole
+  role: UserRole,
+  options?: { first_name?: string; last_name?: string }
 ): Promise<{ user_id: string; email: string; role: string; message: string }> {
+  const body: Record<string, unknown> = { email, password, role };
+  if (options?.first_name != null) body.first_name = options.first_name;
+  if (options?.last_name != null) body.last_name = options.last_name;
   const res = await fetchWithAuth(`${API_BASE}/api/admin/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, role }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {

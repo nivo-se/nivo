@@ -103,6 +103,20 @@ export function getNewUniverseStateFromUrl(searchParams: URLSearchParams): Parti
   return decodeNewUniverseState(searchParams.get(PARAM_KEY));
 }
 
+function encodeState(state: Omit<NewUniverseUrlState, "v">): string {
+  try {
+    const obj: Record<string, unknown> = { v: 1 };
+    if (state.q) obj.q = state.q;
+    if (state.page != null && state.page > 1) obj.page = state.page;
+    if (state.sortField && state.sortField !== "name") obj.sortField = state.sortField;
+    if (state.sortDir && state.sortDir !== "asc") obj.sortDir = state.sortDir;
+    if (state.filters && state.filters.length > 0) obj.filters = state.filters;
+    return JSON.stringify(obj);
+  } catch {
+    return "";
+  }
+}
+
 export function buildNewUniverseSearchParams(
   state: Omit<NewUniverseUrlState, "v">
 ): URLSearchParams {

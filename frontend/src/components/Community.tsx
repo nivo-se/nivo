@@ -34,7 +34,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="text"
                     id="name"
-                    className="w-full rounded-lg border border-grayOlive/30 bg-white px-3 py-2 text-jetBlack shadow-sm outline-none transition focus:border-grayOlive/60 focus:ring-2 focus:ring-grayOlive/30"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
                     placeholder="Ditt namn"
                   />
                 </div>
@@ -45,7 +45,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="text"
                     id="company"
-                    className="w-full rounded-lg border border-grayOlive/30 bg-white px-3 py-2 text-jetBlack shadow-sm outline-none transition focus:border-grayOlive/60 focus:ring-2 focus:ring-grayOlive/30"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
                     placeholder="Ditt företag"
                   />
                 </div>
@@ -56,7 +56,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <input
                     type="email"
                     id="email"
-                    className="w-full rounded-lg border border-grayOlive/30 bg-white px-3 py-2 text-jetBlack shadow-sm outline-none transition focus:border-grayOlive/60 focus:ring-2 focus:ring-grayOlive/30"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
                     placeholder="din@email.com"
                   />
                 </div>
@@ -67,7 +67,7 @@ const Community: React.FC<CommunityProps> = ({ className }) => {
                   <textarea
                     id="message"
                     rows={3}
-                    className="w-full rounded-lg border border-grayOlive/30 bg-white px-3 py-2 text-jetBlack shadow-sm outline-none transition focus:border-grayOlive/60 focus:ring-2 focus:ring-grayOlive/30"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring"
                     placeholder="Berätta om ditt företag..."
                   />
                 </div>

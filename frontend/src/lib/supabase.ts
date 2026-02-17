@@ -49,6 +49,8 @@ export interface Database {
           id: string
           user_id: string
           role: 'admin' | 'approved' | 'pending'
+          first_name: string | null
+          last_name: string | null
           approved_by: string | null
           approved_at: string | null
           created_at: string
@@ -58,6 +60,8 @@ export interface Database {
           id?: string
           user_id: string
           role?: 'admin' | 'approved' | 'pending'
+          first_name?: string | null
+          last_name?: string | null
           approved_by?: string | null
           approved_at?: string | null
           created_at?: string
@@ -67,6 +71,8 @@ export interface Database {
           id?: string
           user_id?: string
           role?: 'admin' | 'approved' | 'pending'
+          first_name?: string | null
+          last_name?: string | null
           approved_by?: string | null
           approved_at?: string | null
           created_at?: string

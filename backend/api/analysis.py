@@ -4,6 +4,7 @@ Acquisition Workflow API Endpoints
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import List, Optional
 
@@ -193,9 +194,18 @@ async def get_run_companies(run_id: str, recommendation: Optional[str] = None):
 
 @router.get("/companies/{orgnr}/analysis")
 async def get_company_analysis(orgnr: str):
-    """Get latest analysis for a specific company"""
-    db = get_database_service()
-    
+    """Get latest analysis for a specific company. Returns 404 when no analysis or tables missing."""
+    try:
+        db = get_database_service()
+    except Exception as e:
+        logger.debug("get_company_analysis: no DB: %s", e)
+        raise HTTPException(status_code=404, detail="No analysis available")
+
+    # Check if acquisition tables exist (Postgres may not have them)
+    if hasattr(db, "table_exists"):
+        if not (db.table_exists("company_analysis") and db.table_exists("companies")):
+            raise HTTPException(status_code=404, detail="No analysis available")
+
     try:
         rows = db.run_raw_query(
             """
@@ -206,33 +216,76 @@ async def get_company_analysis(orgnr: str):
             ORDER BY a.analyzed_at DESC
             LIMIT 1
             """,
-            params=[orgnr]
+            params=[orgnr],
         )
-        
-        if not rows:
-            raise HTTPException(status_code=404, detail="No analysis found for this company")
-        
-        row = rows[0]
-        return CompanyAnalysisResponse(
-            orgnr=row['orgnr'],
-            company_name=row['company_name'],
-            business_model=row.get('business_model'),
-            products_summary=row.get('products_summary'),
-            market_position=row.get('market_position'),
-            swot_strengths=row.get('swot_strengths', []),
-            swot_weaknesses=row.get('swot_weaknesses', []),
-            swot_opportunities=row.get('swot_opportunities', []),
-            swot_threats=row.get('swot_threats', []),
-            strategic_fit_score=row['strategic_fit_score'],
-            recommendation=row['recommendation'],
-            investment_memo=row.get('investment_memo', '')
-        )
-        
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(f"Failed to get company analysis: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.warning("get_company_analysis query failed: %s", e)
+        raise HTTPException(status_code=404, detail="No analysis available")
+
+    if not rows:
+        raise HTTPException(status_code=404, detail="No analysis found for this company")
+
+    row = rows[0]
+    # Parse JSON/JSONB fields if they come as strings
+    def _list(val):
+        if val is None:
+            return []
+        if isinstance(val, list):
+            return val
+        if isinstance(val, str):
+            try:
+                return json.loads(val) if val else []
+            except Exception:
+                return []
+        return []
+
+    return CompanyAnalysisResponse(
+        orgnr=row["orgnr"],
+        company_name=row.get("company_name", ""),
+        business_model=row.get("business_model"),
+        products_summary=row.get("products_summary"),
+        market_position=row.get("market_position"),
+        swot_strengths=_list(row.get("swot_strengths")),
+        swot_weaknesses=_list(row.get("swot_weaknesses")),
+        swot_opportunities=_list(row.get("swot_opportunities")),
+        swot_threats=_list(row.get("swot_threats")),
+        strategic_fit_score=int(row.get("strategic_fit_score") or 0),
+        recommendation=row.get("recommendation", ""),
+        investment_memo=row.get("investment_memo", ""),
+    )
+
+
+@router.get("/status")
+async def analysis_status():
+    """
+    Report whether the analysis schema is ready.
+    UI can show 'Analysis module not installed' when analysis_schema_ready is false.
+    """
+    required_tables = ["companies", "acquisition_runs", "company_analysis"]
+    missing: List[str] = []
+    try:
+        db = get_database_service()
+    except Exception:
+        return {
+            "ok": True,
+            "analysis_schema_ready": False,
+            "missing_tables": required_tables,
+            "message": "Database not configured",
+        }
+
+    if hasattr(db, "table_exists"):
+        for t in required_tables:
+            if not db.table_exists(t):
+                missing.append(t)
+    else:
+        missing = required_tables
+
+    return {
+        "ok": True,
+        "analysis_schema_ready": len(missing) == 0,
+        "missing_tables": missing,
+        "message": "Analysis schema ready" if not missing else f"Missing tables: {', '.join(missing)}",
+    }
 
 
 @router.get("/runs")

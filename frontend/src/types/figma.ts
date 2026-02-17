@@ -9,6 +9,8 @@ export interface Company {
   display_name: string;
   legal_name: string;
   website_url?: string;
+  email?: string;
+  phone?: string;
   region?: string;
   municipality?: string;
   industry_code?: string;
@@ -29,6 +31,8 @@ export interface Company {
   employees_latest: number | null;
   stability_score?: number;
   leverage_ratio?: number;
+  equity_ratio_latest?: number | null;
+  debt_to_equity_latest?: number | null;
   has_homepage: boolean;
   has_ai_profile: boolean;
   has_3y_financials: boolean;

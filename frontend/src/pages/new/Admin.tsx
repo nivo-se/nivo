@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAIRuns, useLists, useCompanies } from "@/lib/hooks/figmaQueries";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLastApiErrors } from "@/lib/services/figmaApi";
 import * as api from "@/lib/services/figmaApi";
 import { getListItems } from "@/lib/services/listsService";
+import { fetchWhoAmI, type WhoAmI } from "@/lib/services/whoamiService";
 import { runNewUniverseUrlStateDevTest } from "@/lib/newUniverseUrlState";
 import { API_BASE } from "@/lib/apiClient";
+import AdminPanel from "@/components/AdminPanel";
+import { AdminSettings } from "@/components/AdminSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 type SmokeStep = "idle" | "running" | "pass" | "fail";
 
@@ -19,6 +20,14 @@ export default function NewAdmin() {
   const { data: companies = [], isError: companiesError } = useCompanies({ limit: 100 });
   const { data: lists = [], isError: listsError } = useLists();
   const { data: runs = [], isError: runsError } = useAIRuns();
+
+  const [whoami, setWhoami] = useState<WhoAmI | null>(null);
+  const [whoamiError, setWhoamiError] = useState<string | null>(null);
+  useEffect(() => {
+    fetchWhoAmI()
+      .then(setWhoami)
+      .catch((e) => setWhoamiError(e instanceof Error ? e.message : String(e)));
+  }, []);
 
   const [smokeState, setSmokeState] = useState<{
     step1: SmokeStep;
@@ -90,15 +99,13 @@ export default function NewAdmin() {
     <div className="h-full overflow-auto new-bg">
       <div className="max-w-5xl mx-auto px-8 py-8">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">Admin Panel</h1>
-        <p className="text-sm text-gray-600 mb-6">System configuration and team management</p>
+        <p className="text-sm text-gray-700 mb-6">System configuration and team management</p>
 
         <Tabs defaultValue="overview" className="mb-8">
-          <TabsList className="w-full justify-start h-auto p-0 bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-gray-100">Overview</TabsTrigger>
-            <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-gray-100">Team</TabsTrigger>
-            <TabsTrigger value="api" className="rounded-none data-[state=active]:bg-gray-100">API Config</TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-gray-100">Settings</TabsTrigger>
-            <TabsTrigger value="audit" className="rounded-none data-[state=active]:bg-gray-100">Audit Log</TabsTrigger>
+          <TabsList className="w-full justify-start h-auto p-0 bg-white border border-gray-200 rounded-lg overflow-hidden text-gray-700">
+            <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Overview</TabsTrigger>
+            <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Team</TabsTrigger>
+            <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 data-[state=inactive]:text-gray-700">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
@@ -107,27 +114,42 @@ export default function NewAdmin() {
             <CardTitle className="text-lg">Contracts</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            {whoami ? (
+              <div className="p-3 rounded bg-gray-50 border border-gray-200 mb-3">
+                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">System overview (truth source)</p>
+                <p className="font-mono text-sm text-gray-900">
+                  Backend: <strong>{whoami.port}</strong>
+                  {" · "}Postgres: <strong>{whoami.db_host}:{whoami.db_port}</strong>
+                  {" · "}SHA: <strong>{whoami.git_sha}</strong>
+                </p>
+                <p className="text-xs text-gray-500 mt-1">API: {whoami.api_base} · started {whoami.started_at}</p>
+              </div>
+            ) : whoamiError ? (
+              <p className="text-amber-600 text-sm">Backend unreachable: {whoamiError}</p>
+            ) : (
+              <p className="text-gray-500 text-sm">Loading backend info…</p>
+            )}
             <div>
-              <span className="text-gray-600">API base URL: </span>
+              <span className="text-gray-700">API base URL: </span>
               <code className="font-mono text-gray-900">{API_BASE}</code>
             </div>
             <div>
-              <span className="text-gray-600">Auth: </span>
+              <span className="text-gray-700">Auth: </span>
               <span className={session ? "text-green-600" : "text-amber-600"}>
                 {session ? `Signed in (${user?.email ?? "user"})` : "Not signed in"}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-4 pt-2">
               <div>
-                <span className="text-gray-600">getCompanies(): </span>
+                <span className="text-gray-700">getCompanies(): </span>
                 <span className="font-mono font-medium">{companies.length}</span>
               </div>
               <div>
-                <span className="text-gray-600">getLists(): </span>
+                <span className="text-gray-700">getLists(): </span>
                 <span className="font-mono font-medium">{lists.length}</span>
               </div>
               <div>
-                <span className="text-gray-600">getAIRuns(): </span>
+                <span className="text-gray-700">getAIRuns(): </span>
                 <span className="font-mono font-medium">{runs.length}</span>
               </div>
             </div>
@@ -179,8 +201,8 @@ export default function NewAdmin() {
                       <div className="mt-3 pt-3 border-t border-red-200 text-red-800">
                         <p className="font-medium mb-1">Troubleshooting (network/CORS):</p>
                         <ol className="list-decimal list-inside text-xs space-y-0.5">
-                          <li>Start backend: <code className="bg-red-100 px-1 rounded">./scripts/start_backend.sh</code> (or <code className="bg-red-100 px-1 rounded">PORT=8001 ./scripts/start_backend.sh</code>)</li>
-                          <li>Ensure <code className="bg-red-100 px-1 rounded">VITE_API_BASE_URL</code> in <code className="bg-red-100 px-1 rounded">.env</code> matches backend port (e.g. <code className="bg-red-100 px-1 rounded">http://localhost:8000</code> or <code className="bg-red-100 px-1 rounded">http://localhost:8001</code>)</li>
+                          <li>Start backend: <code className="bg-red-100 px-1 rounded">./scripts/start_backend.sh</code> (default port 8000)</li>
+                          <li>Ensure <code className="bg-red-100 px-1 rounded">VITE_API_BASE_URL</code> in frontend <code className="bg-red-100 px-1 rounded">.env</code> matches backend (local: <code className="bg-red-100 px-1 rounded">http://127.0.0.1:8000</code>)</li>
                           <li>For Universe/Lists: set <code className="bg-red-100 px-1 rounded">DATABASE_SOURCE=postgres</code> and run migrations</li>
                         </ol>
                       </div>
@@ -197,19 +219,19 @@ export default function NewAdmin() {
         <div className="grid grid-cols-3 gap-6">
           <Card className="new-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-600 mb-1">Companies (sample)</p>
+              <p className="text-sm text-gray-700 mb-1">Companies (sample)</p>
               <p className="text-2xl font-semibold">{companies.length}</p>
             </CardContent>
           </Card>
           <Card className="new-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-600 mb-1">Lists</p>
+              <p className="text-sm text-gray-700 mb-1">Lists</p>
               <p className="text-2xl font-semibold">{lists.length}</p>
             </CardContent>
           </Card>
           <Card className="new-card">
             <CardContent className="p-6">
-              <p className="text-sm text-gray-600 mb-1">AI Runs</p>
+              <p className="text-sm text-gray-700 mb-1">AI Runs</p>
               <p className="text-2xl font-semibold">{runs.length}</p>
             </CardContent>
           </Card>
@@ -217,63 +239,11 @@ export default function NewAdmin() {
           </TabsContent>
 
           <TabsContent value="team" className="mt-6">
-            <Card className="new-card">
-              <CardHeader>
-                <CardTitle>Team Members</CardTitle>
-                <p className="text-sm text-gray-600">Manage team access and roles</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500 py-8 text-center">
-                  Team management coming soon. Add team members, assign roles, and manage access.
-                </p>
-                <Button variant="outline" disabled>Add Team Member</Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="api" className="mt-6">
-            <Card className="new-card">
-              <CardHeader>
-                <CardTitle>OpenAI API</CardTitle>
-                <p className="text-sm text-gray-600">Configure AI analysis API keys</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="api-key">API Key</Label>
-                  <Input id="api-key" type="password" placeholder="sk-..." className="mt-2 max-w-md" disabled />
-                </div>
-                <Button variant="outline" disabled>Test Connection</Button>
-                <p className="text-xs text-gray-500">API configuration coming soon</p>
-              </CardContent>
-            </Card>
+            <AdminPanel currentUser={user} />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
-            <Card className="new-card">
-              <CardHeader>
-                <CardTitle>General Settings</CardTitle>
-                <p className="text-sm text-gray-600">Data retention, notifications, defaults</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500 py-8 text-center">
-                  Settings configuration coming soon.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="audit" className="mt-6">
-            <Card className="new-card">
-              <CardHeader>
-                <CardTitle>Audit Log</CardTitle>
-                <p className="text-sm text-gray-600">Review system activity</p>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500 py-8 text-center">
-                  Audit log coming soon. Track user actions and system changes.
-                </p>
-              </CardContent>
-            </Card>
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </div>

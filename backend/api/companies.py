@@ -3,6 +3,7 @@ Company intelligence endpoints
 """
 import json
 import logging
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -248,14 +249,17 @@ async def get_companies_batch(
                 # Continue anyway - will just show companies without profiles
         
         placeholders = ",".join("?" for _ in request.orgnrs)
-        sql = f"""
+        sql_full = f"""
             SELECT 
                 c.orgnr,
                 c.company_name,
                 c.homepage,
+                c.email,
+                c.phone,
                 c.employees_latest,
                 c.segment_names,
                 c.nace_categories,
+                COALESCE(c.address->>'municipality', c.address->>'region') as region,
                 COALESCE(f.latest_revenue_sek, k.latest_revenue_sek) as latest_revenue_sek,
                 k.latest_profit_sek,
                 k.latest_ebitda_sek,
@@ -265,7 +269,9 @@ async def get_companies_batch(
                 k.revenue_growth_yoy,
                 k.company_size_bucket,
                 k.growth_bucket,
-                k.profitability_bucket
+                k.profitability_bucket,
+                k.equity_ratio_latest,
+                k.debt_to_equity_latest
             FROM companies c
             LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
             LEFT JOIN (
@@ -287,8 +293,50 @@ async def get_companies_batch(
             WHERE c.orgnr IN ({placeholders})
             ORDER BY COALESCE(f.latest_revenue_sek, k.latest_revenue_sek, 0) DESC, c.company_name ASC
         """
-        
-        rows = db.run_raw_query(sql, params=request.orgnrs)
+        sql_medium = f"""
+            SELECT 
+                c.orgnr, c.company_name, c.homepage, c.email, c.phone,
+                c.employees_latest, c.segment_names, c.nace_categories,
+                COALESCE(c.address->>'municipality', c.address->>'region') as region,
+                k.latest_revenue_sek, k.latest_profit_sek, k.latest_ebitda_sek,
+                k.avg_ebitda_margin, k.avg_net_margin, k.revenue_cagr_3y, k.revenue_growth_yoy,
+                k.company_size_bucket, k.growth_bucket, k.profitability_bucket,
+                k.equity_ratio_latest, k.debt_to_equity_latest
+            FROM companies c
+            LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
+            WHERE c.orgnr IN ({placeholders})
+            ORDER BY COALESCE(k.latest_revenue_sek, 0) DESC, c.company_name ASC
+        """
+        sql_minimal = f"""
+            SELECT c.orgnr, c.company_name, c.homepage, c.email, c.phone,
+                   c.employees_latest, c.segment_names, c.nace_categories,
+                   COALESCE(c.address->>'municipality', c.address->>'region') as region
+            FROM companies c
+            WHERE c.orgnr IN ({placeholders})
+            ORDER BY c.company_name ASC
+        """
+        try:
+            rows = db.run_raw_query(sql_full, params=request.orgnrs)
+        except Exception as sql_exc:
+            logger.warning("Batch full query failed, trying medium: %s", sql_exc)
+            try:
+                rows = db.run_raw_query(sql_medium, params=request.orgnrs)
+            except Exception as med_exc:
+                logger.warning("Batch medium query failed, falling back to minimal: %s", med_exc)
+                rows = db.run_raw_query(sql_minimal, params=request.orgnrs)
+                for r in rows:
+                    r.setdefault("latest_revenue_sek", None)
+                    r.setdefault("latest_profit_sek", None)
+                    r.setdefault("latest_ebitda_sek", None)
+                    r.setdefault("avg_ebitda_margin", None)
+                    r.setdefault("avg_net_margin", None)
+                    r.setdefault("revenue_cagr_3y", None)
+                    r.setdefault("revenue_growth_yoy", None)
+                    r.setdefault("company_size_bucket", None)
+                    r.setdefault("growth_bucket", None)
+                    r.setdefault("profitability_bucket", None)
+                    r.setdefault("equity_ratio_latest", None)
+                    r.setdefault("debt_to_equity_latest", None)
         
         ai_profiles_map: Dict[str, Dict[str, Any]] = {}
         enrichment_map: Dict[str, Dict[str, Any]] = {}
@@ -343,6 +391,8 @@ async def get_companies_batch(
                 "orgnr": row.get("orgnr"),
                 "company_name": row.get("company_name"),
                 "homepage": row.get("homepage"),
+                "email": row.get("email"),
+                "phone": row.get("phone"),
                 "employees_latest": row.get("employees_latest"),
                 "segment_names": segment_names,
                 "company_context": company_context,
@@ -356,6 +406,8 @@ async def get_companies_batch(
                 "company_size_bucket": row.get("company_size_bucket"),
                 "growth_bucket": row.get("growth_bucket"),
                 "profitability_bucket": row.get("profitability_bucket"),
+                "equity_ratio_latest": row.get("equity_ratio_latest"),
+                "debt_to_equity_latest": row.get("debt_to_equity_latest"),
                 "ai_strategic_score": profile.get("strategic_fit_score") if profile else None,
                 "ai_defensibility_score": profile.get("defensibility_score") if profile else None,
                 "ai_product_description": profile.get("product_description") if profile else None,
@@ -403,7 +455,14 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
     """
     try:
         db = get_database_service()
-        
+    except Exception as e:
+        logger.debug("get_company_financials: no DB: %s", e)
+        return {"financials": [], "count": 0}
+
+    if hasattr(db, "table_exists") and not db.table_exists("financials"):
+        return {"financials": [], "count": 0}
+
+    try:
         # Get historical financial data from financials table
         # IMPORTANT: Use correct account codes per allabolag_account_code_mapping.json
         # - Revenue: SI (Nettoomsättning) preferred, SDI fallback
@@ -419,15 +478,15 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                 period
             FROM financials
             WHERE orgnr = ?
-              AND currency = 'SEK'
+              AND (currency IS NULL OR currency = 'SEK')
               AND (period = '12' OR period LIKE '%-12')
-              AND year >= 2020
+              AND year >= 2018
             ORDER BY year DESC
             LIMIT 5
         """
         
         rows = db.run_raw_query(sql, params=[orgnr])
-        
+
         # Calculate margins for each year
         financials = []
         for row in rows:
@@ -435,12 +494,12 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             profit = row.get("profit_sek")
             ebit = row.get("ebit_sek")
             ebitda = row.get("ebitda_sek")
-            
+
             # Calculate margins
             net_margin = (profit / revenue * 100) if revenue and revenue > 0 and profit is not None else None
             ebit_margin = (ebit / revenue * 100) if revenue and revenue > 0 and ebit is not None else None
             ebitda_margin = (ebitda / revenue * 100) if revenue and revenue > 0 and ebitda is not None else None
-            
+
             financials.append({
                 "year": row.get("year"),
                 "revenue_sek": revenue,
@@ -451,9 +510,52 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                 "ebit_margin": ebit_margin,
                 "ebitda_margin": ebitda_margin,
             })
-        
+
+        # Fallback: if financials table has no rows, synthesize one from company_kpis
+        if not financials and hasattr(db, "table_exists") and db.table_exists("company_kpis"):
+            try:
+                kpi_sql = "SELECT latest_year, latest_revenue_sek, latest_profit_sek, latest_ebit_sek, latest_ebitda_sek, avg_ebitda_margin, avg_net_margin, avg_ebit_margin FROM company_kpis WHERE orgnr = ? LIMIT 1"
+                kpi_rows = db.run_raw_query(kpi_sql, params=[orgnr])
+                if kpi_rows:
+                    k = kpi_rows[0]
+                    year = k.get("latest_year") or (datetime.now().year - 1)
+                    rev = k.get("latest_revenue_sek")
+                    profit = k.get("latest_profit_sek")
+                    ebit = k.get("latest_ebit_sek")
+                    ebitda = k.get("latest_ebitda_sek")
+                    # avg_*_margin in company_kpis are 0-1 (e.g. 0.007 = 0.7%)
+                    avg_em = k.get("avg_ebitda_margin")
+                    avg_nm = k.get("avg_net_margin")
+                    avg_ebitm = k.get("avg_ebit_margin")
+                    if rev is not None or ebitda is not None:
+                        ebitda_val = ebitda
+                        if ebitda_val is None and rev and rev > 0 and avg_em is not None:
+                            em = float(avg_em)
+                            ebitda_val = float(rev) * (em if em <= 1 else em / 100)
+                        # API/frontend expect margins as 0-1 (formatPercent does value*100)
+                        def _to_01(m):
+                            if m is None:
+                                return None
+                            m = float(m)
+                            return m if m <= 1 else m / 100
+                        financials.append({
+                            "year": year,
+                            "revenue_sek": float(rev) if rev is not None else None,
+                            "profit_sek": float(profit) if profit is not None else None,
+                            "ebit_sek": float(ebit) if ebit is not None else None,
+                            "ebitda_sek": float(ebitda_val) if ebitda_val is not None else None,
+                            "net_margin": _to_01(avg_nm),
+                            "ebit_margin": _to_01(avg_ebitm),
+                            "ebitda_margin": _to_01(avg_em) or (
+                                (float(ebitda_val) / float(rev)) if rev and rev > 0 and ebitda_val is not None else None
+                            ),
+                        })
+            except Exception as kpi_exc:
+                logger.debug("company_kpis fallback failed: %s", kpi_exc)
+
         return {"financials": financials, "count": len(financials)}
-        
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching financials: {str(e)}")
+        logger.warning("get_company_financials failed: %s", e)
+        return {"financials": [], "count": 0}
 

@@ -33,6 +33,7 @@ import {
   guardCompaniesBatchResponse,
 } from "@/lib/services/figmaApiGuards";
 import { API_BASE } from "@/lib/apiClient";
+import { DEFAULT_PROMPT_TEMPLATES } from "@/lib/defaultPromptTemplates";
 
 import type {
   Company,
@@ -103,6 +104,17 @@ function toNull<T>(v: T | null | undefined): T | null {
 }
 
 function mapUniverseRowToCompany(row: UniverseRow): Company {
+  const aiFit = row.ai_strategic_fit_score;
+  const aiBadge =
+    aiFit != null
+      ? aiFit >= 7
+        ? "Strong"
+        : aiFit >= 5
+          ? "Neutral"
+          : aiFit >= 1
+            ? "Weak"
+            : null
+      : null;
   return {
     orgnr: String(row.orgnr ?? ""),
     display_name: row.name ?? row.orgnr ?? "",
@@ -118,6 +130,15 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
     ebitda_margin_latest: toNull(row.ebitda_margin_latest),
     revenue_cagr_3y: toNull(row.revenue_cagr_3y),
     employees_latest: toNull(row.employees_latest),
+    region: row.municipality ? String(row.municipality) : undefined,
+    website_url: row.homepage ? String(row.homepage) : undefined,
+    email: row.email ? String(row.email) : undefined,
+    phone: row.phone ? String(row.phone) : undefined,
+    ai_profile: row.has_ai_profile
+      ? { ai_fit_score: aiFit ?? undefined, ai_badge: aiBadge ?? undefined }
+      : undefined,
+    equity_ratio_latest: toNull(row.equity_ratio_latest),
+    debt_to_equity_latest: toNull(row.debt_to_equity_latest),
     currency: "SEK",
     years_available: 0,
     latest_year: new Date().getFullYear(),
@@ -131,6 +152,15 @@ export async function getCompanies(
   payload?: Partial<UniverseQueryPayload>,
   signal?: AbortSignal
 ): Promise<Company[]> {
+  const { companies } = await getCompaniesWithTotal(payload, signal);
+  return companies;
+}
+
+/** Get companies with total count from Universe query. */
+export async function getCompaniesWithTotal(
+  payload?: Partial<UniverseQueryPayload>,
+  signal?: AbortSignal
+): Promise<{ companies: Company[]; total: number }> {
   try {
     const result = await queryUniverse(
       {
@@ -145,7 +175,10 @@ export async function getCompanies(
     );
     guardUniverseQueryResponse(result);
     setLastApiError(null);
-    return result.rows.map((r) => mapUniverseRowToCompany(r as UniverseRow));
+    return {
+      companies: result.rows.map((r) => mapUniverseRowToCompany(r as UniverseRow)),
+      total: result.total,
+    };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     setLastApiError(msg, "POST /api/universe/query");
@@ -308,10 +341,17 @@ export async function removeFromList(listId: string, orgnr: string): Promise<voi
 }
 
 /** Get company details for multiple orgnrs via /api/companies/batch. Maps to Company[]. */
-export async function getCompaniesBatch(orgnrs: string[]): Promise<Company[]> {
+export async function getCompaniesBatch(
+  orgnrs: string[],
+  options?: { autoEnrich?: boolean }
+): Promise<Company[]> {
   if (orgnrs.length === 0) return [];
+  const params = new URLSearchParams();
+  if (options?.autoEnrich === false) params.set("auto_enrich", "false");
+  const query = params.toString();
+  const url = `/api/companies/batch${query ? `?${query}` : ""}`;
   try {
-    const res = await apiFetch<unknown>("/api/companies/batch", {
+    const res = await apiFetch<unknown>(url, {
       method: "POST",
       body: JSON.stringify({ orgnrs }),
     });
@@ -331,16 +371,25 @@ function mapBatchRowToCompany(row: Record<string, unknown>): Company {
   const margin = row.avg_ebitda_margin;
   const seg = row.segment_names;
   const segArr = Array.isArray(seg) ? seg : seg ? [String(seg)] : [];
+  const homepage = row.homepage ? String(row.homepage) : undefined;
+  const email = row.email ? String(row.email) : undefined;
+  const phone = row.phone ? String(row.phone) : undefined;
   return {
     orgnr: String(row.orgnr ?? ""),
     display_name: String(row.company_name ?? row.orgnr ?? ""),
     legal_name: String(row.company_name ?? row.orgnr ?? ""),
     industry_label: segArr[0] ? String(segArr[0]) : "Unknown",
-    region: row.homepage ? String(row.homepage) : undefined,
+    region: row.region ? String(row.region) : undefined,
+    website_url: homepage,
+    email,
+    phone,
     revenue_latest: toNull(typeof rev === "number" ? rev : null),
     ebitda_margin_latest: toNull(typeof margin === "number" ? margin : null),
     revenue_cagr_3y: toNull(row.revenue_cagr_3y as number | null),
     employees_latest: toNull(row.employees_latest as number | null),
+    equity_ratio_latest: toNull(row.equity_ratio_latest as number | null),
+    debt_to_equity_latest: toNull(row.debt_to_equity_latest as number | null),
+    leverage_ratio: typeof row.debt_to_equity_latest === "number" ? row.debt_to_equity_latest : undefined,
     data_quality_score: null,
     has_homepage: Boolean(row.homepage),
     has_ai_profile: Boolean(row.ai_strategic_score != null),
@@ -397,14 +446,17 @@ export async function deleteProspectNote(
   throw new Error("Prospects not implemented in backend");
 }
 
-// ---- AI Templates (stubbed - not in Nivo backend) ----
+// ---- AI Templates (built-in defaults from Figma export; backend CRUD stubbed) ----
 
 export async function getPromptTemplates(): Promise<PromptTemplate[]> {
-  return [];
+  return [...DEFAULT_PROMPT_TEMPLATES];
 }
 
-export async function getPromptTemplate(_templateId: string): Promise<PromptTemplate | null> {
-  return null;
+export async function getPromptTemplate(
+  templateId: string
+): Promise<PromptTemplate | null> {
+  const found = DEFAULT_PROMPT_TEMPLATES.find((t) => t.id === templateId);
+  return found ?? null;
 }
 
 export async function createPromptTemplate(
@@ -590,6 +642,28 @@ export async function approveResult(_resultId: string): Promise<AIResult> {
 
 export async function rejectResult(_resultId: string): Promise<AIResult> {
   throw new Error("rejectResult not implemented in backend");
+}
+
+/** Financial year from /api/companies/{orgnr}/financials */
+export type FinancialYear = {
+  year: number;
+  revenue_sek: number | null;
+  profit_sek: number | null;
+  ebit_sek: number | null;
+  ebitda_sek: number | null;
+  net_margin: number | null;
+  ebit_margin: number | null;
+  ebitda_margin: number | null;
+};
+
+export async function getCompanyFinancials(orgnr: string): Promise<{
+  financials: FinancialYear[];
+  count: number;
+}> {
+  const res = await apiFetch<{ financials: FinancialYear[]; count: number }>(
+    `/api/companies/${orgnr}/financials`
+  );
+  return { financials: res.financials ?? [], count: res.count ?? 0 };
 }
 
 export async function getCompanyAIProfile(orgnr: string): Promise<AIProfile | null> {

@@ -46,12 +46,12 @@ const Services: React.FC<ServicesProps> = ({ className, id }) => {
             return (
               <Card
                 key={index}
-                className="group h-full border-grayOlive/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl"
+                className="group h-full border-primary/20 bg-white/90 transition-transform duration-500 hover:-translate-y-1 hover:shadow-2xl"
               >
                 <CardContent className="p-6 sm:p-8">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-grayOlive/15 transition-transform duration-300 group-hover:scale-105">
-                      <IconComponent className="h-6 w-6 text-grayOlive" />
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15 transition-transform duration-300 group-hover:scale-105">
+                      <IconComponent className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <h3 className="mb-2 text-lg font-heading font-semibold text-jetBlack sm:text-xl">

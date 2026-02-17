@@ -25,6 +25,8 @@ class CreateUserRequest(BaseModel):
     email: EmailStr
     password: str
     role: UserRole = "approved"
+    first_name: str | None = None
+    last_name: str | None = None
 
 
 class CreateUserResponse(BaseModel):
@@ -93,14 +95,23 @@ async def create_user(
         raise HTTPException(400, "Password must be at least 8 characters")
 
     try:
+        # Build user metadata for auth and profile
+        user_metadata = {}
+        if body.first_name:
+            user_metadata["first_name"] = body.first_name
+        if body.last_name:
+            user_metadata["last_name"] = body.last_name
+
         # Create user in Supabase Auth
-        resp = supabase.auth.admin.create_user(
-            {
-                "email": body.email,
-                "password": body.password,
-                "email_confirm": True,  # Skip email confirmation
-            }
-        )
+        create_options: dict = {
+            "email": body.email,
+            "password": body.password,
+            "email_confirm": True,  # Skip email confirmation
+        }
+        if user_metadata:
+            create_options["data"] = user_metadata
+
+        resp = supabase.auth.admin.create_user(create_options)
 
         if not resp or not resp.user:
             raise HTTPException(500, "Failed to create user in Auth")
@@ -111,14 +122,17 @@ async def create_user(
         admin_id = get_current_user_id(request) or "system"
         now_iso = datetime.now(timezone.utc).isoformat()
         approved_at = now_iso if body.role in ("approved", "admin") else None
-        supabase.table("user_roles").insert(
-            {
-                "user_id": user_id,
-                "role": body.role,
-                "approved_by": admin_id,
-                "approved_at": approved_at,
-            }
-        ).execute()
+        insert_payload: dict = {
+            "user_id": user_id,
+            "role": body.role,
+            "approved_by": admin_id,
+            "approved_at": approved_at,
+        }
+        if body.first_name is not None:
+            insert_payload["first_name"] = body.first_name
+        if body.last_name is not None:
+            insert_payload["last_name"] = body.last_name
+        supabase.table("user_roles").insert(insert_payload).execute()
 
         return CreateUserResponse(
             user_id=user_id,

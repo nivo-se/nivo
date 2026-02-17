@@ -17,7 +17,7 @@ const About: React.FC<AboutProps> = ({ className, id }) => {
           <FadeIn className="md:col-span-4" delay={100}>
             <div className="md:sticky md:top-32">
               <FadeIn delay={200} direction="right">
-                <span className="text-sm font-medium text-grayOlive mb-3 inline-block">Vårt team</span>
+                <span className="text-sm font-medium text-primary mb-3 inline-block">Vårt team</span>
               </FadeIn>
               <TextReveal delay={300} duration={1000}>
                 <h2 className="text-2xl md:text-3xl font-heading font-semibold tracking-tight text-jetBlack">Ett team av erfarna företagsbyggare</h2>
