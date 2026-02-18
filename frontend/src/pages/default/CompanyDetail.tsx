@@ -255,7 +255,6 @@ export default function CompanyDetail() {
 
   const [chartMode, setChartMode] = useState<"revenue_ebitda" | "ebit_profit">("revenue_ebitda");
   const [unitMode, setUnitMode] = useState<"tSEK" | "MSEK">("tSEK");
-  const [yearsCount, setYearsCount] = useState<5 | 7>(5);
   const [deltaMode, setDeltaMode] = useState<"values" | "yoy_pct" | "yoy_delta">("values");
   const [highlightYear, setHighlightYear] = useState<string | null>(null);
   const [highlightRow, setHighlightRow] = useState<string | null>(null);
@@ -824,7 +823,7 @@ export default function CompanyDetail() {
 
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <h3 className="text-base font-semibold">Full statements (Belopp i 1000 SEK)</h3>
+                    <h3 className="text-base font-semibold">P&L and Balance Sheet</h3>
                     <div className="flex gap-1 text-sm">
                       <button type="button" className="text-primary hover:underline" onClick={() => pnlRef.current?.scrollIntoView({ behavior: "smooth" })}>P&L</button>
                       <span className="text-muted-foreground">|</span>
@@ -835,27 +834,11 @@ export default function CompanyDetail() {
                       <Input placeholder="Search rows..." value={rowSearch} onChange={(e) => setRowSearch(e.target.value)} className="pl-8 h-8 text-sm" />
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ml-auto">
                     <div className="flex gap-1">
                       <Button variant={deltaMode === "values" ? "secondary" : "ghost"} size="sm" onClick={() => setDeltaMode("values")}>Values</Button>
                       <Button variant={deltaMode === "yoy_pct" ? "secondary" : "ghost"} size="sm" onClick={() => setDeltaMode("yoy_pct")}>YoY %</Button>
                       <Button variant={deltaMode === "yoy_delta" ? "secondary" : "ghost"} size="sm" onClick={() => setDeltaMode("yoy_delta")}>YoY Δ</Button>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant={yearsCount === 5 ? "secondary" : "ghost"}
-                        size="sm"
-                        onClick={() => setYearsCount(5)}
-                      >
-                        5y
-                      </Button>
-                      <Button
-                        variant={yearsCount === 7 ? "secondary" : "ghost"}
-                        size="sm"
-                        onClick={() => setYearsCount(7)}
-                      >
-                        7y
-                      </Button>
                     </div>
                     <div className="flex gap-1">
                       <Button
@@ -876,16 +859,17 @@ export default function CompanyDetail() {
                   </div>
                 </div>
 
-                {financialsData.full.pnl.length > 0 && (
-                  <Card ref={pnlRef}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-semibold">RESULTATRÄKNING (Belopp i 1000)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                {/* P&L (Resultaträkning) – always show section; table or empty state */}
+                <Card ref={pnlRef}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold">Resultaträkning</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(financialsData.full.pnl?.length ?? 0) > 0 ? (
                       <FullFinancialTable
-                        rows={financialsData.full.pnl}
+                        rows={financialsData.full.pnl ?? []}
                         unitMode={unitMode}
-                        yearsLimit={yearsCount}
+                        yearsLimit={7}
                         deltaMode={deltaMode}
                         highlightYear={highlightYear}
                         highlightRow={highlightRow}
@@ -895,24 +879,27 @@ export default function CompanyDetail() {
                         onCopy={handleCopy}
                         periodOrder={(() => {
                           const keys = new Set<string>();
-                          financialsData.full.pnl.forEach((r) => Object.keys(r.years || {}).forEach((k) => keys.add(k)));
+                          (financialsData.full.pnl ?? []).forEach((r) => Object.keys(r.years || {}).forEach((k) => keys.add(k)));
                           return Array.from(keys).sort().reverse();
                         })()}
                       />
-                    </CardContent>
-                  </Card>
-                )}
+                    ) : (
+                      <p className="text-sm text-muted-foreground py-6 text-center">No P&L line items available for this company.</p>
+                    )}
+                  </CardContent>
+                </Card>
 
-                {financialsData.full.balance.length > 0 && (
-                  <Card ref={balanceRef}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-semibold">BALANSRÄKNING (Belopp i 1000)</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                {/* Balance Sheet (Balansräkning) – always show underneath P&L; table or empty state */}
+                <Card ref={balanceRef}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold">Balansräkning</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(financialsData.full.balance?.length ?? 0) > 0 ? (
                       <FullFinancialTable
-                        rows={financialsData.full.balance}
+                        rows={financialsData.full.balance ?? []}
                         unitMode={unitMode}
-                        yearsLimit={yearsCount}
+                        yearsLimit={7}
                         deltaMode={deltaMode}
                         highlightYear={highlightYear}
                         highlightRow={highlightRow}
@@ -922,13 +909,15 @@ export default function CompanyDetail() {
                         onCopy={handleCopy}
                         periodOrder={(() => {
                           const keys = new Set<string>();
-                          financialsData.full.balance.forEach((r) => Object.keys(r.years || {}).forEach((k) => keys.add(k)));
+                          (financialsData.full.balance ?? []).forEach((r) => Object.keys(r.years || {}).forEach((k) => keys.add(k)));
                           return Array.from(keys).sort().reverse();
                         })()}
                       />
-                    </CardContent>
-                  </Card>
-                )}
+                    ) : (
+                      <p className="text-sm text-muted-foreground py-6 text-center">No balance sheet line items available for this company.</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             ) : (
               <Card>
@@ -976,9 +965,9 @@ export default function CompanyDetail() {
                                 <td className="px-4 py-3 text-right font-mono text-foreground">{formatRevenueSEK(fin.ebitda)}</td>
                                 <td className="px-4 py-3 text-right font-mono text-foreground">{formatRevenueSEK(fin.ebit)}</td>
                                 <td className="px-4 py-3 text-right font-mono text-foreground">{formatRevenueSEK(fin.profit)}</td>
-                                <td className="px-4 py-3 text-right font-mono text-foreground">{((fin.ebitda_margin ?? 0) * 100).toFixed(1)}%</td>
-                                <td className="px-4 py-3 text-right font-mono text-foreground">{((fin.ebit_margin ?? 0) * 100).toFixed(1)}%</td>
-                                <td className="px-4 py-3 text-right font-mono text-foreground">{((fin.net_margin ?? 0) * 100).toFixed(1)}%</td>
+                                <td className="px-4 py-3 text-right font-mono text-foreground">{fin.ebitda_margin != null ? `${(fin.ebitda_margin <= 1 ? fin.ebitda_margin * 100 : fin.ebitda_margin).toFixed(1)}%` : "—"}</td>
+                                <td className="px-4 py-3 text-right font-mono text-foreground">{fin.ebit_margin != null ? `${(fin.ebit_margin <= 1 ? fin.ebit_margin * 100 : fin.ebit_margin).toFixed(1)}%` : "—"}</td>
+                                <td className="px-4 py-3 text-right font-mono text-foreground">{fin.net_margin != null ? `${(fin.net_margin <= 1 ? fin.net_margin * 100 : fin.net_margin).toFixed(1)}%` : "—"}</td>
                                 <td className="px-4 py-3 text-right font-mono">
                                   {yoyGrowth != null ? (
                                     <span className={yoyGrowth > 0 ? "text-primary" : "text-destructive"}>

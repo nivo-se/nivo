@@ -154,7 +154,7 @@ export function CompanySnapshotModal({
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">EBITDA Margin</p>
                   <p className="font-mono text-sm tabular-nums font-medium">
-                    {formatPercent(ebitdaMargin)} Profitability
+                    {formatPercent(ebitdaMargin)}
                   </p>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export function CompanySnapshotModal({
                           </td>
                           <td className="px-3 py-2 text-right font-mono tabular-nums">
                             {f.ebitda_margin != null
-                              ? `${(f.ebitda_margin * 100).toFixed(1)}%`
+                              ? `${(f.ebitda_margin <= 1 ? f.ebitda_margin * 100 : f.ebitda_margin).toFixed(1)}%`
                               : "—"}
                           </td>
                         </tr>

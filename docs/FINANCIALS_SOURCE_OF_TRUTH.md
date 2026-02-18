@@ -56,6 +56,21 @@ Treat `account_codes` as optional enrichment. “Financial history” does not d
 
 The UI can show “Full statement available” when `full` is present and “partial” or summary‑only when it is not.
 
+## Original SQLite DB and migration
+
+**Location:** `data/nivo_optimized_original.db` (and optionally `data/nivo_optimized.db`).
+
+The original SQLite DB has a **wide** `financials` table: 64 columns including core columns plus many account-code columns (`ek_sek`, `fk_sek`, `sv_sek`, `adi_sek`, `dr_sek`, `sdi_sek`, etc.). Example for orgnr 5562642362: `ek_sek`, `fk_sek`, `sv_sek` and 45+ other `*_sek` columns are populated there.
+
+**Migration:** `scripts/migrate_sqlite_to_postgres.py` reads from SQLite and writes to Postgres. It maps all `*_sek` columns (except the six core columns) into the single `account_codes` JSONB column. So Balance Sheet and full P&L in the API depend on Postgres rows having `account_codes` populated from this wide schema.
+
+- **Default source:** `--sqlite` defaults to `data/nivo_optimized.db`. Use `data/nivo_optimized_original.db` if that is your canonical source and you need full `full.balance` / `full.pnl`.
+- **If `full.balance` is empty** for a company that has data in the original DB, re-run migration from the original SQLite so that `account_codes` is backfilled:
+  - Back up Postgres if needed, then:
+  - `python3 scripts/migrate_sqlite_to_postgres.py --sqlite data/nivo_optimized_original.db --truncate`
+
+No extra financial tables exist only in the original DB; the only difference is that the wide columns are turned into `account_codes` during migration.
+
 ## Verification
 
 - **Smoke test:** `./scripts/smoke_financials_endpoint.sh`
