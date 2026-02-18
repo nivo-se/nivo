@@ -46,6 +46,7 @@ class ListUpdate(BaseModel):
     name: Optional[str] = None
     scope: Optional[str] = None
     sourceViewId: Optional[str] = None
+    stage: Optional[str] = None  # research | ai_analysis | prospects
 
 
 def _owner_email(owner_user_id: str) -> Optional[str]:
@@ -129,6 +130,7 @@ async def list_lists(request: Request, scope: str = Query("all")):
                 "owner_email": _owner_email(owner_id),
                 "scope": r["scope"],
                 "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
+                "stage": str(r.get("stage", "research")),
                 "created_at": str(r.get("created_at", "")),
                 "updated_at": str(r.get("updated_at", "")),
                 "item_count": count[0]["n"] if count else 0,
@@ -165,6 +167,7 @@ async def create_list(request: Request, body: ListCreate):
         "owner_user_id": str(r.get("owner_user_id", "")),
         "scope": r.get("scope"),
         "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
+        "stage": str(r.get("stage", "research")),
         "created_at": str(r.get("created_at", "")),
         "updated_at": str(r.get("updated_at", "")),
     }
@@ -355,6 +358,12 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
         updates.append("source_view_id = ?::uuid")
         params.append(body.sourceViewId)
 
+    if body.stage is not None:
+        if body.stage not in ("research", "ai_analysis", "prospects"):
+            raise HTTPException(400, "stage must be research, ai_analysis, or prospects")
+        updates.append("stage = ?")
+        params.append(body.stage)
+
     if not updates:
         return {
             "id": str(row.get("id", "")),
@@ -362,6 +371,7 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
             "owner_user_id": str(row.get("owner_user_id", "")),
             "scope": row.get("scope"),
             "source_view_id": str(row["source_view_id"]) if row.get("source_view_id") else None,
+            "stage": str(row.get("stage", "research")),
             "created_at": str(row.get("created_at", "")),
             "updated_at": str(row.get("updated_at", "")),
         }
@@ -380,6 +390,7 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
         "owner_user_id": str(updated.get("owner_user_id", "")),
         "scope": updated.get("scope"),
         "source_view_id": str(updated["source_view_id"]) if updated.get("source_view_id") else None,
+        "stage": str(updated.get("stage", "research")),
         "created_at": str(updated.get("created_at", "")),
         "updated_at": str(updated.get("updated_at", "")),
     }

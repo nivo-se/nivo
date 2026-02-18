@@ -467,7 +467,14 @@ function ResultDetail({
                 {company?.industry_label} • {company?.region ?? ""}
               </p>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span>Status: {result.status ?? "—"}</span>
+                <span>
+                  Review:{" "}
+                  {result.status === "approved"
+                    ? "Approved"
+                    : result.status === "rejected"
+                      ? "Rejected"
+                      : "Pending review"}
+                </span>
                 <span>Analyzed: {result.analyzed_at ? new Date(result.analyzed_at).toLocaleString() : "—"}</span>
                 <span>Tokens: {result.tokens_used ?? "—"}</span>
                 <span>Cost: {typeof result.cost === "number" ? result.cost.toFixed(4) : "—"}</span>
@@ -488,7 +495,7 @@ function ResultDetail({
         </CardContent>
       </Card>
 
-      {template.scoringDimensions.length > 0 && result.dimension_scores && (
+      {template.scoringDimensions.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -497,46 +504,62 @@ function ResultDetail({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {template.scoringDimensions.map((dim) => {
-                const score = result.dimension_scores?.[dim.id] ?? 0;
+            {(() => {
+              const dimScores = result.dimension_scores ?? {};
+              const hasData = template.scoringDimensions.some(
+                (dim) => typeof dimScores[dim.id] === "number" && dimScores[dim.id] > 0
+              );
+              if (!hasData) {
                 return (
-                  <div key={dim.id}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="font-medium text-foreground">{dim.name}</p>
-                        {dim.description && (
-                          <p className="text-xs text-muted-foreground">{dim.description}</p>
-                        )}
-                      </div>
-                      <span
-                        className={`text-base font-bold ${
-                          score >= 75
-                            ? "text-foreground"
-                            : score >= 50
-                              ? "text-foreground"
-                              : "text-destructive"
-                        }`}
-                      >
-                        {Math.round(score)}
-                      </span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          score >= 75
-                            ? "bg-foreground/60"
-                            : score >= 50
-                              ? "bg-foreground/30"
-                              : "bg-destructive"
-                        }`}
-                        style={{ width: `${score}%` }}
-                      />
-                    </div>
-                  </div>
+                  <p className="text-sm text-muted-foreground py-4 text-center">
+                    Dimension scores are not available for this result. They appear when the
+                    analysis pipeline returns per-dimension scores for this template.
+                  </p>
                 );
-              })}
-            </div>
+              }
+              return (
+                <div className="space-y-4">
+                  {template.scoringDimensions.map((dim) => {
+                    const score = dimScores[dim.id] ?? 0;
+                    return (
+                      <div key={dim.id}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <p className="font-medium text-foreground">{dim.name}</p>
+                            {dim.description && (
+                              <p className="text-xs text-muted-foreground">{dim.description}</p>
+                            )}
+                          </div>
+                          <span
+                            className={`text-base font-bold ${
+                              score >= 75
+                                ? "text-foreground"
+                                : score >= 50
+                                  ? "text-foreground"
+                                  : "text-destructive"
+                            }`}
+                          >
+                            {Math.round(score)}
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              score >= 75
+                                ? "bg-foreground/60"
+                                : score >= 50
+                                  ? "bg-foreground/30"
+                                  : "bg-destructive"
+                            }`}
+                            style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
       )}
@@ -665,6 +688,7 @@ function ResultDetail({
             Reject
           </Button>
           <Button
+            className="btn-neutral"
             onClick={() => onApprove(result.id)}
           >
             <ThumbsUp className="w-4 h-4 mr-2" />

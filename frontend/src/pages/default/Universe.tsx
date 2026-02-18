@@ -302,47 +302,49 @@ export default function Universe() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-8 pb-8 flex flex-col gap-4">
-        <div className="flex flex-col gap-2 shrink-0 sticky top-0 z-20 bg-background py-2 -mx-8 px-8 border-b border-border">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <Input
-              placeholder="Search by name..."
-              value={searchInput}
-              onChange={(e) => {
-                setSearchInput(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-72 max-w-full"
-            />
-            <div className="flex gap-3 shrink-0">
-            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
-              {showFilters ? "Hide" : "Show"} Filters
-            </Button>
-            <Button variant="outline" onClick={() => setSaveDialogOpen(true)}>
-              Save as list
-            </Button>
-            <Button variant="outline">Export</Button>
+      <div className="flex-1 min-h-0">
+        <div className="max-w-5xl mx-auto px-8 pb-8 h-full min-h-0 flex flex-col gap-4">
+        <div className="shrink-0 sticky top-0 z-20 bg-background -mx-8 px-8 pt-2 pb-4 border-b border-border space-y-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <Input
+                placeholder="Search by name..."
+                value={searchInput}
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-72 max-w-full"
+              />
+              <div className="flex gap-3 shrink-0">
+              <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+                {showFilters ? "Hide" : "Show"} Filters
+              </Button>
+              <Button variant="outline" onClick={() => setSaveDialogOpen(true)}>
+                Save as list
+              </Button>
+              <Button variant="outline">Export</Button>
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground">
+              {showLoading
+                ? "Loading..."
+                : filteredCompanies.length > 0
+                  ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
+                  : `${totalCount.toLocaleString()} companies`}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {showLoading
-              ? "Loading..."
-              : filteredCompanies.length > 0
-                ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
-                : `${totalCount.toLocaleString()} companies`}
-          </p>
-        </div>
 
-        {showFilters && (
-          <div className="shrink-0">
-            <FilterBuilder
-              filters={activeFilters}
-              onChange={setActiveFilters}
-              onApply={() => setCurrentPage(1)}
-            />
-          </div>
-        )}
+          {showFilters && (
+            <div className="shrink-0">
+              <FilterBuilder
+                filters={activeFilters}
+                onChange={setActiveFilters}
+                onApply={() => setCurrentPage(1)}
+              />
+            </div>
+          )}
+        </div>
 
         {!showFilters && (activeFilters.include.rules.length > 0 || activeFilters.exclude.rules.length > 0) && (
           <div className="flex items-center gap-2 text-xs shrink-0">
@@ -361,7 +363,7 @@ export default function Universe() {
           </div>
         )}
 
-        <div className="flex-1 min-h-0 overflow-auto">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {showLoading ? (
           <div className="app-card p-12 text-center">
             <div className="inline-block w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin mb-4" />
@@ -391,34 +393,34 @@ export default function Universe() {
           />
         ) : (
         <div className="app-card text-sm flex-1 min-h-0 flex flex-col overflow-hidden">
-          <div className="flex-1 min-h-0 overflow-auto">
-          <table className="w-full">
-            <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-sm">
-              <tr>
-                <th className="px-3 py-2 text-left w-10 text-xs font-medium text-muted-foreground">
+          <div className="flex-1 min-h-0 overflow-auto relative">
+          <table className="w-full border-collapse">
+            <thead className="z-20 border-b border-border shadow-sm [&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-card">
+              <tr className="bg-card">
+                <th className="px-3 py-2 text-left w-10 text-xs font-medium text-muted-foreground bg-card">
                   <Checkbox
                     checked={filteredCompanies.length > 0 && selectedCompanies.size === filteredCompanies.length}
                     onCheckedChange={toggleSelectAll}
                   />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground bg-card">
                   <SortableHeader label="Company Name" field="name" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground bg-card">
                   <SortableHeader label="Industry" field="industry" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="Latest fiscal year">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground bg-card" title="Latest fiscal year">
                   <SortableHeader label="Revenue" field="revenue" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="3-year compound annual growth rate">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground bg-card" title="3-year compound annual growth rate">
                   <SortableHeader label="3Y CAGR" field="cagr" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="Latest fiscal year">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground bg-card" title="Latest fiscal year">
                   <SortableHeader label="EBITDA Margin" field="margin" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground">Flags</th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground">AI</th>
-                <th className="px-3 py-2 w-20 text-xs font-medium text-muted-foreground">Actions</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card">Flags</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card">AI</th>
+                <th className="px-3 py-2 w-20 text-xs font-medium text-muted-foreground bg-card">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -460,7 +462,19 @@ export default function Universe() {
                     </td>
                     <td className="px-3 py-2 text-center text-muted-foreground">
                       {company.ai_profile ? (
-                        <span title={`Score: ${company.ai_profile.ai_fit_score}`}>✓</span>
+                        <span
+                          title={
+                            company.ai_profile.ai_fit_score != null
+                              ? `AI fit score: ${company.ai_profile.ai_fit_score}`
+                              : "AI analyzed"
+                          }
+                        >
+                          {company.ai_profile.ai_fit_score != null ? (
+                            <span className="font-mono text-xs tabular-nums">{company.ai_profile.ai_fit_score}</span>
+                          ) : (
+                            "✓"
+                          )}
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">—</span>
                       )}

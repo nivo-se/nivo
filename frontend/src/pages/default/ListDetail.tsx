@@ -18,6 +18,13 @@ import { FilterBuilder } from "@/components/default/FilterBuilder";
 import { EmptyState } from "@/components/default/EmptyState";
 import { ErrorState } from "@/components/default/ErrorState";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,17 +39,31 @@ import { toast } from "sonner";
 import { updateListEntry, removeCompanyFromList } from "@/lib/api/lists/service";
 import { upsertProspect } from "@/lib/api/prospects/service";
 
-function getStageLabel(stage: string): string {
-  switch (stage) {
-    case "research":
-      return "🔍 Research";
-    case "ai_analysis":
-      return "🤖 AI Analysis";
-    case "prospects":
-      return "🎯 Prospects";
-    default:
-      return stage;
-  }
+const STAGE_CONFIG: Record<
+  string,
+  { label: string; className: string }
+> = {
+  research: {
+    label: "🔍 Research",
+    className: "bg-muted text-muted-foreground",
+  },
+  ai_analysis: {
+    label: "🤖 AI Analysis",
+    className: "bg-primary/15 text-primary",
+  },
+  prospects: {
+    label: "🎯 Prospects",
+    className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+  },
+};
+
+function getStageConfig(stage: string): { label: string; className: string } {
+  return (
+    STAGE_CONFIG[stage] ?? {
+      label: stage,
+      className: "bg-muted text-foreground",
+    }
+  );
 }
 
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
@@ -137,6 +158,16 @@ export default function ListDetail() {
   const handleCancelEditName = () => {
     setEditedName("");
     setIsEditingName(false);
+  };
+
+  const handleStageChange = async (stage: string) => {
+    if (stage !== "research" && stage !== "ai_analysis" && stage !== "prospects") return;
+    try {
+      await updateListMutation.mutateAsync({ listId: list.id, data: { stage } });
+      toast.success("Stage updated");
+    } catch {
+      toast.error("Failed to update stage");
+    }
   };
 
   const handleReloadFilters = () => {
@@ -245,6 +276,8 @@ export default function ListDetail() {
     toast.success("Exported CSV");
   };
 
+  const stageConfig = getStageConfig(list.stage ?? "research");
+
   return (
     <div className="h-full overflow-auto app-bg">
       <div className="max-w-5xl mx-auto px-8 py-8 space-y-6">
@@ -310,9 +343,26 @@ export default function ListDetail() {
                     Shareable
                   </span>
                 )}
-                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
-                  {getStageLabel(list.stage)}
-                </span>
+                {isOwnList ? (
+                  <Select
+                    value={list.stage ?? "research"}
+                    onValueChange={handleStageChange}
+                    disabled={updateListMutation.isPending}
+                  >
+                    <SelectTrigger className={`h-7 w-[140px] text-xs rounded ${stageConfig.className} border-0`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="research">🔍 Research</SelectItem>
+                      <SelectItem value="ai_analysis">🤖 AI Analysis</SelectItem>
+                      <SelectItem value="prospects">🎯 Prospects</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className={`text-xs px-2 py-1 rounded ${stageConfig.className}`}>
+                    {stageConfig.label}
+                  </span>
+                )}
               </div>
               <p className="text-sm text-muted-foreground">
                 {list.companyIds.length} companies

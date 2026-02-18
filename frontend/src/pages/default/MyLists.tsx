@@ -22,17 +22,14 @@ import { Input } from "@/components/ui/input";
 
 const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
 
-function getStageLabel(stage: string) {
-  switch (stage) {
-    case "research":
-      return "🔍 Research";
-    case "ai_analysis":
-      return "🤖 AI Analysis";
-    case "prospects":
-      return "🎯 Prospects";
-    default:
-      return stage;
-  }
+const STAGE_CONFIG: Record<string, { label: string; className: string }> = {
+  research: { label: "🔍 Research", className: "bg-muted text-muted-foreground" },
+  ai_analysis: { label: "🤖 AI Analysis", className: "bg-primary/15 text-primary" },
+  prospects: { label: "🎯 Prospects", className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" },
+};
+
+function getStageConfig(stage: string) {
+  return STAGE_CONFIG[stage] ?? { label: stage, className: "bg-muted text-foreground" };
 }
 
 function getTimeAgo(dateString: string): string {
@@ -103,6 +100,7 @@ function ListCard({
     }
   };
 
+  const stageConfig = getStageConfig(list.stage);
   return (
     <Card className="app-card hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -132,10 +130,10 @@ function ListCard({
                   )}
                 </button>
               )}
-              <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">{getStageLabel(list.stage)}</span>
+              <span className={`text-xs px-2 py-1 rounded ${stageConfig.className}`}>{stageConfig.label}</span>
             </div>
             <p className="text-sm text-muted-foreground mb-3">
-              {list.companyIds.length} companies • Stage: {getStageLabel(list.stage)}
+              {list.companyIds.length} companies • Stage: {stageConfig.label}
               {list.created_by && ` • Created by ${formatCreatedBy(list.created_by, list.created_by_name, currentUserId)}`}
               {" • Last edited "}
               {getTimeAgo(list.updated_at ?? list.created_at)}

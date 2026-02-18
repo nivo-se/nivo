@@ -471,11 +471,16 @@ _FULL_PNL_SPEC = [
 ]
 _FULL_BS_SPEC = [
     {"key": "summa_tillgangar", "label_sv": "Summa tillgångar", "section": "assets", "bold": True, "source": "account_codes", "keys": ["sv_sek", "SV", "sv"]},
+    {"key": "anlaggningstillgangar", "label_sv": "Anläggningstillgångar", "section": "fixed_assets", "bold": False, "source": "account_codes", "keys": ["ak_sek", "AK", "ak"]},
+    {"key": "summa_finansiella_anlaggningstillgangar", "label_sv": "Summa finansiella anläggningstillgångar", "section": "fixed_assets", "bold": False, "source": "account_codes", "keys": ["summa_finansiella_anltillg_sek", "sfa_sek", "summa_finansiella_anltillg", "SFA", "sfa"]},
     {"key": "eget_kapital", "label_sv": "Eget kapital", "section": "equity", "bold": False, "source": "account_codes", "keys": ["ek_sek", "EK", "ek"]},
     {"key": "frammande_kapital", "label_sv": "Främmande kapital", "section": "liabilities", "bold": True, "source": "account_codes", "keys": ["fk_sek", "FK", "fk"]},
+    {"key": "omsattningstillgangar", "label_sv": "Omsättningstillgångar", "section": "current_assets", "bold": False, "source": "account_codes", "keys": ["som_sek", "SOM", "som"]},
     {"key": "kassa_och_bank", "label_sv": "Kassa och bank", "section": "current_assets", "bold": False, "source": "account_codes", "keys": ["sek_sek", "sek", "SEK"]},
     {"key": "langfristiga_skulder", "label_sv": "Långfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["lg_sek", "lg", "LG"]},
-    {"key": "kortfristiga_skulder", "label_sv": "Kortfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["kb_sek", "kbp_sek", "kb", "kbp"]},
+    {"key": "summa_langfristiga_skulder", "label_sv": "Summa långfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["summa_langfristiga_skulder_sek", "summa_langfristiga_skulder"]},
+    {"key": "kortfristiga_skulder", "label_sv": "Kortfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["kb_sek", "kb", "KB"]},
+    {"key": "kortfristiga_skulder_personal", "label_sv": "Kortfristiga skulder personal", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["kbp_sek", "kbp", "KBP"]},
 ]
 
 
@@ -617,8 +622,8 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                                 WHEN period IS NULL OR BTRIM(period::text) = '' THEN 0
                                 WHEN period::text = '12'
                                   OR RIGHT(period::text, 2) = '12'
-                                  OR period::text LIKE '%-12'
-                                  OR period::text LIKE '%-12-31'
+                                  OR period::text LIKE '%%-12'
+                                  OR period::text LIKE '%%-12-31'
                                 THEN 3
                                 ELSE 1
                             END DESC,

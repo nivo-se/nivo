@@ -457,6 +457,33 @@ export default function CompanyDetail() {
                     </p>
                   </Card>
                 )}
+                {aiProfile != null && (aiProfile.ai_fit_score != null || aiProfile.latest_result) && (
+                  <Card className="p-3">
+                    <p className="text-xs text-muted-foreground">AI Fit Score</p>
+                    <p
+                      className={`text-sm font-semibold ${
+                        (aiProfile.ai_fit_score ?? 0) >= 75
+                          ? "text-primary"
+                          : (aiProfile.ai_fit_score ?? 0) >= 50
+                            ? "text-foreground"
+                            : "text-destructive"
+                      }`}
+                    >
+                      {aiProfile.ai_fit_score != null ? aiProfile.ai_fit_score : "—"}
+                    </p>
+                    {aiProfile.latest_result && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {aiProfile.latest_result.recommendation === "strong_fit"
+                          ? "Strong Fit"
+                          : aiProfile.latest_result.recommendation === "potential_fit"
+                            ? "Potential Fit"
+                            : aiProfile.latest_result.recommendation === "weak_fit"
+                              ? "Weak Fit"
+                              : "Pass"}
+                      </p>
+                    )}
+                  </Card>
+                )}
               </div>
             </div>
 

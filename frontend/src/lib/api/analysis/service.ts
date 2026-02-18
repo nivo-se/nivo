@@ -91,6 +91,15 @@ function mapAnalysisRunToRun(r: AnalysisRunApi): AnalysisRun {
   };
 }
 
+function parseDimensionScores(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(value)) {
+    if (typeof v === "number" && !Number.isNaN(v)) out[k] = v;
+  }
+  return out;
+}
+
 function mapCompanyAnalysisToResult(
   row: {
     orgnr: string;
@@ -102,6 +111,7 @@ function mapCompanyAnalysisToResult(
     swot_weaknesses?: string[];
     swot_opportunities?: string[];
     swot_threats?: string[];
+    dimension_scores?: unknown;
   },
   runId: string
 ): AnalysisResult {
@@ -128,7 +138,7 @@ function mapCompanyAnalysisToResult(
           ? "rejected"
           : "pending",
     overall_score: row.strategic_fit_score ?? 0,
-    dimension_scores: {},
+    dimension_scores: parseDimensionScores(row.dimension_scores),
     summary: row.investment_memo ?? "",
     strengths,
     concerns,
@@ -265,6 +275,7 @@ export async function getAnalysisRunResults(runId: string): Promise<AnalysisResu
           swot_weaknesses: Array.isArray(c.swot_weaknesses) ? c.swot_weaknesses.map(String) : undefined,
           swot_opportunities: Array.isArray(c.swot_opportunities) ? c.swot_opportunities.map(String) : undefined,
           swot_threats: Array.isArray(c.swot_threats) ? c.swot_threats.map(String) : undefined,
+          dimension_scores: c.dimension_scores,
         },
         runId
       )

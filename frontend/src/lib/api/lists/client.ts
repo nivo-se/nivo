@@ -1,5 +1,7 @@
 import { requestJson } from "@/lib/api/httpClient";
 
+export type ListStage = "research" | "ai_analysis" | "prospects";
+
 export interface SavedListRecord {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface SavedListRecord {
   owner_email?: string;
   scope: "private" | "team";
   source_view_id?: string | null;
+  stage?: ListStage;
   created_at: string;
   updated_at: string;
 }
@@ -68,7 +71,7 @@ export async function removeListItemClient(listId: string, orgnr: string) {
 
 export async function updateListClient(
   listId: string,
-  payload: { name?: string; scope?: "private" | "team"; sourceViewId?: string | null }
+  payload: { name?: string; scope?: "private" | "team"; sourceViewId?: string | null; stage?: ListStage }
 ) {
   return requestJson<SavedListRecord>(`/api/lists/${listId}`, {
     method: "PUT",

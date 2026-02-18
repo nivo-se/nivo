@@ -22,7 +22,7 @@ function mapSavedListToListModel(saved: SavedListRecord, companyIds: string[], f
     source_view_id: saved.source_view_id ?? undefined,
     filters,
     companyIds,
-    stage: "research",
+    stage: (saved.stage as List["stage"]) ?? "research",
     created_at: saved.created_at,
     updated_at: saved.updated_at,
     created_by: saved.owner_user_id,
@@ -129,6 +129,7 @@ export async function updateListEntry(listId: string, data: Partial<List>): Prom
   const shouldUpdateList =
     data.name !== undefined ||
     data.scope !== undefined ||
+    data.stage !== undefined ||
     sourceViewId !== current.source_view_id;
 
   if (shouldUpdateList) {
@@ -136,6 +137,7 @@ export async function updateListEntry(listId: string, data: Partial<List>): Prom
       name: data.name,
       scope: data.scope,
       sourceViewId: sourceViewId ?? null,
+      stage: data.stage,
     });
   }
 

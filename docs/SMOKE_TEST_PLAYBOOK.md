@@ -1,6 +1,8 @@
 # Smoke Test Playbook
 
-This playbook verifies backend API readiness and frontend service contracts for the canonical domain services:
+This playbook verifies backend API readiness and frontend service contracts for the canonical domain services.
+
+**Manual production verification:** See [PROD_SMOKE_TEST.md](PROD_SMOKE_TEST.md) for route-by-route checks and MVP gate tests.
 
 - Universe
 - Companies

@@ -23,6 +23,17 @@ nivo/
 └── 📄 deploy.sh          # Deployment script
 ```
 
+## 📚 Documentation
+
+**Full doc index:** [docs/README.md](docs/README.md) — setup, data source of truth, API, smoke tests, and production checklists.
+
+Key docs:
+
+- **Local Postgres:** [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md), [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md)
+- **Financials (source of truth):** [docs/FINANCIALS_SOURCE_OF_TRUTH.md](docs/FINANCIALS_SOURCE_OF_TRUTH.md)
+- **Smoke tests:** [docs/SMOKE_TEST_PLAYBOOK.md](docs/SMOKE_TEST_PLAYBOOK.md)
+- **Production:** [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md)
+
 ## 🚀 Features
 
 ### 🤖 AI-Powered Analysis

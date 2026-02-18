@@ -159,6 +159,7 @@ export default function RunDetail() {
               {canViewResults && (
                 <>
                   <Button
+                    className="btn-primary"
                     onClick={() =>
                       navigate(`/ai/runs/${run.id}/results`)
                     }
