@@ -824,11 +824,6 @@ export default function CompanyDetail() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <h3 className="text-base font-semibold">P&L and Balance Sheet</h3>
-                    <div className="flex gap-1 text-sm">
-                      <button type="button" className="text-primary hover:underline" onClick={() => pnlRef.current?.scrollIntoView({ behavior: "smooth" })}>P&L</button>
-                      <span className="text-muted-foreground">|</span>
-                      <button type="button" className="text-primary hover:underline" onClick={() => balanceRef.current?.scrollIntoView({ behavior: "smooth" })}>Balance Sheet</button>
-                    </div>
                     <div className="relative w-48">
                       <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input placeholder="Search rows..." value={rowSearch} onChange={(e) => setRowSearch(e.target.value)} className="pl-8 h-8 text-sm" />
