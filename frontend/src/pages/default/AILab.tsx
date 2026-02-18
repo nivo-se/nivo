@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   usePromptTemplates,
   useLists,
-} from "@/lib/hooks/figmaQueries";
+} from "@/lib/hooks/apiQueries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -18,12 +18,12 @@ import {
   Plus,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { PromptTemplate } from "@/types/figma";
+import type { PromptTemplate } from "@/lib/api/types";
 import {
-  createPromptTemplate,
-  updatePromptTemplate,
-  duplicatePromptTemplate,
-} from "@/lib/services/figmaApi";
+  createAnalysisTemplate,
+  updateAnalysisTemplate,
+  duplicateAnalysisTemplate,
+} from "@/lib/api/analysis/service";
 
 export default function AILab() {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ export default function AILab() {
 
   const handleTemplateDuplicate = async (template: PromptTemplate) => {
     try {
-      await duplicatePromptTemplate(template.id);
+      await duplicateAnalysisTemplate(template.id);
       refetchTemplates();
       toast.success("Template duplicated successfully!");
     } catch {
@@ -72,11 +72,11 @@ export default function AILab() {
   ) => {
     try {
       if (dialogMode === "create") {
-        await createPromptTemplate(template);
+        await createAnalysisTemplate(template);
         refetchTemplates();
         toast.success("Template created successfully!");
       } else if (editingTemplate) {
-        await updatePromptTemplate(editingTemplate.id, template);
+        await updateAnalysisTemplate(editingTemplate.id, template);
         refetchTemplates();
         toast.success("Template updated successfully!");
       }

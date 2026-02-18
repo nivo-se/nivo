@@ -1,5 +1,5 @@
 /**
- * Response shape guards for figmaApi endpoints.
+ * Response shape guards used by the compatibility client.
  * Throws descriptive errors when API response is invalid.
  */
 

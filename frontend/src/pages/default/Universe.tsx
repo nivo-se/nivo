@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useCompaniesWithTotal, useCreateList, useCreateListFromQuery } from "@/lib/hooks/figmaQueries";
+import { useCompaniesWithTotal, useCreateList, useCreateListFromQuery } from "@/lib/hooks/apiQueries";
 import {
   calculateRevenueCagr,
   getLatestFinancials,
   formatRevenueSEK,
   formatPercent,
-} from "@/lib/utils/figmaCompanyUtils";
+} from "@/lib/utils/companyMetrics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "@/hooks/use-toast";
-import type { Company } from "@/types/figma";
+import type { Company } from "@/lib/api/types";
 import type { UniverseQueryPayload } from "@/lib/services/universeQueryService";
 import {
   getDefaultUniverseStateFromUrl,
@@ -144,8 +144,7 @@ export default function Universe() {
   const [currentPage, setCurrentPage] = useState(initialUrlState?.page ?? 1);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [showSaveViewDialog, setShowSaveViewDialog] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [snapshotOrgnr, setSnapshotOrgnr] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     include: { id?: string; type: string; rules: unknown[] };
@@ -247,10 +246,14 @@ export default function Universe() {
         scope: isPublic ? "team" : "private",
         companyIds,
       });
-      setShowSaveDialog(false);
+      setSaveDialogOpen(false);
       navigate(`/lists/${list.id}`);
-    } catch {
-      // Error handled by mutation
+    } catch (e) {
+      toast({
+        title: "Failed to create list",
+        description: e instanceof Error ? e.message : "Could not save selection as list. Check backend and try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -270,7 +273,7 @@ export default function Universe() {
           q: debouncedQ || undefined,
         },
       });
-      setShowSaveViewDialog(false);
+      setSaveDialogOpen(false);
       navigate(`/lists/${res.listId}`);
       toast({
         title: "List created",
@@ -278,8 +281,8 @@ export default function Universe() {
       });
     } catch (e) {
       toast({
-        title: "Failed to create list",
-        description: e instanceof Error ? e.message : "Unknown error",
+        title: "Failed to create list from view",
+        description: e instanceof Error ? e.message : "Could not save view as list. Check backend and try again.",
         variant: "destructive",
       });
     }
@@ -316,18 +319,8 @@ export default function Universe() {
             <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               {showFilters ? "Hide" : "Show"} Filters
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowSaveViewDialog(true)}
-            >
-              Save view as list
-            </Button>
-            <Button
-              variant="outline"
-              disabled={selectedCompanies.size === 0}
-              onClick={() => setShowSaveDialog(true)}
-            >
-              Save selection ({selectedCompanies.size})
+            <Button variant="outline" onClick={() => setSaveDialogOpen(true)}>
+              Save as list
             </Button>
             <Button variant="outline">Export</Button>
             </div>
@@ -414,14 +407,13 @@ export default function Universe() {
                 <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
                   <SortableHeader label="Industry" field="industry" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Geography</th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="Latest fiscal year">
                   <SortableHeader label="Revenue" field="revenue" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="3-year compound annual growth rate">
                   <SortableHeader label="3Y CAGR" field="cagr" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground" title="Latest fiscal year">
                   <SortableHeader label="EBITDA Margin" field="margin" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
                 <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground">Flags</th>
@@ -452,9 +444,9 @@ export default function Universe() {
                       </button>
                     </td>
                     <td className="px-3 py-2 text-foreground">{company.industry_label}</td>
-                    <td className="px-3 py-2 text-foreground">{company.region ?? "—"}</td>
-                    <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums">
+                    <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums" title={company.latest_year ? `FY${company.latest_year}` : undefined}>
                       {formatRevenueSEK(latest.revenue)}
+                      {company.latest_year && <span className="text-muted-foreground font-sans text-[10px] ml-1">({company.latest_year})</span>}
                     </td>
                     <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums">
                       {formatPercent(cagr)}
@@ -513,24 +505,19 @@ export default function Universe() {
         </div>
       </div>
 
-      {showSaveDialog && (
-        <SaveListDialog
-          open={showSaveDialog}
-          onClose={() => setShowSaveDialog(false)}
-          onSave={handleSaveList}
-          companyCount={selectedCompanies.size}
-          isLoading={createListMutation.isPending}
-        />
-      )}
-      {showSaveViewDialog && (
-        <SaveListDialog
-          open={showSaveViewDialog}
-          onClose={() => setShowSaveViewDialog(false)}
-          onSave={handleSaveViewAsList}
-          description="Create a list from all companies matching your current filters, search, and sort. Server-side query may differ if you use exclude filters."
-          isLoading={createListFromQueryMutation.isPending}
-        />
-      )}
+      <SaveListDialog
+        open={saveDialogOpen}
+        onClose={() => setSaveDialogOpen(false)}
+        selectedCount={selectedCompanies.size}
+        onSave={(name, isPublic, saveType) => {
+          if (saveType === "selection") {
+            handleSaveList(name, isPublic);
+          } else {
+            handleSaveViewAsList(name, isPublic);
+          }
+        }}
+        isLoading={createListMutation.isPending || createListFromQueryMutation.isPending}
+      />
       {snapshotOrgnr && (
         <CompanySnapshotModal
           open={!!snapshotOrgnr}

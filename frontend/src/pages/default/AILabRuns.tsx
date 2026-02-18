@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { usePromptTemplates, useAIRuns } from "@/lib/hooks/figmaQueries";
+import { usePromptTemplates, useAIRuns } from "@/lib/hooks/apiQueries";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/default/ErrorState";
 import { CheckCircle, XCircle, Loader, Clock, ArrowLeft } from "lucide-react";

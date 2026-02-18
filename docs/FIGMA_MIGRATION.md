@@ -18,7 +18,7 @@ This document maps the **nivo-figma-app** (Figma export) API expectations to the
 | `GET /api/companies/:orgnr` | `GET /api/companies/{orgnr}/intel` + `POST /api/companies/batch` | Combine intel + batch for full company. |
 | `GET /api/companies/search?q=` | `POST /api/universe/query` with `q` param | Same as Universe search. |
 
-**Adapter:** `figmaApi.getCompanies()` → calls `queryUniverse({ limit: 500, offset: 0 })` and maps `UniverseRow[]` to `Company[]`.
+**Adapter:** `compatClient.getCompanies()` → calls `queryUniverse({ limit: 500, offset: 0 })` and maps `UniverseRow[]` to `Company[]`.
 
 ### Lists
 
@@ -30,7 +30,7 @@ This document maps the **nivo-figma-app** (Figma export) API expectations to the
 | `PUT /api/lists/:listId` | ❌ Not implemented | Stub only. |
 | `DELETE /api/lists/:listId` | `DELETE /api/lists/{listId}` | ✅ Direct match. |
 
-**Adapter:** `figmaApi.getLists()` → `getLists('all')`, map `SavedList` to `List` with `companyIds` from `getListItems()`.
+**Adapter:** `compatClient.getLists()` → `getLists('all')`, map `SavedList` to `List` with `companyIds` from `getListItems()`.
 
 ### Prospects
 
@@ -112,9 +112,9 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
 
 ### Phase 1: API Adapter (DONE)
 
-- [x] Create `frontend/src/lib/services/figmaApi.ts` – maps Figma interface to Nivo backend
-- [x] Create `frontend/src/types/figma.ts` – shared types for Figma app
-- [x] Create `frontend/src/lib/hooks/figmaQueries.ts` – React Query hooks (replace `useData()`)
+- [x] Create `frontend/src/lib/services/compatClient.ts` – maps Figma interface to Nivo backend
+- [x] Create `frontend/src/lib/api/types.ts` – shared types for Figma app
+- [x] Create `frontend/src/lib/hooks/apiQueries.ts` – React Query hooks (replace `useData()`)
 
 ### Phase 2: Integrate nivo-figma-app into Nivo Frontend
 
@@ -123,13 +123,13 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
    - Shared components from `nivo-figma-app/src/app/components/`
    - Add routes in `frontend/src/App.tsx` or router config
 
-2. **Replace DataContext** with `figmaApi` + React Query:
+2. **Replace DataContext** with `compatClient` + React Query:
    - Remove `DataProvider` / `useData()`
-   - Use `useCompanies()`, `useLists()`, etc. from `frontend/src/lib/hooks/figmaQueries.ts`
+   - Use `useCompanies()`, `useLists()`, etc. from `frontend/src/lib/hooks/apiQueries.ts`
 
 3. **Update imports** in copied pages:
-   - `import { api } from '@/lib/services/figmaApi'`
-   - `import type { Company, List, ... } from '@/types/figma'`
+   - `import { api } from '@/lib/services/compatClient'`
+   - `import type { Company, List, ... } from '@/lib/api/types'`
 
 4. **Test incrementally** – Universe first, then Lists, then AI flows
 

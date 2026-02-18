@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,40 +12,86 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+export type SaveListType = "selection" | "view";
+
 interface SaveListDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (name: string, isPublic: boolean) => void;
-  companyCount?: number;
-  /** Override default description e.g. for "Save view as list" */
-  description?: string;
+  /** Called with (name, isPublic, saveType). Parent handles selection vs view. */
+  onSave: (name: string, isPublic: boolean, saveType: SaveListType) => void;
+  /** Number of companies currently selected. If > 0, user can choose "selection" or "view". */
+  selectedCount?: number;
   /** Disable submit while mutation in progress */
   isLoading?: boolean;
 }
 
-export function SaveListDialog({ open, onClose, onSave, companyCount = 0, description, isLoading }: SaveListDialogProps) {
+export function SaveListDialog({
+  open,
+  onClose,
+  onSave,
+  selectedCount = 0,
+  isLoading,
+}: SaveListDialogProps) {
   const [name, setName] = useState("");
   const [privacy, setPrivacy] = useState<"private" | "public">("private");
+  const [saveType, setSaveType] = useState<SaveListType>(selectedCount > 0 ? "selection" : "view");
+
+  useEffect(() => {
+    if (open) {
+      setSaveType(selectedCount > 0 ? "selection" : "view");
+    }
+  }, [open, selectedCount]);
+
+  const canChooseSelection = selectedCount > 0;
+  const effectiveType = canChooseSelection ? saveType : "view";
 
   const handleSave = () => {
     if (name.trim()) {
-      onSave(name.trim(), privacy === "public");
+      onSave(name.trim(), privacy === "public", effectiveType);
       setName("");
       setPrivacy("private");
+      setSaveType(selectedCount > 0 ? "selection" : "view");
     }
   };
+
+  const description =
+    effectiveType === "selection"
+      ? `Create a new list with ${selectedCount} selected ${selectedCount === 1 ? "company" : "companies"}.`
+      : "Create a list from all companies matching your current filters, search, and sort.";
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Save as List</DialogTitle>
-          <DialogDescription>
-            {description ?? `Create a new list with ${companyCount} selected ${companyCount === 1 ? "company" : "companies"}`}
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {canChooseSelection && (
+            <div className="space-y-2">
+              <Label>What to save</Label>
+              <RadioGroup
+                value={saveType}
+                onValueChange={(v) => setSaveType(v as SaveListType)}
+                className="flex flex-col gap-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="selection" id="save-selection" />
+                  <Label htmlFor="save-selection" className="font-normal cursor-pointer">
+                    Selected companies ({selectedCount})
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="view" id="save-view" />
+                  <Label htmlFor="save-view" className="font-normal cursor-pointer">
+                    Current view (all matching filters)
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="list-name">List Name</Label>
             <Input
@@ -75,9 +121,11 @@ export function SaveListDialog({ open, onClose, onSave, companyCount = 0, descri
             </RadioGroup>
           </div>
 
-          <div className="bg-primary/10 border border-primary/40 rounded p-3 text-sm text-primary">
-            ✓ Filters will be saved with this list so you can reload and modify them later
-          </div>
+          {effectiveType === "view" && (
+            <div className="bg-muted border border-border rounded p-3 text-sm text-muted-foreground">
+              ✓ Filters will be saved with this list so you can reload and modify them later
+            </div>
+          )}
         </div>
 
         <DialogFooter>

@@ -50,6 +50,8 @@ export type UniverseRow = {
   ebitda_margin_latest?: number | null;
   revenue_cagr_3y?: number | null;
   employees_latest?: number | null;
+  /** Fiscal year that revenue_latest, ebitda_margin_latest, employees_latest refer to */
+  latest_year?: number | null;
   municipality?: string | null;
   homepage?: string | null;
   email?: string | null;

@@ -59,6 +59,45 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
 
+// FastAPI backend URL for proxying lists, views, universe, etc.
+const FASTAPI_BACKEND = process.env.FASTAPI_BACKEND_URL || process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+
+// Proxy /api/lists, /api/views, /api/labels, /api/prospects, /api/universe to FastAPI backend
+const PROXY_PREFIXES = ['/api/lists', '/api/views', '/api/labels', '/api/prospects', '/api/universe', '/api/companies/', '/api/status', '/api/admin', '/api/home', '/api/coverage', '/api/filters', '/api/analysis/']
+app.use(async (req, res, next) => {
+  const path = req.path
+  const shouldProxy = PROXY_PREFIXES.some((p) => path === p || path.startsWith(p + '/') || (p.endsWith('/') && path.startsWith(p)))
+  if (!shouldProxy) return next()
+  try {
+    const url = new URL(req.originalUrl || req.url, `http://${req.headers.host || 'localhost'}`)
+    const target = `${FASTAPI_BACKEND.replace(/\/$/, '')}${url.pathname}${url.search || ''}`
+    const headers: Record<string, string> = {}
+    ;['authorization', 'content-type'].forEach((h) => {
+      const v = req.headers[h]
+      if (v) headers[h] = Array.isArray(v) ? v[0] : v
+    })
+    const proxyRes = await fetch(target, {
+      method: req.method,
+      headers: { ...headers, 'Content-Type': req.headers['content-type'] || 'application/json' },
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body || {}) : undefined,
+    })
+    const text = await proxyRes.text()
+    try {
+      const json = JSON.parse(text)
+      res.status(proxyRes.status).json(json)
+    } catch {
+      res.status(proxyRes.status).set('Content-Type', proxyRes.headers.get('Content-Type') || 'text/plain').send(text)
+    }
+  } catch (err: any) {
+    console.warn('[Proxy] Forward to FastAPI failed:', err?.message)
+    if (path.startsWith('/api/lists')) {
+      res.status(200).json({ items: [] })
+    } else {
+      next(err)
+    }
+  }
+})
+
 // Types
 type Nullable<T> = T | null
 

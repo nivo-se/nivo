@@ -1,8 +1,7 @@
 /**
- * Built-in prompt templates from Figma export (nivo-figma-app).
- * Used when backend has no AI templates yet.
+ * Built-in prompt templates used when backend templates are unavailable.
  */
-import type { PromptTemplate } from "@/types/figma";
+import type { PromptTemplate } from "@/lib/api/types";
 
 export const DEFAULT_PROMPT_TEMPLATES: PromptTemplate[] = [
   {

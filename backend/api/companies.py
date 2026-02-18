@@ -272,7 +272,8 @@ async def get_companies_batch(
                 k.growth_bucket,
                 k.profitability_bucket,
                 k.equity_ratio_latest,
-                k.debt_to_equity_latest
+                k.debt_to_equity_latest,
+                k.latest_year
             FROM companies c
             LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
             LEFT JOIN (
@@ -302,7 +303,7 @@ async def get_companies_batch(
                 k.latest_revenue_sek, k.latest_profit_sek, k.latest_ebitda_sek,
                 k.avg_ebitda_margin, k.avg_net_margin, k.revenue_cagr_3y, k.revenue_growth_yoy,
                 k.company_size_bucket, k.growth_bucket, k.profitability_bucket,
-                k.equity_ratio_latest, k.debt_to_equity_latest
+                k.equity_ratio_latest, k.debt_to_equity_latest, k.latest_year
             FROM companies c
             LEFT JOIN company_kpis k ON k.orgnr = c.orgnr
             WHERE c.orgnr IN ({placeholders})
@@ -338,6 +339,7 @@ async def get_companies_batch(
                     r.setdefault("profitability_bucket", None)
                     r.setdefault("equity_ratio_latest", None)
                     r.setdefault("debt_to_equity_latest", None)
+                    r.setdefault("latest_year", None)
         
         ai_profiles_map: Dict[str, Dict[str, Any]] = {}
         enrichment_map: Dict[str, Dict[str, Any]] = {}
@@ -416,6 +418,7 @@ async def get_companies_batch(
                 "profitability_bucket": row.get("profitability_bucket"),
                 "equity_ratio_latest": row.get("equity_ratio_latest"),
                 "debt_to_equity_latest": row.get("debt_to_equity_latest"),
+                "latest_year": row.get("latest_year"),
                 "ai_strategic_score": profile.get("strategic_fit_score") if profile else None,
                 "ai_defensibility_score": profile.get("defensibility_score") if profile else None,
                 "ai_product_description": profile.get("product_description") if profile else None,
@@ -455,6 +458,130 @@ async def get_companies_batch(
         raise HTTPException(status_code=500, detail=f"Error fetching companies: {str(e)}")
 
 
+# Line-item spec for full P&L and Balance Sheet. Values in full.pnl/full.balance are raw (thousands if from Allabolag).
+_FULL_PNL_SPEC = [
+    {"key": "nettoomsattning", "label_sv": "Nettoomsättning", "section": "revenue", "bold": False, "source": "core", "keys": ["si_sek", "SI", "si"]},
+    {"key": "ovrig_omsattning", "label_sv": "Övrig omsättning", "section": "revenue", "bold": False, "source": "account_codes", "keys": ["sdi_sek", "SDI", "sdi"]},
+    {"key": "bruttoresultat", "label_sv": "Bruttoresultat", "section": "costs", "bold": False, "source": "account_codes", "keys": ["be_sek", "BE", "be"]},
+    {"key": "rorelseresultat", "label_sv": "Rörelseresultat", "section": "profit", "bold": False, "source": "core", "keys": ["ors_sek", "ebitda_sek", "ORS", "EBITDA", "ors", "ebitda"]},
+    {"key": "avskrivningar", "label_sv": "Avskrivningar", "section": "costs", "bold": False, "source": "account_codes", "keys": ["adi_sek", "ADI", "adi"]},
+    {"key": "rorelseresultat_efter_avskrivningar", "label_sv": "Rörelseresultat efter avskrivningar", "section": "profit", "bold": False, "source": "core", "keys": ["resultat_e_avskrivningar_sek", "resultat_e_avskrivningar"]},
+    {"key": "resultat_efter_finansnetto", "label_sv": "Resultat efter finansnetto", "section": "profit", "bold": False, "source": "account_codes", "keys": ["resultat_e_finansnetto_sek", "resultat_e_finansnetto"]},
+    {"key": "arets_resultat", "label_sv": "Årets resultat", "section": "profit", "bold": True, "source": "core", "keys": ["dr_sek", "DR", "dr"]},
+]
+_FULL_BS_SPEC = [
+    {"key": "summa_tillgangar", "label_sv": "Summa tillgångar", "section": "assets", "bold": True, "source": "account_codes", "keys": ["sv_sek", "SV", "sv"]},
+    {"key": "eget_kapital", "label_sv": "Eget kapital", "section": "equity", "bold": False, "source": "account_codes", "keys": ["ek_sek", "EK", "ek"]},
+    {"key": "frammande_kapital", "label_sv": "Främmande kapital", "section": "liabilities", "bold": True, "source": "account_codes", "keys": ["fk_sek", "FK", "fk"]},
+    {"key": "kassa_och_bank", "label_sv": "Kassa och bank", "section": "current_assets", "bold": False, "source": "account_codes", "keys": ["sek_sek", "sek", "SEK"]},
+    {"key": "langfristiga_skulder", "label_sv": "Långfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["lg_sek", "lg", "LG"]},
+    {"key": "kortfristiga_skulder", "label_sv": "Kortfristiga skulder", "section": "liabilities", "bold": False, "source": "account_codes", "keys": ["kb_sek", "kbp_sek", "kb", "kbp"]},
+]
+
+
+def _to_float(val: Any) -> Optional[float]:
+    if val is None:
+        return None
+    try:
+        f = float(val)
+        return f if not (f != f) else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _norm_period(year: int, period: Optional[str]) -> str:
+    if not period:
+        return f"{year}-12"
+    p = str(period).strip()
+    if len(p) <= 2 and p.isdigit():
+        return f"{year}-{p.zfill(2)}"
+    if "-" in p:
+        return p
+    return f"{year}-12"
+
+
+def _merge_row_to_map(row: Dict[str, Any], ac: Any) -> Dict[str, float]:
+    m: Dict[str, float] = {}
+    for k in ["si_sek", "sdi_sek", "dr_sek", "resultat_e_avskrivningar_sek", "ebitda_sek", "ors_sek"]:
+        v = _to_float(row.get(k))
+        if v is not None:
+            m[k] = v
+            m[k.lower().replace("_sek", "")] = v
+    if ac and isinstance(ac, dict):
+        for k, v in ac.items():
+            f = _to_float(v)
+            if f is not None:
+                m[str(k)] = f
+                m[str(k).lower()] = f
+    return m
+
+
+def _build_full_pnl_balance(rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    period_keys: List[str] = []
+    by_period: Dict[str, Dict[str, float]] = {}
+    for row in rows:
+        year = row.get("year")
+        if year is None:
+            continue
+        pk = _norm_period(int(year), row.get("period"))
+        if pk not in by_period:
+            period_keys.append(pk)
+        ac = row.get("account_codes")
+        if isinstance(ac, str):
+            try:
+                ac = json.loads(ac) if ac else None
+            except json.JSONDecodeError:
+                ac = None
+        by_period[pk] = _merge_row_to_map(row, ac)
+
+    pnl_out: List[Dict[str, Any]] = []
+    for spec in _FULL_PNL_SPEC:
+        years_map: Dict[str, Optional[float]] = {}
+        for pk in period_keys:
+            m = by_period.get(pk, {})
+            val = None
+            for k in spec["keys"]:
+                v = m.get(k) or m.get(k.upper() if isinstance(k, str) else k) or m.get(k.lower() if isinstance(k, str) else k)
+                if v is not None:
+                    val = v
+                    break
+            if val is not None:
+                years_map[pk] = val
+        if years_map or spec["key"] in ("nettoomsattning", "rorelseresultat", "rorelseresultat_efter_avskrivningar", "arets_resultat"):
+            pnl_out.append({
+                "key": spec["key"],
+                "label_sv": spec["label_sv"],
+                "section": spec["section"],
+                "bold": spec["bold"],
+                "source": spec["source"],
+                "years": years_map,
+            })
+
+    balance_out: List[Dict[str, Any]] = []
+    for spec in _FULL_BS_SPEC:
+        years_map = {}
+        for pk in period_keys:
+            m = by_period.get(pk, {})
+            val = None
+            for k in spec["keys"]:
+                v = m.get(k) or m.get(k.upper() if isinstance(k, str) else k) or m.get(k.lower() if isinstance(k, str) else k)
+                if v is not None:
+                    val = v
+                    break
+            if val is not None:
+                years_map[pk] = val
+        if years_map:
+            balance_out.append({
+                "key": spec["key"],
+                "label_sv": spec["label_sv"],
+                "section": spec["section"],
+                "bold": spec["bold"],
+                "source": spec["source"],
+                "years": years_map,
+            })
+    return {"pnl": pnl_out, "balance": balance_out}
+
+
 @router.get("/{orgnr}/financials")
 async def get_company_financials(orgnr: str = Path(..., description="Organization number")):
     """
@@ -465,37 +592,84 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
         db = get_database_service()
     except Exception as e:
         logger.debug("get_company_financials: no DB: %s", e)
-        return {"financials": [], "count": 0}
+        return {"financials": [], "count": 0, "full": None}
 
     if hasattr(db, "table_exists") and not db.table_exists("financials"):
-        return {"financials": [], "count": 0}
+        return {"financials": [], "count": 0, "full": None}
 
     try:
-        # Get historical financial data from financials table
-        # IMPORTANT: Use correct account codes per allabolag_account_code_mapping.json
-        # - Revenue: SI (Nettoomsättning) preferred, SDI fallback
-        # - EBIT: resultat_e_avskrivningar (Rörelseresultat efter avskrivningar) - DO NOT use RG!
-        # - EBITDA: EBITDA preferred, ORS fallback
+        # Do not select raw ebitda_sek in the CTE: we use COALESCE(ebitda_sek, ors_sek) as ebitda_sek
+        # to avoid Postgres "column reference ebitda_sek is ambiguous" when both appear in the SELECT list.
         sql = """
-            SELECT 
-                year,
-                COALESCE(si_sek, sdi_sek) as revenue_sek,
-                dr_sek as profit_sek,
-                resultat_e_avskrivningar_sek as ebit_sek,  -- DO NOT fallback to RG (it's working capital!)
-                COALESCE(ebitda_sek, ors_sek) as ebitda_sek,
-                period
-            FROM financials
-            WHERE orgnr = ?
-              AND (currency IS NULL OR currency = 'SEK')
-              AND (period = '12' OR RIGHT(period, 2) = '12')
-              AND year >= 2018
+            WITH ranked AS (
+                SELECT 
+                    year, period,
+                    COALESCE(si_sek, sdi_sek) as revenue_sek,
+                    dr_sek as profit_sek,
+                    resultat_e_avskrivningar_sek as ebit_sek,
+                    COALESCE(ebitda_sek, ors_sek) as ebitda_sek,
+                    account_codes, si_sek, sdi_sek, dr_sek,
+                    resultat_e_avskrivningar_sek, ors_sek,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY year
+                        ORDER BY
+                            CASE
+                                WHEN period IS NULL OR BTRIM(period::text) = '' THEN 0
+                                WHEN period::text = '12'
+                                  OR RIGHT(period::text, 2) = '12'
+                                  OR period::text LIKE '%-12'
+                                  OR period::text LIKE '%-12-31'
+                                THEN 3
+                                ELSE 1
+                            END DESC,
+                            COALESCE(period::text, '') DESC
+                    ) AS rn
+                FROM financials
+                WHERE orgnr = ?
+                  AND (currency IS NULL OR currency = 'SEK')
+                  AND year >= 2018
+            )
+            SELECT
+                year, period, revenue_sek, profit_sek, ebit_sek, ebitda_sek,
+                account_codes, si_sek, sdi_sek, dr_sek,
+                resultat_e_avskrivningar_sek, ors_sek
+            FROM ranked
+            WHERE rn = 1
             ORDER BY year DESC
-            LIMIT 5
+            LIMIT 7
         """
-        
-        rows = db.run_raw_query(sql, params=[orgnr])
+        rows: List[Dict[str, Any]] = []
+        try:
+            rows = db.run_raw_query(sql, params=[orgnr])
+        except Exception as sql_err:
+            logger.debug("Financials extended query failed, trying without account_codes: %s", sql_err)
+            sql_fallback = """
+                WITH ranked AS (
+                    SELECT
+                        year, period,
+                        COALESCE(si_sek, sdi_sek) as revenue_sek, dr_sek as profit_sek,
+                        resultat_e_avskrivningar_sek as ebit_sek,
+                        COALESCE(ebitda_sek, ors_sek) as ebitda_sek,
+                        NULL::jsonb as account_codes,
+                        si_sek, sdi_sek, dr_sek, resultat_e_avskrivningar_sek, ors_sek,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY year
+                            ORDER BY COALESCE(period::text, '') DESC
+                        ) AS rn
+                    FROM financials
+                    WHERE orgnr = ? AND (currency IS NULL OR currency = 'SEK')
+                      AND year >= 2018
+                )
+                SELECT
+                    year, period, revenue_sek, profit_sek, ebit_sek, ebitda_sek,
+                    account_codes, si_sek, sdi_sek, dr_sek, resultat_e_avskrivningar_sek, ors_sek
+                FROM ranked
+                WHERE rn = 1
+                ORDER BY year DESC
+                LIMIT 7
+            """
+            rows = db.run_raw_query(sql_fallback, params=[orgnr])
 
-        # Calculate margins for each year
         financials = []
         for row in rows:
             revenue = row.get("revenue_sek")
@@ -508,8 +682,10 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             ebit_margin = (ebit / revenue * 100) if revenue and revenue > 0 and ebit is not None else None
             ebitda_margin = (ebitda / revenue * 100) if revenue and revenue > 0 and ebitda is not None else None
 
+            period_str = _norm_period(row.get("year", 0), row.get("period"))
             financials.append({
                 "year": row.get("year"),
+                "period": period_str,
                 "revenue_sek": revenue,
                 "profit_sek": profit,
                 "ebit_sek": ebit,
@@ -518,6 +694,8 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                 "ebit_margin": ebit_margin,
                 "ebitda_margin": ebitda_margin,
             })
+
+        full = _build_full_pnl_balance(rows) if rows else None
 
         # Fallback: if financials table has no rows, synthesize one from company_kpis
         if not financials and hasattr(db, "table_exists") and db.table_exists("company_kpis"):
@@ -548,6 +726,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                             return m if m <= 1 else m / 100
                         financials.append({
                             "year": year,
+                            "period": f"{year}-12",
                             "revenue_sek": float(rev) if rev is not None else None,
                             "profit_sek": float(profit) if profit is not None else None,
                             "ebit_sek": float(ebit) if ebit is not None else None,
@@ -561,8 +740,8 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             except Exception as kpi_exc:
                 logger.debug("company_kpis fallback failed: %s", kpi_exc)
 
-        return {"financials": financials, "count": len(financials)}
+        return {"financials": financials, "count": len(financials), "full": full}
 
     except Exception as e:
         logger.warning("get_company_financials failed: %s", e)
-        return {"financials": [], "count": 0}
+        return {"financials": [], "count": 0, "full": None}

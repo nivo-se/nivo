@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useCompaniesWithTotal, useLists, useProspects, useAIRuns } from "@/lib/hooks/figmaQueries";
+import { useCompaniesWithTotal, useLists, useProspects, useAIRuns } from "@/lib/hooks/apiQueries";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -43,19 +43,28 @@ export default function WorkDashboard() {
           <p className="text-sm text-muted-foreground">Here&apos;s what&apos;s happening with your investment pipeline</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="app-card p-6">
-            <p className="text-sm text-muted-foreground mb-2">Total Companies</p>
-            <p className="text-base font-semibold text-foreground">{totalCompanies.toLocaleString()}</p>
-          </div>
-          <div className="app-card p-6">
-            <p className="text-sm text-muted-foreground mb-2">Active Lists</p>
-            <p className="text-base font-semibold text-foreground">{lists.length}</p>
-          </div>
-          <div className="app-card p-6">
-            <p className="text-sm text-muted-foreground mb-2">Prospects</p>
-            <p className="text-base font-semibold text-foreground">{prospects.length}</p>
-          </div>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <Link
+            to="/universe"
+            className="app-card p-4 block transition-colors hover:border-primary/50 hover:bg-muted/30"
+          >
+            <p className="text-xs text-muted-foreground mb-1">Total Companies</p>
+            <p className="text-sm font-semibold text-foreground">{totalCompanies.toLocaleString()}</p>
+          </Link>
+          <Link
+            to="/lists"
+            className="app-card p-4 block transition-colors hover:border-primary/50 hover:bg-muted/30"
+          >
+            <p className="text-xs text-muted-foreground mb-1">Active Lists</p>
+            <p className="text-sm font-semibold text-foreground">{lists.length}</p>
+          </Link>
+          <Link
+            to="/prospects"
+            className="app-card p-4 block transition-colors hover:border-primary/50 hover:bg-muted/30"
+          >
+            <p className="text-xs text-muted-foreground mb-1">Prospects</p>
+            <p className="text-sm font-semibold text-foreground">{prospects.length}</p>
+          </Link>
         </div>
 
         <div className="mb-8">

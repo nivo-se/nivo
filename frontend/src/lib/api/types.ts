@@ -1,9 +1,7 @@
 /**
- * Types for Figma export app - compatible with nivo-figma-app DataContext.
- * Used by figmaApi adapter when migrating from mock data to Nivo backend.
+ * Shared API types for the frontend domain model.
  */
 
-// Company - from mockData / universe query
 export interface Company {
   orgnr: string;
   display_name: string;
@@ -58,7 +56,6 @@ export interface Company {
   };
 }
 
-// Filters - from mockData
 export interface FilterRule {
   id: string;
   field: string;
@@ -78,7 +75,6 @@ export interface Filters {
   exclude: FilterGroup;
 }
 
-// List - from mockData
 export interface List {
   id: string;
   name: string;
@@ -95,7 +91,6 @@ export interface List {
   updated_by: string;
 }
 
-// Prospect - from mockData
 export interface ProspectStatus {
   id?: string;
   companyId: string;
@@ -106,8 +101,7 @@ export interface ProspectStatus {
   nextAction?: string;
 }
 
-// AI types - from nivo-figma-app/types/ai.ts
-export type AIRunStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
+export type AnalysisRunStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
 
 export interface ScoringDimension {
   id: string;
@@ -127,12 +121,12 @@ export interface PromptTemplate {
   created_by: string;
 }
 
-export interface AIRun {
+export interface AnalysisRun {
   id: string;
   name: string;
   list_id: string;
   template_id: string;
-  status: AIRunStatus;
+  status: AnalysisRunStatus;
   created_at: string;
   created_by: string;
   started_at?: string;
@@ -148,7 +142,7 @@ export interface AIRun {
   };
 }
 
-export interface AIResult {
+export interface AnalysisResult {
   id: string;
   run_id: string;
   company_orgnr: string;
@@ -167,15 +161,19 @@ export interface AIResult {
   approved_by?: string;
 }
 
-export interface AIProfile {
+export interface CompanyAnalysisProfile {
   company_orgnr: string;
   ai_fit_score: number;
   last_analyzed: string;
   analysis_count: number;
-  latest_result?: AIResult;
+  latest_result?: AnalysisResult;
 }
 
-// DTOs for API calls
+export type AIRunStatus = AnalysisRunStatus;
+export type AIRun = AnalysisRun;
+export type AIResult = AnalysisResult;
+export type AIProfile = CompanyAnalysisProfile;
+
 export interface CreateListDTO {
   name: string;
   scope: "private" | "team";
@@ -184,10 +182,23 @@ export interface CreateListDTO {
   filters?: Filters;
 }
 
-export interface CreateAIRunDTO {
+export interface CreateAnalysisRunDTO {
   name: string;
   list_id?: string;
   orgnrs?: string[];
   template_id: string;
-  config: AIRun["config"];
+  config: AnalysisRun["config"];
 }
+
+export type CreateAIRunDTO = CreateAnalysisRunDTO;
+
+export type FinancialYear = {
+  year: number;
+  revenue_sek: number | null;
+  profit_sek: number | null;
+  ebit_sek: number | null;
+  ebitda_sek: number | null;
+  net_margin: number | null;
+  ebit_margin: number | null;
+  ebitda_margin: number | null;
+};

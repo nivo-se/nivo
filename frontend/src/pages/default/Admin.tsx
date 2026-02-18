@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useAIRuns, useLists, useCompanies } from "@/lib/hooks/figmaQueries";
+import { useAIRuns, useLists, useCompanies } from "@/lib/hooks/apiQueries";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLastApiErrors } from "@/lib/services/figmaApi";
-import * as api from "@/lib/services/figmaApi";
+import { getAnalysisRun, getAnalysisRuns } from "@/lib/api/analysis/service";
+import { getAllLists } from "@/lib/api/lists/service";
+import { getUniverseCompanies } from "@/lib/api/universe/service";
+import { getRecentApiErrors } from "@/lib/api/status/service";
 import { getListItems } from "@/lib/services/listsService";
 import { fetchWhoAmI, type WhoAmI } from "@/lib/services/whoamiService";
 import { runDefaultUniverseUrlStateDevTest } from "@/lib/defaultUniverseUrlState";
@@ -39,14 +41,14 @@ export default function Admin() {
   }>({ step1: "idle", step2: "idle", step3: "idle", step4: "idle", step5: "idle" });
   const [urlTestPass, setUrlTestPass] = useState<boolean | null>(null);
 
-  const apiErrors = getLastApiErrors();
+  const apiErrors = getRecentApiErrors();
   const hasError = companiesError || listsError || runsError || apiErrors.length > 0;
 
   const runSmokeTests = async () => {
     setSmokeState({ step1: "running", step2: "idle", step3: "idle", step4: "idle", step5: "idle" });
     let lastError = "";
     try {
-      await api.getCompanies({ limit: 1 });
+      await getUniverseCompanies({ limit: 1 });
       setSmokeState((s) => ({ ...s, step1: "pass", step2: "running" }));
     } catch (e) {
       lastError = e instanceof Error ? e.message : String(e);
@@ -54,7 +56,7 @@ export default function Admin() {
       return;
     }
     try {
-      const listList = await api.getLists();
+      const listList = await getAllLists();
       setSmokeState((s) => ({ ...s, step2: "pass", step3: listList.length > 0 ? "running" : "pass" }));
       if (listList.length > 0) {
         try {
@@ -67,7 +69,7 @@ export default function Admin() {
         }
       }
       try {
-        await api.getCompanies({ limit: 5, offset: 0, sort: { by: "orgnr", dir: "asc" } });
+        await getUniverseCompanies({ limit: 5, offset: 0, sort: { by: "orgnr", dir: "asc" } });
         setSmokeState((s) => ({ ...s, step4: "pass", step5: "running" }));
       } catch (e) {
         lastError = e instanceof Error ? e.message : String(e);
@@ -75,9 +77,9 @@ export default function Admin() {
         return;
       }
       try {
-        const runsList = await api.getAIRuns();
+        const runsList = await getAnalysisRuns();
         if (runsList.length > 0) {
-          await api.getAIRun(runsList[0].id);
+          await getAnalysisRun(runsList[0].id);
         }
         setSmokeState((s) => ({ ...s, step5: "pass" }));
       } catch (e) {

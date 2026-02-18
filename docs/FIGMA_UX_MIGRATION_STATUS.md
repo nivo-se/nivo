@@ -12,7 +12,7 @@
 |--------|--------|
 | Default route | `/` → redirects to `/new` (Figma app) |
 | Figma pages implemented | 12/12 in `frontend/src/pages/new/*` |
-| Mock data in default routes | None – uses figmaApi/figmaQueries |
+| Mock data in default routes | None – uses compatClient/apiQueries |
 | Backend stubs (throw/empty) | Prospects, AI Templates, updateList, cancelAIRun, approve/reject |
 | Legacy UI location | Under `/legacy/*` (to be added) |
 
@@ -65,7 +65,7 @@
 
 ---
 
-## API Mapping (figmaApi.ts)
+## API Mapping (compatClient.ts)
 
 | Figma Expected | Nivo Backend | Status |
 |---------------|--------------|--------|
@@ -129,7 +129,7 @@
 ## Mock Data Usage in Nivo Frontend (Default Routes)
 
 **Checked:** No mock data modules are imported by `frontend/src/pages/new/*`.  
-All new pages use `figmaQueries.ts` → `figmaApi.ts` → real backend or stubbed responses.
+All new pages use `apiQueries.ts` → `compatClient.ts` → real backend or stubbed responses.
 
 **Legacy routes (to move under /legacy):**
 - `IndustryFilter.tsx`, `CollapsibleIndustryFilter.tsx` – import `sampleData`

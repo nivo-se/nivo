@@ -29,10 +29,10 @@ interface FilterBuilderProps {
 
 const filterFields = [
   { value: "name", label: "Company name (search)", type: "text" },
-  { value: "revenue_latest", label: "Revenue (Latest)", type: "number", unit: "SEK" },
-  { value: "ebitda_margin_latest", label: "EBITDA Margin", type: "percent" },
+  { value: "revenue_latest", label: "Revenue (latest fiscal year)", type: "number", unit: "SEK" },
+  { value: "ebitda_margin_latest", label: "EBITDA margin (latest fiscal year)", type: "percent" },
   { value: "revenue_cagr_3y", label: "Revenue CAGR (3Y)", type: "percent" },
-  { value: "employees_latest", label: "Employees", type: "number" },
+  { value: "employees_latest", label: "Employees (latest)", type: "number" },
   { value: "segment_names", label: "Segment (contains)", type: "text" },
   { value: "has_homepage", label: "Has Homepage", type: "boolean" },
   { value: "has_ai_profile", label: "Has AI Profile", type: "boolean" },
@@ -145,7 +145,12 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
   return (
     <div className="bg-muted/40 border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Filter Builder</h3>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Filter Builder</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Revenue, EBITDA margin and employees refer to the latest available fiscal year per company. CAGR uses the last 3 years.
+          </p>
+        </div>
         <div className="flex gap-2">
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearAllFilters}>

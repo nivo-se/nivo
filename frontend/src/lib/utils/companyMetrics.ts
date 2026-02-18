@@ -1,9 +1,8 @@
 /**
- * Helpers for Figma Company type - compatible with figmaApi / universe data.
+ * Helpers for company-level metrics and formatting.
  * Nullable numerics are preserved as null; use format* for display.
  */
-import type { Company } from "@/types/figma";
-import type { FinancialYear } from "@/lib/services/figmaApi";
+import type { Company, FinancialYear } from "@/lib/api/types";
 
 export function calculateRevenueCagr(company: Company, _years = 3): number | null {
   return company.revenue_cagr_3y ?? null;
@@ -58,4 +57,15 @@ export function formatRevenueSEK(value: number | null | undefined): string {
 export function formatPercent(value: number | null | undefined, decimals = 1): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "—";
   return `${(value * 100).toFixed(decimals)}%`;
+}
+
+/** Format as thousands (tSEK) - Belopp i 1000. Value can be in thousands or full SEK. */
+export function formatThousands(value: number | null | undefined, asMSEK = false): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  const v = Number(value);
+  const tsek = v >= 1e6 ? v / 1000 : v;
+  if (asMSEK) {
+    return `${(tsek / 1000).toFixed(1)}`;
+  }
+  return Math.round(tsek).toLocaleString("sv-SE", { useGrouping: true }).replace(/\s/g, " ");
 }

@@ -1,9 +1,7 @@
 /**
- * Figma API adapter - maps nivo-figma-app expected API interface to Nivo backend.
- * Use when migrating Figma export pages into the main Nivo frontend.
- *
- * Uses fetchWithAuth for authenticated requests and VITE_API_BASE_URL.
- * Mapping doc: docs/FIGMA_MIGRATION.md
+ * Compatibility layer for migrated UI. Do not use for new features.
+ * This module preserves legacy response shapes while the app transitions
+ * to domain-based clients/services under `lib/api/<domain>`.
  */
 import { fetchWithAuth } from "@/lib/backendFetch";
 import {
@@ -31,7 +29,7 @@ import {
   guardAnalysisRunResponse,
   guardAnalysisRunCompaniesResponse,
   guardCompaniesBatchResponse,
-} from "@/lib/services/figmaApiGuards";
+} from "@/lib/api/compatGuards";
 import { API_BASE } from "@/lib/apiClient";
 import { DEFAULT_PROMPT_TEMPLATES } from "@/lib/defaultPromptTemplates";
 
@@ -45,7 +43,8 @@ import type {
   AIProfile,
   CreateListDTO,
   CreateAIRunDTO,
-} from "@/types/figma";
+  FinancialYear,
+} from "@/lib/api/types";
 
 /** Single API error for Admin Contracts. */
 export interface LastApiError {
@@ -143,7 +142,7 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
     debt_to_equity_latest: toNull(row.debt_to_equity_latest),
     currency: "SEK",
     years_available: 0,
-    latest_year: new Date().getFullYear(),
+    latest_year: typeof row.latest_year === "number" ? row.latest_year : new Date().getFullYear(),
     status: "active",
     financials: [],
   };
@@ -219,7 +218,7 @@ export async function searchCompanies(query: string, limit = 50, signal?: AbortS
 
 // ---- Lists ----
 
-function mapSavedListToFigmaList(saved: SavedList, companyIds: string[]): List {
+function mapSavedListToListModel(saved: SavedList, companyIds: string[]): List {
   return {
     id: saved.id,
     name: saved.name,
@@ -253,9 +252,9 @@ export async function getLists(): Promise<List[]> {
       const itemsRes = await getListItems(saved.id);
       guardListItemsResponse(itemsRes);
       const companyIds = itemsRes.items.map((i: { orgnr: string }) => i.orgnr);
-      lists.push(mapSavedListToFigmaList(saved, companyIds));
+      lists.push(mapSavedListToListModel(saved, companyIds));
     } catch {
-      lists.push(mapSavedListToFigmaList(saved, []));
+      lists.push(mapSavedListToListModel(saved, []));
     }
   }
   return lists;
@@ -270,10 +269,10 @@ export async function getList(listId: string): Promise<List | null> {
     const itemsRes = await getListItems(listId);
     guardListItemsResponse(itemsRes);
     const companyIds = itemsRes.items.map((i: { orgnr: string }) => i.orgnr);
-    return mapSavedListToFigmaList(saved as SavedList, companyIds);
+    return mapSavedListToListModel(saved as SavedList, companyIds);
   } catch (e) {
     setLastApiError(e instanceof Error ? e.message : String(e), "GET /api/lists/:id/items");
-    return mapSavedListToFigmaList(saved as SavedList, []);
+    return mapSavedListToListModel(saved as SavedList, []);
   }
 }
 
@@ -291,7 +290,7 @@ export async function createList(data: CreateListDTO): Promise<List> {
     name: data.name,
     scope: data.scope ?? "private",
   });
-  return mapSavedListToFigmaList(saved, []);
+  return mapSavedListToListModel(saved, []);
 }
 
 /** Create list from Universe query (recommended when creating from filtered Universe). */
@@ -428,7 +427,7 @@ function mapBatchRowToCompany(row: Record<string, unknown>): Company {
     is_stale: false,
     currency: "SEK",
     years_available: 0,
-    latest_year: new Date().getFullYear(),
+    latest_year: typeof row.latest_year === "number" ? row.latest_year : new Date().getFullYear(),
     status: "active",
     financials: [],
   };
@@ -839,18 +838,6 @@ export async function rejectResult(resultId: string): Promise<AIResult> {
   if (!found) throw new Error("Result not found after reject");
   return found;
 }
-
-/** Financial year from /api/companies/{orgnr}/financials */
-export type FinancialYear = {
-  year: number;
-  revenue_sek: number | null;
-  profit_sek: number | null;
-  ebit_sek: number | null;
-  ebitda_sek: number | null;
-  net_margin: number | null;
-  ebit_margin: number | null;
-  ebitda_margin: number | null;
-};
 
 export async function getCompanyFinancials(orgnr: string): Promise<{
   financials: FinancialYear[];

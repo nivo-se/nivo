@@ -45,6 +45,7 @@ class ListItemsAdd(BaseModel):
 class ListUpdate(BaseModel):
     name: Optional[str] = None
     scope: Optional[str] = None
+    sourceViewId: Optional[str] = None
 
 
 def _owner_email(owner_user_id: str) -> Optional[str]:
@@ -349,6 +350,10 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
             raise HTTPException(400, "scope must be private or team")
         updates.append("scope = ?")
         params.append(body.scope)
+
+    if body.sourceViewId is not None:
+        updates.append("source_view_id = ?::uuid")
+        params.append(body.sourceViewId)
 
     if not updates:
         return {

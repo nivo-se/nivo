@@ -6,7 +6,7 @@ import {
   useCompany,
   useCompaniesBatch,
   usePromptTemplate,
-} from "@/lib/hooks/figmaQueries";
+} from "@/lib/hooks/apiQueries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,10 +34,10 @@ import {
   formatRevenueSEK,
   formatPercent,
   calculateRevenueCagr,
-} from "@/lib/utils/figmaCompanyUtils";
+} from "@/lib/utils/companyMetrics";
 import { ErrorState } from "@/components/default/ErrorState";
 import { EmptyState } from "@/components/default/EmptyState";
-import * as api from "@/lib/services/figmaApi";
+import { approveAnalysisResult, rejectAnalysisResult } from "@/lib/api/analysis/service";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -124,11 +124,11 @@ export default function RunResults() {
   const getRecommendationBadge = (rec: string) => {
     switch (rec) {
       case "strong_fit":
-        return <Badge className="bg-primary/15 text-primary">Strong Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Strong Fit</Badge>;
       case "potential_fit":
-        return <Badge className="bg-accent text-foreground">Potential Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Potential Fit</Badge>;
       case "weak_fit":
-        return <Badge className="bg-accent text-foreground">Weak Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Weak Fit</Badge>;
       case "pass":
         return <Badge className="bg-destructive/15 text-destructive">Pass</Badge>;
       default:
@@ -138,8 +138,8 @@ export default function RunResults() {
 
   const handleApprove = async (resultId: string) => {
     try {
-      await api.approveResult(resultId);
-      queryClient.invalidateQueries({ queryKey: ["figma", "aiRuns", runId ?? "", "results"] });
+      await approveAnalysisResult(resultId);
+      queryClient.invalidateQueries({ queryKey: ["app", "aiRuns", runId ?? "", "results"] });
       const currentIndex = results.findIndex((r) => r.id === resultId);
       const nextPending = results.slice(currentIndex + 1).find((r) => r.status === "pending");
       if (nextPending) setSelectedResultId(nextPending.id);
@@ -151,8 +151,8 @@ export default function RunResults() {
 
   const handleReject = async (resultId: string) => {
     try {
-      await api.rejectResult(resultId);
-      queryClient.invalidateQueries({ queryKey: ["figma", "aiRuns", runId ?? "", "results"] });
+      await rejectAnalysisResult(resultId);
+      queryClient.invalidateQueries({ queryKey: ["app", "aiRuns", runId ?? "", "results"] });
       const currentIndex = results.findIndex((r) => r.id === resultId);
       const nextPending = results.slice(currentIndex + 1).find((r) => r.status === "pending");
       if (nextPending) setSelectedResultId(nextPending.id);
@@ -163,51 +163,101 @@ export default function RunResults() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-muted/40">
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="mb-6">
-          <Link to={`/ai/runs/${run.id}`}>
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Run Detail
-            </Button>
+    <div className="h-full overflow-auto app-bg">
+      <div className="max-w-5xl mx-auto px-8 py-8 space-y-6">
+        <div>
+          <Link
+            to={`/ai/runs/${run.id}`}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Run Detail
           </Link>
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-base font-semibold text-foreground mb-1">
+
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold text-foreground mb-1 truncate">
                 {run.name}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {template.name} • {run.total_companies} companies • Completed {run.completed_at ? (() => {
-                  const d = new Date(run.completed_at);
-                  const now = new Date();
-                  const mins = Math.floor((now.getTime() - d.getTime()) / 60000);
-                  if (mins < 60) return `${mins} minutes ago`;
-                  const hours = Math.floor(mins / 60);
-                  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-                  return d.toLocaleDateString();
-                })() : "—"}
+                {template.name} • {run.total_companies} companies • Completed{" "}
+                {run.completed_at
+                  ? (() => {
+                      const d = new Date(run.completed_at);
+                      const now = new Date();
+                      const mins = Math.floor((now.getTime() - d.getTime()) / 60000);
+                      if (mins < 60) return `${mins} minutes ago`;
+                      const hours = Math.floor(mins / 60);
+                      if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+                      return d.toLocaleDateString();
+                    })()
+                  : "—"}
               </p>
             </div>
-            <div className="flex gap-3">
+
+            <div className="flex gap-4">
               <div className="text-center">
-                <p className="text-base font-bold text-foreground">
-                  {approvedResults.length}
-                </p>
+                <p className="text-base font-bold text-foreground">{approvedResults.length}</p>
                 <p className="text-xs text-muted-foreground">Approved</p>
               </div>
               <div className="text-center">
-                <p className="text-base font-bold text-foreground">
-                  {pendingResults.length}
-                </p>
+                <p className="text-base font-bold text-foreground">{pendingResults.length}</p>
                 <p className="text-xs text-muted-foreground">Pending</p>
               </div>
               <div className="text-center">
-                <p className="text-base font-bold text-muted-foreground">
-                  {rejectedResults.length}
-                </p>
+                <p className="text-base font-bold text-muted-foreground">{rejectedResults.length}</p>
                 <p className="text-xs text-muted-foreground">Rejected</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-card rounded-lg border border-border p-4">
+          <div className="flex flex-col gap-2 text-sm">
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">Status</span>
+              <span className="font-medium text-foreground">{run.status}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">List</span>
+              <Link to={`/lists/${run.list_id}`} className="font-medium text-primary hover:underline">
+                {run.list_id}
+              </Link>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">Processed</span>
+              <span className="font-medium text-foreground">
+                {run.processed_companies}/{run.total_companies}{" "}
+                <span className="text-muted-foreground">({run.failed_companies} failed)</span>
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">Cost</span>
+              <span className="font-medium text-foreground">
+                est {run.estimated_cost.toFixed(4)} • actual {run.actual_cost.toFixed(4)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">Config</span>
+              <span className="font-medium text-foreground">
+                auto-approve {run.config?.auto_approve ? "on" : "off"} • overwrite{" "}
+                {run.config?.overwrite_existing ? "on" : "off"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-muted-foreground">Created</span>
+              <span className="font-medium text-foreground">
+                {new Date(run.created_at).toLocaleString()}
+              </span>
+            </div>
+            {run.completed_at && (
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-muted-foreground">Completed</span>
+                <span className="font-medium text-foreground">
+                  {new Date(run.completed_at).toLocaleString()}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -217,41 +267,32 @@ export default function RunResults() {
             description="Analysis may still be running or no companies were processed."
           />
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">Filter:</span>
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
-                <SelectTrigger className="w-56 h-9">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="score-high">Score (High to Low)</SelectItem>
-                  <SelectItem value="score-low">Score (Low to High)</SelectItem>
-                  <SelectItem value="name-az">Name (A-Z)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-4">
+            <div className="bg-card rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <span className="text-sm font-medium text-foreground">Sort</span>
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                  <SelectTrigger className="w-56 h-9">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="score-high">Score (High to Low)</SelectItem>
+                    <SelectItem value="score-low">Score (Low to High)</SelectItem>
+                    <SelectItem value="name-az">Name (A-Z)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-1">
               <Tabs defaultValue="pending">
                 <TabsList className="w-full grid grid-cols-3">
-                  <TabsTrigger value="pending">
-                    Pending ({pendingResults.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="approved">
-                    Approved ({approvedResults.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="rejected">
-                    Rejected ({rejectedResults.length})
-                  </TabsTrigger>
+                  <TabsTrigger value="pending">Pending ({pendingResults.length})</TabsTrigger>
+                  <TabsTrigger value="approved">Approved ({approvedResults.length})</TabsTrigger>
+                  <TabsTrigger value="rejected">Rejected ({rejectedResults.length})</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="pending" className="space-y-2 mt-4">
                   {pendingResults.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      No pending results
-                    </p>
+                    <p className="text-sm text-muted-foreground text-center py-8">No pending results</p>
                   ) : (
                     pendingResults.map((result) => (
                       <ResultCard
@@ -274,8 +315,8 @@ export default function RunResults() {
                       selectedId={selectedResultId}
                       onSelect={setSelectedResultId}
                       badge={getRecommendationBadge(result.recommendation)}
-                      scoreClass="text-primary"
-                      icon={<CheckCircle className="w-4 h-4 text-primary" />}
+                      scoreClass="text-foreground"
+                      icon={<CheckCircle className="w-4 h-4 text-foreground" />}
                     />
                   ))}
                 </TabsContent>
@@ -297,23 +338,18 @@ export default function RunResults() {
               </Tabs>
             </div>
 
-            <div className="col-span-2">
-              {selectedResult ? (
-                <ResultDetail
-                  result={selectedResult}
-                  template={template}
-                  onApprove={handleApprove}
-                  onReject={handleReject}
-                />
-              ) : (
-                <Card>
-                  <CardContent className="p-12 text-center">
-                    <p className="text-muted-foreground">Select a result to view details</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+            {selectedResult ? (
+              <ResultDetail
+                result={selectedResult}
+                template={template}
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            ) : (
+              <div className="bg-card rounded-lg border border-border p-8 text-center">
+                <p className="text-sm text-muted-foreground">Select a result to view details</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -341,7 +377,7 @@ function ResultCard({
   const { data: company } = useCompany(result.company_orgnr);
   return (
     <Card
-      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-primary" : ""} ${opacity ? "opacity-60" : ""}`}
+      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-border" : ""} ${opacity ? "opacity-60" : ""}`}
       onClick={() => onSelect(result.id)}
     >
       <CardContent className="p-4">
@@ -372,7 +408,23 @@ function ResultDetail({
   onApprove,
   onReject,
 }: {
-  result: { id: string; company_orgnr: string; overall_score: number; recommendation: string; summary: string; strengths: string[]; concerns: string[]; status?: string; dimension_scores?: Record<string, number>; analyzed_at?: string; tokens_used?: number; cost?: number };
+  result: {
+    id: string;
+    company_orgnr: string;
+    overall_score: number;
+    recommendation: string;
+    summary: string;
+    strengths: string[];
+    concerns: string[];
+    prompt_used?: string;
+    status?: string;
+    dimension_scores?: Record<string, number>;
+    analyzed_at?: string;
+    tokens_used?: number;
+    cost?: number;
+    approved_at?: string;
+    approved_by?: string;
+  };
   template: { scoringDimensions: { id: string; name: string; description?: string }[] };
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
@@ -382,11 +434,11 @@ function ResultDetail({
   const getRecommendationBadge = (rec: string) => {
     switch (rec) {
       case "strong_fit":
-        return <Badge className="bg-primary/15 text-primary">Strong Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Strong Fit</Badge>;
       case "potential_fit":
-        return <Badge className="bg-accent text-foreground">Potential Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Potential Fit</Badge>;
       case "weak_fit":
-        return <Badge className="bg-accent text-foreground">Weak Fit</Badge>;
+        return <Badge className="bg-muted text-foreground">Weak Fit</Badge>;
       case "pass":
         return <Badge className="bg-destructive/15 text-destructive">Pass</Badge>;
       default:
@@ -395,9 +447,9 @@ function ResultDetail({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -406,14 +458,24 @@ function ResultDetail({
                 </h2>
                 <Link
                   to={`/company/${result.company_orgnr}`}
-                  className="text-primary hover:text-primary"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <ExternalLink className="w-5 h-5" />
                 </Link>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {company?.industry_label} • {company?.region ?? ""}
               </p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span>Status: {result.status ?? "—"}</span>
+                <span>Analyzed: {result.analyzed_at ? new Date(result.analyzed_at).toLocaleString() : "—"}</span>
+                <span>Tokens: {result.tokens_used ?? "—"}</span>
+                <span>Cost: {typeof result.cost === "number" ? result.cost.toFixed(4) : "—"}</span>
+                {result.approved_at && (
+                  <span>Approved: {new Date(result.approved_at).toLocaleString()}</span>
+                )}
+                {result.approved_by && <span>By: {result.approved_by}</span>}
+              </div>
             </div>
             <div className="text-right">
               <p className="text-base font-bold text-foreground mb-1">
@@ -450,7 +512,7 @@ function ResultDetail({
                       <span
                         className={`text-base font-bold ${
                           score >= 75
-                            ? "text-primary"
+                            ? "text-foreground"
                             : score >= 50
                               ? "text-foreground"
                               : "text-destructive"
@@ -463,9 +525,9 @@ function ResultDetail({
                       <div
                         className={`h-2 rounded-full ${
                           score >= 75
-                            ? "bg-primary"
+                            ? "bg-foreground/60"
                             : score >= 50
-                              ? "bg-accent"
+                              ? "bg-foreground/30"
                               : "bg-destructive"
                         }`}
                         style={{ width: `${score}%` }}
@@ -485,23 +547,33 @@ function ResultDetail({
             <CardTitle>Key Metrics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground mb-1">Revenue</p>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-muted-foreground">Revenue</p>
                 <p className="font-medium text-foreground">
-                  {formatRevenueSEK(getLatestFinancials(company).revenue ?? company.revenue_latest)}
+                  {formatRevenueSEK(
+                    getLatestFinancials(company).revenue ?? company.revenue_latest
+                  )}
                 </p>
               </div>
-              <div>
-                <p className="text-muted-foreground mb-1">EBITDA</p>
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-muted-foreground">EBITDA</p>
                 <p className="font-medium text-foreground">
                   {formatRevenueSEK(getLatestFinancials(company).ebitda)}
                 </p>
               </div>
-              <div>
-                <p className="text-muted-foreground mb-1">Growth</p>
-                <p className={`font-medium ${(calculateRevenueCagr(company) ?? 0) >= 0 ? "text-primary" : "text-destructive"}`}>
-                  {calculateRevenueCagr(company) != null ? formatPercent(calculateRevenueCagr(company)!) : "—"}
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-muted-foreground">Growth</p>
+                <p
+                  className={`font-medium ${
+                    (calculateRevenueCagr(company) ?? 0) >= 0
+                      ? "text-foreground"
+                      : "text-destructive"
+                  }`}
+                >
+                  {calculateRevenueCagr(company) != null
+                    ? formatPercent(calculateRevenueCagr(company)!)
+                    : "—"}
                 </p>
               </div>
             </div>
@@ -520,12 +592,30 @@ function ResultDetail({
         </CardContent>
       </Card>
 
+      {!!result.prompt_used && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Prompt Used</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <details className="group">
+              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                View prompt
+              </summary>
+              <pre className="mt-3 whitespace-pre-wrap text-xs text-foreground bg-muted rounded-md p-3 border border-border">
+                {result.prompt_used}
+              </pre>
+            </details>
+          </CardContent>
+        </Card>
+      )}
+
       {(result.strengths?.length > 0 || result.concerns?.length > 0) && (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-4">
           {result.strengths?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <TrendingUp className="w-5 h-5" />
                   Key Strengths
                 </CardTitle>
@@ -534,7 +624,7 @@ function ResultDetail({
                 <ul className="space-y-2">
                   {result.strengths.map((s, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-4 h-4 text-foreground flex-shrink-0 mt-0.5" />
                       <span className="text-foreground">{s}</span>
                     </li>
                   ))}
@@ -566,7 +656,7 @@ function ResultDetail({
       )}
 
       {result.status === "pending" && (
-        <div className="flex items-center justify-end gap-3 pt-4 border-t">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={() => onReject(result.id)}

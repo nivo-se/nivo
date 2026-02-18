@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 import jwt
 from fastapi import Request, Response
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Paths that bypass auth when REQUIRE_AUTH=true (Universe, Lists, Analysis - dev convenience)
 PUBLIC_PATHS = {
-    "/ping", "/health", "/api/status", "/api/db/ping", "/api/debug/whoami", "/docs", "/redoc", "/openapi.json",
+    "/ping", "/health", "/api/status", "/api/db/ping", "/api/db/info", "/api/debug/whoami", "/docs", "/redoc", "/openapi.json",
     "/api/universe/filters", "/api/universe/query",
     "/api/coverage/snapshot", "/api/coverage/list", "/api/home/dashboard", "/api/companies",
     "/api/lists", "/api/views", "/api/labels",

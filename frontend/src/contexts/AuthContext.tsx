@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!authEnabled) {
         // TEMPORARY: Set mock user for testing
         const mockUser = {
-          id: '795b5119-9fa0-437e-b196-715dcd497666',
+          id: '00000000-0000-0000-0000-000000000001',
           email: 'jesper@rgcapital.se',
           user_metadata: {},
           app_metadata: {},

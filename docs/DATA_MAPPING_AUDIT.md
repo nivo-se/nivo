@@ -12,13 +12,13 @@
 |------|------|
 | **Route** | `/universe` |
 | **Frontend page** | `frontend/src/pages/new/Universe.tsx` |
-| **Frontend hook** | `useCompaniesWithTotal` from `frontend/src/lib/hooks/figmaQueries.ts` |
+| **Frontend hook** | `useCompaniesWithTotal` from `frontend/src/lib/hooks/apiQueries.ts` |
 | **Frontend API** | `getCompaniesWithTotal` → `queryUniverse` from `frontend/src/lib/services/universeQueryService.ts` |
 | **API endpoint** | `POST /api/universe/query` |
 | **Backend route** | `backend/api/universe.py` — `universe_query()` |
 | **SQL source** | `coverage_metrics` view (no raw table; view over `companies`, `ai_profiles`, `company_kpis`) |
 
-**Data flow:** `Universe.tsx` → `useCompaniesWithTotal` → `getCompaniesWithTotal` → `queryUniverse` (POST `/api/universe/query`) → backend queries `coverage_metrics` → response mapped via `mapUniverseRowToCompany` (in `figmaApi.ts`).
+**Data flow:** `Universe.tsx` → `useCompaniesWithTotal` → `getCompaniesWithTotal` → `queryUniverse` (POST `/api/universe/query`) → backend queries `coverage_metrics` → response mapped via `mapUniverseRowToCompany` (in `compatClient.ts`).
 
 ### Company Profile
 
@@ -149,9 +149,9 @@
 
 | Task | Status | Files touched |
 |------|--------|---------------|
-| 1. Universe geography | ✅ | `019_coverage_metrics_add_municipality_contact_ai.sql`, `universe.py`, `universeQueryService.ts`, `figmaApi.ts` |
+| 1. Universe geography | ✅ | `019_coverage_metrics_add_municipality_contact_ai.sql`, `universe.py`, `universeQueryService.ts`, `compatClient.ts` |
 | 2. Universe AI column (Option B) | ✅ | Same migration + `mapUniverseRowToCompany` builds `ai_profile` with `ai_fit_score`, `ai_badge` |
-| 3. Company Profile equity/leverage | ✅ | `companies.py` (batch), `figmaApi.ts` (mapBatchRowToCompany), `CompanyDetail.tsx`, coverage_metrics |
+| 3. Company Profile equity/leverage | ✅ | `companies.py` (batch), `compatClient.ts` (mapBatchRowToCompany), `CompanyDetail.tsx`, coverage_metrics |
 | 4. Contact fields consistent | ✅ | coverage_metrics now includes homepage, email, phone; fallback path populated |
 
 ---

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useProspects, useCompany } from "@/lib/hooks/figmaQueries";
+import { useProspects, useCompany } from "@/lib/hooks/apiQueries";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/select";
 import { ExternalLink, Trash2, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import * as api from "@/lib/services/figmaApi";
+import { addProspectNote, deleteProspectNote, updateProspectNote, updateProspectStatus } from "@/lib/api/prospects/service";
+import type { ProspectStatus } from "@/lib/api/prospects/types";
 import {
   getLatestFinancials,
   formatRevenueSEK,
   formatPercent,
   calculateRevenueCagr,
-} from "@/lib/utils/figmaCompanyUtils";
+} from "@/lib/utils/companyMetrics";
 
 const statusConfig: Record<
   string,
@@ -66,8 +67,8 @@ function ProspectCard({
   const handleAddNote = async () => {
     if (!newNote.trim()) return;
     try {
-      await api.addProspectNote(prospect.companyId, { text: newNote.trim(), author: "User" });
-      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      await addProspectNote(prospect.companyId, { text: newNote.trim(), author: "User" });
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
       setNewNote("");
       toast.success("Note added");
     } catch {
@@ -77,8 +78,8 @@ function ProspectCard({
 
   const handleRemoveNote = async (_companyId: string, noteIndex: number) => {
     try {
-      await api.deleteProspectNote(prospect.companyId, noteIndex);
-      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      await deleteProspectNote(prospect.companyId, noteIndex);
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
       toast.success("Note deleted");
     } catch {
       toast.error("Prospects not yet implemented in backend");
@@ -93,8 +94,8 @@ function ProspectCard({
   const handleSaveEdit = async () => {
     if (!editingNote || !editNoteText.trim()) return;
     try {
-      await api.updateProspectNote(editingNote.companyId, editingNote.noteIndex, editNoteText.trim());
-      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      await updateProspectNote(editingNote.companyId, editingNote.noteIndex, editNoteText.trim());
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
       setEditingNote(null);
       setEditNoteText("");
       toast.success("Note updated");
@@ -110,8 +111,8 @@ function ProspectCard({
 
   const handleStatusChange = async (_companyId: string, newStatus: string) => {
     try {
-      await api.updateProspectStatus(prospect.companyId, { status: newStatus as never });
-      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      await updateProspectStatus(prospect.companyId, newStatus as ProspectStatus);
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
       toast.success("Status updated");
     } catch {
       toast.error("Prospects not yet implemented in backend");
@@ -135,11 +136,21 @@ function ProspectCard({
             <div className="flex items-center gap-3 mb-1">
               <Link
                 to={`/company/${company.orgnr}`}
-                className="text-base font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
+                className="text-base font-medium text-foreground hover:text-foreground/80"
               >
                 {company.display_name}
-                <ExternalLink className="w-3.5 h-3.5" />
               </Link>
+              {company.website_url && (
+                <a
+                  href={company.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
+                  title="Open company website"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
               <span className={`text-xs px-2 py-0.5 rounded ${config.color}`}>{config.label}</span>
             </div>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">

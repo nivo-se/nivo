@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useLists, useAddToList } from "@/lib/hooks/figmaQueries";
+import { useLists, useAddToList } from "@/lib/hooks/apiQueries";
 import {
   DropdownMenu,
   DropdownMenuContent,

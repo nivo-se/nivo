@@ -50,9 +50,9 @@ FILTER_TAXONOMY = {
             "id": "financial",
             "label": "Financial",
             "items": [
-                {"field": "revenue_latest", "label": "Revenue (latest)", "type": "number", "ops": ["between", ">=", "<=", "="], "unit": "SEK"},
-                {"field": "ebitda_margin_latest", "label": "EBITDA margin (latest)", "type": "percent", "ops": [">=", "<=", "between", "="], "unit": "ratio"},
-                {"field": "revenue_cagr_3y", "label": "Revenue CAGR (3y)", "type": "percent", "ops": [">=", "<=", "between", "="], "unit": "ratio"},
+                {"field": "revenue_latest", "label": "Revenue (latest fiscal year)", "type": "number", "ops": ["between", ">=", "<=", "="], "unit": "SEK"},
+                {"field": "ebitda_margin_latest", "label": "EBITDA margin (latest fiscal year)", "type": "percent", "ops": [">=", "<=", "between", "="], "unit": "ratio"},
+                {"field": "revenue_cagr_3y", "label": "Revenue CAGR (3Y)", "type": "percent", "ops": [">=", "<=", "between", "="], "unit": "ratio"},
                 {"field": "employees_latest", "label": "Employees (latest)", "type": "number", "ops": [">=", "<=", "between", "="]},
             ],
         },
@@ -172,6 +172,7 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
     metrics_cagr = "NULL"
     metrics_equity_ratio = "NULL"
     metrics_debt_to_equity = "NULL"
+    metrics_latest_year = "NULL"
     if metrics_table:
         metrics_join = f"LEFT JOIN {metrics_table} m ON m.orgnr = c.orgnr"
         metrics_revenue = "m.latest_revenue_sek"
@@ -179,6 +180,7 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
         metrics_cagr = "m.revenue_cagr_3y"
         metrics_equity_ratio = "m.equity_ratio_latest"
         metrics_debt_to_equity = "m.debt_to_equity_latest"
+        metrics_latest_year = "m.latest_year"
 
     fin_latest_annual_join = ""
     fin_latest_any_join = ""
@@ -186,11 +188,14 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
     fin_latest_annual_margin = "NULL"
     fin_latest_any_revenue = "NULL"
     fin_latest_any_margin = "NULL"
+    latest_year_annual = "NULL"
+    latest_year_any = "NULL"
     if financials_table:
         fin_latest_annual_join = f"""
       LEFT JOIN (
         SELECT DISTINCT ON (f.orgnr)
           f.orgnr,
+          f.year AS latest_fin_year_annual,
           {fin_revenue_expr} AS revenue_latest_annual,
           {fin_ebitda_expr} AS ebitda_latest_annual
         FROM {financials_table} f
@@ -202,6 +207,7 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
       LEFT JOIN (
         SELECT DISTINCT ON (f.orgnr)
           f.orgnr,
+          f.year AS latest_fin_year_any,
           {fin_revenue_expr} AS revenue_latest_any,
           {fin_ebitda_expr} AS ebitda_latest_any
         FROM {financials_table} f
@@ -211,6 +217,8 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
 """
         fin_latest_annual_revenue = "fa.revenue_latest_annual"
         fin_latest_any_revenue = "fn.revenue_latest_any"
+        latest_year_annual = "fa.latest_fin_year_annual"
+        latest_year_any = "fn.latest_fin_year_any"
         fin_latest_annual_margin = (
             "CASE WHEN fa.revenue_latest_annual IS NOT NULL "
             "AND fa.revenue_latest_annual > 0 "
@@ -267,7 +275,8 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
         c.phone,
         a.strategic_fit_score AS ai_strategic_fit_score,
         {metrics_equity_ratio} AS equity_ratio_latest,
-        {metrics_debt_to_equity} AS debt_to_equity_latest
+        {metrics_debt_to_equity} AS debt_to_equity_latest,
+        (COALESCE({metrics_latest_year}, {latest_year_annual}, {latest_year_any}))::int AS latest_year
       FROM companies c
       LEFT JOIN ai_profiles a ON c.orgnr = a.org_number
       {metrics_join}
@@ -499,7 +508,7 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
         "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
         "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
         "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "
-        "cm.equity_ratio_latest, cm.debt_to_equity_latest"
+        "cm.equity_ratio_latest, cm.debt_to_equity_latest, cm.latest_year"
     )
 
     if _IS_POSTGRES:
@@ -562,6 +571,7 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
             "ai_strategic_fit_score": int(ai_score) if ai_score is not None else None,
             "equity_ratio_latest": float(r.get("equity_ratio_latest")) if r.get("equity_ratio_latest") is not None else None,
             "debt_to_equity_latest": float(r.get("debt_to_equity_latest")) if r.get("debt_to_equity_latest") is not None else None,
+            "latest_year": int(r.get("latest_year")) if r.get("latest_year") is not None else None,
         })
 
     return {"rows": out, "total": total}

@@ -4,7 +4,7 @@ import {
   useList,
   usePromptTemplate,
   useCancelAIRun,
-} from "@/lib/hooks/figmaQueries";
+} from "@/lib/hooks/apiQueries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ import {
   Download,
 } from "lucide-react";
 import { ErrorState } from "@/components/default/ErrorState";
-import * as api from "@/lib/services/figmaApi";
+import { getAnalysisRunResults } from "@/lib/api/analysis/service";
 import { toast } from "sonner";
 
 export default function RunDetail() {
@@ -66,13 +66,13 @@ export default function RunDetail() {
     switch (run.status) {
       case "completed":
         return (
-          <Badge className="bg-primary/15 text-primary">
+          <Badge className="bg-muted text-foreground">
             <CheckCircle className="w-3 h-3 mr-1" /> Completed
           </Badge>
         );
       case "running":
         return (
-          <Badge className="bg-primary/15 text-primary">
+          <Badge className="bg-muted text-foreground">
             <Loader className="w-3 h-3 mr-1 animate-spin" /> Running
           </Badge>
         );
@@ -107,7 +107,7 @@ export default function RunDetail() {
 
   const handleExportReport = async () => {
     try {
-      const results = await api.getRunResults(run.id);
+      const results = await getAnalysisRunResults(run.id);
       const headers = ["Company", "Score", "Recommendation", "Summary", "Strengths", "Concerns"];
       const rows = results.map((r) => [
         r.company_orgnr,
@@ -239,7 +239,7 @@ export default function RunDetail() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground mb-1">Processed</p>
-              <p className="text-base font-bold text-primary">
+              <p className="text-base font-bold text-foreground">
                 {run.processed_companies}
               </p>
             </CardContent>
@@ -289,7 +289,7 @@ export default function RunDetail() {
                     {list ? (
                       <Link
                         to={`/lists/${list.id}`}
-                        className="text-primary hover:underline"
+                        className="text-foreground hover:underline"
                       >
                         {list.name}
                       </Link>

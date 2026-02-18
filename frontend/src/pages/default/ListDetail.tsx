@@ -1,25 +1,36 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import { useList, useCompaniesBatch, useRemoveFromList, useUpdateList } from "@/lib/hooks/figmaQueries";
+import { useList, useCompaniesBatch, useRemoveFromList, useUpdateList, useDeleteList } from "@/lib/hooks/apiQueries";
 import {
   getLatestFinancials,
   formatRevenueSEK,
   formatPercent,
   formatNum,
   calculateRevenueCagr,
-} from "@/lib/utils/figmaCompanyUtils";
-import type { Company } from "@/types/figma";
+} from "@/lib/utils/companyMetrics";
+import type { Company } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { FilterBuilder } from "@/components/default/FilterBuilder";
 import { EmptyState } from "@/components/default/EmptyState";
 import { ErrorState } from "@/components/default/ErrorState";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ArrowLeft, Trash2, RefreshCw, Brain, ExternalLink, Download, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import * as api from "@/lib/services/figmaApi";
+import { updateListEntry, removeCompanyFromList } from "@/lib/api/lists/service";
+import { upsertProspect } from "@/lib/api/prospects/service";
 
 function getStageLabel(stage: string): string {
   switch (stage) {
@@ -49,6 +60,7 @@ function formatCreatedBy(
 
 export default function ListDetail() {
   const { listId } = useParams<{ listId: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: list, isLoading, isError, error, refetch } = useList(listId ?? "");
@@ -63,8 +75,13 @@ export default function ListDetail() {
   } = useCompaniesBatch(orgnrs);
   const removeMutation = useRemoveFromList();
   const updateListMutation = useUpdateList();
+  const deleteListMutation = useDeleteList();
+
+  const currentUserId = user?.id ?? DEV_USER_ID;
+  const isOwnList = (list?.owner_user_id ?? list?.created_by) === currentUserId;
 
   const [showFilterBuilder, setShowFilterBuilder] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedFilters, setEditedFilters] = useState(list?.filters);
@@ -130,7 +147,7 @@ export default function ListDetail() {
   const handleUpdateList = async () => {
     if (!editedFilters) return;
     try {
-      await api.updateList(list.id, { filters: editedFilters });
+      await updateListEntry(list.id, { filters: editedFilters });
       setShowFilterBuilder(false);
       refetch();
       toast.success("List updated");
@@ -144,9 +161,9 @@ export default function ListDetail() {
     if (companyIds.length === 0) return;
     try {
       for (const id of companyIds) {
-        await api.createProspect(id);
+        await upsertProspect(id);
       }
-      queryClient.invalidateQueries({ queryKey: ["figma", "prospects"] });
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
       setSelectedCompanies(new Set());
       toast.success(`Added ${companyIds.length} companies to Prospects`);
     } catch {
@@ -177,14 +194,14 @@ export default function ListDetail() {
 
   const handleBulkRemove = async () => {
     const toRemove = Array.from(selectedCompanies);
-    if (toRemove.length < 2) return;
+    if (toRemove.length === 0) return;
     if (!confirm(`Remove ${toRemove.length} companies from this list?`)) return;
     try {
       for (const orgnr of toRemove) {
-        await api.removeFromList(list.id, orgnr);
+        await removeCompanyFromList(list.id, orgnr);
       }
-      queryClient.invalidateQueries({ queryKey: ["figma", "lists", list.id] });
-      queryClient.invalidateQueries({ queryKey: ["figma", "lists"] });
+      queryClient.invalidateQueries({ queryKey: ["app", "lists", list.id] });
+      queryClient.invalidateQueries({ queryKey: ["app", "lists"] });
       setSelectedCompanies(new Set());
       toast.success(`Removed ${toRemove.length} companies from list`);
     } catch {
@@ -323,7 +340,7 @@ export default function ListDetail() {
             >
               Add to Prospects ({selectedCompanies.size})
             </Button>
-            {selectedCompanies.size > 1 && (
+            {selectedCompanies.size > 0 && (
               <Button
                 variant="outline"
                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
@@ -333,8 +350,47 @@ export default function ListDetail() {
                 Remove selected ({selectedCompanies.size})
               </Button>
             )}
+            {isOwnList && (
+              <Button
+                variant="outline"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setDeleteConfirm(true)}
+                disabled={deleteListMutation.isPending}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete list
+              </Button>
+            )}
           </div>
         </div>
+
+        <AlertDialog open={deleteConfirm} onOpenChange={setDeleteConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete list?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the list &quot;{list.name}&quot;. Companies won&apos;t be affected.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  deleteListMutation.mutate(list.id, {
+                    onSuccess: () => {
+                      setDeleteConfirm(false);
+                      navigate("/lists");
+                      toast.success("List deleted");
+                    },
+                  });
+                }}
+                className="border border-border bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {showFilterBuilder && editedFilters && (
           <div className="app-card p-4">
@@ -434,13 +490,25 @@ export default function ListDetail() {
                           />
                         </td>
                         <td className="px-4 py-3">
-                          <Link
-                            to={`/company/${company.orgnr}`}
-                            className="font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
-                          >
-                            {company.display_name}
-                            <ExternalLink className="w-3 h-3" />
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/company/${company.orgnr}`}
+                              className="font-medium text-foreground hover:text-foreground/80"
+                            >
+                              {company.display_name}
+                            </Link>
+                            {company.website_url && (
+                              <a
+                                href={company.website_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-muted-foreground hover:text-foreground"
+                                title="Open company website"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-foreground">
                           {company.industry_label ?? "—"}

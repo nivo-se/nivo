@@ -13,13 +13,13 @@ import {
   useCompaniesBatch,
   useCompany,
   useCompanyFinancials,
-} from "@/lib/hooks/figmaQueries";
+} from "@/lib/hooks/apiQueries";
 import {
   getLatestFinancials,
   deriveFinancialsFromYears,
   formatRevenueSEK,
   formatPercent,
-} from "@/lib/utils/figmaCompanyUtils";
+} from "@/lib/utils/companyMetrics";
 import { ExternalLink, Loader2, Globe, MapPin, Users, Mail, Phone } from "lucide-react";
 
 interface CompanySnapshotModalProps {
