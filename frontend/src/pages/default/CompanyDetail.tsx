@@ -29,7 +29,7 @@ import {
 import * as api from "@/lib/services/figmaApi";
 import { toast } from "sonner";
 
-export default function NewCompanyDetail() {
+export default function CompanyDetail() {
   const { companyId } = useParams<{ companyId: string }>();
   const orgnr = companyId ?? "";
   const queryClient = useQueryClient();
@@ -146,13 +146,13 @@ export default function NewCompanyDetail() {
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
-              <AddToListDropdown orgnrs={[company.orgnr]} />
+            <div className="flex gap-2 items-center">
+              <AddToListDropdown orgnrs={[company.orgnr]} size="default" />
               <Button variant="outline" onClick={handleCreateProspect}>
                 <UserPlus className="w-4 h-4 mr-2" />
                 Create Prospect
               </Button>
-              <Link to="/ai">
+              <Link to={`/ai/run/create?template=default&orgnr=${company.orgnr}`}>
                 <Button variant="outline">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Run AI Analysis
@@ -460,10 +460,10 @@ export default function NewCompanyDetail() {
                   <p className="text-sm text-muted-foreground mb-4">
                     Run an AI analysis for investment insights and recommendations
                   </p>
-                  <Link to="/ai">
+                  <Link to={`/ai/run/create?template=default&orgnr=${company.orgnr}`}>
                     <Button variant="outline" size="sm">
                       <Sparkles className="w-4 h-4 mr-2" />
-                      Go to AI Lab
+                      Run AI Analysis
                     </Button>
                   </Link>
                 </CardContent>

@@ -16,6 +16,7 @@ export default function CreateRun() {
   const navigate = useNavigate();
   const templateId = searchParams.get("template");
   const listId = searchParams.get("list");
+  const orgnr = searchParams.get("orgnr")?.trim() || null;
 
   const { data: templates = [] } = usePromptTemplates();
   const { data: lists = [] } = useLists();
@@ -25,17 +26,20 @@ export default function CreateRun() {
     ? templates.find((t) => t.id === templateId) ?? templates[0]
     : templates[0];
   const list = listId ? lists.find((l) => l.id === listId) ?? lists[0] : lists[0];
-  const companyCount = list?.companyIds.length ?? 0;
+  const singleCompanyMode = !!orgnr;
+  const companyCount = singleCompanyMode ? 1 : (list?.companyIds.length ?? 0);
 
   const [runName, setRunName] = useState("");
   const [autoApprove, setAutoApprove] = useState(false);
   const [overwriteExisting, setOverwriteExisting] = useState(false);
 
   useEffect(() => {
-    if (list && template) {
+    if (singleCompanyMode && template) {
+      setRunName(`${orgnr} - ${template.name}`);
+    } else if (list && template) {
       setRunName(`${list.name} - ${template.name}`);
     }
-  }, [list, template]);
+  }, [list, template, singleCompanyMode, orgnr]);
 
   const dimensionCount = template?.scoringDimensions.length ?? 0;
   const baseCostPerCompany = 0.02;
@@ -65,24 +69,31 @@ export default function CreateRun() {
   };
 
   const handleCreateRun = async () => {
-    if (!list || !template || !runName.trim()) return;
+    if (!template || !runName.trim()) return;
+    if (!singleCompanyMode && !list) return;
     try {
-      const newRun = await createRunMutation.mutateAsync({
+      const payload: Parameters<typeof createRunMutation.mutateAsync>[0] = {
         name: runName.trim(),
-        list_id: list.id,
         template_id: template.id,
         config: {
           auto_approve: autoApprove,
           overwrite_existing: overwriteExisting,
         },
-      });
+      };
+      if (singleCompanyMode) {
+        payload.orgnrs = [orgnr!];
+      } else {
+        payload.list_id = list!.id;
+      }
+      const newRun = await createRunMutation.mutateAsync(payload);
       navigate(`/ai/runs/${newRun.id}`);
     } catch (err) {
       console.error("Failed to create run:", err);
     }
   };
 
-  if (!template || !list) {
+  const hasValidConfig = template && (singleCompanyMode || list);
+  if (!hasValidConfig) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
@@ -90,9 +101,11 @@ export default function CreateRun() {
             Invalid Configuration
           </h2>
           <p className="text-muted-foreground mb-4">
-            {lists.length === 0
-              ? "Create a list first in Universe or My Lists"
-              : "Template or list not found"}
+            {!template
+              ? "Template not found"
+              : !singleCompanyMode && lists.length === 0
+                ? "Create a list first in Universe or My Lists, or open this page from a company detail"
+                : "Template or list not found"}
           </p>
           <Link to="/ai">
             <Button variant="outline">Back to AI Lab</Button>
@@ -139,21 +152,37 @@ export default function CreateRun() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ListChecks className="w-5 h-5" />
-                Target List
+                {singleCompanyMode ? "Target Company" : "Target List"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-4 bg-muted/40 rounded-lg">
-                <div>
-                  <p className="font-medium text-foreground">{list.name}</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {list.companyIds.length} companies • Created{" "}
-                    {new Date(list.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
-                  {list.companyIds.length} companies
-                </span>
+                {singleCompanyMode ? (
+                  <>
+                    <div>
+                      <p className="font-medium text-foreground font-mono">{orgnr}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Single company analysis
+                      </p>
+                    </div>
+                    <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
+                      1 company
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <p className="font-medium text-foreground">{list!.name}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {list!.companyIds.length} companies • Created{" "}
+                        {new Date(list!.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
+                      {list!.companyIds.length} companies
+                    </span>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

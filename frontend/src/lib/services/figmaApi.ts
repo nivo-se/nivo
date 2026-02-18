@@ -115,11 +115,13 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
             ? "Weak"
             : null
       : null;
+  const segmentNames = row.segment_names ?? [];
   return {
     orgnr: String(row.orgnr ?? ""),
     display_name: row.name ?? row.orgnr ?? "",
     legal_name: row.name ?? row.orgnr ?? "",
-    industry_label: Array.isArray(row.segment_names) ? row.segment_names[0] ?? "Unknown" : "Unknown",
+    industry_label: Array.isArray(segmentNames) ? segmentNames[0] ?? "Unknown" : "Unknown",
+    segment_names: Array.isArray(segmentNames) ? segmentNames : null,
     has_homepage: Boolean(row.has_homepage),
     has_ai_profile: Boolean(row.has_ai_profile),
     has_3y_financials: Boolean(row.has_3y_financials),
@@ -229,6 +231,7 @@ function mapSavedListToFigmaList(saved: SavedList, companyIds: string[]): List {
     created_at: saved.created_at,
     updated_at: saved.updated_at,
     created_by: saved.owner_user_id,
+    created_by_name: saved.owner_email,
     updated_by: saved.owner_user_id,
   };
 }
@@ -306,9 +309,37 @@ export async function createListFromUniverseQuery(
   }
 }
 
-export async function updateList(_listId: string, _data: Partial<List>): Promise<List> {
-  // Nivo backend does not have PUT /lists/:id - stub
-  throw new Error("updateList not implemented in backend");
+export async function updateList(listId: string, data: Partial<List>): Promise<List> {
+  const res = await apiFetch<{
+    id: string;
+    name: string;
+    owner_user_id: string;
+    scope: "private" | "team";
+    source_view_id?: string | null;
+    created_at: string;
+    updated_at: string;
+  }>(`/api/lists/${listId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      name: data.name,
+      scope: data.scope,
+    }),
+  });
+  const existing = await getList(listId);
+  return {
+    id: res.id,
+    name: res.name,
+    owner_user_id: res.owner_user_id,
+    scope: res.scope,
+    source_view_id: res.source_view_id ?? undefined,
+    companyIds: existing?.companyIds ?? [],
+    stage: existing?.stage ?? "research",
+    created_at: res.created_at,
+    updated_at: res.updated_at,
+    created_by: res.owner_user_id,
+    created_by_name: existing?.created_by_name,
+    updated_by: res.owner_user_id,
+  };
 }
 
 export async function deleteList(listId: string): Promise<void> {
@@ -403,77 +434,177 @@ function mapBatchRowToCompany(row: Record<string, unknown>): Company {
   };
 }
 
-// ---- Prospects (stubbed - not in Nivo backend) ----
+// ---- Prospects ----
+
+type ProspectNoteApi = { id?: string; text: string; author?: string; date?: string };
+type ProspectApi = {
+  id?: string;
+  companyId?: string;
+  company_id?: string;
+  status?: ProspectStatus["status"];
+  owner?: string;
+  lastContact?: string;
+  last_contact?: string;
+  nextAction?: string;
+  next_action?: string;
+  notes?: ProspectNoteApi[];
+};
+
+function mapProspectApiToStatus(row: ProspectApi): ProspectStatus {
+  return {
+    id: row.id,
+    companyId: String(row.companyId ?? row.company_id ?? ""),
+    status: (row.status ?? "new") as ProspectStatus["status"],
+    owner: row.owner,
+    lastContact: row.lastContact ?? row.last_contact,
+    nextAction: row.nextAction ?? row.next_action,
+    notes: (row.notes ?? []).map((n) => ({
+      id: n.id,
+      text: n.text,
+      author: n.author ?? "",
+      date: n.date ?? new Date().toISOString(),
+    })),
+  };
+}
 
 export async function getProspects(): Promise<ProspectStatus[]> {
-  return [];
+  const res = await apiFetch<{ items?: ProspectApi[] }>("/api/prospects?scope=team");
+  return (res.items ?? []).map(mapProspectApiToStatus);
 }
 
-export async function getProspect(_prospectId: string): Promise<ProspectStatus | null> {
-  return null;
+export async function getProspect(prospectId: string): Promise<ProspectStatus | null> {
+  const items = await getProspects();
+  return items.find((p) => p.companyId === prospectId || p.id === prospectId) ?? null;
 }
 
-export async function createProspect(_companyId: string): Promise<ProspectStatus> {
-  throw new Error("Prospects not implemented in backend");
+export async function createProspect(companyId: string): Promise<ProspectStatus> {
+  const row = await apiFetch<ProspectApi>("/api/prospects", {
+    method: "POST",
+    body: JSON.stringify({ company_id: companyId, status: "new", scope: "team" }),
+  });
+  return mapProspectApiToStatus(row);
 }
 
 export async function updateProspectStatus(
-  _prospectId: string,
-  _updates: Partial<ProspectStatus>
+  prospectId: string,
+  updates: Partial<ProspectStatus>
 ): Promise<ProspectStatus> {
-  throw new Error("Prospects not implemented in backend");
+  const row = await apiFetch<ProspectApi>(`/api/prospects/${prospectId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      status: updates.status,
+      owner: updates.owner,
+      last_contact: updates.lastContact,
+      next_action: updates.nextAction,
+    }),
+  });
+  return mapProspectApiToStatus(row);
 }
 
 export async function addProspectNote(
-  _prospectId: string,
-  _note: { text: string; author: string }
+  prospectId: string,
+  note: { text: string; author: string }
 ): Promise<ProspectStatus> {
-  throw new Error("Prospects not implemented in backend");
+  await apiFetch(`/api/prospects/${prospectId}/notes`, {
+    method: "POST",
+    body: JSON.stringify({ text: note.text, author: note.author }),
+  });
+  const refreshed = await getProspect(prospectId);
+  if (!refreshed) throw new Error("Prospect not found after note add");
+  return refreshed;
 }
 
 export async function updateProspectNote(
-  _prospectId: string,
-  _noteIndex: number,
-  _text: string
+  prospectId: string,
+  noteIndex: number,
+  text: string
 ): Promise<ProspectStatus> {
-  throw new Error("Prospects not implemented in backend");
+  const current = await getProspect(prospectId);
+  const note = current?.notes?.[noteIndex];
+  if (!note || !current?.id) throw new Error("Prospect note not found");
+  const noteId = (current as unknown as { notes?: Array<{ id?: string }> }).notes?.[noteIndex]?.id;
+  if (!noteId) throw new Error("Prospect note id missing");
+  await apiFetch(`/api/prospects/${prospectId}/notes/${noteId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ text }),
+  });
+  const refreshed = await getProspect(prospectId);
+  if (!refreshed) throw new Error("Prospect not found after note update");
+  return refreshed;
 }
 
-export async function deleteProspectNote(
-  _prospectId: string,
-  _noteIndex: number
-): Promise<void> {
-  throw new Error("Prospects not implemented in backend");
+export async function deleteProspectNote(prospectId: string, noteIndex: number): Promise<void> {
+  const current = await getProspect(prospectId);
+  const noteId = (current as unknown as { notes?: Array<{ id?: string }> }).notes?.[noteIndex]?.id;
+  if (!noteId) throw new Error("Prospect note id missing");
+  await apiFetch(`/api/prospects/${prospectId}/notes/${noteId}`, { method: "DELETE" });
 }
 
-// ---- AI Templates (built-in defaults from Figma export; backend CRUD stubbed) ----
+// ---- AI Templates ----
 
 export async function getPromptTemplates(): Promise<PromptTemplate[]> {
+  try {
+    const res = await apiFetch<{ items?: Array<Record<string, unknown>> }>("/api/analysis/templates");
+    const items = (res.items ?? []).map((row) => ({
+      id: String(row.id ?? ""),
+      name: String(row.name ?? ""),
+      description: String(row.description ?? ""),
+      prompt: String(row.prompt ?? ""),
+      variables: Array.isArray(row.variables) ? row.variables.map(String) : [],
+      scoringDimensions: Array.isArray(row.scoringDimensions)
+        ? (row.scoringDimensions as PromptTemplate["scoringDimensions"])
+        : [],
+      created_at: String(row.created_at ?? new Date().toISOString()),
+      created_by: String(row.created_by ?? "system"),
+    }));
+    if (items.length > 0) return items;
+  } catch {
+    // fallback to defaults
+  }
   return [...DEFAULT_PROMPT_TEMPLATES];
 }
 
-export async function getPromptTemplate(
-  templateId: string
-): Promise<PromptTemplate | null> {
+export async function getPromptTemplate(templateId: string): Promise<PromptTemplate | null> {
   const found = DEFAULT_PROMPT_TEMPLATES.find((t) => t.id === templateId);
   return found ?? null;
 }
 
 export async function createPromptTemplate(
-  _data: Omit<PromptTemplate, "id" | "created_at" | "created_by">
+  data: Omit<PromptTemplate, "id" | "created_at" | "created_by">
 ): Promise<PromptTemplate> {
-  throw new Error("AI templates not implemented in backend");
+  return apiFetch<PromptTemplate>("/api/analysis/templates", {
+    method: "POST",
+    body: JSON.stringify({
+      name: data.name,
+      description: data.description,
+      prompt: data.prompt,
+      variables: data.variables,
+      scoring_dimensions: data.scoringDimensions,
+    }),
+  });
 }
 
 export async function updatePromptTemplate(
-  _templateId: string,
-  _data: Partial<PromptTemplate>
+  templateId: string,
+  data: Partial<PromptTemplate>
 ): Promise<PromptTemplate> {
-  throw new Error("AI templates not implemented in backend");
+  return apiFetch<PromptTemplate>(`/api/analysis/templates/${templateId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      name: data.name,
+      description: data.description,
+      prompt: data.prompt,
+      variables: data.variables,
+      scoring_dimensions: data.scoringDimensions,
+    }),
+  });
 }
 
-export async function duplicatePromptTemplate(_templateId: string): Promise<PromptTemplate> {
-  throw new Error("AI templates not implemented in backend");
+export async function duplicatePromptTemplate(templateId: string): Promise<PromptTemplate> {
+  return apiFetch<PromptTemplate>(`/api/analysis/templates/${templateId}/duplicate`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
 }
 
 // ---- AI Runs (mapped to Nivo /api/analysis) ----
@@ -558,6 +689,23 @@ export async function getAIRun(runId: string): Promise<AIRun | null> {
 
 export async function createAIRun(data: CreateAIRunDTO): Promise<AIRun> {
   const template = DEFAULT_PROMPT_TEMPLATES.find((t) => t.id === data.template_id);
+  const body: Record<string, unknown> = {
+    name: data.name,
+    template_id: data.template_id,
+    template_name: template?.name ?? data.template_id,
+    template_prompt: template?.prompt ?? "",
+    config: data.config,
+    run_async: true,
+    min_revenue: 0,
+    min_ebitda_margin: -1,
+    min_growth: -1,
+    max_results: 500,
+  };
+  if (data.orgnrs && data.orgnrs.length > 0) {
+    body.orgnrs = data.orgnrs;
+  } else if (data.list_id) {
+    body.list_id = data.list_id;
+  }
   const res = await apiFetch<{
     success: boolean;
     run_id: string;
@@ -573,19 +721,7 @@ export async function createAIRun(data: CreateAIRunDTO): Promise<AIRun> {
     config?: { auto_approve?: boolean; overwrite_existing?: boolean };
   }>("/api/analysis/start", {
     method: "POST",
-    body: JSON.stringify({
-      name: data.name,
-      list_id: data.list_id,
-      template_id: data.template_id,
-      template_name: template?.name ?? data.template_id,
-      template_prompt: template?.prompt ?? "",
-      config: data.config,
-      run_async: true,
-      min_revenue: 0,
-      min_ebitda_margin: -1,
-      min_growth: -1,
-      max_results: 500,
-    }),
+    body: JSON.stringify(body),
   });
   return mapAnalysisRunToAIRun({
     run_id: res.run_id,
@@ -603,8 +739,11 @@ export async function createAIRun(data: CreateAIRunDTO): Promise<AIRun> {
   });
 }
 
-export async function cancelAIRun(_runId: string): Promise<AIRun> {
-  throw new Error("cancelAIRun not implemented in backend");
+export async function cancelAIRun(runId: string): Promise<AIRun> {
+  await apiFetch(`/api/analysis/runs/${runId}/cancel`, { method: "POST", body: JSON.stringify({}) });
+  const run = await getAIRun(runId);
+  if (!run) throw new Error("Run not found after cancel");
+  return run;
 }
 
 // ---- AI Results (mapped to analysis run companies) ----
@@ -641,7 +780,7 @@ function mapCompanyAnalysisToAIResult(
     pass: "pass",
   };
   return {
-    id: `${runId}-${row.orgnr}`,
+    id: `${runId}::${row.orgnr}`,
     run_id: runId,
     company_orgnr: row.orgnr,
     status:
@@ -677,12 +816,28 @@ export async function getRunResults(runId: string): Promise<AIResult[]> {
   }
 }
 
-export async function approveResult(_resultId: string): Promise<AIResult> {
-  throw new Error("approveResult not implemented in backend");
+export async function approveResult(resultId: string): Promise<AIResult> {
+  await apiFetch(`/api/analysis/results/${encodeURIComponent(resultId)}/approve`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  const [runId] = resultId.split("::");
+  const results = await getRunResults(runId);
+  const found = results.find((r) => r.id === resultId);
+  if (!found) throw new Error("Result not found after approve");
+  return found;
 }
 
-export async function rejectResult(_resultId: string): Promise<AIResult> {
-  throw new Error("rejectResult not implemented in backend");
+export async function rejectResult(resultId: string): Promise<AIResult> {
+  await apiFetch(`/api/analysis/results/${encodeURIComponent(resultId)}/reject`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  const [runId] = resultId.split("::");
+  const results = await getRunResults(runId);
+  const found = results.find((r) => r.id === resultId);
+  if (!found) throw new Error("Result not found after reject");
+  return found;
 }
 
 /** Financial year from /api/companies/{orgnr}/financials */

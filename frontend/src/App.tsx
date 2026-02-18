@@ -23,11 +23,13 @@ import Universe from "./pages/default/Universe";
 import MyLists from "./pages/default/MyLists";
 import ListDetail from "./pages/default/ListDetail";
 import AILab from "./pages/default/AILab";
+import AILabRuns from "./pages/default/AILabRuns";
 import CreateRun from "./pages/default/CreateRun";
 import RunDetail from "./pages/default/RunDetail";
 import RunResults from "./pages/default/RunResults";
 import CompanyDetail from "./pages/default/CompanyDetail";
 import Admin from "./pages/default/Admin";
+import Settings from "./pages/default/Settings";
 import Prospects from "./pages/default/Prospects";
 import ThemeSanityPage from "./pages/default/ThemeSanityPage";
 import WorkingDashboard from "./pages/WorkingDashboard";
@@ -74,8 +76,10 @@ const App = () => (
               <Route path="company/:companyId" element={<CompanyDetail />} />
               <Route path="ai" element={<AILab />} />
               <Route path="ai/run/create" element={<CreateRun />} />
+              <Route path="ai/runs" element={<AILabRuns />} />
               <Route path="ai/runs/:runId" element={<RunDetail />} />
               <Route path="ai/runs/:runId/results" element={<RunResults />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
             </Route>

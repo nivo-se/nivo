@@ -16,7 +16,7 @@ function getTimeAgo(dateString: string): string {
   return `${diffDays} days ago`;
 }
 
-export default function NewWorkDashboard() {
+export default function WorkDashboard() {
   const { data: universeData } = useCompaniesWithTotal({ limit: 1 });
   const companies = universeData?.companies ?? [];
   const totalCompanies = universeData?.total ?? 0;

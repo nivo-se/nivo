@@ -23,7 +23,7 @@ import { ErrorState } from "@/components/default/ErrorState";
 import * as api from "@/lib/services/figmaApi";
 import { toast } from "sonner";
 
-export default function NewRunDetail() {
+export default function RunDetail() {
   const { runId } = useParams<{ runId: string }>();
   const navigate = useNavigate();
   const { data: run, isLoading, isError, error, refetch } = useAIRun(runId);

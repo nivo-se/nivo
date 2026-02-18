@@ -7,6 +7,7 @@ const FIELD_TYPE_MAP: Record<string, string> = {
   revenue_cagr_3y: "percent",
   employees_latest: "number",
   segment_names: "text",
+  name: "text",
   has_homepage: "boolean",
   has_ai_profile: "boolean",
   has_3y_financials: "boolean",

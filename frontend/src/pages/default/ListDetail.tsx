@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useList, useCompaniesBatch, useRemoveFromList } from "@/lib/hooks/figmaQueries";
+import { useAuth } from "@/contexts/AuthContext";
+import { useList, useCompaniesBatch, useRemoveFromList, useUpdateList } from "@/lib/hooks/figmaQueries";
 import {
   getLatestFinancials,
   formatRevenueSEK,
@@ -16,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { FilterBuilder } from "@/components/default/FilterBuilder";
 import { EmptyState } from "@/components/default/EmptyState";
 import { ErrorState } from "@/components/default/ErrorState";
-import { ArrowLeft, Trash2, RefreshCw, Brain, ExternalLink, Download } from "lucide-react";
+import { ArrowLeft, Trash2, RefreshCw, Brain, ExternalLink, Download, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import * as api from "@/lib/services/figmaApi";
 
@@ -33,9 +34,23 @@ function getStageLabel(stage: string): string {
   }
 }
 
-export default function NewListDetail() {
+const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
+
+function formatCreatedBy(
+  createdBy: string | undefined,
+  createdByName: string | undefined,
+  currentUserId: string | undefined
+): string {
+  if (!createdBy) return "";
+  if (createdBy === currentUserId) return "You";
+  if (createdBy === DEV_USER_ID) return "System";
+  return createdByName ?? "Another user";
+}
+
+export default function ListDetail() {
   const { listId } = useParams<{ listId: string }>();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { data: list, isLoading, isError, error, refetch } = useList(listId ?? "");
   const orgnrs = list?.companyIds ?? [];
   const {
@@ -47,8 +62,11 @@ export default function NewListDetail() {
     refetch: refetchCompanies,
   } = useCompaniesBatch(orgnrs);
   const removeMutation = useRemoveFromList();
+  const updateListMutation = useUpdateList();
 
   const [showFilterBuilder, setShowFilterBuilder] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
   const [editedFilters, setEditedFilters] = useState(list?.filters);
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,6 +96,31 @@ export default function NewListDetail() {
       </div>
     );
   }
+
+  const handleStartEditName = () => {
+    setEditedName(list.name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmed = editedName.trim();
+    if (!trimmed || trimmed === list.name) {
+      setIsEditingName(false);
+      return;
+    }
+    try {
+      await updateListMutation.mutateAsync({ listId: list.id, data: { name: trimmed } });
+      setIsEditingName(false);
+      toast.success("List name updated");
+    } catch {
+      toast.error("Failed to update list name");
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setEditedName("");
+    setIsEditingName(false);
+  };
 
   const handleReloadFilters = () => {
     setShowFilterBuilder(true);
@@ -132,6 +175,23 @@ export default function NewListDetail() {
     }
   };
 
+  const handleBulkRemove = async () => {
+    const toRemove = Array.from(selectedCompanies);
+    if (toRemove.length < 2) return;
+    if (!confirm(`Remove ${toRemove.length} companies from this list?`)) return;
+    try {
+      for (const orgnr of toRemove) {
+        await api.removeFromList(list.id, orgnr);
+      }
+      queryClient.invalidateQueries({ queryKey: ["figma", "lists", list.id] });
+      queryClient.invalidateQueries({ queryKey: ["figma", "lists"] });
+      setSelectedCompanies(new Set());
+      toast.success(`Removed ${toRemove.length} companies from list`);
+    } catch {
+      toast.error("Failed to remove some companies");
+    }
+  };
+
   const searchLower = searchQuery.trim().toLowerCase();
   const filteredCompaniesList = searchLower
     ? companies.filter(
@@ -169,18 +229,65 @@ export default function NewListDetail() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-card border-b border-border px-8 py-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <Link to="/lists">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-1" /> Back
-              </Button>
-            </Link>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-base font-bold text-foreground">{list.name}</h1>
+    <div className="h-full overflow-auto app-bg">
+      <div className="max-w-5xl mx-auto px-8 py-8 space-y-6">
+        <Link to="/lists" className="inline-flex">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Lists
+          </Button>
+        </Link>
+
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-4 min-w-0">
+            <div className="min-w-0">
+              <div className="flex items-center gap-3 mb-1 flex-wrap">
+                {isEditingName ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveName();
+                        if (e.key === "Escape") handleCancelEditName();
+                      }}
+                      onBlur={(e) => {
+                        const next = e.relatedTarget as HTMLElement;
+                        if (next?.closest?.("[data-list-name-actions]")) return;
+                        handleCancelEditName();
+                      }}
+                      className="h-8 w-64 font-semibold text-base"
+                      autoFocus
+                    />
+                    <div data-list-name-actions className="flex items-center gap-0">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                        onClick={handleSaveName}
+                        disabled={updateListMutation.isPending || !editedName.trim()}
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                        onClick={handleCancelEditName}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleStartEditName}
+                    className="group flex items-center gap-2 text-left hover:bg-muted/50 rounded px-1 -mx-1 py-0.5 transition-colors"
+                  >
+                    <h1 className="text-base font-semibold text-foreground truncate">{list.name}</h1>
+                    <Pencil className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                )}
                 {list.scope === "team" && (
                   <span className="text-xs px-2 py-1 bg-muted text-foreground rounded">
                     Shareable
@@ -192,12 +299,13 @@ export default function NewListDetail() {
               </div>
               <p className="text-sm text-muted-foreground">
                 {list.companyIds.length} companies
-                {list.created_by && ` • Created by ${list.created_by}`} •{" "}
+                {list.created_by && ` • Created by ${formatCreatedBy(list.created_by, list.created_by_name, user?.id)}`} •{" "}
                 {new Date(list.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
+
+          <div className="flex gap-2 flex-wrap">
             {list.filters && (
               <Button variant="outline" onClick={handleReloadFilters}>
                 <RefreshCw className="w-4 h-4 mr-2" /> Reload & Modify Filters
@@ -215,11 +323,21 @@ export default function NewListDetail() {
             >
               Add to Prospects ({selectedCompanies.size})
             </Button>
+            {selectedCompanies.size > 1 && (
+              <Button
+                variant="outline"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={handleBulkRemove}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Remove selected ({selectedCompanies.size})
+              </Button>
+            )}
           </div>
         </div>
 
         {showFilterBuilder && editedFilters && (
-          <div className="mt-4">
+          <div className="app-card p-4">
             <FilterBuilder
               filters={editedFilters}
               onChange={setEditedFilters}
@@ -235,7 +353,7 @@ export default function NewListDetail() {
         )}
 
         {list.filters && !showFilterBuilder && (
-          <div className="mt-4 p-3 bg-muted/40 border border-border rounded text-sm">
+          <div className="app-card p-4 text-sm">
             <p className="text-foreground">
               ✓ This list was created from filters and can be reloaded to see updated
               results
@@ -243,28 +361,25 @@ export default function NewListDetail() {
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <Input
             placeholder="Search companies..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-64"
+            className="w-72 max-w-full"
           />
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportCsv}>
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" onClick={handleExportCsv}>
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
         </div>
-      </div>
 
-      <div className="flex-1 overflow-auto px-8 py-4">
         {isTruncated && (
-          <div className="mb-4 px-4 py-2 rounded bg-accent border border-accent text-sm text-accent-foreground">
+          <div className="app-card px-4 py-2 text-sm bg-muted/40">
             Showing first 500 companies for performance. List has {orgnrs.length} total.
           </div>
         )}
+
         {companiesError ? (
           <ErrorState
             message={companiesErrorObj?.message ?? "Failed to load companies"}
@@ -283,104 +398,106 @@ export default function NewListDetail() {
             }
           />
         ) : (
-          <div className="bg-card rounded-lg border border-border overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-muted/40 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-left w-12">
-                    <Checkbox
-                      checked={companies.length > 0 && selectedCompanies.size === companies.length}
-                      onCheckedChange={toggleSelectAll}
-                      className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left">Company Name</th>
-                  <th className="px-4 py-3 text-left">Industry</th>
-                  <th className="px-4 py-3 text-left">Geography</th>
-                  <th className="px-4 py-3 text-right">Revenue</th>
-                  <th className="px-4 py-3 text-right">3Y CAGR</th>
-                  <th className="px-4 py-3 text-right">EBITDA Margin</th>
-                  <th className="px-4 py-3 text-center">AI Score</th>
-                  <th className="px-4 py-3 w-16">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filteredCompaniesList.map((company: Company) => {
-                  const latest = getLatestFinancials(company);
-                  const cagr = calculateRevenueCagr(company) ?? 0;
-                  return (
-                    <tr key={company.orgnr} className="hover:bg-muted/40">
-                      <td className="px-4 py-3">
-                        <Checkbox
-                          checked={selectedCompanies.has(company.orgnr)}
-                          onCheckedChange={() => toggleSelectCompany(company.orgnr)}
-                          className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          to={`/company/${company.orgnr}`}
-                          className="font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
-                        >
-                          {company.display_name}
-                          <ExternalLink className="w-3 h-3" />
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-foreground">
-                        {company.industry_label ?? "—"}
-                      </td>
-                      <td className="px-4 py-3 text-foreground">{company.region ?? "—"}</td>
-                      <td className="px-4 py-3 text-right font-mono text-sm">
-                        {formatRevenueSEK(latest.revenue)}
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono">
-                        <span
-                          className={
-                            cagr > 0.15
-                              ? "text-foreground"
-                              : cagr < 0
-                                ? "text-destructive"
-                                : "text-foreground"
-                          }
-                        >
-                          {formatPercent(cagr)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono text-sm">
-                        {formatPercent(latest.ebitdaMargin)}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {company.ai_profile?.ai_fit_score != null ? (
-                          <span
-                            className={`font-semibold ${
-                              company.ai_profile.ai_fit_score >= 75
-                                ? "text-foreground"
-                                : company.ai_profile.ai_fit_score >= 50
-                                  ? "text-foreground"
-                                  : "text-destructive"
-                            }`}
+          <div className="app-card overflow-hidden">
+            <div className="overflow-auto">
+              <table className="w-full">
+                <thead className="bg-muted/40 border-b border-border">
+                  <tr>
+                    <th className="px-4 py-3 text-left w-12">
+                      <Checkbox
+                        checked={companies.length > 0 && selectedCompanies.size === companies.length}
+                        onCheckedChange={toggleSelectAll}
+                        className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
+                      />
+                    </th>
+                    <th className="px-4 py-3 text-left">Company Name</th>
+                    <th className="px-4 py-3 text-left">Industry</th>
+                    <th className="px-4 py-3 text-left">Geography</th>
+                    <th className="px-4 py-3 text-right">Revenue</th>
+                    <th className="px-4 py-3 text-right">3Y CAGR</th>
+                    <th className="px-4 py-3 text-right">EBITDA Margin</th>
+                    <th className="px-4 py-3 text-center">AI Score</th>
+                    <th className="px-4 py-3 w-16">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredCompaniesList.map((company: Company) => {
+                    const latest = getLatestFinancials(company);
+                    const cagr = calculateRevenueCagr(company) ?? 0;
+                    return (
+                      <tr key={company.orgnr} className="hover:bg-muted/40">
+                        <td className="px-4 py-3">
+                          <Checkbox
+                            checked={selectedCompanies.has(company.orgnr)}
+                            onCheckedChange={() => toggleSelectCompany(company.orgnr)}
+                            className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link
+                            to={`/company/${company.orgnr}`}
+                            className="font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
                           >
-                            {company.ai_profile.ai_fit_score}
+                            {company.display_name}
+                            <ExternalLink className="w-3 h-3" />
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-foreground">
+                          {company.industry_label ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-foreground">{company.region ?? "—"}</td>
+                        <td className="px-4 py-3 text-right font-mono text-sm">
+                          {formatRevenueSEK(latest.revenue)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono">
+                          <span
+                            className={
+                              cagr > 0.15
+                                ? "text-foreground"
+                                : cagr < 0
+                                  ? "text-destructive"
+                                  : "text-foreground"
+                            }
+                          >
+                            {formatPercent(cagr)}
                           </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemove(company.orgnr)}
-                          disabled={removeMutation.isPending}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-sm">
+                          {formatPercent(latest.ebitdaMargin)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {company.ai_profile?.ai_fit_score != null ? (
+                            <span
+                              className={`font-semibold ${
+                                company.ai_profile.ai_fit_score >= 75
+                                  ? "text-foreground"
+                                  : company.ai_profile.ai_fit_score >= 50
+                                    ? "text-foreground"
+                                    : "text-destructive"
+                              }`}
+                            >
+                              {company.ai_profile.ai_fit_score}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemove(company.orgnr)}
+                            disabled={removeMutation.isPending}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

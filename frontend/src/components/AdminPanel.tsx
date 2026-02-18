@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Loader2, Users, CheckCircle, XCircle, Clock, Shield, Mail, Calendar, Database, BarChart3, Globe, TrendingUp, Eye, Info, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { supabaseDataService } from '../lib/supabaseDataService';
-import { createUser, type UserRole } from '../lib/services/adminService';
+import { createUser, updateUserProfile, type UserRole } from '../lib/services/adminService';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -269,18 +269,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   };
 
   const handleUpdateName = async () => {
-    if (!selectedUser || !supabase) return;
+    if (!selectedUser) return;
     setActionLoading(selectedUser.id);
     try {
-      const { error: updateError } = await supabase
-        .from('user_roles')
-        .update({
-          first_name: editFirstName.trim() || null,
-          last_name: editLastName.trim() || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', selectedUser.user_id);
-      if (updateError) throw updateError;
+      await updateUserProfile(selectedUser.user_id, {
+        first_name: editFirstName.trim() || null,
+        last_name: editLastName.trim() || null,
+      });
       setSuccess('Name updated');
       await fetchUsers();
       setSelectedUser({ ...selectedUser, first_name: editFirstName.trim() || null, last_name: editLastName.trim() || null });

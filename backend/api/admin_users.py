@@ -36,6 +36,11 @@ class CreateUserResponse(BaseModel):
     message: str
 
 
+class UpdateUserProfileRequest(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+
+
 async def _require_admin(request: Request) -> str:
     """Verify requester is admin. Returns user_id or raises 403."""
     user_id = get_current_user_id(request)
@@ -148,3 +153,49 @@ async def create_user(
         if "already" in msg or "exists" in msg or "duplicate" in msg:
             raise HTTPException(409, "A user with this email already exists")
         raise HTTPException(500, f"Failed to create user: {e}")
+
+
+@router.patch("/users/{user_id}", response_model=dict)
+async def update_user_profile(
+    user_id: str,
+    body: UpdateUserProfileRequest,
+    request: Request,
+    _: str = Depends(_require_admin),
+):
+    """
+    Update a user's first_name and last_name in user_roles.
+    Admin only. Requires Supabase.
+    """
+    supabase = get_supabase_admin_client()
+    if not supabase:
+        raise HTTPException(
+            503,
+            "User profile update not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
+        )
+
+    try:
+        update_payload: dict = {"updated_at": datetime.now(timezone.utc).isoformat()}
+        if body.first_name is not None:
+            update_payload["first_name"] = body.first_name.strip() or None
+        if body.last_name is not None:
+            update_payload["last_name"] = body.last_name.strip() or None
+
+        if len(update_payload) <= 1:
+            return {"message": "No changes"}
+
+        resp = (
+            supabase.table("user_roles")
+            .update(update_payload)
+            .eq("user_id", user_id)
+            .execute()
+        )
+
+        if not resp.data:
+            raise HTTPException(404, "User not found in user_roles")
+
+        return {"message": "Name updated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Update user profile failed: %s", e)
+        raise HTTPException(500, f"Failed to update user profile: {e}")

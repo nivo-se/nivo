@@ -15,6 +15,7 @@ export interface Company {
   municipality?: string;
   industry_code?: string;
   industry_label: string;
+  segment_names?: string[] | null;
   status: "active" | "inactive";
   fiscal_year_end?: string;
   currency: string;
@@ -90,6 +91,7 @@ export interface List {
   created_at: string;
   updated_at: string;
   created_by: string;
+  created_by_name?: string;
   updated_by: string;
 }
 
@@ -100,7 +102,7 @@ export interface ProspectStatus {
   status: "new" | "researching" | "contacted" | "in_discussion" | "meeting_scheduled" | "interested" | "not_interested" | "passed" | "deal_in_progress";
   owner?: string;
   lastContact?: string;
-  notes: { text: string; author: string; date: string }[];
+  notes: { id?: string; text: string; author: string; date: string }[];
   nextAction?: string;
 }
 
@@ -184,7 +186,8 @@ export interface CreateListDTO {
 
 export interface CreateAIRunDTO {
   name: string;
-  list_id: string;
+  list_id?: string;
+  orgnrs?: string[];
   template_id: string;
   config: AIRun["config"];
 }

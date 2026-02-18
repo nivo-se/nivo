@@ -29,6 +29,7 @@ FILTER_FIELDS = {
     "revenue_cagr_3y": "cm.revenue_cagr_3y",
     "employees_latest": "cm.employees_latest",
     "segment_names": "cm.segment_names",
+    "name": "cm.name",
     "has_homepage": "cm.has_homepage",
     "has_ai_profile": "cm.has_ai_profile",
     "has_3y_financials": "cm.has_3y_financials",
@@ -71,6 +72,7 @@ FILTER_TAXONOMY = {
             "label": "Segment",
             "items": [
                 {"field": "segment_names", "label": "Segment name contains", "type": "text", "ops": ["contains"]},
+                {"field": "name", "label": "Company name contains", "type": "text", "ops": ["contains"]},
             ],
         },
     ],
@@ -391,6 +393,10 @@ def _compile_filter(
         if value is None or str(value).strip() == "":
             return None
         pattern = f"%{str(value).strip()}%"
+        if field == "name":
+            params.append(pattern)
+            return "(cm.name ILIKE ?)" if db_is_postgres else "(cm.name LIKE ?)"
+        # segment_names: JSON array search
         if db_is_postgres:
             params.append(pattern)
             return "(cm.segment_names IS NOT NULL AND EXISTS (SELECT 1 FROM jsonb_array_elements_text(cm.segment_names) s WHERE s ILIKE ?))"

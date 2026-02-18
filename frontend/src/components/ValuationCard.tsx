@@ -84,7 +84,7 @@ export const ValuationCard: React.FC<ValuationCardProps> = ({ company }) => {
       <CardContent className="space-y-6">
         {/* Target Price */}
         {company.targetPrice && (
-          <div className="text-center p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-primary/40">
+          <div className="text-center p-6 bg-muted/60 rounded-lg border border-primary/40">
             <div className="flex items-center justify-center gap-2 mb-2">
               <DollarSign className="h-6 w-6 text-primary" />
               <span className="text-sm font-medium text-muted-foreground">Målpris</span>

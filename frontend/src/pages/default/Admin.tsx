@@ -8,7 +8,6 @@ import { fetchWhoAmI, type WhoAmI } from "@/lib/services/whoamiService";
 import { runDefaultUniverseUrlStateDevTest } from "@/lib/defaultUniverseUrlState";
 import { API_BASE } from "@/lib/apiClient";
 import AdminPanel from "@/components/AdminPanel";
-import { AdminSettings } from "@/components/AdminSettings";
 import ScraperInterface from "@/components/ScraperInterface";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type SmokeStep = "idle" | "running" | "pass" | "fail";
 
-export default function NewAdmin() {
+export default function Admin() {
   const { user, session } = useAuth();
   const { data: companies = [], isError: companiesError } = useCompanies({ limit: 100 });
   const { data: lists = [], isError: listsError } = useLists();
@@ -106,7 +105,6 @@ export default function NewAdmin() {
           <TabsList className="w-full justify-start h-auto p-0 bg-card border border-border rounded-lg overflow-hidden text-foreground">
             <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Overview</TabsTrigger>
             <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Team</TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Settings</TabsTrigger>
             <TabsTrigger value="scraper" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Scraper</TabsTrigger>
           </TabsList>
 
@@ -242,10 +240,6 @@ export default function NewAdmin() {
 
           <TabsContent value="team" className="mt-6">
             <AdminPanel currentUser={user} />
-          </TabsContent>
-
-          <TabsContent value="settings" className="mt-6">
-            <AdminSettings />
           </TabsContent>
 
           <TabsContent value="scraper" className="mt-6">

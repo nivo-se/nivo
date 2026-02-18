@@ -39,16 +39,16 @@ export const KeyFindingsCard: React.FC<KeyFindingsCardProps> = ({ company }) => 
     if (lowerFinding.includes('styrka') || lowerFinding.includes('positiv') || 
         lowerFinding.includes('bra') || lowerFinding.includes('hög') ||
         lowerFinding.includes('tillväxt') || lowerFinding.includes('förbättring')) {
-      return 'border-l-green-500 bg-primary/10'
+      return 'border-l-primary bg-primary/10'
     }
     
     if (lowerFinding.includes('risk') || lowerFinding.includes('negativ') || 
         lowerFinding.includes('problem') || lowerFinding.includes('låg') ||
         lowerFinding.includes('brist') || lowerFinding.includes('utmaning')) {
-      return 'border-l-red-500 bg-destructive/10'
+      return 'border-l-destructive bg-destructive/10'
     }
     
-    return 'border-l-blue-500 bg-primary/10'
+    return 'border-l-muted-foreground bg-muted/50'
   }
 
   const findings = company.keyFindings || [

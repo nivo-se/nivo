@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLists, useDeleteList } from "@/lib/hooks/figmaQueries";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,11 +44,24 @@ function getTimeAgo(dateString: string): string {
   return `${diffDays} days ago`;
 }
 
+function formatCreatedBy(
+  createdBy: string | undefined,
+  createdByName: string | undefined,
+  currentUserId: string | undefined
+): string {
+  if (!createdBy) return "";
+  if (createdBy === currentUserId) return "You";
+  if (createdBy === "00000000-0000-0000-0000-000000000001") return "System";
+  return createdByName ?? "Another user";
+}
+
 function ListCard({
   list,
+  currentUserId,
   onDeleteClick,
 }: {
-  list: { id: string; name: string; scope: string; stage: string; companyIds: string[]; created_at: string; updated_at?: string; created_by?: string; filters?: unknown };
+  list: { id: string; name: string; scope: string; stage: string; companyIds: string[]; created_at: string; updated_at?: string; created_by?: string; created_by_name?: string; filters?: unknown };
+  currentUserId: string | undefined;
   onDeleteClick: (id: string, name: string) => void;
 }) {
   return (
@@ -64,7 +78,7 @@ function ListCard({
             </div>
             <p className="text-sm text-muted-foreground mb-3">
               {list.companyIds.length} companies • Stage: {getStageLabel(list.stage)}
-              {list.created_by && ` • Created by ${list.created_by}`}
+              {list.created_by && ` • Created by ${formatCreatedBy(list.created_by, list.created_by_name, currentUserId)}`}
               {" • Last edited "}
               {getTimeAgo(list.updated_at ?? list.created_at)}
             </p>
@@ -92,7 +106,8 @@ function ListCard({
   );
 }
 
-export default function NewMyLists() {
+export default function MyLists() {
+  const { user } = useAuth();
   const { data: lists = [], isLoading, isError, error, refetch } = useLists();
   const deleteListMutation = useDeleteList();
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
@@ -153,7 +168,7 @@ export default function NewMyLists() {
           ) : (
             <div className="grid gap-3">
               {privateLists.map((list) => (
-                <ListCard key={list.id} list={list} onDeleteClick={handleDeleteClick} />
+                <ListCard key={list.id} list={list} currentUserId={user?.id} onDeleteClick={handleDeleteClick} />
               ))}
             </div>
           )}
@@ -169,7 +184,7 @@ export default function NewMyLists() {
           ) : (
             <div className="grid gap-3">
               {sharedLists.map((list) => (
-                <ListCard key={list.id} list={list} onDeleteClick={handleDeleteClick} />
+                <ListCard key={list.id} list={list} currentUserId={user?.id} onDeleteClick={handleDeleteClick} />
               ))}
             </div>
           )}

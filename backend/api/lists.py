@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service
-from .dependencies import get_current_user_id
+from .dependencies import get_current_user_id, get_supabase_admin_client
 from .universe import (
     FilterItem,
     UniverseQueryPayload,
@@ -40,6 +40,25 @@ class ListFromQuery(BaseModel):
 
 class ListItemsAdd(BaseModel):
     orgnrs: List[str]
+
+
+class ListUpdate(BaseModel):
+    name: Optional[str] = None
+    scope: Optional[str] = None
+
+
+def _owner_email(owner_user_id: str) -> Optional[str]:
+    """Look up owner email by user ID when Supabase admin is available."""
+    supabase = get_supabase_admin_client()
+    if not supabase:
+        return None
+    try:
+        resp = supabase.auth.admin.get_user_by_id(str(owner_user_id))
+        if resp and resp.user and getattr(resp.user, "email", None):
+            return resp.user.email
+    except Exception:
+        pass
+    return None
 
 
 def _require_postgres():
@@ -101,10 +120,12 @@ async def list_lists(request: Request, scope: str = Query("all")):
                 "SELECT COUNT(*) as n FROM saved_list_items WHERE list_id::text = ?",
                 [str(r["id"])],
             )
+            owner_id = str(r["owner_user_id"])
             items.append({
                 "id": str(r["id"]),
                 "name": r["name"],
-                "owner_user_id": str(r["owner_user_id"]),
+                "owner_user_id": owner_id,
+                "owner_email": _owner_email(owner_id),
                 "scope": r["scope"],
                 "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
                 "created_at": str(r.get("created_at", "")),
@@ -296,6 +317,66 @@ async def get_list_items(request: Request, list_id: str):
     return {
         "list_id": list_id,
         "items": [{"orgnr": x["orgnr"], "added_by": str(x["added_by_user_id"]), "added_at": str(x["added_at"])} for x in items],
+    }
+
+
+@router.put("/{list_id}")
+async def update_list(request: Request, list_id: str, body: ListUpdate):
+    """Update a list (owner can rename/scope)."""
+    _require_postgres()
+    uid = _require_user(request)
+    db = get_database_service()
+
+    rows = db.run_raw_query("SELECT * FROM saved_lists WHERE id::text = ?", [list_id])
+    if not rows:
+        raise HTTPException(404, "List not found")
+    row = rows[0]
+    if str(row.get("owner_user_id")) != uid:
+        raise HTTPException(403, "Only owner can update")
+
+    updates: List[str] = []
+    params: List[Any] = []
+
+    if body.name is not None:
+        name = body.name.strip()
+        if not name:
+            raise HTTPException(400, "name cannot be empty")
+        updates.append("name = ?")
+        params.append(name)
+
+    if body.scope is not None:
+        if body.scope not in ("private", "team"):
+            raise HTTPException(400, "scope must be private or team")
+        updates.append("scope = ?")
+        params.append(body.scope)
+
+    if not updates:
+        return {
+            "id": str(row.get("id", "")),
+            "name": row.get("name"),
+            "owner_user_id": str(row.get("owner_user_id", "")),
+            "scope": row.get("scope"),
+            "source_view_id": str(row["source_view_id"]) if row.get("source_view_id") else None,
+            "created_at": str(row.get("created_at", "")),
+            "updated_at": str(row.get("updated_at", "")),
+        }
+
+    updates.append("updated_at = NOW()")
+    params.append(list_id)
+    db.run_raw_query(
+        f"UPDATE saved_lists SET {', '.join(updates)} WHERE id::text = ?",
+        params,
+    )
+
+    updated = db.run_raw_query("SELECT * FROM saved_lists WHERE id::text = ?", [list_id])[0]
+    return {
+        "id": str(updated.get("id", "")),
+        "name": updated.get("name"),
+        "owner_user_id": str(updated.get("owner_user_id", "")),
+        "scope": updated.get("scope"),
+        "source_view_id": str(updated["source_view_id"]) if updated.get("source_view_id") else None,
+        "created_at": str(updated.get("created_at", "")),
+        "updated_at": str(updated.get("updated_at", "")),
     }
 
 

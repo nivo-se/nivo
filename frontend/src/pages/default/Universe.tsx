@@ -68,7 +68,13 @@ function evaluateFilterRule(company: Company, rule: { field?: string; operator?:
       companyValue = company.region;
       break;
     case "display_name":
-      companyValue = company.display_name?.toLowerCase() ?? "";
+    case "name":
+      companyValue = (company.display_name ?? "").toString().toLowerCase();
+      break;
+    case "segment_names":
+      companyValue = Array.isArray(company.segment_names)
+        ? (company.segment_names as string[]).join(" ").toLowerCase()
+        : String(company.segment_names ?? "").toLowerCase();
       break;
     default:
       return true;
@@ -124,7 +130,7 @@ const DEFAULT_FILTERS = {
   exclude: { type: "and" as const, rules: [] as unknown[] },
 };
 
-export default function NewUniverse() {
+export default function Universe() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -295,15 +301,8 @@ export default function NewUniverse() {
 
       <div className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 pb-8 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap shrink-0">
-          <p className="text-sm text-muted-foreground">
-            {showLoading
-              ? "Loading..."
-              : filteredCompanies.length > 0
-                ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
-                : `${totalCount.toLocaleString()} companies`}
-          </p>
-          <div className="flex gap-3">
+        <div className="flex flex-col gap-2 shrink-0 sticky top-0 z-20 bg-background py-2 -mx-8 px-8 border-b border-border">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <Input
               placeholder="Search by name..."
               value={searchInput}
@@ -311,8 +310,9 @@ export default function NewUniverse() {
                 setSearchInput(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-48"
+              className="w-72 max-w-full"
             />
+            <div className="flex gap-3 shrink-0">
             <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               {showFilters ? "Hide" : "Show"} Filters
             </Button>
@@ -330,7 +330,15 @@ export default function NewUniverse() {
               Save selection ({selectedCompanies.size})
             </Button>
             <Button variant="outline">Export</Button>
+            </div>
           </div>
+          <p className="text-sm text-muted-foreground">
+            {showLoading
+              ? "Loading..."
+              : filteredCompanies.length > 0
+                ? `Showing ${(currentPage - 1) * COMPANIES_PER_PAGE + 1}–${(currentPage - 1) * COMPANIES_PER_PAGE + filteredCompanies.length} of ${totalCount.toLocaleString()} companies`
+                : `${totalCount.toLocaleString()} companies`}
+          </p>
         </div>
 
         {showFilters && (

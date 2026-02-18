@@ -41,7 +41,7 @@ import * as api from "@/lib/services/figmaApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export default function NewRunResults() {
+export default function RunResults() {
   const { runId } = useParams<{ runId: string }>();
   const queryClient = useQueryClient();
   const { data: run, isError: runError, error: runErrorObj, refetch: refetchRun } = useAIRun(runId ?? "");
@@ -341,7 +341,7 @@ function ResultCard({
   const { data: company } = useCompany(result.company_orgnr);
   return (
     <Card
-      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-blue-600" : ""} ${opacity ? "opacity-60" : ""}`}
+      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-primary" : ""} ${opacity ? "opacity-60" : ""}`}
       onClick={() => onSelect(result.id)}
     >
       <CardContent className="p-4">

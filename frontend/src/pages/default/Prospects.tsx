@@ -26,15 +26,15 @@ const statusConfig: Record<
   string,
   { label: string; color: string }
 > = {
-  new: { label: "New", color: "bg-primary/15 text-primary" },
-  researching: { label: "Researching", color: "bg-accent text-accent-foreground" },
-  contacted: { label: "Contacted", color: "bg-accent text-foreground" },
-  in_discussion: { label: "In Discussion", color: "bg-accent text-foreground" },
-  meeting_scheduled: { label: "Meeting Scheduled", color: "bg-accent text-accent-foreground" },
-  interested: { label: "Interested", color: "bg-primary/15 text-primary" },
+  new: { label: "New", color: "bg-muted text-foreground" },
+  researching: { label: "Researching", color: "bg-muted text-foreground" },
+  contacted: { label: "Contacted", color: "bg-muted text-foreground" },
+  in_discussion: { label: "In Discussion", color: "bg-muted text-foreground" },
+  meeting_scheduled: { label: "Meeting Scheduled", color: "bg-muted text-foreground" },
+  interested: { label: "Interested", color: "bg-muted text-foreground" },
   not_interested: { label: "Not Interested", color: "bg-muted text-foreground" },
   passed: { label: "Passed", color: "bg-destructive/15 text-destructive" },
-  deal_in_progress: { label: "Deal in Progress", color: "bg-primary/15 text-primary" },
+  deal_in_progress: { label: "Deal in Progress", color: "bg-muted text-foreground" },
 };
 
 function ProspectCard({
@@ -135,7 +135,7 @@ function ProspectCard({
             <div className="flex items-center gap-3 mb-1">
               <Link
                 to={`/company/${company.orgnr}`}
-                className="text-base font-medium text-foreground hover:text-primary flex items-center gap-2"
+                className="text-base font-medium text-foreground hover:text-foreground/80 flex items-center gap-2"
               >
                 {company.display_name}
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -176,7 +176,9 @@ function ProspectCard({
               className="text-sm text-foreground hover:text-foreground cursor-pointer font-medium"
               onClick={() => onToggleExpand(isExpanded ? null : prospect.companyId)}
             >
-              {prospect.notes.length} {prospect.notes.length === 1 ? "note" : "notes"}
+              {prospect.notes.length === 0
+                ? "Add Note"
+                : `${prospect.notes.length} ${prospect.notes.length === 1 ? "note" : "notes"}`}
             </button>
           </div>
         </div>
@@ -188,7 +190,7 @@ function ProspectCard({
           {(() => {
             const cagr = calculateRevenueCagr(company);
             return cagr != null ? (
-              <span className={cagr >= 0 ? "text-primary font-medium" : "text-destructive"}>
+              <span className={cagr >= 0 ? "text-foreground font-medium" : "text-destructive"}>
                 Growth: {formatPercent(cagr)}
               </span>
             ) : null;
@@ -197,9 +199,9 @@ function ProspectCard({
 
         {!isExpanded && prospect.notes.length > 0 && (
           <div className="bg-muted/40 rounded-md p-3 mb-2">
-            <p className="text-sm text-foreground mb-1 line-clamp-2">{prospect.notes[prospect.notes.length - 1].text}</p>
+            <p className="text-sm text-foreground mb-1 line-clamp-2">{prospect.notes[0].text}</p>
             <p className="text-xs text-muted-foreground">
-              {prospect.notes[prospect.notes.length - 1].author} • {new Date(prospect.notes[prospect.notes.length - 1].date).toLocaleString()}
+              {prospect.notes[0].author} • {new Date(prospect.notes[0].date).toLocaleString()}
             </p>
           </div>
         )}
@@ -286,7 +288,7 @@ function ProspectCard({
                 placeholder="Add call outcome, meeting notes, next steps..."
                 className="mb-2"
               />
-              <Button size="sm" onClick={handleAddNote} disabled={!newNote.trim()} className="h-8 text-xs">
+              <Button variant="outline" size="sm" onClick={handleAddNote} disabled={!newNote.trim()} className="h-8 text-xs">
                 Add Note
               </Button>
             </div>
@@ -297,7 +299,7 @@ function ProspectCard({
   );
 }
 
-export default function NewProspects() {
+export default function Prospects() {
   const { data: prospects = [], isLoading } = useProspects();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [expandedProspect, setExpandedProspect] = useState<string | null>(null);

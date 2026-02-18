@@ -229,7 +229,7 @@ const ScreeningResultCard: React.FC<{
   }
 
   return (
-    <Card className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-purple-500 bg-accent/60' : 'hover:shadow-md'}`}>
+    <Card className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-primary bg-accent/60' : 'hover:shadow-md'}`}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <Checkbox

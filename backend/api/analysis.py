@@ -90,6 +90,61 @@ class CompanyAnalysisResponse(BaseModel):
     digital_score: int = 0
 
 
+class PromptTemplateCreate(BaseModel):
+    name: str
+    description: str = ""
+    prompt: str
+    variables: List[str] = Field(default_factory=list)
+    scoring_dimensions: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class PromptTemplateUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    prompt: Optional[str] = None
+    variables: Optional[List[str]] = None
+    scoring_dimensions: Optional[List[Dict[str, Any]]] = None
+
+
+class ReviewPayload(BaseModel):
+    note: Optional[str] = None
+
+
+class DuplicateTemplatePayload(BaseModel):
+    name: Optional[str] = None
+
+
+def _ensure_prompt_templates_table(db: Any) -> None:
+    db.run_raw_query(
+        """
+        CREATE TABLE IF NOT EXISTS analysis_prompt_templates (
+            id uuid PRIMARY KEY,
+            name text NOT NULL,
+            description text,
+            prompt text NOT NULL,
+            variables jsonb NOT NULL DEFAULT '[]'::jsonb,
+            scoring_dimensions jsonb NOT NULL DEFAULT '[]'::jsonb,
+            created_by text,
+            created_at timestamptz NOT NULL DEFAULT NOW(),
+            updated_at timestamptz NOT NULL DEFAULT NOW()
+        )
+        """
+    )
+
+
+def _shape_template_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": str(row.get("id", "")),
+        "name": str(row.get("name", "")),
+        "description": str(row.get("description") or ""),
+        "prompt": str(row.get("prompt", "")),
+        "variables": _parse_json_field(row.get("variables")),
+        "scoringDimensions": _parse_json_field(row.get("scoring_dimensions")),
+        "created_at": str(row.get("created_at", "")),
+        "created_by": str(row.get("created_by") or "system"),
+    }
+
+
 def _parse_json_field(value: Any) -> List[Any]:
     if value is None:
         return []
@@ -135,6 +190,24 @@ def _extract_run_metadata(criteria: Dict[str, Any]) -> Dict[str, Any]:
             "overwrite_existing": bool(cfg_dict.get("overwrite_existing", False)),
         },
     }
+
+
+def _ensure_analysis_review_table(db: Any) -> None:
+    """Create moderation table if missing (non-invasive runtime bootstrap)."""
+    db.run_raw_query(
+        """
+        CREATE TABLE IF NOT EXISTS analysis_result_reviews (
+            id uuid PRIMARY KEY,
+            run_id uuid NOT NULL,
+            orgnr text NOT NULL,
+            status text NOT NULL,
+            note text,
+            updated_by text,
+            updated_at timestamptz NOT NULL DEFAULT NOW(),
+            UNIQUE (run_id, orgnr)
+        )
+        """
+    )
 
 
 def _shape_run_row(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -315,15 +388,18 @@ async def get_run_status(run_id: str):
 async def get_run_companies(run_id: str, recommendation: Optional[str] = None):
     """Get all companies analyzed in a run."""
     db = get_database_service()
+    _ensure_analysis_review_table(db)
 
     try:
         sql = """
         SELECT a.*, c.company_name, ar.criteria AS run_criteria,
-               r.extracted_products, r.extracted_markets, r.sales_channels, r.digital_score
+               r.extracted_products, r.extracted_markets, r.sales_channels, r.digital_score,
+               rev.status AS reviewed_status
         FROM company_analysis a
         JOIN companies c ON c.orgnr = a.orgnr
         JOIN acquisition_runs ar ON ar.id = a.run_id
         LEFT JOIN company_research r ON r.orgnr = a.orgnr
+        LEFT JOIN analysis_result_reviews rev ON rev.run_id = a.run_id AND rev.orgnr = a.orgnr
         WHERE a.run_id::text = ?
         """
         params: List[Any] = [run_id]
@@ -355,7 +431,7 @@ async def get_run_companies(run_id: str, recommendation: Optional[str] = None):
                     strategic_fit_score=int(row.get("strategic_fit_score") or 0),
                     recommendation=str(row.get("recommendation", "")),
                     investment_memo=str(row.get("investment_memo", "")),
-                    result_status="approved" if auto_approve else "pending",
+                    result_status=str(row.get("reviewed_status") or ("approved" if auto_approve else "pending")),
                     extracted_products=_parse_json_field(row.get("extracted_products")),
                     extracted_markets=_parse_json_field(row.get("extracted_markets")),
                     sales_channels=_parse_json_field(row.get("sales_channels")),
@@ -418,6 +494,180 @@ async def get_company_analysis(orgnr: str):
         recommendation=str(row.get("recommendation", "")),
         investment_memo=str(row.get("investment_memo", "")),
     )
+
+
+@router.get("/templates")
+async def list_prompt_templates():
+    db = get_database_service()
+    _ensure_prompt_templates_table(db)
+    rows = db.run_raw_query(
+        "SELECT * FROM analysis_prompt_templates ORDER BY updated_at DESC"
+    )
+    return {"items": [_shape_template_row(r) for r in rows]}
+
+
+@router.post("/templates")
+async def create_prompt_template(body: PromptTemplateCreate):
+    db = get_database_service()
+    _ensure_prompt_templates_table(db)
+    template_id = str(__import__("uuid").uuid4())
+    db.run_raw_query(
+        """
+        INSERT INTO analysis_prompt_templates
+        (id, name, description, prompt, variables, scoring_dimensions, created_by)
+        VALUES (?::uuid, ?, ?, ?, ?::jsonb, ?::jsonb, 'system')
+        """,
+        [
+            template_id,
+            body.name,
+            body.description,
+            body.prompt,
+            json.dumps(body.variables or [], ensure_ascii=False),
+            json.dumps(body.scoring_dimensions or [], ensure_ascii=False),
+        ],
+    )
+    row = db.run_raw_query("SELECT * FROM analysis_prompt_templates WHERE id::text = ?", [template_id])[0]
+    return _shape_template_row(row)
+
+
+@router.put("/templates/{template_id}")
+async def update_prompt_template(template_id: str, body: PromptTemplateUpdate):
+    db = get_database_service()
+    _ensure_prompt_templates_table(db)
+    rows = db.run_raw_query("SELECT * FROM analysis_prompt_templates WHERE id::text = ?", [template_id])
+    if not rows:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    updates: List[str] = []
+    params: List[Any] = []
+    if body.name is not None:
+        updates.append("name = ?")
+        params.append(body.name)
+    if body.description is not None:
+        updates.append("description = ?")
+        params.append(body.description)
+    if body.prompt is not None:
+        updates.append("prompt = ?")
+        params.append(body.prompt)
+    if body.variables is not None:
+        updates.append("variables = ?::jsonb")
+        params.append(json.dumps(body.variables, ensure_ascii=False))
+    if body.scoring_dimensions is not None:
+        updates.append("scoring_dimensions = ?::jsonb")
+        params.append(json.dumps(body.scoring_dimensions, ensure_ascii=False))
+
+    if updates:
+        updates.append("updated_at = NOW()")
+        params.append(template_id)
+        db.run_raw_query(
+            f"UPDATE analysis_prompt_templates SET {', '.join(updates)} WHERE id::text = ?",
+            params,
+        )
+
+    row = db.run_raw_query("SELECT * FROM analysis_prompt_templates WHERE id::text = ?", [template_id])[0]
+    return _shape_template_row(row)
+
+
+@router.post("/templates/{template_id}/duplicate")
+async def duplicate_prompt_template(template_id: str, payload: DuplicateTemplatePayload = DuplicateTemplatePayload()):
+    db = get_database_service()
+    _ensure_prompt_templates_table(db)
+    rows = db.run_raw_query("SELECT * FROM analysis_prompt_templates WHERE id::text = ?", [template_id])
+    if not rows:
+        raise HTTPException(status_code=404, detail="Template not found")
+    src = rows[0]
+    new_id = str(__import__("uuid").uuid4())
+    new_name = payload.name or f"{src.get('name', 'Template')} (Copy)"
+    db.run_raw_query(
+        """
+        INSERT INTO analysis_prompt_templates
+        (id, name, description, prompt, variables, scoring_dimensions, created_by)
+        VALUES (?::uuid, ?, ?, ?, ?::jsonb, ?::jsonb, 'system')
+        """,
+        [
+            new_id,
+            new_name,
+            src.get("description") or "",
+            src.get("prompt") or "",
+            json.dumps(_parse_json_field(src.get("variables")), ensure_ascii=False),
+            json.dumps(_parse_json_field(src.get("scoring_dimensions")), ensure_ascii=False),
+        ],
+    )
+    row = db.run_raw_query("SELECT * FROM analysis_prompt_templates WHERE id::text = ?", [new_id])[0]
+    return _shape_template_row(row)
+
+
+@router.post("/runs/{run_id}/cancel")
+async def cancel_run(run_id: str):
+    """Cancel a queued/running analysis run."""
+    db = get_database_service()
+    if not (hasattr(db, "table_exists") and db.table_exists("acquisition_runs")):
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    rows = db.run_raw_query("SELECT * FROM acquisition_runs WHERE id::text = ? LIMIT 1", [run_id])
+    if not rows:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    status = str(rows[0].get("status", ""))
+    if status in ("complete", "completed", "failed", "cancelled"):
+        raise HTTPException(status_code=409, detail=f"Run already {status}")
+
+    db.run_raw_query(
+        "UPDATE acquisition_runs SET status = 'cancelled', completed_at = NOW() WHERE id::text = ?",
+        [run_id],
+    )
+
+    task = ACTIVE_RUN_TASKS.get(run_id)
+    if task and not task.done():
+        task.cancel()
+
+    return {"success": True, "run_id": run_id, "status": "cancelled"}
+
+
+@router.post("/results/{result_id}/approve")
+async def approve_result(result_id: str, payload: ReviewPayload = ReviewPayload()):
+    """Approve analysis result by composite id (runId::orgnr)."""
+    return await _set_result_review_status(result_id, "approved", payload.model_dump())
+
+
+@router.post("/results/{result_id}/reject")
+async def reject_result(result_id: str, payload: ReviewPayload = ReviewPayload()):
+    """Reject analysis result by composite id (runId::orgnr)."""
+    return await _set_result_review_status(result_id, "rejected", payload.model_dump())
+
+
+async def _set_result_review_status(result_id: str, status: str, payload: Dict[str, Any]):
+    if "::" in result_id:
+        run_id, orgnr = result_id.split("::", 1)
+    else:
+        raise HTTPException(status_code=400, detail="result_id must be runId::orgnr")
+
+    db = get_database_service()
+    if not (hasattr(db, "table_exists") and db.table_exists("company_analysis")):
+        raise HTTPException(status_code=404, detail="Analysis data unavailable")
+
+    existing = db.run_raw_query(
+        "SELECT 1 FROM company_analysis WHERE run_id::text = ? AND orgnr = ? LIMIT 1",
+        [run_id, orgnr],
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Result not found")
+
+    _ensure_analysis_review_table(db)
+    note = payload.get("note") if isinstance(payload, dict) else None
+    db.run_raw_query(
+        """
+        INSERT INTO analysis_result_reviews (id, run_id, orgnr, status, note, updated_by)
+        VALUES (?::uuid, ?::uuid, ?, ?, ?, NULL)
+        ON CONFLICT (run_id, orgnr) DO UPDATE
+        SET status = EXCLUDED.status,
+            note = EXCLUDED.note,
+            updated_at = NOW()
+        """,
+        [str(__import__("uuid").uuid4()), run_id, orgnr, status, note],
+    )
+
+    return {"success": True, "result_id": result_id, "status": status}
 
 
 @router.get("/status")

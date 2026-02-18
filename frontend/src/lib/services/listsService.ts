@@ -5,6 +5,7 @@ export type SavedList = {
   id: string;
   name: string;
   owner_user_id: string;
+  owner_email?: string;
   scope: "private" | "team";
   source_view_id?: string;
   created_at: string;

@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Search } from "lucide-react";
 
 interface FilterRule {
   id: string;
@@ -29,6 +28,7 @@ interface FilterBuilderProps {
 }
 
 const filterFields = [
+  { value: "name", label: "Company name (search)", type: "text" },
   { value: "revenue_latest", label: "Revenue (Latest)", type: "number", unit: "SEK" },
   { value: "ebitda_margin_latest", label: "EBITDA Margin", type: "percent" },
   { value: "revenue_cagr_3y", label: "Revenue CAGR (3Y)", type: "percent" },
@@ -96,6 +96,52 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
 
   const hasActiveFilters = filters.include.rules.length > 0 || filters.exclude.rules.length > 0;
 
+  const getNameSearchRules = (groupType: "include" | "exclude") => {
+    const rules = filters[groupType].rules as FilterRule[];
+    return rules.filter((r) => r.field === "name" && r.operator === "contains");
+  };
+
+  const getOtherRules = (groupType: "include" | "exclude") => {
+    const rules = filters[groupType].rules as FilterRule[];
+    return rules.filter((r) => !(r.field === "name" && r.operator === "contains"));
+  };
+
+  const updateNameSearch = (groupType: "include" | "exclude", index: number, value: string) => {
+    const newFilters = { ...filters };
+    const nameRules = getNameSearchRules(groupType);
+    const otherRules = getOtherRules(groupType);
+    const isNewSlot = index >= nameRules.length;
+    if (value.trim()) {
+      const updated: FilterRule = !isNewSlot
+        ? { ...nameRules[index]!, value: value.trim() }
+        : { id: `rule_${Date.now()}`, field: "name", operator: "contains", value: value.trim() };
+      const nextNameRules = isNewSlot ? [...nameRules, updated] : nameRules.map((r, i) => (i === index ? updated : r));
+      newFilters[groupType].rules = [...nextNameRules, ...otherRules];
+    } else if (!isNewSlot) {
+      const nextNameRules = nameRules.filter((_, i) => i !== index);
+      newFilters[groupType].rules = [...nextNameRules, ...otherRules];
+    }
+    onChange(newFilters);
+  };
+
+  const addNameSearch = (groupType: "include" | "exclude") => {
+    const newFilters = { ...filters };
+    const nameRules = getNameSearchRules(groupType);
+    const otherRules = getOtherRules(groupType);
+    const newRule: FilterRule = {
+      id: `rule_${Date.now()}`,
+      field: "name",
+      operator: "contains",
+      value: "",
+    };
+    newFilters[groupType].rules = [...nameRules, newRule, ...otherRules];
+    onChange(newFilters);
+  };
+
+  const removeNameSearch = (groupType: "include" | "exclude", ruleId: string) => {
+    removeRule(groupType, ruleId);
+  };
+
   return (
     <div className="bg-muted/40 border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
@@ -119,11 +165,47 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
             <Plus className="w-4 h-4 mr-1" /> Add Rule
           </Button>
         </div>
-        {filters.include.rules.length === 0 ? (
+        <div className="space-y-2 mb-3">
+          {getNameSearchRules("include").map((rule, i) => (
+            <div key={rule.id} className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Search companies by name..."
+                  value={(rule.value as string) ?? ""}
+                  onChange={(e) => updateNameSearch("include", i, e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => removeNameSearch("include", rule.id)} aria-label="Remove search">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Search companies by name... (add more to narrow)"
+                value=""
+                onChange={(e) => updateNameSearch("include", getNameSearchRules("include").length, e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <Button variant="outline" size="sm" onClick={() => addNameSearch("include")}>
+              <Plus className="w-4 h-4 mr-1" /> Add search
+            </Button>
+          </div>
+        </div>
+        {filters.include.rules.filter((r) => !((r as FilterRule).field === "name" && (r as FilterRule).operator === "contains")).length === 0 ? (
           <p className="text-sm text-muted-foreground italic">No filters applied</p>
         ) : (
           <div className="space-y-2">
-            {filters.include.rules.map((rule) => (
+            {filters.include.rules
+              .filter((r) => !((r as FilterRule).field === "name" && (r as FilterRule).operator === "contains"))
+              .map((rule) => (
               <FilterRuleRow
                 key={(rule as FilterRule).id}
                 rule={rule as FilterRule}
@@ -142,11 +224,47 @@ export function FilterBuilder({ filters, onChange, onApply }: FilterBuilderProps
             <Plus className="w-4 h-4 mr-1" /> Add Rule
           </Button>
         </div>
-        {filters.exclude.rules.length === 0 ? (
+        <div className="space-y-2 mb-3">
+          {getNameSearchRules("exclude").map((rule, i) => (
+            <div key={rule.id} className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Exclude companies by name..."
+                  value={(rule.value as string) ?? ""}
+                  onChange={(e) => updateNameSearch("exclude", i, e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => removeNameSearch("exclude", rule.id)} aria-label="Remove search">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Exclude companies by name... (add more to narrow)"
+                value=""
+                onChange={(e) => updateNameSearch("exclude", getNameSearchRules("exclude").length, e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <Button variant="outline" size="sm" onClick={() => addNameSearch("exclude")}>
+              <Plus className="w-4 h-4 mr-1" /> Add search
+            </Button>
+          </div>
+        </div>
+        {filters.exclude.rules.filter((r) => !((r as FilterRule).field === "name" && (r as FilterRule).operator === "contains")).length === 0 ? (
           <p className="text-sm text-muted-foreground italic">No exclusions</p>
         ) : (
           <div className="space-y-2">
-            {filters.exclude.rules.map((rule) => (
+            {filters.exclude.rules
+              .filter((r) => !((r as FilterRule).field === "name" && (r as FilterRule).operator === "contains"))
+              .map((rule) => (
               <FilterRuleRow
                 key={(rule as FilterRule).id}
                 rule={rule as FilterRule}

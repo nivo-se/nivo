@@ -30,3 +30,29 @@ export async function createUser(
 
   return res.json();
 }
+
+export async function updateUserProfile(
+  userId: string,
+  profile: { first_name?: string | null; last_name?: string | null }
+): Promise<{ message: string }> {
+  const body: Record<string, string | null> = {};
+  if (profile.first_name !== undefined) body.first_name = profile.first_name ?? null;
+  if (profile.last_name !== undefined) body.last_name = profile.last_name ?? null;
+
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/users/${encodeURIComponent(userId)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg =
+      (err as { detail?: string }).detail ||
+      (err as { message?: string }).message ||
+      "Failed to update name";
+    throw new Error(msg);
+  }
+
+  return res.json();
+}

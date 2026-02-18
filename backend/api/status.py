@@ -139,3 +139,29 @@ async def get_config():
         "llm_provider": llm_provider,
     }
 
+
+@router.get("/status/capabilities")
+async def get_capabilities():
+    """Feature capability map for frontend gating."""
+    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    require_auth = os.getenv("REQUIRE_AUTH", "false").lower() in ("1", "true", "yes")
+
+    capabilities = {
+        "prospects": db_source == "postgres",
+        "prompt_templates": False,
+        "run_cancel": db_source == "postgres",
+        "result_moderation": db_source == "postgres",
+        "lists_update": db_source == "postgres",
+        "database_source": db_source,
+        "auth_required": require_auth,
+    }
+
+    try:
+        db = get_database_service()
+        if hasattr(db, "table_exists"):
+            capabilities["result_moderation"] = db.table_exists("company_analysis")
+            capabilities["run_cancel"] = db.table_exists("acquisition_runs")
+    except Exception:
+        pass
+
+    return capabilities

@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, Globe, List, Target, Cpu, Settings, LogOut } from "lucide-react";
+import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
@@ -9,12 +9,13 @@ const navItems = [
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },
-  { path: "/admin", label: "Admin", icon: Settings },
+  { path: "/ai/runs", label: "Recent Runs", icon: Cpu, indent: true },
 ];
 
 export default function AppLayout() {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
+  const isAdmin = userRole === "admin" || user?.email === "jesper@rgcapital.se";
 
   const handleSignOut = async () => {
     try {
@@ -50,6 +51,7 @@ export default function AppLayout() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
+            const indent = "indent" in item && item.indent;
             return (
               <Link
                 key={item.path}
@@ -58,7 +60,7 @@ export default function AppLayout() {
                   active
                     ? "bg-sidebar-hover-bg !text-sidebar-fg font-medium"
                     : "!text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
-                } ${item.indent ? "pl-6" : ""}`}
+                } ${indent ? "pl-8" : ""}`}
               >
                 <Icon className="w-4 h-4" />
                 {item.label}
@@ -67,11 +69,34 @@ export default function AppLayout() {
           })}
         </nav>
         <div className="p-4 border-t border-sidebar-border space-y-3 mt-auto">
+          <Link
+            to="/settings"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+              location.pathname.startsWith("/settings")
+                ? "bg-sidebar-hover-bg !text-sidebar-fg font-medium"
+                : "!text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+            Settings
+          </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                location.pathname.startsWith("/admin")
+                  ? "bg-sidebar-hover-bg !text-sidebar-fg font-medium"
+                  : "!text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
+              }`}
+            >
+              <Shield className="w-4 h-4" />
+              Admin
+            </Link>
+          )}
           <div>
             <div className="text-sm font-medium text-foreground truncate">
               {user?.email ?? "User"}
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">Team Plan</div>
           </div>
           <Button
             variant="outline"

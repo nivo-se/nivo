@@ -1011,7 +1011,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+                          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
                             {index + 1}
                           </div>
                           <div>
