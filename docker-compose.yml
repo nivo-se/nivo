@@ -1,24 +1,49 @@
-# Local Postgres for Nivo development
-# Usage: docker compose up -d
-# See docs/LOCAL_POSTGRES_SETUP.md
+# Nivo — Mac mini deploy: Postgres + API on the same machine
+# See docs/DEPLOY_MAC_MINI.md. For local dev on your Mac, use docker-compose.postgres.yml and run the API locally.
 
 services:
   postgres:
     image: postgres:16
     container_name: nivo-pg
-    ports:
-      - "5433:5432"  # Host 5433 to avoid conflict with local Postgres on 5432
     environment:
-      POSTGRES_DB: nivo
-      POSTGRES_USER: nivo
-      POSTGRES_PASSWORD: nivo
+      POSTGRES_DB: ${POSTGRES_DB:-nivo}
+      POSTGRES_USER: ${POSTGRES_USER:-nivo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     volumes:
       - nivo_pg_data:/var/lib/postgresql/data
+    networks:
+      - nivo_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nivo -d nivo"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nivo} -d ${POSTGRES_DB:-nivo}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    # Optional: expose for migrations/pg_dump from mini host (default: not exposed)
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: nivo-api
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    ports:
+      - "8000:8000"
+    networks:
+      - nivo_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   nivo_pg_data:
+
+networks:
+  nivo_net:
+    driver: bridge

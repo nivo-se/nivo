@@ -1,0 +1,26 @@
+# Postgres on this Mac — for local dev and/or as DB host for the mini (when mini is not always on).
+# Usage: docker compose -f docker-compose.postgres.yml up -d
+# - Local API: DATABASE_SOURCE=postgres POSTGRES_PORT=5433 uvicorn backend.api.main:app --reload
+# - Mini: set POSTGRES_HOST=<this-Mac's-LAN-IP> and POSTGRES_PORT=5433 on the mini (see docs/DEPLOY_MAC_MINI.md).
+# Bind to all interfaces so the mini can connect over LAN; restrict 5433 to LAN in firewall if needed.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: nivo-pg
+    ports:
+      - "0.0.0.0:5433:5432"
+    environment:
+      POSTGRES_DB: nivo
+      POSTGRES_USER: nivo
+      POSTGRES_PASSWORD: nivo
+    volumes:
+      - nivo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nivo -d nivo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nivo_pg_data:
