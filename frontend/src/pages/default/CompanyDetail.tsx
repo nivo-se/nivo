@@ -409,59 +409,59 @@ export default function CompanyDetail() {
               )}
             </div>
 
-            {/* B. Snapshot grid (2 rows) - compact cards */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">Latest FY{overviewModel.latestFY.year}</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">Revenue</p>
-                  <p className="text-sm font-semibold text-foreground">{formatRevenueSEK(overviewModel.latestFY.revenue)}</p>
+            {/* B. Snapshot grid (2 rows) - compact metric boxes */}
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-medium text-muted-foreground">Latest FY{overviewModel.latestFY.year}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">Revenue</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatRevenueSEK(overviewModel.latestFY.revenue)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">EBITDA</p>
-                  <p className="text-sm font-semibold text-foreground">{formatRevenueSEK(overviewModel.latestFY.ebitda)}</p>
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">EBITDA</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatRevenueSEK(overviewModel.latestFY.ebitda)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">EBIT</p>
-                  <p className="text-sm font-semibold text-foreground">{formatRevenueSEK(overviewModel.latestFY.ebit)}</p>
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">EBIT</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatRevenueSEK(overviewModel.latestFY.ebit)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">Net Profit</p>
-                  <p className="text-sm font-semibold text-foreground">{formatRevenueSEK(overviewModel.latestFY.profit)}</p>
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">Net Profit</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatRevenueSEK(overviewModel.latestFY.profit)}</p>
                 </Card>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">EBITDA Margin</p>
-                  <p className="text-sm font-semibold text-foreground">{formatPercent(overviewModel.latestFY.ebitdaMargin)}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">EBITDA Margin</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatPercent(overviewModel.latestFY.ebitdaMargin)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">EBIT Margin</p>
-                  <p className="text-sm font-semibold text-foreground">{formatPercent(overviewModel.latestFY.ebitMargin)}</p>
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">EBIT Margin</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatPercent(overviewModel.latestFY.ebitMargin)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">Net Margin</p>
-                  <p className="text-sm font-semibold text-foreground">{formatPercent(overviewModel.latestFY.netMargin)}</p>
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">Net Margin</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">{formatPercent(overviewModel.latestFY.netMargin)}</p>
                 </Card>
-                <Card className="p-3">
-                  <p className="text-xs text-muted-foreground">Revenue CAGR (3y)</p>
-                  <p className="text-sm font-semibold">
+                <Card className="p-2 rounded-lg shadow-none">
+                  <p className="text-[11px] text-muted-foreground leading-tight">Revenue CAGR (3y)</p>
+                  <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">
                     {formatPercent(overviewModel.growth.cagr3y)}
                   </p>
                 </Card>
                 {overviewModel.growth.cagr5y != null && (
-                  <Card className="p-3">
-                    <p className="text-xs text-muted-foreground">Revenue CAGR (5y)</p>
-                    <p className="text-sm font-semibold">
+                  <Card className="p-2 rounded-lg shadow-none">
+                    <p className="text-[11px] text-muted-foreground leading-tight">Revenue CAGR (5y)</p>
+                    <p className="text-xs font-semibold text-foreground leading-tight tabular-nums">
                       {formatPercent(overviewModel.growth.cagr5y)}
                     </p>
                   </Card>
                 )}
                 {aiProfile != null && (aiProfile.ai_fit_score != null || aiProfile.latest_result) && (
-                  <Card className="p-3">
-                    <p className="text-xs text-muted-foreground">AI Fit Score</p>
+                  <Card className="p-2 rounded-lg shadow-none">
+                    <p className="text-[11px] text-muted-foreground leading-tight">AI Fit Score</p>
                     <p
-                      className={`text-sm font-semibold ${
+                      className={`text-xs font-semibold leading-tight tabular-nums ${
                         (aiProfile.ai_fit_score ?? 0) >= 75
                           ? "text-primary"
                           : (aiProfile.ai_fit_score ?? 0) >= 50
@@ -472,7 +472,7 @@ export default function CompanyDetail() {
                       {aiProfile.ai_fit_score != null ? aiProfile.ai_fit_score : "—"}
                     </p>
                     {aiProfile.latest_result && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
                         {aiProfile.latest_result.recommendation === "strong_fit"
                           ? "Strong Fit"
                           : aiProfile.latest_result.recommendation === "potential_fit"

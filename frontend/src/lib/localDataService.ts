@@ -66,17 +66,9 @@ export interface CompanyFilter {
 }
 
 class LocalDataService {
-  // Use Railway API in production, localhost in dev
+  // Use configured API base; in dev, empty base routes through Vite proxy.
   private getBaseUrl(): string {
-    if (import.meta.env.VITE_API_BASE_URL) {
-      return import.meta.env.VITE_API_BASE_URL
-    }
-    // In development, use localhost
-    if (import.meta.env.DEV) {
-      return 'http://localhost:8000'
-    }
-    // In production, return empty (will use Supabase directly)
-    return ''
+    return API_BASE
   }
 
   // Get all companies with pagination and filtering
@@ -327,3 +319,4 @@ export type DashboardAnalytics = {
   averageRevenueGrowth: number
   averageEBITMargin: number
 }
+import { API_BASE } from "@/lib/apiClient"

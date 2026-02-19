@@ -3,20 +3,11 @@
  * Unified service for all intelligence operations
  */
 import { fetchWithAuth } from './backendFetch'
+import { API_BASE } from './apiClient'
 
-// API base URL - use environment variable or default based on environment
+// API base URL from centralized config.
 const getApiBaseUrl = (): string => {
-  // If explicitly set, use it
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
-  }
-  // In development, use localhost
-  if (import.meta.env.DEV) {
-    return 'http://localhost:8000'
-  }
-  // In production, return empty to indicate API is not available
-  // The backend API needs to be deployed separately
-  return ''
+  return API_BASE
 }
 
 // Helper to handle API errors
@@ -124,18 +115,7 @@ export interface JobStatus {
 
 class IntelligenceService {
   private getApiBaseUrl(): string {
-    // If explicitly set, use it (for external API deployment like Railway)
-    if (import.meta.env.VITE_API_BASE_URL) {
-      return import.meta.env.VITE_API_BASE_URL
-    }
-    // In development, use localhost FastAPI backend
-    if (import.meta.env.DEV) {
-      return 'http://localhost:8000'
-    }
-    // In production, if VITE_API_BASE_URL is not set, show helpful error
-    // The backend should be deployed separately (Railway/Render) and URL set in Vercel env vars
-    console.warn('VITE_API_BASE_URL not set. Backend API needs to be deployed separately.')
-    return ''
+    return API_BASE
   }
 
   private async fetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -252,4 +232,3 @@ class IntelligenceService {
 }
 
 export const intelligenceService = new IntelligenceService()
-

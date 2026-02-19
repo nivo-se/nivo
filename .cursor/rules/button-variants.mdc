@@ -1,0 +1,17 @@
+---
+description: Button variant and color conventions for primary/secondary actions
+globs: frontend/**/*.tsx
+alwaysApply: false
+---
+
+# Button Usage
+
+For primary actions, always use `<Button variant="default">`.
+
+For secondary actions, use only `secondary`, `outline`, or `ghost`.
+
+If a button must not be color-filled, use `variant="outline"` or `variant="ghost"`, not `default` or `neutral`.
+
+Never add local color classes to buttons (`text-blue-*`, `bg-blue-*`, `border-blue-*`, `text-indigo-*`, `bg-sky-*`, etc.).
+
+Do not invent custom visual variants for new pages; use existing `ui/button` variants tied to theme tokens.

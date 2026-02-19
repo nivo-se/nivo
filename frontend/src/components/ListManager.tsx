@@ -424,9 +424,9 @@ const ListManager: React.FC<ListManagerProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Alla storlekar</SelectItem>
-                    <SelectItem value="small">Små (< 10M SEK)</SelectItem>
+                    <SelectItem value="small">Små (&lt; 10M SEK)</SelectItem>
                     <SelectItem value="medium">Medelstora (10-50M SEK)</SelectItem>
-                    <SelectItem value="large">Stora (> 50M SEK)</SelectItem>
+                    <SelectItem value="large">Stora (&gt; 50M SEK)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

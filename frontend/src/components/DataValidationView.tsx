@@ -22,6 +22,7 @@ import {
   ExternalLink,
   RefreshCw
 } from 'lucide-react';
+import { buildScraperApiUrl } from '@/lib/scraperUrls';
 
 interface CompanyData {
   orgnr: string;
@@ -95,7 +96,9 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
         ...(filters.hasFinancials && { hasFinancials: filters.hasFinancials })
       });
       
-      const response = await fetch(`http://localhost:3000/api/sessions/${sessionId}/companies?${params}`);
+      const response = await fetch(
+        buildScraperApiUrl(`/api/sessions/${sessionId}/companies?${params.toString()}`)
+      );
       const data = await response.json();
       
       if (data.success) {

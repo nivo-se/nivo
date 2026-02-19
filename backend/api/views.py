@@ -36,7 +36,7 @@ class ViewUpdate(BaseModel):
 
 def _require_postgres():
     import os
-    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+    if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         raise HTTPException(503, "Views require DATABASE_SOURCE=postgres")
 
 

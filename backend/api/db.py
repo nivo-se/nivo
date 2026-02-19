@@ -19,7 +19,7 @@ async def db_ping(response: Response):
     Lightweight health check: runs SELECT 1 using the configured db service.
     Returns 200 if pool/connection is healthy, 503 if not.
     """
-    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+    if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         response.status_code = 503
         return {"ok": False, "reason": "DATABASE_SOURCE is not postgres"}
 
@@ -44,7 +44,7 @@ async def db_info():
     """
     Read-only DB metadata for smoke checks and diagnostics.
     """
-    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    db_source = os.getenv("DATABASE_SOURCE", "postgres").lower()
     info = {
         "database_source": db_source,
         "engine": "postgres" if db_source == "postgres" else db_source,

@@ -3,19 +3,10 @@
  * Handles all API calls to Railway backend
  */
 import { fetchWithAuth } from './backendFetch'
+import { API_BASE } from './apiClient'
 
 const getApiBaseUrl = (): string => {
-  // If explicitly set, use it (for external API deployment like Railway)
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
-  }
-  // In development, use localhost FastAPI backend
-  if (import.meta.env.DEV) {
-    return 'http://localhost:8000'
-  }
-  // In production, if VITE_API_BASE_URL is not set, return empty
-  console.warn('VITE_API_BASE_URL not set. Backend API needs to be deployed separately.')
-  return ''
+  return API_BASE
 }
 
 export class ApiService {
@@ -215,4 +206,3 @@ export interface CompanyRow {
   company_context?: string
   ai_fit_status?: string
 }
-

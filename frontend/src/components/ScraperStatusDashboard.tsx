@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Database, CheckCircle, Clock, AlertCircle, ExternalLink } from 'lucide-react';
+import { buildScraperApiUrl, buildScraperAppUrl } from '@/lib/scraperUrls';
 
 interface JobStatus {
   id: string;
@@ -30,25 +31,18 @@ const ScraperStatusDashboard: React.FC = () => {
   const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const backendApiBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  const backendDocsUrl = backendApiBase?.trim()
+    ? `${backendApiBase.replace(/\/+$/, '')}/docs`
+    : '/docs';
 
   const fetchData = async () => {
     try {
       setRefreshing(true);
       
-      // Get API base URL (Railway or localhost)
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '');
-      
-      if (!apiBaseUrl) {
-        console.warn('API base URL not configured. Scraper status dashboard requires backend API.');
-        setJobs([]);
-        setCompanies([]);
-        return;
-      }
-      
-      // Fetch jobs - Note: These endpoints may not exist in Railway backend
-      // They appear to be for local scraper staging, not production
+      // Fetch jobs - these endpoints may not exist in all environments.
       try {
-        const jobsResponse = await fetch(`${apiBaseUrl}/staging/jobs`);
+        const jobsResponse = await fetch(buildScraperApiUrl('/staging/jobs'));
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
           setJobs(jobsData);
@@ -63,7 +57,7 @@ const ScraperStatusDashboard: React.FC = () => {
 
       // Fetch companies
       try {
-        const companiesResponse = await fetch(`${apiBaseUrl}/staging/companies`);
+        const companiesResponse = await fetch(buildScraperApiUrl('/staging/companies'));
         if (companiesResponse.ok) {
           const companiesData = await companiesResponse.json();
           setCompanies(companiesData);
@@ -227,7 +221,7 @@ const ScraperStatusDashboard: React.FC = () => {
                   {getStatusBadge(job.status)}
                   {job.status === 'done' && (
                     <Button size="sm" variant="outline" asChild>
-                      <a href={`http://localhost:3000`} target="_blank" rel="noopener noreferrer">
+                      <a href={buildScraperAppUrl()} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4 mr-1" />
                         View Scraper
                       </a>
@@ -276,13 +270,13 @@ const ScraperStatusDashboard: React.FC = () => {
         <CardContent>
           <div className="flex space-x-4">
             <Button asChild>
-              <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer">
+              <a href={buildScraperAppUrl()} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Open Scraper
               </a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="http://localhost:8000/docs" target="_blank" rel="noopener noreferrer">
+              <a href={backendDocsUrl} target="_blank" rel="noopener noreferrer">
                 API Documentation
               </a>
             </Button>
@@ -298,7 +292,6 @@ const ScraperStatusDashboard: React.FC = () => {
 };
 
 export default ScraperStatusDashboard;
-
 
 
 

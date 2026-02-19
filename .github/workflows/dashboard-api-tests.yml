@@ -1,4 +1,4 @@
-name: Dashboard API Tests
+name: Nightly Code Checks
 
 on:
   push:
@@ -7,21 +7,39 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  dashboard-api-tests:
+  nightly-code-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: nivo
+          POSTGRES_USER: nivo
+          POSTGRES_PASSWORD: nivo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nivo -d nivo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
-      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      DATABASE_SOURCE: postgres
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: nivo
+      POSTGRES_USER: nivo
+      POSTGRES_PASSWORD: nivo
+      DATABASE_URL: postgresql://nivo:nivo@127.0.0.1:5432/nivo
+      VITE_API_BASE_URL: http://127.0.0.1:8001
 
     steps:
       - name: Checkout
@@ -38,67 +56,56 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install npm dependencies
+      - name: Install frontend dependencies
         run: npm ci
 
-      - name: Create frontend env file
+      - name: Install backend dependencies
         run: |
-          cat <<'EOF' > frontend/.env.local
-          VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
-          VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
-          SUPABASE_URL=${SUPABASE_URL}
-          SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-          OPENAI_API_KEY=${OPENAI_API_KEY}
-          EOF
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
 
-      - name: Create root env file
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Bootstrap local Postgres schema
+        run: python3 scripts/bootstrap_postgres_schema.py
+
+      - name: Apply SQL migrations
+        run: ./scripts/run_postgres_migrations.sh
+
+      - name: Start backend API
         run: |
-          cat <<'EOF' > .env.local
-          VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
-          VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
-          SUPABASE_URL=${SUPABASE_URL}
-          SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-          OPENAI_API_KEY=${OPENAI_API_KEY}
-          SUPABASE_DB_URL=${SUPABASE_DB_URL}
-          EOF
+          python -m uvicorn backend.api.main:app --host 127.0.0.1 --port 8001 > backend.log 2>&1 &
+          echo $! > backend.pid
 
-      - name: Bootstrap lightweight local database
-        run: CREATE_TEST_LOCAL_DB_FORCE=1 python3 scripts/create_test_local_db.py
-
-      - name: Start enhanced dashboard server
+      - name: Wait for backend health
         run: |
-          npx tsx frontend/server/enhanced-server.ts > server.log 2>&1 &
-          echo $! > server.pid
-
-      - name: Wait for dashboard API
-        run: |
-          for attempt in {1..30}; do
-            if curl -sf http://localhost:3001/api/analytics >/dev/null; then
+          for attempt in {1..60}; do
+            if curl -sf http://127.0.0.1:8001/health >/dev/null; then
               exit 0
             fi
-            sleep 5
+            sleep 2
           done
-          echo "Dashboard API did not start in time"
-          cat server.log
+          echo "Backend API did not start in time"
+          cat backend.log || true
           exit 1
 
-      - name: Run dashboard API regression suite
-        run: ./scripts/test_dashboard_apis.py
+      - name: Run nightly checks
+        run: ./scripts/nightly_code_check.sh
 
-      - name: Stop server
+      - name: Stop backend API
         if: always()
         run: |
-          if [ -f server.pid ]; then
-            kill $(cat server.pid) || true
+          if [ -f backend.pid ]; then
+            kill "$(cat backend.pid)" || true
           fi
-          rm -f server.pid
+          rm -f backend.pid
           echo "--- Server log ---"
-          cat server.log || true
+          cat backend.log || true
 
-      - name: Upload API test results
+      - name: Upload backend logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dashboard-api-test-results
-          path: scripts/dashboard_api_test_results.json
-
+          name: backend-log
+          path: backend.log

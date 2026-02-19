@@ -10,6 +10,7 @@ import { fetchWhoAmI, type WhoAmI } from "@/lib/services/whoamiService";
 import { runDefaultUniverseUrlStateDevTest } from "@/lib/defaultUniverseUrlState";
 import { API_BASE } from "@/lib/apiClient";
 import AdminPanel from "@/components/AdminPanel";
+import AICreditsAdmin from "@/components/admin/AICreditsAdmin";
 import ScraperInterface from "@/components/ScraperInterface";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -107,6 +108,7 @@ export default function Admin() {
           <TabsList className="w-full justify-start h-auto p-0 bg-card border border-border rounded-lg overflow-hidden text-foreground">
             <TabsTrigger value="overview" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Overview</TabsTrigger>
             <TabsTrigger value="team" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Team</TabsTrigger>
+            <TabsTrigger value="credits" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">AI credits</TabsTrigger>
             <TabsTrigger value="scraper" className="rounded-none data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=inactive]:text-foreground">Scraper</TabsTrigger>
           </TabsList>
 
@@ -242,6 +244,10 @@ export default function Admin() {
 
           <TabsContent value="team" className="mt-6">
             <AdminPanel currentUser={user} />
+          </TabsContent>
+
+          <TabsContent value="credits" className="mt-6">
+            <AICreditsAdmin />
           </TabsContent>
 
           <TabsContent value="scraper" className="mt-6">

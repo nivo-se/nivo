@@ -275,6 +275,60 @@ function getSupabase(): SupabaseClient | null {
   })
 }
 
+// AI credits: check spend limit before running (best-effort; ignores if tables missing)
+async function checkAiCreditsLimit(supabase: SupabaseClient, userId: string, estimatedCostUsd: number): Promise<{ allowed: boolean; message: string }> {
+  try {
+    const { data: configRows } = await supabase.from('ai_credits_config').select('global_monthly_limit_usd, per_user_monthly_limit_usd').eq('id', 1)
+    const config = Array.isArray(configRows) && configRows.length > 0 ? configRows[0] : null
+    if (!config) return { allowed: true, message: '' }
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+    const { data: usageRows } = await supabase
+      .from('ai_credits_usage')
+      .select('user_id, amount_usd')
+      .gte('created_at', startOfMonth)
+    const rows = usageRows || []
+    let userTotal = 0
+    let globalTotal = 0
+    for (const row of rows) {
+      const amt = Number(row?.amount_usd ?? 0)
+      globalTotal += amt
+      if (row?.user_id === userId) userTotal += amt
+    }
+    const globalLimit = Number(config.global_monthly_limit_usd ?? 999999)
+    const perUserLimit = config.per_user_monthly_limit_usd != null ? Number(config.per_user_monthly_limit_usd) : null
+    if (perUserLimit != null && userTotal + estimatedCostUsd > perUserLimit) {
+      return { allowed: false, message: `Per-user AI spend limit reached ($${userTotal.toFixed(2)} / $${perUserLimit.toFixed(2)} this month).` }
+    }
+    if (globalTotal + estimatedCostUsd > globalLimit) {
+      return { allowed: false, message: `Global AI spend limit reached ($${globalTotal.toFixed(2)} / $${globalLimit.toFixed(2)} this month).` }
+    }
+    return { allowed: true, message: '' }
+  } catch {
+    return { allowed: true, message: '' }
+  }
+}
+
+// Record AI credits usage after a run (best-effort)
+async function recordAiCreditsUsage(
+  supabase: SupabaseClient,
+  userId: string,
+  amountUsd: number,
+  operationType: 'screening' | 'deep_analysis',
+  runId: string
+): Promise<void> {
+  try {
+    await supabase.from('ai_credits_usage').insert({
+      user_id: userId,
+      amount_usd: amountUsd,
+      operation_type: operationType,
+      run_id: runId
+    })
+  } catch (e) {
+    console.warn('Failed to record AI credits usage:', e)
+  }
+}
+
 // Main AI Analysis endpoint
 app.post('/api/ai-analysis', async (req, res) => {
   try {
@@ -308,6 +362,15 @@ app.post('/api/ai-analysis', async (req, res) => {
 
     if (uniqueSelections.length === 0) {
       return res.status(400).json({ success: false, error: 'No valid companies provided' })
+    }
+
+    const userId = typeof initiatedBy === 'string' && initiatedBy ? initiatedBy : 'unknown-user'
+    const estimatedCostUsd = analysisType === 'screening'
+      ? uniqueSelections.length * 0.002
+      : uniqueSelections.length * 0.05
+    const creditsCheck = await checkAiCreditsLimit(supabase, userId, estimatedCostUsd)
+    if (!creditsCheck.allowed) {
+      return res.status(402).json({ success: false, error: creditsCheck.message })
     }
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -388,6 +451,20 @@ app.post('/api/ai-analysis', async (req, res) => {
       })
     } catch (updateError) {
       console.error('Failed to update run record:', updateError)
+    }
+
+    // Record AI credits usage for this run
+    const screeningCost = screeningResults.reduce((sum, r) => sum + (Number((r as any).audit?.cost_usd) || 0), 0)
+    const deepCost = companiesResults.reduce((sum, c) => sum + (Number((c as any).audit?.cost_usd) || 0), 0)
+    const totalCostUsd = screeningCost + deepCost
+    if (totalCostUsd > 0) {
+      await recordAiCreditsUsage(
+        supabase,
+        userId,
+        Math.round(totalCostUsd * 1e6) / 1e6,
+        analysisType === 'screening' ? 'screening' : 'deep_analysis',
+        runId
+      )
     }
     
     const runPayload: RunPayload = {

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/coverage", tags=["coverage"])
 
-_IS_POSTGRES = os.getenv("DATABASE_SOURCE", "local").lower() == "postgres"
+_IS_POSTGRES = os.getenv("DATABASE_SOURCE", "postgres").lower() == "postgres"
 
 
 def _parse_segment_names(val: Any) -> List[str]:

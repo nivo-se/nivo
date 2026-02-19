@@ -65,7 +65,7 @@ def _owner_email(owner_user_id: str) -> Optional[str]:
 
 def _require_postgres():
     import os
-    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+    if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         raise HTTPException(503, "Lists require DATABASE_SOURCE=postgres")
 
 
@@ -82,7 +82,7 @@ def _require_user(request: Request) -> str:
 @router.get("")
 async def list_lists(request: Request, scope: str = Query("all")):
     """List saved lists: private, team, or all. Returns empty when Postgres unavailable."""
-    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+    if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         return {"items": []}
     uid = _require_user(request)
     try:

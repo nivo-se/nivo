@@ -19,7 +19,7 @@ DatabaseSource = Literal["local", "supabase", "postgres"]
 
 
 def _get_source() -> DatabaseSource:
-    return os.getenv("DATABASE_SOURCE", "local").lower()  # type: ignore[return-value]
+    return os.getenv("DATABASE_SOURCE", "postgres").lower()  # type: ignore[return-value]
 
 
 @lru_cache(maxsize=1)
@@ -53,4 +53,3 @@ def get_database_service() -> DatabaseService:
 def reset_database_service_cache() -> None:
     """Clear cached instance (useful for tests)."""
     get_database_service.cache_clear()  # type: ignore[attr-defined]
-

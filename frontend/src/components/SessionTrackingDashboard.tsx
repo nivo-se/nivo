@@ -26,6 +26,7 @@ import {
   ArrowRight,
   CalendarClock
 } from 'lucide-react';
+import { buildScraperApiUrl } from '@/lib/scraperUrls';
 
 interface SessionInfo {
   sessionId: string;
@@ -146,13 +147,9 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
   const fetchSessions = async () => {
     try {
       setRefreshing(true);
-      
-      // Note: This endpoint appears to be for a different service (port 3000)
-      // It's not part of the Railway backend. Consider removing or implementing in Railway.
-      const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:3000/api/sessions'
-        : '/api/sessions'; // Use Vercel serverless in production
-      
+
+      const apiUrl = buildScraperApiUrl('/api/sessions');
+
       const response = await fetch(apiUrl);
       const data = await response.json();
       
@@ -182,10 +179,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
   const fetchSessionDetails = async (sessionId: string) => {
     try {
-      const apiUrl = import.meta.env.DEV 
-        ? `http://localhost:3000/api/sessions/${sessionId}`
-        : `/api/sessions/${sessionId}`; // Use Vercel serverless in production
-      
+      const apiUrl = buildScraperApiUrl(`/api/sessions/${sessionId}`);
+
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -203,10 +198,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
   const fetchMonitoringData = async (sessionId: string) => {
     try {
       setMonitoringLoading(true);
-      const apiUrl = import.meta.env.DEV 
-        ? `http://localhost:3000/api/monitoring/dashboard?jobId=${sessionId}`
-        : `/api/monitoring/dashboard?jobId=${sessionId}`; // Use Vercel serverless in production
-      
+      const apiUrl = buildScraperApiUrl(`/api/monitoring/dashboard?jobId=${encodeURIComponent(sessionId)}`);
+
       const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error(`Monitoring request failed with status ${response.status}`);
@@ -353,10 +346,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
     try {
       setProcessActionLoading(action);
-      const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:3000/api/monitoring/control'
-        : '/api/monitoring/control'; // Use Vercel serverless in production
-      
+      const apiUrl = buildScraperApiUrl('/api/monitoring/control');
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -387,10 +378,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
 
     try {
       setRetryingErrorId(errorId);
-      const apiUrl = import.meta.env.DEV 
-        ? `http://localhost:3000/api/sessions/${selectedSession}/errors/${errorId}/retry`
-        : `/api/sessions/${selectedSession}/errors/${errorId}/retry`; // Use Vercel serverless in production
-      
+      const apiUrl = buildScraperApiUrl(`/api/sessions/${selectedSession}/errors/${errorId}/retry`);
+
       const response = await fetch(apiUrl, {
         method: 'POST',
       });
@@ -493,10 +482,8 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
     if (!selectedSession) return;
     
     try {
-      const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:3000/api/stages/control'
-        : '/api/stages/control'; // Use Vercel serverless in production
-      
+      const apiUrl = buildScraperApiUrl('/api/stages/control');
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {

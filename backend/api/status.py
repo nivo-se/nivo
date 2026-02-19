@@ -23,7 +23,7 @@ async def get_status():
     """
     Comprehensive status check. Returns db_source, db_ok, tables_ok, counts.
     """
-    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    db_source = os.getenv("DATABASE_SOURCE", "postgres").lower()
     db_ok = False
     tables_ok = {}
     counts = {}
@@ -102,7 +102,7 @@ async def get_config():
     """
     Effective config (no secrets). For ops verification.
     """
-    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    db_source = os.getenv("DATABASE_SOURCE", "postgres").lower()
     require_auth = os.getenv("REQUIRE_AUTH", "false").lower() in ("1", "true", "yes")
 
     # CORS origins count (from default + CORS_ORIGINS)
@@ -143,7 +143,7 @@ async def get_config():
 @router.get("/status/capabilities")
 async def get_capabilities():
     """Feature capability map for frontend gating."""
-    db_source = os.getenv("DATABASE_SOURCE", "local").lower()
+    db_source = os.getenv("DATABASE_SOURCE", "postgres").lower()
     require_auth = os.getenv("REQUIRE_AUTH", "false").lower() in ("1", "true", "yes")
 
     capabilities = {

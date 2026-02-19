@@ -18,7 +18,7 @@ load_dotenv(dotenv_path=env_path)
 
 def _is_supabase_mode() -> bool:
     """True only when DATABASE_SOURCE=supabase."""
-    return os.getenv("DATABASE_SOURCE", "local").lower() == "supabase"
+    return os.getenv("DATABASE_SOURCE", "postgres").lower() == "supabase"
 
 
 @lru_cache()
@@ -76,4 +76,3 @@ def get_redis_client() -> redis.Redis:
         return client
     except redis.ConnectionError as e:
         raise ConnectionError(f"Failed to connect to Redis at {redis_url}: {e}")
-

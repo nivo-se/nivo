@@ -592,7 +592,7 @@ async function invokeScreeningModel(openai: OpenAI, prompt: string) {
     input: [
       { role: 'system', content: [{ type: 'text', text: screeningSystemPrompt }] },
       { role: 'user', content: [{ type: 'text', text: prompt }] },
-    },
+    ],
     response_format: { type: 'json_schema', json_schema: screeningSchema },
   } as any)
   const latency = Date.now() - started

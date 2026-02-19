@@ -1,6 +1,5 @@
 import { fetchWithAuth } from "@/lib/backendFetch";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+import { API_BASE } from "@/lib/apiClient";
 
 export type TimeRange = "1d" | "7d" | "30d";
 

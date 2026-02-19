@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { ExternalLink, Database, Play, Settings, Activity, BarChart3, AlertTriangle } from 'lucide-react'
 import SessionTrackingDashboard from './SessionTrackingDashboard'
 import DataValidationView from './DataValidationView'
+import { buildScraperAppUrl } from '@/lib/scraperUrls'
 
 const ScraperInterface: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -16,8 +17,7 @@ const ScraperInterface: React.FC = () => {
 
   const handleOpenScraper = () => {
     setIsLoading(true)
-    // Open local scraper in new tab
-    window.open('http://localhost:3000', '_blank')
+    window.open(buildScraperAppUrl(), '_blank')
     setTimeout(() => setIsLoading(false), 1000)
   }
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 import {
   Card,
   CardContent,
@@ -403,6 +404,7 @@ const CompanyAnalysisCard: React.FC<{ company: CompanyResult }> = ({ company }) 
 )
 
 const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_metrics' }) => {
+  const { user } = useAuth()
   // Saved lists state
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedListId, setSelectedListId] = useState<string>('')
@@ -534,12 +536,13 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
           templateId: selectedTemplate?.id,
           templateName: selectedTemplate?.name,
           customInstructions: selectedTemplate ? null : instructions.trim() || undefined,
-          initiatedBy: 'user-' + Date.now(), // Temporary user ID until auth is properly integrated
+          initiatedBy: user?.id ?? 'unknown-user',
         }),
       })
       const data = await response.json()
       if (!data.success) {
-        throw new Error(data.error || 'AI analysis failed')
+        const msg = response.status === 402 ? (data.error || 'AI spend limit reached') : (data.error || 'AI analysis failed')
+        throw new Error(msg)
       }
       
       if (analysisMode === 'screening') {

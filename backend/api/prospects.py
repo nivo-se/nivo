@@ -50,7 +50,7 @@ class ProspectNoteUpdate(BaseModel):
 
 
 def _require_postgres() -> None:
-    if os.getenv("DATABASE_SOURCE", "local").lower() != "postgres":
+    if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         raise HTTPException(503, "Prospects require DATABASE_SOURCE=postgres")
 
 
