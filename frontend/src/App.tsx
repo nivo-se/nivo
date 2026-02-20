@@ -97,6 +97,27 @@ function AppOrClaimFirstAdmin() {
   return <AppLayout />;
 }
 
+/** Root path: show landing page when not logged in, app when logged in. */
+function RootOrLanding() {
+  const { user, loading } = useAuth();
+  const authEnabled = isAuth0Configured();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+  if (!authEnabled || !user) {
+    return <Index />;
+  }
+  return (
+    <ProtectedRoute>
+      <AppOrClaimFirstAdmin />
+    </ProtectedRoute>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -112,15 +133,8 @@ const App = () => (
             <Route path="/styleguide" element={<StyleGuide />} />
             <Route path="/landing" element={<Index />} />
 
-            {/* Default UI */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppOrClaimFirstAdmin />
-                </ProtectedRoute>
-              }
-            >
+            {/* Default UI: landing for guests, app for logged-in users */}
+            <Route path="/" element={<RootOrLanding />}>
               <Route index element={<WorkDashboard />} />
               <Route path="prospects" element={<Prospects />} />
               <Route path="universe" element={<Universe />} />
