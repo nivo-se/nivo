@@ -6,15 +6,20 @@ import React, { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { postBootstrap } from '@/lib/bootstrapService'
-import { Loader2, Shield } from 'lucide-react'
+import { testBackendConnectivity } from '@/lib/connectivityTest'
+import { Loader2, Shield, Wifi, ChevronDown, ChevronUp } from 'lucide-react'
 
 export default function ClaimFirstAdmin() {
   const { user, signOut } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [diagnostic, setDiagnostic] = useState<{ ok: boolean; message: string; suggestion?: string } | null>(null)
+  const [diagnosticLoading, setDiagnosticLoading] = useState(false)
+  const [troubleshootOpen, setTroubleshootOpen] = useState(false)
 
   const handleClaim = async () => {
     setError(null)
+    setDiagnostic(null)
     setLoading(true)
     try {
       await postBootstrap()
@@ -23,6 +28,33 @@ export default function ClaimFirstAdmin() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Claim failed')
       setLoading(false)
+    }
+  }
+
+  const handleTestConnection = async () => {
+    setDiagnosticLoading(true)
+    setDiagnostic(null)
+    try {
+      const result = await testBackendConnectivity()
+      if (result.ok) {
+        setDiagnostic({
+          ok: true,
+          message: `Backend reachable (status ${result.status}). If claim still fails, the issue may be with auth/CORS on POST /api/bootstrap.`,
+        })
+      } else {
+        setDiagnostic({
+          ok: false,
+          message: result.error ?? `Status ${result.status}`,
+          suggestion: result.suggestion,
+        })
+      }
+    } catch (e) {
+      setDiagnostic({
+        ok: false,
+        message: e instanceof Error ? e.message : 'Test failed',
+      })
+    } finally {
+      setDiagnosticLoading(false)
     }
   }
 
@@ -64,6 +96,47 @@ export default function ClaimFirstAdmin() {
           <Button variant="ghost" className="w-full" onClick={() => signOut()}>
             Sign out
           </Button>
+        </div>
+
+        <div className="mt-6 border-t border-border pt-4">
+          <button
+            type="button"
+            onClick={() => setTroubleshootOpen(!troubleshootOpen)}
+            className="flex items-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground"
+          >
+            {troubleshootOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            Troubleshooting
+          </button>
+          {troubleshootOpen && (
+            <div className="mt-3 space-y-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={handleTestConnection}
+                disabled={diagnosticLoading}
+              >
+                {diagnosticLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Wifi className="mr-2 h-4 w-4" />
+                )}
+                Test connection to API
+              </Button>
+              {diagnostic && (
+                <div
+                  className={`text-sm p-3 rounded-md ${
+                    diagnostic.ok ? 'bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-destructive/10 text-destructive'
+                  }`}
+                >
+                  <p>{diagnostic.message}</p>
+                  {diagnostic.suggestion && (
+                    <p className="mt-2 text-muted-foreground">{diagnostic.suggestion}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

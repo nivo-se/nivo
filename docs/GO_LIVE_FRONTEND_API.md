@@ -21,7 +21,7 @@ Use this checklist so the Vite app (Vercel or local) talks to the tunneled API a
 
 ## 1. Backend (already done in this repo)
 
-- **CORS:** `.env` has `CORS_ORIGINS=http://localhost:5173,http://localhost:8080,https://app.nivogroup.se`. Add any other frontend origins (e.g. your Vercel URL).
+- **CORS:** `.env` has `CORS_ORIGINS=...` including your frontend origin: `https://nivogroup.se`, `https://app.nivogroup.se`, or `https://nivo-web.vercel.app`. Add every origin where the app is loaded.
 - **PUBLIC_PATHS:** Trimmed to minimal (`/ping`, `/health`, `/api/db/ping`, `/docs`, `/redoc`, `/openapi.json`). Everything else requires auth.
 - **Restart API** after changing `.env`: `docker compose up -d --build api` (or restart your process).
 
@@ -31,17 +31,23 @@ Use this checklist so the Vite app (Vercel or local) talks to the tunneled API a
 
 In **Auth0 Dashboard** → your **Application** (SPA) → **Settings**:
 
-1. **Allowed Callback URLs** — add (comma-separated):
-   - `https://app.nivogroup.se/auth/callback`
-   - Your Vercel URL if used: `https://your-app.vercel.app/auth/callback`
+1. **Application Login URI** (sometimes "Initiate Login URI") — set to your app's login page:
+   - `https://nivogroup.se/auth` (if app is at root)
+   - `https://app.nivogroup.se/auth` (if app is on subdomain)
+
+2. **Allowed Callback URLs** — add (comma-separated):
+   - `https://nivogroup.se/auth/callback` (if app is at root)
+   - `https://app.nivogroup.se/auth/callback` (if app is on subdomain)
+   - Your Vercel URL if used: `https://nivo-web.vercel.app/auth/callback`
    - Local: `http://localhost:5173/auth/callback`
 
-2. **Allowed Logout URLs** — add:
+3. **Allowed Logout URLs** — add:
+   - `https://nivogroup.se`
    - `https://app.nivogroup.se`
-   - Vercel: `https://your-app.vercel.app`
+   - Vercel: `https://nivo-web.vercel.app`
    - `http://localhost:5173`
 
-3. **Allowed Web Origins** — same as above (where the app is loaded from).
+4. **Allowed Web Origins** — same as above (where the app is loaded from).
 
 Save changes.
 

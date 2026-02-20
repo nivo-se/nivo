@@ -41,7 +41,8 @@ export async function fetchWithAuth(
       const base = new URL(url).origin
       throw new Error(
         `Cannot reach backend at ${base}. Is the backend running? ` +
-        `Check VITE_API_BASE_URL in .env (e.g. http://localhost:8000 or http://localhost:8001).`
+        `If using api.nivogroup.se: ensure the Cloudflare tunnel and API are running on the Mac. ` +
+        `Use the Troubleshooting → Test connection on this page to diagnose.`
       )
     }
     throw e
