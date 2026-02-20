@@ -17,7 +17,9 @@ export default function AuthCallback() {
       return;
     }
     if (isAuthenticated) {
-      navigate("/", { replace: true });
+      // Delay so Auth0 SDK can finish committing state before we navigate
+      const t = setTimeout(() => navigate("/", { replace: true }), 400);
+      return () => clearTimeout(t);
     } else {
       navigate("/auth", { replace: true });
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Loader2, Building2 } from 'lucide-react'
 import { isAuth0Configured } from '../lib/authToken'
@@ -9,6 +9,8 @@ const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const { signIn, user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const callbackError = (location.state as { error?: string } | null)?.error
 
   useEffect(() => {
     if (user) navigate('/', { replace: true })
@@ -47,6 +49,11 @@ const Auth: React.FC = () => {
             </div>
             <h1 className="text-base font-bold text-foreground mb-2">Log In</h1>
           </div>
+          {callbackError && (
+            <p className="text-sm text-destructive mb-4 text-center" role="alert">
+              {callbackError}
+            </p>
+          )}
           <Button
             className="w-full font-semibold rounded-lg h-12"
             onClick={async () => {

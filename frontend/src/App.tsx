@@ -15,7 +15,9 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { NoAuthProvider, useAuth } from "./contexts/AuthContext";
 import { Auth0AuthProvider } from "./contexts/Auth0AuthProvider";
 import { isAuth0Configured } from "./lib/authToken";
+import { auth0NavigateRef } from "./lib/auth0NavigateRef";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NavigateRefSetter from "./components/NavigateRefSetter";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
@@ -56,6 +58,11 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
       <Auth0Provider
         domain={auth0Domain}
         clientId={auth0ClientId}
+        cacheLocation="memory"
+        onRedirectCallback={(appState) => {
+          const path = appState?.returnTo ?? "/";
+          auth0NavigateRef.current?.(path);
+        }}
         authorizationParams={{
           redirect_uri: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
           audience: auth0Audience || undefined,
@@ -96,6 +103,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <NavigateRefSetter />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             {isAuth0Configured() && <Route path="/auth/callback" element={<AuthCallback />} />}

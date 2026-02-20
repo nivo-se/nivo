@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { isAuth0Configured } from '../lib/authToken'
 import { Loader2, Clock, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 import { Button } from './ui/button'
+
+const AUTH_SETTLE_MS = 2500 // Grace period after navigation before redirecting to /auth (Auth0 may need time to propagate)
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -14,19 +16,37 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const navigate = useNavigate()
   const { user, loading, isApproved } = useAuth()
   const authEnabled = isAuth0Configured()
+  const [graceExpired, setGraceExpired] = useState(false)
 
-  // Redirect to /auth when not logged in (use navigate so we stay in SPA and keep Auth0 session)
   useEffect(() => {
-    if (authEnabled && !loading && !user) {
-      navigate('/auth', { replace: true })
-    }
-  }, [authEnabled, loading, user, navigate])
+    const t = setTimeout(() => setGraceExpired(true), AUTH_SETTLE_MS)
+    return () => clearTimeout(t)
+  }, [])
+
+  // Redirect to /auth when not logged in—but only after grace period (avoids redirect loop right after callback)
+  useEffect(() => {
+    if (!authEnabled || !graceExpired) return
+    if (loading || user) return
+    navigate('/auth', { replace: true })
+  }, [authEnabled, loading, user, navigate, graceExpired])
 
   if (!authEnabled) {
     return <>{children}</>
   }
 
   if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // During grace period after nav from callback, show loading instead of redirecting (Auth0 may still be settling)
+  if (!user && !graceExpired) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
