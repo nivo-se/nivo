@@ -189,6 +189,11 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             request.state.user = None
             return await call_next(request)
 
+        # Allow CORS preflight (OPTIONS) without auth so browser can complete the actual request
+        if request.method == "OPTIONS":
+            request.state.user = None
+            return await call_next(request)
+
         path = request.url.path
         if _is_public_path(path):
             request.state.user = None
