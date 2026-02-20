@@ -15,6 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Investor from "./pages/Investor";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import AppLayout from "./pages/default/AppLayout";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/styleguide" element={<StyleGuide />} />
             <Route path="/landing" element={<Index />} />
+            <Route path="/investor" element={<Investor />} />
 
             {/* Default UI */}
             <Route
