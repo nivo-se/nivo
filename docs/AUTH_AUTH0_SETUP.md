@@ -19,7 +19,8 @@ This project is **Vite + React** (not Next.js). We use the official **Auth0 Reac
 
 1. Go to **Applications → APIs** and **Create API**.
 2. Name it (e.g. "Nivo API"), set **Identifier** to your API audience URL (e.g. `https://api.nivogroup.se`). This is your **Audience**.
-3. Note the **Identifier** → use for `AUTH0_AUDIENCE` and `VITE_AUTH0_AUDIENCE`.
+3. Enable **Allow Offline Access** (for refresh tokens; avoids `/oauth/token` 401 when tokens expire).
+4. Note the **Identifier** → use for `AUTH0_AUDIENCE` and `VITE_AUTH0_AUDIENCE`.
 
 **Example (Nivo production):** Audience `https://api.nivogroup.se`, Issuer `https://dev-fkrjopczcor0bjzt.us.auth0.com/`. The FastAPI backend and any Express gateway should use the same values so the same token works for both.
 
@@ -202,3 +203,9 @@ If users sign up successfully but are redirected back to the login screen:
 
 2. **API not authorized for the application**  
    If you see "Client ... is not authorized to access resource server ...", go to APIs → your API → enable the application (or add it under Machine to Machine Applications).
+
+3. **401 on Auth0 `/oauth/token`**  
+   The SDK uses this to exchange the auth code or refresh tokens. Ensure:
+   - **Allowed Web Origins** includes your exact frontend URL (e.g. the Vercel preview domain).
+   - **APIs → your API → Allow Offline Access** is enabled (needed for refresh tokens).
+   - **Applications → your app** is enabled for the API.
