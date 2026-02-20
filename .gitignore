@@ -109,6 +109,9 @@ data/csv_export/
 # Service logs (LaunchAgent output)
 logs/
 
+# DB dumps (large, not for version control)
+nivo_dump.sql
+
 # macOS
 .DS_Store
 ._*
