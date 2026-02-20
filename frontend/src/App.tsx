@@ -59,7 +59,6 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
         domain={auth0Domain}
         clientId={auth0ClientId}
         cacheLocation="localstorage"
-        useRefreshTokens={true}
         onRedirectCallback={(appState) => {
           const path = appState?.returnTo ?? "/";
           auth0NavigateRef.current?.(path);
@@ -67,7 +66,7 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
         authorizationParams={{
           redirect_uri: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
           audience: auth0Audience || undefined,
-          scope: "openid profile email offline_access",
+          scope: "openid profile email",
         }}
       >
         <Auth0AuthProvider>{children}</Auth0AuthProvider>
