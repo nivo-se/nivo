@@ -190,3 +190,15 @@ RBAC is stored in **local Postgres only** (no Supabase, no Auth0 Management API)
 **Migrations**
 
 - Apply schema: `./scripts/run_postgres_migrations.sh` (includes 020; 021 is optional and not run by default).
+
+---
+
+## Troubleshooting: Signup redirects back to login
+
+If users sign up successfully but are redirected back to the login screen:
+
+1. **Auth0 "Require Email Verification"**  
+   Auth0 Dashboard → Authentication → Database → your connection → if "Require Email Verification" is on, Auth0 may redirect users to the login page before verification. For development, you can turn this off. For production, users must verify their email before Auth0 completes the sign-in.
+
+2. **API not authorized for the application**  
+   If you see "Client ... is not authorized to access resource server ...", go to APIs → your API → enable the application (or add it under Machine to Machine Applications).

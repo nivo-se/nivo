@@ -11,10 +11,15 @@ const Auth: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const callbackError = (location.state as { error?: string } | null)?.error
+  // Auth0 can append error/error_description to URL when redirecting (e.g. after signup if email verification required)
+  const params = new URLSearchParams(location.search)
+  const urlError = params.get('error_description') ?? params.get('error')
 
   useEffect(() => {
     if (user) navigate('/', { replace: true })
   }, [user, navigate])
+
+  const displayError = callbackError || urlError
 
   if (!isAuth0Configured()) {
     return (
@@ -49,9 +54,9 @@ const Auth: React.FC = () => {
             </div>
             <h1 className="text-base font-bold text-foreground mb-2">Log In</h1>
           </div>
-          {callbackError && (
+          {displayError && (
             <p className="text-sm text-destructive mb-4 text-center" role="alert">
-              {callbackError}
+              {displayError}
             </p>
           )}
           <Button

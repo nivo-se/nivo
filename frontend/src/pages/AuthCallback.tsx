@@ -17,8 +17,8 @@ export default function AuthCallback() {
       return;
     }
     if (isAuthenticated) {
-      // Delay so Auth0 SDK can finish committing state before we navigate
-      const t = setTimeout(() => navigate("/", { replace: true }), 400);
+      // Delay so Auth0 SDK can finish committing state before we navigate (signup can be slower)
+      const t = setTimeout(() => navigate("/", { replace: true }), 600);
       return () => clearTimeout(t);
     } else {
       navigate("/auth", { replace: true });

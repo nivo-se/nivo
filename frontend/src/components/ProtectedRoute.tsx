@@ -6,7 +6,7 @@ import { Loader2, Clock, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 import { Button } from './ui/button'
 
-const AUTH_SETTLE_MS = 2500 // Grace period after navigation before redirecting to /auth (Auth0 may need time to propagate)
+const AUTH_SETTLE_MS = 5000 // Grace period after navigation before redirecting to /auth (Auth0 signup/login may need time to propagate)
 
 interface ProtectedRouteProps {
   children: React.ReactNode
