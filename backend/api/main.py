@@ -1,6 +1,8 @@
 """
 FastAPI application for Nivo Intelligence API
 """
+import re
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -59,10 +61,22 @@ if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
 app.add_middleware(CORSMiddleware, **cors_config)
 
 
+def _is_origin_allowed(origin: str) -> bool:
+    """Check if origin is allowed for CORS (matches CORSMiddleware config)."""
+    if not origin:
+        return False
+    if origin in default_origins:
+        return True
+    if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
+        if re.match(r"^https://.*\.vercel\.app$", origin):
+            return True
+    return False
+
+
 def _cors_headers_for_request(request: Request) -> dict:
     """Return CORS headers for the requesting origin (so error responses are not blocked)."""
     origin = request.headers.get("origin", "")
-    if origin in default_origins:
+    if _is_origin_allowed(origin):
         return {
             "Access-Control-Allow-Origin": origin,
             "Access-Control-Allow-Credentials": "true",

@@ -96,7 +96,7 @@ async def create_view(request: Request, body: ViewCreate):
     db.run_raw_query(
         """
         INSERT INTO saved_views (name, owner_user_id, scope, filters_json, columns_json, sort_json)
-        VALUES (?, ?::uuid, ?, ?::jsonb, ?::jsonb, ?::jsonb)
+        VALUES (?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)
         """,
         [
             body.name,

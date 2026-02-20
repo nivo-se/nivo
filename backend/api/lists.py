@@ -153,7 +153,7 @@ async def create_list(request: Request, body: ListCreate):
     db = get_database_service()
     source_id = body.sourceViewId if body.sourceViewId else None
     db.run_raw_query(
-        "INSERT INTO saved_lists (name, owner_user_id, scope, source_view_id) VALUES (?, ?::uuid, ?, ?::uuid)",
+        "INSERT INTO saved_lists (name, owner_user_id, scope, source_view_id) VALUES (?, ?, ?, ?::uuid)",
         [body.name, uid, body.scope, source_id],
     )
     rows = db.run_raw_query(
@@ -216,7 +216,7 @@ async def create_list_from_query(request: Request, body: ListFromQuery):
         raise HTTPException(400, "Your query matches no companies. Adjust filters and try again.")
 
     db.run_raw_query(
-        "INSERT INTO saved_lists (name, owner_user_id, scope) VALUES (?, ?::uuid, ?)",
+        "INSERT INTO saved_lists (name, owner_user_id, scope) VALUES (?, ?, ?)",
         [body.name, uid, body.scope],
     )
     list_rows = db.run_raw_query(
@@ -266,7 +266,7 @@ async def add_list_items(request: Request, list_id: str, body: ListItemsAdd):
             db.run_raw_query(
                 """
                 INSERT INTO saved_list_items (list_id, orgnr, added_by_user_id)
-                VALUES (?::uuid, ?, ?::uuid)
+                VALUES (?::uuid, ?, ?)
                 ON CONFLICT (list_id, orgnr) DO NOTHING
                 """,
                 [list_id, orgnr, uid],

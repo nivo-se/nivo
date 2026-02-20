@@ -60,7 +60,7 @@ def _ensure_tables(db: Any) -> None:
         CREATE TABLE IF NOT EXISTS prospects (
             id uuid PRIMARY KEY,
             company_id text NOT NULL,
-            owner_user_id uuid NOT NULL,
+            owner_user_id text NOT NULL,
             scope text NOT NULL DEFAULT 'team',
             status text NOT NULL DEFAULT 'new',
             owner text,
@@ -151,7 +151,7 @@ async def create_prospect(request: Request, body: ProspectCreate):
     db.run_raw_query(
         """
         INSERT INTO prospects (id, company_id, owner_user_id, scope, status)
-        VALUES (?::uuid, ?, ?::uuid, ?, ?)
+        VALUES (?::uuid, ?, ?, ?, ?)
         ON CONFLICT (company_id, owner_user_id, scope)
         DO UPDATE SET status = EXCLUDED.status, updated_at = NOW()
         """,

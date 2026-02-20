@@ -11,7 +11,7 @@ credentials-file: /Users/you/.cloudflared/TUNNEL_ID.json
 ingress:
   # API (FastAPI) — required
   - hostname: api.yourdomain.com
-    service: http://localhost:8000
+    service: http://127.0.0.1:8000
   # Frontend (optional): only if you serve the app through this tunnel (e.g. Vite dev or static server)
   # - hostname: app.yourdomain.com
   #   service: http://localhost:5173
