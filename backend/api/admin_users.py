@@ -1,201 +1,75 @@
 """
-Admin API: create users and set privileges.
-Requires Supabase Auth Admin (service role) and user_roles table.
+Admin API: role and allowlist management. Local Postgres only (user_roles, allowed_users).
+All endpoints require role=admin via require_role("admin").
 """
 import logging
-from datetime import datetime, timezone
-from typing import Literal
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, EmailStr
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
-from .dependencies import get_supabase_admin_client, get_current_user_id
+from .rbac import (
+    list_allowed_users,
+    list_user_roles,
+    require_role,
+    set_allowed_user,
+    upsert_user_role,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-# Admin emails that can create users (bypass user_roles lookup when DB not available)
-ADMIN_EMAILS = {"jesper@rgcapital.se"}
 
-UserRole = Literal["pending", "approved", "admin"]
-
-
-class CreateUserRequest(BaseModel):
-    email: EmailStr
-    password: str
-    role: UserRole = "approved"
-    first_name: str | None = None
-    last_name: str | None = None
+class PutRoleBody(BaseModel):
+    role: str  # 'admin' | 'analyst'
 
 
-class CreateUserResponse(BaseModel):
-    user_id: str
-    email: str
-    role: str
-    message: str
+class PutAllowBody(BaseModel):
+    enabled: bool
+    note: Optional[str] = None
 
 
-class UpdateUserProfileRequest(BaseModel):
-    first_name: str | None = None
-    last_name: str | None = None
+@router.get("/users")
+def list_users(_sub: str = Depends(require_role("admin"))):
+    """
+    List all user_roles and allowed_users. Admin only.
+    Returns { "user_roles": [...], "allowed_users": [...] }.
+    """
+    roles = list_user_roles()
+    allowed = list_allowed_users()
+    # Serialize datetimes for JSON
+    def row_to_json(r):
+        d = dict(r)
+        for k in ("created_at", "updated_at"):
+            if k in d and hasattr(d[k], "isoformat"):
+                d[k] = d[k].isoformat()
+        return d
+    return {
+        "user_roles": [row_to_json(r) for r in roles],
+        "allowed_users": [row_to_json(a) for a in allowed],
+    }
 
 
-async def _require_admin(request: Request) -> str:
-    """Verify requester is admin. Returns user_id or raises 403."""
-    user_id = get_current_user_id(request)
-    # When REQUIRE_AUTH=false, middleware may not set user - try to verify token for this route
-    if not user_id:
-        auth = request.headers.get("Authorization", "")
-        if auth.lower().startswith("bearer "):
-            from .auth import _verify_token
-            payload = _verify_token(auth[7:].strip())
-            if payload:
-                request.state.user = {"sub": payload.get("sub"), "email": payload.get("email")}
-                user_id = str(payload.get("sub", ""))
-    if not user_id:
-        raise HTTPException(403, "Authentication required")
-    # When REQUIRE_AUTH is false, request.state.user may be None - allow for dev
-    user = getattr(request.state, "user", None)
-    email = (user or {}).get("email")
-    if email and email in ADMIN_EMAILS:
-        return user_id
-    # Check user_roles for admin
-    supabase = get_supabase_admin_client()
-    if supabase:
-        try:
-            r = (
-                supabase.table("user_roles")
-                .select("role")
-                .eq("user_id", user_id)
-                .maybe_single()
-                .execute()
-            )
-            if r.data and (r.data.get("role") or "").lower() == "admin":
-                return user_id
-        except Exception as e:
-            logger.warning("Could not check user_roles: %s", e)
-    raise HTTPException(403, "Admin privileges required")
-
-
-@router.post("/users", response_model=CreateUserResponse)
-async def create_user(
-    body: CreateUserRequest,
-    request: Request,
-    _: str = Depends(_require_admin),
+@router.put("/users/{sub}/role")
+def set_user_role(
+    sub: str,
+    body: PutRoleBody,
+    _admin_sub: str = Depends(require_role("admin")),
 ):
-    """
-    Create a new user with email, password, and role.
-    Admin only. Requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
-    """
-    supabase = get_supabase_admin_client()
-    if not supabase:
-        raise HTTPException(
-            503,
-            "User creation not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
-        )
-
-    # Validate password
-    if len(body.password) < 8:
-        raise HTTPException(400, "Password must be at least 8 characters")
-
-    try:
-        # Build user metadata for auth and profile
-        user_metadata = {}
-        if body.first_name:
-            user_metadata["first_name"] = body.first_name
-        if body.last_name:
-            user_metadata["last_name"] = body.last_name
-
-        # Create user in Supabase Auth
-        create_options: dict = {
-            "email": body.email,
-            "password": body.password,
-            "email_confirm": True,  # Skip email confirmation
-        }
-        if user_metadata:
-            create_options["data"] = user_metadata
-
-        resp = supabase.auth.admin.create_user(create_options)
-
-        if not resp or not resp.user:
-            raise HTTPException(500, "Failed to create user in Auth")
-
-        user_id = str(resp.user.id)
-
-        # Insert into user_roles
-        admin_id = get_current_user_id(request) or "system"
-        now_iso = datetime.now(timezone.utc).isoformat()
-        approved_at = now_iso if body.role in ("approved", "admin") else None
-        insert_payload: dict = {
-            "user_id": user_id,
-            "role": body.role,
-            "approved_by": admin_id,
-            "approved_at": approved_at,
-        }
-        if body.first_name is not None:
-            insert_payload["first_name"] = body.first_name
-        if body.last_name is not None:
-            insert_payload["last_name"] = body.last_name
-        supabase.table("user_roles").insert(insert_payload).execute()
-
-        return CreateUserResponse(
-            user_id=user_id,
-            email=body.email,
-            role=body.role,
-            message=f"User created with role {body.role}. They can sign in immediately.",
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception("Create user failed: %s", e)
-        msg = str(e).lower()
-        if "already" in msg or "exists" in msg or "duplicate" in msg:
-            raise HTTPException(409, "A user with this email already exists")
-        raise HTTPException(500, f"Failed to create user: {e}")
+    """Set role for user by Auth0 sub. Admin only. Idempotent upsert."""
+    if body.role not in ("admin", "analyst"):
+        raise HTTPException(400, "role must be 'admin' or 'analyst'")
+    upsert_user_role(sub, body.role)
+    return {"sub": sub, "role": body.role}
 
 
-@router.patch("/users/{user_id}", response_model=dict)
-async def update_user_profile(
-    user_id: str,
-    body: UpdateUserProfileRequest,
-    request: Request,
-    _: str = Depends(_require_admin),
+@router.put("/users/{sub}/allow")
+def set_user_allow(
+    sub: str,
+    body: PutAllowBody,
+    _admin_sub: str = Depends(require_role("admin")),
 ):
-    """
-    Update a user's first_name and last_name in user_roles.
-    Admin only. Requires Supabase.
-    """
-    supabase = get_supabase_admin_client()
-    if not supabase:
-        raise HTTPException(
-            503,
-            "User profile update not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
-        )
-
-    try:
-        update_payload: dict = {"updated_at": datetime.now(timezone.utc).isoformat()}
-        if body.first_name is not None:
-            update_payload["first_name"] = body.first_name.strip() or None
-        if body.last_name is not None:
-            update_payload["last_name"] = body.last_name.strip() or None
-
-        if len(update_payload) <= 1:
-            return {"message": "No changes"}
-
-        resp = (
-            supabase.table("user_roles")
-            .update(update_payload)
-            .eq("user_id", user_id)
-            .execute()
-        )
-
-        if not resp.data:
-            raise HTTPException(404, "User not found in user_roles")
-
-        return {"message": "Name updated"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception("Update user profile failed: %s", e)
-        raise HTTPException(500, f"Failed to update user profile: {e}")
+    """Set allowlist entry for sub. Admin only."""
+    set_allowed_user(sub, body.enabled, body.note)
+    return {"sub": sub, "enabled": body.enabled, "note": body.note}

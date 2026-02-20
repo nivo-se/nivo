@@ -1,5 +1,13 @@
-import { supabase } from './supabase'
+import { getAccessToken } from './authToken'
 import { SupabaseCompany } from './supabaseDataService'
+
+async function authHeaders(extra: HeadersInit = {}): Promise<HeadersInit> {
+  const token = await getAccessToken()
+  return {
+    ...extra,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
 
 export interface SavedCompanyList {
   id: string
@@ -18,15 +26,7 @@ export class SavedListsService {
   static async getSavedLists(): Promise<SavedCompanyList[]> {
     try {
       console.log('Fetching saved lists from API...')
-
-      // Get auth token from Supabase
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {}
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
+      const headers = await authHeaders()
       const response = await fetch('/api/saved-lists', { headers })
 
       if (!response.ok) {
@@ -78,17 +78,7 @@ export class SavedListsService {
   static async saveList(list: Omit<SavedCompanyList, 'id' | 'createdAt' | 'updatedAt'>): Promise<SavedCompanyList | null> {
     try {
       console.log('Saving list via API:', list.name)
-
-      // Get auth token from Supabase
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      }
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
+      const headers = await authHeaders({ 'Content-Type': 'application/json' })
       const response = await fetch('/api/saved-lists', {
         method: 'POST',
         headers,
@@ -143,17 +133,7 @@ export class SavedListsService {
   static async updateList(id: string, updates: Partial<Omit<SavedCompanyList, 'id' | 'createdAt' | 'updatedAt'>>): Promise<SavedCompanyList | null> {
     try {
       console.log('Updating list via API:', id)
-
-      // Get auth token from Supabase
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json'
-      }
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
+      const headers = await authHeaders({ 'Content-Type': 'application/json' })
       const response = await fetch(`/api/saved-lists/${id}`, {
         method: 'PUT',
         headers,
@@ -207,10 +187,9 @@ export class SavedListsService {
    */
   static async addCompaniesToList(listId: string, newCompanies: any[]): Promise<SavedCompanyList | null> {
     try {
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
+      const token = await getAccessToken()
+      if (!token) {
+        console.warn('No auth token, using localStorage fallback')
         const existingLists = await this.getSavedListsFallback()
         const existingList = existingLists.find(l => l.id === listId)
         if (!existingList) {
@@ -230,55 +209,16 @@ export class SavedListsService {
         return updatedList
       }
 
-      // First get the current list
-      const { data: currentList, error: fetchError } = await supabase
-        .from('saved_company_lists')
-        .select('*')
-        .eq('id', listId)
-        .eq('user_id', user.id)
-        .single()
-
-      if (fetchError || !currentList) {
-        console.error('Error fetching current list:', fetchError)
+      const lists = await this.getSavedLists()
+      const currentList = lists.find(l => l.id === listId)
+      if (!currentList) {
+        console.error('List not found for adding companies')
         return null
       }
-
-      // Merge companies (avoid duplicates based on OrgNr)
-      const existingCompanies = currentList.companies || []
-      const existingOrgNrs = new Set(existingCompanies.map((c: any) => c.OrgNr))
-
-      const uniqueNewCompanies = newCompanies.filter(company =>
-        !existingOrgNrs.has(company.OrgNr)
-      )
-
-      const mergedCompanies = [...existingCompanies, ...uniqueNewCompanies]
-
-      // Update the list with merged companies
-      const { data, error } = await supabase
-        .from('saved_company_lists')
-        .update({
-          companies: mergedCompanies,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', listId)
-        .eq('user_id', user.id)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error adding companies to list:', error)
-        return null
-      }
-
-      return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        companies: data.companies || [],
-        filters: data.filters || {},
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
-      }
+      const existingOrgNrs = new Set((currentList.companies || []).map((c: any) => c.OrgNr))
+      const uniqueNewCompanies = newCompanies.filter(company => !existingOrgNrs.has(company.OrgNr))
+      const mergedCompanies = [...(currentList.companies || []), ...uniqueNewCompanies]
+      return this.updateList(listId, { companies: mergedCompanies })
     } catch (error) {
       console.error('Error in addCompaniesToList:', error)
       return null
@@ -290,18 +230,15 @@ export class SavedListsService {
    */
   static async removeCompaniesFromList(listId: string, companyOrgNrs: string[]): Promise<SavedCompanyList | null> {
     try {
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        console.warn('No authenticated user found, using localStorage fallback')
+      const token = await getAccessToken()
+      if (!token) {
+        console.warn('No auth token, using localStorage fallback')
         const existingLists = await this.getSavedListsFallback()
         const existingList = existingLists.find(l => l.id === listId)
         if (!existingList) {
           console.error('List not found for removing companies')
           return null
         }
-
-        // Remove companies
         const updatedList = {
           ...existingList,
           companies: existingList.companies.filter(c => !companyOrgNrs.includes(c.OrgNr)),
@@ -310,52 +247,16 @@ export class SavedListsService {
         await this.saveListFallback(updatedList)
         return updatedList
       }
-
-      // First get the current list
-      const { data: currentList, error: fetchError } = await supabase
-        .from('saved_company_lists')
-        .select('*')
-        .eq('id', listId)
-        .eq('user_id', user.id)
-        .single()
-
-      if (fetchError || !currentList) {
-        console.error('Error fetching current list:', fetchError)
+      const lists = await this.getSavedLists()
+      const currentList = lists.find(l => l.id === listId)
+      if (!currentList) {
+        console.error('List not found for removing companies')
         return null
       }
-
-      // Remove companies with matching OrgNrs
-      const existingCompanies = currentList.companies || []
-      const filteredCompanies = existingCompanies.filter((company: any) =>
-        !companyOrgNrs.includes(company.OrgNr)
+      const filteredCompanies = (currentList.companies || []).filter(
+        (company: any) => !companyOrgNrs.includes(company.OrgNr)
       )
-
-      // Update the list with filtered companies
-      const { data, error } = await supabase
-        .from('saved_company_lists')
-        .update({
-          companies: filteredCompanies,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', listId)
-        .eq('user_id', user.id)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error removing companies from list:', error)
-        return null
-      }
-
-      return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        companies: data.companies || [],
-        filters: data.filters || {},
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
-      }
+      return this.updateList(listId, { companies: filteredCompanies })
     } catch (error) {
       console.error('Error in removeCompaniesFromList:', error)
       return null
@@ -368,15 +269,7 @@ export class SavedListsService {
   static async deleteList(id: string): Promise<boolean> {
     try {
       console.log('Deleting list via API:', id)
-
-      // Get auth token from Supabase
-      if (!supabase) throw new Error('Supabase client not initialized')
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {}
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
+      const headers = await authHeaders()
       const response = await fetch(`/api/saved-lists/${id}`, {
         method: 'DELETE',
         headers

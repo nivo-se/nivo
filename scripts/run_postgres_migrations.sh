@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Run Postgres migrations against local Docker or DATABASE_URL
+# Run Postgres migrations. Uses DATABASE_URL from env, or default local Docker URL.
 # Prerequisite: run bootstrap first: python scripts/bootstrap_postgres_schema.py
 # Usage: ./scripts/run_postgres_migrations.sh
-set -e
+# WARNING: Confirm you are targeting the intended DB (dev vs prod) before running.
+set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Load .env if present
@@ -13,9 +14,13 @@ if [ -f .env ]; then
 fi
 
 URL="${DATABASE_URL:-postgresql://nivo:nivo@localhost:5433/nivo}"
-
-echo "Running migrations against Postgres"
-echo "  URL: ${URL%%@*}@***"
+# Show target without password: protocol and host (or "default")
+if [ -n "${DATABASE_URL:-}" ]; then
+  echo "Using DATABASE_URL from environment"
+else
+  echo "Using default URL (DATABASE_URL not set)"
+fi
+echo "Target: ${URL%%@*}@*** (run against this DB)"
 echo ""
 
 for f in database/migrations/013_add_coverage_view.sql \
@@ -24,7 +29,8 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/016_extend_coverage_metrics_financial_cols.sql \
          database/migrations/017_coverage_metrics_add_is_stale.sql \
          database/migrations/018_create_analysis_tables.sql \
-         database/migrations/019_coverage_metrics_add_municipality_contact_ai.sql; do
+         database/migrations/019_coverage_metrics_add_municipality_contact_ai.sql \
+         database/migrations/020_user_roles_allowed_users.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     psql "$URL" -f "$f" -v ON_ERROR_STOP=1
@@ -32,4 +38,4 @@ for f in database/migrations/013_add_coverage_view.sql \
 done
 
 echo ""
-echo "Migrations complete."
+echo "Migrations complete. First admin: insert manually after login (see docs/BOOTSTRAP_ROLES.md)."

@@ -1,18 +1,13 @@
 /**
- * Fetch with Supabase auth token for backend API calls.
- * Attaches Authorization: Bearer <access_token> when session exists.
- * Catches network errors and throws a more helpful message.
+ * Fetch with Auth0 access token for backend API calls.
+ * Attaches Authorization: Bearer <access_token> when available.
  */
-import { supabase } from './supabase'
+import { getAccessToken } from './authToken'
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  if (!supabase) return {}
   try {
-    const { data: { session } } = await supabase.auth.getSession()
-    const token = session?.access_token
-    if (token) {
-      return { Authorization: `Bearer ${token}` }
-    }
+    const token = await getAccessToken()
+    if (token) return { Authorization: `Bearer ${token}` }
   } catch {
     // ignore
   }

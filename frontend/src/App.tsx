@@ -11,10 +11,14 @@ function RedirectWithParam({ to, param }: { to: string; param: string }) {
   const target = to.replace(`:${param}`, value ?? "");
   return <Navigate to={target} replace />;
 }
-import { AuthProvider } from "./contexts/AuthContext";
+import { Auth0Provider } from "@auth0/auth0-react";
+import { NoAuthProvider } from "./contexts/AuthContext";
+import { Auth0AuthProvider } from "./contexts/Auth0AuthProvider";
+import { isAuth0Configured } from "./lib/authToken";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import AppLayout from "./pages/default/AppLayout";
@@ -41,6 +45,29 @@ import { CompanyPage } from "./pages/app/CompanyPage";
 
 const queryClient = new QueryClient();
 
+const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE;
+
+function AuthWrapper({ children }: { children: React.ReactNode }) {
+  if (isAuth0Configured() && auth0Domain && auth0ClientId) {
+    return (
+      <Auth0Provider
+        domain={auth0Domain}
+        clientId={auth0ClientId}
+        authorizationParams={{
+          redirect_uri: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
+          audience: auth0Audience || undefined,
+          scope: "openid profile email",
+        }}
+      >
+        <Auth0AuthProvider>{children}</Auth0AuthProvider>
+      </Auth0Provider>
+    );
+  }
+  return <NoAuthProvider>{children}</NoAuthProvider>;
+}
+
 function RedirectToCompany() {
   const { orgnr } = useParams<{ orgnr: string }>();
   return <Navigate to={orgnr ? `/company/${orgnr}` : "/"} replace />;
@@ -49,13 +76,14 @@ function RedirectToCompany() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <AuthProvider>
+      <AuthWrapper>
         <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            {isAuth0Configured() && <Route path="/auth/callback" element={<AuthCallback />} />}
             <Route path="/styleguide" element={<StyleGuide />} />
             <Route path="/landing" element={<Index />} />
 
@@ -135,7 +163,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
         </TooltipProvider>
-      </AuthProvider>
+      </AuthWrapper>
     </ThemeProvider>
   </QueryClientProvider>
 );

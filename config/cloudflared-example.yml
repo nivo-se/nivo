@@ -1,0 +1,19 @@
+# Cloudflare Tunnel config — copy to cloudflared.yml and fill in your tunnel ID and credentials path.
+# See docs/CLOUDFLARE_TUNNEL_SETUP.md for full setup.
+#
+# 1. Replace TUNNEL_ID with the UUID from: cloudflared tunnel create nivo
+# 2. Replace the credentials-file path with your actual path (e.g. ~/.cloudflared/TUNNEL_ID.json)
+# 3. Replace hostnames with your domain (e.g. api.nivogroup.se, app.nivogroup.se)
+
+tunnel: TUNNEL_ID
+credentials-file: /Users/you/.cloudflared/TUNNEL_ID.json
+
+ingress:
+  # API (FastAPI) — required
+  - hostname: api.yourdomain.com
+    service: http://localhost:8000
+  # Frontend (optional): only if you serve the app through this tunnel (e.g. Vite dev or static server)
+  # - hostname: app.yourdomain.com
+  #   service: http://localhost:5173
+  # Catch-all required: must be last
+  - service: http_status:404

@@ -106,6 +106,12 @@ node_modules
 data/new_schema_local.db
 data/csv_export/
 
+# Service logs (LaunchAgent output)
+logs/
+
 # macOS
 .DS_Store
 ._*
+
+# Cloudflare Tunnel (local config with tunnel ID and credentials path)
+config/cloudflared.yml

@@ -1,268 +1,71 @@
+/**
+ * Auth context: Auth0 only. When Auth0 is not configured, this no-auth provider is used.
+ */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase, supabaseConfig } from '../lib/supabase'
+import { setAccessTokenGetter } from '../lib/authToken'
 
-interface AuthContextType {
-  user: User | null
-  session: Session | null
+export interface AppUser {
+  id: string
+  email: string | null
+  user_metadata?: Record<string, unknown>
+  app_metadata?: Record<string, unknown>
+  aud?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface AuthContextType {
+  user: AppUser | null
+  session: unknown
   loading: boolean
   userRole: string | null
   isApproved: boolean
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>
-  signInWithGoogle: () => Promise<{ error: AuthError | null }>
-  signOut: () => Promise<{ error: AuthError | null }>
+  signUp: (email: string, password: string) => Promise<{ error: { name: string; message: string; status: number } | null }>
+  signIn: (email: string, password: string) => Promise<{ error: { name: string; message: string; status: number } | null }>
+  signInWithMagicLink: (email: string) => Promise<{ error: { name: string; message: string; status: number } | null }>
+  signInWithGoogle: () => Promise<{ error: { name: string; message: string; status: number } | null }>
+  signOut: () => Promise<{ error: { name: string; message: string; status: number } | null }>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider or Auth0AuthProvider')
   }
   return context
 }
 
-interface AuthProviderProps {
-  children: React.ReactNode
-}
+const notConfiguredError = () => ({
+  name: 'AuthNotConfigured',
+  message: 'Auth0 is not configured. Set VITE_AUTH0_DOMAIN and VITE_AUTH0_CLIENT_ID.',
+  status: 503,
+})
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
+/**
+ * No-auth fallback when Auth0 is not configured. No login; user is always null.
+ */
+export function NoAuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
-  const [userRole, setUserRole] = useState<string | null>(null)
-  const [isApproved, setIsApproved] = useState(false)
-  const authEnabled = supabaseConfig.isConfigured
-
-  const createAuthDisabledError = (): AuthError => ({
-    name: 'AuthNotConfigured',
-    message: 'Authentication is not configured for this environment.',
-    status: 503
-  } as AuthError)
-
-  // Check user role and approval status
-  const checkUserStatus = async (userId: string, userEmail?: string) => {
-    if (!supabase) {
-      console.warn('Supabase not configured, skipping user status check')
-      return
-    }
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single()
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error checking user status:', error)
-        return
-      }
-
-      if (data) {
-        setUserRole(data.role)
-        setIsApproved(data.role === 'approved' || data.role === 'admin')
-      } else {
-        // User not in user_roles table, check if they're the admin email
-        const isAdminEmail = userEmail === 'jesper@rgcapital.se'
-        if (isAdminEmail) {
-          setUserRole('admin')
-          setIsApproved(true)
-        } else {
-          setUserRole('pending')
-          setIsApproved(false)
-        }
-      }
-    } catch (err) {
-      console.error('Error checking user status:', err)
-      // Fallback: if there's an error, check if it's the admin email
-      const isAdminEmail = userEmail === 'jesper@rgcapital.se'
-      if (isAdminEmail) {
-        setUserRole('admin')
-        setIsApproved(true)
-      } else {
-        setUserRole('pending')
-        setIsApproved(false)
-      }
-    }
-  }
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      if (!authEnabled) {
-        // TEMPORARY: Set mock user for testing
-        const mockUser = {
-          id: '00000000-0000-0000-0000-000000000001',
-          email: 'jesper@rgcapital.se',
-          user_metadata: {},
-          app_metadata: {},
-          aud: 'authenticated',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        } as User
-        setUser(mockUser)
-        setSession(null)
-        setUserRole('admin')
-        setIsApproved(true)
-        setLoading(false)
-        return
-      }
+    setAccessTokenGetter(() => Promise.resolve(null))
+    setLoading(false)
+    return () => setAccessTokenGetter(() => Promise.resolve(null))
+  }, [])
 
-      if (!supabase) {
-        console.warn('Supabase not configured, skipping session check')
-        setLoading(false)
-        return
-      }
-
-      const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) {
-        console.error('Error getting session:', error)
-      } else {
-        setSession(session)
-        setUser(session?.user ?? null)
-        if (session?.user) {
-          // TEMPORARY FIX: Force admin for jesper@rgcapital.se
-          if (session.user.email === 'jesper@rgcapital.se') {
-            console.log('TEMPORARY FIX: Forcing admin access for jesper@rgcapital.se')
-            setUserRole('admin')
-            setIsApproved(true)
-          } else {
-            await checkUserStatus(session.user.id, session.user.email)
-          }
-        }
-      }
-      setLoading(false)
-    }
-
-    getInitialSession()
-
-    if (!authEnabled) {
-      return
-    }
-
-    // Listen for auth changes
-    if (!supabase) {
-      return
-    }
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        if (session?.user) {
-          // TEMPORARY FIX: Force admin for jesper@rgcapital.se
-          if (session.user.email === 'jesper@rgcapital.se') {
-            console.log('TEMPORARY FIX: Forcing admin access for jesper@rgcapital.se (auth change)')
-            setUserRole('admin')
-            setIsApproved(true)
-          } else {
-            await checkUserStatus(session.user.id, session.user.email)
-          }
-        } else {
-          setUserRole(null)
-          setIsApproved(false)
-        }
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [authEnabled])
-
-  const signUp = async (email: string, password: string) => {
-    if (!authEnabled || !supabase) {
-      return { error: createAuthDisabledError() }
-    }
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    
-    if (!error && data.user) {
-      // Add user to user_roles table with pending status
-      await supabase
-        .from('user_roles')
-        .insert({
-          user_id: data.user.id,
-          role: 'pending'
-        })
-    }
-    
-    return { error }
-  }
-
-  const signIn = async (email: string, password: string) => {
-    if (!authEnabled || !supabase) {
-      return { error: createAuthDisabledError() }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
-  }
-
-  const signInWithMagicLink = async (email: string) => {
-    if (!supabase) {
-      return { error: createAuthDisabledError() }
-    }
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin + '/auth' },
-    })
-    return { error }
-  }
-
-  const signInWithGoogle = async () => {
-    if (!supabase) {
-      return { error: createAuthDisabledError() }
-    }
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/auth' },
-    })
-    return { error }
-  }
-
-  const signOut = async () => {
-    if (!supabase) {
-      return { error: createAuthDisabledError() }
-    }
-
-    try {
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        console.error('Sign out error:', error)
-        return { error }
-      }
-      // Clear local state
-      setUser(null)
-      setSession(null)
-      setUserRole(null)
-      setIsApproved(false)
-      return { error: null }
-    } catch (err: any) {
-      console.error('Sign out error:', err)
-      return { error: err }
-    }
-  }
-
-  const value = {
-    user,
-    session,
+  const value: AuthContextType = {
+    user: null,
+    session: null,
     loading,
-    userRole,
-    isApproved,
-    signUp,
-    signIn,
-    signInWithMagicLink,
-    signInWithGoogle,
-    signOut,
+    userRole: null,
+    isApproved: false,
+    signUp: async () => ({ error: notConfiguredError() }),
+    signIn: async () => ({ error: notConfiguredError() }),
+    signInWithMagicLink: async () => ({ error: notConfiguredError() }),
+    signInWithGoogle: async () => ({ error: notConfiguredError() }),
+    signOut: async () => ({ error: null }),
   }
 
   return (

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { supabaseConfig } from '../lib/supabase'
+import { isAuth0Configured } from '../lib/authToken'
 import { Loader2, Clock, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 import { Button } from './ui/button'
@@ -10,8 +10,8 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading, isApproved, userRole } = useAuth()
-  const authEnabled = supabaseConfig.isConfigured
+  const { user, loading, isApproved } = useAuth()
+  const authEnabled = isAuth0Configured()
 
   if (!authEnabled) {
     return <>{children}</>

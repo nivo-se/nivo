@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from .dependencies import get_supabase_admin_client, get_current_user_id
-from .admin_users import _require_admin
+from .rbac import require_role
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class AICreditsUsageResponse(BaseModel):
 
 
 @router.get("/config", response_model=AICreditsConfigResponse)
-async def get_config(_: str = Depends(_require_admin)):
+async def get_config(_: str = Depends(require_role("admin"))):
     """Get current AI credits limits (admin only)."""
     supabase = _supabase()
     if not supabase:
@@ -116,7 +116,7 @@ async def get_config(_: str = Depends(_require_admin)):
 async def update_config(
     body: AICreditsConfigUpdate,
     request: Request,
-    _: str = Depends(_require_admin),
+    _: str = Depends(require_role("admin")),
 ):
     """Update AI credits limits (admin only)."""
     supabase = _supabase()
@@ -162,7 +162,7 @@ async def update_config(
 @router.get("/usage", response_model=AICreditsUsageResponse)
 async def get_usage(
     period: str = "current_month",
-    _: str = Depends(_require_admin),
+    _: str = Depends(require_role("admin")),
 ):
     """
     Get AI credits usage per user for a period (admin only).

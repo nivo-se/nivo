@@ -45,12 +45,12 @@ cors_origins_env = os.getenv("CORS_ORIGINS", "")
 if cors_origins_env:
     default_origins.extend([origin.strip() for origin in cors_origins_env.split(",") if origin.strip()])
 
-# Restrict to explicit origins when credentials enabled; no wildcard regex.
+# Explicit origins; Authorization header allowed for Bearer tokens. Add prod frontend via CORS_ORIGINS.
 cors_config: dict = {
     "allow_origins": default_origins,
     "allow_credentials": True,
     "allow_methods": ["*"],
-    "allow_headers": ["*"],
+    "allow_headers": ["*"],  # includes Authorization for Bearer JWT
 }
 # Opt-in: add Vercel preview regex only when explicitly enabled (security: avoids trusting any *.vercel.app)
 if os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes"):
@@ -86,6 +86,21 @@ async def global_exception_handler(request: Request, exc: Exception):
 from .auth import JWTAuthMiddleware
 app.add_middleware(JWTAuthMiddleware)
 
+
+@app.on_event("startup")
+def _check_auth_config():
+    """Fail closed: crash if REQUIRE_AUTH=true but Auth0 config is missing."""
+    if os.getenv("REQUIRE_AUTH", "").lower() not in ("true", "1", "yes"):
+        return
+    domain = (os.getenv("AUTH0_DOMAIN") or "").strip()
+    audience = (os.getenv("AUTH0_AUDIENCE") or "").strip()
+    if not domain or not audience:
+        raise RuntimeError(
+            "REQUIRE_AUTH is true but AUTH0_DOMAIN or AUTH0_AUDIENCE is missing. "
+            "Set both in .env and restart. Refusing to run in half-configured state."
+        )
+
+
 # Ping - no DB, no deps; use to isolate hang (before vs after FastAPI)
 @app.get("/ping")
 def ping():
@@ -97,11 +112,12 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "nivo-intelligence-api"}
 
-# Import routers
-from . import admin_users, ai_credits, ai_filter, ai_reports, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, prospects, shortlists, status, analysis, saved_lists, universe, views
+# Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
+from . import admin_users, ai_credits, ai_filter, ai_reports, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, me, prospects, shortlists, status, analysis, saved_lists, universe, views
 from .chat import router as chat_router
 from .enrichment import router as enrichment_router
 
+app.include_router(me.router)
 app.include_router(admin_users.router)
 app.include_router(ai_credits.router)
 app.include_router(coverage.router)
