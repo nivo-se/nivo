@@ -12,13 +12,14 @@ function RedirectWithParam({ to, param }: { to: string; param: string }) {
   return <Navigate to={target} replace />;
 }
 import { Auth0Provider } from "@auth0/auth0-react";
-import { NoAuthProvider } from "./contexts/AuthContext";
+import { NoAuthProvider, useAuth } from "./contexts/AuthContext";
 import { Auth0AuthProvider } from "./contexts/Auth0AuthProvider";
 import { isAuth0Configured } from "./lib/authToken";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import ClaimFirstAdmin from "./pages/ClaimFirstAdmin";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import AppLayout from "./pages/default/AppLayout";
@@ -73,6 +74,20 @@ function RedirectToCompany() {
   return <Navigate to={orgnr ? `/company/${orgnr}` : "/"} replace />;
 }
 
+/** When user has no role in DB, show ClaimFirstAdmin; otherwise AppLayout (with nested routes). */
+function AppOrClaimFirstAdmin() {
+  const { user, userRole, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+  if (user && userRole === null) return <ClaimFirstAdmin />;
+  return <AppLayout />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -92,7 +107,7 @@ const App = () => (
               path="/"
               element={
                 <ProtectedRoute>
-                  <AppLayout />
+                  <AppOrClaimFirstAdmin />
                 </ProtectedRoute>
               }
             >

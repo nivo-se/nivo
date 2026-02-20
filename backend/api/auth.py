@@ -145,15 +145,36 @@ def _is_public_path(path: str) -> bool:
     return False
 
 
+def _cors_allowed_origin(origin: str) -> bool:
+    if not origin:
+        return False
+    allowed = {
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:8081",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    }
+    extra = os.getenv("CORS_ORIGINS", "")
+    if extra:
+        allowed.update({o.strip() for o in extra.split(",") if o.strip()})
+    if origin in allowed:
+        return True
+    allow_vercel_previews = os.getenv("CORS_ALLOW_VERCEL_PREVIEWS", "").lower() in ("1", "true", "yes")
+    return bool(allow_vercel_previews and origin.startswith("https://") and origin.endswith(".vercel.app"))
+
+
 def _json_401(request: Request) -> Response:
     """Return 401 JSON with CORS headers so the browser can read the response."""
-    origin = request.headers.get("origin", "")
-    allowed = ("http://localhost:8080", "http://localhost:8081", "http://127.0.0.1:8080", "http://127.0.0.1:8081",
-               "http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:3000")
+    origin = request.headers.get("origin", "").strip()
     headers = {"Content-Type": "application/json"}
-    if origin in allowed:
+    if _cors_allowed_origin(origin):
         headers["Access-Control-Allow-Origin"] = origin
         headers["Access-Control-Allow-Credentials"] = "true"
+        headers["Vary"] = "Origin"
     return Response(status_code=401, content='{"error":"unauthorized"}', headers=headers)
 
 

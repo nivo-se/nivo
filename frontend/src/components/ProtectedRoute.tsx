@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { isAuth0Configured } from '../lib/authToken'
 import { Loader2, Clock, AlertTriangle } from 'lucide-react'
@@ -10,8 +11,16 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const navigate = useNavigate()
   const { user, loading, isApproved } = useAuth()
   const authEnabled = isAuth0Configured()
+
+  // Redirect to /auth when not logged in (use navigate so we stay in SPA and keep Auth0 session)
+  useEffect(() => {
+    if (authEnabled && !loading && !user) {
+      navigate('/auth', { replace: true })
+    }
+  }, [authEnabled, loading, user, navigate])
 
   if (!authEnabled) {
     return <>{children}</>
@@ -29,8 +38,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    // Redirect to auth page
-    window.location.href = '/auth'
     return null
   }
 
@@ -58,9 +65,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           <div className="mt-6 text-center">
             <Button 
               variant="outline" 
-              onClick={() => {
-                window.location.href = '/auth'
-              }}
+              onClick={() => navigate('/auth')}
             >
               Back to Login
             </Button>
