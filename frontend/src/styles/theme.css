@@ -38,6 +38,12 @@
   --sidebar-active-fg: #6E6D67;
 
   --radius: 0.5rem;
+
+  --deck-accent: 92 8.4% 35.1%;
+  --deck-accent-hover: 85.3 8.8% 42.2%;
+  --deck-fg: 345 4.5% 17.3%;
+  --deck-bg: 0 0% 90%;
+  --deck-surface: 0 0% 100%;
 }
 
 .dark {

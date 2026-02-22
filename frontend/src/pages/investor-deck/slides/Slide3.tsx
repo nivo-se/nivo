@@ -15,10 +15,10 @@ export function Slide3() {
     <div className="h-full flex flex-col justify-center space-y-8">
       {/* Title */}
       <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#2E2A2B]">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
           Investment Overview
         </h1>
-        <p className="text-sm text-[#596152]">
+        <p className="text-sm text-deck-accent">
           A disciplined approach to Nordic SME compounding
         </p>
       </div>
@@ -28,12 +28,12 @@ export function Slide3() {
         {items.map((item, index) => (
           <div
             key={index}
-            className="bg-white border border-[#2E2A2B]/10 rounded-lg p-6 space-y-3 hover:border-[#596152]/50 transition-colors shadow-sm"
+            className="bg-deck-surface border border-deck-fg/10 rounded-lg p-6 space-y-3 hover:border-deck-accent/50 transition-colors shadow-sm"
           >
-            <div className="text-xs font-semibold text-[#596152] uppercase tracking-wider">
+            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">
               {item.label}
             </div>
-            <div className="text-sm text-[#2E2A2B] leading-relaxed">
+            <div className="text-sm text-deck-fg leading-relaxed">
               {item.value}
             </div>
           </div>
@@ -41,8 +41,8 @@ export function Slide3() {
       </div>
 
       {/* Bottom Message */}
-      <div className="bg-[#596152]/10 border border-[#596152]/30 rounded-lg p-6 text-center">
-        <p className="text-base text-[#2E2A2B]">
+      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 text-center">
+        <p className="text-base text-deck-fg">
           Nivo does not buy technology risk. <span className="font-semibold">Nivo buys operational improvement potential.</span>
         </p>
       </div>

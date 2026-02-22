@@ -39,10 +39,10 @@ export function Slide12() {
     <div className="h-full flex flex-col justify-center space-y-7">
       {/* Title */}
       <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#2E2A2B]">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
           Team
         </h1>
-        <p className="text-sm text-[#596152]">
+        <p className="text-sm text-deck-accent">
           Operational experience meets disciplined capital allocation
         </p>
       </div>
@@ -50,24 +50,24 @@ export function Slide12() {
       {/* Core Team */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
-          <Briefcase className="w-5 h-5 text-[#596152]" />
-          <h2 className="text-base font-semibold text-[#2E2A2B]">Core Team</h2>
+          <Briefcase className="w-5 h-5 text-deck-accent" />
+          <h2 className="text-base font-semibold text-deck-fg">Core Team</h2>
         </div>
         <div className="grid grid-cols-2 gap-6">
           {team.map((member, index) => (
             <div
               key={index}
-              className="bg-white border border-[#2E2A2B]/10 rounded-lg p-8 space-y-4 shadow-sm"
+              className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 space-y-4 shadow-sm"
             >
               <div className="space-y-1">
-                <h3 className="text-base font-semibold text-[#2E2A2B]">{member.name}</h3>
-                <p className="text-[#596152] font-medium">{member.role}</p>
+                <h3 className="text-base font-semibold text-deck-fg">{member.name}</h3>
+                <p className="text-deck-accent font-medium">{member.role}</p>
               </div>
               <ul className="space-y-2.5">
                 {member.background.map((item, itemIndex) => (
                   <li key={itemIndex} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#596152] mt-2 flex-shrink-0" />
-                    <span className="text-[#2E2A2B] text-sm">{item}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0" />
+                    <span className="text-deck-fg text-sm">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -79,31 +79,31 @@ export function Slide12() {
       {/* Advisory Board */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
-          <Award className="w-5 h-5 text-[#596152]" />
-          <h2 className="text-base font-semibold text-[#2E2A2B]">Advisory Board</h2>
+          <Award className="w-5 h-5 text-deck-accent" />
+          <h2 className="text-base font-semibold text-deck-fg">Advisory Board</h2>
         </div>
         <div className="grid grid-cols-2 gap-6">
           {advisors.map((advisor, index) => (
             <div
               key={index}
-              className="bg-[#596152]/10 border border-[#596152]/30 rounded-lg p-6 space-y-3"
+              className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 space-y-3"
             >
-              <h3 className="text-lg font-semibold text-[#2E2A2B]">{advisor.name}</h3>
-              <p className="text-[#2E2A2B] text-sm leading-relaxed">{advisor.expertise}</p>
+              <h3 className="text-lg font-semibold text-deck-fg">{advisor.name}</h3>
+              <p className="text-deck-fg text-sm leading-relaxed">{advisor.expertise}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Team Philosophy */}
-      <div className="bg-white border border-[#2E2A2B]/10 rounded-lg p-8 shadow-sm">
+      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 shadow-sm">
         <div className="flex items-start gap-6">
-          <div className="w-12 h-12 rounded-lg bg-[#596152]/10 border border-[#596152]/30 flex items-center justify-center flex-shrink-0">
-            <Target className="w-6 h-6 text-[#596152]" />
+          <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center flex-shrink-0">
+            <Target className="w-6 h-6 text-deck-accent" />
           </div>
           <div className="space-y-4">
-            <h3 className="text-base font-semibold text-[#2E2A2B]">Team Philosophy</h3>
-            <p className="text-[#2E2A2B] leading-relaxed">
+            <h3 className="text-base font-semibold text-deck-fg">Team Philosophy</h3>
+            <p className="text-deck-fg leading-relaxed">
               We are operators first, investors second. Our team has sat in CEO and CFO chairs, managed P&Ls, and executed operational improvements. This is not advisory work—it is hands-on execution guided by proven experience.
             </p>
           </div>

@@ -79,11 +79,11 @@ const CONTENT_MAX = "max-w-7xl mx-auto";
 
 export function FullPresentation() {
   return (
-    <div className="min-h-screen bg-[#E6E6E6]">
+    <div className="min-h-screen bg-deck-bg">
       <main>
         {sections.map((section) => (
           <section key={section.id} id={`section-${section.id}`} className="scroll-mt-16">
-            <div className={`bg-[#596152] text-white py-6 md:py-8 ${CONTENT_PADDING}`}>
+            <div className={`bg-deck-accent text-white py-6 md:py-8 ${CONTENT_PADDING}`}>
               <div className={`${CONTENT_MAX}`}>
                 <h2 className="text-lg md:text-xl font-bold tracking-tight">
                   {section.name}
@@ -100,10 +100,10 @@ export function FullPresentation() {
                 <div
                   key={slide.num}
                   id={`slide-${slide.num}`}
-                  className={`scroll-mt-16 relative ${index % 2 === 0 ? "bg-white" : "bg-[#E6E6E6]"}`}
+                  className={`scroll-mt-16 relative ${index % 2 === 0 ? "bg-deck-surface" : "bg-deck-bg"}`}
                 >
                   <div className={`${CONTENT_MAX} ${CONTENT_PADDING} py-14 md:py-20`}>
-                    <div className="absolute top-4 right-6 md:right-8 text-xs font-semibold text-[#596152] bg-[#596152]/10 border border-[#596152]/30 rounded px-2.5 py-1 tabular-nums">
+                    <div className="absolute top-4 right-6 md:right-8 text-xs font-semibold text-deck-accent bg-deck-accent/10 border border-deck-accent/30 rounded px-2.5 py-1 tabular-nums">
                       Slide {slide.num}
                     </div>
                     <SlideComponent />
@@ -111,7 +111,7 @@ export function FullPresentation() {
 
                   {index < section.slides.length - 1 && (
                     <div className={`${CONTENT_MAX} ${CONTENT_PADDING}`}>
-                      <hr className="border-t border-[#2E2A2B]/10" />
+                      <hr className="border-t border-deck-fg/10" />
                     </div>
                   )}
                 </div>
@@ -120,7 +120,7 @@ export function FullPresentation() {
           </section>
         ))}
 
-        <footer className="bg-[#2E2A2B] text-white py-14 md:py-20">
+        <footer className="bg-deck-fg text-white py-14 md:py-20">
           <div className={`${CONTENT_MAX} ${CONTENT_PADDING} text-center space-y-8`}>
             <div className="space-y-4">
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -135,7 +135,7 @@ export function FullPresentation() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="mailto:invest@nivogroup.se"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[#596152] hover:bg-[#6d7562] rounded-lg font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#2E2A2B]"
+                className="inline-flex items-center justify-center px-8 py-4 bg-deck-accent hover:bg-deck-accent-hover rounded-lg font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-deck-fg"
               >
                 Contact Investment Team
               </a>

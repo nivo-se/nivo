@@ -82,6 +82,14 @@ export default {
 					2: 'hsl(var(--chart-2))',
 					3: 'hsl(var(--chart-3))',
 				},
+				deck: {
+					DEFAULT: 'hsl(var(--deck-accent))',
+					accent: 'hsl(var(--deck-accent))',
+					'accent-hover': 'hsl(var(--deck-accent-hover))',
+					fg: 'hsl(var(--deck-fg))',
+					bg: 'hsl(var(--deck-bg))',
+					surface: 'hsl(var(--deck-surface))',
+				},
 				orangery: {
 					50: 'hsl(var(--muted))',
 					100: 'hsl(var(--muted))',
