@@ -1,6 +1,6 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield } from "lucide-react";
+import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield, Check } from "lucide-react";
 
 // ─── Projection data for chart (base: 100 equity + 30 debt in year 0) ─────────
 const ENTRY_EQUITY = 100;
@@ -87,19 +87,26 @@ export function Investor2LongForm() {
             We buy execution upside.
           </blockquote>
           <div className="mt-14 max-w-2xl mx-auto pt-8 border-t border-white/30">
-            <p className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/90">Underwriting snapshot (base case)</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
               <div className="flex items-center justify-between gap-3">
-                <span className="flex items-center gap-2 text-white/80"><Building2 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target size</span>
+                <span className="flex items-center gap-2 text-white/80"><Building2 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Investment Company</span>
+                <Check className="w-5 h-5 text-white flex-shrink-0" aria-hidden />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-white/80"><Shield className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Management Fee</span>
+                <span className="font-semibold tabular-nums text-white">0%</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-white/80"><Target className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target size</span>
                 <span className="font-semibold tabular-nums text-white">SEK 1,000m</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><TrendingUp className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target gross IRR</span>
-                <span className="font-semibold tabular-nums text-white">19–23%</span>
+                <span className="font-semibold tabular-nums text-white">20–25%</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><BarChart3 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target gross MOIC</span>
-                <span className="font-semibold tabular-nums text-white">2.2–2.8x</span>
+                <span className="font-semibold tabular-nums text-white">4x–5x</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><Clock className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Base case hold</span>
@@ -268,6 +275,7 @@ export function Investor2LongForm() {
                   <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--inv2-fg-muted))" }} stroke="hsl(var(--inv2-divider))" />
                   <YAxis tick={{ fontSize: 11, fill: "hsl(var(--inv2-fg-muted))" }} stroke="hsl(var(--inv2-divider))" width={36} />
                   <Tooltip
+                    cursor={false}
                     contentStyle={{ backgroundColor: "white", border: "1px solid hsl(var(--inv2-divider))", borderRadius: 6, fontSize: 12 }}
                     formatter={(value: number, name: string) => [value.toFixed(1), name === "equityValue" ? "Equity" : "Debt"]}
                     labelFormatter={(l) => l}
@@ -616,26 +624,26 @@ export function Investor2LongForm() {
               <h3 className={H3_CLASS}>Core team</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 1</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Partner 1</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">15+ years Nordic SME operations, 8+ transformations, M.Sc. Industrial Engineering.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 2</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Partner 2</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">12+ years PE and growth investing, 20+ Nordic companies, MBA SSE.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 3</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Partner 3</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">10+ years M&A, tech and industrials, M.Sc. Economics.</p>
                 </div>
@@ -643,14 +651,18 @@ export function Investor2LongForm() {
             </div>
             <div>
               <h3 className={H3_CLASS}>Advisory board</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl">
-                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto justify-items-center">
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
                   <p className="font-semibold text-inv2-fg">Senior Advisor</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-1">Ex-CEO SEK 400m industrial. 25+ years operations.</p>
                 </div>
-                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60">
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
                   <p className="font-semibold text-inv2-fg">Financial Advisor</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-1">Ex-CFO listed Nordic. Financial systems.</p>
+                </div>
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
+                  <p className="font-semibold text-inv2-fg">Advisor</p>
+                  <p className="text-[15px] text-inv2-fg-muted mt-1">Strategic and operational advisory.</p>
                 </div>
               </div>
             </div>
@@ -692,13 +704,64 @@ export function Investor2LongForm() {
 
             <div className="pt-6 border-t border-inv2-divider">
               <h3 className={H3_CLASS}>Corporate and investment structure</h3>
-              <p className={PROSE_CLASS + " mb-6"}>
-                All acquisitions are consolidated under the parent company. The structure is: <strong className="text-inv2-fg">Nivo Group AB (Parent)</strong> owns <strong className="text-inv2-fg">Nivo OpCo</strong>, the operating company; each acquisition is held in a dedicated <strong className="text-inv2-fg">BidCo</strong> (BidCo 1, 2, 3 …), under which the respective <strong className="text-inv2-fg">Target</strong> company sits. Financial returns flow from the targets up to the parent and are distributed according to share class rights.
-              </p>
-              <div className="bg-inv2-bg-subtle rounded-lg border border-inv2-divider/60 p-6 text-[15px] text-inv2-fg-muted space-y-3">
-                <p><span className="font-semibold text-inv2-fg">Founders and Founding Investors</span> → A- & B-shares → Nivo Group AB</p>
-                <p><span className="font-semibold text-inv2-fg">New investors</span> → B-shares → Nivo Group AB</p>
-                <p className="pt-2 border-t border-inv2-divider/60 mt-4">Nivo Group AB → Nivo OpCo → BidCo 1, BidCo 2, BidCo 3 … → Target 1, Target 2, Target 3 …</p>
+              <p className="text-sm text-inv2-fg-muted mb-4">Evergreen Swedish AB structure. Deal-by-deal financing.</p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                {/* Left: Corporate structure diagram */}
+                <div className="bg-white rounded-lg border border-inv2-divider/60 p-6 sm:p-8">
+                  <div className="flex flex-col items-center gap-0">
+                    {/* Above Parent: investors */}
+                    <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-3">
+                      <div className="text-center">
+                        <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-inv2-bg-subtle/50 min-w-[140px]">
+                          <p className="text-sm font-medium text-inv2-fg">Founders & Founding Investors</p>
+                          <p className="text-xs text-inv2-olive font-medium mt-1">A- & B-shares</p>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-inv2-bg-subtle/50 min-w-[140px]">
+                          <p className="text-sm font-medium text-inv2-fg">New Investors</p>
+                          <p className="text-xs text-inv2-olive font-medium mt-1">B-shares</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-olive/50" aria-hidden />
+                    <div className="px-5 py-3 rounded-md border-2 border-inv2-olive/50 bg-inv2-bg-subtle/80">
+                      <p className="text-sm font-semibold text-inv2-fg">Nivo Group AB (Parent Company)</p>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-olive/50" aria-hidden />
+                    <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-white">
+                      <p className="text-sm text-inv2-fg-muted">Nivo OpCo (operational holding function)</p>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-divider/80" aria-hidden />
+                    <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                      {["BidCo 1", "BidCo 2", "BidCo 3"].map((label) => (
+                        <div key={label} className="flex flex-col items-center">
+                          <div className="px-3 py-2 rounded border border-inv2-divider/80 bg-inv2-bg-subtle/50 text-center min-w-[90px]">
+                            <p className="text-xs font-medium text-inv2-fg">{label}</p>
+                            <p className="text-[11px] text-inv2-fg-muted mt-0.5">acquisition vehicle</p>
+                          </div>
+                          <div className="w-px h-3 bg-inv2-divider/60 my-0.5" aria-hidden />
+                          <div className="px-2 py-1.5 rounded border border-inv2-divider/60 bg-white text-center min-w-[70px]">
+                            <p className="text-[11px] text-inv2-fg-muted">{label.replace("BidCo", "Target")}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Right: Financing model text */}
+                <div>
+                  <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model</p>
+                  <div className={PROSE_CLASS + " space-y-4"}>
+                    <p>All acquisitions are consolidated under Nivo Group AB.</p>
+                    <p>New acquisitions are financed on a deal-by-deal basis through newly formed BidCos.</p>
+                    <p>Investors participate through share ownership in the Parent Company (A- and B-shares).</p>
+                    <p>There are no capital commitments. Participation in future share issues is voluntary, with pre-emptive rights.</p>
+                    <p>Nivo’s strategy focuses on long-term ownership of stable Nordic SMEs within an evergreen structure.</p>
+                    <p>In the event of additional capital needs within a portfolio company, capital may be provided either through retained earnings at the Parent level or through new share issues.</p>
+                    <p>With each new acquisition, the portfolio NAV is revalued, allowing early investors to benefit from value uplift prior to new capital being introduced.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
