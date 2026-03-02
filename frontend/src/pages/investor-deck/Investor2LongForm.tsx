@@ -450,7 +450,10 @@ export function Investor2LongForm() {
             </span>
           </div>
           <div className="mt-10 w-full">
-            <p className={LABEL_OLIVE_CLASS + " text-center mb-6"}>Proprietary AI sourcing engine</p>
+            <p className={LABEL_OLIVE_CLASS + " text-center mb-2"}>Proprietary AI sourcing engine</p>
+            <p className="text-center text-inv2-fg-muted text-[15px] sm:text-[16px] leading-relaxed mb-6 max-w-2xl mx-auto">
+              We built an in-house proprietary sourcing engine that leverages AI as well as financial analysis. We can analyse any Swedish company.
+            </p>
             <div className="rounded-lg overflow-hidden border border-inv2-divider/60 shadow-[var(--inv2-shadow-soft)] relative">
               <img
                 src="/sourcing-ai-screenshot.png"
