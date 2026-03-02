@@ -1,48 +1,28 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield } from "lucide-react";
+import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield, Check } from "lucide-react";
 
-// ─── Projection data for chart (base: 100 equity + 30 debt in year 0) ─────────
+// ─── Projection data: 7-year horizon, ~15% yearly return, reinvestment → ROIC 20%, MoM growth ─────────
 const ENTRY_EQUITY = 100;
-const ENTRY_DEBT = 30;
-const ENTRY_MULTIPLE = 6.0;
-const EXIT_MULTIPLE = 6.5;
-const REVENUE_CAGR = 0.06;
-const ENTRY_MARGIN = 0.1;
-const TARGET_MARGIN = 0.13;
-const YEARS = 5;
-// Entry EV = Equity + Debt = 130 → EBITDA = 130/6 → Revenue = EBITDA/margin
-const ENTRY_REVENUE = (ENTRY_EQUITY + ENTRY_DEBT) / ENTRY_MULTIPLE / ENTRY_MARGIN;
+const YEARS = 7;
 
-function buildProjection() {
-  const rows: { year: number; label: string; revenue: number; ebitda: number; debt: number; equityValue: number }[] = [];
-  let debt = ENTRY_DEBT;
-  for (let year = 0; year <= YEARS; year += 1) {
-    const revenue = ENTRY_REVENUE * (1 + REVENUE_CAGR) ** year;
-    const margin = Math.min(TARGET_MARGIN, ENTRY_MARGIN + year * 0.01);
-    const ebitda = revenue * margin;
-    const enterpriseValue = ebitda * ENTRY_MULTIPLE;
-    const equityValue = enterpriseValue - debt;
-    rows.push({
-      year,
-      label: `Year ${year}`,
-      revenue: Math.round(revenue * 10) / 10,
-      ebitda: Math.round(ebitda * 10) / 10,
-      debt: Math.round(debt * 10) / 10,
-      equityValue: Math.round(equityValue * 10) / 10,
-    });
-    if (year < YEARS) debt = Math.max(0, debt - ebitda * 0.15);
-  }
-  return rows;
-}
+const PROJ: { year: number; label: string; equityValue: number; debt: number; ev: number; return: number; reinvestment: number; roic: string; mom: string }[] = [
+  { year: 0, label: "Year 0", equityValue: 100, debt: 30, ev: 130, return: 0, reinvestment: 0, roic: "—", mom: "—" },
+  { year: 1, label: "Year 1", equityValue: 120, debt: 36, ev: 155, return: 20, reinvestment: 25, roic: "20%", mom: "1.20x" },
+  { year: 2, label: "Year 2", equityValue: 143, debt: 43, ev: 186, return: 23, reinvestment: 30, roic: "20%", mom: "1.43x" },
+  { year: 3, label: "Year 3", equityValue: 171, debt: 51, ev: 222, return: 28, reinvestment: 36, roic: "20%", mom: "1.71x" },
+  { year: 4, label: "Year 4", equityValue: 204, debt: 61, ev: 265, return: 33, reinvestment: 43, roic: "20%", mom: "2.04x" },
+  { year: 5, label: "Year 5", equityValue: 244, debt: 73, ev: 317, return: 40, reinvestment: 52, roic: "20%", mom: "2.44x" },
+  { year: 6, label: "Year 6", equityValue: 291, debt: 87, ev: 379, return: 48, reinvestment: 62, roic: "20%", mom: "2.91x" },
+  { year: 7, label: "Year 7", equityValue: 348, debt: 104, ev: 452, return: 57, reinvestment: 74, roic: "20%", mom: "3.48x" },
+];
 
-const PROJ = buildProjection();
 const EXIT_EQUITY = PROJ[PROJ.length - 1].equityValue;
 const GROSS_MOIC = (EXIT_EQUITY / ENTRY_EQUITY).toFixed(2);
 const GROSS_IRR = ((Math.pow(EXIT_EQUITY / ENTRY_EQUITY, 1 / YEARS) - 1) * 100).toFixed(1);
 
-const SECTION_CLASS = "max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14";
-const PROSE_CLASS = "w-full text-inv2-fg-muted leading-relaxed text-[17px] sm:text-[18px]";
+const SECTION_CLASS = "max-w-4xl mx-auto px-5 sm:px-6 py-10 sm:py-14";
+const PROSE_CLASS = "w-full text-inv2-fg-muted leading-relaxed text-[16px] sm:text-[18px]";
 const PUNCH_CLASS = "text-center text-xl sm:text-2xl font-semibold text-inv2-fg py-6";
 
 // Heading hierarchy (refactoring design UX)
@@ -55,9 +35,9 @@ const LABEL_OLIVE_CLASS = "text-sm font-semibold text-inv2-olive uppercase track
 
 export function Investor2LongForm() {
   return (
-    <div className="bg-white text-inv2-fg antialiased">
+    <div className="bg-white text-inv2-fg antialiased min-h-screen overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)] [padding-bottom:env(safe-area-inset-bottom)]">
       {/* ─── Hero (video background, white text) ──────────────────────────── */}
-      <section className="relative min-h-[70vh] flex flex-col justify-center px-4 sm:px-6 pt-20 pb-24 overflow-hidden">
+      <section className="relative min-h-[70vh] flex flex-col justify-center px-5 sm:px-6 pt-20 pb-24 overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
           <video
             className="h-full w-full object-cover object-center"
@@ -87,19 +67,26 @@ export function Investor2LongForm() {
             We buy execution upside.
           </blockquote>
           <div className="mt-14 max-w-2xl mx-auto pt-8 border-t border-white/30">
-            <p className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/90">Underwriting snapshot (base case)</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
               <div className="flex items-center justify-between gap-3">
-                <span className="flex items-center gap-2 text-white/80"><Building2 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target size</span>
+                <span className="flex items-center gap-2 text-white/80"><Building2 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Investment Company</span>
+                <Check className="w-5 h-5 text-white flex-shrink-0" aria-hidden />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-white/80"><Shield className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Management Fee</span>
+                <span className="font-semibold tabular-nums text-white">0%</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-white/80"><Target className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target size</span>
                 <span className="font-semibold tabular-nums text-white">SEK 1,000m</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><TrendingUp className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target gross IRR</span>
-                <span className="font-semibold tabular-nums text-white">19–23%</span>
+                <span className="font-semibold tabular-nums text-white">20–25%</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><BarChart3 className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Target gross MOIC</span>
-                <span className="font-semibold tabular-nums text-white">2.2–2.8x</span>
+                <span className="font-semibold tabular-nums text-white">4x–5x</span>
               </div>
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2 text-white/80"><Clock className="w-4 h-4 text-white/90 flex-shrink-0" aria-hidden />Base case hold</span>
@@ -108,9 +95,7 @@ export function Investor2LongForm() {
             </div>
           </div>
           <p className="mt-8 sm:mt-10 text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto font-bold">
-            Return profile is driven by EBITDA growth and debt paydown,
-            <br />
-            not multiple expansion.
+            Operational excellence will add value driven by added revenue growth, EBITDA expansion and only modest multiple expansion.
           </p>
         </div>
       </section>
@@ -193,20 +178,20 @@ export function Investor2LongForm() {
       <section className={"bg-inv2-bg-subtle " + SECTION_CLASS} id="overview">
         <div className="border-t border-inv2-divider pt-10 sm:pt-14">
           <h2 className={H2_CLASS}>Investment overview</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>A disciplined approach to Nordic SME compounding</p>
+          <p className={SECTION_SUBTITLE_CLASS}>A disciplined approach to Nordic compounding SMEs</p>
           <div className="space-y-6">
             <p className={PROSE_CLASS}>
               We acquire profitable, under-digitised SMEs in the Nordic region, typically in the SEK 50–200m revenue range. The model is an operational compounder: we use a proprietary segmentation engine to identify targets and create value through structured execution and selective use of data and automation. Our edge is systematic sourcing and outside-in intelligence; our value proposition is operational improvement and long-term compounding, not technology risk.
             </p>
             <p className={PROSE_CLASS}>
-              We target a normalised ROIC of 15% at portfolio companies. Reinvestment discipline is central: we reinvest 100% of operational cash flow plus approximately 30% leverage where appropriate. The intended outcome is long-term compounding equity growth. Nivo buys operational improvement potential, not technology risk.
+              We target a normalised ROIC of 20% at portfolio companies. Reinvestment discipline is central: we reinvest 100% of operational cash flow plus approximately 30% leverage where appropriate. Nivo buys operational improvement potential, not technology risk.
             </p>
           </div>
         </div>
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
         <div className="aspect-[21/9] rounded-lg overflow-hidden bg-inv2-sage-muted/50">
           <img
             src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80"
@@ -235,10 +220,16 @@ export function Investor2LongForm() {
                 </div>
                 <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
                   <p className="font-semibold text-inv2-fg text-base mb-1">Compound with discipline</p>
-                  <p className="text-[15px] text-inv2-fg-muted leading-relaxed">Reinvest cash flow, reduce debt, build equity.</p>
+                  <p className="text-[15px] text-inv2-fg-muted leading-relaxed">Reinvest cash flow, keep appropriate debt levels, build equity.</p>
                 </div>
               </div>
-              <p className="text-base sm:text-lg text-inv2-fg-muted mt-6 leading-relaxed font-bold">
+              <div className="bg-white/60 rounded-lg py-3 px-4 w-full mt-6">
+                <p className="font-semibold text-inv2-fg text-base mb-1">Return drivers</p>
+                <p className="text-[15px] text-inv2-fg-muted leading-relaxed">
+                  We use operational excellence and apply technology—including AI—where appropriate to accelerate revenue growth and margin expansion. Value is driven primarily by these levers; we assume only modest multiple expansion.
+                </p>
+              </div>
+              <p className="text-base sm:text-lg text-inv2-fg-muted mt-6 leading-relaxed font-bold text-center w-full">
                 Execution leads to margins, margins to cash flow, cash flow to equity.
               </p>
             </div>
@@ -246,21 +237,15 @@ export function Investor2LongForm() {
             <div className="pt-4 border-t border-inv2-divider/60 space-y-4">
               <p className={LABEL_OLIVE_CLASS + " mb-4"}>Illustrative investment outcome</p>
               <div className="bg-white/60 rounded-lg py-3 px-4 w-full">
-                <p className="font-semibold text-inv2-fg text-base mb-1">Return drivers</p>
                 <p className="text-[15px] text-inv2-fg-muted leading-relaxed">
-                  Returns are built by EBITDA growth and debt reduction, not aggressive multiple assumptions.
+                  The chart and table below are based on the assumptions set out in this section: entry and exit multiples, revenue growth, margin progression, leverage and hold period. Outcomes are illustrative and do not represent a forecast.
                 </p>
-              </div>
-              <div className="bg-white/60 rounded-lg py-3 px-4 w-full">
-                <p className="font-semibold text-inv2-fg text-base mb-1">Entry → Exit (illustrative)</p>
-                <p className="text-2xl font-semibold text-inv2-olive">Equity {ENTRY_EQUITY} → {EXIT_EQUITY.toFixed(1)}</p>
-                <p className="mt-2 text-inv2-fg font-medium text-[15px]">Gross MOIC {GROSS_MOIC}x · IRR {GROSS_IRR}%</p>
               </div>
             </div>
           </div>
 
           <div className="mt-10 w-full rounded-lg overflow-hidden bg-white shadow-[var(--inv2-shadow-soft)] p-6">
-            <p className="text-sm font-medium text-inv2-fg-muted mb-4">Enterprise value build (illustrative, 5 years)</p>
+            <p className="text-sm font-medium text-inv2-fg-muted mb-4">Enterprise value build (illustrative, 7 years)</p>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -268,6 +253,7 @@ export function Investor2LongForm() {
                   <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--inv2-fg-muted))" }} stroke="hsl(var(--inv2-divider))" />
                   <YAxis tick={{ fontSize: 11, fill: "hsl(var(--inv2-fg-muted))" }} stroke="hsl(var(--inv2-divider))" width={36} />
                   <Tooltip
+                    cursor={false}
                     contentStyle={{ backgroundColor: "white", border: "1px solid hsl(var(--inv2-divider))", borderRadius: 6, fontSize: 12 }}
                     formatter={(value: number, name: string) => [value.toFixed(1), name === "equityValue" ? "Equity" : "Debt"]}
                     labelFormatter={(l) => l}
@@ -279,43 +265,56 @@ export function Investor2LongForm() {
             </div>
           </div>
 
+          <div className="mt-6 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
+              <p className={LABEL_CLASS}>Entry → Exit (illustrative)</p>
+              <p className="text-xl sm:text-2xl font-semibold text-inv2-olive tabular-nums">Equity {ENTRY_EQUITY} → {EXIT_EQUITY.toFixed(1)}</p>
+            </div>
+            <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
+              <p className={LABEL_CLASS}>Gross MOIC</p>
+              <p className="text-xl sm:text-2xl font-semibold text-inv2-olive tabular-nums">{GROSS_MOIC}x</p>
+            </div>
+            <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
+              <p className={LABEL_CLASS}>IRR</p>
+              <p className="text-xl sm:text-2xl font-semibold text-inv2-olive tabular-nums">{GROSS_IRR}%</p>
+            </div>
+          </div>
+
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS + " mb-4"}>Assumptions</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
-                <p className="text-[15px] text-inv2-fg-muted font-bold">Entry EV/EBITDA 6.0x · Exit 6.5x</p>
-              </div>
-              <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
-                <p className="text-[15px] text-inv2-fg-muted font-bold">Revenue CAGR 6% · Margin 10% → 13%</p>
-              </div>
-              <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
-                <p className="text-[15px] text-inv2-fg-muted font-bold">Entry leverage 25% debt / 75% equity</p>
-              </div>
-              <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4">
-                <p className="text-[15px] text-inv2-fg-muted font-bold">Hold period 5 years</p>
-              </div>
+            <div className="pl-4 border-l-2 border-inv2-olive/60 bg-white/60 rounded-r-lg py-3 pr-4 w-full">
+              <p className="text-[15px] text-inv2-fg-muted leading-relaxed">Yearly returns of 15% over a cycle, full reinvestments and 30% leverage. No exit multiple expansion assumed.</p>
             </div>
           </div>
 
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS}>Projection detail (illustrative)</p>
+            <p className="text-[13px] text-inv2-fg-muted mb-3">7-year investment horizon with ~15% yearly return. Reinvestment of returns drives ROIC and MoM multiples.</p>
             <div className="overflow-x-auto rounded-lg border border-inv2-divider/60">
-              <table className="w-full text-sm min-w-[320px]">
+              <table className="w-full text-sm min-w-[520px]">
                 <thead className="bg-inv2-bg-subtle">
                   <tr>
-                    <th className="px-4 py-2.5 text-left font-semibold text-inv2-fg">Year</th>
-                    <th className="px-4 py-2.5 text-right font-semibold text-inv2-fg">Revenue</th>
-                    <th className="px-4 py-2.5 text-right font-semibold text-inv2-fg">EBITDA</th>
-                    <th className="px-4 py-2.5 text-right font-semibold text-inv2-fg">Equity</th>
+                    <th className="px-3 py-2.5 text-left font-semibold text-inv2-fg">Year</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">Equity</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">Debt</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">EV</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">Return</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">Reinvestment</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">ROIC</th>
+                    <th className="px-3 py-2.5 text-right font-semibold text-inv2-fg">MoM</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white">
                   {PROJ.map((row) => (
                     <tr key={row.year} className="border-t border-inv2-divider/60">
-                      <td className="px-4 py-2.5 text-inv2-fg-muted">{row.label}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-inv2-fg">{row.revenue.toFixed(1)}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-inv2-fg">{row.ebitda.toFixed(1)}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums font-medium text-inv2-olive">{row.equityValue.toFixed(1)}</td>
+                      <td className="px-3 py-2.5 text-inv2-fg-muted">{row.label}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums font-medium text-inv2-olive">{row.equityValue}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.debt}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.ev}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.return || "—"}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.reinvestment || "—"}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.roic}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-inv2-fg">{row.mom}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -451,7 +450,10 @@ export function Investor2LongForm() {
             </span>
           </div>
           <div className="mt-10 w-full">
-            <p className={LABEL_OLIVE_CLASS + " text-center mb-6"}>Proprietary AI sourcing engine</p>
+            <p className={LABEL_OLIVE_CLASS + " text-center mb-2"}>Proprietary AI sourcing engine</p>
+            <p className="text-center text-inv2-fg-muted text-[15px] sm:text-[16px] leading-relaxed mb-6 max-w-2xl mx-auto">
+              We built an in-house proprietary sourcing engine that leverages AI as well as financial analysis. We can analyse any Swedish company.
+            </p>
             <div className="rounded-lg overflow-hidden border border-inv2-divider/60 shadow-[var(--inv2-shadow-soft)] relative">
               <img
                 src="/sourcing-ai-screenshot.png"
@@ -516,7 +518,7 @@ export function Investor2LongForm() {
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
         <div className="aspect-[21/9] rounded-lg overflow-hidden bg-inv2-olive-muted/30">
           <img
             src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=80"
@@ -596,7 +598,7 @@ export function Investor2LongForm() {
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
         <div className="aspect-[21/9] rounded-lg overflow-hidden bg-inv2-sage-muted/40">
           <img
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80"
@@ -616,26 +618,26 @@ export function Investor2LongForm() {
               <h3 className={H3_CLASS}>Core team</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 1</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Jesper Kreuger</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">15+ years Nordic SME operations, 8+ transformations, M.Sc. Industrial Engineering.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 2</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Henrik Cavalli</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">12+ years PE and growth investing, 20+ Nordic companies, MBA SSE.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 h-32 rounded-full bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center mb-4 overflow-hidden">
-                    <User className="w-14 h-14 text-inv2-fg-muted/60" aria-hidden />
+                  <div className="w-full max-w-[200px] aspect-[4/3] rounded-lg bg-inv2-bg-subtle border-2 border-inv2-divider flex items-center justify-center overflow-hidden">
+                    <User className="w-16 h-16 text-inv2-fg-muted/60" aria-hidden />
                   </div>
-                  <p className="font-semibold text-inv2-fg">Partner 3</p>
+                  <p className="font-semibold text-inv2-fg mt-4">Sebastian Robson</p>
                   <p className="text-sm text-inv2-olive font-medium">Founding Partner</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-2 leading-relaxed">10+ years M&A, tech and industrials, M.Sc. Economics.</p>
                 </div>
@@ -643,14 +645,18 @@ export function Investor2LongForm() {
             </div>
             <div>
               <h3 className={H3_CLASS}>Advisory board</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl">
-                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto justify-items-center">
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
                   <p className="font-semibold text-inv2-fg">Senior Advisor</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-1">Ex-CEO SEK 400m industrial. 25+ years operations.</p>
                 </div>
-                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60">
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
                   <p className="font-semibold text-inv2-fg">Financial Advisor</p>
                   <p className="text-[15px] text-inv2-fg-muted mt-1">Ex-CFO listed Nordic. Financial systems.</p>
+                </div>
+                <div className="bg-inv2-bg-subtle rounded-lg p-4 border border-inv2-divider/60 w-full max-w-[260px]">
+                  <p className="font-semibold text-inv2-fg">Advisor</p>
+                  <p className="text-[15px] text-inv2-fg-muted mt-1">Strategic and operational advisory.</p>
                 </div>
               </div>
             </div>
@@ -671,10 +677,6 @@ export function Investor2LongForm() {
                 <p className="text-[15px] text-inv2-fg-muted">AI and automation, process optimisation, change management.</p>
               </div>
             </div>
-            <div className="pt-4 border-t border-inv2-divider/60 w-full">
-              <p className={LABEL_OLIVE_CLASS}>Alignment of interest</p>
-              <p className="text-[15px] text-inv2-fg-muted">We use a classic Swedish A/B share structure. A-shares (voting-strong) are held by Founders and Founding Investors and are entitled to 20% of dividends and excess returns; A-shares also have a catch-up on 20% of the B-shares’ return threshold. B-shares are entitled to 80% of dividends and excess returns and include a 1x liquidation preference and a 20% return threshold (adjusted for distributed capital). Shared incentives: focus on better deals, not on higher AUM.</p>
-            </div>
           </div>
         </div>
       </section>
@@ -686,32 +688,82 @@ export function Investor2LongForm() {
           <p className={SECTION_SUBTITLE_CLASS}>Capital model and governance</p>
 
           <div className="space-y-10 mb-12">
-            <p className={PROSE_CLASS}>
+            <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px]">
               Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon and the aim to become a listed entity within 10 years. Capital is deployed into Nordic SMEs and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. All material investments are subject to investment committee approval; the committee includes independent members and meets for quarterly reviews. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
             </p>
 
             <div className="pt-6 border-t border-inv2-divider">
+              <p className={LABEL_OLIVE_CLASS + " mb-2"}>Alignment of interest</p>
+              <p className="text-[14px] sm:text-[15px] text-inv2-fg-muted leading-relaxed">We use a classic Swedish A/B share structure. A-shares (voting-strong) are held by Founders and Founding Investors and are entitled to 20% of dividends and excess returns; A-shares also have a catch-up on 20% of the B-shares’ return threshold. B-shares are entitled to 80% of dividends and excess returns and include a 1x liquidation preference and a 20% return threshold (adjusted for distributed capital). Shared incentives: focus on better deals, not on higher AUM.</p>
+            </div>
+
+            <div className="pt-6 border-t border-inv2-divider">
               <h3 className={H3_CLASS}>Corporate and investment structure</h3>
-              <p className={PROSE_CLASS + " mb-6"}>
-                All acquisitions are consolidated under the parent company. The structure is: <strong className="text-inv2-fg">Nivo Group AB (Parent)</strong> owns <strong className="text-inv2-fg">Nivo OpCo</strong>, the operating company; each acquisition is held in a dedicated <strong className="text-inv2-fg">BidCo</strong> (BidCo 1, 2, 3 …), under which the respective <strong className="text-inv2-fg">Target</strong> company sits. Financial returns flow from the targets up to the parent and are distributed according to share class rights.
-              </p>
-              <div className="bg-inv2-bg-subtle rounded-lg border border-inv2-divider/60 p-6 text-[15px] text-inv2-fg-muted space-y-3">
-                <p><span className="font-semibold text-inv2-fg">Founders and Founding Investors</span> → A- & B-shares → Nivo Group AB</p>
-                <p><span className="font-semibold text-inv2-fg">New investors</span> → B-shares → Nivo Group AB</p>
-                <p className="pt-2 border-t border-inv2-divider/60 mt-4">Nivo Group AB → Nivo OpCo → BidCo 1, BidCo 2, BidCo 3 … → Target 1, Target 2, Target 3 …</p>
+              <p className="text-sm text-inv2-fg-muted mb-4">Evergreen Swedish AB structure. Deal-by-deal financing.</p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                {/* Left: Corporate structure diagram */}
+                <div className="bg-white rounded-lg border border-inv2-divider/60 p-6 sm:p-8">
+                  <div className="flex flex-col items-center gap-0">
+                    {/* Above Parent: investors */}
+                    <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-3">
+                      <div className="text-center">
+                        <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-inv2-bg-subtle/50 min-w-[140px]">
+                          <p className="text-sm font-medium text-inv2-fg">Founders & Founding Investors</p>
+                          <p className="text-xs text-inv2-olive font-medium mt-1">A- & B-shares</p>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-inv2-bg-subtle/50 min-w-[140px]">
+                          <p className="text-sm font-medium text-inv2-fg">New Investors</p>
+                          <p className="text-xs text-inv2-olive font-medium mt-1">B-shares</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-olive/50" aria-hidden />
+                    <div className="px-5 py-3 rounded-md border-2 border-inv2-olive/50 bg-inv2-bg-subtle/80">
+                      <p className="text-sm font-semibold text-inv2-fg">Nivo Group AB (Parent Company)</p>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-olive/50" aria-hidden />
+                    <div className="px-4 py-2.5 rounded-md border border-inv2-divider/80 bg-white">
+                      <p className="text-sm text-inv2-fg-muted">Nivo OpCo (operational holding function)</p>
+                    </div>
+                    <div className="w-px h-4 bg-inv2-divider/80" aria-hidden />
+                    <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                      {["BidCo 1", "BidCo 2", "BidCo 3"].map((label) => (
+                        <div key={label} className="flex flex-col items-center">
+                          <div className="px-3 py-2 rounded border border-inv2-divider/80 bg-inv2-bg-subtle/50 text-center min-w-[90px]">
+                            <p className="text-xs font-medium text-inv2-fg">{label}</p>
+                            <p className="text-[11px] text-inv2-fg-muted mt-0.5">acquisition vehicle</p>
+                          </div>
+                          <div className="w-px h-3 bg-inv2-divider/60 my-0.5" aria-hidden />
+                          <div className="px-2 py-1.5 rounded border border-inv2-divider/60 bg-white text-center min-w-[70px]">
+                            <p className="text-[11px] text-inv2-fg-muted">{label.replace("BidCo", "Target")}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Right: Financing model text */}
+                <div>
+                  <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model</p>
+                  <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px]">
+                    All acquisitions are consolidated under Nivo Group AB. New acquisitions are financed on a deal-by-deal basis through newly formed BidCos. Investors participate through share ownership in the Parent Company (A- and B-shares). There are no capital commitments; participation in future share issues is voluntary, with pre-emptive rights. Nivo’s strategy focuses on long-term ownership of stable Nordic SMEs within an evergreen structure. In the event of additional capital needs within a portfolio company, capital may be provided either through retained earnings at the Parent level or through new share issues. With each new acquisition, the portfolio NAV is revalued, allowing early investors to benefit from value uplift prior to new capital being introduced.
+                  </p>
+                </div>
               </div>
             </div>
 
             <div className="pt-6 border-t border-inv2-divider">
               <h3 className={H3_CLASS}>Share classes (classic Swedish A/B)</h3>
-              <p className={PROSE_CLASS + " mb-4"}>
+              <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px] mb-4">
                 <strong className="text-inv2-fg">A-shares</strong> are voting-strong shares held by Founders and Founding Investors, entitled to 20% of dividends and excess returns. A-shares have a catch-up on 20% of the B-shares’ return threshold. <strong className="text-inv2-fg">B-shares</strong> are held by Founding Investors and other investors, entitled to 80% of dividends and excess returns. B-shares include a 1x liquidation preference (priority to recover invested capital) and a 20% return threshold, with adjustments for distributed capital (e.g. dividends). Each divestment or exit triggers a distribution according to these rights.
               </p>
             </div>
 
             <div className="pt-6 border-t border-inv2-divider">
               <h3 className={H3_CLASS}>Financing and rewards for early capital</h3>
-              <p className={PROSE_CLASS + " mb-4"}>
+              <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px] mb-4">
                 New acquisitions are financed on a <strong className="text-inv2-fg">deal-by-deal</strong> basis. Investors commit only to their initial investment; participation in future new issues is welcomed (with pre-emptive rights) but not obligatory. In the event of additional capital needs in a portfolio company, funding is provided either from Nivo Group (e.g. dividends from other portfolio companies) or through new issues in which investors may voluntarily participate. With each new acquisition, the existing portfolio NAV is re-valued, providing value uplift for early investors before new capital is committed. This structure rewards early capital injection.
               </p>
             </div>
@@ -766,19 +818,19 @@ export function Investor2LongForm() {
 
             <div className="pt-6 border-t border-inv2-divider">
               <h3 className={H3_CLASS}>Governance — portfolio companies</h3>
-              <p className={PROSE_CLASS + " mb-6"}>
+              <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px] mb-6">
                 We typically take majority control (51–100%) with operational oversight at board level and incentives tied to ROIC and cash flow. Decision rights are clear: the board retains strategy, capital allocation, and M&A; management runs day-to-day operations and hiring within defined thresholds. Reporting is monthly (financials, KPI, cash flow), quarterly (board, strategy, investor updates), and annual (audit, valuations, planning). Shareholders receive transparent updates and annual meetings. Documentation follows sound corporate practice with an independent administrator and auditor. Disciplined governance protects capital and alignment.
               </p>
             </div>
 
-            <p className={PROSE_CLASS}>
+            <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px]">
               Target close is Q2 2026. We are seeking 2–3 anchor investors. The pipeline is strong and the team is committed. Deployment is expected over 18–24 months; hold per company 5–7 years. Target gross IRR 19–23% through disciplined reinvestment and operational compounding; base-case underwriting assumes margin expansion and debt paydown with flat-to-modest exit multiples.
             </p>
           </div>
 
           <div className="pt-8 border-t border-inv2-divider">
             <h3 className={H3_CLASS}>Exit strategy and value drivers</h3>
-            <p className={PROSE_CLASS + " mb-6"}>
+            <p className="w-full text-inv2-fg-muted leading-relaxed text-[14px] sm:text-[15px] mb-6">
               Primary exit route is strategic sale to trade or corporate buyers. Secondary buyout to larger PE or growth equity is a viable alternative. Recapitalisation (dividend recap while retaining control) may be used where appropriate. Value creation follows a clear timeline: in years 1–2 we focus on margin expansion of 200–300 bps; years 3–4 on cash conversion and debt reduction; years 5–6 on sustaining ROIC at 15%+ and strategic positioning; year 7+ on exit or recap depending on market and portfolio readiness.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
