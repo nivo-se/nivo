@@ -1,113 +1,49 @@
-import { Briefcase, Award, Target } from "lucide-react";
+import { Target } from "lucide-react";
 
 export function Slide12() {
   const team = [
-    {
-      name: "Partner 1",
-      role: "Founding Partner",
-      background: [
-        "15+ years operational leadership in Nordic SMEs",
-        "Led 8+ business transformations",
-        "Background in industrial services and manufacturing",
-        "M.Sc. Industrial Engineering",
-      ],
-    },
-    {
-      name: "Partner 2",
-      role: "Founding Partner",
-      background: [
-        "12+ years private equity and growth equity",
-        "Investment experience across 20+ Nordic companies",
-        "Specialized in operational value creation",
-        "MBA, Stockholm School of Economics",
-      ],
-    },
+    { name: "Partner 1", role: "Founding Partner", bullets: ["15+ years Nordic SME ops", "8+ transformations", "M.Sc. Industrial Eng."] },
+    { name: "Partner 2", role: "Founding Partner", bullets: ["12+ years PE/growth", "20+ Nordic companies", "MBA SSE"] },
+    { name: "Partner 3", role: "Founding Partner", bullets: ["10+ years M&A", "Tech & industrials", "M.Sc. Economics"] },
   ];
-
   const advisors = [
-    {
-      name: "Senior Advisor",
-      expertise: "Former CEO of SEK 400m Nordic industrial group. 25+ years operational experience.",
-    },
-    {
-      name: "Financial Advisor",
-      expertise: "Former CFO of listed Nordic company. Expertise in financial systems and reporting.",
-    },
+    { name: "Senior Advisor", expertise: "Ex-CEO SEK 400m industrial. 25+ years ops." },
+    { name: "Financial Advisor", expertise: "Ex-CFO listed Nordic. Financial systems." },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-7">
-      {/* Title */}
-      <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Team
-        </h1>
-        <p className="text-sm text-deck-accent">
-          Operational experience meets disciplined capital allocation
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Team</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">Operational experience meets disciplined capital</p>
       </div>
-
-      {/* Core Team */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Briefcase className="w-5 h-5 text-deck-accent" />
-          <h2 className="text-base font-semibold text-deck-fg">Core Team</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          {team.map((member, index) => (
-            <div
-              key={index}
-              className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 space-y-4 shadow-sm"
-            >
-              <div className="space-y-1">
-                <h3 className="text-base font-semibold text-deck-fg">{member.name}</h3>
-                <p className="text-deck-accent font-medium">{member.role}</p>
-              </div>
-              <ul className="space-y-2.5">
-                {member.background.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0" />
-                    <span className="text-deck-fg text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Advisory Board */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Award className="w-5 h-5 text-deck-accent" />
-          <h2 className="text-base font-semibold text-deck-fg">Advisory Board</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          {advisors.map((advisor, index) => (
-            <div
-              key={index}
-              className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 space-y-3"
-            >
-              <h3 className="text-lg font-semibold text-deck-fg">{advisor.name}</h3>
-              <p className="text-deck-fg text-sm leading-relaxed">{advisor.expertise}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Team Philosophy */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 shadow-sm">
-        <div className="flex items-start gap-6">
-          <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center flex-shrink-0">
-            <Target className="w-6 h-6 text-deck-accent" />
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3">
+        {team.map((m, i) => (
+          <div key={i} className="bg-deck-surface border border-deck-border rounded-lg p-2.5 sm:p-3 shadow-[var(--deck-shadow-card)] flex flex-col">
+            <h3 className="text-xs font-semibold text-deck-fg">{m.name}</h3>
+            <p className="text-[10px] text-deck-accent font-medium">{m.role}</p>
+            <ul className="mt-1.5 space-y-0.5">
+              {m.bullets.map((b, j) => (
+                <li key={j} className="flex items-center gap-1.5 text-[10px] text-deck-fg/80">
+                  <span className="w-1 h-1 rounded-full bg-deck-accent flex-shrink-0" />
+                  {b}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold text-deck-fg">Team Philosophy</h3>
-            <p className="text-deck-fg leading-relaxed">
-              We are operators first, investors second. Our team has sat in CEO and CFO chairs, managed P&Ls, and executed operational improvements. This is not advisory work—it is hands-on execution guided by proven experience.
-            </p>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-shrink-0">
+        {advisors.map((a, i) => (
+          <div key={i} className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
+            <h3 className="text-xs font-semibold text-deck-fg">{a.name}</h3>
+            <p className="text-[10px] text-deck-fg/80 leading-snug mt-0.5">{a.expertise}</p>
           </div>
-        </div>
+        ))}
+      </div>
+      <div className="flex-shrink-0 bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 flex items-start gap-2">
+        <Target className="w-5 h-5 text-deck-accent flex-shrink-0 mt-0.5" />
+        <p className="text-[10px] sm:text-xs text-deck-fg leading-snug">Operators first, investors second. Hands-on execution guided by proven experience.</p>
       </div>
     </div>
   );

@@ -39,11 +39,35 @@
 
   --radius: 0.5rem;
 
+  /* Investor deck: accent, text, surfaces, borders. Change here for a full redesign. */
   --deck-accent: 92 8.4% 35.1%;
   --deck-accent-hover: 85.3 8.8% 42.2%;
+  --deck-accent-foreground: 0 0% 100%;
   --deck-fg: 345 4.5% 17.3%;
+  --deck-fg-foreground: 0 0% 100%;
   --deck-bg: 0 0% 90%;
   --deck-surface: 0 0% 100%;
+  --deck-quote-foreground: 0 0% 0%;
+  --deck-border: 345 4.5% 17.3% / 0.1;
+  --deck-accent-border: 92 8.4% 35.1% / 0.3;
+  /* Slide system: padding scales with viewport, consistent with 16:9 canvas */
+  --deck-slide-padding-x: clamp(0.75rem, 3vw, 2rem);
+  --deck-slide-padding-y: clamp(0.75rem, 2.5vw, 1.75rem);
+  --deck-slide-gap: clamp(0.5rem, 1.5vw, 1rem);
+  --deck-shadow-slide: 0 1px 3px hsl(345 4.5% 17.3% / 0.06), 0 4px 12px hsl(345 4.5% 17.3% / 0.04);
+  --deck-shadow-card: 0 1px 2px hsl(345 4.5% 17.3% / 0.05);
+
+  /* Investor2 long-form: premium memo style — olive/sage, soft gradients */
+  --inv2-olive: 85 18% 32%;
+  --inv2-sage: 120 12% 42%;
+  --inv2-olive-muted: 85 14% 92%;
+  --inv2-sage-muted: 120 10% 95%;
+  --inv2-fg: 40 8% 18%;
+  --inv2-fg-muted: 40 6% 38%;
+  --inv2-divider: 85 12% 88%;
+  --inv2-bg-subtle: 60 12% 98%;
+  --inv2-shadow-soft: 0 2px 12px hsl(85 18% 32% / 0.06);
+  --inv2-radial-highlight: radial-gradient(ellipse 80% 50% at 50% 0%, hsl(85 14% 92% / 0.6), transparent 70%);
 }
 
 .dark {

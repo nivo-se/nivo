@@ -1,100 +1,70 @@
 export function Slide1() {
   const highlights = [
-    { label: "Target fund size", value: "SEK 200m" },
+    { label: "Target fund size", value: "SEK 1,000m" },
     { label: "Target gross IRR", value: "19-23%" },
     { label: "Target gross MOIC", value: "2.2-2.8x" },
-    { label: "Base case hold", value: "5 years" },
+    { label: "Base case hold", value: "5-10 years" },
   ];
 
   const pillars = [
-    {
-      number: "01",
-      title: "Acquire Right",
-      detail: "Buy resilient SMEs at disciplined entry valuations with clear improvement headroom.",
-    },
-    {
-      number: "02",
-      title: "Execute Relentlessly",
-      detail: "Drive pricing discipline, margin expansion, and reporting control from day one.",
-    },
-    {
-      number: "03",
-      title: "Compound with Discipline",
-      detail: "Reinvest cash flow and reduce debt to build equity value through operations.",
-    },
+    { number: "01", title: "Acquire Right", detail: "Disciplined entry, clear improvement headroom." },
+    { number: "02", title: "Execute Relentlessly", detail: "Pricing discipline, margin expansion, reporting." },
+    { number: "03", title: "Compound with Discipline", detail: "Reinvest cash flow, reduce debt, build equity." },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-10">
-      <div className="grid grid-cols-5 gap-8 items-stretch">
-        <div className="col-span-3 space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-deck-accent/10 border border-deck-accent/30 rounded-full text-deck-accent text-xs font-semibold uppercase tracking-wider">
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4 flex-1 min-h-0">
+        <div className="lg:col-span-3 flex flex-col justify-center gap-3 sm:gap-4 min-h-0">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-deck-accent/10 border border-deck-accent-border rounded-full text-deck-accent text-xs sm:text-sm font-semibold uppercase tracking-wider w-fit">
             Investor Brief
           </div>
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-deck-fg leading-tight">
-              Nordic Operational
-              <br />
-              Compounder
-            </h1>
-            <p className="text-base text-deck-accent max-w-3xl leading-relaxed">
-              Nivo acquires profitable but under-digitised Nordic SMEs and builds value through
-              pricing discipline, operating rigor, and structured reinvestment.
-            </p>
-          </div>
-
-          <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-xl p-6">
-            <p className="text-xl font-semibold text-deck-fg leading-relaxed">
-              We do not buy technology risk.
-              <span className="text-deck-accent"> We buy execution upside.</span>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-deck-fg leading-tight">
+            Nordic Operational Compounder
+          </h1>
+          <p className="text-sm sm:text-base text-deck-accent max-w-2xl leading-snug">
+            Nivo acquires profitable, under-digitised Nordic SMEs and builds value through pricing discipline, operating rigor, and structured reinvestment.
+          </p>
+          <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-3 sm:p-4">
+            <p className="text-base sm:text-lg font-bold text-deck-quote-foreground leading-snug">
+              We do not buy technology risk. We buy execution upside.
             </p>
           </div>
         </div>
-
-        <div className="col-span-2 bg-deck-surface border border-deck-fg/10 rounded-xl p-6 shadow-sm space-y-4">
-          <div>
-            <p className="text-xs font-semibold text-deck-accent uppercase tracking-wider">
-              Underwriting Snapshot
-            </p>
-            <h2 className="text-lg font-bold text-deck-fg mt-1">Disciplined Base Case</h2>
-          </div>
-          <div className="space-y-2">
+        <div className="lg:col-span-2 bg-deck-surface border border-deck-border rounded-lg p-3 sm:p-4 shadow-[var(--deck-shadow-card)] flex flex-col justify-center">
+          <p className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Underwriting Snapshot</p>
+          <h2 className="text-sm sm:text-base font-bold text-deck-fg mt-0.5">Disciplined Base Case</h2>
+          <div className="space-y-1.5 mt-3">
             {highlights.map((item) => (
-              <div key={item.label} className="flex items-center justify-between py-2 border-b border-deck-fg/10 last:border-b-0">
-                <span className="text-sm text-deck-accent">{item.label}</span>
-                <span className="text-base font-semibold text-deck-fg">{item.value}</span>
+              <div key={item.label} className="flex items-center justify-between py-1.5 border-b border-deck-border last:border-b-0">
+                <span className="text-xs sm:text-sm text-deck-accent">{item.label}</span>
+                <span className="text-xs sm:text-sm font-semibold text-deck-fg tabular-nums">{item.value}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-deck-fg/70">
-            Return profile is driven by EBITDA growth and debt paydown, not aggressive multiple expansion.
+          <p className="text-xs text-deck-fg/70 leading-snug mt-2">
+            Return profile: EBITDA growth and debt paydown, not multiple expansion.
           </p>
         </div>
       </div>
-
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 flex-shrink-0">
         {pillars.map((pillar) => (
           <div
             key={pillar.number}
-            className="bg-deck-surface border border-deck-fg/10 rounded-xl p-6 shadow-sm space-y-3"
+            className="bg-deck-surface border border-deck-border rounded-lg p-2.5 sm:p-3 shadow-[var(--deck-shadow-card)]"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-deck-accent uppercase tracking-wider">
-                Step {pillar.number}
-              </span>
-              <div className="w-7 h-7 rounded-full bg-deck-accent/10 border border-deck-accent/30" />
+              <span className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Step {pillar.number}</span>
+              <div className="w-5 h-5 rounded-full bg-deck-accent/10 border border-deck-accent-border" />
             </div>
-            <h3 className="text-lg font-semibold text-deck-fg">{pillar.title}</h3>
-            <p className="text-sm text-deck-fg/80 leading-relaxed">{pillar.detail}</p>
+            <h3 className="text-sm font-semibold text-deck-fg mt-1">{pillar.title}</h3>
+            <p className="text-xs text-deck-fg/80 leading-snug mt-0.5">{pillar.detail}</p>
           </div>
         ))}
       </div>
-
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-xl p-5 text-center shadow-sm">
-        <p className="text-base text-deck-fg font-semibold tracking-tight">
-          Execution expands margins. Margins expand cash flow. Cash flow compounds equity.
-        </p>
-      </div>
+      <p className="text-xs sm:text-sm text-deck-fg font-semibold text-center leading-snug flex-shrink-0">
+        Execution → margins → cash flow → equity.
+      </p>
     </div>
   );
 }

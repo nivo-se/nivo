@@ -86,9 +86,14 @@ export default {
 					DEFAULT: 'hsl(var(--deck-accent))',
 					accent: 'hsl(var(--deck-accent))',
 					'accent-hover': 'hsl(var(--deck-accent-hover))',
+					'accent-foreground': 'hsl(var(--deck-accent-foreground))',
 					fg: 'hsl(var(--deck-fg))',
+					'fg-foreground': 'hsl(var(--deck-fg-foreground))',
 					bg: 'hsl(var(--deck-bg))',
 					surface: 'hsl(var(--deck-surface))',
+					'quote-foreground': 'hsl(var(--deck-quote-foreground))',
+					border: 'hsl(var(--deck-border))',
+					'accent-border': 'hsl(var(--deck-accent-border))',
 				},
 				orangery: {
 					50: 'hsl(var(--muted))',
@@ -101,6 +106,16 @@ export default {
 					700: 'hsl(var(--foreground))',
 					800: 'hsl(var(--foreground))',
 					900: 'hsl(var(--foreground))',
+				},
+				inv2: {
+					olive: 'hsl(var(--inv2-olive))',
+					'olive-muted': 'hsl(var(--inv2-olive-muted))',
+					sage: 'hsl(var(--inv2-sage))',
+					'sage-muted': 'hsl(var(--inv2-sage-muted))',
+					fg: 'hsl(var(--inv2-fg))',
+					'fg-muted': 'hsl(var(--inv2-fg-muted))',
+					divider: 'hsl(var(--inv2-divider))',
+					'bg-subtle': 'hsl(var(--inv2-bg-subtle))',
 				}
 			},
 			borderRadius: {

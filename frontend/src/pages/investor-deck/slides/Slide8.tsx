@@ -2,135 +2,52 @@ import { Building2, TrendingDown, Shield } from "lucide-react";
 
 export function Slide8() {
   const criteria = [
-    {
-      icon: Building2,
-      title: "Valuation Discipline",
-      items: [
-        "EV/EBITDA multiples: 5-7x range",
-        "Prioritize operational improvement potential over growth premiums",
-        "Target proven business models with stable cash generation",
-        "No speculative bets—acquire normalised earnings power",
-      ],
-    },
-    {
-      icon: TrendingDown,
-      title: "Conservative Leverage",
-      items: [
-        "Debt/Total Capital: <30% at acquisition",
-        "Net Debt/EBITDA: <2x maximum",
-        "Maintain capacity for operational flexibility",
-        "Leverage supplements, never dictates, acquisition strategy",
-      ],
-    },
-    {
-      icon: Shield,
-      title: "Financial Guardrails",
-      items: [
-        "Acquire only with clear path to 15% normalized ROIC",
-        "Require 12+ months runway at acquisition close",
-        "Stress-test downside scenarios before commitment",
-        "Capital preservation > growth at any cost",
-      ],
-    },
+    { icon: Building2, title: "Valuation Discipline", items: ["EV/EBITDA 5–7x", "Operational improvement over growth premium", "Stable cash generation"] },
+    { icon: TrendingDown, title: "Conservative Leverage", items: ["Debt/Capital <30%", "Net Debt/EBITDA <2x", "Leverage supplements strategy"] },
+    { icon: Shield, title: "Financial Guardrails", items: ["Path to 15% ROIC", "12+ months runway", "Capital preservation first"] },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-7">
-      {/* Title */}
-      <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Acquisition Criteria
-        </h1>
-        <p className="text-sm text-deck-accent">
-          Disciplined approach to valuation and capital structure
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Acquisition Criteria</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">Valuation and capital structure discipline</p>
       </div>
-
-      {/* Criteria Grid */}
-      <div className="grid grid-cols-3 gap-6">
-        {criteria.map((criterion, index) => (
-          <div
-            key={index}
-            className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 space-y-6 shadow-sm hover:border-deck-accent/30 transition-colors"
-          >
-            <div className="flex flex-col items-start gap-4">
-              <div className="w-14 h-14 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center flex-shrink-0">
-                <criterion.icon className="w-7 h-7 text-deck-accent" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 flex-1 min-h-0">
+        {criteria.map((c, i) => (
+          <div key={i} className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)] flex flex-col">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent-border flex items-center justify-center flex-shrink-0">
+                <c.icon className="w-4 h-4 text-deck-accent" />
               </div>
-              <h3 className="text-base font-semibold text-deck-fg">{criterion.title}</h3>
+              <h3 className="text-xs font-semibold text-deck-fg">{c.title}</h3>
             </div>
-            <ul className="space-y-3">
-              {criterion.items.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-                  <span className="text-deck-fg/80 text-sm leading-relaxed">{item}</span>
+            <ul className="mt-1.5 space-y-0.5">
+              {c.items.map((item, j) => (
+                <li key={j} className="flex items-center gap-1.5 text-[10px] sm:text-xs text-deck-fg/80">
+                  <span className="w-1 h-1 rounded-full bg-deck-accent flex-shrink-0" />
+                  {item}
                 </li>
               ))}
             </ul>
           </div>
         ))}
       </div>
-
-      {/* Financial Framework */}
-      <div className="grid grid-cols-2 gap-6">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-6 shadow-sm">
-          <h3 className="text-sm font-semibold text-deck-fg mb-4">Target Acquisition Profile</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center pb-2 border-b border-deck-fg/10">
-              <span className="text-sm text-deck-accent">EV/EBITDA Multiple</span>
-              <span className="text-lg font-bold text-deck-fg">5-7x</span>
-            </div>
-            <div className="flex justify-between items-center pb-2 border-b border-deck-fg/10">
-              <span className="text-sm text-deck-accent">Debt/Total Capital</span>
-              <span className="text-lg font-bold text-deck-fg">&lt;30%</span>
-            </div>
-            <div className="flex justify-between items-center pb-2 border-b border-deck-fg/10">
-              <span className="text-sm text-deck-accent">Net Debt/EBITDA</span>
-              <span className="text-lg font-bold text-deck-fg">&lt;2x</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-deck-accent">Target ROIC</span>
-              <span className="text-lg font-bold text-deck-accent">15%</span>
-            </div>
+      <div className="grid grid-cols-2 gap-2 flex-shrink-0">
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)]">
+          <h3 className="text-xs font-semibold text-deck-fg">Target Profile</h3>
+          <div className="space-y-1 mt-1 text-[10px] sm:text-xs">
+            <div className="flex justify-between"><span className="text-deck-accent">EV/EBITDA</span><span className="font-semibold text-deck-fg">5–7x</span></div>
+            <div className="flex justify-between"><span className="text-deck-accent">Debt/Cap</span><span className="font-semibold text-deck-fg">&lt;30%</span></div>
+            <div className="flex justify-between"><span className="text-deck-accent">ROIC</span><span className="font-semibold text-deck-accent">15%</span></div>
           </div>
         </div>
-
-        <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6">
-          <h3 className="text-sm font-semibold text-deck-fg mb-4">Example Acquisition Structure</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex items-start gap-2">
-              <span className="text-deck-accent font-semibold">•</span>
-              <span className="text-deck-fg/80">Company EBITDA: 10 MSEK</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-deck-accent font-semibold">•</span>
-              <span className="text-deck-fg/80">Purchase price: 60 MSEK (6x EBITDA)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-deck-accent font-semibold">•</span>
-              <span className="text-deck-fg/80">Equity contribution: 45 MSEK (75%)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-deck-accent font-semibold">•</span>
-              <span className="text-deck-fg/80">Debt financing: 15 MSEK (25%)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-deck-accent font-semibold">•</span>
-              <span className="text-deck-fg/80">Net Debt/EBITDA: 1.5x</span>
-            </div>
-            <div className="pt-2 mt-2 border-t border-deck-accent/20">
-              <span className="text-deck-accent font-semibold text-base">Conservative, scalable structure</span>
-            </div>
-          </div>
+        <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
+          <h3 className="text-xs font-semibold text-deck-fg">Example</h3>
+          <p className="text-[10px] sm:text-xs text-deck-fg/80 mt-1">EBITDA 10 MSEK → 6x → 60 MSEK. Equity 45 / Debt 15. Conservative, scalable.</p>
         </div>
       </div>
-
-      {/* Key Message */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 text-center">
-        <p className="text-base text-deck-fg font-semibold">
-          We buy value creation potential, not financial leverage.
-        </p>
-      </div>
+      <p className="text-[10px] sm:text-xs text-deck-fg font-semibold text-center flex-shrink-0">We buy value creation potential, not leverage.</p>
     </div>
   );
 }

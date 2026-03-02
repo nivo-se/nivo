@@ -1,119 +1,82 @@
 import { Filter, Database, Target, Search } from "lucide-react";
 
 export function Slide4() {
+  const segPoints = ["Revenue SEK 50–200m", "Stable economics", "Margin stagnation", "Niche positioning"];
+  const intelPoints = ["Products & services", "Customer segments", "Go-to-market", "Pricing", "Operational signals"];
+
   return (
-    <div className="h-full flex flex-col justify-center space-y-8">
-      {/* Title */}
-      <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">
           Sourcing Engine
         </h1>
-        <p className="text-sm text-deck-accent max-w-4xl leading-relaxed">
-          Disciplined pipeline development through data-driven analysis
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">
+          Disciplined pipeline through data-driven analysis
         </p>
       </div>
-
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-2 gap-8">
-        {/* Systematic Segmentation */}
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center flex-shrink-0">
-              <Filter className="w-6 h-6 text-deck-accent" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-0">
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2.5 sm:p-3 shadow-[var(--deck-shadow-card)] flex flex-col min-h-0">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent-border flex items-center justify-center flex-shrink-0">
+              <Filter className="w-4 h-4 text-deck-accent" />
             </div>
-            <h3 className="text-base font-semibold text-deck-fg">Systematic Segmentation</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-deck-fg">Systematic Segmentation</h3>
           </div>
-          <p className="text-deck-fg leading-relaxed">
-            We analyse the Swedish SME universe within the target size band.
-          </p>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Revenue SEK 50–200m</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Stable base economics</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Signs of margin stagnation</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Niche market positioning</p>
-            </div>
-          </div>
-          <div className="pt-4 border-t border-deck-fg/10">
-            <div className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-deck-accent" />
-              <span className="font-semibold text-deck-accent">Output: Ranked Target 100 shortlist</span>
-            </div>
+          <p className="text-[10px] sm:text-xs text-deck-fg mt-1.5 leading-snug">Swedish SME universe, target size band.</p>
+          <ul className="space-y-1 mt-2">
+            {segPoints.map((p) => (
+              <li key={p} className="flex items-center gap-2 text-[10px] sm:text-xs text-deck-fg/80">
+                <span className="w-1 h-1 rounded-full bg-deck-accent flex-shrink-0" />
+                {p}
+              </li>
+            ))}
+          </ul>
+          <div className="pt-2 mt-auto border-t border-deck-border flex items-center gap-1.5">
+            <Target className="w-4 h-4 text-deck-accent flex-shrink-0" />
+            <span className="text-[10px] sm:text-xs font-semibold text-deck-accent">Output: Ranked Target 100</span>
           </div>
         </div>
-
-        {/* Outside-In Intelligence */}
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center flex-shrink-0">
-              <Search className="w-6 h-6 text-deck-accent" />
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2.5 sm:p-3 shadow-[var(--deck-shadow-card)] flex flex-col min-h-0">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent-border flex items-center justify-center flex-shrink-0">
+              <Search className="w-4 h-4 text-deck-accent" />
             </div>
-            <h3 className="text-base font-semibold text-deck-fg">Outside-In Intelligence</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-deck-fg">Outside-In Intelligence</h3>
           </div>
-          <p className="text-deck-fg leading-relaxed">
-            Before engagement we analyse:
+          <p className="text-[10px] sm:text-xs text-deck-fg mt-1.5 leading-snug">Before engagement we analyse:</p>
+          <ul className="space-y-1 mt-2">
+            {intelPoints.map((p) => (
+              <li key={p} className="flex items-center gap-2 text-[10px] sm:text-xs text-deck-fg/80">
+                <span className="w-1 h-1 rounded-full bg-deck-accent flex-shrink-0" />
+                {p}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[10px] sm:text-xs text-deck-accent font-semibold mt-auto pt-2 leading-snug">
+            Informed dialogue and disciplined entry.
           </p>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Products & services</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Customer segments</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Go-to-market model</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Pricing structure</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-deck-accent mt-2 flex-shrink-0"></div>
-              <p className="text-deck-fg/80">Operational signals</p>
-            </div>
-          </div>
-          <div className="pt-4 border-t border-deck-fg/10">
-            <p className="text-deck-accent font-semibold">
-              This enables informed dialogue and disciplined entry decisions.
-            </p>
-          </div>
         </div>
       </div>
-
-      {/* Process Flow */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Database className="w-6 h-6 text-deck-accent" />
-            <span className="text-deck-fg font-medium">Universe Analysis</span>
+      <div className="flex-shrink-0 bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5 overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5">
+            <Database className="w-4 h-4 text-deck-accent flex-shrink-0" />
+            <span className="text-xs text-deck-fg font-medium">Universe</span>
           </div>
-          <div className="text-deck-accent text-2xl">→</div>
-          <div className="flex items-center gap-3">
-            <Filter className="w-6 h-6 text-deck-accent" />
-            <span className="text-deck-fg font-medium">Systematic Filtering</span>
+          <span className="text-deck-accent">→</span>
+          <div className="flex items-center gap-1.5">
+            <Filter className="w-4 h-4 text-deck-accent flex-shrink-0" />
+            <span className="text-xs text-deck-fg font-medium">Filtering</span>
           </div>
-          <div className="text-deck-accent text-2xl">→</div>
-          <div className="flex items-center gap-3">
-            <Search className="w-6 h-6 text-deck-accent" />
-            <span className="text-deck-fg font-medium">Outside-In Research</span>
+          <span className="text-deck-accent">→</span>
+          <div className="flex items-center gap-1.5">
+            <Search className="w-4 h-4 text-deck-accent flex-shrink-0" />
+            <span className="text-xs text-deck-fg font-medium">Research</span>
           </div>
-          <div className="text-deck-accent text-2xl">→</div>
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-deck-accent" />
-            <span className="text-deck-fg font-medium">Prioritized Targets</span>
+          <span className="text-deck-accent">→</span>
+          <div className="flex items-center gap-1.5">
+            <Target className="w-4 h-4 text-deck-accent flex-shrink-0" />
+            <span className="text-xs text-deck-fg font-medium">Targets</span>
           </div>
         </div>
       </div>

@@ -2,141 +2,57 @@ import { Users, Award, Briefcase } from "lucide-react";
 
 export function Slide19() {
   const team = [
-    {
-      icon: Briefcase,
-      title: "Operational Experience",
-      items: [
-        "20+ years operational leadership",
-        "Experience scaling SMEs",
-        "Direct P&L responsibility",
-      ],
-    },
-    {
-      icon: Award,
-      title: "Capital Allocation",
-      items: [
-        "Value-focused acquisitions",
-        "Pricing and negotiation",
-        "Long-term perspective",
-      ],
-    },
-    {
-      icon: Users,
-      title: "Technical Capabilities",
-      items: [
-        "AI/automation implementation",
-        "Process optimization",
-        "Change management",
-      ],
-    },
+    { icon: Briefcase, title: "Operational", items: ["20+ years ops leadership", "Scaling SMEs", "P&L responsibility"] },
+    { icon: Award, title: "Capital", items: ["Value-focused acquisitions", "Pricing & negotiation", "Long-term view"] },
+    { icon: Users, title: "Technical", items: ["AI/automation", "Process optimization", "Change management"] },
+  ];
+  const alignment = [
+    { label: "GP Commitment", value: "5%+ of fund" },
+    { label: "Horizon", value: "10+ years" },
+    { label: "Carry", value: "20% / 8% pref" },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-4">
-      {/* Title */}
-      <div className="space-y-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Team
-        </h1>
-        <p className="text-sm text-deck-accent">
-          Operational expertise, capital discipline, long-term commitment
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Team</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">Ops expertise, capital discipline, long-term commitment</p>
       </div>
-
-      {/* Team Capabilities */}
-      <div className="grid grid-cols-3 gap-4">
-        {team.map((area, index) => (
-          <div
-            key={index}
-            className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-                <area.icon className="w-5 h-5 text-deck-accent" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1 min-h-0">
+        {team.map((t, i) => {
+          const Icon = t.icon;
+          return (
+            <div key={i} className="bg-deck-surface border border-deck-border rounded-lg p-2.5 sm:p-3 shadow-[var(--deck-shadow-card)] flex flex-col">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent-border flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-deck-accent" />
+                </div>
+                <h3 className="text-xs font-semibold text-deck-fg">{t.title}</h3>
               </div>
-              <h3 className="text-base font-semibold text-deck-fg">{area.title}</h3>
+              <ul className="mt-1.5 space-y-0.5">
+                {t.items.map((item, j) => (
+                  <li key={j} className="text-[10px] text-deck-fg/80 flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-deck-accent flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-1.5">
-              {area.items.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <div className="w-1 h-1 rounded-full bg-deck-accent mt-1.5 flex-shrink-0"></div>
-                  <span className="text-deck-fg/80 text-xs">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          );
+        })}
       </div>
-
-      {/* Commitment */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5">
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold text-deck-fg">Long-term Alignment</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">GP Commitment</div>
-              <p className="text-base text-deck-fg font-semibold">5%+ of fund</p>
-              <p className="text-xs text-deck-fg/70">Meaningful skin in the game</p>
+      <div className="flex-shrink-0 bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
+        <h3 className="text-xs font-semibold text-deck-fg mb-1">Alignment</h3>
+        <div className="grid grid-cols-3 gap-2 text-[10px] sm:text-xs">
+          {alignment.map((a) => (
+            <div key={a.label}>
+              <p className="font-semibold text-deck-accent uppercase">{a.label}</p>
+              <p className="font-semibold text-deck-fg">{a.value}</p>
             </div>
-            <div className="space-y-1">
-              <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Time Horizon</div>
-              <p className="text-base text-deck-fg font-semibold">10+ years</p>
-              <p className="text-xs text-deck-fg/70">Patient capital approach</p>
-            </div>
-            <div className="space-y-1">
-              <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Carry Structure</div>
-              <p className="text-base text-deck-fg font-semibold">20% / 8% pref</p>
-              <p className="text-xs text-deck-fg/70">Standard alignment</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-
-      {/* Advisory Board */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-4 space-y-2 shadow-sm">
-          <h3 className="text-sm font-semibold text-deck-fg">Operating Advisors</h3>
-          <div className="space-y-1.5 text-xs text-deck-fg/80">
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>Pricing strategy experts from McKinsey and Simon-Kucher</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>AI implementation specialists from Nordic tech</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>Former CFOs from Nordic mid-market companies</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-4 space-y-2 shadow-sm">
-          <h3 className="text-sm font-semibold text-deck-fg">Professional Network</h3>
-          <div className="space-y-1.5 text-xs text-deck-fg/80">
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>Established relationships with top-tier law firms</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>Partnership with leading Nordic accounting firms</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-              <p>Access to operational talent pool for portfolio</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Message */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-3 text-center shadow-sm">
-        <p className="text-sm text-deck-fg font-semibold">
-          We operate companies. We don't just own them.
-        </p>
-      </div>
+      <p className="text-[10px] sm:text-xs text-deck-fg font-semibold text-center flex-shrink-0">We operate companies. We don't just own them.</p>
     </div>
   );
 }

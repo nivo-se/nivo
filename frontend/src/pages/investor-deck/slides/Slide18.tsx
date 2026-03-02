@@ -1,167 +1,58 @@
-import { Target, TrendingUp, Users } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 export function Slide18() {
   const caseStudy = {
     company: "Nordic Industrial Services AB",
     sector: "Facility Maintenance",
-    acquired: "Q3 2026 (illustrative)",
     revenue: "SEK 45m",
     ebitda: "SEK 4.5m (10%)",
-    purchasePrice: "SEK 27m EV (6.0x EBITDA)",
-    capitalStructure: "SEK 20.2m equity / SEK 6.8m debt",
+    ev: "SEK 27m (6.0x)",
+    structure: "Equity 20.2m / Debt 6.8m",
   };
-
   const improvements = [
-    {
-      area: "Pricing",
-      baseline: "No pricing framework",
-      action: "Implemented value-based pricing for 40% of contracts",
-      impact: "+150 bps margin",
-    },
-    {
-      area: "Operations",
-      baseline: "Manual scheduling, paper-based reporting",
-      action: "Digital workflow system, automated dispatch",
-      impact: "+100 bps margin",
-    },
-    {
-      area: "Cost Structure",
-      baseline: "Fragmented overhead, no procurement discipline",
-      action: "Consolidated functions, vendor renegotiation",
-      impact: "+50 bps margin",
-    },
+    { area: "Pricing", action: "Value-based pricing 40% contracts", impact: "+150 bps" },
+    { area: "Operations", action: "Digital workflow, dispatch", impact: "+100 bps" },
+    { area: "Cost", action: "Consolidated functions, vendors", impact: "+50 bps" },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-5">
-      {/* Title */}
-      <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Case Study (Illustrative)
-        </h1>
-        <p className="text-sm text-deck-accent">
-          How operational improvements drive compounding returns
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Case Study (Illustrative)</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">How operational improvements drive returns</p>
       </div>
-
-      {/* Company Overview */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-deck-accent uppercase tracking-wider">Company</h3>
-          <div className="space-y-1">
-            <p className="text-lg font-bold text-deck-fg">{caseStudy.company}</p>
-            <p className="text-xs text-deck-fg/70">{caseStudy.sector}</p>
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-shrink-0">
+        <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2">
+          <p className="text-[10px] font-semibold text-deck-accent uppercase">Company</p>
+          <p className="text-xs font-bold text-deck-fg leading-tight">{caseStudy.company}</p>
+          <p className="text-[10px] text-deck-fg/70">{caseStudy.sector}</p>
         </div>
-
-        <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-deck-accent uppercase tracking-wider">Entry Metrics</h3>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span className="text-deck-fg/70">Revenue</span>
-              <span className="text-deck-fg font-semibold">{caseStudy.revenue}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-deck-fg/70">EBITDA</span>
-              <span className="text-deck-fg font-semibold">{caseStudy.ebitda}</span>
-            </div>
-          </div>
+        <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2">
+          <p className="text-[10px] font-semibold text-deck-accent uppercase">Entry</p>
+          <p className="text-xs text-deck-fg">Rev {caseStudy.revenue}</p>
+          <p className="text-xs text-deck-fg">EBITDA {caseStudy.ebitda}</p>
         </div>
-
-        <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-deck-accent uppercase tracking-wider">Valuation</h3>
-          <div className="space-y-1">
-            <p className="text-lg font-bold text-deck-fg">{caseStudy.purchasePrice}</p>
-            <p className="text-xs text-deck-fg/70">{caseStudy.capitalStructure}</p>
-          </div>
+        <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:col-span-2">
+          <p className="text-[10px] font-semibold text-deck-accent uppercase">Valuation</p>
+          <p className="text-xs font-bold text-deck-fg">{caseStudy.ev}</p>
+          <p className="text-[10px] text-deck-fg/70">{caseStudy.structure}</p>
         </div>
       </div>
-
-      {/* Value Creation Plan */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-deck-fg mb-4">Value Creation Roadmap (24 months)</h3>
-        <div className="space-y-4">
-          {improvements.map((improvement, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 pb-4 border-b border-deck-fg/10 last:border-0 last:pb-0">
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Area</div>
-                <p className="text-sm text-deck-fg font-semibold">{improvement.area}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Baseline</div>
-                <p className="text-xs text-deck-fg/80">{improvement.baseline}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Action</div>
-                <p className="text-xs text-deck-fg/80">{improvement.action}</p>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Impact</div>
-                <p className="text-sm text-deck-accent font-bold">{improvement.impact}</p>
-              </div>
+      <div className="flex-1 min-h-0 bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)] overflow-auto">
+        <h3 className="text-xs font-semibold text-deck-fg mb-1.5">Value Creation (24 mo)</h3>
+        <div className="space-y-2">
+          {improvements.map((imp, i) => (
+            <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 py-1.5 border-b border-deck-border last:border-0 text-[10px] sm:text-xs">
+              <span className="font-semibold text-deck-accent">{imp.area}</span>
+              <span className="text-deck-fg/80 sm:col-span-2">{imp.action}</span>
+              <span className="font-bold text-deck-accent">{imp.impact}</span>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Results */}
-      <div className="grid grid-cols-2 gap-5">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-6 space-y-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-              <Target className="w-5 h-5 text-deck-accent" />
-            </div>
-            <h3 className="font-semibold text-deck-fg">Post-Improvement Metrics</h3>
-          </div>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between items-center py-2 border-b border-deck-fg/10">
-              <span className="text-deck-accent">EBITDA Margin</span>
-              <span className="text-deck-fg font-semibold">10% → 13%</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-deck-fg/10">
-              <span className="text-deck-accent">Run-rate EBITDA (24m)</span>
-              <span className="text-deck-fg font-semibold">SEK 6.8m</span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-deck-accent">ROIC on invested capital</span>
-              <span className="text-deck-accent font-bold text-lg">20%+</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-deck-accent/20 border border-deck-accent/50 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-deck-accent" />
-            </div>
-            <h3 className="font-semibold text-deck-fg">Returns Scenario</h3>
-          </div>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between items-center py-2 border-b border-deck-accent/20">
-              <span className="text-deck-fg">Year 5 EBITDA / multiple</span>
-              <span className="text-deck-fg font-semibold">SEK 7.9m @ 6.5x</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-deck-accent/20">
-              <span className="text-deck-fg">Exit EV / net debt</span>
-              <span className="text-deck-fg font-semibold">SEK 51m / SEK 4.5m</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-deck-accent/20">
-              <span className="text-deck-fg">Gross MOIC</span>
-              <span className="text-deck-accent font-bold text-lg">2.3x</span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-deck-fg">Gross IRR (5 years)</span>
-              <span className="text-deck-accent font-bold text-lg">~18%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Message */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-4 text-center shadow-sm">
-        <p className="text-sm text-deck-fg font-semibold">
-          Margin improvement through operational excellence creates sustainable value.
-        </p>
+      <div className="flex-shrink-0 bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 flex items-center gap-2">
+        <TrendingUp className="w-5 h-5 text-deck-accent flex-shrink-0" />
+        <p className="text-[10px] sm:text-xs text-deck-fg leading-snug">Operational improvements compound into equity value. Exit via strategic sale or secondary.</p>
       </div>
     </div>
   );

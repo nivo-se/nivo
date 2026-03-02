@@ -5,45 +5,40 @@ export function Slide3() {
     { label: "SIZE", value: "SEK 50–200m revenue" },
     { label: "MODEL", value: "Operational compounder" },
     { label: "EDGE", value: "Proprietary segmentation engine" },
-    { label: "VALUE CREATION", value: "Structured execution + selective AI enablement" },
-    { label: "FINANCIAL DISCIPLINE", value: "15% normalized ROIC target" },
-    { label: "REINVESTMENT", value: "100% reinvestment + ~30% leverage" },
+    { label: "VALUE", value: "Structured execution + selective AI" },
+    { label: "ROIC", value: "15% normalized target" },
+    { label: "REINVEST", value: "100% + ~30% leverage" },
     { label: "OUTCOME", value: "Long-term compounding equity growth" },
   ];
 
   return (
-    <div className="h-full flex flex-col justify-center space-y-8">
-      {/* Title */}
-      <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">
           Investment Overview
         </h1>
-        <p className="text-sm text-deck-accent">
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">
           A disciplined approach to Nordic SME compounding
         </p>
       </div>
-
-      {/* 9-Block Grid */}
-      <div className="grid grid-cols-3 gap-4">
-        {items.map((item, index) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 flex-1 min-h-0 overflow-auto">
+        {items.map((item) => (
           <div
-            key={index}
-            className="bg-deck-surface border border-deck-fg/10 rounded-lg p-6 space-y-3 hover:border-deck-accent/50 transition-colors shadow-sm"
+            key={item.label}
+            className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 hover:border-deck-accent/50 transition-colors shadow-[var(--deck-shadow-card)]"
           >
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">
+            <div className="text-[10px] sm:text-xs font-semibold text-deck-accent uppercase tracking-wider">
               {item.label}
             </div>
-            <div className="text-sm text-deck-fg leading-relaxed">
+            <div className="text-xs sm:text-sm text-deck-fg leading-snug mt-0.5">
               {item.value}
             </div>
           </div>
         ))}
       </div>
-
-      {/* Bottom Message */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-6 text-center">
-        <p className="text-base text-deck-fg">
-          Nivo does not buy technology risk. <span className="font-semibold">Nivo buys operational improvement potential.</span>
+      <div className="flex-shrink-0 bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5 text-center">
+        <p className="text-xs sm:text-sm text-deck-fg leading-snug">
+          Nivo buys <span className="font-semibold">operational improvement potential</span>, not technology risk.
         </p>
       </div>
     </div>

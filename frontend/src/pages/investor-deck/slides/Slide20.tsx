@@ -2,166 +2,66 @@ import { Shield, FileText, Users2, Gavel } from "lucide-react";
 
 export function Slide20() {
   return (
-    <div className="h-full flex flex-col justify-center space-y-4">
-      {/* Title */}
-      <div className="space-y-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Governance
-        </h1>
-        <p className="text-sm text-deck-accent">
-          Clear ownership, defined decision rights, structured reporting
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Governance</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">Ownership, decision rights, reporting</p>
       </div>
-
-      {/* Governance Structure */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 min-h-0">
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)] flex flex-col">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-deck-accent" />
-            </div>
-            <h3 className="text-base font-semibold text-deck-fg">Ownership Model</h3>
+            <Shield className="w-5 h-5 text-deck-accent" />
+            <h3 className="text-xs font-semibold text-deck-fg">Ownership</h3>
           </div>
-          <div className="space-y-2 text-xs">
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Control Structure</p>
-              <p className="text-deck-fg">Majority equity ownership (51-100%)</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Management</p>
-              <p className="text-deck-fg">Board seats with operational oversight</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Alignment</p>
-              <p className="text-deck-fg">Incentives tied to ROIC and cash flow</p>
-            </div>
+          <div className="mt-1.5 space-y-1 text-[10px] sm:text-xs">
+            <p><span className="font-semibold text-deck-accent">Control:</span> Majority 51–100%</p>
+            <p><span className="font-semibold text-deck-accent">Board:</span> Operational oversight</p>
+            <p><span className="font-semibold text-deck-accent">Alignment:</span> ROIC & cash flow incentives</p>
           </div>
         </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)] flex flex-col">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-              <Gavel className="w-5 h-5 text-deck-accent" />
-            </div>
-            <h3 className="text-base font-semibold text-deck-fg">Decision Rights</h3>
+            <Gavel className="w-5 h-5 text-deck-accent" />
+            <h3 className="text-xs font-semibold text-deck-fg">Decision Rights</h3>
           </div>
-          <div className="space-y-2 text-xs">
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Board Level</p>
-              <p className="text-deck-fg">Strategy, capital allocation, M&A</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Management Level</p>
-              <p className="text-deck-fg">Day-to-day operations, hiring</p>
-            </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-deck-accent uppercase tracking-wider">Thresholds</p>
-              <p className="text-deck-fg">Clear monetary limits defined</p>
-            </div>
+          <div className="mt-1.5 space-y-1 text-[10px] sm:text-xs">
+            <p><span className="font-semibold text-deck-accent">Board:</span> Strategy, capital, M&A</p>
+            <p><span className="font-semibold text-deck-accent">Mgmt:</span> Day-to-day, hiring</p>
+            <p><span className="font-semibold text-deck-accent">Thresholds:</span> Clear limits</p>
           </div>
         </div>
       </div>
-
-      {/* Reporting */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-deck-accent/20 border border-deck-accent/50 flex items-center justify-center">
-            <FileText className="w-5 h-5 text-deck-accent" />
-          </div>
-          <h3 className="text-base font-semibold text-deck-fg">Structured Reporting Cadence</h3>
+      <div className="flex-shrink-0 bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
+        <div className="flex items-center gap-2 mb-1.5">
+          <FileText className="w-5 h-5 text-deck-accent" />
+          <h3 className="text-xs font-semibold text-deck-fg">Reporting</h3>
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Monthly</div>
-            <ul className="space-y-1 text-xs text-deck-fg">
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Financial statements</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>KPI dashboard</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Cash flow updates</span>
-              </li>
-            </ul>
+        <div className="grid grid-cols-3 gap-2 text-[10px] sm:text-xs">
+          <div>
+            <p className="font-semibold text-deck-accent uppercase">Monthly</p>
+            <p className="text-deck-fg/80">Financials, KPI, cash flow</p>
           </div>
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Quarterly</div>
-            <ul className="space-y-1 text-xs text-deck-fg">
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Board meetings</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Strategic reviews</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>LP updates</span>
-              </li>
-            </ul>
+          <div>
+            <p className="font-semibold text-deck-accent uppercase">Quarterly</p>
+            <p className="text-deck-fg/80">Board, strategy, LP updates</p>
           </div>
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Annual</div>
-            <ul className="space-y-1 text-xs text-deck-fg">
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Audited financials</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Portfolio valuations</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-deck-accent mt-1 flex-shrink-0"></div>
-                <span>Strategic planning</span>
-              </li>
-            </ul>
+          <div>
+            <p className="font-semibold text-deck-accent uppercase">Annual</p>
+            <p className="text-deck-fg/80">Audit, valuations, planning</p>
           </div>
         </div>
       </div>
-
-      {/* Investor Relations */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-4 space-y-2 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-              <Users2 className="w-4 h-4 text-deck-accent" />
-            </div>
-            <h3 className="text-sm font-semibold text-deck-fg">LP Communication</h3>
-          </div>
-          <div className="space-y-1 text-xs text-deck-fg/80">
-            <p>Transparent, regular performance updates</p>
-            <p>Direct GP access for questions</p>
-            <p>Annual meetings with portfolio tours</p>
-          </div>
+      <div className="flex-shrink-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 shadow-[var(--deck-shadow-card)] flex items-center gap-2">
+          <Users2 className="w-5 h-5 text-deck-accent flex-shrink-0" />
+          <p className="text-[10px] sm:text-xs text-deck-fg/80">LP: transparent updates, GP access, annual meetings</p>
         </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-4 space-y-2 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-deck-accent" />
-            </div>
-            <h3 className="text-sm font-semibold text-deck-fg">Documentation</h3>
-          </div>
-          <div className="space-y-1 text-xs text-deck-fg/80">
-            <p>Standard Nordic PE fund docs</p>
-            <p>Clear, enforceable LP protections</p>
-            <p>Independent administrator & auditor</p>
-          </div>
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 shadow-[var(--deck-shadow-card)] flex items-center gap-2">
+          <FileText className="w-5 h-5 text-deck-accent flex-shrink-0" />
+          <p className="text-[10px] sm:text-xs text-deck-fg/80">Nordic PE docs, LP protections, admin & auditor</p>
         </div>
       </div>
-
-      {/* Key Message */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-3 text-center shadow-sm">
-        <p className="text-sm text-deck-fg font-semibold">
-          Disciplined governance protects capital and ensures alignment with investors.
-        </p>
-      </div>
+      <p className="text-[10px] sm:text-xs text-deck-fg font-semibold text-center flex-shrink-0">Disciplined governance protects capital and alignment.</p>
     </div>
   );
 }

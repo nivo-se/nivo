@@ -1,3 +1,4 @@
+import { SlideFrame } from "./SlideFrame";
 import { Slide1 } from "./slides/Slide1";
 import { Slide2 } from "./slides/Slide2";
 import { Slide3 } from "./slides/Slide3";
@@ -74,82 +75,86 @@ const sections = [
   },
 ];
 
-const CONTENT_PADDING = "px-6";
+const CONTENT_PADDING = "px-4 sm:px-6";
 const CONTENT_MAX = "max-w-7xl mx-auto";
 
 export function FullPresentation() {
   return (
-    <div className="min-h-screen bg-deck-bg">
-      <main>
-        {sections.map((section) => (
-          <section key={section.id} id={`section-${section.id}`} className="scroll-mt-16">
-            <div className={`bg-deck-accent text-white py-6 md:py-8 ${CONTENT_PADDING}`}>
-              <div className={`${CONTENT_MAX}`}>
-                <h2 className="text-lg md:text-xl font-bold tracking-tight">
-                  {section.name}
+    <div className="min-h-screen bg-deck-bg overflow-x-hidden">
+      <main className="py-6 sm:py-8 md:py-10">
+        <div className={`${CONTENT_MAX} ${CONTENT_PADDING} flex flex-col items-center gap-8 sm:gap-10 md:gap-12`}>
+          {sections.map((section) => (
+            <section
+              key={section.id}
+              id={`section-${section.id}`}
+              className="scroll-mt-20 w-full flex flex-col items-center gap-6 sm:gap-8"
+            >
+              {/* Section header: full-width bar */}
+              <div className={`w-full bg-deck-accent text-deck-accent-foreground py-3 sm:py-4 md:py-5 rounded-lg ${CONTENT_PADDING}`}>
+                <div className="max-w-[min(100%,1280px)] mx-auto flex items-baseline justify-between gap-4">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
+                    {section.name}
+                  </h2>
+                  <span className="text-deck-accent-foreground/80 text-sm tabular-nums">
+                    {section.slides.length} {section.slides.length === 1 ? "slide" : "slides"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Slides: each is a 16:9 SlideFrame */}
+              <div className="w-full flex flex-col items-center gap-6 sm:gap-8">
+                {section.slides.map((slide, index) => {
+                  const SlideComponent = slide.component;
+                  return (
+                    <div
+                      key={slide.num}
+                      id={`slide-${slide.num}`}
+                      className="scroll-mt-20 w-full flex justify-center"
+                    >
+                      <SlideFrame
+                        sectionLabel={section.name}
+                        slideNum={slide.num}
+                        variant={index % 2 === 0 ? "surface" : "bg"}
+                      >
+                        <SlideComponent />
+                      </SlideFrame>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+
+          {/* Footer */}
+          <footer className="w-full bg-deck-fg text-deck-fg-foreground py-10 sm:py-14 rounded-lg mt-4">
+            <div className={`${CONTENT_MAX} ${CONTENT_PADDING} text-center space-y-6`}>
+              <div className="space-y-3">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">
+                  Ready to Learn More?
                 </h2>
-                <p className="text-white/80 text-sm mt-1">
-                  {section.slides.length} {section.slides.length === 1 ? "slide" : "slides"}
+                <p className="text-deck-fg-foreground/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                  Contact us to discuss investment opportunities and receive our
+                  detailed investment memorandum.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a
+                  href="mailto:invest@nivogroup.se"
+                  className="inline-flex items-center justify-center min-h-[48px] px-6 sm:px-8 py-3 sm:py-4 bg-deck-accent hover:bg-deck-accent-hover rounded-lg font-semibold text-sm sm:text-base text-deck-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deck-accent-foreground/50 focus-visible:ring-offset-2 focus-visible:ring-offset-deck-fg touch-manipulation"
+                >
+                  Contact Investment Team
+                </a>
+              </div>
+              <div className="pt-6 sm:pt-8 border-t border-deck-fg-foreground/20 text-sm sm:text-base text-deck-fg-foreground/60 space-y-1">
+                <p>© 2026 Nivo Group. All rights reserved.</p>
+                <p>
+                  This presentation is confidential and intended solely for
+                  prospective investors.
                 </p>
               </div>
             </div>
-
-            {section.slides.map((slide, index) => {
-              const SlideComponent = slide.component;
-              return (
-                <div
-                  key={slide.num}
-                  id={`slide-${slide.num}`}
-                  className={`scroll-mt-16 relative ${index % 2 === 0 ? "bg-deck-surface" : "bg-deck-bg"}`}
-                >
-                  <div className={`${CONTENT_MAX} ${CONTENT_PADDING} py-14 md:py-20`}>
-                    <div className="absolute top-4 right-6 md:right-8 text-xs font-semibold text-deck-accent bg-deck-accent/10 border border-deck-accent/30 rounded px-2.5 py-1 tabular-nums">
-                      Slide {slide.num}
-                    </div>
-                    <SlideComponent />
-                  </div>
-
-                  {index < section.slides.length - 1 && (
-                    <div className={`${CONTENT_MAX} ${CONTENT_PADDING}`}>
-                      <hr className="border-t border-deck-fg/10" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </section>
-        ))}
-
-        <footer className="bg-deck-fg text-white py-14 md:py-20">
-          <div className={`${CONTENT_MAX} ${CONTENT_PADDING} text-center space-y-8`}>
-            <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                Ready to Learn More?
-              </h2>
-              <p className="text-white/80 text-sm max-w-2xl mx-auto leading-relaxed">
-                Contact us to discuss investment opportunities and receive our
-                detailed investment memorandum.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="mailto:invest@nivogroup.se"
-                className="inline-flex items-center justify-center px-8 py-4 bg-deck-accent hover:bg-deck-accent-hover rounded-lg font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-deck-fg"
-              >
-                Contact Investment Team
-              </a>
-            </div>
-
-            <div className="pt-8 border-t border-white/20 text-sm text-white/60 space-y-1">
-              <p>© 2026 Nivo Group. All rights reserved.</p>
-              <p>
-                This presentation is confidential and intended solely for
-                prospective investors.
-              </p>
-            </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </main>
     </div>
   );

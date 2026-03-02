@@ -1,149 +1,66 @@
 import { TrendingUp, RefreshCw, DollarSign } from "lucide-react";
 
 export function Slide21() {
+  const exits = [
+    { icon: TrendingUp, title: "Strategic Sale", desc: "Sale to strategic buyer", tag: "Primary" },
+    { icon: RefreshCw, title: "Secondary", desc: "Larger PE or growth equity", tag: "Secondary" },
+    { icon: DollarSign, title: "Recap", desc: "Dividend recap, retain control", tag: "Alternative" },
+  ];
+  const timeline = [
+    { period: "Y1–2", text: "Margin expansion 200–300 bps" },
+    { period: "Y3–4", text: "Cash conversion, debt reduction" },
+    { period: "Y5–6", text: "ROIC 15%+, strategic position" },
+    { period: "Y7+", text: "Exit or recap" },
+  ];
+  const returns = [
+    { label: "Gross IRR", value: "19–23%" },
+    { label: "Net IRR", value: "15–18%" },
+    { label: "MOIC", value: "2.2–2.8x" },
+  ];
+
   return (
-    <div className="h-full flex flex-col justify-center space-y-4">
-      {/* Title */}
-      <div className="space-y-1">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-deck-fg">
-          Exit Strategy & Returns
-        </h1>
-        <p className="text-sm text-deck-accent">
-          Value realization through multiple pathways
-        </p>
+    <div className="h-full flex flex-col min-h-0 overflow-hidden gap-[var(--deck-slide-gap)]">
+      <div className="flex-shrink-0 space-y-0.5">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-deck-fg">Exit Strategy & Returns</h1>
+        <p className="text-xs sm:text-sm text-deck-accent leading-snug">Value realization through multiple pathways</p>
       </div>
-
-      {/* Exit Options */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-deck-accent" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-semibold text-deck-fg">Strategic Sale</h3>
-            <p className="text-xs text-deck-fg/70">
-              Sale to strategic buyer seeking capabilities or market position
-            </p>
-          </div>
-          <div className="pt-2 border-t border-deck-fg/10">
-            <p className="text-xs text-deck-accent font-semibold uppercase tracking-wider">Primary Exit</p>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-shrink-0">
+        {exits.map((e, i) => {
+          const Icon = e.icon;
+          return (
+            <div key={i} className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)]">
+              <div className="w-8 h-8 rounded-lg bg-deck-accent/10 border border-deck-accent-border flex items-center justify-center">
+                <Icon className="w-4 h-4 text-deck-accent" />
+              </div>
+              <h3 className="text-xs font-semibold text-deck-fg mt-1">{e.title}</h3>
+              <p className="text-[10px] text-deck-fg/70 leading-snug">{e.desc}</p>
+              <p className="text-[10px] font-semibold text-deck-accent uppercase mt-1">{e.tag}</p>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
+          <h3 className="text-xs font-semibold text-deck-fg mb-1.5">Timeline</h3>
+          {timeline.map((t) => (
+            <div key={t.period} className="flex justify-between gap-2 py-0.5 text-[10px] sm:text-xs">
+              <span className="font-semibold text-deck-accent">{t.period}</span>
+              <span className="text-deck-fg/80">{t.text}</span>
+            </div>
+          ))}
         </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-            <RefreshCw className="w-6 h-6 text-deck-accent" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-semibold text-deck-fg">Secondary Buyout</h3>
-            <p className="text-xs text-deck-fg/70">
-              Sale to larger PE fund or growth equity investor
-            </p>
-          </div>
-          <div className="pt-2 border-t border-deck-fg/10">
-            <p className="text-xs text-deck-accent font-semibold uppercase tracking-wider">Secondary Path</p>
-          </div>
-        </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-deck-accent/10 border border-deck-accent/30 flex items-center justify-center">
-            <DollarSign className="w-6 h-6 text-deck-accent" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-semibold text-deck-fg">Recapitalization</h3>
-            <p className="text-xs text-deck-fg/70">
-              Partial exit via dividend recap while maintaining control
-            </p>
-          </div>
-          <div className="pt-2 border-t border-deck-fg/10">
-            <p className="text-xs text-deck-accent font-semibold uppercase tracking-wider">Alternative Path</p>
-          </div>
+        <div className="bg-deck-surface border border-deck-border rounded-lg p-2 sm:p-2.5 shadow-[var(--deck-shadow-card)]">
+          <h3 className="text-xs font-semibold text-deck-fg mb-1.5">Target Returns</h3>
+          {returns.map((r) => (
+            <div key={r.label} className="flex justify-between py-0.5 text-[10px] sm:text-xs">
+              <span className="text-deck-accent">{r.label}</span>
+              <span className="font-semibold text-deck-fg">{r.value}</span>
+            </div>
+          ))}
+          <p className="text-[10px] text-deck-fg/70 mt-1.5 pt-1 border-t border-deck-border">Drivers: margin 45%, revenue 35%, debt paydown 20%</p>
         </div>
       </div>
-
-      {/* Value Creation Timeline */}
-      <div className="bg-deck-accent/10 border border-deck-accent/30 rounded-lg p-5 space-y-3">
-        <h3 className="text-base font-semibold text-deck-fg">Value Creation Timeline</h3>
-        <div className="grid grid-cols-4 gap-3">
-          <div className="space-y-1">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Year 1-2</div>
-            <p className="text-xs text-deck-fg">Operational initiatives deliver 200-300 bps of margin expansion</p>
-          </div>
-          <div className="space-y-1">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Year 3-4</div>
-            <p className="text-xs text-deck-fg">Cash conversion and debt reduction increase equity value</p>
-          </div>
-          <div className="space-y-1">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Year 5-6</div>
-            <p className="text-xs text-deck-fg">ROIC sustained at 15%+, strategic positioning improves</p>
-          </div>
-          <div className="space-y-1">
-            <div className="text-xs font-semibold text-deck-accent uppercase tracking-wider">Year 7+</div>
-            <p className="text-xs text-deck-fg">Exit or recapitalization based on market and portfolio readiness</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Returns Profile */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
-          <h3 className="text-base font-semibold text-deck-fg">Target Returns</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between items-center py-1">
-              <span className="text-deck-accent">Gross IRR</span>
-              <span className="text-deck-fg font-semibold text-lg">19-23%</span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className="text-deck-accent">Net IRR (post-fees)</span>
-              <span className="text-deck-fg font-semibold text-lg">15-18%</span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className="text-deck-accent">Target MOIC</span>
-              <span className="text-deck-fg font-semibold text-lg">2.2-2.8x</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-5 space-y-3 shadow-sm">
-          <h3 className="text-base font-semibold text-deck-fg">Value Drivers</h3>
-          <div className="space-y-2">
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-deck-accent">Margin expansion</span>
-                <span className="text-deck-fg font-semibold">45%</span>
-              </div>
-              <div className="w-full h-1.5 bg-deck-fg/5 rounded-full">
-                <div className="h-full bg-deck-accent rounded-full" style={{ width: "45%" }}></div>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-deck-accent">Revenue growth</span>
-                <span className="text-deck-fg font-semibold">35%</span>
-              </div>
-              <div className="w-full h-1.5 bg-deck-fg/5 rounded-full">
-                <div className="h-full bg-deck-accent rounded-full" style={{ width: "35%" }}></div>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-deck-accent">Debt paydown & cash conversion</span>
-                <span className="text-deck-fg font-semibold">20%</span>
-              </div>
-              <div className="w-full h-1.5 bg-deck-fg/5 rounded-full">
-                <div className="h-full bg-deck-accent rounded-full" style={{ width: "20%" }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Message */}
-      <div className="bg-deck-surface border border-deck-fg/10 rounded-lg p-3 text-center shadow-sm">
-        <p className="text-sm text-deck-fg font-semibold">
-          Returns are driven by operations, cash conversion, and disciplined capital structure.
-        </p>
-      </div>
+      <p className="text-[10px] sm:text-xs text-deck-fg font-semibold text-center flex-shrink-0">Returns from operations, cash conversion, disciplined structure.</p>
     </div>
   );
 }
