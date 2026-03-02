@@ -22,6 +22,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ClaimFirstAdmin from "./pages/ClaimFirstAdmin";
+import Investor from "./pages/Investor";
+import Investor2 from "./pages/Investor2";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import AppLayout from "./pages/default/AppLayout";
@@ -132,6 +134,8 @@ const App = () => (
             {isAuth0Configured() && <Route path="/auth/callback" element={<AuthCallback />} />}
             <Route path="/styleguide" element={<StyleGuide />} />
             <Route path="/landing" element={<Index />} />
+            <Route path="/investor" element={<Investor />} />
+            <Route path="/investor2" element={<Investor2 />} />
 
             {/* Default UI: landing for guests, app for logged-in users */}
             <Route path="/" element={<RootOrLanding />}>
