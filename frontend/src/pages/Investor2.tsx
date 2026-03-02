@@ -93,9 +93,9 @@ const Investor2: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-      <header className="border-b border-inv2-divider bg-inv2-olive text-white sticky top-0 z-20 shadow-[var(--inv2-shadow-soft)]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-white overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)]">
+      <header className="border-b border-inv2-divider bg-inv2-olive text-white sticky top-0 z-20 shadow-[var(--inv2-shadow-soft)] [padding-top:env(safe-area-inset-top)]">
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <img
               src="/nivo-wordmark-white.svg"
