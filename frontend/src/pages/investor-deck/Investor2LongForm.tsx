@@ -424,10 +424,10 @@ export function Investor2LongForm() {
           <h2 className={H2_CLASS}>Sourcing edge</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Pipeline development</p>
           <p className={PROSE_CLASS + " mb-8"}>
-            We analyse the Swedish SME universe within the target size band. Systematic segmentation focuses on revenue SEK 50–200m, stable base economics, signs of margin stagnation, and niche market positioning. The output is a ranked Target 100 shortlist.
+            We use a proprietary AI sourcing engine built in-house to analyse the Swedish SME universe within the target size band. Our backend ingests and segments companies by revenue SEK 50–200m, stable base economics, margin stagnation signals, and niche positioning. The engine outputs a ranked Target 100 shortlist and supports consistent, repeatable screening at scale.
           </p>
           <p className={PROSE_CLASS + " mb-10"}>
-            Before engagement we analyse products and services, customer segments, go-to-market model, pricing structure, and operational signals. The result is informed dialogue and disciplined entry.
+            Before engagement the same platform powers analysis of products and services, customer segments, go-to-market model, pricing structure, and operational signals. We arrive at dialogue with structured intelligence and disciplined entry criteria—all driven by our own technology stack.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 py-10 text-base sm:text-lg font-medium text-inv2-fg-muted">
             <span className="flex items-center gap-2 text-inv2-olive">
@@ -449,6 +449,35 @@ export function Investor2LongForm() {
               <Target className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" aria-hidden />
               Targets
             </span>
+          </div>
+          <div className="mt-10 w-full">
+            <p className={LABEL_OLIVE_CLASS + " text-center mb-6"}>Proprietary AI sourcing engine</p>
+            <div className="rounded-lg overflow-hidden border border-inv2-divider/60 shadow-[var(--inv2-shadow-soft)] relative">
+              <img
+                src="/sourcing-ai-screenshot.png"
+                alt="AI sourcing engine interface — company financial profile and analysis"
+                className="w-full h-auto"
+                style={{ maxHeight: "420px", objectFit: "cover" }}
+              />
+              <div
+                className="absolute top-0 left-0 w-56 h-20 backdrop-blur-md pointer-events-none"
+                aria-hidden
+                title="Company name redacted"
+              />
+            </div>
+            <div className="mt-6 rounded-lg overflow-hidden border border-inv2-divider/60 shadow-[var(--inv2-shadow-soft)] relative">
+              <img
+                src="/sourcing-ai-memo-screenshot.png"
+                alt="AI Investment Score — investment memo and strategic fit"
+                className="w-full h-auto"
+                style={{ maxHeight: "420px", objectFit: "cover" }}
+              />
+              <div
+                className="absolute top-0 left-0 right-0 h-14 backdrop-blur-md pointer-events-none"
+                aria-hidden
+                title="Company name redacted"
+              />
+            </div>
           </div>
         </div>
       </section>
