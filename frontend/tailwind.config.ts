@@ -208,7 +208,15 @@ export default {
 					to: {
 						backgroundPosition: "350% 50%, 350% 50%",
 					},
-				}
+				},
+				appear: {
+					"0%": { opacity: "0", transform: "translateY(10px)" },
+					"100%": { opacity: "1", transform: "translateY(0)" },
+				},
+				"appear-zoom": {
+					"0%": { opacity: "0", transform: "scale(0.95)" },
+					"100%": { opacity: "1", transform: "scale(1)" },
+				},
 			},
 			animation: {
 				aurora: "aurora 60s linear infinite",
@@ -219,8 +227,16 @@ export default {
 				'fade-in': 'fade-in 0.5s ease-out forwards',
 				'fade-in-up': 'fade-in-up 0.7s ease-out forwards',
 				'fade-in-down': 'fade-in-down 0.7s ease-out forwards',
-				'text-reveal': 'text-reveal 0.7s ease-out forwards'
-			}
+				'text-reveal': 'text-reveal 0.7s ease-out forwards',
+				appear: "appear 0.5s ease-out forwards",
+				"appear-zoom": "appear-zoom 0.5s ease-out forwards",
+			},
+			animationDelay: {
+				"100": "100ms",
+				"300": "300ms",
+				"700": "700ms",
+				"1000": "1000ms",
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
