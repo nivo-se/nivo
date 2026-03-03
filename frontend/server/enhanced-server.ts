@@ -43,8 +43,10 @@ import {
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const PROJECT_ROOT = path.resolve(__dirname, '../..')
 
-// Load environment variables from .env.local
+// Load environment: project root .env first (Mac Mini / single .env), then frontend/.env.local override
+config({ path: path.resolve(PROJECT_ROOT, '.env') })
 config({ path: path.resolve(__dirname, '../.env.local') })
 
 // Environment check (only when DEBUG=true to avoid leaking operational hints)
@@ -96,6 +98,26 @@ app.use(async (req, res, next) => {
       next(err)
     }
   }
+})
+
+// AI config status (for debugging live/Mac Mini: curl http://<host>:<port>/api/ai-status)
+app.get('/api/ai-status', (_req, res) => {
+  const openaiConfigured = Boolean(process.env.OPENAI_API_KEY)
+  const supabaseUrl = process.env.VITE_SUPABASE_URL
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY
+  const supabaseConfigured = Boolean(supabaseUrl && supabaseKey)
+  res.json({
+    openaiConfigured,
+    supabaseConfigured,
+    message: !openaiConfigured
+      ? 'Set OPENAI_API_KEY in .env (project root) or frontend/.env.local'
+      : !supabaseConfigured
+        ? 'Set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or VITE_SUPABASE_ANON_KEY) in .env or frontend/.env.local'
+        : 'AI and Supabase configured',
+  })
 })
 
 // Types
@@ -4004,7 +4026,15 @@ app.get('/api/analytics', async (req, res) => {
 
 // Start server
 app.listen(port, () => {
+  const openaiOk = Boolean(process.env.OPENAI_API_KEY)
+  const supabaseOk = Boolean(
+    process.env.VITE_SUPABASE_URL &&
+    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY)
+  )
   console.log(`🚀 Enhanced AI Analysis Server running on http://localhost:${port}`)
   console.log('✨ Features: Enhanced Codex AI analysis with Swedish localization')
   console.log('📊 Features: Multi-model valuation engine with EV vs Equity handling')
+  console.log(`🔑 AI (OpenAI): ${openaiOk ? 'configured' : 'NOT CONFIGURED — set OPENAI_API_KEY in .env or frontend/.env.local'}`)
+  console.log(`🔑 Supabase: ${supabaseOk ? 'configured' : 'NOT CONFIGURED — set VITE_SUPABASE_URL and service/anon key'}`)
+  console.log(`   Debug: GET http://localhost:${port}/api/ai-status`)
 })
