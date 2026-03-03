@@ -32,6 +32,13 @@ export const NIVO_INKS = {
   forest: "#1E4D3C",
 } as const;
 
+/** Suggested gradient pairs (from → to) for cards/sections */
+export const NIVO_GRADIENTS = [
+  { name: "Olive muted → Soft peach", from: NIVO_WASHES.oliveMuted, to: NIVO_WASHES.softPeach },
+  { name: "Soft sky → Soft peach", from: NIVO_WASHES.softSky, to: NIVO_WASHES.softPeach },
+  { name: "Forest → Platinum", from: NIVO_INKS.forest, to: NIVO_CORE.platinum },
+] as const;
+
 /** All complementing colors (neutrals + washes + inks) */
 export const NIVO_COMPLEMENTS = {
   ...NIVO_NEUTRALS,
@@ -59,14 +66,11 @@ export const NIVO_BENTO_COLORS = {
   card5: [NIVO_WASHES.sageMuted, NIVO_WASHES.softPeach, NIVO_WASHES.softLilac],
 } as const;
 
-/** Aurora gradient — Nivo washes + core olive + ink */
+/** Aurora gradient — green-focused with forest & deep teal (2 greens swapped for inks) */
 export const NIVO_AURORA_COLORS = [
-  NIVO_WASHES.oliveMuted,
-  NIVO_WASHES.sageMuted,
-  NIVO_WASHES.softSky,
-  NIVO_WASHES.softPeach,
-  NIVO_WASHES.softLilac,
-  NIVO_NEUTRALS.border,
-  NIVO_CORE.grayOlive,
-  NIVO_INKS.deepTeal,
+  "#B0C8A8", // olive green — solid
+  NIVO_INKS.forest, // #1E4D3C
+  "#A0D8C0", // sage/mint — solid
+  NIVO_INKS.deepTeal, // #0F6B63
+  "#C0D8B0", // soft green — solid
 ] as const;

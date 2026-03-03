@@ -8,6 +8,7 @@ import {
   NIVO_NEUTRALS,
   NIVO_WASHES,
   NIVO_INKS,
+  NIVO_GRADIENTS,
 } from "@/lib/nivoPalette";
 
 const CORE = [
@@ -198,6 +199,16 @@ export default function Colors() {
             Aurora demos →
           </a>
         </div>
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Fonts used</p>
+          <p className="text-sm text-gray-700">
+            <span className="font-heading font-semibold">Heading:</span> Zapf Humanist 601 Demi BT
+            <span className="mx-2 text-gray-400">·</span>
+            <span className="font-sans">Body:</span> Poppins (300–700)
+            <span className="mx-2 text-gray-400">·</span>
+            <span className="font-mono text-xs">Hex codes:</span> system monospace
+          </p>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-10">
@@ -224,6 +235,16 @@ export default function Colors() {
           <Section title="Ink accents (links/CTAs)">
             {NIVO_INKS_DISPLAY.map((i) => (
               <Swatch key={i.hex} name={i.name} hex={i.hex} />
+            ))}
+          </Section>
+          <Section title="Suggested gradient pairs">
+            {NIVO_GRADIENTS.map((g) => (
+              <GradientSwatch
+                key={g.name}
+                name={g.name}
+                from={g.from}
+                to={g.to}
+              />
             ))}
           </Section>
         </OptionCard>
