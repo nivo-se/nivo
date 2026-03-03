@@ -19,6 +19,9 @@ import Investor from "./pages/Investor";
 import Investor2 from "./pages/Investor2";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
+import Colors from "./pages/Colors";
+import ColorDemos from "./pages/ColorDemos";
+import ColorAuroraDemos from "./pages/ColorAuroraDemos";
 import AppLayout from "./pages/default/AppLayout";
 import WorkDashboard from "./pages/default/WorkDashboard";
 import Universe from "./pages/default/Universe";
@@ -59,6 +62,9 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/styleguide" element={<StyleGuide />} />
+            <Route path="/colors" element={<Colors />} />
+            <Route path="/colors/demos" element={<ColorDemos />} />
+            <Route path="/colors/aurora" element={<ColorAuroraDemos />} />
             <Route path="/landing" element={<Index />} />
             <Route path="/investor" element={<Investor />} />
             <Route path="/investor2" element={<Investor2 />} />
