@@ -112,6 +112,18 @@ cp .env.example .env
 npm run dev
 ```
 
+### Mac Mini / live instance (AI requests)
+
+On a deployed “live” instance (e.g. Mac Mini), the Node enhanced-server handles `/api/ai-analysis`. It loads env from **project root `.env`** first, then `frontend/.env.local`. Ensure the process has:
+
+- **`OPENAI_API_KEY`** — required for AI analysis
+- **`VITE_SUPABASE_URL`** and **`SUPABASE_SERVICE_ROLE_KEY`** (or `VITE_SUPABASE_ANON_KEY`) — for credits and storage
+
+Use a single `.env` at the repo root with these set, or copy the same vars into `frontend/.env.local`. After starting the server, check:
+
+- Startup logs: `🔑 AI (OpenAI): configured` / `🔑 Supabase: configured`
+- `GET http://<host>:<port>/api/ai-status` — returns `openaiConfigured` and `supabaseConfigured` (no secrets).
+
 ### Database Setup
 1. Create a Supabase project
 2. Run the SQL migrations:
