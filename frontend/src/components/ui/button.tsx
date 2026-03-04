@@ -22,6 +22,8 @@ const buttonVariants = cva(
         ghost:
           "border border-transparent bg-transparent text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring focus-visible:ring-offset-2",
         link: "border-0 text-foreground underline-offset-4 hover:underline hover:bg-transparent",
+        glow:
+          "border border-border bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring shadow-[0_0_20px_hsl(var(--brand)_/_0.4)]",
       },
       size: {
         default: "h-10 px-4 py-2",

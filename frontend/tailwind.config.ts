@@ -124,6 +124,27 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
+				"background-gradient": {
+					"0%, 100%": {
+						transform: "translate(0, 0)",
+					},
+					"20%": {
+						transform:
+							"translate(calc(100% * var(--tx-1, 1)), calc(100% * var(--ty-1, 1)))",
+					},
+					"40%": {
+						transform:
+							"translate(calc(100% * var(--tx-2, -1)), calc(100% * var(--ty-2, 1)))",
+					},
+					"60%": {
+						transform:
+							"translate(calc(100% * var(--tx-3, 1)), calc(100% * var(--ty-3, -1)))",
+					},
+					"80%": {
+						transform:
+							"translate(calc(100% * var(--tx-4, -1)), calc(100% * var(--ty-4, -1)))",
+					},
+				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -179,16 +200,43 @@ export default {
 						transform: 'translateY(0)',
 						opacity: '1'
 					}
-				}
+				},
+				aurora: {
+					from: {
+						backgroundPosition: "50% 50%, 50% 50%",
+					},
+					to: {
+						backgroundPosition: "350% 50%, 350% 50%",
+					},
+				},
+				appear: {
+					"0%": { opacity: "0", transform: "translateY(10px)" },
+					"100%": { opacity: "1", transform: "translateY(0)" },
+				},
+				"appear-zoom": {
+					"0%": { opacity: "0", transform: "scale(0.95)" },
+					"100%": { opacity: "1", transform: "scale(1)" },
+				},
 			},
 			animation: {
+				aurora: "aurora 60s linear infinite",
+				"background-gradient":
+					"background-gradient var(--background-gradient-speed, 15s) cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite",
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out forwards',
 				'fade-in-up': 'fade-in-up 0.7s ease-out forwards',
 				'fade-in-down': 'fade-in-down 0.7s ease-out forwards',
-				'text-reveal': 'text-reveal 0.7s ease-out forwards'
-			}
+				'text-reveal': 'text-reveal 0.7s ease-out forwards',
+				appear: "appear 0.5s ease-out forwards",
+				"appear-zoom": "appear-zoom 0.5s ease-out forwards",
+			},
+			animationDelay: {
+				"100": "100ms",
+				"300": "300ms",
+				"700": "700ms",
+				"1000": "1000ms",
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

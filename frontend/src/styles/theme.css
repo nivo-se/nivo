@@ -68,6 +68,10 @@
   --inv2-bg-subtle: 60 12% 98%;
   --inv2-shadow-soft: 0 2px 12px hsl(85 18% 32% / 0.06);
   --inv2-radial-highlight: radial-gradient(ellipse 80% 50% at 50% 0%, hsl(85 14% 92% / 0.6), transparent 70%);
+
+  /* Hero / Glow (overridden per section on color hero demos) */
+  --brand: 85 18% 32%;
+  --brand-foreground: 0 0% 98%;
 }
 
 .dark {
@@ -109,4 +113,7 @@
   --sidebar-hover-bg: #242320;
   --sidebar-active-bg: #1A1812;
   --sidebar-active-fg: #DCDCDB;
+
+  --brand: 85 18% 48%;
+  --brand-foreground: 0 0% 98%;
 }
