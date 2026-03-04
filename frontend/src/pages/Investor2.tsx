@@ -51,12 +51,14 @@ const TEAM = [
   { name: "Sebastian Robson", role: "Founding Partner", bio: "10+ years M&A, tech and industrials, M.Sc. Economics." },
 ];
 
-// ─── Section wrapper (design profile) ─────────────────────────────────────
+// ─── Section wrapper (design profile) — background full width, content constrained ───
 function Section({ title, bg = "bg", children }: { title: string; bg?: "bg" | "bgAlt"; children: React.ReactNode }) {
   return (
-    <section className={SECTION_CLASS} style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
-      <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>{title}</h2>
-      {children}
+    <section className="w-full" style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
+      <div className={SECTION_CLASS}>
+        <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>{title}</h2>
+        {children}
+      </div>
     </section>
   );
 }
@@ -85,7 +87,7 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
       >
         <div className="text-center mb-6">
           <img src="/nivo-logo-green.svg" alt="Nivo" className="h-14 sm:h-16 w-auto mx-auto mb-4" />
-          <span className="inline-block px-3 py-1.5 rounded-full text-sm font-medium uppercase tracking-wider" style={{ background: tokens.gradients.soft, color: tokens.accent }}>Investor</span>
+          <span className="inline-block px-3 py-1.5 rounded-full text-sm font-medium uppercase tracking-wider" style={{ backgroundColor: tokens.bg, color: tokens.accent }}>Investor</span>
           <h1 className="text-xl sm:text-2xl font-bold mt-4 mb-2" style={{ color: tokens.text }}>Investor Access</h1>
           <p className="text-base" style={{ color: tokens.text }}>Ange lösenord för att komma åt materialet.</p>
         </div>
@@ -214,7 +216,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
       <Section title="The Opportunity" bg="bgAlt">
         <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Why Nordic SMEs, why now</p>
 
-        <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border" style={{ background: tokens.gradients.callout, borderColor: tokens.border }}>
+        <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
             We buy profitable, under-digitised Nordic SMEs and compound value through operational improvement — not technology risk.
           </p>
@@ -239,7 +241,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-          <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+          <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -256,7 +258,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
             </ul>
           </div>
 
-          <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+          <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Workflow className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -273,7 +275,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
             </ul>
           </div>
 
-          <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+          <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -290,7 +292,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
             </ul>
           </div>
 
-          <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.callout, borderColor: tokens.accent, borderWidth: 2 }}>
+          <div className="rounded-xl p-5 sm:p-6 border-2 flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -317,12 +319,12 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Three pillars</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {["Acquire right", "Execute relentlessly", "Compound with discipline"].map((title, i) => (
-            <div key={i} className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, background: tokens.gradients.callout }}>
+            <div key={i} className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
               <p className="font-semibold" style={{ color: tokens.text }}>{title}</p>
             </div>
           ))}
         </div>
-        <div className="rounded-lg p-4 border mb-6" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+        <div className="rounded-lg p-4 border mb-6" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-sm font-medium mb-4" style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -338,15 +340,15 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, background: tokens.gradients.callout }}>
+          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
             <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Entry → Exit (illustrative)</p>
             <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY}</p>
           </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, background: tokens.gradients.callout }}>
+          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
             <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Gross MOIC</p>
             <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
           </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, background: tokens.gradients.callout }}>
+          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
             <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>IRR</p>
             <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
           </div>
@@ -358,7 +360,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Target 100 by operational improvement potential</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {PIPELINE_ITEMS.map((item) => (
-            <div key={item.stage} className="rounded-lg p-5 text-center border" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+            <div key={item.stage} className="rounded-lg p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
               <p className="text-sm mt-1" style={{ color: tokens.text }}>{item.stage}</p>
             </div>
@@ -371,7 +373,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
             { name: "Company B", sector: "Business services", revenue: "SEK 75m", status: "Advanced" },
             { name: "Company C", sector: "Distribution", revenue: "SEK 165m", status: "Due diligence" },
           ].map((c) => (
-            <div key={c.name} className="rounded-lg p-5 border" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+            <div key={c.name} className="rounded-lg p-5 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <p className="font-semibold" style={{ color: tokens.text }}>{c.name}</p>
               <p className="text-sm mt-1" style={{ color: tokens.text }}>{c.sector} · {c.revenue}</p>
               <p className="text-sm font-medium mt-3" style={{ color: tokens.accent }}>{c.status}</p>
@@ -398,7 +400,8 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
       </Section>
 
       {/* CTA — reveal full long-form on same page */}
-      <section className={SECTION_CLASS} style={{ backgroundColor: tokens.bg, borderTop: `1px solid ${tokens.border}` }}>
+      <section className="w-full" style={{ backgroundColor: tokens.bg, borderTop: `1px solid ${tokens.border}` }}>
+        <div className={SECTION_CLASS}>
         <p className="text-center mb-4" style={{ color: tokens.text }}>Full long-form memo with structure, sourcing, value creation and case study.</p>
         <div className="flex justify-center gap-4">
           <button
@@ -409,6 +412,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
           >
             Open long-form version
           </button>
+        </div>
         </div>
       </section>
       </div>

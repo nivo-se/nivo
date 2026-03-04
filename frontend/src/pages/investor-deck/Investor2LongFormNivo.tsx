@@ -99,13 +99,14 @@ export function Investor2LongFormNivo() {
       </section>
 
       {/* ─── The Opportunity ────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="opportunity" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="opportunity" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>The Opportunity</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Why Nordic SMEs, why now</p>
 
           {/* One-line thesis + key selling points — for investors who only read this section */}
-          <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border" style={{ background: tokens.gradients.callout, borderColor: tokens.border }}>
+          <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <p className="text-lg sm:text-xl font-semibold text-profile-fg mb-4 leading-snug">
               We buy profitable, under-digitised Nordic SMEs and compound value through operational improvement — not technology risk.
             </p>
@@ -131,7 +132,7 @@ export function Investor2LongFormNivo() {
 
           {/* Four pillars in a 2x2 grid — easy to scan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-            <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+            <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                   <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -148,7 +149,7 @@ export function Investor2LongFormNivo() {
               </ul>
             </div>
 
-            <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+            <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                   <Workflow className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -165,7 +166,7 @@ export function Investor2LongFormNivo() {
               </ul>
             </div>
 
-            <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+            <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                   <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -182,7 +183,7 @@ export function Investor2LongFormNivo() {
               </ul>
             </div>
 
-            <div className="rounded-xl p-5 sm:p-6 border flex flex-col" style={{ background: tokens.gradients.callout, borderColor: tokens.accent, borderWidth: 2 }}>
+            <div className="rounded-xl p-5 sm:p-6 border-2 flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -195,10 +196,12 @@ export function Investor2LongFormNivo() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Investment overview ────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="overview" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="overview" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Investment overview</h2>
           <p className={SECTION_SUBTITLE_CLASS}>A disciplined approach to Nordic compounding SMEs</p>
@@ -211,21 +214,25 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5" style={{ backgroundColor: tokens.bg }}>
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+      <section className="w-full" style={{ backgroundColor: tokens.bg }}>
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
+        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <img
             src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80"
             alt="Nordic industrial landscape"
             className="w-full h-full object-cover opacity-90"
           />
         </div>
+        </div>
       </section>
 
       {/* ─── The Nordic Compounder Model ─────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="model" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="model" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>The Nordic Compounder Model</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Investment thesis</p>
@@ -233,20 +240,20 @@ export function Investor2LongFormNivo() {
             <div>
               <p className={LABEL_OLIVE_CLASS + " mb-4"}>Three pillars</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Acquire right</p>
                   <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Disciplined entry, clear improvement headroom.</p>
                 </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Execute relentlessly</p>
                   <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Pricing discipline, margin expansion, reporting.</p>
                 </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Compound with discipline</p>
                   <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Reinvest cash flow, keep appropriate debt levels, build equity.</p>
                 </div>
               </div>
-              <div className="rounded-lg py-3 px-4 w-full mt-6" style={{ background: tokens.gradients.soft, border: `1px solid ${tokens.border}` }}>
+              <div className="rounded-lg py-3 px-4 w-full mt-6" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
                 <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Return drivers</p>
                 <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
                   We use operational excellence and apply technology—including AI—where appropriate to accelerate revenue growth and margin expansion. Value is driven primarily by these levers; we assume only modest multiple expansion.
@@ -259,7 +266,7 @@ export function Investor2LongFormNivo() {
 
             <div className="pt-4 border-t space-y-4" style={{ borderColor: tokens.border }}>
               <p className={LABEL_OLIVE_CLASS + " mb-4"}>Illustrative investment outcome</p>
-              <div className="rounded-lg py-3 px-4 w-full" style={{ background: tokens.gradients.soft, border: `1px solid ${tokens.border}` }}>
+              <div className="rounded-lg py-3 px-4 w-full" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
                 <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
                   The chart and table below are based on the assumptions set out in this section: entry and exit multiples, revenue growth, margin progression, leverage and hold period. Outcomes are illustrative and do not represent a forecast.
                 </p>
@@ -289,15 +296,15 @@ export function Investor2LongFormNivo() {
           </div>
 
           <div className="mt-6 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Entry → Exit (illustrative)</p>
               <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY.toFixed(1)}</p>
             </div>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Gross MOIC</p>
               <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
             </div>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>IRR</p>
               <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
             </div>
@@ -305,7 +312,7 @@ export function Investor2LongFormNivo() {
 
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS + " mb-4"}>Assumptions</p>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className="text-[15px] text-profile-fg leading-relaxed">Yearly returns of 15% over a cycle, full reinvestments and 30% leverage. No exit multiple expansion assumed.</p>
             </div>
           </div>
@@ -315,7 +322,7 @@ export function Investor2LongFormNivo() {
             <p className="text-[13px] text-profile-fg mb-3">7-year investment horizon with ~15% yearly return. Reinvestment of returns drives ROIC and MoM multiples.</p>
             <div className="overflow-x-auto rounded-lg border" style={{ borderColor: tokens.border }}>
               <table className="w-full text-sm min-w-[520px]">
-                <thead style={{ background: tokens.gradients.soft }}>
+                <thead style={{ backgroundColor: tokens.bg }}>
                   <tr>
                     <th className="px-3 py-2.5 text-left font-semibold text-profile-fg">Year</th>
                     <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">Equity</th>
@@ -345,10 +352,12 @@ export function Investor2LongFormNivo() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Value Creation ─────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="value-creation" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="value-creation" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Value creation</h2>
           <p className={SECTION_SUBTITLE_CLASS}>From acquisition to compounding</p>
@@ -359,15 +368,15 @@ export function Investor2LongFormNivo() {
             <p className={LABEL_CLASS}>Value creation playbook — three operational pillars</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10">
-            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Revenue</p>
               <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Pricing discipline, sales governance, retention, product mix.</p>
             </div>
-            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Margins</p>
               <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Overhead optimisation, working capital, procurement, cost allocation.</p>
             </div>
-            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+            <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Digital & AI</p>
               <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Workflow automation, reporting, data-led decisions, AI capacity.</p>
             </div>
@@ -386,10 +395,12 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Acquisition criteria ───────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="acquisition-criteria" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="acquisition-criteria" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Acquisition criteria</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Valuation and capital structure discipline</p>
@@ -398,7 +409,7 @@ export function Investor2LongFormNivo() {
               We apply strict valuation discipline: entry at EV/EBITDA in the 5–7x range, prioritising operational improvement potential over growth premium. Targets must demonstrate stable cash generation. Leverage is conservative—debt to capital below 30%, net debt to EBITDA below 2x—and supplements strategy rather than driving returns. Financial guardrails include a credible path to 15% ROIC, at least 12 months runway, and capital preservation as the first principle.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
-              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS + " mb-3"}>Target profile</p>
                 <ul className="space-y-2 text-[15px] text-profile-fg">
                   <li className="flex items-start gap-2">
@@ -415,7 +426,7 @@ export function Investor2LongFormNivo() {
                   </li>
                 </ul>
               </div>
-              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS + " mb-3"}>Example</p>
                 <ul className="space-y-2 text-[15px] text-profile-fg">
                   <li className="flex items-start gap-2">
@@ -438,10 +449,12 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Sourcing Edge ───────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="sourcing" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="sourcing" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Sourcing edge</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Pipeline development</p>
@@ -505,10 +518,12 @@ export function Investor2LongFormNivo() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Investment process ──────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="process" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="process" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Investment process</h2>
           <p className="text-profile-accent font-medium uppercase tracking-widest text-sm mb-8">Sourcing to value creation</p>
@@ -519,17 +534,17 @@ export function Investor2LongFormNivo() {
             <div className="w-full">
               <p className={LABEL_OLIVE_CLASS + " text-center"}>Current pipeline status</p>
               <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4">
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                   <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>12</p>
                   <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Initial screen</p>
                   <p className="text-xs mt-0.5" style={{ color: tokens.text }}>Under review</p>
                 </div>
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                   <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>2</p>
                   <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Due diligence</p>
                   <p className="text-xs mt-0.5" style={{ color: tokens.text }}>Active</p>
                 </div>
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                   <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>1</p>
                   <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Negotiation</p>
                   <p className="text-xs mt-0.5" style={{ color: tokens.text }}>LOI+</p>
@@ -538,21 +553,25 @@ export function Investor2LongFormNivo() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5" style={{ backgroundColor: tokens.bgAlt }}>
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ background: tokens.gradients.warm, borderColor: tokens.border }}>
+      <section className="w-full" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
+        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <img
             src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=80"
             alt="Nordic nature"
             className="w-full h-full object-cover opacity-85"
           />
         </div>
+        </div>
       </section>
 
       {/* ─── Pipeline ────────────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="pipeline" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="pipeline" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Pipeline</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Target 100 by operational improvement potential</p>
@@ -563,7 +582,7 @@ export function Investor2LongFormNivo() {
               { stage: "Initial contact", count: "12" },
               { stage: "Identified", count: "81" },
             ].map((item) => (
-              <div key={item.stage} className="rounded-lg p-4 sm:p-5 text-center border" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+              <div key={item.stage} className="rounded-lg p-4 sm:p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                 <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
                 <p className="text-sm mt-1" style={{ color: tokens.text }}>{item.stage}</p>
               </div>
@@ -576,7 +595,7 @@ export function Investor2LongFormNivo() {
               { name: "Company B", sector: "Business services", revenue: "SEK 75m", status: "Advanced" },
               { name: "Company C", sector: "Distribution", revenue: "SEK 165m", status: "Due diligence" },
             ].map((c) => (
-              <div key={c.name} className="min-w-[200px] rounded-lg p-5 border transition-colors" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+              <div key={c.name} className="min-w-[200px] rounded-lg p-5 border transition-colors" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                 <p className="font-semibold text-profile-fg">{c.name}</p>
                 <p className="text-sm text-profile-fg mt-1">{c.sector} · {c.revenue}</p>
                 <p className="text-sm text-profile-accent font-medium mt-3">{c.status}</p>
@@ -585,10 +604,12 @@ export function Investor2LongFormNivo() {
           </div>
           <p className="text-sm text-profile-fg mt-6">Company names anonymised. All fit established selection criteria.</p>
         </div>
+        </div>
       </section>
 
       {/* ─── Case study (illustrative) ───────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="case-study" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="case-study" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Case study (illustrative)</h2>
           <p className={SECTION_SUBTITLE_CLASS}>How operational improvements drive returns</p>
@@ -599,15 +620,15 @@ export function Investor2LongFormNivo() {
             <div className="max-w-2xl space-y-4">
               <p className={LABEL_CLASS}>Value creation over 24 months</p>
               <div className="space-y-3">
-                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Pricing</p>
                   <p className="text-[15px]" style={{ color: tokens.text }}>Introduction of value-based pricing across 40% of contracts. Impact: +150 bps margin.</p>
                 </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Operations</p>
                   <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflow and dispatch replacing manual, paper-based processes. Impact: +100 bps.</p>
                 </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Cost</p>
                   <p className="text-[15px]" style={{ color: tokens.text }}>Consolidated functions and vendor renegotiation. Impact: +50 bps.</p>
                 </div>
@@ -618,21 +639,25 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5" style={{ backgroundColor: tokens.bg }}>
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ background: tokens.gradients.cool, borderColor: tokens.border }}>
+      <section className="w-full" style={{ backgroundColor: tokens.bg }}>
+        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
+        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <img
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80"
             alt="Minimal workspace"
             className="w-full h-full object-cover opacity-90"
           />
         </div>
+        </div>
       </section>
 
       {/* ─── Team ───────────────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="team" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="team" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Team</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Operational experience meets disciplined capital</p>
@@ -669,15 +694,15 @@ export function Investor2LongFormNivo() {
             <div>
               <h3 className={H3_CLASS}>Advisory board</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto justify-items-center">
-                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Senior Advisor</p>
                   <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Ex-CEO SEK 400m industrial. 25+ years operations.</p>
                 </div>
-                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Financial Advisor</p>
                   <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Ex-CFO listed Nordic. Financial systems.</p>
                 </div>
-                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+                <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Advisor</p>
                   <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Strategic and operational advisory.</p>
                 </div>
@@ -687,25 +712,27 @@ export function Investor2LongFormNivo() {
               Operators first, investors second. Hands-on execution guided by proven experience. We operate companies; we do not just own them.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
-              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Operational</p>
                 <p className="text-[15px]" style={{ color: tokens.text }}>20+ years ops leadership, scaling SMEs, P&L responsibility.</p>
               </div>
-              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Capital</p>
                 <p className="text-[15px]" style={{ color: tokens.text }}>Value-focused acquisitions, pricing and negotiation, long-term view.</p>
               </div>
-              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Technical</p>
                 <p className="text-[15px]" style={{ color: tokens.text }}>AI and automation, process optimisation, change management.</p>
               </div>
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Structure & Returns ─────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="structure" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="structure" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Structure & returns</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Capital model and governance</p>
@@ -730,20 +757,20 @@ export function Investor2LongFormNivo() {
                     {/* Above Parent: investors */}
                     <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-3">
                       <div className="text-center">
-                        <div className="px-4 py-2.5 rounded-md border min-w-[140px]" style={{ borderColor: tokens.border, background: tokens.gradients.soft }}>
+                        <div className="px-4 py-2.5 rounded-md border min-w-[140px]" style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}>
                           <p className="text-sm font-medium" style={{ color: tokens.text }}>Founders & Founding Investors</p>
                           <p className="text-xs font-medium mt-1" style={{ color: tokens.accent }}>A- & B-shares</p>
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="px-4 py-2.5 rounded-md border min-w-[140px]" style={{ borderColor: tokens.border, background: tokens.gradients.soft }}>
+                        <div className="px-4 py-2.5 rounded-md border min-w-[140px]" style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}>
                           <p className="text-sm font-medium" style={{ color: tokens.text }}>New Investors</p>
                           <p className="text-xs font-medium mt-1" style={{ color: tokens.accent }}>B-shares</p>
                         </div>
                       </div>
                     </div>
                     <div className="w-px h-4" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                    <div className="px-5 py-3 rounded-md border-2" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+                    <div className="px-5 py-3 rounded-md border-2" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                       <p className="text-sm font-semibold" style={{ color: tokens.text }}>Nivo Group AB (Parent Company)</p>
                     </div>
                     <div className="w-px h-4" style={{ backgroundColor: tokens.accent }} aria-hidden />
@@ -754,7 +781,7 @@ export function Investor2LongFormNivo() {
                     <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
                       {["BidCo 1", "BidCo 2", "BidCo 3"].map((label) => (
                         <div key={label} className="flex flex-col items-center">
-                          <div className="px-3 py-2 rounded border text-center min-w-[90px]" style={{ borderColor: tokens.border, background: tokens.gradients.soft }}>
+                          <div className="px-3 py-2 rounded border text-center min-w-[90px]" style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}>
                             <p className="text-xs font-medium" style={{ color: tokens.text }}>{label}</p>
                             <p className="text-[11px] mt-0.5" style={{ color: tokens.text }}>acquisition vehicle</p>
                           </div>
@@ -832,7 +859,7 @@ export function Investor2LongFormNivo() {
                 ))}
                 </div>
                 <div className="mt-4 h-2 rounded-full overflow-hidden flex" style={{ backgroundColor: tokens.border }}>
-                  <div className="rounded-l" style={{ width: "75%", background: tokens.gradients.progress }} />
+                  <div className="rounded-l" style={{ width: "75%", backgroundColor: tokens.accent }} />
                   <div style={{ width: "15%", backgroundColor: tokens.accentSecondary }} />
                   <div className="rounded-r" style={{ width: "10%", backgroundColor: tokens.accentSecondary, opacity: 0.5 }} />
                 </div>
@@ -863,7 +890,7 @@ export function Investor2LongFormNivo() {
                 { label: "Target MOIC", value: "2.2–2.8x" },
                 { label: "Base case hold", value: "5–10 years" },
               ].map((item) => (
-                <div key={item.label} className="text-center py-4 px-4 rounded-lg border" style={{ background: tokens.gradients.soft, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+                <div key={item.label} className="text-center py-4 px-4 rounded-lg border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                   <p className="text-xl font-semibold" style={{ color: tokens.accent }}>{item.value}</p>
                   <p className="text-sm mt-1" style={{ color: tokens.text }}>{item.label}</p>
                 </div>
@@ -874,28 +901,30 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Risk factors & mitigation ───────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="risks" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="risks" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Risk factors and mitigation</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Transparent assessment, disciplined mitigation</p>
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Execution</p>
                 <p className="text-[15px] text-profile-fg mb-2">Initiatives may take longer or cost more than planned.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
                 <p className="text-[15px] text-profile-fg">Proven playbook, stress scenarios, experienced advisors.</p>
               </div>
-              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Market</p>
                 <p className="text-[15px] text-profile-fg mb-2">Downturn or sector-specific challenges.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
                 <p className="text-[15px] text-profile-fg">Defensive sectors, 3–4 company diversification, leverage below 2x.</p>
               </div>
-              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, background: tokens.gradients.callout }}>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Key person</p>
                 <p className="text-[15px] text-profile-fg mb-2">Founder dependence and transition risk.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
@@ -903,11 +932,11 @@ export function Investor2LongFormNivo() {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl">
-              <div className="rounded-lg p-4 border" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                 <p className={LABEL_CLASS}>Concentration</p>
                 <p className="text-[15px]" style={{ color: tokens.text }}>3–4 companies implies meaningful impact per holding. Mitigated by screening, sector diversity, and deep operational involvement.</p>
               </div>
-              <div className="rounded-lg p-4 border" style={{ background: tokens.gradients.soft, borderColor: tokens.border }}>
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                 <p className={LABEL_CLASS}>Liquidity</p>
                 <p className="text-[15px]" style={{ color: tokens.text }}>SME exits can be illiquid. We build for strategic buyers, maintain flexibility on timing, and focus on ROIC to justify valuation.</p>
               </div>
@@ -917,10 +946,12 @@ export function Investor2LongFormNivo() {
             </p>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ─── Closing ─────────────────────────────────────────────────────── */}
-      <section className={DECK_SECTION_CLASS} id="closing" style={{ backgroundColor: tokens.bg }}>
+      <section className="w-full" id="closing" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Contact</h2>
           <p className={PROSE_CLASS + " mb-6"}>
@@ -936,6 +967,7 @@ export function Investor2LongFormNivo() {
           <p className="text-sm mt-12 pt-8 border-t" style={{ color: tokens.text, borderColor: tokens.border }}>
             © 2026 Nivo Group. All rights reserved. This document is confidential and intended solely for prospective investors.
           </p>
+        </div>
         </div>
       </section>
     </div>
