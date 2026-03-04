@@ -36,7 +36,7 @@ const PROJ = [
 const ENTRY_EQUITY = 100;
 const EXIT_EQUITY = PROJ[PROJ.length - 1].equityValue;
 const GROSS_MOIC = (EXIT_EQUITY / ENTRY_EQUITY).toFixed(2);
-const GROSS_IRR = "15.0";
+const GROSS_IRR = ((Math.pow(EXIT_EQUITY / ENTRY_EQUITY, 1 / 7) - 1) * 100).toFixed(1);
 
 const PIPELINE_ITEMS = [
   { stage: "Active due diligence", count: "2" },
@@ -160,21 +160,24 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
         {/* Hero — Aurora background; same text structure/formatting as long-form (max-w-3xl, typography) */}
         <section className="relative">
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
-          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-20 pb-24 min-h-[75vh] overflow-visible">
+          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="flex justify-center py-8 px-8 sm:py-10 sm:px-10 mb-8 sm:mb-10 overflow-visible min-h-[120px] sm:min-h-[140px] items-center">
+              <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
                 <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-24 sm:h-28 w-auto max-w-none object-contain" />
               </div>
               <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
                 Nordic Operational Compounder
               </h1>
               <p className="text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                We acquire profitable, under-digitised Nordic SMEs and build value through pricing discipline, operating rigor, and structured reinvestment.
+                We acquire profitable Nordic SMEs that already have <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
+              </p>
+              <p className="mt-6 text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                Through <span className="font-semibold" style={{ color: tokens.accent }}>hands-on ownership</span>, structured <span className="font-semibold" style={{ color: tokens.accent }}>operational improvement</span> and selective use of <span className="font-semibold" style={{ color: tokens.accent }}>AI</span>, we unlock <span className="font-semibold" style={{ color: tokens.accent }}>value</span> that the current owner has overlooked.
               </p>
               <blockquote className="mt-12 text-lg sm:text-xl font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
                 We do not buy technology risk.
                 <br />
-                We buy execution upside.
+                We only invest where better execution creates disproportionate value.
               </blockquote>
               <div className="mt-14 max-w-2xl mx-auto pt-8 border-t" style={{ borderColor: tokens.border }}>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
@@ -292,7 +295,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
             </ul>
           </div>
 
-          <div className="rounded-xl p-5 sm:p-6 border-2 flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
+          <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />

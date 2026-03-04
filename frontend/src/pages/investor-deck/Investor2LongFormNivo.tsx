@@ -5,7 +5,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { SECTION_CLASS as SECTION_CLASS_TOKEN, tokens } from "@/lib/designProfileTokens";
 import { NIVO_AURORA_COLORS } from "@/lib/nivoPalette";
 
-// ─── Projection data: 7-year horizon, ~15% yearly return, reinvestment → ROIC 20%, MoM growth ─────────
+// ─── Projection data: 7-year horizon, target IRR 20–25% / MOIC 4–5x; reinvestment and 20% ROIC at portfolio level drive MoM growth ─────────
 const ENTRY_EQUITY = 100;
 const YEARS = 7;
 
@@ -46,21 +46,24 @@ export function Investor2LongFormNivo() {
       {/* ─── Hero (Aurora + design profile tokens — same as investor2 short form, clearly NEW UX) ─── */}
       <section className="relative">
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
-          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-20 pb-24 min-h-[75vh] overflow-visible">
+          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="flex justify-center py-8 px-8 sm:py-10 sm:px-10 mb-8 sm:mb-10 overflow-visible min-h-[120px] sm:min-h-[140px] items-center">
+              <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
                 <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-24 sm:h-28 w-auto max-w-none object-contain" />
               </div>
               <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
                 Nordic Operational Compounder
               </h1>
               <p className="text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                We acquire profitable, under-digitised Nordic SMEs and build value through pricing discipline, operating rigor, and structured reinvestment.
+                We acquire profitable Nordic SMEs that already have <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
+              </p>
+              <p className="mt-6 text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                Through <span className="font-semibold" style={{ color: tokens.accent }}>hands-on ownership</span>, structured <span className="font-semibold" style={{ color: tokens.accent }}>operational improvement</span> and selective use of <span className="font-semibold" style={{ color: tokens.accent }}>AI</span>, we unlock <span className="font-semibold" style={{ color: tokens.accent }}>value</span> that the current owner has overlooked.
               </p>
               <blockquote className="mt-12 text-lg sm:text-xl font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
                 We do not buy technology risk.
                 <br />
-                We buy execution upside.
+                We only invest where better execution creates disproportionate value.
               </blockquote>
               <div className="mt-14 max-w-2xl mx-auto pt-8 border-t" style={{ borderColor: tokens.border }}>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
@@ -183,7 +186,7 @@ export function Investor2LongFormNivo() {
               </ul>
             </div>
 
-            <div className="rounded-xl p-5 sm:p-6 border-2 flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
+            <div className="rounded-xl p-5 sm:p-6 border flex flex-col shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
@@ -210,7 +213,7 @@ export function Investor2LongFormNivo() {
               We acquire profitable, under-digitised SMEs in the Nordic region, typically in the SEK 50–200m revenue range. The model is an operational compounder: we use a proprietary segmentation engine to identify targets and create value through structured execution and selective use of data and automation. Our edge is systematic sourcing and outside-in intelligence; our value proposition is operational improvement and long-term compounding, not technology risk.
             </p>
             <p className={PROSE_CLASS}>
-              We target a normalised ROIC of 20% at portfolio companies. Reinvestment discipline is central: we reinvest 100% of operational cash flow plus approximately 30% leverage where appropriate. Nivo buys operational improvement potential, not technology risk.
+              We target a normalised ROIC of 20% at portfolio companies and gross MOIC of 4–5x with 20–25% IRR over the investment period. Reinvestment discipline is central: we reinvest 100% of operational cash flow plus approximately 30% leverage where appropriate. Nivo buys operational improvement potential, not technology risk.
             </p>
           </div>
         </div>
@@ -313,13 +316,13 @@ export function Investor2LongFormNivo() {
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS + " mb-4"}>Assumptions</p>
             <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className="text-[15px] text-profile-fg leading-relaxed">Yearly returns of 15% over a cycle, full reinvestments and 30% leverage. No exit multiple expansion assumed.</p>
+              <p className="text-[15px] text-profile-fg leading-relaxed">Illustrative scenario: target 20–25% IRR and 4–5x MOIC over the hold period; full reinvestment and ~30% leverage. Assumes operational improvement from hands-on work over the holding period. No exit multiple expansion assumed.</p>
             </div>
           </div>
 
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS}>Projection detail (illustrative)</p>
-            <p className="text-[13px] text-profile-fg mb-3">7-year investment horizon with ~15% yearly return. Reinvestment of returns drives ROIC and MoM multiples.</p>
+            <p className="text-[13px] text-profile-fg mb-3">7-year investment horizon; target 20–25% IRR and 4–5x MOIC. Reinvestment of returns and 20% ROIC at portfolio level drive MoM growth.</p>
             <div className="overflow-x-auto rounded-lg border" style={{ borderColor: tokens.border }}>
               <table className="w-full text-sm min-w-[520px]">
                 <thead style={{ backgroundColor: tokens.bg }}>
@@ -362,36 +365,36 @@ export function Investor2LongFormNivo() {
           <h2 className={H2_CLASS}>Value creation</h2>
           <p className={SECTION_SUBTITLE_CLASS}>From acquisition to compounding</p>
           <p className={PROSE_CLASS + " mb-10"}>
-            We run a repeatable five-step process. We acquire profitable, under-digitised SMEs with stable cash flows (control). We improve through pricing, sales discipline, cost structure, and reporting (margin). We optimise ROIC toward a normalised 15% through operational excellence (ROIC). We reinvest 100% of operational cash flow plus approximately 30% leverage where appropriate (cash). We compound by repeating the cycle with increasing capability and scale (equity). Each acquisition increases data, benchmarks, and execution capability—the model strengthens with scale.
+            We buy profitable Nordic SMEs and get involved. We know what it takes to improve them. When we acquire a business we invest time in understanding it thoroughly—the people, the operations, the numbers—so we can act from day one. We focus on what moves the needle: pricing, sales, back-office execution, and how data is used. We target a clear return on the capital we deploy, reinvest what the businesses generate, and use modest debt where it helps. Then we do it again. We apply the same approach every time; the more we do it, the sharper we get.
           </p>
           <div className="mb-4">
-            <p className={LABEL_CLASS}>Value creation playbook — three operational pillars</p>
+            <p className={LABEL_CLASS}>Where we focus when we're in the business</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10">
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Revenue</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Pricing discipline, sales governance, retention, product mix.</p>
+              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Getting pricing right, keeping customers, and making sure the sales team is focused and accountable.</p>
             </div>
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Margins</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Overhead optimisation, working capital, procurement, cost allocation.</p>
+              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Trimming unnecessary cost, tightening how we buy and hold stock, and making sure we know where the money goes.</p>
             </div>
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Digital & AI</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Workflow automation, reporting, data-led decisions, AI capacity.</p>
+              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Less manual work and spreadsheets, clearer numbers every month, and using data—and AI where it clearly helps—so decisions are based on fact, not gut.</p>
             </div>
           </div>
           <p className={PROSE_CLASS + " mt-10"}>
-            Each acquisition adds operational data and benchmarks for future deals; those benchmarks refine value-creation approaches from portfolio performance; expertise deepens and implementation becomes faster. The system becomes more effective with every investment. AI increases capacity; disciplined execution drives margins.
+            We go in with a clear plan. Each company reinforces what works; we get faster at spotting and fixing the same issues, and we carry that into the next. Where it helps, we use data and tools so the team can do more without adding headcount.
           </p>
 
           <div className="mt-16 pt-10 border-t" style={{ borderColor: tokens.border }}>
             <h3 className={H3_CLASS}>AI enablement</h3>
             <p className={PROSE_CLASS + " mb-6"}>
-              We apply AI to execution bottlenecks, not speculative bets. Workflow digitisation replaces manual scheduling and reporting with digital workflows; typical impact is cycle-time reduction of 15–25%. Reporting is standardised into monthly KPI packs and margin by customer and product line, reducing close time by 2–4 weeks. Commercial control is strengthened through price corridors, win/loss tracking, and discount gates, typically adding 100–200 bps to gross margin.
+              We use AI where it clearly saves time or improves decisions—for example, replacing manual scheduling and slow, spreadsheet-based reporting. Companies often get to reliable monthly numbers weeks faster and see margin by customer and product. We tighten how they price and discount so they stop leaving money on the table; in practice that often means a percentage or two of margin.
             </p>
             <p className={PROSE_CLASS}>
-              AI is deployed only where outcomes are measurable—throughput, margin, speed. It acts as a capacity multiplier inside a disciplined system. AI supports execution; it does not replace discipline.
+              We only use AI where we can see the impact—faster turnaround, better margin, clearer numbers. It supports how we work; it does not replace judgment or hands-on management.
             </p>
           </div>
         </div>
@@ -406,7 +409,7 @@ export function Investor2LongFormNivo() {
           <p className={SECTION_SUBTITLE_CLASS}>Valuation and capital structure discipline</p>
           <div className="space-y-8">
             <p className={PROSE_CLASS}>
-              We apply strict valuation discipline: entry at EV/EBITDA in the 5–7x range, prioritising operational improvement potential over growth premium. Targets must demonstrate stable cash generation. Leverage is conservative—debt to capital below 30%, net debt to EBITDA below 2x—and supplements strategy rather than driving returns. Financial guardrails include a credible path to 15% ROIC, at least 12 months runway, and capital preservation as the first principle.
+              We apply strict valuation discipline: entry at EV/EBITDA in the 5–7x range, prioritising operational improvement potential over growth premium. Targets must demonstrate stable cash generation. Leverage is conservative—debt to capital below 30%, net debt to EBITDA below 2x—and supplements strategy rather than driving returns. Financial guardrails include a credible path to 20% ROIC, at least 12 months runway, and capital preservation as the first principle.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
@@ -422,7 +425,7 @@ export function Investor2LongFormNivo() {
                   </li>
                   <li className="flex items-start gap-2">
                     <TrendingUp className="w-4 h-4 text-profile-accent flex-shrink-0 mt-0.5" aria-hidden />
-                    <span>ROIC target 15%</span>
+                    <span>ROIC target 20%</span>
                   </li>
                 </ul>
               </div>
@@ -874,20 +877,20 @@ export function Investor2LongFormNivo() {
             </div>
 
             <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
-              Target close is Q2 2026. We are seeking 2–3 anchor investors. The pipeline is strong and the team is committed. Deployment is expected over 18–24 months; hold per company 5–7 years. Target gross IRR 19–23% through disciplined reinvestment and operational compounding; base-case underwriting assumes margin expansion and debt paydown with flat-to-modest exit multiples.
+              Target close is Q2 2026. We are seeking 2–3 anchor investors. The pipeline is strong and the team is committed. Deployment is expected over 18–24 months; hold per company 5–7 years. Target gross IRR 20–25% and MOIC 4–5x through disciplined reinvestment and operational compounding; base-case underwriting assumes margin expansion and debt paydown with flat-to-modest exit multiples.
             </p>
           </div>
 
           <div className="pt-8 border-t" style={{ borderColor: tokens.border }}>
             <h3 className={H3_CLASS}>Exit strategy and value drivers</h3>
             <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
-              Primary exit route is strategic sale to trade or corporate buyers. Secondary buyout to larger PE or growth equity is a viable alternative. Recapitalisation (dividend recap while retaining control) may be used where appropriate. Value creation follows a clear timeline: in years 1–2 we focus on margin expansion of 200–300 bps; years 3–4 on cash conversion and debt reduction; years 5–6 on sustaining ROIC at 15%+ and strategic positioning; year 7+ on exit or recap depending on market and portfolio readiness.
+              Primary exit route is strategic sale to trade or corporate buyers. Secondary buyout to larger PE or growth equity is a viable alternative. Recapitalisation (dividend recap while retaining control) may be used where appropriate. Value creation follows a clear timeline: in years 1–2 we focus on margin expansion of 200–300 bps; years 3–4 on cash conversion and debt reduction; years 5–6 on sustaining ROIC at 20%+ and strategic positioning; year 7+ on exit or recap depending on market and portfolio readiness.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
               {[
-                { label: "Gross IRR", value: "19–23%" },
-                { label: "Net IRR", value: "15–18%" },
-                { label: "Target MOIC", value: "2.2–2.8x" },
+                { label: "Gross IRR", value: "20–25%" },
+                { label: "Net IRR", value: "15–20%" },
+                { label: "Target MOIC", value: "4–5x" },
                 { label: "Base case hold", value: "5–10 years" },
               ].map((item) => (
                 <div key={item.label} className="text-center py-4 px-4 rounded-lg border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
