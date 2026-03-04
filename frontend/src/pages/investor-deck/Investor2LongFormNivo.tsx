@@ -39,7 +39,7 @@ const SECTION_SUBTITLE_CLASS = "text-profile-accent font-medium uppercase tracki
 const LABEL_CLASS = "text-sm font-semibold text-profile-fg mb-2";
 const LABEL_OLIVE_CLASS = "text-sm font-semibold text-profile-accent uppercase tracking-wider mb-2";
 
-/** Long-form investor memo with Nivo design profile (profile-*). Used at /investor2. */
+/** Long-form investor memo with Nivo design profile (profile-*). Used at /investor. */
 export function Investor2LongFormNivo() {
   return (
     <div className="text-profile-fg antialiased min-h-screen overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)] [padding-bottom:env(safe-area-inset-bottom)]" style={{ backgroundColor: tokens.bg }}>
@@ -49,7 +49,7 @@ export function Investor2LongFormNivo() {
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
               <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
-                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-24 sm:h-28 w-auto max-w-none object-contain" />
+                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-28 sm:h-36 w-auto max-w-none object-contain" />
               </div>
               <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
                 Nordic Operational Compounder
@@ -618,18 +618,18 @@ export function Investor2LongFormNivo() {
           <p className={SECTION_SUBTITLE_CLASS}>How operational improvements drive returns</p>
           <div className="space-y-8">
             <p className={PROSE_CLASS}>
-              Nordic Industrial Services AB operates in facility maintenance. At entry: revenue SEK 45m, EBITDA SEK 4.5m (10% margin). Enterprise value SEK 27m (6.0x); capital structure equity 20.2m / debt 6.8m.
+              We focus on product companies that scale—not pure services. Services are stable but tend to scale less well. This example: a Nordic industrial products company. At entry: equity SEK 100m, debt SEK 30m (enterprise value SEK 130m). Revenue and margin had clear upside from pricing, operations and cost.
             </p>
             <div className="max-w-2xl space-y-4">
               <p className={LABEL_CLASS}>Value creation over 24 months</p>
               <div className="space-y-3">
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Pricing</p>
-                  <p className="text-[15px]" style={{ color: tokens.text }}>Introduction of value-based pricing across 40% of contracts. Impact: +150 bps margin.</p>
+                  <p className="text-[15px]" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Operations</p>
-                  <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflow and dispatch replacing manual, paper-based processes. Impact: +100 bps.</p>
+                  <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Cost</p>
@@ -638,7 +638,7 @@ export function Investor2LongFormNivo() {
               </div>
             </div>
             <p className={PUNCH_CLASS}>
-              Operational improvements compound into equity value. Exit via strategic sale or secondary.
+              Operational improvements compound into equity value and cash flow. We reinvest in the business and compound over time—we are compounders, not exit-driven.
             </p>
           </div>
         </div>

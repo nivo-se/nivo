@@ -22,8 +22,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ClaimFirstAdmin from "./pages/ClaimFirstAdmin";
-import Investor from "./pages/Investor";
-import Investor2 from "./pages/Investor2"; // Nivo UX version
+import Investor2 from "./pages/Investor2";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import Colors from "./pages/Colors";
@@ -142,8 +141,7 @@ const App = () => (
             <Route path="/colors/aurora" element={<ColorAuroraDemos />} />
             <Route path="/design-profile" element={<DesignProfile />} />
             <Route path="/landing" element={<Index />} />
-            <Route path="/investor" element={<Investor />} />
-            <Route path="/investor2" element={<Investor2 />} />
+            <Route path="/investor" element={<Investor2 />} />
 
             {/* Default UI: landing for guests, app for logged-in users */}
             <Route path="/" element={<RootOrLanding />}>
