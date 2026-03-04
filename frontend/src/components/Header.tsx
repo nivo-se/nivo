@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           )}
         >
           <img
-            src={isScrolled ? '/nivo-wordmark-green.svg' : '/nivo-wordmark-white.svg'}
+            src={isScrolled ? '/nivo-wordmark.svg' : '/nivo-wordmark-white.svg'}
             alt="Nivo Logo"
             className="h-7 w-auto sm:h-8"
             onError={(e) => {

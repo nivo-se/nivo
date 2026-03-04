@@ -36,7 +36,7 @@ export default function AppLayout() {
         <div className="p-6 border-b border-sidebar-border shrink-0">
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img
-              src="/nivo-wordmark-green.svg"
+              src="/nivo-wordmark.svg"
               alt="Nivo"
               className="h-6 w-auto dark:hidden"
             />

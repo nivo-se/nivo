@@ -116,6 +116,18 @@ export default {
 					'fg-muted': 'hsl(var(--inv2-fg-muted))',
 					divider: 'hsl(var(--inv2-divider))',
 					'bg-subtle': 'hsl(var(--inv2-bg-subtle))',
+				},
+				/* Design profile: Nivo palette — use with data-design-profile="nivo" */
+				profile: {
+					accent: 'hsl(var(--profile-accent))',
+					'accent-secondary': 'hsl(var(--profile-accent-secondary))',
+					'accent-muted': 'hsl(var(--profile-accent-muted))',
+					'sage-muted': 'hsl(var(--profile-sage-muted))',
+					fg: 'hsl(var(--profile-fg))',
+					'fg-muted': 'hsl(var(--profile-fg-muted))',
+					divider: 'hsl(var(--profile-divider))',
+					'bg-subtle': 'hsl(var(--profile-bg-subtle))',
+					'bg-surface': 'hsl(var(--profile-bg-surface))',
 				}
 			},
 			borderRadius: {

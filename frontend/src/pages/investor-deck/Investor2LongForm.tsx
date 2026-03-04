@@ -1,3 +1,7 @@
+/**
+ * Original long-form investor memo (inv2 styling). Used at /investor.
+ * Nivo design-profile version lives in Investor2LongFormNivo.tsx and is used at /investor2.
+ */
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield, Check } from "lucide-react";
@@ -25,7 +29,7 @@ const SECTION_CLASS = "max-w-4xl mx-auto px-5 sm:px-6 py-10 sm:py-14";
 const PROSE_CLASS = "w-full text-inv2-fg-muted leading-relaxed text-[16px] sm:text-[18px]";
 const PUNCH_CLASS = "text-center text-xl sm:text-2xl font-semibold text-inv2-fg py-6";
 
-// Heading hierarchy (refactoring design UX)
+// Heading hierarchy (original inv2 styling)
 const H1_CLASS = "font-heading font-semibold text-inv2-fg tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6";
 const H2_CLASS = "font-heading font-semibold text-inv2-fg tracking-tight text-2xl sm:text-3xl mb-4";
 const H3_CLASS = "font-heading font-semibold text-inv2-fg text-lg sm:text-xl mb-3";

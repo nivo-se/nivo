@@ -29,7 +29,7 @@ export function AppLayout() {
       <aside className="w-[220px] border-r bg-background flex flex-col min-h-screen">
         <div className="h-14 px-4 flex items-center border-b shrink-0">
           <img
-            src="/nivo-wordmark-green.svg"
+            src="/nivo-wordmark.svg"
             alt="Nivo"
             className="h-6"
           />

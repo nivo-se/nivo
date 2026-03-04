@@ -52,7 +52,7 @@ function AuroraSection({ sectionId, title, subtitle, auroraColors }: AuroraSecti
           </div>
           <button
             type="button"
-            className="rounded-full w-fit px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+            className="rounded-md w-fit px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 transition-opacity"
             style={{ backgroundColor: NIVO_CORE.jetBlack }}
           >
             Debug now
