@@ -618,18 +618,18 @@ export function Investor2LongFormNivo() {
           <p className={SECTION_SUBTITLE_CLASS}>How operational improvements drive returns</p>
           <div className="space-y-8">
             <p className={PROSE_CLASS}>
-              Nordic Industrial Services AB operates in facility maintenance. At entry: revenue SEK 45m, EBITDA SEK 4.5m (10% margin). Enterprise value SEK 27m (6.0x); capital structure equity 20.2m / debt 6.8m.
+              We focus on product companies that scale—not pure services. Services are stable but tend to scale less well. This example: a Nordic industrial products company. At entry: equity SEK 100m, debt SEK 30m (enterprise value SEK 130m). Revenue and margin had clear upside from pricing, operations and cost.
             </p>
             <div className="max-w-2xl space-y-4">
               <p className={LABEL_CLASS}>Value creation over 24 months</p>
               <div className="space-y-3">
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Pricing</p>
-                  <p className="text-[15px]" style={{ color: tokens.text }}>Introduction of value-based pricing across 40% of contracts. Impact: +150 bps margin.</p>
+                  <p className="text-[15px]" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Operations</p>
-                  <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflow and dispatch replacing manual, paper-based processes. Impact: +100 bps.</p>
+                  <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className={LABEL_CLASS}>Cost</p>
@@ -638,7 +638,7 @@ export function Investor2LongFormNivo() {
               </div>
             </div>
             <p className={PUNCH_CLASS}>
-              Operational improvements compound into equity value. Exit via strategic sale or secondary.
+              Operational improvements compound into equity value and cash flow. We reinvest in the business and compound over time—we are compounders, not exit-driven.
             </p>
           </div>
         </div>
