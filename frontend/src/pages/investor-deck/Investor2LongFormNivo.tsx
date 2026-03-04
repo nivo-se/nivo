@@ -39,7 +39,7 @@ const SECTION_SUBTITLE_CLASS = "text-profile-accent font-medium uppercase tracki
 const LABEL_CLASS = "text-sm font-semibold text-profile-fg mb-2";
 const LABEL_OLIVE_CLASS = "text-sm font-semibold text-profile-accent uppercase tracking-wider mb-2";
 
-/** Long-form investor memo with Nivo design profile (profile-*). Used at /investor2. */
+/** Long-form investor memo with Nivo design profile (profile-*). Used at /investor. */
 export function Investor2LongFormNivo() {
   return (
     <div className="text-profile-fg antialiased min-h-screen overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)] [padding-bottom:env(safe-area-inset-bottom)]" style={{ backgroundColor: tokens.bg }}>
@@ -49,7 +49,7 @@ export function Investor2LongFormNivo() {
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
               <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
-                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-24 sm:h-28 w-auto max-w-none object-contain" />
+                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-28 sm:h-36 w-auto max-w-none object-contain" />
               </div>
               <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
                 Nordic Operational Compounder
