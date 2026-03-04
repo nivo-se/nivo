@@ -23,12 +23,13 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ClaimFirstAdmin from "./pages/ClaimFirstAdmin";
 import Investor from "./pages/Investor";
-import Investor2 from "./pages/Investor2";
+import Investor2 from "./pages/Investor2"; // Nivo UX version
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import Colors from "./pages/Colors";
 import ColorDemos from "./pages/ColorDemos";
 import ColorAuroraDemos from "./pages/ColorAuroraDemos";
+import DesignProfile from "./pages/DesignProfile";
 import AppLayout from "./pages/default/AppLayout";
 import WorkDashboard from "./pages/default/WorkDashboard";
 import Universe from "./pages/default/Universe";
@@ -139,6 +140,7 @@ const App = () => (
             <Route path="/colors" element={<Colors />} />
             <Route path="/colors/demos" element={<ColorDemos />} />
             <Route path="/colors/aurora" element={<ColorAuroraDemos />} />
+            <Route path="/design-profile" element={<DesignProfile />} />
             <Route path="/landing" element={<Index />} />
             <Route path="/investor" element={<Investor />} />
             <Route path="/investor2" element={<Investor2 />} />

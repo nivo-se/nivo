@@ -198,6 +198,12 @@ export default function Colors() {
           >
             Aurora demos →
           </a>
+          <a
+            href="/design-profile"
+            className="text-sm text-gray-500 hover:text-gray-900 underline"
+          >
+            Design profile (Investor2 template) →
+          </a>
         </div>
         <div className="mt-4 pt-4 border-t border-gray-200">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Fonts used</p>

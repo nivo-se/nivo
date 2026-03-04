@@ -72,6 +72,18 @@
   /* Hero / Glow (overridden per section on color hero demos) */
   --brand: 85 18% 32%;
   --brand-foreground: 0 0% 98%;
+
+  /* Design profile (Nivo palette) — matches designProfileTokens / nivoPalette */
+  --profile-accent: 152 44% 21%;        /* forest #1E4D3C */
+  --profile-accent-secondary: 174 75% 24%; /* deepTeal #0F6B63 */
+  --profile-accent-muted: 152 24% 88%;
+  --profile-sage-muted: 120 24% 88%;
+  --profile-fg: 30 6% 16%;            /* jetBlack #2E2A2B */
+  --profile-fg-muted: 85 8% 35%;      /* grayOlive #596152 */
+  --profile-divider: 90 14% 82%;      /* border #D0D6CC */
+  --profile-bg-subtle: 60 20% 98%;
+  --profile-bg-surface: 214 14% 95%;
+  --profile-shadow-soft: 0 2px 12px hsl(152 44% 21% / 0.08);
 }
 
 .dark {
