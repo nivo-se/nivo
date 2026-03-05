@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -15,7 +16,7 @@ const navItems = [
 export default function AppLayout() {
   const location = useLocation();
   const { user, userRole, signOut } = useAuth();
-  const isAdmin = userRole === "admin" || user?.email === "jesper@rgcapital.se";
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
 
   const handleSignOut = async () => {
     try {

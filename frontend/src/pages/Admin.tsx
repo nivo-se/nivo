@@ -1,13 +1,14 @@
 import React from 'react';
 import AdminPanel from '../components/AdminPanel';
 import { useAuth } from '../contexts/AuthContext';
+import { isAdminLinkVisible } from '../lib/isAdmin';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Shield, AlertTriangle } from 'lucide-react';
 
 const Admin: React.FC = () => {
   const { user, userRole } = useAuth();
 
-  const isAdmin = userRole === 'admin';
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
 
   if (!isAdmin) {
     return (

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Target, TrendingUp, DollarSign, Users } from 'lucide-react'
 import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
 import { isAuth0Configured } from '../lib/authToken'
+import { isAdminLinkVisible } from '../lib/isAdmin'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
 import BusinessRulesConfig from '../components/BusinessRulesConfig'
 import DataExport from '../components/DataExport'
@@ -56,8 +57,8 @@ const WorkingDashboard: React.FC = () => {
     loadAnalytics()
   }, [])
 
-  // Admin: backend returns role from GET /api/me (local Postgres user_roles). Backend enforces 403.
-  const isAdmin = userRole === 'admin'
+  // Admin: in dev any logged-in user sees link; in prod only role admin or VITE_ADMIN_EMAILS. Backend enforces 403.
+  const isAdmin = isAdminLinkVisible(userRole, user?.email ?? null, !!user)
 
   interface MenuItem {
     id: string

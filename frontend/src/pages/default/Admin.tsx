@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAIRuns, useLists, useCompanies } from "@/lib/hooks/apiQueries";
 import { useAuth } from "@/contexts/AuthContext";
+import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { getAnalysisRun, getAnalysisRuns } from "@/lib/api/analysis/service";
 import { getAllLists } from "@/lib/api/lists/service";
 import { getUniverseCompanies } from "@/lib/api/universe/service";
@@ -19,7 +20,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 type SmokeStep = "idle" | "running" | "pass" | "fail";
 
 export default function Admin() {
-  const { user, session } = useAuth();
+  const { user, userRole, session } = useAuth();
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
+
+  if (!isAdmin) {
+    return (
+      <div className="h-full overflow-auto app-bg flex items-center justify-center">
+        <div className="text-center p-8 max-w-md">
+          <p className="text-base font-medium text-foreground mb-2">Access denied</p>
+          <p className="text-sm text-muted-foreground">
+            You need administrator privileges to view this page. If you are an admin, ensure your account has role &quot;admin&quot; in the database or add your email to <code className="text-xs bg-muted px-1 rounded">VITE_ADMIN_EMAILS</code>.
+          </p>
+        </div>
+      </div>
+    );
+  }
   const { data: companies = [], isError: companiesError } = useCompanies({ limit: 100 });
   const { data: lists = [], isError: listsError } = useLists();
   const { data: runs = [], isError: runsError } = useAIRuns();

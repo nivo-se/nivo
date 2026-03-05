@@ -3,6 +3,7 @@ import { appNavItems } from "@/app/nav";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
+import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings } from "lucide-react";
@@ -10,7 +11,7 @@ import { LogOut, Settings } from "lucide-react";
 export function AppLayout() {
   const location = useLocation();
   const { user, userRole, signOut } = useAuth();
-  const isAdmin = userRole === "admin" || user?.email === "jesper@rgcapital.se";
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
 
   const mainNavItems = appNavItems.filter((item) => item.to !== "/app/admin");
 
