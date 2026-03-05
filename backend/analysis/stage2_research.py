@@ -9,11 +9,13 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import ssl
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from urllib.parse import urljoin, urlparse
 
 import aiohttp
+import certifi
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
@@ -40,7 +42,6 @@ class WebResearcher:
     """Researches companies via web scraping and search"""
     
     def __init__(self):
-        self.serpapi_key = os.getenv("SERPAPI_KEY")
         self.timeout = aiohttp.ClientTimeout(total=10)
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
@@ -70,14 +71,10 @@ class WebResearcher:
         # Run scraping and search in parallel
         tasks = []
         
+        # Use only data we have: scrape when we already have homepage URL (no external search)
         if homepage:
             tasks.append(self._scrape_website(homepage, research))
-        
-        if self.serpapi_key:
-            tasks.append(self._search_company(company_name, research))
-        else:
-            logger.warning("SERPAPI_KEY not set, skipping search")
-        
+
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
         
@@ -86,10 +83,17 @@ class WebResearcher:
         
         return research
     
+    def _ssl_connector(self) -> aiohttp.TCPConnector:
+        """Connector with certifi CA bundle so SSL verification works on macOS."""
+        ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+        return aiohttp.TCPConnector(ssl=ssl_ctx)
+
     async def _scrape_website(self, url: str, research: ResearchData) -> None:
         """Scrape company website"""
         try:
-            async with aiohttp.ClientSession(timeout=self.timeout) as session:
+            async with aiohttp.ClientSession(
+                connector=self._ssl_connector(), timeout=self.timeout
+            ) as session:
                 # Scrape homepage
                 async with session.get(url, headers=self.headers) as response:
                     if response.status == 200:
@@ -155,47 +159,6 @@ class WebResearcher:
         
         # Limit length
         return text[:5000]
-    
-    async def _search_company(self, company_name: str, research: ResearchData) -> None:
-        """Search for company information using SerpAPI"""
-        if not self.serpapi_key:
-            return
-        
-        queries = [
-            f"{company_name} products services",
-            f"{company_name} customers markets",
-            f"{company_name} business model",
-        ]
-        
-        try:
-            async with aiohttp.ClientSession(timeout=self.timeout) as session:
-                for query in queries:
-                    params = {
-                        "q": query,
-                        "api_key": self.serpapi_key,
-                        "num": 3,
-                        "gl": "se",  # Sweden
-                        "hl": "sv",  # Swedish
-                    }
-                    
-                    async with session.get(
-                        "https://serpapi.com/search",
-                        params=params
-                    ) as response:
-                        if response.status == 200:
-                            data = await response.json()
-                            research.search_results[query] = data.get("organic_results", [])
-                        else:
-                            logger.warning(f"Search failed for '{query}': HTTP {response.status}")
-                    
-                    # Rate limit
-                    await asyncio.sleep(0.5)
-                
-                research.search_success = True
-                logger.info(f"Successfully searched for {company_name}")
-                
-        except Exception as e:
-            logger.error(f"Error searching for {company_name}: {e}")
     
     def _calculate_digital_score(self, research: ResearchData) -> int:
         """Calculate digital presence score (0-100)"""

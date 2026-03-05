@@ -61,18 +61,7 @@ def main() -> int:
         print(f"  FAIL: sample financials: {e}")
         return 1
 
-    try:
-        from backend.api.dependencies import get_supabase_client
-        supabase = get_supabase_client()
-        if supabase is None:
-            print("  supabase client: None (expected when DATABASE_SOURCE=postgres)")
-        else:
-            print("  WARN: supabase client initialized (should be None)")
-    except ImportError:
-        print("  supabase check: skipped (backend deps not fully installed)")
-    except Exception as e:
-        print(f"  supabase check: {e}")
-
+    print("  (Supabase removed; Postgres only)")
     print("-" * 40)
     print("OK: smoke test passed")
     return 0

@@ -31,18 +31,17 @@ The enrichment pipeline works in this order:
 
 ---
 
-### Option 2: Run Puppeteer on Railway (More Control)
+### Option 2: Run Puppeteer on your own server (e.g. Mac Mini)
 
 **Pros:**
 - ✅ **Full control** - Your own infrastructure
-- ✅ **No per-request costs** - Pay only for Railway instance
+- ✅ **No per-request costs** - Pay only for your server
 - ✅ **Privacy** - All scraping happens on your infrastructure
 - ✅ **Customizable** - Can modify scraping logic
 
 **Cons:**
 - ❌ **More setup** - Need to create and deploy a service
 - ❌ **Memory intensive** - Chrome needs ~500MB+ RAM
-- ❌ **Railway limits** - Free tier has memory constraints
 - ❌ **Maintenance** - Need to handle Chrome updates, crashes
 
 **Best for:** Production at scale, privacy requirements, custom needs
@@ -54,12 +53,12 @@ The enrichment pipeline works in this order:
 ### For Now: Use Browserless.io
 
 **Why:**
-1. **5 minutes to set up** vs 30+ minutes for Railway deployment
+1. **5 minutes to set up** vs 30+ minutes for self-hosted deployment
 2. **Free tier is enough** for testing and small batches
 3. **No maintenance** - They handle Chrome, updates, crashes
 4. **You can switch later** - The code supports both options
 
-**When to switch to Railway:**
+**When to switch to self-hosted (e.g. Mac Mini):**
 - You're doing >1000 enrichments/month
 - You need more control/customization
 - Privacy/compliance requires on-premise scraping
@@ -82,7 +81,7 @@ The enrichment pipeline works in this order:
 
 ---
 
-## Alternative: Railway Puppeteer Service
+## Alternative: Self-hosted Puppeteer Service (e.g. Mac Mini)
 
 If you want to run your own, here's what you'd need:
 
@@ -92,7 +91,7 @@ If you want to run your own, here's what you'd need:
 ┌─────────────────┐         ┌──────────────────┐
 │  FastAPI        │         │  Puppeteer       │
 │  Backend        │  HTTP   │  Service         │
-│  (Railway)      │ ──────> │  (Railway)       │
+│  (Mac Mini)     │ ──────> │  (same or other) │
 │                 │         │                  │
 │  - Enrichment   │         │  - Chrome        │
 │  - AI Analysis  │         │  - Scraping      │
@@ -108,10 +107,9 @@ If you want to run your own, here's what you'd need:
 ### What You'd Need to Build
 
 1. **Node.js service** with Puppeteer
-2. **Deploy to Railway** as separate service
-3. **Handle Chrome binaries** (Railway supports this)
-4. **Memory management** (Chrome can crash if OOM)
-5. **Error handling** (timeouts, crashes, etc.)
+2. **Deploy** (e.g. on Mac Mini or any host) as separate service
+3. **Handle Chrome binaries** and memory (Chrome can crash if OOM)
+4. **Error handling** (timeouts, crashes, etc.)
 
 **Time estimate:** 1-2 hours for setup + testing
 
@@ -127,7 +125,7 @@ If you want to run your own, here's what you'd need:
 - ✅ Free tier is enough for development
 - ✅ Zero maintenance
 
-**Switch to Railway later if:**
+**Switch to self-hosted later if:**
 - You need more control
 - You're doing high volume
 - Browserless costs become an issue
@@ -143,18 +141,18 @@ The code already supports both - you can switch anytime by changing the `PUPPETE
 - **Starter:** $75/month (50 hours)
 - **Pro:** $200/month (200 hours)
 
-### Railway (Your Own)
+### Self-hosted (e.g. Mac Mini)
 - **Free tier:** $5/month credit (usually enough for small usage)
 - **Hobby:** $5/month + usage
 - **Pro:** $20/month + usage
 
-**Break-even:** If you're doing <50 hours/month, Browserless is cheaper. Above that, Railway becomes cheaper.
+**Break-even:** If you're doing <50 hours/month, Browserless is cheaper. Above that, self-hosted becomes cheaper.
 
 ---
 
 ## Decision Matrix
 
-| Factor | Browserless.io | Railway |
+| Factor | Browserless.io | Self-hosted |
 |--------|----------------|---------|
 | Setup time | 5 minutes | 1-2 hours |
 | Maintenance | None | Medium |

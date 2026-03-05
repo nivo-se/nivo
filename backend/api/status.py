@@ -3,7 +3,7 @@ Status and health check endpoints
 """
 import os
 from fastapi import APIRouter
-from .dependencies import get_supabase_client, get_redis_client
+from .dependencies import get_redis_client
 from ..services.db_factory import get_database_service
 
 router = APIRouter(prefix="/api", tags=["status"])
@@ -65,19 +65,6 @@ async def get_status():
         "tables_ok": tables_ok,
         "counts": counts,
     }
-
-    # Supabase when relevant
-    status["supabase"] = "n/a" if db_source != "supabase" else "unknown"
-    if db_source == "supabase":
-        try:
-            supabase = get_supabase_client()
-            if supabase:
-                supabase.table("companies").select("orgnr").limit(1).execute()
-                status["supabase"] = "healthy"
-            else:
-                status["supabase"] = "error: not configured"
-        except Exception as e:
-            status["supabase"] = f"error: {str(e)}"
 
     # Redis
     status["redis"] = "unknown"

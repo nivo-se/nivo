@@ -25,7 +25,7 @@ MAX_COMBINED_CHARS = 50000
 class PuppeteerScraper:
     """
     Lightweight HTTP client that talks to a headless scraping worker (Puppeteer/Playwright)
-    deployed on Railway. The worker is expected to expose a POST endpoint that accepts a URL
+    deployed (e.g. on Mac Mini or self-hosted). The worker is expected to expose a POST endpoint that accepts a URL
     and returns extracted text.
     """
 

@@ -187,10 +187,14 @@ class AnalysisWorkflow:
                 tp = run_context.get("template_prompt")
                 if isinstance(tp, str) and tp.strip():
                     template_prompt = tp
-            logger.info(f"[{run_id}] Stage 3: AI analysis")
+            # Only run stage 3 for companies that have research (stage 2 succeeded)
+            orgnrs_with_research = [r.orgnr for r in research_results]
+            logger.info(
+                f"[{run_id}] Stage 3: AI analysis ({len(orgnrs_with_research)}/{len(orgnrs)} with research)"
+            )
             analysis_results = await self._run_stage3(
                 run_id=run_id,
-                orgnrs=orgnrs,
+                orgnrs=orgnrs_with_research,
                 research_results=research_results,
                 template_prompt=template_prompt,
             )

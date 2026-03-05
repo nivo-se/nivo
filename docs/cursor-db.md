@@ -1,6 +1,6 @@
 We are resetting Supabase Postgres tonight. The old DB is obsolete; local Postgres schema is the source of truth.
 
-Goal: produce a repeatable, low-risk path to recreate the Supabase schema and connect Railway + Vercel to it.
+Goal: produce a repeatable, low-risk path to recreate the DB schema and connect Mac Mini backend + Vercel to it.
 
 Tasks:
 1) Add docs/DB_RESET_SUPABASE.md with step-by-step commands to:
@@ -19,5 +19,5 @@ Tasks:
 Return:
 - files changed
 - exact commands to run locally for pg_dump and psql (using placeholders)
-- exact Railway env vars needed
+- exact Mac Mini / backend env vars needed
 - exact Vercel env vars needed

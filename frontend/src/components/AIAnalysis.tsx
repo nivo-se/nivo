@@ -23,6 +23,8 @@ import { Checkbox } from './ui/checkbox'
 import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2, List, FileText } from 'lucide-react'
 import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
 import { AIAnalysisService } from '../lib/aiAnalysisService'
+import { API_BASE } from '../lib/apiClient'
+import { fetchWithAuth } from '../lib/backendFetch'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
@@ -442,12 +444,15 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
     }
   }
 
+  const aiAnalysisUrl = (params?: string) =>
+    API_BASE ? `${API_BASE.replace(/\/$/, '')}/api/ai-analysis${params ? `?${params}` : ''}` : `/api/ai-analysis${params ? `?${params}` : ''}`
+
   const loadHistory = async () => {
     try {
-      const response = await fetch('/api/ai-analysis?history=1&limit=10')
+      const response = await fetchWithAuth(aiAnalysisUrl('history=1&limit=10'))
       const data = await response.json()
       if (data.success) {
-        setHistory(data.history || [])
+        setHistory(data.history ?? data.data ?? [])
       }
     } catch (error) {
       console.error('Failed to load AI analysis history', error)
@@ -525,7 +530,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
           : 'Välj företag från screeningresultat för djupanalys')
       }
 
-      const response = await fetch('/api/ai-analysis', {
+      const response = await fetchWithAuth(aiAnalysisUrl(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -567,7 +572,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
     setLoadingRunId(runId)
     setErrorMessage(null)
     try {
-      const response = await fetch(`/api/ai-analysis?runId=${encodeURIComponent(runId)}`)
+      const response = await fetchWithAuth(aiAnalysisUrl(`runId=${encodeURIComponent(runId)}`))
       const data = await response.json()
       if (!data.success) {
         throw new Error(data.error || 'Kunde inte ladda körningsdetaljer')

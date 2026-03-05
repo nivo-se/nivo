@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException, Request
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
-from .dependencies import get_supabase_client, get_current_user_id
+from .dependencies import get_current_user_id
 from .ai_credits import can_use_ai, record_usage, AI_FILTER_ESTIMATED_COST_USD
 from ..services.db_factory import get_database_service
 
@@ -211,7 +211,6 @@ def _call_openai_for_where_clause(prompt: str, current_where_clause: Optional[st
 @router.post("/", response_model=AIFilterResponse)
 async def run_ai_filter(payload: AIFilterRequest, request: Request) -> AIFilterResponse:
     db = get_database_service()
-    supabase = get_supabase_client()
     user_id = get_current_user_id(request)
 
     # Enforce AI credits limit before calling LLM
@@ -287,18 +286,6 @@ async def run_ai_filter(payload: AIFilterRequest, request: Request) -> AIFilterR
         "excluded_types": EXCLUDED_TYPES,
         "capped": capped,
     }
-
-    # Log to Supabase (best effort)
-    try:
-        supabase.table("ai_queries").insert(
-            {
-                "user_prompt": payload.prompt,
-                "parsed_sql": clause,
-                "result_count": len(org_numbers),
-            }
-        ).execute()
-    except Exception as exc:  # pragma: no cover - logging only
-        logger.warning("Failed to log AI query: %s", exc)
 
     # Record AI credits usage when LLM was used
     if used_llm:

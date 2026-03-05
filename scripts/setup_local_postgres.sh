@@ -14,16 +14,16 @@ fi
 echo "=== Nivo Local Postgres Setup ==="
 echo ""
 
-# 1. Start Postgres (Docker)
+# 1. Start Postgres (Docker) — use postgres-only compose so port 5433 is exposed
 echo "1. Starting Postgres container..."
-if docker compose ps postgres 2>/dev/null | grep -q "Up"; then
+if docker compose -f docker-compose.postgres.yml ps postgres 2>/dev/null | grep -q "Up"; then
   echo "   Postgres already running."
 else
-  docker compose up -d
+  docker compose -f docker-compose.postgres.yml up -d
   echo "   Waiting for Postgres to be ready..."
   sleep 3
   for i in 1 2 3 4 5 6 7 8 9 10; do
-    if docker compose exec -T postgres pg_isready -U nivo -d nivo 2>/dev/null; then
+    if docker compose -f docker-compose.postgres.yml exec -T postgres pg_isready -U nivo -d nivo 2>/dev/null; then
       break
     fi
     if [ $i -eq 10 ]; then

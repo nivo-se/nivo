@@ -15,8 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from agentic_pipeline.config import PipelineConfig, SegmentWeighting
 from agentic_pipeline.staged_workflow import StagedTargetingWorkflow, StagePlan
-from .dependencies import get_supabase_client
-from supabase import Client
+from ..services.db_factory import get_database_service
 
 logger = logging.getLogger(__name__)
 
@@ -96,17 +95,8 @@ async def get_filter_analytics(
         # Map to backend weights
         segment_weights = map_frontend_weights_to_segment_weighting(filter_weights)
         
-        # Get Supabase client
-        supabase = get_supabase_client()
-        
-        # Fetch company metrics for analytics
-        # Get a sample of companies with metrics (limit to 1000 for performance)
-        response = supabase.table("company_metrics").select(
-            "orgnr, latest_revenue_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, "
-            "companies!inner(company_name, employees_latest)"
-        ).limit(1000).execute()
-        
-        if not response.data:
+        db = get_database_service()
+        if not getattr(db, "table_exists", lambda t: False)("company_kpis"):
             return {
                 "percentiles": {},
                 "clusters": [],
@@ -114,21 +104,36 @@ async def get_filter_analytics(
                 "density_data": [],
                 "error": "No data available"
             }
-        
-        # Convert to DataFrame for analysis
+        rows = db.run_raw_query(
+            """
+            SELECT k.orgnr, k.latest_revenue_sek, k.revenue_cagr_3y, k.avg_ebitda_margin, k.avg_net_margin,
+                   k.latest_ebitda_sek, k.latest_revenue_sek, c.company_name, c.employees_latest
+            FROM company_kpis k
+            JOIN companies c ON c.orgnr = k.orgnr
+            WHERE k.latest_revenue_sek IS NOT NULL
+            LIMIT 1000
+            """,
+            [],
+        )
+        if not rows:
+            return {
+                "percentiles": {},
+                "clusters": [],
+                "scatter_data": [],
+                "density_data": [],
+                "error": "No data available"
+            }
         companies = []
-        for row in response.data:
-            company = row.get('companies', {})
+        for row in rows:
             companies.append({
                 'orgnr': row.get('orgnr'),
-                'name': company.get('company_name', 'Unknown'),
-                'revenue': row.get('latest_revenue_sek') or 0,
-                'growth': row.get('revenue_cagr_3y') or 0,
-                'ebitda_margin': row.get('avg_ebitda_margin') or 0,
-                'net_margin': row.get('avg_net_margin') or 0,
-                'employees': company.get('employees_latest') or 0,
+                'name': row.get('company_name') or 'Unknown',
+                'revenue': float(row.get('latest_revenue_sek') or 0),
+                'growth': float(row.get('revenue_cagr_3y') or 0),
+                'ebitda_margin': float(row.get('avg_ebitda_margin') or 0),
+                'net_margin': float(row.get('avg_net_margin') or 0),
+                'employees': float(row.get('employees_latest') or 0),
             })
-        
         df = pd.DataFrame(companies)
         
         # Calculate percentiles
@@ -220,50 +225,45 @@ async def get_filter_analytics(
 @router.post("/apply")
 async def apply_filters(request: FilterRequest):
     """
-    Apply financial filters and generate Stage 1 shortlist.
-    Uses Supabase directly instead of the SQLite-based pipeline.
+    Apply financial filters and generate Stage 1 shortlist from Postgres (company_kpis + companies).
     """
     try:
-        supabase = get_supabase_client()
-        
-        # Fetch company metrics from Supabase
-        # IMPORTANT: Using avg_ebitda_margin which is the average EBITDA margin over multiple years
-        # This is stored as a decimal (0.15 = 15%), not a percentage
-        response = supabase.table("company_metrics").select(
-            "orgnr, latest_revenue_sek, revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, "
-            "latest_ebitda_sek, latest_revenue_sek, "
-            "companies!inner(company_name, employees_latest)"
-        ).limit(5000).execute()
-        
-        if not response.data:
+        db = get_database_service()
+        if not getattr(db, "table_exists", lambda t: False)("company_kpis"):
             raise HTTPException(status_code=404, detail="No company data found")
-        
-        # Convert to DataFrame
+        rows = db.run_raw_query(
+            """
+            SELECT k.orgnr, k.latest_revenue_sek, k.revenue_cagr_3y, k.avg_ebitda_margin, k.avg_net_margin,
+                   k.latest_ebitda_sek, k.latest_revenue_sek, c.company_name, c.employees_latest
+            FROM company_kpis k
+            JOIN companies c ON c.orgnr = k.orgnr
+            WHERE k.latest_revenue_sek IS NOT NULL
+            LIMIT 5000
+            """,
+            [],
+        )
+        if not rows:
+            raise HTTPException(status_code=404, detail="No company data found")
         companies_data = []
-        for row in response.data:
-            company = row.get('companies', {})
-            revenue = row.get('latest_revenue_sek') or 0
-            ebitda = row.get('latest_ebitda_sek') or 0
-            
-            # Use avg_ebitda_margin if available, otherwise calculate from latest year
-            # avg_ebitda_margin is stored as decimal (0.15 = 15%)
+        for row in rows:
+            revenue = float(row.get('latest_revenue_sek') or 0)
+            ebitda = float(row.get('latest_ebitda_sek') or 0)
             avg_ebitda_margin = row.get('avg_ebitda_margin')
             if avg_ebitda_margin is None and revenue > 0:
-                # Fallback: calculate from latest year data
-                avg_ebitda_margin = ebitda / revenue if revenue > 0 else 0
+                avg_ebitda_margin = ebitda / revenue
             elif avg_ebitda_margin is None:
                 avg_ebitda_margin = 0
-            
+            else:
+                avg_ebitda_margin = float(avg_ebitda_margin)
             companies_data.append({
                 'orgnr': row.get('orgnr'),
-                'name': company.get('company_name', 'Unknown'),
+                'name': row.get('company_name') or 'Unknown',
                 'revenue': revenue,
-                'revenue_growth': row.get('revenue_cagr_3y') or 0,  # Already a decimal (0.12 = 12%)
-                'ebitda_margin': avg_ebitda_margin,  # Decimal format (0.15 = 15%)
-                'net_margin': row.get('avg_net_margin') or 0,  # Decimal format
-                'employees': company.get('employees_latest') or 0,
+                'revenue_growth': float(row.get('revenue_cagr_3y') or 0),
+                'ebitda_margin': avg_ebitda_margin,
+                'net_margin': float(row.get('avg_net_margin') or 0),
+                'employees': float(row.get('employees_latest') or 0),
             })
-        
         df = pd.DataFrame(companies_data)
         
         if df.empty:
@@ -316,24 +316,7 @@ async def apply_filters(request: FilterRequest):
                 'composite_score': float(row['composite_score']),
             })
         
-        # Save shortlist to database
-        try:
-            shortlist_name = f"Stage 1 Shortlist - {request.stage_one_size} companies"
-            shortlist_description = f"Generated with weights: Revenue={request.weights.revenue}%, EBITDA Margin={request.weights.ebitMargin}%, Growth={request.weights.growth}%, Leverage={request.weights.leverage}%, Headcount={request.weights.headcount}%"
-            
-            supabase.table("stage1_shortlists").insert({
-                "name": shortlist_name,
-                "description": shortlist_description,
-                "weights_json": request.weights.dict(),
-                "stage_one_size": request.stage_one_size,
-                "companies": companies,
-                "total_companies": len(companies),
-                "status": "active"
-            }).execute()
-        except Exception as save_error:
-            # Log error but don't fail the request
-            logger.warning(f"Failed to save shortlist to database: {save_error}")
-        
+        # Shortlist is returned in response; use POST /api/lists or /api/lists/from_query to persist lists.
         return {
             "success": True,
             "companies": companies,

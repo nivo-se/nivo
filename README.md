@@ -6,21 +6,21 @@ A comprehensive AI-powered system for analyzing, valuing, and managing Swedish c
 
 ```
 nivo/
-├── 📁 backend/              # Python data processing & analysis
-│   ├── *.py                # Scraping, analysis, and migration scripts
-│   ├── requirements.txt    # Python dependencies
-│   └── .env               # Environment variables
-├── 📁 frontend/            # Next.js web application
-│   ├── components/         # React components
-│   ├── pages/             # Next.js pages
-│   ├── lib/               # Supabase client configuration
-│   ├── package.json       # Node.js dependencies
-│   └── .env.local         # Frontend environment variables
-├── 📁 database/           # Database schemas and migrations
-│   ├── supabase_create_tables.sql
-│   └── *.json            # Configuration files
-├── 📁 outputs/            # Analysis results and reports
-└── 📄 deploy.sh          # Deployment script
+├── 📁 backend/              # FastAPI (Python) API and workers
+│   ├── api/                # API endpoints
+│   ├── services/           # DB (Postgres), RAG, etc.
+│   ├── requirements.txt   # Python dependencies
+│   └── .env                # Environment variables (not in git)
+├── 📁 frontend/            # Vite + React + TypeScript
+│   ├── src/components/    # React components
+│   ├── src/pages/         # Routes
+│   ├── src/lib/            # API client, Supabase config
+│   └── package.json        # Node.js dependencies
+├── 📁 database/            # Schema and migrations (Postgres)
+│   ├── migrations/         # SQL migrations
+│   └── *.json              # Account code mapping, etc.
+├── 📁 scripts/             # Bootstrap, smoke tests, migrations
+└── .env.example            # Env template (copy to .env)
 ```
 
 ## 📚 Documentation
@@ -30,6 +30,7 @@ nivo/
 Key docs:
 
 - **Local Postgres:** [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md), [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md)
+- **Deploy (Mac Mini):** [docs/DEPLOY_MAC_MINI.md](docs/DEPLOY_MAC_MINI.md)
 - **Financials (source of truth):** [docs/FINANCIALS_SOURCE_OF_TRUTH.md](docs/FINANCIALS_SOURCE_OF_TRUTH.md)
 - **Smoke tests:** [docs/SMOKE_TEST_PLAYBOOK.md](docs/SMOKE_TEST_PLAYBOOK.md)
 - **Production:** [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md)
@@ -64,19 +65,16 @@ Key docs:
 - **Export Features**: Multiple format support (CSV, Excel, PDF)
 - **Accessibility**: WCAG-compliant components and navigation
 
-### 🛠️ Backend (Node.js/TypeScript)
-- **Enhanced API**: 20+ endpoints for comprehensive functionality
-- **AI Integration**: OpenAI GPT-4.1-mini and GPT-4o integration
-- **Valuation Engine**: Multi-model financial calculations
-- **Data Services**: Supabase integration with proper error handling
-- **Security**: Row-level security policies and proper authentication
+### 🛠️ Backend (FastAPI + Python)
+- **API**: Company data, AI filter, enrichment, lists, labels, prospects, export
+- **Database**: Postgres (local Docker or Mac Mini); see [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md)
+- **AI**: OpenAI for filtering, analysis, and reports
+- **Workers**: RQ + Redis for enrichment and background jobs
 
-### 🗄️ Database (Supabase PostgreSQL)
-- **Master Analytics**: 8,479+ companies with comprehensive financial data
-- **Valuation Tables**: valuation_sessions, valuation_assumptions, valuation_models
-- **Saved Lists**: saved_company_lists with proper RLS policies
-- **AI Analysis**: Historical analysis runs and AI insights storage
-- **Real-time**: Live data updates with proper indexing
+### 🗄️ Database (Postgres)
+- **Runtime**: Postgres only (`DATABASE_SOURCE=postgres`). Schema and migrations in `database/`.
+- **Tables**: companies, financials, company_kpis, company_enrichment, saved_lists, saved_list_items, company_labels, etc.
+- **Auth**: Supabase Auth for frontend; app data in your Postgres instance.
 
 ## 📊 Data Overview
 
@@ -90,10 +88,12 @@ Key docs:
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
-- Node.js 20.19+ (required for Vite)
-- Supabase account
-- OpenAI API key (for AI features)
-- Git
+- Node.js 18+ (for frontend)
+- Python 3.10+ (for backend)
+- Docker (for local Postgres)
+- Redis (for background jobs)
+- Supabase account (auth)
+- OpenAI API key
 
 ### Full-Stack Setup
 ```bash
@@ -101,56 +101,33 @@ Key docs:
 git clone [repository-url]
 cd nivo
 
-# Install dependencies
-npm install
+# Start Postgres (Docker)
+docker compose -f docker-compose.postgres.yml up -d
+# Then: scripts/bootstrap_postgres_schema.py, scripts/run_postgres_migrations.sh
 
-# Configure environment variables
+# Configure environment
 cp .env.example .env
-# Edit .env with your Supabase and OpenAI credentials
+# Set DATABASE_SOURCE=postgres, POSTGRES_*, OPENAI_API_KEY, SUPABASE_*, REDIS_URL
 
-# Start development server
-npm run dev
+# Backend (from repo root)
+python -m uvicorn backend.api.main:app --reload --port 8000
+
+# Frontend (from repo root)
+npm install && npm run dev
 ```
 
-### Mac Mini / live instance (AI requests)
+See [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md) and [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md) for Postgres. See [START_ALL_SERVERS.md](START_ALL_SERVERS.md) for a quick server reference.
 
-On a deployed “live” instance (e.g. Mac Mini), the Node enhanced-server handles `/api/ai-analysis`. It loads env from **project root `.env`** first, then `frontend/.env.local`. Ensure the process has:
+### Mac Mini (production)
 
-- **`OPENAI_API_KEY`** — required for AI analysis
-- **`VITE_SUPABASE_URL`** and **`SUPABASE_SERVICE_ROLE_KEY`** (or `VITE_SUPABASE_ANON_KEY`) — for credits and storage
-
-Use a single `.env` at the repo root with these set, or copy the same vars into `frontend/.env.local`. After starting the server, check:
-
-- Startup logs: `🔑 AI (OpenAI): configured` / `🔑 Supabase: configured`
-- `GET http://<host>:<port>/api/ai-status` — returns `openaiConfigured` and `supabaseConfigured` (no secrets).
-
-### Database Setup
-1. Create a Supabase project
-2. Run the SQL migrations:
-   - `database/supabase_create_tables.sql` (main tables)
-   - `database/valuation_schema.sql` (valuation tables)
-   - `database/disable_saved_lists_rls.sql` (for saved lists)
-3. Configure environment variables with your Supabase and OpenAI credentials
+Backend and Postgres run on the Mac Mini. See [docs/DEPLOY_MAC_MINI.md](docs/DEPLOY_MAC_MINI.md). Set `VITE_API_BASE_URL` in Vercel to your Mac Mini API URL.
 
 ## 🚀 Deployment
 
-**Production env checklist:** See [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md) for required env vars (DB, CORS, RQ, LLM). Use `GET /api/status/config` to verify effective config after deploy.
+**Production env checklist:** [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md). Verify with `GET /api/status/config` after deploy.
 
-### Vercel (Full-Stack)
-```bash
-# Deploy to Vercel
-vercel deploy
-
-# Configure environment variables in Vercel dashboard:
-# - VITE_SUPABASE_URL
-# - VITE_SUPABASE_ANON_KEY
-# - OPENAI_API_KEY
-```
-
-### Supabase (Database)
-- Database is automatically deployed to Supabase cloud
-- Row Level Security (RLS) policies configured for saved lists
-- All valuation and AI analysis tables ready for production
+- **Frontend:** Vercel. Set `VITE_API_BASE_URL` to your Mac Mini API URL, plus `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+- **Backend + Postgres:** Mac Mini. See [docs/DEPLOY_MAC_MINI.md](docs/DEPLOY_MAC_MINI.md) and [VERCEL_RAILWAY_SETUP.md](VERCEL_RAILWAY_SETUP.md) (Vercel + Mac Mini).
 
 ## 📈 Usage
 
@@ -171,30 +148,19 @@ vercel deploy
 
 ### Environment Variables
 
-#### Required (.env)
-```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
-OPENAI_API_KEY=your_openai_api_key
-```
+#### Required
+- **Frontend:** `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- **Backend:** `DATABASE_SOURCE=postgres`, `POSTGRES_*` (or `SUPABASE_DB_URL`), `OPENAI_API_KEY`, `SUPABASE_*`, `REDIS_URL`
 
-## ✅ CI: Dashboard API Regression
+See [ENV_SETUP_GUIDE.md](ENV_SETUP_GUIDE.md) and [.env.example](.env.example).
 
-- GitHub Actions workflow `dashboard-api-tests.yml` runs on every push/PR to `main`.  
-- The job bootstraps a lightweight SQLite file via `scripts/create_test_local_db.py` (set `CREATE_TEST_LOCAL_DB_FORCE=1` to overwrite).  
-- The dashboard server (`frontend/server/enhanced-server.ts`) is started with `npx tsx …` and the regression suite `scripts/test_dashboard_apis.py` hits all dashboard-facing APIs (no scraping endpoints).  
-- Add these repository secrets so the workflow can talk to Supabase/OpenAI: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL`, `OPENAI_API_KEY`.  
-- Test artifacts (`scripts/dashboard_api_test_results.json`) are uploaded for every run.
+## 📊 Key Tables (Postgres)
 
-## 📊 Key Tables
-
-- `master_analytics`: Main company data with financial metrics
-- `valuation_sessions`: Valuation analysis sessions and results
-- `valuation_assumptions`: Industry-specific valuation assumptions
-- `saved_company_lists`: User-created company lists
-- `ai_company_analysis`: AI-powered insights and analysis runs
-- `company_accounts_by_id`: Historical financial data
-- `company_kpis_by_id`: Calculated KPIs and ratios
+- `companies`, `financials`, `company_kpis`: Core company and financial data
+- `company_enrichment`: AI and scraped enrichment (per kind)
+- `saved_lists`, `saved_list_items`: Saved company lists
+- `company_labels`: User/app labels
+- See [docs/FINANCIALS_SOURCE_OF_TRUTH.md](docs/FINANCIALS_SOURCE_OF_TRUTH.md) and `database/` for schema details.
 
 ## 🤝 Contributing
 
@@ -217,7 +183,7 @@ For issues and questions:
 
 ---
 
-**Built with ❤️ using React, TypeScript, Supabase, and OpenAI GPT-4**
+**Built with React, TypeScript, Vite, FastAPI, Postgres, and OpenAI**
 
 ## 🎉 Production Ready
 

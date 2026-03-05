@@ -92,9 +92,9 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="investor2-pw" className="block text-sm font-medium mb-2" style={{ color: tokens.text }}>Lösenord</label>
+            <label htmlFor="investor-pw" className="block text-sm font-medium mb-2" style={{ color: tokens.text }}>Lösenord</label>
             <Input
-              id="investor2-pw"
+              id="investor-pw"
               type="password"
               placeholder="Lösenord"
               value={password}
@@ -124,14 +124,14 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
 }
 
 // Header height for fixed header — use same value for content pt (section menus can go here later)
-const INVESTOR2_HEADER_HEIGHT = 68;
+const INVESTOR_HEADER_HEIGHT = 68;
 
 // ─── Shared header (short vs long form) — fixed so it stays visible when scrolling; section nav can be added later ───
-function Investor2Header({ onSignOut }: { onSignOut: () => void }) {
+function InvestorHeader({ onSignOut }: { onSignOut: () => void }) {
   return (
     <header
       className="border-b fixed top-0 left-0 right-0 z-20 bg-white dark:bg-zinc-50"
-      style={{ borderColor: "var(--profile-border, #e4e4e7)", height: INVESTOR2_HEADER_HEIGHT }}
+      style={{ borderColor: "var(--profile-border, #e4e4e7)", height: INVESTOR_HEADER_HEIGHT }}
     >
       <div className="max-w-5xl mx-auto px-5 sm:px-6 h-full flex items-center justify-between">
         <div className="flex items-center justify-start flex-shrink-0 min-w-0">
@@ -151,11 +151,11 @@ function Investor2Header({ onSignOut }: { onSignOut: () => void }) {
 }
 
 // ─── Short-form content (design profile UX) ────────────────────────────────
-function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => void; onOpenLongForm: () => void }) {
+function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => void; onOpenLongForm: () => void }) {
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: tokens.bg }} data-design-profile="nivo">
-      <Investor2Header onSignOut={onSignOut} />
-      <div style={{ paddingTop: INVESTOR2_HEADER_HEIGHT }}>
+      <InvestorHeader onSignOut={onSignOut} />
+      <div style={{ paddingTop: INVESTOR_HEADER_HEIGHT }}>
         {/* Hero — Aurora background; same text structure/formatting as long-form (max-w-3xl, typography) */}
         <section className="relative">
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
@@ -422,7 +422,7 @@ function Investor2ShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => vo
   );
 }
 
-export default function Investor2() {
+export default function Investor() {
   const [unlocked, setUnlocked] = useState(false);
   const [showLongForm, setShowLongForm] = useState(false);
 
@@ -441,14 +441,14 @@ export default function Investor2() {
 
   if (showLongForm) {
     return (
-      <div className="min-h-screen overflow-x-hidden" data-design-profile="nivo" data-investor2-view="long-form-nivo">
-        <Investor2Header onSignOut={handleSignOut} />
-        <div style={{ paddingTop: INVESTOR2_HEADER_HEIGHT }}>
+      <div className="min-h-screen overflow-x-hidden" data-design-profile="nivo" data-investor-view="long-form-nivo">
+        <InvestorHeader onSignOut={handleSignOut} />
+        <div style={{ paddingTop: INVESTOR_HEADER_HEIGHT }}>
           <Investor2LongFormNivo key="nivo-long-form" />
         </div>
       </div>
     );
   }
 
-  return <Investor2ShortForm onSignOut={handleSignOut} onOpenLongForm={() => setShowLongForm(true)} />;
+  return <InvestorShortForm onSignOut={handleSignOut} onOpenLongForm={() => setShowLongForm(true)} />;
 }

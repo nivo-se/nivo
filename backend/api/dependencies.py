@@ -2,7 +2,6 @@
 Shared dependencies for FastAPI endpoints
 """
 from functools import lru_cache
-from supabase import create_client, Client
 import redis
 from dotenv import load_dotenv
 from pathlib import Path
@@ -16,44 +15,6 @@ env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
 
-def _is_supabase_mode() -> bool:
-    """True only when DATABASE_SOURCE=supabase."""
-    return os.getenv("DATABASE_SOURCE", "postgres").lower() == "supabase"
-
-
-@lru_cache()
-def get_supabase_client() -> Optional[Client]:
-    """
-    Get Supabase client (singleton). Returns None unless DATABASE_SOURCE=supabase.
-    Uses SUPABASE_SERVICE_ROLE_KEY server-side only (never expose to frontend).
-    """
-    if not _is_supabase_mode():
-        return None
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
-    if not url or not key:
-        return None
-    return create_client(url, key)
-
-
-@lru_cache()
-def get_supabase_admin_client() -> Optional[Client]:
-    """
-    Get Supabase client with service role for auth admin (create users, etc.).
-    Used when SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set, regardless of DATABASE_SOURCE.
-    """
-    url = os.getenv("SUPABASE_URL") or os.getenv("VITE_SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-    if not url or not key:
-        return None
-    return create_client(url, key)
-
-
-def require_supabase_message() -> str:
-    """Message for endpoints that require DATABASE_SOURCE=supabase."""
-    return "This feature requires DATABASE_SOURCE=supabase"
-
-
 def get_current_user_id(request: Request) -> Optional[str]:
     """
     Get current user ID (sub) from request.state.user set by JWTAuthMiddleware.
@@ -64,6 +25,7 @@ def get_current_user_id(request: Request) -> Optional[str]:
         return None
     sub = user.get("sub")
     return str(sub) if sub else None
+
 
 @lru_cache()
 def get_redis_client() -> redis.Redis:

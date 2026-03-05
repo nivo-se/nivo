@@ -89,7 +89,7 @@ def check_dependency(name: str) -> bool:
     if name == "local_db":
         return LOCAL_DB_PATH.exists()
     if name == "supabase":
-        return bool(os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL"))
+        return False  # Supabase removed; use postgres
     if name == "openai":
         return bool(os.getenv("OPENAI_API_KEY"))
     return True

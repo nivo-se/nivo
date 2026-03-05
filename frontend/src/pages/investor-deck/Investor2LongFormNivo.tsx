@@ -43,7 +43,7 @@ const LABEL_OLIVE_CLASS = "text-sm font-semibold text-profile-accent uppercase t
 export function Investor2LongFormNivo() {
   return (
     <div className="text-profile-fg antialiased min-h-screen overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)] [padding-bottom:env(safe-area-inset-bottom)]" style={{ backgroundColor: tokens.bg }}>
-      {/* ─── Hero (Aurora + design profile tokens — same as investor2 short form, clearly NEW UX) ─── */}
+      {/* ─── Hero (Aurora + design profile tokens — same as investor short form) ─── */}
       <section className="relative">
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">

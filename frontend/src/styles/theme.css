@@ -57,7 +57,7 @@
   --deck-shadow-slide: 0 1px 3px hsl(345 4.5% 17.3% / 0.06), 0 4px 12px hsl(345 4.5% 17.3% / 0.04);
   --deck-shadow-card: 0 1px 2px hsl(345 4.5% 17.3% / 0.05);
 
-  /* Investor2 long-form: premium memo style — olive/sage, soft gradients */
+  /* Investor long-form: premium memo style — olive/sage, soft gradients */
   --inv2-olive: 85 18% 32%;
   --inv2-sage: 120 12% 42%;
   --inv2-olive-muted: 85 14% 92%;

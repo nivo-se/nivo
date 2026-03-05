@@ -125,8 +125,7 @@ class IntelligenceService {
     if (!baseUrl && !import.meta.env.DEV) {
       throw new Error(
         'Backend API is not configured. Please set VITE_API_BASE_URL environment variable ' +
-        'in Vercel settings. Financial Filters require the backend API to be running.\n' +
-        'Railway backend URL: https://vitereactshadcnts-production-fad5.up.railway.app'
+        'in Vercel settings (e.g. your Mac Mini API URL). Financial Filters require the backend API to be running.'
       )
     }
     

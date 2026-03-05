@@ -11,7 +11,6 @@ from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service
 from ..services.ai_summary_service import build_ai_summary
-from .dependencies import get_supabase_client
 
 logger = logging.getLogger(__name__)
 
@@ -47,36 +46,8 @@ class BatchCompanyRequest(BaseModel):
 @router.get("/{orgnr}/intel")
 async def get_company_intel(orgnr: str = Path(..., description="Organization number")):
     """
-    Get all intelligence data for a company.
-    Uses DatabaseService (ai_profiles + company_enrichment) when DATABASE_SOURCE=postgres.
-    Falls back to Supabase (company_intel, intel_artifacts) when DATABASE_SOURCE=supabase.
+    Get all intelligence data for a company from Postgres (ai_profiles + company_enrichment).
     """
-    supabase = get_supabase_client()
-    if supabase:
-        try:
-            intel_response = supabase.table("company_intel").select("*").eq("orgnr", orgnr).maybe_single().execute()
-            artifacts_response = supabase.table("intel_artifacts").select("*").eq("orgnr", orgnr).order("created_at", desc=True).limit(50).execute()
-            intel_data = intel_response.data if intel_response.data else None
-            artifacts = artifacts_response.data if artifacts_response.data else []
-            tech_stack = []
-            if intel_data and intel_data.get("tech_stack_json"):
-                tech_stack_json = intel_data["tech_stack_json"]
-                if isinstance(tech_stack_json, dict):
-                    tech_stack = list(tech_stack_json.keys())
-                elif isinstance(tech_stack_json, list):
-                    tech_stack = tech_stack_json
-            return {
-                "orgnr": orgnr,
-                "company_id": intel_data.get("company_id") if intel_data else None,
-                "domain": intel_data.get("domain") if intel_data else None,
-                "industry": intel_data.get("industry") if intel_data else None,
-                "tech_stack": tech_stack,
-                "digital_maturity_score": intel_data.get("digital_maturity_score") if intel_data else None,
-                "artifacts": artifacts,
-            }
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching company intel: {str(e)}")
-
     try:
         db = get_database_service()
         profiles = db.fetch_ai_profiles([orgnr])
@@ -139,46 +110,16 @@ async def get_company_intel(orgnr: str = Path(..., description="Organization num
 @router.get("/{orgnr}/ai-report")
 async def get_ai_report(orgnr: str = Path(..., description="Organization number")):
     """
-    Get latest AI analysis report for a company.
-
-    Uses shared ai_report_service.build_ai_report_from_db (same as POST /generate).
-    Falls back to Supabase ai_reports when build returns None and Supabase is configured.
+    Get latest AI analysis report for a company from Postgres (company_enrichment / ai_profiles).
     """
     db = get_database_service()
-    if db:
-        try:
-            from ..services import ai_report_service
-            report = ai_report_service.build_ai_report_from_db(orgnr, db, include_extras=True)
-            if report is not None:
-                return report
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
-
-    # Fallback: Supabase ai_reports when configured
-    supabase = get_supabase_client()
-    if supabase:
-        try:
-            response = supabase.table("ai_reports").select("*").eq("orgnr", orgnr).order("generated_at", desc=True).limit(1).execute()
-            if response.data and len(response.data) > 0:
-                data = response.data[0]
-                weaknesses = data.get("weaknesses_json", [])
-                if isinstance(weaknesses, dict):
-                    weaknesses = list(weaknesses.values())
-                elif not isinstance(weaknesses, list):
-                    weaknesses = []
-                uplift_ops = data.get("uplift_ops_json", [])
-                if not isinstance(uplift_ops, list):
-                    uplift_ops = []
-                return {
-                    "orgnr": orgnr,
-                    "business_model": data.get("business_model"),
-                    "weaknesses": weaknesses,
-                    "uplift_ops": uplift_ops,
-                    "impact_range": data.get("impact_range"),
-                    "outreach_angle": data.get("outreach_angle"),
-                }
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
+    try:
+        from ..services import ai_report_service
+        report = ai_report_service.build_ai_report_from_db(orgnr, db, include_extras=True)
+        if report is not None:
+            return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching AI report: {str(e)}")
 
     return {
         "orgnr": orgnr,

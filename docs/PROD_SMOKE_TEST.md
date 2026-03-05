@@ -1,6 +1,6 @@
 # Production Smoke Test Guide
 
-**Purpose:** Validate that the Figma UX app works end-to-end against real Postgres/Supabase data.  
+**Purpose:** Validate that the Figma UX app works end-to-end against real Postgres data.  
 **Run after:** deploy, or before release.
 
 ---
@@ -10,7 +10,7 @@
 - Backend running (`python -m uvicorn backend.api.main:app` or similar)
 - `VITE_API_BASE_URL` or `VITE_API_BASE_URL` env points to backend
 - Database migrations applied
-- User authenticated (Supabase JWT or auth bypass in dev)
+- User authenticated (JWT or auth bypass in dev)
 
 ---
 

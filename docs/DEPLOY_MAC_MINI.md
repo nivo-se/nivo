@@ -8,6 +8,21 @@ For **local dev on your Mac**, use `docker-compose.postgres.yml` for Postgres an
 
 ---
 
+## After you push to GitHub and merge to main
+
+There is **no automated deploy**. The Mac Mini does not pull from GitHub by itself.
+
+1. **On the Mac Mini** (e.g. SSH in): go to the repo and pull the latest:
+   ```bash
+   cd /srv/nivo
+   git pull
+   docker compose up -d --build
+   ```
+2. **The Mac Mini keeps its own `.env`** in `/srv/nivo/.env`. That file is **not in git** (and must not be). You create it once from `.env.example` and edit it on the mini with production secrets (e.g. `POSTGRES_PASSWORD`, OpenAI, Auth0). When you `git pull`, `.env` is untouched, so the mini keeps using the same DB (Postgres in Docker on the mini) and the same secrets.
+3. **DB connection on the mini:** The API runs **inside** Docker and gets `POSTGRES_HOST=postgres` and `POSTGRES_PORT=5432` from `docker-compose.yml` (overrides in the compose file), so it talks to the Postgres container on the same host. You do **not** need `DATABASE_URL` or `POSTGRES_HOST` in the mini’s `.env` for the API; the compose file sets them. You only need `POSTGRES_PASSWORD` (and optionally `POSTGRES_DB` / `POSTGRES_USER`) for the Postgres service and for any host-side tools (e.g. migrations, pg_dump).
+
+---
+
 ## 1. Folder structure on the mini
 
 ```

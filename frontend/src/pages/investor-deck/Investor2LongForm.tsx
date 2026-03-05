@@ -1,6 +1,6 @@
 /**
- * Original long-form investor memo (inv2 styling). Used at /investor.
- * Nivo design-profile version lives in Investor2LongFormNivo.tsx and is used at /investor2.
+ * Original long-form investor memo (inv2 styling). Legacy; not used by main /investor route.
+ * Nivo design-profile version is Investor2LongFormNivo.tsx, used at /investor.
  */
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";

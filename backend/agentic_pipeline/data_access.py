@@ -26,7 +26,7 @@ class DataLoadResult:
 
 
 class TargetingDataLoader:
-    """Loads and merges company datasets from SQLite or Supabase mirrors."""
+    """Loads and merges company datasets from SQLite or Postgres."""
 
     def __init__(self, db_path: Path) -> None:
         self.db_path = db_path

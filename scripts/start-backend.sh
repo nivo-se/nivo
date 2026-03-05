@@ -32,12 +32,6 @@ cd ..
 
 # Check for required environment variables
 echo "🔍 Checking environment variables..."
-if [ -z "${SUPABASE_URL:-}" ]; then
-    echo "⚠️  Warning: SUPABASE_URL not set"
-fi
-if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
-    echo "⚠️  Warning: SUPABASE_SERVICE_ROLE_KEY not set"
-fi
 if [ -z "${OPENAI_API_KEY:-}" ]; then
     echo "⚠️  Warning: OPENAI_API_KEY not set (required for AI reports)"
 fi

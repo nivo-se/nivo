@@ -11,7 +11,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from ..services.db_factory import get_database_service
-from ..api.dependencies import get_supabase_client
 from .ai_analyzer import AIAnalyzer
 
 logger = logging.getLogger(__name__)
@@ -121,38 +120,15 @@ def auto_enrich_search_results(
         Dict with enrichment stats
     """
     db = get_database_service()
-    
-    # Supabase is optional
-    supabase = None
-    try:
-        supabase = get_supabase_client()
-    except Exception:
-        pass  # Will use local SQLite
-    
-    # Check which companies already have profiles
     existing_profiles: set = set()
-    
-    if supabase:
-        try:
-            response = (
-                supabase.table("ai_profiles")
-                .select("org_number")
-                .in_("org_number", org_numbers[:max_enrich])
-                .execute()
-            )
-            if response.data:
-                existing_profiles = {p["org_number"] for p in response.data}
-        except Exception:
-            pass
-    else:
-        try:
-            profiles = db.fetch_ai_profiles(org_numbers[:max_enrich])
-            for p in profiles:
-                orgnr = p.get("org_number")
-                if orgnr:
-                    existing_profiles.add(orgnr)
-        except Exception:
-            pass
+    try:
+        profiles = db.fetch_ai_profiles(org_numbers[:max_enrich])
+        for p in profiles:
+            orgnr = p.get("org_number")
+            if orgnr:
+                existing_profiles.add(orgnr)
+    except Exception:
+        pass
     
     # Get company data for companies that need enrichment
     to_enrich = [org for org in org_numbers[:max_enrich] if org not in existing_profiles]
@@ -210,19 +186,11 @@ def auto_enrich_search_results(
             financial_metrics=financial_metrics,
         )
         
-        # Save profile: Supabase when DATABASE_SOURCE=supabase, else DatabaseService
-        if supabase:
-            try:
-                supabase.table("ai_profiles").upsert(profile, on_conflict="org_number").execute()
-            except Exception:
-                pass
-        else:
-            try:
-                db.upsert_ai_profile(profile)
-            except Exception as exc:
-                logger.warning("Failed to save lightweight profile for %s: %s", orgnr, exc)
-                continue
-
+        try:
+            db.upsert_ai_profile(profile)
+        except Exception as exc:
+            logger.warning("Failed to save lightweight profile for %s: %s", orgnr, exc)
+            continue
         enriched_count += 1
     
     return {

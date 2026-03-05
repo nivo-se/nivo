@@ -34,7 +34,7 @@ Health and DB readiness. No request body.
 }
 ```
 
-**Extras:** `supabase`, `redis` (when applicable).
+**Extras:** `redis` (when applicable).
 
 ---
 

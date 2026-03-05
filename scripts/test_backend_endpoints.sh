@@ -23,7 +23,7 @@ fi
 
 echo ""
 echo "2. API Status..."
-curl -s "$BACKEND_URL/api/status" | python3 -m json.tool || echo "   ⚠️  Status endpoint returned an error (may be expected if Supabase/Redis not configured)"
+curl -s "$BACKEND_URL/api/status" | python3 -m json.tool || echo "   ⚠️  Status endpoint returned an error (may be expected if Redis not configured)"
 
 echo ""
 echo "3. New AI Filter Endpoint (POST /api/ai-filter)..."

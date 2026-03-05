@@ -1,6 +1,6 @@
 """
 Saved lists API: static company lists for Pipeline.
-Scope: private | team. Items stored in saved_list_items.
+Scope: private | team | public. Items stored in saved_list_items.
 """
 import logging
 import os
@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service
-from .dependencies import get_current_user_id, get_supabase_admin_client
+from .dependencies import get_current_user_id
 from .universe import (
     FilterItem,
     UniverseQueryPayload,
@@ -50,16 +50,7 @@ class ListUpdate(BaseModel):
 
 
 def _owner_email(owner_user_id: str) -> Optional[str]:
-    """Look up owner email by user ID when Supabase admin is available."""
-    supabase = get_supabase_admin_client()
-    if not supabase:
-        return None
-    try:
-        resp = supabase.auth.admin.get_user_by_id(str(owner_user_id))
-        if resp and resp.user and getattr(resp.user, "email", None):
-            return resp.user.email
-    except Exception:
-        pass
+    """Look up owner email by user ID. Not configured; returns None."""
     return None
 
 
@@ -106,11 +97,15 @@ async def list_lists(request: Request, scope: str = Query("all")):
             rows = db.run_raw_query(
                 "SELECT * FROM saved_lists WHERE scope = 'team' ORDER BY updated_at DESC"
             )
+        elif scope == "public":
+            rows = db.run_raw_query(
+                "SELECT * FROM saved_lists WHERE scope = 'public' ORDER BY updated_at DESC"
+            )
         else:
             rows = db.run_raw_query(
                 """
                 SELECT * FROM saved_lists
-                WHERE scope = 'team' OR owner_user_id::text = ?
+                WHERE scope IN ('team', 'public') OR owner_user_id::text = ?
                 ORDER BY updated_at DESC
                 """,
                 [uid],
@@ -147,8 +142,8 @@ async def create_list(request: Request, body: ListCreate):
     """Create a new list."""
     _require_postgres()
     uid = _require_user(request)
-    if body.scope not in ("private", "team"):
-        raise HTTPException(400, "scope must be private or team")
+    if body.scope not in ("private", "team", "public"):
+        raise HTTPException(400, "scope must be private, team, or public")
 
     db = get_database_service()
     source_id = body.sourceViewId if body.sourceViewId else None
@@ -182,8 +177,8 @@ async def create_list_from_query(request: Request, body: ListFromQuery):
     """
     _require_postgres()
     uid = _require_user(request)
-    if body.scope not in ("private", "team"):
-        raise HTTPException(400, "scope must be private or team")
+    if body.scope not in ("private", "team", "public"):
+        raise HTTPException(400, "scope must be private, team, or public")
 
     db = get_database_service()
     if not hasattr(db, "run_execute_values"):
@@ -349,8 +344,8 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
         params.append(name)
 
     if body.scope is not None:
-        if body.scope not in ("private", "team"):
-            raise HTTPException(400, "scope must be private or team")
+        if body.scope not in ("private", "team", "public"):
+            raise HTTPException(400, "scope must be private, team, or public")
         updates.append("scope = ?")
         params.append(body.scope)
 

@@ -15,7 +15,6 @@ from typing import Any, Iterable, Optional, Sequence
 
 import pandas as pd
 from openai import OpenAI
-from supabase import Client, create_client
 
 from .screening_prompt import SCREENING_SYSTEM_PROMPT, get_screening_prompt, get_batch_screening_prompt
 from .web_enrichment import enrich_companies_for_analysis, EnrichmentDataFormatter
@@ -180,7 +179,7 @@ def _default_analysis_schema() -> dict[str, Any]:
 
 
 def _screening_analysis_schema() -> dict[str, Any]:
-    """Simplified schema for rapid screening analysis."""
+    """Schema for rapid screening with confidence and data-gap transparency."""
     return {
         "name": "ScreeningAnalysis",
         "strict": True,
@@ -189,7 +188,7 @@ def _screening_analysis_schema() -> dict[str, Any]:
             "properties": {
                 "screening_score": {
                     "type": "number",
-                    "description": "Overall screening score from 1-100 based on financial health, growth, and market position.",
+                    "description": "Overall screening score 1-100 (rubric: growth ~30%, profitability ~30%, leverage ~25%, stability ~15%).",
                     "minimum": 1,
                     "maximum": 100,
                 },
@@ -202,8 +201,18 @@ def _screening_analysis_schema() -> dict[str, Any]:
                     "type": "string",
                     "description": "2-3 sentences highlighting key strengths and weaknesses.",
                 },
+                "confidence_reason": {
+                    "type": "string",
+                    "description": "One sentence explaining why confidence is high/medium/low given available data.",
+                },
+                "key_data_gaps": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Critical missing data that would improve the assessment.",
+                },
             },
-            "required": ["screening_score", "risk_flag", "brief_summary"],
+            "required": ["screening_score", "risk_flag", "brief_summary", "confidence_reason", "key_data_gaps"],
+            "additionalProperties": False,
         },
     }
 
@@ -304,9 +313,11 @@ class ScreeningResult:
     screening_score: Optional[float]
     risk_flag: Optional[str]
     brief_summary: Optional[str]
-    analysis_generated_at: datetime
-    audit: AnalysisAuditRecord
-    raw_json: dict[str, Any]
+    confidence_reason: Optional[str] = None
+    key_data_gaps: Optional[list[str]] = None
+    analysis_generated_at: datetime = field(default_factory=datetime.utcnow)
+    audit: Optional[AnalysisAuditRecord] = None
+    raw_json: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -429,7 +440,6 @@ class AIAnalysisConfig:
     system_prompt: str = field(default_factory=_default_system_prompt)
     context_fields: list[str] = field(default_factory=_default_context_fields)
     response_schema: dict[str, Any] = field(default_factory=_default_analysis_schema)
-    supabase_schema: str = "ai_ops"
     runs_table: str = "ai_analysis_runs"
     company_table: str = "ai_company_analysis"
     sections_table: str = "ai_analysis_sections"
@@ -449,157 +459,6 @@ class AIAnalysisConfig:
             self.output_dir.mkdir(parents=True, exist_ok=True)
 
 
-class SupabaseAnalysisWriter:
-    """Utility for persisting AI analysis rows into Supabase."""
-
-    def __init__(
-        self,
-        *,
-        config: AIAnalysisConfig,
-        chunk_size: int = 50,
-        url_env: str = "SUPABASE_URL",
-        key_env_options: Iterable[str] = ("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_ANON_KEY"),
-    ) -> None:
-        url = os.getenv(url_env)
-        key = next((os.getenv(env) for env in key_env_options if os.getenv(env)), None)
-        if not url or not key:
-            raise ValueError(
-                "Supabase credentials missing. Set SUPABASE_URL and either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY."
-            )
-        self.config = config
-        self.chunk_size = chunk_size
-        self.client: Client = create_client(url, key)
-
-    def _table(self, table_name: str):
-        builder = self.client.table(table_name)
-        if self.config.supabase_schema:
-            builder = builder.schema(self.config.supabase_schema)
-        return builder
-
-    def record_run_start(self, run: AIAnalysisRun) -> None:
-        self._table(self.config.runs_table).insert(run.to_record()).execute()
-
-    def record_run_completion(self, run: AIAnalysisRun) -> None:
-        payload = {
-            "status": run.status,
-            "completed_at": _iso(run.completed_at),
-            "error_message": run.error_message,
-        }
-        self._table(self.config.runs_table).update(payload).eq("id", run.id).execute()
-
-    def upsert_company_results(self, results: Sequence[CompanyAnalysisRecord]) -> None:
-        if not results:
-            return
-        company_rows = [
-            {
-                "run_id": record.run_id,
-                "orgnr": record.orgnr,
-                "company_name": record.company_name,
-                "summary": record.summary,
-                "recommendation": record.recommendation,
-                "confidence": record.confidence,
-                "risk_score": record.risk_score,
-                "financial_grade": record.financial_grade,
-                "commercial_grade": record.commercial_grade,
-                "operational_grade": record.operational_grade,
-                "next_steps": list(record.next_steps),
-                "created_at": _iso(record.analysis_generated_at),
-            }
-            for record in results
-        ]
-        self._table(self.config.company_table).upsert(company_rows, on_conflict="run_id,orgnr").execute()
-
-        sections_rows: list[dict[str, Any]] = []
-        metrics_rows: list[dict[str, Any]] = []
-        audit_rows: list[dict[str, Any]] = []
-
-        for record in results:
-            for section in record.sections:
-                sections_rows.append(
-                    {
-                        "run_id": record.run_id,
-                        "orgnr": record.orgnr,
-                        "section_type": section.section_type,
-                        "title": section.title,
-                        "content_md": section.content_md,
-                        "supporting_metrics": section.supporting_metrics,
-                        "confidence": section.confidence,
-                        "tokens_used": section.tokens_used,
-                    }
-                )
-            for metric in record.metrics:
-                metrics_rows.append(
-                    {
-                        "run_id": record.run_id,
-                        "orgnr": record.orgnr,
-                        "metric_name": metric.metric_name,
-                        "metric_value": metric.metric_value,
-                        "metric_unit": metric.metric_unit,
-                        "source": metric.source,
-                        "year": metric.year,
-                        "confidence": metric.confidence,
-                    }
-                )
-            audit_rows.append(
-                {
-                    "run_id": record.run_id,
-                    "orgnr": record.orgnr,
-                    "module": record.audit.module,
-                    "prompt": record.audit.prompt,
-                    "response": record.audit.response,
-                    "model": record.audit.model,
-                    "latency_ms": record.audit.latency_ms,
-                    "prompt_tokens": record.audit.prompt_tokens,
-                    "completion_tokens": record.audit.completion_tokens,
-                    "cost_usd": record.audit.cost_usd,
-                }
-            )
-
-        if sections_rows:
-            self._table(self.config.sections_table).upsert(sections_rows).execute()
-        if metrics_rows:
-            self._table(self.config.metrics_table).upsert(metrics_rows).execute()
-        if audit_rows:
-            self._table(self.config.audit_table).upsert(audit_rows).execute()
-
-    def upsert_screening_results(self, results: Sequence[ScreeningResult]) -> None:
-        """Persist screening results to Supabase."""
-        if not results:
-            return
-        screening_rows = [
-            {
-                "run_id": result.run_id,
-                "orgnr": result.orgnr,
-                "company_name": result.company_name,
-                "screening_score": result.screening_score,
-                "risk_flag": result.risk_flag,
-                "brief_summary": result.brief_summary,
-                "created_at": _iso(result.analysis_generated_at),
-            }
-            for result in results
-        ]
-        self._table(self.config.screening_table).upsert(screening_rows, on_conflict="run_id,orgnr").execute()
-
-        # Also store audit records for screening
-        audit_rows = [
-            {
-                "run_id": result.run_id,
-                "orgnr": result.orgnr,
-                "module": result.audit.module,
-                "prompt": result.audit.prompt,
-                "response": result.audit.response,
-                "model": result.audit.model,
-                "latency_ms": result.audit.latency_ms,
-                "prompt_tokens": result.audit.prompt_tokens,
-                "completion_tokens": result.audit.completion_tokens,
-                "cost_usd": result.audit.cost_usd,
-            }
-            for result in results
-        ]
-        if audit_rows:
-            self._table(self.config.audit_table).upsert(audit_rows).execute()
-
-
 class AgenticLLMAnalyzer:
     """Runs LLM analysis for a shortlist of target companies."""
 
@@ -608,7 +467,6 @@ class AgenticLLMAnalyzer:
         config: AIAnalysisConfig,
         *,
         openai_client: Optional[OpenAI] = None,
-        supabase_writer: Optional[SupabaseAnalysisWriter] = None,
     ) -> None:
         config.ensure_output_dir()
         api_key = os.getenv("OPENAI_API_KEY")
@@ -616,7 +474,6 @@ class AgenticLLMAnalyzer:
             raise ValueError("OPENAI_API_KEY environment variable is required to run AI analysis.")
         self.config = config
         self.client = openai_client or OpenAI(api_key=api_key)
-        self.supabase_writer = supabase_writer
 
     def run(
         self,
@@ -641,9 +498,6 @@ class AgenticLLMAnalyzer:
             started_at=datetime.utcnow(),
             filters=filters,
         )
-
-        if self.supabase_writer is not None:
-            self.supabase_writer.record_run_start(run)
 
         analyses: list[CompanyAnalysisRecord] = []
         errors: list[str] = []
@@ -682,8 +536,6 @@ class AgenticLLMAnalyzer:
                 enrichment_data = enrichment_data_map.get(orgnr)
                 record = self._analyze_row(row, run, enrichment_data)
                 analyses.append(record)
-                if self.supabase_writer is not None:
-                    self.supabase_writer.upsert_company_results([record])
             except Exception as exc:  # pragma: no cover - defensive fallback
                 errors.append(f"{row.get('orgnr', 'unknown')}: {exc}")
             if self.config.sleep_between_requests:
@@ -695,9 +547,6 @@ class AgenticLLMAnalyzer:
             run.error_message = "; ".join(errors)
         else:
             run.status = "completed"
-
-        if self.supabase_writer is not None:
-            self.supabase_writer.record_run_completion(run)
 
         batch = AIAnalysisBatch(run=run, companies=analyses, errors=errors)
         if self.config.write_to_disk and analyses:
@@ -730,9 +579,6 @@ class AgenticLLMAnalyzer:
             filters=filters,
         )
 
-        if self.supabase_writer is not None:
-            self.supabase_writer.record_run_start(run)
-
         results: list[ScreeningResult] = []
         errors: list[str] = []
 
@@ -742,8 +588,6 @@ class AgenticLLMAnalyzer:
             try:
                 batch_results = self._analyze_screening_batch(batch_df, run)
                 results.extend(batch_results)
-                if self.supabase_writer is not None:
-                    self.supabase_writer.upsert_screening_results(batch_results)
             except Exception as exc:
                 errors.append(f"Batch {i//self.config.batch_size + 1}: {exc}")
             
@@ -756,9 +600,6 @@ class AgenticLLMAnalyzer:
             run.error_message = "; ".join(errors)
         else:
             run.status = "completed"
-
-        if self.supabase_writer is not None:
-            self.supabase_writer.record_run_completion(run)
 
         batch = ScreeningBatch(run=run, results=results, errors=errors)
         if self.config.write_to_disk and results:
@@ -818,6 +659,8 @@ class AgenticLLMAnalyzer:
                     screening_score=result_data.get("screening_score"),
                     risk_flag=result_data.get("risk_flag"),
                     brief_summary=result_data.get("brief_summary"),
+                    confidence_reason=result_data.get("confidence_reason"),
+                    key_data_gaps=result_data.get("key_data_gaps") if isinstance(result_data.get("key_data_gaps"), list) else None,
                     analysis_generated_at=datetime.utcnow(),
                     audit=audit,
                     raw_json=result_data,
@@ -1056,6 +899,5 @@ __all__ = [
     "AnalysisSection",
     "ScreeningBatch",
     "ScreeningResult",
-    "SupabaseAnalysisWriter",
 ]
 

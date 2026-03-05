@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 
 from ..services.db_factory import get_database_service
 from ..workers.enrichment_worker import enrich_companies_batch
-from .dependencies import get_supabase_client
 
 logger = logging.getLogger(__name__)
 
@@ -50,26 +49,6 @@ class StrategicEvaluationResponse(BaseModel):
 
 
 def _load_ai_profile(orgnr: str) -> Optional[Dict[str, Any]]:
-    supabase = None
-    try:
-        supabase = get_supabase_client()
-    except Exception:
-        supabase = None
-
-    if supabase:
-        try:
-            response = (
-                supabase.table("ai_profiles")
-                .select("*")
-                .eq("org_number", orgnr)
-                .maybe_single()
-                .execute()
-            )
-            if response.data:
-                return response.data
-        except Exception as exc:
-            logger.debug("Supabase ai_profile lookup failed: %s", exc)
-
     db = get_database_service()
     try:
         rows = db.run_raw_query(

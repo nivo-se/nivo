@@ -24,9 +24,17 @@ This guide helps you configure all required environment variables for the Nivo p
 
 These are required for the platform to function:
 
-#### Database
-- `DATABASE_SOURCE` - Set to `local` (for SQLite) or `supabase` (for PostgreSQL)
-- `LOCAL_DB_PATH` - Path to your SQLite database (default: `data/nivo_optimized.db`)
+#### Database (Postgres required)
+- `DATABASE_SOURCE` - Set to `postgres` (required). SQLite (`local`) is disabled at runtime.
+- `POSTGRES_HOST` - Host (e.g. `localhost` for local Docker, or `postgres` when API runs in Docker)
+- `POSTGRES_PORT` - Port (e.g. `5433` for local Docker, `5432` in Docker Compose)
+- `POSTGRES_USER` - Database user (e.g. `nivo`)
+- `POSTGRES_PASSWORD` - Database password
+- `POSTGRES_DB` - Database name (e.g. `nivo`)
+
+Alternatively, use `SUPABASE_DB_URL=postgres://...` if you connect to Supabase's Postgres.
+
+**Local Postgres setup:** See [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md) for Docker and bootstrap steps.
 
 #### Supabase
 - `SUPABASE_URL` - Your Supabase project URL
@@ -66,12 +74,12 @@ These are required for the platform to function:
      ```
    - **Cost:** Free tier available (6 hours/month)
 
-2. **Deploy Your Own (Railway)**
+2. **Deploy Your Own (e.g. Mac Mini or VPS)**
    - Create a simple Node.js service that uses Puppeteer
-   - Deploy to Railway
+   - Deploy to your server (e.g. Mac Mini)
    - Set:
      ```bash
-     PUPPETEER_SERVICE_URL=https://your-puppeteer-worker.railway.app/scrape
+     PUPPETEER_SERVICE_URL=https://your-puppeteer-service.example.com/scrape
      PUPPETEER_SERVICE_TOKEN=your-api-token-if-needed
      ```
    - See `PUPPETEER_SERVICE_SETUP.md` for details
@@ -100,7 +108,7 @@ Set these in `frontend/.env.local` or in Vercel dashboard:
 ```bash
 # Backend API URL
 VITE_API_BASE_URL=http://localhost:8000  # Local dev
-# VITE_API_BASE_URL=https://your-backend.railway.app  # Production
+# VITE_API_BASE_URL=https://api.yourdomain.com  # Production (Mac Mini)
 
 # Supabase (for auth)
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -127,16 +135,16 @@ This will:
 
 ---
 
-## Railway Deployment
+## Backend (Mac Mini) Deployment
 
-When deploying to Railway, set these variables in the Railway dashboard:
+When running the backend on the Mac Mini, set these variables in your environment:
 
 **Backend Service:**
 - All backend variables (DATABASE_SOURCE, SUPABASE_URL, etc.)
 - `CORS_ORIGINS` should include your Vercel frontend URL
 
 **Frontend Service (Vercel):**
-- `VITE_API_BASE_URL` - Your Railway backend URL
+- `VITE_API_BASE_URL` - Your Mac Mini backend URL (set in Vercel)
 - `VITE_SUPABASE_URL` - Your Supabase URL
 - `VITE_SUPABASE_ANON_KEY` - Your Supabase anon key
 
@@ -152,7 +160,7 @@ When deploying to Railway, set these variables in the Railway dashboard:
 ### "Failed to connect to Redis"
 - Make sure Redis is running: `redis-cli ping`
 - Check `REDIS_URL` format: `redis://localhost:6379/0`
-- For Railway: Use the Redis connection string from Railway dashboard
+- For Mac Mini: Typically `redis://localhost:6379/0` or your Redis URL
 
 ### "OPENAI_API_KEY not set"
 - Get your key from: https://platform.openai.com/api-keys
@@ -167,10 +175,11 @@ When deploying to Railway, set these variables in the Railway dashboard:
 
 ## Next Steps
 
-1. ✅ Set up required variables
-2. ✅ Run verification script
-3. ✅ Start backend: `python3 -m uvicorn backend.api.main:app --reload`
-4. ✅ Start frontend: `npm run dev`
-5. ✅ Test AI filter in dashboard
-6. ⚠️  Set up Puppeteer (optional, for better enrichment)
+1. ✅ Set up Postgres (Docker): see [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md)
+2. ✅ Set up required variables (including `DATABASE_SOURCE=postgres` and `POSTGRES_*`)
+3. ✅ Run verification script
+4. ✅ Start backend: `python3 -m uvicorn backend.api.main:app --reload`
+5. ✅ Start frontend: `npm run dev`
+6. ✅ Test AI filter in dashboard
+7. ⚠️  Set up Puppeteer (optional, for better enrichment)
 

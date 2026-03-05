@@ -1,7 +1,7 @@
 # Nivo Project Status
 
-**Last Updated:** 2024-11-20  
-**Current Branch:** `feature-ai-chat`  
+**Last Updated:** 2025-03-05  
+**Current Branch:** `main`  
 **Project Type:** Full-stack Swedish Company Intelligence Platform
 
 ---
@@ -45,8 +45,8 @@ Nivo is an AI-first sourcing tool for identifying and analyzing Swedish companie
 - **Location:** `backend/`
 - **Framework:** FastAPI 0.115.0
 - **Server:** Uvicorn
-- **Deployment:** Railway
-- **Port:** 8000 (local), Railway (production)
+- **Deployment:** Mac Mini
+- **Port:** 8000 (local and production on Mac Mini)
 
 **Key API Endpoints:**
 
@@ -72,16 +72,12 @@ Nivo is an AI-first sourcing tool for identifying and analyzing Swedish companie
 - `GET /health` - API health check
 - `GET /status` - Comprehensive service status (API, Supabase, Redis)
 
-### **Database** (SQLite Local + Supabase Remote)
+### **Database** (Postgres)
 
-#### Local Database (`data/nivo_optimized.db`)
-- **Type:** SQLite
-- **Size:** ~36 MB
-- **Companies:** 13,610
-- **Structure:**
-  - `companies` table - Company details (orgnr, name, address, employees, etc.)
-  - `financials` table - Financial data (one row per company-year, 52+ account code columns)
-  - `company_kpis` table - Pre-calculated KPIs (margins, growth, segmentation buckets)
+- **Runtime:** Backend uses **Postgres** only. Set `DATABASE_SOURCE=postgres` in `.env`. SQLite (`DATABASE_SOURCE=local`) is **disabled** at runtime; use Postgres for local dev and production (see `docs/LOCAL_POSTGRES_SETUP.md`).
+- **Local dev:** Postgres via Docker (e.g. `docker compose -f docker-compose.postgres.yml up -d`), then `scripts/bootstrap_postgres_schema.py` and `scripts/run_postgres_migrations.sh`.
+- **Production:** Postgres and API run on **Mac Mini** (see `docs/DEPLOY_MAC_MINI.md`).
+- **Structure (Postgres):** `companies`, `financials`, `company_kpis`, `company_enrichment`, `saved_lists`, `saved_list_items`, `company_labels`, etc. Schema: `database/` and migrations in `database/migrations/`.
 
 **Key Account Codes (from Allabolag):**
 - `SI` - Nettoomsättning (Net Sales) - **Primary revenue metric**
@@ -94,10 +90,13 @@ Nivo is an AI-first sourcing tool for identifying and analyzing Swedish companie
 
 **Important:** All financial values are stored in **actual SEK** (not thousands). The scraper multiplies by 1000 during extraction.
 
-#### Supabase (Remote)
-- **Purpose:** Authentication, AI queries logging, future data sync
-- **Tables:** `auth.*`, `ai_queries`, `ai_profiles` (planned)
-- **Status:** Cleaned up, minimal storage (~10 MB)
+#### SQLite (scripts / legacy only)
+- **Purpose:** Output of `scripts/create_optimized_db.py` and `scripts/create_kpi_table.py`; used by `scripts/migrate_sqlite_to_postgres.py` to load data into Postgres. Not used by the running API.
+- **Path:** `data/nivo_optimized.db` (optional; only for migration tooling)
+
+#### Supabase (Auth only)
+- **Purpose:** Authentication (Supabase Auth). Application data lives in Postgres (local or Mac Mini), not in Supabase DB.
+- **Tables:** `auth.*`; app tables are in your Postgres instance.
 
 ### **Services & Infrastructure**
 
@@ -149,16 +148,17 @@ nivo/
 │   │   ├── enrichment.py       # Enrichment jobs
 │   │   └── export.py            # CRM export
 │   ├── services/                # Database abstraction
-│   │   ├── db_factory.py        # Database service factory
-│   │   ├── local_db_service.py  # SQLite implementation
-│   │   └── supabase_db_service.py  # Supabase implementation
+│   │   ├── db_factory.py        # Database service factory (Postgres default)
+│   │   ├── postgres_db_service.py  # Postgres implementation
+│   │   ├── local_db_service.py  # SQLite (disabled at runtime; scripts only)
+│   │   └── supabase_db_service.py  # Supabase (unused; use Postgres)
 │   ├── workers/                 # Background workers
 │   │   ├── enrichment_worker.py
 │   │   └── ai_analyzer.py
 │   └── requirements.txt
 │
 ├── data/
-│   └── nivo_optimized.db        # Local SQLite database
+│   └── nivo_optimized.db        # Optional: SQLite from scripts (for migration into Postgres)
 │
 ├── database/
 │   ├── allabolag_account_code_mapping.json  # Account code reference
@@ -177,17 +177,22 @@ nivo/
 
 **Required for Backend:**
 ```bash
-# Database
-DATABASE_SOURCE=local              # 'local' or 'supabase'
-LOCAL_DB_PATH=data/nivo_optimized.db
+# Database (Postgres – required)
+DATABASE_SOURCE=postgres
+POSTGRES_HOST=localhost            # or 'postgres' when API runs in Docker
+POSTGRES_PORT=5433                 # 5432 when in Docker
+POSTGRES_USER=nivo
+POSTGRES_PASSWORD=...
+POSTGRES_DB=nivo
+# Or use SUPABASE_DB_URL=postgres://... if connecting to Supabase Postgres
 
 # OpenAI
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
 
-# Supabase (for auth and logging)
+# Supabase (for auth)
 SUPABASE_URL=https://...
-SUPABASE_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...      # or SUPABASE_ANON_KEY
 
 # Redis (for job queues)
 REDIS_URL=redis://localhost:6379
@@ -317,17 +322,17 @@ profitability_bucket TEXT     -- 'loss-making', 'low', 'healthy', 'high'
 - **Build Command:** `cd frontend && npm run build`
 - **Output Directory:** `frontend/dist`
 
-### Backend (Railway)
-- **Branch:** `feature-ai-chat` (or `main`)
-- **Build Command:** Auto-detected (Nixpacks)
-- **Start Command:** `uvicorn backend.api.main:app --host 0.0.0.0 --port $PORT`
-- **Environment Variables:** Set in Railway dashboard
+### Backend (Mac Mini)
+- **Branch:** `main`
+- **Deploy:** See `docs/DEPLOY_MAC_MINI.md`. No auto-deploy; SSH to mini, `git pull`, `docker compose up -d --build`.
+- **Start Command:** API and Postgres run via repo `docker-compose.yml` on the mini.
+- **Environment Variables:** Set in `/srv/nivo/.env` on the Mac Mini (not in git).
 
 ---
 
 ## 📝 Important Notes
 
-1. **Database Abstraction:** The backend uses a factory pattern (`db_factory.py`) to support both local SQLite and Supabase. Currently using local database.
+1. **Database:** The backend uses Postgres only (`db_factory.py` → `PostgresDBService`). SQLite is disabled at runtime; use Postgres for local dev (Docker) and production (Mac Mini). See `docs/LOCAL_POSTGRES_SETUP.md` and `docs/DEPLOY_MAC_MINI.md`.
 
 2. **Account Codes:** Always refer to `database/allabolag_account_code_mapping.json` for correct account code usage. Critical: `RG` is NOT EBIT - it's working capital.
 
@@ -346,9 +351,8 @@ profitability_bucket TEXT     -- 'loss-making', 'low', 'healthy', 'high'
 
 ## 🔮 Future Plans
 
-- Migrate local database to Supabase for production
 - Implement full enrichment pipeline (SerpAPI + Puppeteer)
-- Add more AI analysis features
+- Add more AI analysis features and persistence (e.g. ai_analysis_runs)
 - Expand CRM export capabilities
 - Add more financial metrics and visualizations
 
@@ -356,10 +360,14 @@ profitability_bucket TEXT     -- 'loss-making', 'low', 'healthy', 'high'
 
 ## 📚 Documentation Files
 
+- `docs/README.md` - Documentation index
+- `docs/LOCAL_POSTGRES_SETUP.md` - Local Postgres (Docker) setup
+- `docs/DEPLOY_MAC_MINI.md` - Production deploy (Mac Mini)
+- `docs/FINANCIALS_SOURCE_OF_TRUTH.md` - Financials table and account codes
 - `database/ACCOUNT_CODE_MAPPING_GUIDE.md` - Account code usage guide
 - `database/allabolag_account_code_mapping.json` - Complete account code reference
 - `KPI_TABLE_GUIDE.md` - KPI calculation methods
-- `OPTIMIZED_DATABASE_GUIDE.md` - Database structure details
+- `OPTIMIZED_DATABASE_GUIDE.md` - SQLite schema (from create_optimized_db; used for migration into Postgres)
 
 ---
 

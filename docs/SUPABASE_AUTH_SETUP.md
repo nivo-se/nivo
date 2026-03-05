@@ -1,6 +1,10 @@
-# Supabase Auth for Production
+# Supabase Auth for Production *(DEPRECATED)*
 
-Nivo uses Supabase Auth for JWT-gated backend in production while keeping local dev on Docker Postgres with optional auth.
+**Supabase has been removed from this project.** Use Postgres + JWT (JWT_SECRET or Auth0) for auth. This doc is kept for historical reference only.
+
+---
+
+Nivo previously used Supabase Auth for JWT-gated backend in production while keeping local dev on Docker Postgres with optional auth.
 
 ## Environment Variables
 
@@ -21,7 +25,7 @@ Nivo uses Supabase Auth for JWT-gated backend in production while keeping local 
 |----------|-------------|
 | `VITE_SUPABASE_URL` | Same as backend SUPABASE_URL |
 | `VITE_SUPABASE_ANON_KEY` | Anon/public key (safe for frontend) |
-| `VITE_API_BASE_URL` | Backend API URL (e.g. Railway) |
+| `VITE_API_BASE_URL` | Backend API URL (e.g. Mac Mini) |
 
 ## Production Setup
 

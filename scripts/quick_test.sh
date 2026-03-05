@@ -104,10 +104,10 @@ else
     echo -e "${YELLOW}   ⚠️  OPENAI_API_KEY not set${NC}"
 fi
 
-if [ -n "${SUPABASE_URL:-}" ]; then
-    echo -e "${GREEN}   ✅ SUPABASE_URL is set${NC}"
+if [ -n "${DATABASE_URL:-}" ] || [ -n "${POSTGRES_HOST:-}" ]; then
+    echo -e "${GREEN}   ✅ Database URL/Postgres is set${NC}"
 else
-    echo -e "${YELLOW}   ⚠️  SUPABASE_URL not set (required for ai_profiles)${NC}"
+    echo -e "${YELLOW}   ⚠️  DATABASE_URL or POSTGRES_* not set (required for DB)${NC}"
 fi
 
 if [ -n "${REDIS_URL:-}" ]; then

@@ -1,5 +1,5 @@
 /**
- * Shared Nivo design profile tokens — used by DesignProfile (template) and Investor2 (real data).
+ * Shared Nivo design profile tokens — used by DesignProfile (template) and Investor page (real data).
  * Update here when the design system changes so both pages stay in sync.
  */
 

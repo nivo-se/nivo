@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { usePromptTemplates, useAIRuns } from "@/lib/hooks/apiQueries";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/default/ErrorState";
-import { CheckCircle, XCircle, Loader, Clock, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function AILabRuns() {
   const { data: templates = [] } = usePromptTemplates();
@@ -13,20 +13,10 @@ export default function AILabRuns() {
   );
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="w-4 h-4 text-primary" />;
-      case "running":
-        return <Loader className="w-4 h-4 text-primary animate-spin" />;
-      case "queued":
-        return <Clock className="w-4 h-4 text-muted-foreground" />;
-      case "failed":
-        return <XCircle className="w-4 h-4 text-destructive" />;
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-muted-foreground" />;
-      default:
-        return null;
+    if (status === "completed") {
+      return <CheckCircle className="w-4 h-4 text-green-600" />;
     }
+    return null;
   };
 
   return (

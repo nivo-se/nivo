@@ -1,6 +1,6 @@
 /**
  * Centralized API Service
- * Handles all API calls to Railway backend
+ * Handles all API calls to the backend (Mac Mini).
  */
 import { fetchWithAuth } from './backendFetch'
 import { API_BASE } from './apiClient'

@@ -21,7 +21,7 @@ The Nivo platform uses a Puppeteer service for deep scraping of dynamic websites
 
 ---
 
-## Option 2: Deploy Your Own (Railway)
+## Option 2: Deploy Your Own (e.g. Mac Mini or any host)
 
 If you want full control or need more capacity, deploy your own Puppeteer service.
 
@@ -158,31 +158,31 @@ app.listen(PORT, () => {
 });
 ```
 
-### Step 4: Deploy to Railway
+### Step 4: Deploy
 
-1. **Create new Railway project:**
-   - Go to Railway dashboard
+1. **Create and deploy your service** (e.g. Railway, Mac Mini, or any host):
+   - Or use Railway: go to Railway dashboard
    - Click "New Project" → "Deploy from GitHub repo"
    - Select your `puppeteer-service` directory
 
 2. **Set environment variables:**
    - `API_TOKEN` (optional) - For authentication
-   - Railway will auto-detect Node.js and deploy
+   - Railway (if used) will auto-detect Node.js and deploy
 
 3. **Get the service URL:**
-   - Railway will provide a URL like: `https://puppeteer-service-production.up.railway.app`
-   - Add `/scrape` endpoint: `https://puppeteer-service-production.up.railway.app/scrape`
+   - You'll get a URL (e.g. `https://puppeteer-service.example.com` or Railway URL)
+   - Add `/scrape` endpoint: `https://your-puppeteer-service.example.com/scrape`
 
 4. **Add to Nivo `.env`:**
    ```bash
-   PUPPETEER_SERVICE_URL=https://puppeteer-service-production.up.railway.app/scrape
+   PUPPETEER_SERVICE_URL=https://your-puppeteer-service.example.com/scrape
    PUPPETEER_SERVICE_TOKEN=your-api-token-if-set
    ```
 
 ### Step 5: Test
 
 ```bash
-curl -X POST https://your-puppeteer-service.railway.app/scrape \
+curl -X POST https://your-puppeteer-service.example.com/scrape \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your-token" \
   -d '{"url": "https://example.com"}'
@@ -216,7 +216,7 @@ curl -X POST https://chrome.browserless.io/scrape \
   -d '{"url": "https://example.com"}'
 
 # Test your own service
-curl -X POST https://your-service.railway.app/scrape \
+curl -X POST https://your-service.example.com/scrape \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'
 ```
@@ -227,14 +227,14 @@ curl -X POST https://your-service.railway.app/scrape \
 
 ### "Browser not ready"
 - Wait a few seconds after deployment
-- Check Railway logs for browser initialization errors
+- Check service logs for browser initialization errors
 
 ### "Timeout"
 - Some sites take longer to load
 - Increase timeout in `server.js` if needed
 
 ### "Memory issues"
-- Railway free tier has memory limits
+- If using a free tier host, check its memory limits
 - Consider using Browserless.io for production
 
 ---

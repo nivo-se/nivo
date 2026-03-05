@@ -86,7 +86,7 @@ def main():
     print("=" * 60)
     print("4) Fill in and reply:")
     print("=" * 60)
-    print("  • Where is the backend running? (local / Railway / Render / Fly / VPS)")
+    print("  • Where is the backend running? (local / Mac Mini / VPS)")
     print("  • counts.company_enrichment = ?  counts.ai_profiles = ?")
     print("  • Golden orgnr = ?  (paste first ~30 lines of /intel above)")
     print("  • First page to fix: list / company detail / deep dive")

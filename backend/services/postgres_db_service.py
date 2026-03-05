@@ -41,7 +41,7 @@ def _log_db_exception(op_name: str, exc: BaseException) -> None:
 
 
 def _make_conn():
-    """Use DATABASE_URL or SUPABASE_DB_URL if set; otherwise POSTGRES_* vars."""
+    """Use DATABASE_URL if set; otherwise POSTGRES_* vars. SUPABASE_DB_URL is still read for backward compatibility."""
     url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")
     if url:
         return psycopg2.connect(url, connect_timeout=5)
@@ -73,7 +73,8 @@ class PostgresDBService(DatabaseService):
         self._lock = Lock()
         self._conn = _make_conn()
         self._conn.autocommit = False
-        conn_display = "DATABASE_URL/SUPABASE_DB_URL" if (os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")) else f"{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'nivo')}"
+        url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")
+        conn_display = "DATABASE_URL" if url else f"{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'nivo')}"
         logger.info("Connected to Postgres (%s)", conn_display)
 
     def _execute(

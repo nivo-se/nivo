@@ -40,15 +40,18 @@ SYSTEM_PROMPT = """You are an M&A analyst evaluating companies for acquisition.
 
 Analyze the provided company data and generate a structured investment analysis.
 
-Your analysis should include:
+Your analysis must include:
 1. Business Model - How the company makes money
 2. Products/Services - What they offer and to whom
 3. Market Position - Their competitive standing
 4. SWOT Analysis - Strengths, Weaknesses, Opportunities, Threats
 5. Strategic Fit Score - Rate 1-10 how good an acquisition target this is
 6. Recommendation - buy, pass, or watch
+7. missing_data - List any critical data points not available
+8. assumptions - List assumptions made when data was missing or ambiguous
+9. recommendation_rationale - Exactly 3 evidence bullets supporting your recommendation
 
-Be concise but insightful. Focus on acquisition potential."""
+Be concise and evidence-based. When data is sparse, avoid overconfident language; state gaps and assumptions clearly."""
 
 
 class AIAnalyzer:
@@ -93,15 +96,48 @@ class AIAnalyzer:
         )
         
         try:
-            # Call OpenAI
+            # Call OpenAI with strict schema and lower temperature for consistency
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
-                response_format={"type": "json_object"},
-                temperature=0.7,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "stage3_analysis",
+                        "strict": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "business_model": {"type": "string"},
+                                "products_summary": {"type": "string"},
+                                "market_position": {"type": "string"},
+                                "swot": {
+                                    "type": "object",
+                                    "properties": {
+                                        "strengths": {"type": "array", "items": {"type": "string"}},
+                                        "weaknesses": {"type": "array", "items": {"type": "string"}},
+                                        "opportunities": {"type": "array", "items": {"type": "string"}},
+                                        "threats": {"type": "array", "items": {"type": "string"}},
+                                    },
+                                    "required": ["strengths", "weaknesses", "opportunities", "threats"],
+                                    "additionalProperties": False,
+                                },
+                                "strategic_fit_score": {"type": "integer", "minimum": 1, "maximum": 10},
+                                "recommendation": {"type": "string", "enum": ["buy", "pass", "watch"]},
+                                "key_insights": {"type": "array", "items": {"type": "string"}},
+                                "missing_data": {"type": "array", "items": {"type": "string"}},
+                                "assumptions": {"type": "array", "items": {"type": "string"}},
+                                "recommendation_rationale": {"type": "array", "items": {"type": "string"}, "minItems": 3, "maxItems": 3},
+                            },
+                            "required": ["business_model", "products_summary", "market_position", "swot", "strategic_fit_score", "recommendation", "key_insights", "missing_data", "assumptions", "recommendation_rationale"],
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+                temperature=0.25,
             )
             
             # Parse response
@@ -193,24 +229,19 @@ class AIAnalyzer:
         
         prompt_parts.append("""
 TASK:
-Analyze this company and return a JSON object with:
-{
-  "business_model": "How they make money (2-3 sentences)",
-  "products_summary": "What they offer (2-3 sentences)",
-  "market_position": "Their competitive standing (2-3 sentences)",
-  "swot": {
-    "strengths": ["strength 1", "strength 2", "strength 3"],
-    "weaknesses": ["weakness 1", "weakness 2"],
-    "opportunities": ["opportunity 1", "opportunity 2"],
-    "threats": ["threat 1", "threat 2"]
-  },
-  "strategic_fit_score": 7,
-  "recommendation": "buy",
-  "key_insights": ["insight 1", "insight 2", "insight 3"]
-}
+Analyze this company and return JSON with this exact structure. Be consistent and evidence-based.
 
-Recommendation must be one of: "buy", "pass", "watch"
-Strategic fit score must be 1-10 (10 = perfect acquisition target)
+Required fields:
+- business_model, products_summary, market_position: 2-3 sentences each.
+- swot: strengths, weaknesses, opportunities, threats (each a list of strings).
+- strategic_fit_score: integer 1-10 (10 = perfect acquisition target).
+- recommendation: exactly one of "buy", "pass", "watch".
+- key_insights: array of 2-4 short insights.
+- missing_data: list of critical data points that were not available (e.g. "revenue_breakdown", "management_tenure"). Use [] if nothing material is missing.
+- assumptions: list of assumptions you made when data was missing or ambiguous. Use [] if none.
+- recommendation_rationale: array of exactly 3 concise evidence bullets supporting your recommendation (e.g. "Strong 3Y revenue growth (12% CAGR).", "EBITDA margin stable at 8%.", "Limited digital presence.").
+
+When data is sparse, avoid overconfident language; state assumptions and data gaps clearly.
 """)
         
         return "\n".join(prompt_parts)

@@ -67,15 +67,15 @@ else
     echo "✅ .env file exists"
 fi
 
-# Check Supabase connection
+# Check database config
 echo ""
-echo "🗄️  Checking Supabase connection..."
+echo "🗄️  Checking database config..."
 if [ -f ".env" ]; then
     source .env
-    if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-        echo "⚠️  Supabase credentials not set in .env"
+    if [ -n "${DATABASE_URL:-}" ] || [ -n "${POSTGRES_HOST:-}" ]; then
+        echo "✅ Database URL or Postgres host set"
     else
-        echo "✅ Supabase credentials found"
+        echo "⚠️  Set DATABASE_URL or POSTGRES_* in .env for Postgres"
     fi
 fi
 
@@ -83,8 +83,8 @@ echo ""
 echo "✅ Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Update .env with your API keys"
-echo "2. Run database migrations in Supabase SQL Editor"
+echo "1. Update .env with your API keys and Postgres connection"
+echo "2. Run database migrations (see docs/LOCAL_POSTGRES_BOOTSTRAP.md)"
 echo "3. Start services:"
 echo "   - Terminal 1: redis-server (or already running)"
 echo "   - Terminal 2: cd backend && source venv/bin/activate && uvicorn api.main:app --reload"

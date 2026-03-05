@@ -278,9 +278,7 @@ export const FinancialFilterPanel: React.FC<FinancialFilterPanelProps> = ({ onSh
                     )}
                     {!import.meta.env.DEV && (
                       <span className="block mt-2 text-xs">
-                        Set <code className="bg-muted px-1 py-0.5 rounded">VITE_API_BASE_URL</code> in Vercel environment variables.
-                        <br />
-                        Railway URL: <code className="bg-muted px-1 py-0.5 rounded">https://vitereactshadcnts-production-fad5.up.railway.app</code>
+                        Set <code className="bg-muted px-1 py-0.5 rounded">VITE_API_BASE_URL</code> in Vercel to your Mac Mini API URL (e.g. https://api.yourdomain.com).
                       </span>
                     )}
                   </>

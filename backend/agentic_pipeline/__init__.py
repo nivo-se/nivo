@@ -4,7 +4,6 @@ from .ai_analysis import (
     AIAnalysisBatch,
     AIAnalysisConfig,
     AgenticLLMAnalyzer,
-    SupabaseAnalysisWriter,
 )
 from .analysis import AnalysisResult, MarketFinancialAnalyzer
 from .config import PipelineConfig, SegmentWeighting
@@ -20,5 +19,4 @@ __all__ = [
     "PipelineArtifacts",
     "PipelineConfig",
     "SegmentWeighting",
-    "SupabaseAnalysisWriter",
 ]

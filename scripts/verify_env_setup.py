@@ -28,9 +28,7 @@ OPTIONAL_VARS = {
     "PUPPETEER_SERVICE_URL": None,  # Optional - for deep scraping
     "PUPPETEER_SERVICE_TOKEN": None,  # Optional - for Puppeteer auth
     "COPPER_API_TOKEN": None,  # Optional - for CRM export
-    "SUPABASE_URL": None,  # Optional if using local DB
-    "SUPABASE_SERVICE_ROLE_KEY": None,  # Optional if using local DB
-    "SUPABASE_ANON_KEY": None,  # Optional if using local DB
+    # Supabase removed; use Postgres (DATABASE_URL or POSTGRES_*)
     "REDIS_URL": "redis://localhost:6379/0",  # Default value
     "CORS_ORIGINS": "",  # Optional
     "VITE_API_BASE_URL": None,  # Frontend only
@@ -117,14 +115,8 @@ def verify_database_setup() -> Tuple[bool, List[str]]:
             all_good = False
     
     elif db_source == "supabase":
-        supabase_url = os.getenv("SUPABASE_URL")
-        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
-        
-        if supabase_url and supabase_key:
-            results.append(f"✅ Supabase configured")
-        else:
-            results.append(f"❌ Supabase URL or key missing")
-            all_good = False
+        results.append("❌ Supabase is no longer supported; use DATABASE_SOURCE=postgres")
+        all_good = False
 
     elif db_source == "postgres":
         host = os.getenv("POSTGRES_HOST", "localhost")

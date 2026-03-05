@@ -1,79 +1,41 @@
-# Vercel + Railway Setup Guide
+# Vercel + Mac Mini Setup Guide
 
-## ✅ Railway Backend (DONE)
-- **URL**: `https://vitereactshadcnts-production-fad5.up.railway.app`
-- **Status**: ✅ Running (Uvicorn on port 8080)
-- **Environment Variables**: ✅ Added to Railway
+**Note:** Railway has been removed. Backend and database run on the Mac Mini only.
 
-## 🔧 Vercel Frontend Setup
+## Backend (Mac Mini)
 
-### Step 1: Add Environment Variable in Vercel
+- **URL:** Your Mac Mini API URL (e.g. `https://api.yourdomain.com` or your chosen host/port).
+- **Stack:** FastAPI, Postgres, Redis, RQ — all on the Mac Mini.
 
-1. Go to **Vercel Dashboard** → Your Project → **Settings** → **Environment Variables**
+## Vercel Frontend Setup
 
-2. Add new variable:
-   - **Name**: `VITE_API_BASE_URL`
-   - **Value**: `https://vitereactshadcnts-production-fad5.up.railway.app`
-   - **Environment**: Select all (Production, Preview, Development)
+### 1. Environment variable
 
-3. **Save** the variable
+1. **Vercel Dashboard** → Your Project → **Settings** → **Environment Variables**
+2. Add:
+   - **Name:** `VITE_API_BASE_URL`
+   - **Value:** Your Mac Mini API URL (e.g. `https://api.yourdomain.com`)
+   - **Environment:** Production, Preview, Development (as needed)
+3. Save and redeploy.
 
-### Step 2: Redeploy Frontend
+### 2. Verify
 
-After adding the environment variable, you need to redeploy:
+1. Open your Vercel frontend URL.
+2. DevTools → Console / Network.
+3. Use a feature that calls the API (e.g. Financial Filters); confirm requests go to the Mac Mini backend.
 
-1. Go to **Deployments** tab
-2. Click **"..."** on the latest deployment → **Redeploy**
-3. Or push a new commit to trigger a redeploy
-
-### Step 3: Verify Connection
-
-Once redeployed, test the connection:
-
-1. Visit your Vercel frontend URL
-2. Open browser DevTools → Console
-3. Try using the **Financial Filters** feature
-4. Check Network tab for API calls to Railway backend
-
-## 🔍 Testing the Backend
-
-Test the Railway backend directly:
+## Testing the backend
 
 ```bash
-# Health check
-curl https://vitereactshadcnts-production-fad5.up.railway.app/health
-
-# Should return:
-# {"status":"healthy","service":"nivo-intelligence-api"}
+# Replace with your Mac Mini API URL
+curl https://api.yourdomain.com/health
+# Expect: {"status":"healthy",...}
 ```
 
-## 📋 Environment Variables Checklist
+## Troubleshooting
 
-### Railway (Backend) - ✅ Done
-- [x] `SUPABASE_URL`
-- [x] `SUPABASE_SERVICE_ROLE_KEY`
-- [x] `OPENAI_API_KEY`
-- [x] `REDIS_URL` (optional)
-- [x] `CORS_ORIGINS` (optional - for custom domains)
+- **Frontend can't reach backend:** Ensure `VITE_API_BASE_URL` in Vercel matches the Mac Mini API URL.
+- **CORS errors:** On the Mac Mini, set `CORS_ORIGINS` or `CORS_ALLOW_VERCEL_PREVIEWS=true` so your Vercel domain is allowed.
+- **Backend not responding:** Check the backend process and logs on the Mac Mini; ensure Postgres and Redis are running.
 
-### Vercel (Frontend) - ⏳ Next Step
-- [ ] `VITE_API_BASE_URL` = `https://vitereactshadcnts-production-fad5.up.railway.app`
-- [ ] `VITE_SUPABASE_URL` (if not already set)
-- [ ] `VITE_SUPABASE_ANON_KEY` (if not already set)
-
-## 🐛 Troubleshooting
-
-### Frontend can't connect to backend
-- Check `VITE_API_BASE_URL` is set correctly in Vercel
-- Verify Railway backend is running (check Railway logs)
-- Check browser console for CORS errors
-
-### CORS errors
-- Railway backend already allows `*.vercel.app` domains
-- If using custom domain, add it to `CORS_ORIGINS` in Railway
-
-### Backend not responding
-- Check Railway logs for errors
-- Verify environment variables are set in Railway
-- Test health endpoint: `curl https://vitereactshadcnts-production-fad5.up.railway.app/health`
-
+See [docs/CONNECTIONS_VERIFICATION.md](docs/CONNECTIONS_VERIFICATION.md) for full connection checks.

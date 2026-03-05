@@ -11,8 +11,8 @@ if [ ! -f "$ENV_FILE" ]; then
     echo "❌ .env file not found at: $ENV_FILE"
     echo ""
     echo "Create a .env file in the project root with:"
-    echo "  SUPABASE_URL=..."
-    echo "  SUPABASE_SERVICE_ROLE_KEY=..."
+    echo "  DATABASE_SOURCE=postgres"
+    echo "  POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD (or DATABASE_URL)"
     echo "  OPENAI_API_KEY=..."
     echo "  REDIS_URL=redis://localhost:6379/0"
     echo "  VITE_API_BASE_URL=http://localhost:8000"
@@ -50,16 +50,18 @@ check_var() {
 
 echo "Required Variables:"
 echo "-------------------"
-check_var "SUPABASE_URL" true
-check_var "SUPABASE_SERVICE_ROLE_KEY" true
+check_var "DATABASE_SOURCE" true
 check_var "OPENAI_API_KEY" true
 
 echo ""
-echo "Optional Variables:"
+echo "Optional Variables (Postgres when DATABASE_SOURCE=postgres):"
 echo "-------------------"
+check_var "DATABASE_URL" false
+check_var "POSTGRES_HOST" false
+check_var "POSTGRES_PORT" false
+check_var "POSTGRES_DB" false
 check_var "REDIS_URL" false
 check_var "VITE_API_BASE_URL" false
-check_var "SUPABASE_ANON_KEY" false
 
 echo ""
 if [ $MISSING -eq 0 ]; then

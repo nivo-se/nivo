@@ -202,7 +202,7 @@ export default function Colors() {
             href="/design-profile"
             className="text-sm text-gray-500 hover:text-gray-900 underline"
           >
-            Design profile (Investor2 template) →
+            Design profile (Investor template) →
           </a>
         </div>
         <div className="mt-4 pt-4 border-t border-gray-200">

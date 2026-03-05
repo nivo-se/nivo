@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 
 from urllib.parse import urljoin
 
+import certifi
 import requests
 from bs4 import BeautifulSoup
 
@@ -56,7 +57,9 @@ class SerpAPIScraper:
         try:
             self.api_call_count += 1
             logger.info("SerpAPI lookup #%d: %s", self.api_call_count, company_name)
-            response = requests.get(SERP_API_URL, params=params, timeout=20)
+            response = requests.get(
+                SERP_API_URL, params=params, timeout=20, verify=certifi.where()
+            )
             response.raise_for_status()
             data = response.json()
             organic = data.get("organic_results") or []
@@ -79,7 +82,7 @@ class SerpAPIScraper:
 
     def fetch_site_text(self, url: str) -> Optional[str]:
         try:
-            resp = requests.get(url, timeout=30)
+            resp = requests.get(url, timeout=30, verify=certifi.where())
             resp.raise_for_status()
             soup = BeautifulSoup(resp.text, "lxml")
             return " ".join(soup.stripped_strings)[:20000]

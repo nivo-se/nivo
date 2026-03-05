@@ -1,7 +1,8 @@
 """
-Supabase JWT auth for FastAPI.
+JWT auth for FastAPI.
 
 Verifies Bearer token from Authorization header and attaches user to request.state.
+Uses JWT_SECRET or SUPABASE_JWT_SECRET env for verification.
 """
 from __future__ import annotations
 
@@ -30,7 +31,7 @@ def _should_require_auth() -> bool:
 
 
 def _get_jwt_secret() -> Optional[str]:
-    return os.getenv("SUPABASE_JWT_SECRET", "").strip() or None
+    return os.getenv("JWT_SECRET", "").strip() or os.getenv("SUPABASE_JWT_SECRET", "").strip() or None
 
 
 def _verify_token(token: str) -> Optional[dict]:
@@ -75,7 +76,7 @@ def _json_401(request: Request) -> Response:
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     """
-    Verifies Supabase JWT on /api routes when REQUIRE_AUTH=true.
+    Verifies JWT on /api routes when REQUIRE_AUTH=true.
     Sets request.state.user = { sub, email, ... } on success.
     Returns 401 { "error": "unauthorized" } when token missing/invalid.
     """

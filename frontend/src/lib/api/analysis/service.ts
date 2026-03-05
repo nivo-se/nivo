@@ -53,6 +53,7 @@ function mapTemplate(row: Record<string, unknown>): PromptTemplate {
 function mapAnalysisRunToRun(r: AnalysisRunApi): AnalysisRun {
   const total = r.stage1_count ?? r.stage2_count ?? r.stage3_count ?? 0;
   const processed = r.stage3_count ?? 0;
+  const failed = Math.max(0, total - processed);
   const statusMap: Record<string, AnalysisRun["status"]> = {
     running: "running",
     stage_1_complete: "running",
@@ -78,7 +79,7 @@ function mapAnalysisRunToRun(r: AnalysisRunApi): AnalysisRun {
     completed_at: r.completed_at,
     total_companies: total,
     processed_companies: processed,
-    failed_companies: 0,
+    failed_companies: failed,
     estimated_cost: total * perCompanyEstimate,
     actual_cost:
       r.status === "complete" || r.status === "completed"

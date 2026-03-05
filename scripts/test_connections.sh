@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test script to verify all connections are working
-# Railway backend, Vercel frontend, and Supabase
+# Backend on Mac Mini, frontend on Vercel (Railway removed)
 
 echo "🔍 Testing Nivo Platform Connections"
 echo "===================================="
@@ -21,17 +21,17 @@ else
     exit 1
 fi
 
-# Get Railway URL (from user or env)
-RAILWAY_URL="${RAILWAY_URL:-https://vitereactshadcnts-production-fad5.up.railway.app}"
+# Backend URL: Mac Mini API (from env or default local)
+BACKEND_URL="${VITE_API_BASE_URL:-${BACKEND_URL:-http://localhost:8000}}"
 VERCEL_URL="${VERCEL_URL:-https://nivo-web.vercel.app}"
 
-echo "📡 Testing Railway Backend..."
-echo "   URL: $RAILWAY_URL"
+echo "📡 Testing Backend (Mac Mini)..."
+echo "   URL: $BACKEND_URL"
 echo ""
 
-# Test 1: Railway Health Check
-echo "1️⃣  Testing Railway Health Endpoint..."
-HEALTH_RESPONSE=$(curl -s -w "\n%{http_code}" "$RAILWAY_URL/health" 2>/dev/null)
+# Test 1: Backend Health Check
+echo "1️⃣  Testing Backend Health Endpoint..."
+HEALTH_RESPONSE=$(curl -s -w "\n%{http_code}" "$BACKEND_URL/health" 2>/dev/null)
 HTTP_CODE=$(echo "$HEALTH_RESPONSE" | tail -n1)
 BODY=$(echo "$HEALTH_RESPONSE" | sed '$d')
 
@@ -44,9 +44,9 @@ else
 fi
 echo ""
 
-# Test 2: Railway API Status
-echo "2️⃣  Testing Railway API Status Endpoint..."
-STATUS_RESPONSE=$(curl -s -w "\n%{http_code}" "$RAILWAY_URL/api/status" 2>/dev/null)
+# Test 2: Backend API Status
+echo "2️⃣  Testing Backend API Status Endpoint..."
+STATUS_RESPONSE=$(curl -s -w "\n%{http_code}" "$BACKEND_URL/api/status" 2>/dev/null)
 HTTP_CODE=$(echo "$STATUS_RESPONSE" | tail -n1)
 BODY=$(echo "$STATUS_RESPONSE" | sed '$d')
 
@@ -59,13 +59,12 @@ else
 fi
 echo ""
 
-# Test 3: Supabase Connection (via Railway)
-echo "3️⃣  Testing Supabase Connection (via Railway)..."
-if [ -n "$SUPABASE_URL" ]; then
-    echo "   Supabase URL: $SUPABASE_URL"
-    echo -e "   ${GREEN}✅ Supabase URL configured${NC}"
+# Test 3: Database (Postgres on Mac Mini)
+echo "3️⃣  Checking backend database config..."
+if [ "$DATABASE_SOURCE" = "postgres" ] && [ -n "$POSTGRES_HOST" ]; then
+    echo -e "   ${GREEN}✅ DATABASE_SOURCE=postgres, POSTGRES_HOST set${NC}"
 else
-    echo -e "   ${RED}❌ SUPABASE_URL not set${NC}"
+    echo -e "   ${YELLOW}⚠️  DATABASE_SOURCE or POSTGRES_* not set (expected for Mac Mini)${NC}"
 fi
 echo ""
 
@@ -84,30 +83,18 @@ echo ""
 # Test 5: Check Environment Variables
 echo "5️⃣  Checking Environment Variables..."
 MISSING_VARS=()
-
-if [ -z "$SUPABASE_URL" ]; then
-    MISSING_VARS+=("SUPABASE_URL")
-fi
-if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] && [ -z "$SUPABASE_ANON_KEY" ]; then
-    MISSING_VARS+=("SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY")
-fi
-if [ -z "$OPENAI_API_KEY" ]; then
-    MISSING_VARS+=("OPENAI_API_KEY")
-fi
+[ -z "$OPENAI_API_KEY" ] && MISSING_VARS+=("OPENAI_API_KEY")
 
 if [ ${#MISSING_VARS[@]} -eq 0 ]; then
-    echo -e "   ${GREEN}✅ All required environment variables are set${NC}"
+    echo -e "   ${GREEN}✅ Required environment variables are set${NC}"
 else
-    echo -e "   ${YELLOW}⚠️  Missing environment variables:${NC}"
-    for var in "${MISSING_VARS[@]}"; do
-        echo "      - $var"
-    done
+    echo -e "   ${YELLOW}⚠️  Missing: ${MISSING_VARS[*]}${NC}"
 fi
 echo ""
 
-# Test 6: Test API Endpoint (if possible)
+# Test 6: Analytics endpoint
 echo "6️⃣  Testing Financial Filters Analytics Endpoint..."
-ANALYTICS_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$RAILWAY_URL/api/filters/analytics" 2>/dev/null)
+ANALYTICS_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$BACKEND_URL/api/filters/analytics" 2>/dev/null)
 HTTP_CODE=$(echo "$ANALYTICS_RESPONSE" | tail -n1)
 BODY=$(echo "$ANALYTICS_RESPONSE" | sed '$d')
 
@@ -127,15 +114,14 @@ echo "===================================="
 echo "📊 Connection Test Summary"
 echo "===================================="
 echo ""
-echo "✅ Railway Backend: $RAILWAY_URL"
+echo "✅ Backend (Mac Mini): $BACKEND_URL"
 echo "✅ Vercel Frontend: $VERCEL_URL"
 echo ""
 echo "To test the full flow:"
 echo "1. Visit your Vercel frontend: $VERCEL_URL"
 echo "2. Open browser DevTools (F12) → Console tab"
 echo "3. Try using the Financial Filters feature"
-echo "4. Check Network tab for API calls to Railway"
+echo "4. Check Network tab for API calls to backend"
 echo ""
-echo "If you see CORS errors, check Railway CORS settings"
-echo "If you see 404 errors, verify VITE_API_BASE_URL is set in Vercel"
-
+echo "If you see CORS errors, check CORS_ORIGINS / CORS_ALLOW_VERCEL_PREVIEWS on the Mac Mini."
+echo "If you see 404 errors, verify VITE_API_BASE_URL is set in Vercel to your Mac Mini API URL."

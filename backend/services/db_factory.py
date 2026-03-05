@@ -15,7 +15,7 @@ from typing import Literal
 from .database_service import DatabaseService
 
 
-DatabaseSource = Literal["local", "supabase", "postgres"]
+DatabaseSource = Literal["local", "postgres"]
 
 
 def _get_source() -> DatabaseSource:
@@ -24,7 +24,7 @@ def _get_source() -> DatabaseSource:
 
 @lru_cache(maxsize=1)
 def get_database_service() -> DatabaseService:
-    """Return a singleton database service instance based on env var."""
+    """Return a singleton database service instance based on env var. Postgres only."""
     source = _get_source()
 
     if source == "local":
@@ -34,12 +34,6 @@ def get_database_service() -> DatabaseService:
             "  2. Run: docker compose up -d\n"
             "  3. Run: python scripts/bootstrap_postgres_schema.py && ./scripts/run_postgres_migrations.sh\n"
             "See docs/LOCAL_POSTGRES_SETUP.md"
-        )
-
-    if source == "supabase":
-        raise ValueError(
-            "Supabase backend (DATABASE_SOURCE=supabase) is not implemented. "
-            "Use DATABASE_SOURCE=postgres with POSTGRES_* vars or SUPABASE_DB_URL."
         )
 
     if source == "postgres":

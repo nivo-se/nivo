@@ -15,7 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Investor2 from "./pages/Investor2";
+import Investor from "./pages/Investor";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import Colors from "./pages/Colors";
@@ -67,7 +67,7 @@ const App = () => (
             <Route path="/colors/aurora" element={<ColorAuroraDemos />} />
             <Route path="/design-profile" element={<DesignProfile />} />
             <Route path="/landing" element={<Index />} />
-            <Route path="/investor" element={<Investor2 />} />
+            <Route path="/investor" element={<Investor />} />
 
             {/* Default UI */}
             <Route

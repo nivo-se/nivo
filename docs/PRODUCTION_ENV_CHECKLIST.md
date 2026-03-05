@@ -7,20 +7,21 @@ Copy/paste and fill in. These env vars **must** be set in production.
 | Variable | Example | Required |
 |----------|---------|----------|
 | `REQUIRE_AUTH` | `true` | Yes |
-| `SUPABASE_JWT_SECRET` | (from Supabase Project Settings → API → JWT Secret) | Yes when `REQUIRE_AUTH=true` |
+| `JWT_SECRET` | (secret for verifying Bearer tokens) | Yes when `REQUIRE_AUTH=true` |
 
-## Database (Supabase Postgres)
+## Database (Postgres)
 
-Use `DATABASE_SOURCE=postgres` with Supabase's Postgres connection. Do **not** use `DATABASE_SOURCE=supabase` (not implemented; fails fast).
+Use `DATABASE_SOURCE=postgres` with your Postgres connection (Mac Mini or local Docker).
 
 | Variable | Example | Required |
 |----------|---------|----------|
 | `DATABASE_SOURCE` | `postgres` | Yes |
-| `POSTGRES_HOST` | `db.xxxx.supabase.co` | Yes |
-| `POSTGRES_PORT` | `5432` | Yes (Supabase uses 5432; local Docker was 5433) |
-| `POSTGRES_DB` | `postgres` | Yes |
-| `POSTGRES_USER` | `postgres` | Yes |
-| `POSTGRES_PASSWORD` | (from Supabase project) | Yes |
+| `DATABASE_URL` or `POSTGRES_*` | Connection URL or host/port/db/user/password | Yes |
+| `POSTGRES_HOST` | `localhost` or your DB host | When not using `DATABASE_URL` |
+| `POSTGRES_PORT` | `5432` or `5433` (local Docker) | When not using `DATABASE_URL` |
+| `POSTGRES_DB` | `nivo` | Yes |
+| `POSTGRES_USER` | `nivo` | Yes |
+| `POSTGRES_PASSWORD` | (your DB password) | Yes |
 
 ## CORS
 
@@ -35,7 +36,7 @@ Enrichment jobs enqueue to Redis. If Redis is down, enrichment falls back to syn
 
 | Variable | Example | Required |
 |----------|---------|----------|
-| `REDIS_URL` | `redis://default:xxx@xxx.railway.internal:6379` | Yes for async enrichment |
+| `REDIS_URL` | `redis://localhost:6379/0` (Mac Mini) or your Redis URL | Yes for async enrichment |
 
 **Sanity checks:**
 - `POST /api/enrichment/run` returns `{run_id, job_id}`

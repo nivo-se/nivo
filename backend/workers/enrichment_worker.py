@@ -1,5 +1,9 @@
 """
-Background worker for company enrichment
+Background worker for company enrichment.
+
+Uses only DB data and direct URL fetch when we already have a URL.
+Does not use the scraper service or any external website lookup (no DuckDuckGo/SerpAPI).
+Website must come from ai_profiles.website or companies.homepage.
 """
 
 from __future__ import annotations
@@ -11,14 +15,28 @@ from typing import Any, Dict, List, Optional, Set
 
 from rq import get_current_job
 
-from ..api.dependencies import get_supabase_client
 from ..services.db_factory import get_database_service
 from ..llm.provider_factory import get_llm_provider
 from ..workers.ai_analyzer import AIAnalyzer
+import certifi
+import requests
+from bs4 import BeautifulSoup
+
 from ..workers.scrapers.puppeteer_scraper import PuppeteerScraper
-from ..workers.scrapers.serpapi_scraper import SerpAPIScraper
 
 logger = logging.getLogger(__name__)
+
+
+def _fetch_site_text(url: str) -> Optional[str]:
+    """Fetch main text from a URL (requests + BeautifulSoup). No 3rd-party search; use only when we already have the URL."""
+    try:
+        resp = requests.get(url, timeout=30, verify=certifi.where())
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "lxml")
+        return " ".join(soup.stripped_strings)[:20000]
+    except Exception as exc:
+        logger.warning("Failed to fetch site content for %s: %s", url, exc)
+        return None
 
 
 def _update_job_progress(job, progress: int) -> None:
@@ -78,17 +96,6 @@ def enrich_companies_batch(
     job = get_current_job()
 
     db = get_database_service()
-    
-    # Supabase is optional - try to get client, but continue without it
-    supabase = None
-    try:
-        supabase = get_supabase_client()
-        logger.info("Supabase client initialized - ai_profiles will be saved to Supabase")
-    except (ValueError, Exception) as supabase_exc:
-        logger.warning("Supabase not configured (%s) - will save to local SQLite as fallback", supabase_exc)
-        # Will save to local SQLite instead
-    
-    serpapi = SerpAPIScraper()
     puppeteer = PuppeteerScraper()
     llm_provider = get_llm_provider()
     analyzer = AIAnalyzer(llm_provider=llm_provider)
@@ -96,7 +103,7 @@ def enrich_companies_batch(
     total = len(orgnrs)
     enriched = 0
     skipped = 0
-    skipped_with_homepage = 0  # Companies that already had homepage (saved SerpAPI call)
+    skipped_with_homepage = 0  # Companies that had homepage/website in DB (no external lookup)
     errors: List[Dict[str, Any]] = []
 
     logger.info("Starting enrichment for %s companies (force_refresh=%s)", total, force_refresh)
@@ -121,38 +128,17 @@ def enrich_companies_batch(
     existing_profiles: Set[str] = set()
     existing_websites: Dict[str, str] = {}  # orgnr -> website
     if not force_refresh and orgnrs:
-        # Check Supabase first (if available)
-        if supabase:
-            try:
-                profile_response = (
-                    supabase.table("ai_profiles")
-                    .select("org_number, website")
-                    .in_("org_number", orgnrs)
-                    .execute()
-                )
-                if profile_response.data:
-                    for row in profile_response.data:
-                        orgnr_val = row.get("org_number")
-                        if orgnr_val:
-                            existing_profiles.add(orgnr_val)
-                            website_val = row.get("website")
-                            if website_val:
-                                existing_websites[orgnr_val] = website_val
-            except Exception as exc:  # pragma: no cover - best effort
-                logger.warning("Failed to fetch existing profiles from Supabase: %s", exc)
-        
-        else:
-            try:
-                profiles = db.fetch_ai_profiles(orgnrs)
-                for row in profiles:
-                    orgnr_val = row.get("org_number")
-                    if orgnr_val:
-                        existing_profiles.add(orgnr_val)
-                        website_val = row.get("website")
-                        if website_val:
-                            existing_websites[orgnr_val] = website_val
-            except Exception as exc:
-                logger.debug("fetch_ai_profiles failed: %s", exc)
+        try:
+            profiles = db.fetch_ai_profiles(orgnrs)
+            for row in profiles:
+                orgnr_val = row.get("org_number")
+                if orgnr_val:
+                    existing_profiles.add(orgnr_val)
+                    website_val = row.get("website")
+                    if website_val:
+                        existing_websites[orgnr_val] = website_val
+        except Exception as exc:
+            logger.debug("fetch_ai_profiles failed: %s", exc)
         # Always check companies table for homepages (persistent cache)
         try:
             if orgnrs:
@@ -185,10 +171,9 @@ def enrich_companies_batch(
             company_name = company.get("company_name", orgnr)
             existing_homepage = company.get("homepage")
             
-            # Get website - prioritize existing sources to save SerpAPI calls
-            # Priority: 1) existing ai_profiles.website, 2) companies.homepage, 3) SerpAPI lookup
+            # Use only data we have: website from ai_profiles or companies.homepage (no external lookup)
             website = None
-            website_source = None  # Track where we got the website from
+            website_source = None
             if orgnr in existing_websites:
                 website = existing_websites[orgnr]
                 website_source = "ai_profiles"
@@ -198,30 +183,16 @@ def enrich_companies_batch(
                 website = existing_homepage
                 website_source = "companies_table"
                 skipped_with_homepage += 1
-                logger.debug("Using existing homepage from companies table for %s (saved SerpAPI call)", company_name)
-            else:
-                # No existing website - lookup via SerpAPI
-                website = serpapi.lookup_website(company_name, None)
-                if website:
-                    website_source = "serpapi"
-                    # CRITICAL: Save discovered website to companies table so we never search again
-                    try:
-                        db.run_raw_query(
-                            "UPDATE companies SET homepage = ? WHERE orgnr = ?",
-                            [website, orgnr]
-                        )
-                        logger.info("💾 Saved discovered website to companies table: %s -> %s", company_name, website)
-                    except Exception as db_exc:
-                        logger.warning("Failed to save website to companies table for %s: %s", orgnr, db_exc)
-                        # Continue anyway - we'll still save to ai_profiles
-            
+                logger.debug("Using existing homepage from companies table for %s", company_name)
+            # If no website in DB, we skip scraping; AI analysis will use only prompt/DB inputs + OpenAI
+
             scraped_pages: Dict[str, str] = {}
             raw_text: Optional[str] = None
             if website:
                 scraped_pages = puppeteer.scrape_multiple_pages(website) or {}
                 raw_text = _combine_scraped_pages(scraped_pages)
                 if not raw_text:
-                    fallback_text = serpapi.fetch_site_text(website)
+                    fallback_text = _fetch_site_text(website)
                     if fallback_text:
                         scraped_pages = {website: fallback_text}
                         raw_text = fallback_text[:8000]
@@ -267,19 +238,11 @@ def enrich_companies_batch(
                 "date_scraped": scraped_timestamp,
             }
             
-            # Save ai_profile: Supabase when DATABASE_SOURCE=supabase, else DatabaseService
-            if supabase:
-                try:
-                    supabase.table("ai_profiles").upsert(profile, on_conflict="org_number").execute()
-                    logger.info("Saved ai_profile to Supabase for %s", orgnr)
-                except Exception as supabase_exc:
-                    logger.warning("Failed to save to Supabase: %s", supabase_exc)
-            else:
-                try:
-                    db.upsert_ai_profile(profile)
-                    logger.info("Saved ai_profile via DatabaseService for %s", orgnr)
-                except Exception as db_exc:
-                    logger.error("Failed to save ai_profile for %s: %s", orgnr, db_exc)
+            try:
+                db.upsert_ai_profile(profile)
+                logger.info("Saved ai_profile for %s", orgnr)
+            except Exception as db_exc:
+                logger.error("Failed to save ai_profile for %s: %s", orgnr, db_exc)
 
             if run_id:
                 write_kinds = kinds if kinds else ["llm_analysis"]
@@ -297,16 +260,6 @@ def enrich_companies_batch(
                     except Exception as ce_exc:
                         logger.warning("Failed to save company_enrichment for %s: %s", orgnr, ce_exc)
             
-            # Also ensure website is saved to companies table (in case it wasn't saved earlier)
-            if website and not existing_homepage:
-                try:
-                    db.run_raw_query(
-                        "UPDATE companies SET homepage = ? WHERE orgnr = ? AND (homepage IS NULL OR homepage = '')",
-                        [website, orgnr]
-                    )
-                except Exception as db_exc:
-                    logger.debug("Website already saved or update failed for %s: %s", orgnr, db_exc)
-            
             enriched += 1
             existing_profiles.add(orgnr)
         except Exception as exc:
@@ -316,37 +269,22 @@ def enrich_companies_batch(
         progress = int(((i + 1) / max(total, 1)) * 100)
         _update_job_progress(job, progress)
 
-    # Get SerpAPI usage stats
-    serpapi_calls = serpapi.get_api_call_count()
-    
     result = {
         "enriched": enriched,
         "total": total,
         "skipped": skipped,
         "skipped_with_homepage": skipped_with_homepage,
-        "serpapi_calls": serpapi_calls,
-        "serpapi_saved": skipped_with_homepage,  # Number of API calls saved by using existing homepages
+        "serpapi_calls": 0,
+        "search_calls": 0,
+        "serpapi_saved": skipped_with_homepage,
         "errors": errors,
         "success_rate": enriched / total if total > 0 else 0,
         "completed_at": datetime.utcnow().isoformat(),
     }
 
     logger.info(
-        "Enrichment complete: %s/%s companies enriched (skipped=%s, SerpAPI calls=%s, saved=%s)",
-        enriched, total, skipped, serpapi_calls, skipped_with_homepage
+        "Enrichment complete: %s/%s companies enriched (skipped=%s, using DB data only, no external lookup)",
+        enriched, total, skipped
     )
-    
-    # Warn if approaching SerpAPI free tier limit
-    if serpapi_calls > 200:
-        logger.warning(
-            "⚠️  SerpAPI usage: %d calls in this batch. Free tier limit is 250/month. "
-            "Consider upgrading or using smaller batches.",
-            serpapi_calls
-        )
-    elif serpapi_calls > 100:
-        logger.info(
-            "ℹ️  SerpAPI usage: %d calls in this batch. Free tier: 250/month remaining.",
-            serpapi_calls
-        )
     
     return result
