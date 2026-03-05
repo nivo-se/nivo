@@ -392,12 +392,14 @@ async def get_run_companies(run_id: str, recommendation: Optional[str] = None):
 
     try:
         sql = """
-        SELECT a.*, c.company_name, ar.criteria AS run_criteria,
+        SELECT a.*,
+               COALESCE(c.company_name, a.orgnr::text) AS company_name,
+               ar.criteria AS run_criteria,
                r.extracted_products, r.extracted_markets, r.sales_channels, r.digital_score,
                rev.status AS reviewed_status
         FROM company_analysis a
-        JOIN companies c ON c.orgnr = a.orgnr
         JOIN acquisition_runs ar ON ar.id = a.run_id
+        LEFT JOIN companies c ON c.orgnr = a.orgnr
         LEFT JOIN company_research r ON r.orgnr = a.orgnr
         LEFT JOIN analysis_result_reviews rev ON rev.run_id = a.run_id AND rev.orgnr = a.orgnr
         WHERE a.run_id::text = ?

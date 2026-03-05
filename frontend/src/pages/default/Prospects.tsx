@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { ExternalLink, Trash2, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { addProspectNote, deleteProspectNote, updateProspectNote, updateProspectStatus } from "@/lib/api/prospects/service";
+import { addProspectNote, deleteProspectNote, removeProspect, updateProspectNote, updateProspectStatus } from "@/lib/api/prospects/service";
 import type { ProspectStatus } from "@/lib/api/prospects/types";
 import {
   getLatestFinancials,
@@ -119,6 +119,17 @@ function ProspectCard({
     }
   };
 
+  const handleRemoveFromProspects = async () => {
+    if (!confirm(`Remove ${company.display_name} from prospects? This will remove the company and all notes.`)) return;
+    try {
+      await removeProspect(prospect.companyId);
+      queryClient.invalidateQueries({ queryKey: ["app", "prospects"] });
+      toast.success("Removed from prospects");
+    } catch {
+      toast.error("Failed to remove from prospects");
+    }
+  };
+
   if (isLoading || !company) {
     return (
       <div className="bg-card rounded-lg border border-border p-5 animate-pulse">
@@ -191,6 +202,16 @@ function ProspectCard({
                 ? "Add Note"
                 : `${prospect.notes.length} ${prospect.notes.length === 1 ? "note" : "notes"}`}
             </button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+              onClick={handleRemoveFromProspects}
+              title="Remove from prospects"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 

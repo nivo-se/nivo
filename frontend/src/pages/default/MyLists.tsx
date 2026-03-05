@@ -102,7 +102,7 @@ function ListCard({
 
   const stageConfig = getStageConfig(list.stage);
   return (
-    <Card className="app-card hover:shadow-md transition-shadow">
+    <Card className="app-card">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">

@@ -102,7 +102,7 @@ function AppOrClaimFirstAdmin() {
   return <AppLayout />;
 }
 
-/** Root path: show landing page when not logged in, app when logged in. */
+/** Root path: when Auth0 configured, show landing when not logged in and app when logged in; when Auth0 not configured (local dev), show app without login. */
 function RootOrLanding() {
   const { user, loading } = useAuth();
   const authEnabled = isAuth0Configured();
@@ -113,7 +113,15 @@ function RootOrLanding() {
       </div>
     );
   }
-  if (!authEnabled || !user) {
+  // Local dev: Auth0 not configured → no login, go straight to app
+  if (!authEnabled) {
+    return (
+      <ProtectedRoute>
+        <AppOrClaimFirstAdmin />
+      </ProtectedRoute>
+    );
+  }
+  if (!user) {
     return <Index />;
   }
   return (

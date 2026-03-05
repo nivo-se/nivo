@@ -50,7 +50,7 @@
   }
 
   .app-card {
-    @apply rounded-lg border border-border bg-card text-card-foreground;
+    @apply rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary/10;
   }
 
   .app-header {
@@ -74,7 +74,7 @@
   }
 
   .card-elevated {
-    @apply rounded-xl border border-primary/15 bg-card p-6 text-card-foreground shadow-lg shadow-primary/10;
+    @apply rounded-xl border border-primary/15 bg-card p-6 text-card-foreground shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary/10;
   }
 
   .surface-muted {

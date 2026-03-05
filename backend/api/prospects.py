@@ -201,6 +201,25 @@ async def update_prospect(request: Request, company_id: str, body: ProspectUpdat
     return _to_prospect_response(row, notes)
 
 
+@router.delete("/{company_id}")
+async def delete_prospect(request: Request, company_id: str):
+    """Remove a company from the prospects list (and its notes via CASCADE)."""
+    _require_postgres()
+    uid = _require_user(request)
+    db = get_database_service()
+    _ensure_tables(db)
+
+    rows = db.run_raw_query(
+        "SELECT id FROM prospects WHERE company_id = ? AND owner_user_id::text = ? LIMIT 1",
+        [company_id, uid],
+    )
+    if not rows:
+        raise HTTPException(404, "Prospect not found")
+
+    db.run_raw_query("DELETE FROM prospects WHERE id::text = ?", [str(rows[0]["id"])])
+    return {"success": True}
+
+
 @router.post("/{company_id}/notes")
 async def add_prospect_note(request: Request, company_id: str, body: ProspectNoteCreate):
     _require_postgres()

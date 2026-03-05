@@ -59,6 +59,8 @@ export async function deleteProspectNoteClient(companyId: string, noteId: string
   });
 }
 
-export async function deleteProspectClient(_companyId: string): Promise<void> {
-  throw new Error("DELETE /api/prospects/{company_id} is not available on the backend yet");
+export async function deleteProspectClient(companyId: string): Promise<{ success: boolean }> {
+  return requestJson(`/api/prospects/${companyId}`, {
+    method: "DELETE",
+  });
 }

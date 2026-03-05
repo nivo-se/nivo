@@ -6,11 +6,11 @@ alwaysApply: false
 
 # Button Usage
 
-For primary actions, always use `<Button variant="default">`.
+Default `<Button>` has no background (border only). Use it for standard actions.
 
-For secondary actions, use only `secondary`, `outline`, or `ghost`.
+For primary (filled) actions, use `<Button variant="primary">`.
 
-If a button must not be color-filled, use `variant="outline"` or `variant="ghost"`, not `default` or `neutral`.
+For secondary actions, use `default`, `outline`, `secondary`, or `ghost` (all no-fill by default).
 
 Never add local color classes to buttons (`text-blue-*`, `bg-blue-*`, `border-blue-*`, `text-indigo-*`, `bg-sky-*`, etc.).
 

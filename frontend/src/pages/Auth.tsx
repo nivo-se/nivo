@@ -27,13 +27,33 @@ const Auth: React.FC = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
 
   if (!isAuth0Configured()) {
+    const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
+    const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
+    const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-card rounded-2xl p-8 shadow-2xl border border-border text-center">
-          <h1 className="text-base font-bold text-foreground mb-2">Auth Not Configured</h1>
-          <p className="text-muted-foreground">
-            Set VITE_AUTH0_DOMAIN and VITE_AUTH0_CLIENT_ID in frontend/.env
+          <h1 className="text-base font-bold text-foreground mb-2">Local development</h1>
+          <p className="text-muted-foreground mb-4">
+            Auth0 is not configured. No login required — continue to the app.
           </p>
+          <div className="text-left bg-muted/50 rounded-lg p-4 mb-6">
+            <p className="text-xs font-medium text-foreground mb-2">Auth0 status (to test login, set these and restart dev server):</p>
+            <ul className="text-xs text-muted-foreground space-y-1 font-mono">
+              <li>VITE_AUTH0_DOMAIN: {auth0Domain ? "✓ set" : "✗ not set"}</li>
+              <li>VITE_AUTH0_CLIENT_ID: {auth0ClientId ? "✓ set" : "✗ not set"}</li>
+              <li>VITE_AUTH0_AUDIENCE: {auth0Audience ? "✓ set" : "— optional"}</li>
+            </ul>
+            <p className="text-xs text-muted-foreground mt-2">
+              Set in <code className="bg-muted px-1 rounded">frontend/.env</code> or root <code className="bg-muted px-1 rounded">.env</code>, then restart <code className="bg-muted px-1 rounded">npm run dev</code> and reload /auth.
+            </p>
+          </div>
+          <Button
+            className="w-full font-semibold rounded-lg h-12"
+            onClick={() => navigate('/', { replace: true })}
+          >
+            Continue to app
+          </Button>
         </div>
       </div>
     )

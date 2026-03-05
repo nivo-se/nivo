@@ -1,5 +1,6 @@
 import {
   addProspectNoteClient,
+  deleteProspectClient,
   deleteProspectNoteClient,
   getProspectClient,
   getProspectsClient,
@@ -60,4 +61,8 @@ export async function deleteProspectNote(companyId: string, noteIndex: number): 
   const noteId = current?.notes?.[noteIndex]?.id;
   if (!noteId) throw new Error("Prospect note id missing");
   await deleteProspectNoteClient(companyId, noteId);
+}
+
+export async function removeProspect(companyId: string): Promise<void> {
+  await deleteProspectClient(companyId);
 }
