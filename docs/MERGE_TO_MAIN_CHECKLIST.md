@@ -7,15 +7,22 @@
 ## 2. Merge and cleanup (done on this machine)
 
 - [x] Commit any remaining work on current branch (`inverstor-page`)
-- [ ] Fetch latest: `git fetch origin`
-- [ ] Merge `origin/main` into current branch (resolve conflicts if any): `git merge origin/main`
-- [ ] Checkout main: `git checkout main`
-- [ ] Pull main: `git pull origin main`
-- [ ] Merge `inverstor-page` into main: `git merge inverstor-page`
-- [ ] Push main: `git push origin main`
-- [ ] Delete remote branches: `codex-check-db`, `supabase-prepare`, `mini-setup`, `inverstor-page`
-- [ ] Delete local branches (after switching to main): same list
-- [ ] Laptop: next time `git fetch origin && git checkout main && git pull origin main` and delete any local branches that tracked removed remotes
+- [x] Fetch latest and merge `inverstor-page` into main
+- [x] Remove `.env.bak` and `nivo_dump.sql` from history (secrets + large file), add `.env.bak` to .gitignore
+- [x] Push main: `git push origin main --force-with-lease`
+- [x] Delete remote branches: `codex-check-db`, `supabase-prepare`, `mini-setup`, `inverstor-page`
+- [x] Delete local branches: same list
+
+## Laptop (next time you use it for dev)
+
+```bash
+git fetch origin --prune
+git checkout main
+git pull origin main
+git branch -a   # delete any local branches that tracked deleted remotes, e.g. git branch -D inverstor-page
+```
+
+Then create a new branch from main for new work (e.g. `git checkout -b feature/your-feature`).
 
 ## 3. After deploy
 - Log in as admin in production and confirm Admin link + admin functions work.
