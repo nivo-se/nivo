@@ -301,16 +301,6 @@ export default function RunDetail() {
                 </div>
                 <div>
                   <dt className="text-sm font-medium text-muted-foreground">
-                    Auto-approve Results
-                  </dt>
-                  <dd className="text-sm text-foreground mt-1">
-                    {run.config.auto_approve
-                      ? "Yes"
-                      : "No (manual review required)"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-muted-foreground">
                     Overwrite Existing
                   </dt>
                   <dd className="text-sm text-foreground mt-1">

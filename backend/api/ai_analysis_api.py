@@ -307,6 +307,15 @@ async def post_ai_analysis(request: Request) -> Dict[str, Any]:
             )
             run_payload = _run_to_payload(batch.run)
             results = _screening_results_to_payload(batch)
+            if not results and batch.errors:
+                err_msg = batch.run.error_message or "; ".join(batch.errors[:3])
+                if len(batch.errors) > 3:
+                    err_msg += f" (... and {len(batch.errors) - 3} more)"
+                raise HTTPException(
+                    500,
+                    f"AI screening failed for all companies. "
+                    f"Check OPENAI_API_KEY in .env and API logs. Details: {err_msg}",
+                )
             try:
                 db = get_database_service()
                 if hasattr(db, "table_exists") and db.table_exists("acquisition_runs") and db.table_exists("company_analysis"):
@@ -338,6 +347,15 @@ async def post_ai_analysis(request: Request) -> Dict[str, Any]:
             )
             run_payload = _run_to_payload(batch.run)
             companies_payload = _deep_companies_to_payload(batch)
+            if not companies_payload and batch.errors:
+                err_msg = batch.run.error_message or "; ".join(batch.errors[:3])
+                if len(batch.errors) > 3:
+                    err_msg += f" (... and {len(batch.errors) - 3} more)"
+                raise HTTPException(
+                    500,
+                    f"AI deep analysis failed for all companies. "
+                    f"Check OPENAI_API_KEY in .env and API logs. Details: {err_msg}",
+                )
             try:
                 db = get_database_service()
                 if hasattr(db, "table_exists") and db.table_exists("acquisition_runs") and db.table_exists("company_analysis"):

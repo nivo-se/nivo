@@ -545,8 +545,10 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
         }),
       })
       const data = await response.json()
-      if (!data.success) {
-        const msg = response.status === 402 ? (data.error || 'AI spend limit reached') : (data.error || 'AI analysis failed')
+      if (!data.success || !response.ok) {
+        const msg = response.status === 402
+          ? (data.error || 'AI spend limit reached')
+          : (data.detail || data.error || 'AI analysis failed')
         throw new Error(msg)
       }
       

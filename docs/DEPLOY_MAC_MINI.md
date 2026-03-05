@@ -125,8 +125,68 @@ This rebuilds and restarts the API; Postgres keeps running and keeps its data (i
 
 ## 5. Ports and security
 
-- **Postgres:** Not exposed on the host by default. Only the API container (on `nivo_net`) can connect. To run migrations or `pg_dump` from the mini host, you can temporarily add `ports: ["127.0.0.1:5432:5432"]` to the `postgres` service in `docker-compose.yml`.
+- **Postgres:** Exposed on `127.0.0.1:5433` on the host (maps to container 5432) so you can run migrations or `pg_dump` from the mini host.
 - **FastAPI:** Exposed on port 8000. Later you can put **Cloudflare Tunnel** (or similar) in front so the outside world sees only `api.<domain>`.
+
+### 5b. AI runs / “Recent Runs” not showing
+
+The list comes from the `acquisition_runs` table, created by migration `018_create_analysis_tables.sql`. If migrations haven’t been run on the Mac Mini, the table doesn’t exist and the API returns an empty list (no error, just no runs).
+
+**What to do on the Mac Mini**
+
+1. Run Postgres migrations (from your repo directory, e.g. `~/nivo-web` or `/srv/nivo`):
+
+   ```bash
+   cd /srv/nivo
+   export DATABASE_URL="postgresql://nivo:YOUR_POSTGRES_PASSWORD@127.0.0.1:5433/nivo"
+   ./scripts/run_postgres_migrations.sh
+   ```
+
+   Replace `YOUR_POSTGRES_PASSWORD` with the value of `POSTGRES_PASSWORD` from your `.env`.
+
+2. Restart the API (optional, for a clean state):
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. Reload the app in the browser; “Recent Runs” / AI runs should show (existing runs if any, or empty until you start new ones).
+
+**If migrations fail:** The script expects the base schema to exist (e.g. `companies`). If your Mini DB was created only from a dump, that’s usually enough. If you get “relation does not exist” for something like `companies`, run the bootstrap once against the same DB:
+
+   ```bash
+   export DATABASE_URL="postgresql://nivo:YOUR_POSTGRES_PASSWORD@127.0.0.1:5433/nivo"
+   python scripts/bootstrap_postgres_schema.py
+   ```
+
+   Then run `./scripts/run_postgres_migrations.sh` again.
+
+### 5c. AI analysis runs but produces no data (finishes too fast)
+
+If analysis completes almost instantly with empty results, the LLM calls are likely failing. Common causes:
+
+1. **`OPENAI_API_KEY` not set or invalid** — The API uses OpenAI (api.openai.com) by default. Ensure `.env` on the Mac Mini has a real key:
+   ```
+   OPENAI_API_KEY=sk-proj-...   # Real key from platform.openai.com
+   ```
+   If you use a placeholder (e.g. from `.env.example`), the API will return 401 and analysis will fail silently per company.
+
+2. **Check API logs** — On the mini:
+   ```bash
+   docker logs nivo-api --tail 100
+   ```
+   Look for `Failed to persist` or OpenAI/auth errors.
+
+3. **Local/alternative LLM** — To use LM Studio, Azure OpenAI, or another OpenAI-compatible endpoint, set in `.env`:
+   ```
+   LLM_BASE_URL=http://localhost:1234/v1   # or your endpoint
+   LLM_API_KEY=lm-studio                    # or your key
+   ```
+
+4. **Restart after changing .env:**
+   ```bash
+   docker compose up -d --build
+   ```
 
 ---
 

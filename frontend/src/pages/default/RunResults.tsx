@@ -10,13 +10,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   CheckCircle,
-  XCircle,
-  ThumbsUp,
-  ThumbsDown,
   TrendingUp,
   AlertTriangle,
   Sparkles,
@@ -37,13 +33,9 @@ import {
 } from "@/lib/utils/companyMetrics";
 import { ErrorState } from "@/components/default/ErrorState";
 import { EmptyState } from "@/components/default/EmptyState";
-import { approveAnalysisResult, rejectAnalysisResult } from "@/lib/api/analysis/service";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 export default function RunResults() {
   const { runId } = useParams<{ runId: string }>();
-  const queryClient = useQueryClient();
   const { data: run, isError: runError, error: runErrorObj, refetch: refetchRun } = useAIRun(runId ?? "");
   const { data: results = [], isLoading, isError: resultsError, error: resultsErrorObj, refetch: refetchResults } = useRunResults(runId ?? "");
   const { data: template } = usePromptTemplate(run?.template_id ?? "");
@@ -117,9 +109,7 @@ export default function RunResults() {
     return copy;
   };
 
-  const pendingResults = sortResults(results.filter((r) => r.status === "pending"));
-  const approvedResults = sortResults(results.filter((r) => r.status === "approved"));
-  const rejectedResults = sortResults(results.filter((r) => r.status === "rejected"));
+  const sortedResults = sortResults(results);
 
   const getRecommendationBadge = (rec: string) => {
     switch (rec) {
@@ -133,32 +123,6 @@ export default function RunResults() {
         return <Badge className="bg-destructive/15 text-destructive">Pass</Badge>;
       default:
         return null;
-    }
-  };
-
-  const handleApprove = async (resultId: string) => {
-    try {
-      await approveAnalysisResult(resultId);
-      queryClient.invalidateQueries({ queryKey: ["app", "aiRuns", runId ?? "", "results"] });
-      const currentIndex = results.findIndex((r) => r.id === resultId);
-      const nextPending = results.slice(currentIndex + 1).find((r) => r.status === "pending");
-      if (nextPending) setSelectedResultId(nextPending.id);
-      toast.success("Result approved");
-    } catch {
-      toast.error("Approve not yet implemented in backend");
-    }
-  };
-
-  const handleReject = async (resultId: string) => {
-    try {
-      await rejectAnalysisResult(resultId);
-      queryClient.invalidateQueries({ queryKey: ["app", "aiRuns", runId ?? "", "results"] });
-      const currentIndex = results.findIndex((r) => r.id === resultId);
-      const nextPending = results.slice(currentIndex + 1).find((r) => r.status === "pending");
-      if (nextPending) setSelectedResultId(nextPending.id);
-      toast.success("Result rejected");
-    } catch {
-      toast.error("Reject not yet implemented in backend");
     }
   };
 
@@ -195,19 +159,9 @@ export default function RunResults() {
               </p>
             </div>
 
-            <div className="flex gap-4">
-              <div className="text-center">
-                <p className="text-base font-bold text-foreground">{approvedResults.length}</p>
-                <p className="text-xs text-muted-foreground">Approved</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-bold text-foreground">{pendingResults.length}</p>
-                <p className="text-xs text-muted-foreground">Pending</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-bold text-muted-foreground">{rejectedResults.length}</p>
-                <p className="text-xs text-muted-foreground">Rejected</p>
-              </div>
+            <div className="text-center">
+              <p className="text-base font-bold text-foreground">{results.length}</p>
+              <p className="text-xs text-muted-foreground">Companies analyzed</p>
             </div>
           </div>
         </div>
@@ -235,13 +189,6 @@ export default function RunResults() {
               <span className="text-muted-foreground">Cost</span>
               <span className="font-medium text-foreground">
                 est {run.estimated_cost.toFixed(4)} • actual {run.actual_cost.toFixed(4)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-muted-foreground">Config</span>
-              <span className="font-medium text-foreground">
-                auto-approve {run.config?.auto_approve ? "on" : "off"} • overwrite{" "}
-                {run.config?.overwrite_existing ? "on" : "off"}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
@@ -283,68 +230,22 @@ export default function RunResults() {
                 </Select>
               </div>
 
-              <Tabs defaultValue="pending">
-                <TabsList className="w-full grid grid-cols-3">
-                  <TabsTrigger value="pending">Pending ({pendingResults.length})</TabsTrigger>
-                  <TabsTrigger value="approved">Approved ({approvedResults.length})</TabsTrigger>
-                  <TabsTrigger value="rejected">Rejected ({rejectedResults.length})</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="pending" className="space-y-2 mt-4">
-                  {pendingResults.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">No pending results</p>
-                  ) : (
-                    pendingResults.map((result) => (
-                      <ResultCard
-                        key={result.id}
-                        result={result}
-                        selectedId={selectedResultId}
-                        onSelect={setSelectedResultId}
-                        badge={getRecommendationBadge(result.recommendation)}
-                        scoreClass="text-foreground"
-                      />
-                    ))
-                  )}
-                </TabsContent>
-
-                <TabsContent value="approved" className="space-y-2 mt-4">
-                  {approvedResults.map((result) => (
-                    <ResultCard
-                      key={result.id}
-                      result={result}
-                      selectedId={selectedResultId}
-                      onSelect={setSelectedResultId}
-                      badge={getRecommendationBadge(result.recommendation)}
-                      scoreClass="text-foreground"
-                      icon={<CheckCircle className="w-4 h-4 text-foreground" />}
-                    />
-                  ))}
-                </TabsContent>
-
-                <TabsContent value="rejected" className="space-y-2 mt-4">
-                  {rejectedResults.map((result) => (
-                    <ResultCard
-                      key={result.id}
-                      result={result}
-                      selectedId={selectedResultId}
-                      onSelect={setSelectedResultId}
-                      badge={getRecommendationBadge(result.recommendation)}
-                      scoreClass="text-muted-foreground"
-                      icon={<XCircle className="w-4 h-4 text-muted-foreground" />}
-                      opacity
-                    />
-                  ))}
-                </TabsContent>
-              </Tabs>
+              <div className="space-y-2">
+                {sortedResults.map((result) => (
+                  <ResultCard
+                    key={result.id}
+                    result={result}
+                    selectedId={selectedResultId}
+                    onSelect={setSelectedResultId}
+                    badge={getRecommendationBadge(result.recommendation)}
+                    scoreClass="text-foreground"
+                  />
+                ))}
+              </div>
             </div>
 
             {selectedResult ? (
-              <ResultDetail
-                result={selectedResult}
-                template={template}
-                onApprove={handleApprove}
-                onReject={handleReject}
-              />
+              <ResultDetail result={selectedResult} template={template} />
             ) : (
               <div className="bg-card rounded-lg border border-border p-8 text-center">
                 <p className="text-sm text-muted-foreground">Select a result to view details</p>
@@ -363,21 +264,17 @@ function ResultCard({
   onSelect,
   badge,
   scoreClass,
-  icon,
-  opacity,
 }: {
   result: { id: string; company_orgnr: string; overall_score: number; recommendation: string };
   selectedId: string | null;
   onSelect: (id: string) => void;
   badge: React.ReactNode;
   scoreClass: string;
-  icon?: React.ReactNode;
-  opacity?: boolean;
 }) {
   const { data: company } = useCompany(result.company_orgnr);
   return (
     <Card
-      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-border" : ""} ${opacity ? "opacity-60" : ""}`}
+      className={`cursor-pointer ${selectedId === result.id ? "ring-2 ring-border" : ""}`}
       onClick={() => onSelect(result.id)}
     >
       <CardContent className="p-4">
@@ -391,11 +288,9 @@ function ResultCard({
         </div>
         <div className="flex items-center justify-between">
           {badge}
-          {icon ?? (
-            <span className="text-xs text-muted-foreground">
-              {company?.industry_label}
-            </span>
-          )}
+          <span className="text-xs text-muted-foreground">
+            {company?.industry_label}
+          </span>
         </div>
       </CardContent>
     </Card>
@@ -405,8 +300,6 @@ function ResultCard({
 function ResultDetail({
   result,
   template,
-  onApprove,
-  onReject,
 }: {
   result: {
     id: string;
@@ -417,17 +310,12 @@ function ResultDetail({
     strengths: string[];
     concerns: string[];
     prompt_used?: string;
-    status?: string;
     dimension_scores?: Record<string, number>;
     analyzed_at?: string;
     tokens_used?: number;
     cost?: number;
-    approved_at?: string;
-    approved_by?: string;
   };
   template: { scoringDimensions: { id: string; name: string; description?: string }[] };
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
 }) {
   const { data: company } = useCompany(result.company_orgnr);
 
@@ -467,21 +355,9 @@ function ResultDetail({
                 {company?.industry_label} • {company?.region ?? ""}
               </p>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span>
-                  Review:{" "}
-                  {result.status === "approved"
-                    ? "Approved"
-                    : result.status === "rejected"
-                      ? "Rejected"
-                      : "Pending review"}
-                </span>
                 <span>Analyzed: {result.analyzed_at ? new Date(result.analyzed_at).toLocaleString() : "—"}</span>
                 <span>Tokens: {result.tokens_used ?? "—"}</span>
                 <span>Cost: {typeof result.cost === "number" ? result.cost.toFixed(4) : "—"}</span>
-                {result.approved_at && (
-                  <span>Approved: {new Date(result.approved_at).toLocaleString()}</span>
-                )}
-                {result.approved_by && <span>By: {result.approved_by}</span>}
               </div>
             </div>
             <div className="text-right">
@@ -678,24 +554,6 @@ function ResultDetail({
         </div>
       )}
 
-      {result.status === "pending" && (
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-          <Button
-            variant="outline"
-            onClick={() => onReject(result.id)}
-          >
-            <ThumbsDown className="w-4 h-4 mr-2" />
-            Reject
-          </Button>
-          <Button
-            className="btn-neutral"
-            onClick={() => onApprove(result.id)}
-          >
-            <ThumbsUp className="w-4 h-4 mr-2" />
-            Approve
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

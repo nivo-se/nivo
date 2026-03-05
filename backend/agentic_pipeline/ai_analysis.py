@@ -469,11 +469,25 @@ class AgenticLLMAnalyzer:
         openai_client: Optional[OpenAI] = None,
     ) -> None:
         config.ensure_output_dir()
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY", "")
         if not api_key and openai_client is None:
-            raise ValueError("OPENAI_API_KEY environment variable is required to run AI analysis.")
+            raise ValueError(
+                "OPENAI_API_KEY (or LLM_API_KEY) environment variable is required to run AI analysis. "
+                "Set it in .env on the Mac Mini."
+            )
         self.config = config
-        self.client = openai_client or OpenAI(api_key=api_key)
+        if openai_client is not None:
+            self.client = openai_client
+        else:
+            kwargs: dict[str, Any] = {"api_key": api_key}
+            base_url = (os.getenv("LLM_BASE_URL") or os.getenv("OPENAI_BASE_URL") or "").strip()
+            if base_url:
+                base_url = base_url.rstrip("/")
+                if not base_url.endswith("/v1"):
+                    base_url = f"{base_url}/v1"
+                kwargs["base_url"] = base_url
+                logger.info("AI analysis using LLM base_url=%s", base_url)
+            self.client = OpenAI(**kwargs)
 
     def run(
         self,

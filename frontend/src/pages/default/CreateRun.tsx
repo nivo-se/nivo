@@ -30,7 +30,6 @@ export default function CreateRun() {
   const companyCount = singleCompanyMode ? 1 : (list?.companyIds.length ?? 0);
 
   const [runName, setRunName] = useState("");
-  const [autoApprove, setAutoApprove] = useState(false);
   const [overwriteExisting, setOverwriteExisting] = useState(false);
 
   useEffect(() => {
@@ -45,10 +44,9 @@ export default function CreateRun() {
   const baseCostPerCompany = 0.02;
   const perDimensionCost = 0.003;
   const overwriteSurcharge = overwriteExisting ? 0.004 : 0;
-  const autoApproveDiscount = autoApprove ? 0.001 : 0;
   const estimatedCostPerCompany = Math.max(
     0.01,
-    baseCostPerCompany + dimensionCount * perDimensionCost + overwriteSurcharge - autoApproveDiscount
+    baseCostPerCompany + dimensionCount * perDimensionCost + overwriteSurcharge
   );
   const estimatedCost = companyCount * estimatedCostPerCompany;
 
@@ -58,14 +56,8 @@ export default function CreateRun() {
   );
   const estimatedTime = companyCount > 0 ? Math.ceil(companyCount / companiesPerMinute) : 0;
 
-  const handleAutoApproveChange = (checked: boolean) => {
-    setAutoApprove(checked);
-    if (checked) setOverwriteExisting(false);
-  };
-
   const handleOverwriteChange = (checked: boolean) => {
     setOverwriteExisting(checked);
-    if (checked) setAutoApprove(false);
   };
 
   const handleCreateRun = async () => {
@@ -76,7 +68,7 @@ export default function CreateRun() {
         name: runName.trim(),
         template_id: template.id,
         config: {
-          auto_approve: autoApprove,
+          auto_approve: true,
           overwrite_existing: overwriteExisting,
         },
       };
@@ -229,26 +221,6 @@ export default function CreateRun() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Checkbox
-                    id="auto-approve"
-                    checked={autoApprove}
-                    onCheckedChange={(c) => handleAutoApproveChange(c === true)}
-                    className="focus-visible:ring-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground"
-                  />
-                  <div>
-                    <label
-                      htmlFor="auto-approve"
-                      className="text-sm font-medium text-foreground cursor-pointer"
-                    >
-                      Auto-approve results
-                    </label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Automatically approve all AI results without manual review.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Checkbox
                     id="overwrite"
                     checked={overwriteExisting}
                     onCheckedChange={(c) => handleOverwriteChange(c === true)}
@@ -267,9 +239,6 @@ export default function CreateRun() {
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  These options are mutually exclusive, so only one can be enabled at a time.
-                </p>
               </div>
             </CardContent>
           </Card>

@@ -260,30 +260,26 @@ export async function cancelAnalysisRun(runId: string): Promise<AnalysisRun> {
 }
 
 export async function getAnalysisRunResults(runId: string): Promise<AnalysisResult[]> {
-  try {
-    const res = await getAnalysisRunCompaniesClient(runId);
-    const companies = Array.isArray(res.companies) ? res.companies : [];
-    return companies.map((c) =>
-      mapCompanyAnalysisToResult(
-        {
-          orgnr: String(c.orgnr ?? ""),
-          strategic_fit_score:
-            typeof c.strategic_fit_score === "number" ? c.strategic_fit_score : undefined,
-          recommendation: typeof c.recommendation === "string" ? c.recommendation : undefined,
-          result_status: typeof c.result_status === "string" ? c.result_status : undefined,
-          investment_memo: typeof c.investment_memo === "string" ? c.investment_memo : undefined,
-          swot_strengths: Array.isArray(c.swot_strengths) ? c.swot_strengths.map(String) : undefined,
-          swot_weaknesses: Array.isArray(c.swot_weaknesses) ? c.swot_weaknesses.map(String) : undefined,
-          swot_opportunities: Array.isArray(c.swot_opportunities) ? c.swot_opportunities.map(String) : undefined,
-          swot_threats: Array.isArray(c.swot_threats) ? c.swot_threats.map(String) : undefined,
-          dimension_scores: c.dimension_scores,
-        },
-        runId
-      )
-    );
-  } catch {
-    return [];
-  }
+  const res = await getAnalysisRunCompaniesClient(runId);
+  const companies = Array.isArray(res.companies) ? res.companies : [];
+  return companies.map((c) =>
+    mapCompanyAnalysisToResult(
+      {
+        orgnr: String(c.orgnr ?? ""),
+        strategic_fit_score:
+          typeof c.strategic_fit_score === "number" ? c.strategic_fit_score : undefined,
+        recommendation: typeof c.recommendation === "string" ? c.recommendation : undefined,
+        result_status: typeof c.result_status === "string" ? c.result_status : undefined,
+        investment_memo: typeof c.investment_memo === "string" ? c.investment_memo : undefined,
+        swot_strengths: Array.isArray(c.swot_strengths) ? c.swot_strengths.map(String) : undefined,
+        swot_weaknesses: Array.isArray(c.swot_weaknesses) ? c.swot_weaknesses.map(String) : undefined,
+        swot_opportunities: Array.isArray(c.swot_opportunities) ? c.swot_opportunities.map(String) : undefined,
+        swot_threats: Array.isArray(c.swot_threats) ? c.swot_threats.map(String) : undefined,
+        dimension_scores: c.dimension_scores,
+      },
+      runId
+    )
+  );
 }
 
 export async function approveAnalysisResult(resultId: string): Promise<AnalysisResult> {
