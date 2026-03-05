@@ -42,6 +42,7 @@ venv.bak/
 
 # Environment variables
 .env
+.env.bak
 .env.local
 .env.vercel
 .env.development.local
