@@ -1,17 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { supabaseConfig } from '../lib/supabase'
+import { isAuth0Configured } from '../lib/authToken'
 import { Loader2, Clock, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 import { Button } from './ui/button'
+
+const AUTH_SETTLE_MS = 5000 // Grace period after navigation before redirecting to /auth (Auth0 signup/login may need time to propagate)
 
 interface ProtectedRouteProps {
   children: React.ReactNode
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading, isApproved, userRole } = useAuth()
-  const authEnabled = supabaseConfig.isConfigured
+  const navigate = useNavigate()
+  const { user, loading, isApproved } = useAuth()
+  const authEnabled = isAuth0Configured()
+  const [graceExpired, setGraceExpired] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setGraceExpired(true), AUTH_SETTLE_MS)
+    return () => clearTimeout(t)
+  }, [])
+
+  // Redirect to /auth when not logged in—but only after grace period (avoids redirect loop right after callback)
+  useEffect(() => {
+    if (!authEnabled || !graceExpired) return
+    if (loading || user) return
+    navigate('/auth', { replace: true })
+  }, [authEnabled, loading, user, navigate, graceExpired])
 
   if (!authEnabled) {
     return <>{children}</>
@@ -28,9 +45,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     )
   }
 
+  // During grace period after nav from callback, show loading instead of redirecting (Auth0 may still be settling)
+  if (!user && !graceExpired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!user) {
-    // Redirect to auth page
-    window.location.href = '/auth'
     return null
   }
 
@@ -58,9 +85,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           <div className="mt-6 text-center">
             <Button 
               variant="outline" 
-              onClick={() => {
-                window.location.href = '/auth'
-              }}
+              onClick={() => navigate('/auth')}
             >
               Back to Login
             </Button>

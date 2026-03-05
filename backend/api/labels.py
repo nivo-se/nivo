@@ -87,7 +87,7 @@ async def add_label(request: Request, orgnr: str, body: LabelCreate):
         db.run_raw_query(
             """
             INSERT INTO company_labels (orgnr, label, scope, created_by_user_id)
-            VALUES (?, ?, ?, ?::uuid)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT (orgnr, label, scope, created_by_user_id) DO NOTHING
             """,
             [orgnr, body.label.strip(), body.scope, uid],

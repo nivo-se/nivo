@@ -1,18 +1,13 @@
 /**
- * Fetch with Supabase auth token for backend API calls.
- * Attaches Authorization: Bearer <access_token> when session exists.
- * Catches network errors and throws a more helpful message.
+ * Fetch with Auth0 access token for backend API calls.
+ * Attaches Authorization: Bearer <access_token> when available.
  */
-import { supabase } from './supabase'
+import { getAccessToken } from './authToken'
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  if (!supabase) return {}
   try {
-    const { data: { session } } = await supabase.auth.getSession()
-    const token = session?.access_token
-    if (token) {
-      return { Authorization: `Bearer ${token}` }
-    }
+    const token = await getAccessToken()
+    if (token) return { Authorization: `Bearer ${token}` }
   } catch {
     // ignore
   }
@@ -46,7 +41,8 @@ export async function fetchWithAuth(
       const base = new URL(url).origin
       throw new Error(
         `Cannot reach backend at ${base}. Is the backend running? ` +
-        `Check VITE_API_BASE_URL in .env (e.g. http://localhost:8000 or http://localhost:8001).`
+        `If using api.nivogroup.se: ensure the Cloudflare tunnel and API are running on the Mac. ` +
+        `Use the Troubleshooting → Test connection on this page to diagnose.`
       )
     }
     throw e

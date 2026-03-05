@@ -8,7 +8,7 @@ import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Target, TrendingUp, DollarSign, Users } from 'lucide-react'
 import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
-import { supabaseConfig } from '../lib/supabase'
+import { isAuth0Configured } from '../lib/authToken'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
 import BusinessRulesConfig from '../components/BusinessRulesConfig'
 import DataExport from '../components/DataExport'
@@ -28,7 +28,7 @@ const WorkingDashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const { user, userRole, signOut } = useAuth()
-  const supabaseEnabled = supabaseConfig.isConfigured
+  const authEnabled = isAuth0Configured()
 
   // Load dashboard analytics
   useEffect(() => {
@@ -56,8 +56,8 @@ const WorkingDashboard: React.FC = () => {
     loadAnalytics()
   }, [])
 
-  // Check if user is admin
-  const isAdmin = userRole === 'admin' || user?.email === 'jesper@rgcapital.se'
+  // Admin: backend returns role from GET /api/me (local Postgres user_roles). Backend enforces 403.
+  const isAdmin = userRole === 'admin'
 
   interface MenuItem {
     id: string
@@ -196,7 +196,7 @@ const WorkingDashboard: React.FC = () => {
               </p>
             </div>
 
-            {!supabaseEnabled && (
+            {!authEnabled && (
               <Alert>
                 <AlertDescription>
                   Supabase-integration är inte konfigurerad i denna miljö. Instrumentpanelen använder det incheckade demo-

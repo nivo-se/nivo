@@ -1,4 +1,5 @@
 import { API_BASE } from "@/lib/apiClient";
+import { fetchWithAuth } from "@/lib/backendFetch";
 
 export type WhoAmI = {
   api_base: string;
@@ -11,7 +12,7 @@ export type WhoAmI = {
 };
 
 export async function fetchWhoAmI(): Promise<WhoAmI> {
-  const res = await fetch(`${API_BASE}/api/debug/whoami`);
+  const res = await fetchWithAuth(`${API_BASE}/api/debug/whoami`);
   if (!res.ok) throw new Error(`whoami failed: ${res.status}`);
   return res.json();
 }

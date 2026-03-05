@@ -1,58 +1,80 @@
 import { fetchWithAuth } from "@/lib/backendFetch";
 import { API_BASE } from "@/lib/apiClient";
 
-export type UserRole = "pending" | "approved" | "admin";
+/** Role in local Postgres (user_roles). */
+export type UserRole = "admin" | "analyst";
 
-export async function createUser(
-  email: string,
-  password: string,
-  role: UserRole,
-  options?: { first_name?: string; last_name?: string }
-): Promise<{ user_id: string; email: string; role: string; message: string }> {
-  const body: Record<string, unknown> = { email, password, role };
-  if (options?.first_name != null) body.first_name = options.first_name;
-  if (options?.last_name != null) body.last_name = options.last_name;
-  const res = await fetchWithAuth(`${API_BASE}/api/admin/users`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export interface UserRoleRow {
+  sub: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
 
+export interface AllowedUserRow {
+  sub: string;
+  enabled: boolean;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminUsersResponse {
+  user_roles: UserRoleRow[];
+  allowed_users: AllowedUserRow[];
+}
+
+/** List all user_roles and allowed_users. Admin only. */
+export async function getAdminUsers(): Promise<AdminUsersResponse> {
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/users`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const msg =
       (err as { detail?: string }).detail ||
       (err as { message?: string }).message ||
-      "Failed to create user";
+      "Failed to load users";
     throw new Error(msg);
   }
-
   return res.json();
 }
 
-export async function updateUserProfile(
-  userId: string,
-  profile: { first_name?: string | null; last_name?: string | null }
-): Promise<{ message: string }> {
-  const body: Record<string, string | null> = {};
-  if (profile.first_name !== undefined) body.first_name = profile.first_name ?? null;
-  if (profile.last_name !== undefined) body.last_name = profile.last_name ?? null;
-
-  const res = await fetchWithAuth(`${API_BASE}/api/admin/users/${encodeURIComponent(userId)}`, {
-    method: "PATCH",
+/** Set role for user by sub. Admin only. */
+export async function setUserRole(sub: string, role: UserRole): Promise<{ sub: string; role: string }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/users/${encodeURIComponent(sub)}/role`, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ role }),
   });
-
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const msg =
       (err as { detail?: string }).detail ||
       (err as { message?: string }).message ||
-      "Failed to update name";
+      "Failed to set role";
     throw new Error(msg);
   }
+  return res.json();
+}
 
+/** Set allowlist entry for sub. Admin only. */
+export async function setUserAllow(
+  sub: string,
+  enabled: boolean,
+  note?: string | null
+): Promise<{ sub: string; enabled: boolean; note?: string | null }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/users/${encodeURIComponent(sub)}/allow`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled, note: note ?? null }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg =
+      (err as { detail?: string }).detail ||
+      (err as { message?: string }).message ||
+      "Failed to update allowlist";
+    throw new Error(msg);
+  }
   return res.json();
 }
 

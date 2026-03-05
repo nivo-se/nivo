@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 
 interface HeaderProps {
   className?: string;
@@ -81,38 +81,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         <div className="hidden md:flex items-center space-x-8">
           <NavLinks scrollToSection={scrollToSection} isScrolled={isScrolled} />
           
-          {/* Auth buttons */}
-          <div className="flex items-center space-x-2">
-            {user ? (
-              <>
-                <NavLink to="/dashboard">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className={cn(
-                      "flex items-center space-x-1",
-                      isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
-                    )}
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Button>
-                </NavLink>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={handleSignOut}
-                  className={cn(
-                    "flex items-center space-x-1",
-                    isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
-                  )}
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
-                </Button>
-              </>
-            ) : (
-              <NavLink to="/auth">
+          {/* Auth buttons - only show when logged in; login via /auth for those who know */}
+          {user && (
+            <div className="flex items-center space-x-2">
+              <NavLink to="/dashboard">
                 <Button 
                   variant="ghost" 
                   size="sm"
@@ -121,12 +93,24 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                     isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
                   )}
                 >
-                  <LogIn className="h-4 w-4" />
-                  <span>Sign In</span>
+                  <User className="h-4 w-4" />
+                  <span>Dashboard</span>
                 </Button>
               </NavLink>
-            )}
-          </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleSignOut}
+                className={cn(
+                  "flex items-center space-x-1",
+                  isScrolled ? "text-foreground hover:text-accent" : "text-primary-foreground hover:text-primary-foreground/80"
+                )}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </Button>
+            </div>
+          )}
         </div>
         
         <button 
@@ -198,8 +182,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             Kontakt
           </button>
           
-          {/* Mobile Auth Options */}
-          {user ? (
+          {/* Mobile Auth - only show when logged in */}
+          {user && (
             <>
               <NavLink 
                 to="/dashboard" 
@@ -220,15 +204,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
                 <span>Sign Out</span>
               </button>
             </>
-          ) : (
-            <NavLink 
-              to="/auth" 
-              className="text-left hover:text-accent transition-colors flex items-center space-x-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <LogIn className="h-4 w-4" />
-              <span>Sign In</span>
-            </NavLink>
           )}
         </nav>
       </div>

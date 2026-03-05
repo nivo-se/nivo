@@ -7,8 +7,7 @@ import { Shield, AlertTriangle } from 'lucide-react';
 const Admin: React.FC = () => {
   const { user, userRole } = useAuth();
 
-  // Check if user is admin
-  const isAdmin = userRole === 'admin' || user?.email === 'jesper@rgcapital.se';
+  const isAdmin = userRole === 'admin';
 
   if (!isAdmin) {
     return (

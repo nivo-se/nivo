@@ -3,147 +3,92 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Loader2, Users, CheckCircle, XCircle, Clock, Shield, Mail, Calendar, Database, BarChart3, Globe, TrendingUp, Eye, Info, UserPlus } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { supabaseDataService } from '../lib/supabaseDataService';
-import { createUser, updateUserProfile, type UserRole } from '../lib/services/adminService';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
+import { Loader2, Users, Shield, Mail, Eye, Info, UserPlus, XCircle, CheckCircle } from 'lucide-react';
+import {
+  getAdminUsers,
+  setUserRole,
+  setUserAllow,
+  type UserRole,
+  type AdminUsersResponse,
+} from '../lib/services/adminService';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-interface User {
-  id: string;
-  user_id: string;
-  email: string;
-  first_name?: string | null;
-  last_name?: string | null;
-  role: 'admin' | 'approved' | 'pending';
+/** Merged row: sub + role (from user_roles) + allowed (from allowed_users). */
+interface UserRow {
+  sub: string;
+  role: string;
   created_at: string;
   updated_at: string;
-  approved_by: string | null;
-  approved_at: string | null;
-}
-
-interface SystemMetrics {
-  totalUsers: number;
-  pendingUsers: number;
-  approvedUsers: number;
-  adminUsers: number;
-  databaseConnected: boolean;
+  enabled: boolean;
+  note: string | null;
 }
 
 interface AdminPanelProps {
-  currentUser: any;
+  currentUser: { id: string; email?: string | null } | null;
+}
+
+function mergeAdminUsers(data: AdminUsersResponse): UserRow[] {
+  const bySub = new Map<string, UserRow>();
+  for (const r of data.user_roles) {
+    bySub.set(r.sub, {
+      sub: r.sub,
+      role: r.role,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+      enabled: true,
+      note: null,
+    });
+  }
+  for (const a of data.allowed_users) {
+    const row = bySub.get(a.sub);
+    if (row) {
+      row.enabled = a.enabled;
+      row.note = a.note;
+    } else {
+      bySub.set(a.sub, {
+        sub: a.sub,
+        role: '',
+        created_at: a.created_at,
+        updated_at: a.updated_at,
+        enabled: a.enabled,
+        note: a.note,
+      });
+    }
+  }
+  return Array.from(bySub.values()).sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
-  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
-  const [addEmail, setAddEmail] = useState('');
-  const [addPassword, setAddPassword] = useState('');
-  const [addFirstName, setAddFirstName] = useState('');
-  const [addLastName, setAddLastName] = useState('');
-  const [addRole, setAddRole] = useState<UserRole>('approved');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [addSub, setAddSub] = useState('');
+  const [addRole, setAddRole] = useState<UserRole>('analyst');
   const [addSubmitting, setAddSubmitting] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
-  const [editFirstName, setEditFirstName] = useState('');
-  const [editLastName, setEditLastName] = useState('');
+  const [editRole, setEditRole] = useState<UserRole>('analyst');
+  const [editEnabled, setEditEnabled] = useState(true);
+  const [editNote, setEditNote] = useState('');
 
-  // Fetch all users
   const fetchUsers = async () => {
     try {
       setLoading(true);
-
-      if (!supabase) {
-        setError('Supabase is not configured (auth disabled or paused). User management unavailable.');
-        if (currentUser?.email === 'jesper@rgcapital.se') {
-          setUsers([{
-            id: 'fallback-admin',
-            user_id: currentUser.id,
-            role: 'admin' as const,
-            email: currentUser.email,
-            approved_by: 'system',
-            approved_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }]);
-        } else {
-          setUsers([]);
-        }
-        return;
-      }
-
-      // Get user roles
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (rolesError) {
-        throw rolesError;
-      }
-      
-      // Try to get user emails, but fallback to user ID if not possible
-      console.log('Processing', userRoles?.length || 0, 'users...');
-      const usersWithEmails = userRoles?.map(userRole => {
-        // For now, we'll use a more user-friendly display
-        // In a real implementation, you'd need proper admin permissions to fetch emails
-        const userIdShort = userRole.user_id.slice(0, 8);
-        return {
-          ...userRole,
-          email: `user-${userIdShort}@nivo.local` // More readable format
-        };
-      }) || [];
-      
-      console.log('Processed users:', usersWithEmails.map(u => u.email));
-      
-      setUsers(usersWithEmails);
-    } catch (err: any) {
-      setError(err.message);
-      
-      // Fallback: If we can't fetch from database, show current user as admin
-      if (currentUser?.email === 'jesper@rgcapital.se') {
-        setUsers([{
-          id: 'fallback-admin',
-          user_id: currentUser.id,
-          role: 'admin' as const,
-          email: currentUser.email,
-          approved_by: 'system',
-          approved_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }]);
-      }
+      setError(null);
+      const data = await getAdminUsers();
+      setUsers(mergeAdminUsers(data));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load users');
+      setUsers([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Fetch system metrics
-  const fetchSystemMetrics = async () => {
-    try {
-      // Count users by role
-      const pendingUsers = users.filter(user => user.role === 'pending').length;
-      const approvedUsers = users.filter(user => user.role === 'approved').length;
-      const adminUsers = users.filter(user => user.role === 'admin').length;
-      
-      setSystemMetrics({
-        totalUsers: users.length,
-        pendingUsers,
-        approvedUsers,
-        adminUsers,
-        databaseConnected: true
-      });
-    } catch (error) {
-      console.error('Error fetching system metrics:', error);
     }
   };
 
@@ -151,103 +96,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     fetchUsers();
   }, []);
 
-  // Update system metrics when users change
-  useEffect(() => {
-    if (users.length > 0) {
-      fetchSystemMetrics();
-    }
-  }, [users]);
-
-  // Approve user
-  const approveUser = async (userId: string) => {
-    if (!supabase) {
-      setError('Supabase not configured');
-      return;
-    }
-    try {
-      setActionLoading(userId);
-      const { error } = await supabase
-        .from('user_roles')
-        .update({
-          role: 'approved',
-          approved_by: currentUser.id,
-          approved_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      setSuccess('User approved successfully!');
-      await fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // Reject user
-  const rejectUser = async (userId: string) => {
-    if (!supabase) {
-      setError('Supabase not configured');
-      return;
-    }
-    try {
-      setActionLoading(userId);
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      setSuccess('User rejected and removed!');
-      await fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // Make user admin
-  const makeAdmin = async (userId: string) => {
-    if (!supabase) {
-      setError('Supabase not configured');
-      return;
-    }
-    try {
-      setActionLoading(userId);
-      const { error } = await supabase
-        .from('user_roles')
-        .update({
-          role: 'admin',
-          approved_by: currentUser.id,
-          approved_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      setSuccess('User promoted to admin!');
-      await fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
         return <Badge variant="destructive"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
-      case 'approved':
-        return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
-      case 'pending':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+      case 'analyst':
+        return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />Analyst</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">No role</Badge>;
     }
   };
 
@@ -257,96 +113,95 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const handleUserClick = (user: User) => {
-    setSelectedUser(user);
-    setEditFirstName(user.first_name ?? '');
-    setEditLastName(user.last_name ?? '');
-    setIsUserDialogOpen(true);
-  };
-
-  const handleUpdateName = async () => {
-    if (!selectedUser) return;
-    setActionLoading(selectedUser.id);
+  const handleSetRole = async (sub: string, role: UserRole) => {
     try {
-      await updateUserProfile(selectedUser.user_id, {
-        first_name: editFirstName.trim() || null,
-        last_name: editLastName.trim() || null,
-      });
-      setSuccess('Name updated');
+      setActionLoading(sub);
+      setError(null);
+      await setUserRole(sub, role);
+      setSuccess(`Role set to ${role}`);
       await fetchUsers();
-      setSelectedUser({ ...selectedUser, first_name: editFirstName.trim() || null, last_name: editLastName.trim() || null });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to update name');
+      setError(err instanceof Error ? err.message : 'Failed to set role');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleAddUser = async () => {
-    if (!addEmail.trim() || !addPassword) {
-      setAddError('Email and password are required');
+  const handleSetAllow = async (sub: string, enabled: boolean, note: string | null) => {
+    try {
+      setActionLoading(sub);
+      setError(null);
+      await setUserAllow(sub, enabled, note || undefined);
+      setSuccess(enabled ? 'User allowed' : 'User disabled');
+      await fetchUsers();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update allowlist');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleUserClick = (user: UserRow) => {
+    setSelectedUser(user);
+    setEditRole((user.role === 'admin' ? 'admin' : 'analyst') as UserRole);
+    setEditEnabled(user.enabled);
+    setEditNote(user.note ?? '');
+    setIsUserDialogOpen(true);
+  };
+
+  const handleAddBySub = async () => {
+    const sub = addSub.trim();
+    if (!sub) {
+      setAddError('Sub is required.');
       return;
     }
-    if (addPassword.length < 8) {
-      setAddError('Password must be at least 8 characters');
+    if (!sub.includes('|')) {
+      setAddError('Sub should look like an Auth0 sub (e.g. auth0|xxxxxxxx).');
       return;
     }
     setAddError(null);
     setAddSubmitting(true);
     try {
-      await createUser(addEmail.trim(), addPassword, addRole, {
-        first_name: addFirstName.trim() || undefined,
-        last_name: addLastName.trim() || undefined,
-      });
-      setSuccess('User created!');
-      setIsAddUserDialogOpen(false);
-      setAddEmail('');
-      setAddPassword('');
-      setAddFirstName('');
-      setAddLastName('');
-      setAddRole('approved');
+      await setUserRole(sub, addRole);
+      setSuccess(`Added ${sub} as ${addRole}`);
+      setIsAddDialogOpen(false);
+      setAddSub('');
+      setAddRole('analyst');
       await fetchUsers();
     } catch (err: unknown) {
-      setAddError(err instanceof Error ? err.message : 'Could not create user');
+      setAddError(err instanceof Error ? err.message : 'Failed to add user');
     } finally {
       setAddSubmitting(false);
     }
   };
 
-  const pendingUsers = users.filter(user => user.role === 'pending');
-  const approvedUsers = users.filter(user => user.role === 'approved');
-  const adminUsers = users.filter(user => user.role === 'admin');
-
-  const displayName = (u: User) => {
-    const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
-    return name || u.email;
-  };
+  const adminCount = users.filter((u) => u.role === 'admin').length;
+  const analystCount = users.filter((u) => u.role === 'analyst').length;
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading users and fetching emails...</span>
+        <span className="ml-2">Loading users...</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold text-foreground">User administration</h2>
-          <p className="text-sm text-muted-foreground">Manage user access and permissions</p>
+          <p className="text-sm text-muted-foreground">Roles and allowlist by Auth0 sub (local Postgres)</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsAddUserDialogOpen(true)}>
+          <Button variant="outline" onClick={() => setIsAddDialogOpen(true)}>
             <UserPlus className="w-4 h-4 mr-2" />
-            Add user
+            Add by sub
           </Button>
           <Button onClick={fetchUsers} variant="outline">
             <Users className="w-4 h-4 mr-2" />
@@ -355,14 +210,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Alerts */}
       {error && (
         <Alert variant="destructive">
           <XCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
       {success && (
         <Alert>
           <CheckCircle className="h-4 w-4" />
@@ -370,166 +223,79 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </Alert>
       )}
 
-      {/* System metrics - stacked rows */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-foreground">Total users</span>
-          <span className="font-medium">{systemMetrics?.totalUsers || 0}</span>
+          <span className="text-foreground">Total</span>
+          <span className="font-medium">{users.length}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-foreground">Pending</span>
-          <span className="font-medium">{systemMetrics?.pendingUsers || 0}</span>
+          <span className="text-foreground">Admins</span>
+          <span className="font-medium">{adminCount}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-foreground">Approved</span>
-          <span className="font-medium">{systemMetrics?.approvedUsers || 0}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-foreground">Administrators</span>
-          <span className="font-medium">{systemMetrics?.adminUsers || 0}</span>
-        </div>
-        <div className="flex justify-between text-sm pt-2 border-t">
-          <span className="text-foreground">Database</span>
-          <Badge variant={systemMetrics?.databaseConnected ? "secondary" : "destructive"}>
-            {systemMetrics?.databaseConnected ? "Connected" : "Disconnected"}
-          </Badge>
+          <span className="text-foreground">Analysts</span>
+          <span className="font-medium">{analystCount}</span>
         </div>
       </div>
 
-      {/* Pending Users */}
-      {pendingUsers.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-foreground" />
-              Pending approval ({pendingUsers.length})
-            </CardTitle>
-            <CardDescription>
-              New users waiting for your approval to access the platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {pendingUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors">
-                  <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => handleUserClick(user)}>
-                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{displayName(user)}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.email} · Registered: {formatDate(user.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {getRoleBadge(user.role)}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleUserClick(user)}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View details
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => approveUser(user.id)}
-                      disabled={actionLoading === user.id}
-                    >
-                      {actionLoading === user.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => rejectUser(user.id)}
-                      disabled={actionLoading === user.id}
-                    >
-                      {actionLoading === user.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reject
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* All Users */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="w-5 h-5 mr-2" />
-            All users ({users.length})
+            Users ({users.length})
           </CardTitle>
           <CardDescription>
-            Complete list of all users in the system
+            Set role (admin/analyst) and allowlist. Identity is Auth0 sub.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {users.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors">
+              <div
+                key={user.sub}
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors"
+              >
                 <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => handleUserClick(user)}>
                   <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
                     <Mail className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium">{displayName(user)}</p>
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <span>{user.email}</span>
-                      <span>·</span>
-                      <span>Joined: {formatDate(user.created_at)}</span>
-                      {user.approved_at && (
-                        <>
-                          <span>•</span>
-                          <span>Approved: {formatDate(user.approved_at)}</span>
-                        </>
-                      )}
-                    </div>
+                    <p className="font-mono text-sm font-medium">{user.sub}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Updated: {formatDate(user.updated_at)}
+                      {user.note ? ` · ${user.note}` : ''}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {getRoleBadge(user.role)}
+                  {!user.enabled && (
+                    <Badge variant="outline">Disabled</Badge>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => handleUserClick(user)}>
+                    <Eye className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  {user.role !== 'admin' && (
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleUserClick(user)}
+                      onClick={() => handleSetRole(user.sub, 'admin')}
+                      disabled={actionLoading === user.sub}
                     >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View details
+                      {actionLoading === user.sub ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shield className="w-4 h-4 mr-1" />}
+                      Make admin
                     </Button>
-                    {user.role === 'approved' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => makeAdmin(user.id)}
-                        disabled={actionLoading === user.id}
-                      >
-                        {actionLoading === user.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Shield className="w-4 h-4 mr-1" />
-                            Make admin
-                          </>
-                        )}
+                  )}
+                  {user.role === 'admin' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleSetRole(user.sub, 'analyst')}
+                      disabled={actionLoading === user.sub}
+                    >
+                      {actionLoading === user.sub ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Demote to analyst
                     </Button>
                   )}
                 </div>
@@ -539,122 +305,64 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </CardContent>
       </Card>
 
-      {/* User Details Dialog */}
       <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
-        <DialogContent className="max-w-2xl bg-card text-foreground border-border shadow-xl">
+        <DialogContent className="max-w-lg bg-card text-foreground border-border shadow-xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <Info className="h-5 w-5 mr-2" />
-              User details
-            </DialogTitle>
-            <DialogDescription>
-              Detailed information about the selected user
-            </DialogDescription>
+            <DialogTitle>User details</DialogTitle>
+            <DialogDescription>Role and allowlist for this user</DialogDescription>
           </DialogHeader>
-          
           {selectedUser && (
-            <div className="space-y-6">
-              {/* User Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground">Email</label>
-                  <p className="text-base font-semibold">{selectedUser.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">Role</label>
-                  <div className="mt-1">
-                    {getRoleBadge(selectedUser.role)}
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Sub</Label>
+                <p className="font-mono text-sm bg-muted p-2 rounded mt-1">{selectedUser.sub}</p>
               </div>
-
-              {/* First and Last Name (editable) */}
-              <div className="space-y-3 border-t pt-4">
-                <Label className="text-sm font-medium text-foreground">Name</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="edit-first-name">First name</Label>
-                    <Input
-                      id="edit-first-name"
-                      value={editFirstName}
-                      onChange={(e) => setEditFirstName(e.target.value)}
-                      placeholder="First name"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-last-name">Last name</Label>
-                    <Input
-                      id="edit-last-name"
-                      value={editLastName}
-                      onChange={(e) => setEditLastName(e.target.value)}
-                      placeholder="Last name"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
+              <div>
+                <Label className="text-sm font-medium">Role</Label>
+                <div className="flex gap-2 mt-1">
+                  <Select value={editRole} onValueChange={(v) => setEditRole(v as UserRole)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="analyst">Analyst</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={handleUpdateName}
-                    disabled={actionLoading === selectedUser.id}
+                    onClick={() => handleSetRole(selectedUser.sub, editRole)}
+                    disabled={actionLoading === selectedUser.sub}
                   >
-                    {actionLoading === selectedUser.id ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : null}
-                    Save name
+                    {actionLoading === selectedUser.sub ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save role'}
                   </Button>
                 </div>
               </div>
-
-              {/* User ID */}
               <div>
-                  <label className="text-sm font-medium text-foreground">User ID</label>
-                <p className="text-sm font-mono bg-muted p-2 rounded">{selectedUser.user_id}</p>
-              </div>
-
-              {/* Dates */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground">Joined date</label>
-                  <p className="text-sm">{formatDate(selectedUser.created_at)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">Last updated</label>
-                  <p className="text-sm">{formatDate(selectedUser.updated_at)}</p>
-                </div>
-              </div>
-
-              {/* Approval Info */}
-              {selectedUser.approved_at && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground">Approved date</label>
-                    <p className="text-sm">{formatDate(selectedUser.approved_at)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground">Approved by</label>
-                    <p className="text-sm">{selectedUser.approved_by || 'System'}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Status Summary */}
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-2">Status summary</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex justify-between">
-                    <span>Account status:</span>
-                    <span className="font-medium">
-                      {selectedUser.role === 'pending' ? 'Pending approval' : 
-                       selectedUser.role === 'approved' ? 'Active' : 'Administrator'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Access level:</span>
-                    <span className="font-medium capitalize">{selectedUser.role}</span>
-                  </div>
+                <Label className="text-sm font-medium">Allowlist</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Select value={editEnabled ? 'yes' : 'no'} onValueChange={(v) => setEditEnabled(v === 'yes')}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Enabled</SelectItem>
+                      <SelectItem value="no">Disabled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="Note (optional)"
+                    value={editNote}
+                    onChange={(e) => setEditNote(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => handleSetAllow(selectedUser.sub, editEnabled, editNote || null)}
+                    disabled={actionLoading === selectedUser.sub}
+                  >
+                    {actionLoading === selectedUser.sub ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -662,105 +370,57 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Add User Dialog */}
-      <Dialog open={isAddUserDialogOpen} onOpenChange={(open) => {
-        setIsAddUserDialogOpen(open);
+      <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        setIsAddDialogOpen(open);
         if (!open) {
-          setAddEmail('');
-          setAddPassword('');
-          setAddFirstName('');
-          setAddLastName('');
-          setAddRole('approved');
+          setAddSub('');
+          setAddRole('analyst');
           setAddError(null);
         }
       }}>
         <DialogContent className="max-w-md text-foreground">
           <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <UserPlus className="h-5 w-5 mr-2" />
-              Add user
-            </DialogTitle>
+            <DialogTitle>Add user by sub</DialogTitle>
             <DialogDescription>
-              Create a new user with email, password and role
+              Enter the Auth0 sub (e.g. from GET /api/me or Auth0 logs). They will get the chosen role.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             {addError && (
               <Alert variant="destructive">
-                <XCircle className="h-4 w-4" />
                 <AlertDescription>{addError}</AlertDescription>
               </Alert>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="add-email">Email</Label>
+            <div>
+              <Label htmlFor="add-sub">Sub</Label>
               <Input
-                id="add-email"
-                type="email"
-                placeholder="name@example.com"
-                value={addEmail}
-                onChange={(e) => setAddEmail(e.target.value)}
+                id="add-sub"
+                placeholder="auth0|xxxxxxxx"
+                value={addSub}
+                onChange={(e) => setAddSub(e.target.value)}
                 disabled={addSubmitting}
+                className="font-mono mt-1"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="add-first-name">First name</Label>
-                <Input
-                  id="add-first-name"
-                  placeholder="First name"
-                  value={addFirstName}
-                  onChange={(e) => setAddFirstName(e.target.value)}
-                  disabled={addSubmitting}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="add-last-name">Last name</Label>
-                <Input
-                  id="add-last-name"
-                  placeholder="Last name"
-                  value={addLastName}
-                  onChange={(e) => setAddLastName(e.target.value)}
-                  disabled={addSubmitting}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="add-password">Password</Label>
-              <Input
-                id="add-password"
-                type="password"
-                placeholder="At least 8 characters"
-                value={addPassword}
-                onChange={(e) => setAddPassword(e.target.value)}
-                disabled={addSubmitting}
-              />
-            </div>
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="add-role">Role</Label>
               <Select value={addRole} onValueChange={(v) => setAddRole(v as UserRole)} disabled={addSubmitting}>
-                <SelectTrigger id="add-role">
+                <SelectTrigger id="add-role" className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="analyst">Analyst</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setIsAddUserDialogOpen(false)} disabled={addSubmitting}>
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={addSubmitting}>
                 Cancel
               </Button>
-              <Button variant="outline" onClick={handleAddUser} disabled={addSubmitting}>
-                {addSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create user'
-                )}
+              <Button onClick={handleAddBySub} disabled={addSubmitting}>
+                {addSubmitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Add
               </Button>
             </div>
           </div>

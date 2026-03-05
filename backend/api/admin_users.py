@@ -1,89 +1,75 @@
 """
-Admin API: create users and set privileges.
-Uses JWT + allowlist (ADMIN_EMAILS) for admin check. User create/update return 503 when not configured.
+Admin API: role and allowlist management. Local Postgres only (user_roles, allowed_users).
+All endpoints require role=admin via require_role("admin").
 """
 import logging
-from datetime import datetime, timezone
-from typing import Literal
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, EmailStr
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
-from .dependencies import get_current_user_id
+from .rbac import (
+    list_allowed_users,
+    list_user_roles,
+    require_role,
+    set_allowed_user,
+    upsert_user_role,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-# Admin emails that can create users (bypass user_roles lookup when DB not available)
-ADMIN_EMAILS = {"jesper@rgcapital.se"}
 
-UserRole = Literal["pending", "approved", "admin"]
-
-
-class CreateUserRequest(BaseModel):
-    email: EmailStr
-    password: str
-    role: UserRole = "approved"
-    first_name: str | None = None
-    last_name: str | None = None
+class PutRoleBody(BaseModel):
+    role: str  # 'admin' | 'analyst'
 
 
-class CreateUserResponse(BaseModel):
-    user_id: str
-    email: str
-    role: str
-    message: str
+class PutAllowBody(BaseModel):
+    enabled: bool
+    note: Optional[str] = None
 
 
-class UpdateUserProfileRequest(BaseModel):
-    first_name: str | None = None
-    last_name: str | None = None
+@router.get("/users")
+def list_users(_sub: str = Depends(require_role("admin"))):
+    """
+    List all user_roles and allowed_users. Admin only.
+    Returns { "user_roles": [...], "allowed_users": [...] }.
+    """
+    roles = list_user_roles()
+    allowed = list_allowed_users()
+    # Serialize datetimes for JSON
+    def row_to_json(r):
+        d = dict(r)
+        for k in ("created_at", "updated_at"):
+            if k in d and hasattr(d[k], "isoformat"):
+                d[k] = d[k].isoformat()
+        return d
+    return {
+        "user_roles": [row_to_json(r) for r in roles],
+        "allowed_users": [row_to_json(a) for a in allowed],
+    }
 
 
-async def _require_admin(request: Request) -> str:
-    """Verify requester is admin. Returns user_id or raises 403."""
-    user_id = get_current_user_id(request)
-    # When REQUIRE_AUTH=false, middleware may not set user - try to verify token for this route
-    if not user_id:
-        auth = request.headers.get("Authorization", "")
-        if auth.lower().startswith("bearer "):
-            from .auth import _verify_token
-            payload = _verify_token(auth[7:].strip())
-            if payload:
-                request.state.user = {"sub": payload.get("sub"), "email": payload.get("email")}
-                user_id = str(payload.get("sub", ""))
-    if not user_id:
-        raise HTTPException(403, "Authentication required")
-    user = getattr(request.state, "user", None)
-    email = (user or {}).get("email")
-    if email and email in ADMIN_EMAILS:
-        return user_id
-    raise HTTPException(403, "Admin privileges required")
-
-
-@router.post("/users", response_model=CreateUserResponse)
-async def create_user(
-    body: CreateUserRequest,
-    request: Request,
-    _: str = Depends(_require_admin),
+@router.put("/users/{sub}/role")
+def set_user_role(
+    sub: str,
+    body: PutRoleBody,
+    _admin_sub: str = Depends(require_role("admin")),
 ):
-    """
-    Create a new user with email, password, and role.
-    Admin only. User management not configured (no auth backend); returns 503.
-    """
-    raise HTTPException(503, "User creation not configured. Use your auth provider to manage users.")
+    """Set role for user by Auth0 sub. Admin only. Idempotent upsert."""
+    if body.role not in ("admin", "analyst"):
+        raise HTTPException(400, "role must be 'admin' or 'analyst'")
+    upsert_user_role(sub, body.role)
+    return {"sub": sub, "role": body.role}
 
 
-@router.patch("/users/{user_id}", response_model=dict)
-async def update_user_profile(
-    user_id: str,
-    body: UpdateUserProfileRequest,
-    request: Request,
-    _: str = Depends(_require_admin),
+@router.put("/users/{sub}/allow")
+def set_user_allow(
+    sub: str,
+    body: PutAllowBody,
+    _admin_sub: str = Depends(require_role("admin")),
 ):
-    """
-    Update a user's first_name and last_name.
-    Admin only. User management not configured; returns 503.
-    """
-    raise HTTPException(503, "User profile update not configured.")
+    """Set allowlist entry for sub. Admin only."""
+    set_allowed_user(sub, body.enabled, body.note)
+    return {"sub": sub, "enabled": body.enabled, "note": body.note}
