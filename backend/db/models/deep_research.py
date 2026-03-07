@@ -78,6 +78,43 @@ class AnalysisRun(TimestampMixin, Base):
 
     company: Mapped[Optional["Company"]] = relationship(back_populates="analysis_runs")
     sources: Mapped[list["Source"]] = relationship(back_populates="analysis_run")
+    node_states: Mapped[list["RunNodeState"]] = relationship(back_populates="analysis_run")
+
+
+class RunNodeState(TimestampMixin, Base):
+    __tablename__ = "run_node_states"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('running', 'completed', 'failed', 'skipped')",
+            name="ck_dr_run_node_states_status",
+        ),
+        UniqueConstraint("run_id", "node_name", name="uq_dr_run_node_states_run_node"),
+        Index("ix_dr_run_node_states_run_status", "run_id", "status"),
+        Index("ix_dr_run_node_states_node_name", "node_name"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    node_name: Mapped[str] = mapped_column(String(128), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="running")
+    started_at: Mapped[Optional[Any]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    completed_at: Mapped[Optional[Any]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    input_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    output_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    analysis_run: Mapped["AnalysisRun"] = relationship(back_populates="node_states")
 
 
 class Source(TimestampMixin, Base):

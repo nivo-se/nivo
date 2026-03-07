@@ -38,15 +38,17 @@ resolve_default_url() {
 URL="${DATABASE_URL:-$(resolve_default_url)}"
 echo "Applying Deep Research migration to: ${URL%%@*}@***"
 
-if [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
-  psql "$URL" -f database/migrations/024_deep_research_persistence.sql -v ON_ERROR_STOP=1
-else
-  DATABASE_URL="$URL" python3 - <<'PY'
+run_sql() {
+  local file="$1"
+  if [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
+    psql "$URL" -f "$file" -v ON_ERROR_STOP=1
+  else
+    DATABASE_URL="$URL" SQL_FILE="$file" python3 - <<'PY'
 import os
 from pathlib import Path
 import psycopg2
 
-sql = Path("database/migrations/024_deep_research_persistence.sql").read_text(encoding="utf-8")
+sql = Path(os.environ["SQL_FILE"]).read_text(encoding="utf-8")
 conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=10)
 try:
     with conn:
@@ -55,6 +57,12 @@ try:
 finally:
     conn.close()
 PY
+  fi
+}
+
+run_sql "database/migrations/024_deep_research_persistence.sql"
+if [ -f "database/migrations/025_deep_research_run_node_states.sql" ]; then
+  run_sql "database/migrations/025_deep_research_run_node_states.sql"
 fi
 
 echo "Deep Research migration applied."

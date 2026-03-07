@@ -31,8 +31,11 @@ class ApiResponse(BaseModel, Generic[T]):
 
 
 class AnalysisStartRequest(BaseModel):
+    run_id: uuid.UUID | None = None
     company_id: uuid.UUID | None = None
     orgnr: str | None = Field(default=None, min_length=4, max_length=32)
+    company_name: str | None = Field(default=None, min_length=1, max_length=512)
+    website: str | None = Field(default=None, max_length=2048)
     analysis_type: Literal["full", "refresh", "quick"] = "full"
     priority: Literal["low", "normal", "high"] = "normal"
     query: str | None = Field(default=None, max_length=4000)
