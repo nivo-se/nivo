@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from backend.db.models.deep_research import (
     AnalysisRun,
+    Claim,
     Company,
     CompanyProfile,
     Competitor,
@@ -21,10 +22,14 @@ from backend.db.models.deep_research import (
     ReportSection,
     ReportVersion,
     RunNodeState,
+    Source,
+    SourceChunk,
     Strategy,
     Valuation,
     ValueCreation,
 )
+from backend.agents.context import AgentContext, SourceChunkRecord, SourceRecord
+from backend.agents.schemas import AgentClaim, IdentityAgentOutput
 
 
 def _safe_dict(value: Any) -> dict:
@@ -33,6 +38,24 @@ def _safe_dict(value: Any) -> dict:
 
 def _safe_list(value: Any) -> list:
     return value if isinstance(value, list) else []
+
+
+def _json_field(value: Any) -> dict:
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, list):
+        return {"items": value}
+    return {}
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, uuid.UUID):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(k): _json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    return value
 
 
 @dataclass(slots=True)
@@ -147,6 +170,102 @@ class RunStateRepository:
         run.error_message = error
         self.session.flush()
 
+    def build_agent_context(self, run_id: uuid.UUID, company_id: uuid.UUID) -> AgentContext:
+        company = self.session.get(Company, company_id)
+        if company is None:
+            raise ValueError(f"Company not found: {company_id}")
+
+        source_rows = self.session.execute(
+            select(Source)
+            .where(Source.run_id == run_id, Source.company_id == company_id)
+            .order_by(Source.created_at.desc())
+        ).scalars()
+        sources = list(source_rows)
+        source_ids = [s.id for s in sources]
+        chunks: list[SourceChunk] = []
+        if source_ids:
+            chunk_rows = self.session.execute(
+                select(SourceChunk)
+                .where(SourceChunk.source_id.in_(source_ids))
+                .order_by(SourceChunk.source_id.asc(), SourceChunk.chunk_index.asc())
+            ).scalars()
+            chunks = list(chunk_rows)
+
+        return AgentContext(
+            company_id=company.id,
+            company_name=company.name,
+            orgnr=company.orgnr,
+            website=company.website,
+            sources=[
+                SourceRecord(
+                    source_id=s.id,
+                    source_type=s.source_type,
+                    title=s.title,
+                    url=s.url,
+                    content_text=s.content_text,
+                    metadata=_safe_dict(s.extra),
+                )
+                for s in sources
+            ],
+            chunks=[
+                SourceChunkRecord(
+                    chunk_id=c.id,
+                    source_id=c.source_id,
+                    text=c.content_text,
+                    token_count=c.token_count,
+                )
+                for c in chunks
+            ],
+        )
+
+    def persist_identity(self, company_id: uuid.UUID, payload: IdentityAgentOutput | dict) -> None:
+        data = payload.model_dump() if hasattr(payload, "model_dump") else _safe_dict(payload)
+        company = self.session.get(Company, company_id)
+        if company is None:
+            return
+        if data.get("canonical_name"):
+            company.name = data["canonical_name"]
+        if data.get("website"):
+            company.website = data["website"]
+        if data.get("orgnr"):
+            company.orgnr = data["orgnr"]
+        if data.get("headquarters"):
+            company.headquarters = data["headquarters"]
+        if data.get("industry"):
+            company.industry = data["industry"]
+        self.session.flush()
+
+    def persist_claims(
+        self,
+        *,
+        run_id: uuid.UUID,
+        company_id: uuid.UUID,
+        claims: list[AgentClaim] | list[dict],
+        default_claim_type: str,
+    ) -> list[uuid.UUID]:
+        claim_ids: list[uuid.UUID] = []
+        for item in claims:
+            c = item.model_dump() if hasattr(item, "model_dump") else _safe_dict(item)
+            evidence = _json_safe(_safe_dict(c.get("evidence")))
+            source_chunk_id = evidence.get("source_chunk_id")
+            parsed_source_chunk_id = (
+                uuid.UUID(str(source_chunk_id)) if source_chunk_id else None
+            )
+            row = Claim(
+                run_id=run_id,
+                company_id=company_id,
+                source_chunk_id=parsed_source_chunk_id,
+                claim_text=c.get("claim_text") or "",
+                claim_type=c.get("claim_type") or default_claim_type,
+                confidence=c.get("confidence"),
+                is_verified=bool(c.get("verified", False)),
+                evidence=evidence,
+            )
+            self.session.add(row)
+            self.session.flush()
+            claim_ids.append(row.id)
+        return claim_ids
+
     def list_node_states(self, run_id: uuid.UUID) -> list[RunNodeState]:
         rows = self.session.execute(
             select(RunNodeState)
@@ -167,9 +286,9 @@ class RunStateRepository:
             self.session.add(row)
         row.summary = data.get("summary")
         row.business_model = data.get("business_model")
-        row.products_services = _safe_dict(data.get("products_services"))
-        row.customer_segments = _safe_dict(data.get("customer_segments"))
-        row.geographies = _safe_dict(data.get("geographies"))
+        row.products_services = _json_field(data.get("products_services"))
+        row.customer_segments = _json_field(data.get("customer_segments"))
+        row.geographies = _json_field(data.get("geographies"))
         row.extra = _safe_dict(data.get("metadata"))
         self.session.flush()
 
@@ -185,9 +304,9 @@ class RunStateRepository:
             self.session.add(row)
         row.market_size = data.get("market_size")
         row.growth_rate = data.get("growth_rate")
-        row.trends = _safe_dict(data.get("trends"))
-        row.risks = _safe_dict(data.get("risks"))
-        row.opportunities = _safe_dict(data.get("opportunities"))
+        row.trends = _json_field(data.get("trends"))
+        row.risks = _json_field(data.get("risks"))
+        row.opportunities = _json_field(data.get("opportunities"))
         row.extra = _safe_dict(data.get("metadata"))
         self.session.flush()
 

@@ -9,6 +9,7 @@ from typing import Any
 
 from sqlalchemy import select
 
+from backend.agents import AgentRegistry
 from backend.db import SessionLocal
 from backend.db.models.deep_research import AnalysisRun
 from backend.orchestrator.persistence import RunStateRepository
@@ -51,6 +52,9 @@ class OrchestratorRunResult:
 class LangGraphAgentOrchestrator:
     """Executes a deterministic Deep Research node pipeline using LangGraph."""
 
+    def __init__(self) -> None:
+        self.agent_registry = AgentRegistry.default()
+
     def _merge_node_result(
         self, state: OrchestratorState, node_name: str, output: dict
     ) -> dict:
@@ -86,14 +90,22 @@ class LangGraphAgentOrchestrator:
             )
             return self._merge_node_result(state, node_name, output)
         except Exception as exc:
-            repo.upsert_node_state(
-                run_id=uuid.UUID(state["run_id"]),
-                node_name=node_name,
-                status="failed",
-                input_json=input_payload,
-                output_json={},
-                error_message=str(exc),
-            )
+            repo.session.rollback()
+            try:
+                repo.upsert_node_state(
+                    run_id=uuid.UUID(state["run_id"]),
+                    node_name=node_name,
+                    status="failed",
+                    input_json=input_payload,
+                    output_json={},
+                    error_message=str(exc),
+                )
+            except Exception:
+                logger.exception(
+                    "Failed to persist failed node state for run=%s node=%s",
+                    state.get("run_id"),
+                    node_name,
+                )
             raise
 
     def _build_graph(self, repo: RunStateRepository):
@@ -103,52 +115,87 @@ class LangGraphAgentOrchestrator:
 
         def identity(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                return {
-                    "identity_summary": f"Resolved target {_state.get('company_name') or _state.get('orgnr')}",
-                    "target": {
-                        "company_id": _state.get("company_id"),
-                        "orgnr": _state.get("orgnr"),
-                        "company_name": _state.get("company_name"),
-                    },
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                agent = self.agent_registry.get("identity")
+                if agent is None:
+                    raise RuntimeError("identity agent not registered")
+                output = agent.run(context)
+                repo.persist_identity(company_id, output)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="identity",
+                )
+                payload = output.model_dump(mode="json")
+                payload["metadata"] = {
+                    **payload.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
+                return payload
 
             return self._node_wrapper(repo, "identity", state, compute)
 
         def company_profile(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                data = {
-                    "summary": "Company profile scaffold generated.",
-                    "business_model": "Not yet derived - placeholder for agent output.",
-                    "products_services": {},
-                    "customer_segments": {},
-                    "geographies": {},
-                    "metadata": {"source": "langgraph_stub"},
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                agent = self.agent_registry.get("company_profile")
+                if agent is None:
+                    raise RuntimeError("company_profile agent not registered")
+                output = agent.run(context)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="company_profile",
+                )
+                payload = output.model_dump(mode="json")
+                payload["metadata"] = {
+                    **payload.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 repo.persist_company_profile(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
-                    payload=data,
+                    run_id=run_id,
+                    company_id=company_id,
+                    payload=payload,
                 )
-                return data
+                return payload
 
             return self._node_wrapper(repo, "company_profile", state, compute)
 
         def market_analysis(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                data = {
-                    "market_size": "TBD",
-                    "growth_rate": "TBD",
-                    "trends": {},
-                    "risks": {},
-                    "opportunities": {},
-                    "metadata": {"source": "langgraph_stub"},
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                agent = self.agent_registry.get("market_analysis")
+                if agent is None:
+                    raise RuntimeError("market_analysis agent not registered")
+                output = agent.run(context)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="market_analysis",
+                )
+                payload = output.model_dump(mode="json")
+                payload["metadata"] = {
+                    **payload.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 repo.persist_market_analysis(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
-                    payload=data,
+                    run_id=run_id,
+                    company_id=company_id,
+                    payload=payload,
                 )
-                return data
+                return payload
 
             return self._node_wrapper(repo, "market_analysis", state, compute)
 
@@ -331,11 +378,13 @@ class LangGraphAgentOrchestrator:
                 company_id=company.id,
                 query=query or company.name,
             )
+            run_uuid = run.id
+            company_uuid = company.id
 
             graph = self._build_graph(repo)
             init_state: OrchestratorState = {
-                "run_id": str(run.id),
-                "company_id": str(company.id),
+                "run_id": str(run_uuid),
+                "company_id": str(company_uuid),
                 "orgnr": company.orgnr,
                 "company_name": company.name,
                 "website": company.website,
@@ -347,13 +396,13 @@ class LangGraphAgentOrchestrator:
             }
             try:
                 final_state = graph.invoke(init_state)
-                repo.finalize_run(run.id, status="completed", error=None)
-                node_rows = repo.list_node_states(run.id)
+                repo.finalize_run(run_uuid, status="completed", error=None)
+                node_rows = repo.list_node_states(run_uuid)
                 session.commit()
                 node_results = dict(final_state.get("node_results", {}))
                 return OrchestratorRunResult(
-                    run_id=run.id,
-                    company_id=company.id,
+                    run_id=run_uuid,
+                    company_id=company_uuid,
                     status="completed",
                     stage=str(final_state.get("current_node", "report_generation")),
                     progress_pct=self._progress_from_node_states(
@@ -363,13 +412,14 @@ class LangGraphAgentOrchestrator:
                     errors=[],
                 )
             except Exception as exc:
-                logger.exception("LangGraph pipeline failed for run %s: %s", run.id, exc)
-                repo.finalize_run(run.id, status="failed", error=str(exc))
-                node_rows = repo.list_node_states(run.id)
+                session.rollback()
+                logger.exception("LangGraph pipeline failed for run %s: %s", run_uuid, exc)
+                repo.finalize_run(run_uuid, status="failed", error=str(exc))
+                node_rows = repo.list_node_states(run_uuid)
                 session.commit()
                 return OrchestratorRunResult(
-                    run_id=run.id,
-                    company_id=company.id,
+                    run_id=run_uuid,
+                    company_id=company_uuid,
                     status="failed",
                     stage="failed",
                     progress_pct=self._progress_from_node_states(
