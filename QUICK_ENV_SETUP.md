@@ -2,6 +2,14 @@
 
 **TL;DR:** Copy `.env.example` to `.env`, fill in your keys, run verification script.
 
+For cloud agents and Linux environments, fastest setup is:
+
+```bash
+./scripts/setup_cloud_environment.sh
+```
+
+This installs PostgreSQL client/server tooling + backend Python dependencies and runs migrations.
+
 ## 1. Create `.env` File
 
 ```bash

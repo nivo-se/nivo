@@ -4,6 +4,22 @@ This guide helps you configure all required environment variables for the Nivo p
 
 ## Quick Start
 
+### One-command cloud setup (recommended)
+
+```bash
+./scripts/setup_cloud_environment.sh
+```
+
+This installs PostgreSQL client/server tooling, installs backend Python dependencies, bootstraps schema, and runs both migration scripts.
+
+Then verify:
+
+```bash
+python3 scripts/verify_env_setup.py
+```
+
+---
+
 1. **Copy the example file:**
    ```bash
    cp .env.example .env
