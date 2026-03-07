@@ -114,3 +114,27 @@ class ValueCreationIdentificationAgentOutput(BaseModel):
     claims: list[AgentClaim] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
 
+
+class FinancialModelingAgentOutput(BaseModel):
+    agent: Literal["financial_modeling"] = "financial_modeling"
+    model_version: str = "deterministic_v1"
+    assumption_set: dict = Field(default_factory=dict)
+    forecast: dict = Field(default_factory=dict)
+    sensitivity: dict = Field(default_factory=dict)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class ValuationAnalysisAgentOutput(BaseModel):
+    agent: Literal["valuation_analysis"] = "valuation_analysis"
+    method: str = "deterministic_dcf"
+    enterprise_value: float | None = None
+    equity_value: float | None = None
+    valuation_range_low: float | None = None
+    valuation_range_high: float | None = None
+    currency: str = "SEK"
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+

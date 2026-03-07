@@ -8,9 +8,11 @@ from typing import Dict, List
 from .company_profile_agent import CompanyProfileAgent
 from .competitor_discovery_agent import CompetitorDiscoveryAgent
 from .competitor_profiling_agent import CompetitorProfilingAgent
+from .financial_modeling_agent import FinancialModelingAgent
 from .identity_agent import IdentityAgent
 from .market_analysis_agent import MarketAnalysisAgent
 from .strategy_analysis_agent import StrategyAnalysisAgent
+from .valuation_analysis_agent import ValuationAnalysisAgent
 from .value_creation_identification_agent import ValueCreationIdentificationAgent
 
 
@@ -29,6 +31,8 @@ class AgentRegistry:
         registry.register("competitor_discovery", CompetitorDiscoveryAgent())
         registry.register("competitor_profiling", CompetitorProfilingAgent())
         registry.register("strategy_analysis", StrategyAnalysisAgent())
+        registry.register("financial_modeling", FinancialModelingAgent())
+        registry.register("valuation_analysis", ValuationAnalysisAgent())
         registry.register(
             "value_creation_identification", ValueCreationIdentificationAgent()
         )

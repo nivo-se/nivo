@@ -335,16 +335,32 @@ class LangGraphAgentOrchestrator:
 
         def financial_model(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                data = {
-                    "model_version": "v1",
-                    "assumption_set": {},
-                    "forecast": {},
-                    "sensitivity": {},
-                    "metadata": {"source": "langgraph_stub"},
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                strategy_data = _state.get("node_results", {}).get("strategy", {})
+                value_creation_data = _state.get("node_results", {}).get(
+                    "value_creation", {}
+                )
+                agent = self.agent_registry.get("financial_modeling")
+                if agent is None:
+                    raise RuntimeError("financial_modeling agent not registered")
+                output = agent.run(context, strategy_data, value_creation_data)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="financial_model",
+                )
+                data = output.model_dump(mode="json")
+                data["metadata"] = {
+                    **data.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 model_row = repo.persist_financial_model(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
+                    run_id=run_id,
+                    company_id=company_id,
                     payload=data,
                 )
                 data["financial_model_id"] = str(model_row.id)
@@ -354,21 +370,31 @@ class LangGraphAgentOrchestrator:
 
         def valuation(state: OrchestratorState):
             def compute(_state: OrchestratorState):
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
                 fm_data = _state.get("node_results", {}).get("financial_model", {})
                 fm_id = fm_data.get("financial_model_id")
                 parsed_fm_id = uuid.UUID(fm_id) if fm_id else None
-                data = {
-                    "method": "comps",
-                    "enterprise_value": None,
-                    "equity_value": None,
-                    "valuation_range_low": None,
-                    "valuation_range_high": None,
-                    "currency": "SEK",
-                    "metadata": {"source": "langgraph_stub"},
+                agent = self.agent_registry.get("valuation_analysis")
+                if agent is None:
+                    raise RuntimeError("valuation_analysis agent not registered")
+                output = agent.run(context, fm_data)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="valuation",
+                )
+                data = output.model_dump(mode="json")
+                data["metadata"] = {
+                    **data.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 repo.persist_valuation(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
+                    run_id=run_id,
+                    company_id=company_id,
                     financial_model_id=parsed_fm_id,
                     payload=data,
                 )
