@@ -201,29 +201,95 @@ class LangGraphAgentOrchestrator:
 
         def competitor_discovery(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                data = {"competitors": []}
-                repo.persist_competitors(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
-                    payload=data,
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+
+                discovery_agent = self.agent_registry.get("competitor_discovery")
+                profiling_agent = self.agent_registry.get("competitor_profiling")
+                if discovery_agent is None:
+                    raise RuntimeError("competitor_discovery agent not registered")
+                if profiling_agent is None:
+                    raise RuntimeError("competitor_profiling agent not registered")
+
+                discovery_output = discovery_agent.run(context)
+                profiling_output = profiling_agent.run(
+                    context, discovery_output.competitors
                 )
-                return data
+
+                profile_by_name = {p.name.lower(): p for p in profiling_output.profiles}
+                competitors_payload = []
+                for competitor in discovery_output.competitors:
+                    profile = profile_by_name.get(competitor.name.lower())
+                    competitors_payload.append(
+                        {
+                            "name": competitor.name,
+                            "website": competitor.website,
+                            "relation_score": competitor.relation_score,
+                            "metadata": {
+                                **competitor.metadata,
+                                "source_ids": [str(x) for x in competitor.source_ids],
+                            },
+                            "profile_text": profile.profile_text if profile else None,
+                            "strengths": profile.strengths if profile else [],
+                            "weaknesses": profile.weaknesses if profile else [],
+                            "differentiation": profile.differentiation if profile else [],
+                            "profile_metadata": profile.metadata if profile else {},
+                        }
+                    )
+
+                repo.persist_competitors(
+                    run_id=run_id,
+                    company_id=company_id,
+                    payload={"competitors": competitors_payload},
+                )
+                all_claims = list(discovery_output.claims) + list(
+                    profiling_output.claims
+                )
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=all_claims,
+                    default_claim_type="competitor_intelligence",
+                )
+                return {
+                    "competitors": competitors_payload,
+                    "metadata": {
+                        "method": "semantic_similarity_plus_profiling",
+                        "claim_ids": [str(x) for x in claim_ids],
+                        "source_ids": [str(x) for x in discovery_output.source_ids],
+                    },
+                }
 
             return self._node_wrapper(repo, "competitor_discovery", state, compute)
 
         def strategy(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                data = {
-                    "investment_thesis": "Placeholder thesis pending agent analysis.",
-                    "acquisition_rationale": "Placeholder rationale.",
-                    "key_risks": {},
-                    "diligence_focus": {},
-                    "integration_themes": {},
-                    "metadata": {"source": "langgraph_stub"},
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                competitor_payload = _state.get("node_results", {}).get(
+                    "competitor_discovery", {}
+                )
+                agent = self.agent_registry.get("strategy_analysis")
+                if agent is None:
+                    raise RuntimeError("strategy_analysis agent not registered")
+                output = agent.run(context, competitor_payload)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="strategy_analysis",
+                )
+                data = output.model_dump(mode="json")
+                data["metadata"] = {
+                    **data.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 strategy_row = repo.persist_strategy(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
+                    run_id=run_id,
+                    company_id=company_id,
                     payload=data,
                 )
                 data["strategy_id"] = str(strategy_row.id)
@@ -233,18 +299,33 @@ class LangGraphAgentOrchestrator:
 
         def value_creation(state: OrchestratorState):
             def compute(_state: OrchestratorState):
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
                 strategy_data = _state.get("node_results", {}).get("strategy", {})
                 strategy_id = strategy_data.get("strategy_id")
                 parsed_strategy_id = uuid.UUID(strategy_id) if strategy_id else None
-                data = {
-                    "initiatives": {},
-                    "timeline": {},
-                    "kpis": {},
-                    "metadata": {"source": "langgraph_stub"},
+                agent = self.agent_registry.get("value_creation_identification")
+                if agent is None:
+                    raise RuntimeError(
+                        "value_creation_identification agent not registered"
+                    )
+                output = agent.run(context, strategy_data)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="value_creation",
+                )
+                data = output.model_dump(mode="json")
+                data["metadata"] = {
+                    **data.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
                 repo.persist_value_creation(
-                    run_id=uuid.UUID(_state["run_id"]),
-                    company_id=uuid.UUID(_state["company_id"]),
+                    run_id=run_id,
+                    company_id=company_id,
                     strategy_id=parsed_strategy_id,
                     payload=data,
                 )

@@ -59,3 +59,58 @@ class MarketAnalysisAgentOutput(BaseModel):
     claims: list[AgentClaim] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
 
+
+class CompetitorCandidate(BaseModel):
+    name: str = Field(min_length=2, max_length=512)
+    website: str | None = None
+    relation_score: float = Field(ge=0.0, le=1.0, default=0.5)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class CompetitorDiscoveryAgentOutput(BaseModel):
+    agent: Literal["competitor_discovery"] = "competitor_discovery"
+    competitors: list[CompetitorCandidate] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class CompetitorProfileData(BaseModel):
+    name: str = Field(min_length=2, max_length=512)
+    profile_text: str | None = None
+    strengths: list[str] = Field(default_factory=list)
+    weaknesses: list[str] = Field(default_factory=list)
+    differentiation: list[str] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class CompetitorProfilingAgentOutput(BaseModel):
+    agent: Literal["competitor_profiling"] = "competitor_profiling"
+    profiles: list[CompetitorProfileData] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class StrategyAnalysisAgentOutput(BaseModel):
+    agent: Literal["strategy_analysis"] = "strategy_analysis"
+    investment_thesis: str
+    acquisition_rationale: str
+    key_risks: list[str] = Field(default_factory=list)
+    diligence_focus: list[str] = Field(default_factory=list)
+    integration_themes: list[str] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class ValueCreationIdentificationAgentOutput(BaseModel):
+    agent: Literal["value_creation_identification"] = "value_creation_identification"
+    initiatives: list[str] = Field(default_factory=list)
+    timeline: list[str] = Field(default_factory=list)
+    kpis: list[str] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+

@@ -321,17 +321,17 @@ class RunStateRepository:
                 competitor_name=info.get("name") or "Unknown competitor",
                 website=info.get("website"),
                 relation_score=info.get("relation_score"),
-                extra=_safe_dict(info.get("metadata")),
+                extra=_json_field(info.get("metadata")),
             )
             self.session.add(competitor)
             self.session.flush()
             profile = CompetitorProfile(
                 competitor_id=competitor.id,
                 profile_text=info.get("profile_text"),
-                strengths=_safe_dict(info.get("strengths")),
-                weaknesses=_safe_dict(info.get("weaknesses")),
-                differentiation=_safe_dict(info.get("differentiation")),
-                extra=_safe_dict(info.get("profile_metadata")),
+                strengths=_json_field(info.get("strengths")),
+                weaknesses=_json_field(info.get("weaknesses")),
+                differentiation=_json_field(info.get("differentiation")),
+                extra=_json_field(info.get("profile_metadata")),
             )
             self.session.add(profile)
         self.session.flush()
@@ -346,9 +346,9 @@ class RunStateRepository:
             self.session.add(row)
         row.investment_thesis = data.get("investment_thesis")
         row.acquisition_rationale = data.get("acquisition_rationale")
-        row.key_risks = _safe_dict(data.get("key_risks"))
-        row.diligence_focus = _safe_dict(data.get("diligence_focus"))
-        row.integration_themes = _safe_dict(data.get("integration_themes"))
+        row.key_risks = _json_field(data.get("key_risks"))
+        row.diligence_focus = _json_field(data.get("diligence_focus"))
+        row.integration_themes = _json_field(data.get("integration_themes"))
         row.extra = _safe_dict(data.get("metadata"))
         self.session.flush()
         return row
@@ -366,9 +366,9 @@ class RunStateRepository:
             row = ValueCreation(run_id=run_id, company_id=company_id, strategy_id=strategy_id)
             self.session.add(row)
         row.strategy_id = strategy_id
-        row.initiatives = _safe_dict(data.get("initiatives"))
-        row.timeline = _safe_dict(data.get("timeline"))
-        row.kpis = _safe_dict(data.get("kpis"))
+        row.initiatives = _json_field(data.get("initiatives"))
+        row.timeline = _json_field(data.get("timeline"))
+        row.kpis = _json_field(data.get("kpis"))
         row.extra = _safe_dict(data.get("metadata"))
         self.session.flush()
 

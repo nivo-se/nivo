@@ -1,4 +1,4 @@
-"""Agent registry scaffold (no research logic yet)."""
+"""Agent registry for Deep Research runtime wiring."""
 
 from __future__ import annotations
 
@@ -6,8 +6,12 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from .company_profile_agent import CompanyProfileAgent
+from .competitor_discovery_agent import CompetitorDiscoveryAgent
+from .competitor_profiling_agent import CompetitorProfilingAgent
 from .identity_agent import IdentityAgent
 from .market_analysis_agent import MarketAnalysisAgent
+from .strategy_analysis_agent import StrategyAnalysisAgent
+from .value_creation_identification_agent import ValueCreationIdentificationAgent
 
 
 @dataclass(slots=True)
@@ -22,6 +26,12 @@ class AgentRegistry:
         registry.register("identity", IdentityAgent())
         registry.register("company_profile", CompanyProfileAgent())
         registry.register("market_analysis", MarketAnalysisAgent())
+        registry.register("competitor_discovery", CompetitorDiscoveryAgent())
+        registry.register("competitor_profiling", CompetitorProfilingAgent())
+        registry.register("strategy_analysis", StrategyAnalysisAgent())
+        registry.register(
+            "value_creation_identification", ValueCreationIdentificationAgent()
+        )
         return registry
 
     def register(self, name: str, agent: object) -> None:
