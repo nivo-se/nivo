@@ -39,3 +39,21 @@ Programmatic startup:
 python -m backend.start
 ```
 
+## Persistence layer
+
+SQLAlchemy ORM models are defined under:
+
+- `backend/db/base.py`
+- `backend/db/session.py`
+- `backend/db/models/deep_research.py`
+
+Migration SQL:
+
+- `database/migrations/024_deep_research_persistence.sql`
+
+Run migration:
+
+```bash
+./scripts/run_deep_research_migrations.sh
+```
+
