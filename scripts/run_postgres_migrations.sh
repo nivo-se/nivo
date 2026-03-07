@@ -13,12 +13,62 @@ if [ -f .env ]; then
   set +a
 fi
 
-URL="${DATABASE_URL:-postgresql://nivo:nivo@localhost:5433/nivo}"
+resolve_default_url() {
+  local host="${POSTGRES_HOST:-localhost}"
+  local user="${POSTGRES_USER:-nivo}"
+  local password="${POSTGRES_PASSWORD:-nivo}"
+  local db="${POSTGRES_DB:-nivo}"
+  local preferred_port="${POSTGRES_PORT:-}"
+
+  if [ -n "$preferred_port" ]; then
+    echo "postgresql://${user}:${password}@${host}:${preferred_port}/${db}"
+    return
+  fi
+
+  # Try common local ports: Docker compose (5433) then native postgres (5432).
+  if command -v pg_isready >/dev/null 2>&1; then
+    if pg_isready -h "$host" -p 5433 -d "$db" -U "$user" >/dev/null 2>&1; then
+      echo "postgresql://${user}:${password}@${host}:5433/${db}"
+      return
+    fi
+    if pg_isready -h "$host" -p 5432 -d "$db" -U "$user" >/dev/null 2>&1; then
+      echo "postgresql://${user}:${password}@${host}:5432/${db}"
+      return
+    fi
+  fi
+
+  # Fallback to Docker compose default.
+  echo "postgresql://${user}:${password}@${host}:5433/${db}"
+}
+
+apply_sql_file() {
+  local file="$1"
+  if [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
+    psql "$URL" -f "$file" -v ON_ERROR_STOP=1
+  else
+    DATABASE_URL="$URL" SQL_FILE="$file" python3 - <<'PY'
+import os
+from pathlib import Path
+import psycopg2
+
+sql = Path(os.environ["SQL_FILE"]).read_text(encoding="utf-8")
+conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=10)
+try:
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+finally:
+    conn.close()
+PY
+  fi
+}
+
+URL="${DATABASE_URL:-$(resolve_default_url)}"
 # Show target without password: protocol and host (or "default")
 if [ -n "${DATABASE_URL:-}" ]; then
   echo "Using DATABASE_URL from environment"
 else
-  echo "Using default URL (DATABASE_URL not set)"
+  echo "Using resolved default URL (DATABASE_URL not set)"
 fi
 echo "Target: ${URL%%@*}@*** (run against this DB)"
 echo ""
@@ -35,7 +85,7 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/024_deep_research_persistence.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
-    psql "$URL" -f "$f" -v ON_ERROR_STOP=1
+    apply_sql_file "$f"
   fi
 done
 

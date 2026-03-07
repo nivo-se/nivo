@@ -57,3 +57,11 @@ Run migration:
 ./scripts/run_deep_research_migrations.sh
 ```
 
+For cloud agents and fresh Linux environments, run one-shot environment bootstrap:
+
+```bash
+./scripts/setup_cloud_environment.sh
+```
+
+This installs PostgreSQL client/server tooling, installs backend Python dependencies, bootstraps schema, and runs both migration scripts.
+

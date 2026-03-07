@@ -9,10 +9,36 @@ if [ -f .env ]; then
   set +a
 fi
 
-URL="${DATABASE_URL:-postgresql://nivo:nivo@localhost:5433/nivo}"
+resolve_default_url() {
+  local host="${POSTGRES_HOST:-localhost}"
+  local user="${POSTGRES_USER:-nivo}"
+  local password="${POSTGRES_PASSWORD:-nivo}"
+  local db="${POSTGRES_DB:-nivo}"
+  local preferred_port="${POSTGRES_PORT:-}"
+
+  if [ -n "$preferred_port" ]; then
+    echo "postgresql://${user}:${password}@${host}:${preferred_port}/${db}"
+    return
+  fi
+
+  if command -v pg_isready >/dev/null 2>&1; then
+    if pg_isready -h "$host" -p 5433 -d "$db" -U "$user" >/dev/null 2>&1; then
+      echo "postgresql://${user}:${password}@${host}:5433/${db}"
+      return
+    fi
+    if pg_isready -h "$host" -p 5432 -d "$db" -U "$user" >/dev/null 2>&1; then
+      echo "postgresql://${user}:${password}@${host}:5432/${db}"
+      return
+    fi
+  fi
+
+  echo "postgresql://${user}:${password}@${host}:5433/${db}"
+}
+
+URL="${DATABASE_URL:-$(resolve_default_url)}"
 echo "Applying Deep Research migration to: ${URL%%@*}@***"
 
-if command -v psql >/dev/null 2>&1; then
+if [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
   psql "$URL" -f database/migrations/024_deep_research_persistence.sql -v ON_ERROR_STOP=1
 else
   DATABASE_URL="$URL" python3 - <<'PY'
