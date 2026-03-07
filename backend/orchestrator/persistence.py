@@ -266,6 +266,33 @@ class RunStateRepository:
             claim_ids.append(row.id)
         return claim_ids
 
+    def list_claims_for_run(
+        self, run_id: uuid.UUID, company_id: uuid.UUID | None = None
+    ) -> list[Claim]:
+        query = select(Claim).where(Claim.run_id == run_id)
+        if company_id is not None:
+            query = query.where(Claim.company_id == company_id)
+        rows = self.session.execute(query.order_by(Claim.created_at.asc())).scalars()
+        return list(rows)
+
+    def apply_claim_verification(self, claim_updates: list[dict]) -> int:
+        updated = 0
+        for item in claim_updates:
+            claim_id = item.get("claim_id")
+            if not claim_id:
+                continue
+            try:
+                parsed_id = uuid.UUID(str(claim_id))
+            except ValueError:
+                continue
+            claim = self.session.get(Claim, parsed_id)
+            if claim is None:
+                continue
+            claim.is_verified = bool(item.get("is_verified", False))
+            updated += 1
+        self.session.flush()
+        return updated
+
     def list_node_states(self, run_id: uuid.UUID) -> list[RunNodeState]:
         rows = self.session.execute(
             select(RunNodeState)
@@ -421,10 +448,16 @@ class RunStateRepository:
 
     def persist_report(self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict) -> ReportVersion:
         data = _safe_dict(payload)
+        latest = self.session.execute(
+            select(ReportVersion)
+            .where(ReportVersion.run_id == run_id, ReportVersion.company_id == company_id)
+            .order_by(ReportVersion.version_number.desc())
+        ).scalars().first()
+        next_version = (latest.version_number + 1) if latest else 1
         row = ReportVersion(
             run_id=run_id,
             company_id=company_id,
-            version_number=1,
+            version_number=next_version,
             status=data.get("status") or "draft",
             title=data.get("title"),
             generated_by="langgraph-orchestrator",

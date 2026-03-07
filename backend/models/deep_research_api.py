@@ -71,6 +71,19 @@ class ReportVersionData(BaseModel):
     run_id: uuid.UUID
     status: Literal["draft", "review", "published", "archived"]
     title: str | None = None
+    version_number: int | None = None
+
+
+class ReportSectionData(BaseModel):
+    section_key: str
+    heading: str | None = None
+    content_md: str
+    sort_order: int
+
+
+class ReportDetailData(ReportVersionData):
+    company_id: uuid.UUID | None = None
+    sections: list[ReportSectionData] = Field(default_factory=list)
 
 
 class CompetitorRequest(BaseModel):
@@ -82,6 +95,7 @@ class CompetitorItem(BaseModel):
     competitor_id: uuid.UUID
     name: str
     relation_score: float | None = None
+    website: str | None = None
 
 
 class CompetitorListData(BaseModel):
@@ -99,6 +113,7 @@ class VerificationData(BaseModel):
     run_id: uuid.UUID
     status: Literal["queued", "running", "completed", "failed"] = "queued"
     issues: list[str] = Field(default_factory=list)
+    stats: dict = Field(default_factory=dict)
 
 
 class SourceCreateRequest(BaseModel):
