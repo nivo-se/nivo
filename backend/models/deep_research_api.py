@@ -1,0 +1,157 @@
+"""Deep Research API request/response contracts and wrapper models."""
+
+from __future__ import annotations
+
+import uuid
+from datetime import datetime
+from typing import Generic, Literal, Optional, TypeVar
+
+from pydantic import BaseModel, Field, model_validator
+
+T = TypeVar("T")
+
+
+class ApiError(BaseModel):
+    code: str
+    message: str
+    details: dict | None = None
+
+
+class ApiMeta(BaseModel):
+    request_id: str | None = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    version: str = "v1"
+
+
+class ApiResponse(BaseModel, Generic[T]):
+    success: bool
+    data: Optional[T] = None
+    error: Optional[ApiError] = None
+    meta: ApiMeta = Field(default_factory=ApiMeta)
+
+
+class AnalysisStartRequest(BaseModel):
+    company_id: uuid.UUID | None = None
+    orgnr: str | None = Field(default=None, min_length=4, max_length=32)
+    analysis_type: Literal["full", "refresh", "quick"] = "full"
+    priority: Literal["low", "normal", "high"] = "normal"
+    query: str | None = Field(default=None, max_length=4000)
+
+    @model_validator(mode="after")
+    def validate_target(self) -> "AnalysisStartRequest":
+        if not self.company_id and not self.orgnr:
+            raise ValueError("Either company_id or orgnr must be provided")
+        return self
+
+
+class AnalysisStartData(BaseModel):
+    run_id: uuid.UUID
+    status: str
+    message: str
+    accepted_at: datetime
+
+
+class AnalysisStatusData(BaseModel):
+    run_id: uuid.UUID
+    status: Literal["pending", "running", "completed", "failed", "cancelled"]
+    stage: str
+    progress_pct: int = Field(ge=0, le=100)
+
+
+class ReportGenerateRequest(BaseModel):
+    run_id: uuid.UUID
+    format: Literal["markdown", "json", "html"] = "markdown"
+
+
+class ReportVersionData(BaseModel):
+    report_version_id: uuid.UUID
+    run_id: uuid.UUID
+    status: Literal["draft", "review", "published", "archived"]
+    title: str | None = None
+
+
+class CompetitorRequest(BaseModel):
+    company_id: uuid.UUID
+    top_n: int = Field(default=10, ge=1, le=50)
+
+
+class CompetitorItem(BaseModel):
+    competitor_id: uuid.UUID
+    name: str
+    relation_score: float | None = None
+
+
+class CompetitorListData(BaseModel):
+    company_id: uuid.UUID
+    items: list[CompetitorItem] = Field(default_factory=list)
+
+
+class VerificationRequest(BaseModel):
+    run_id: uuid.UUID
+    strict_mode: bool = False
+
+
+class VerificationData(BaseModel):
+    verification_id: uuid.UUID
+    run_id: uuid.UUID
+    status: Literal["queued", "running", "completed", "failed"] = "queued"
+    issues: list[str] = Field(default_factory=list)
+
+
+class SourceCreateRequest(BaseModel):
+    run_id: uuid.UUID
+    source_type: Literal["url", "document", "note", "database"]
+    url: str | None = Field(default=None, max_length=2048)
+    raw_text: str | None = Field(default=None, max_length=20000)
+
+    @model_validator(mode="after")
+    def validate_source_payload(self) -> "SourceCreateRequest":
+        if self.source_type == "url" and not self.url:
+            raise ValueError("url is required when source_type=url")
+        if not self.url and not self.raw_text:
+            raise ValueError("At least one of url or raw_text must be provided")
+        return self
+
+
+class SourceData(BaseModel):
+    source_id: uuid.UUID
+    run_id: uuid.UUID
+    source_type: str
+    status: Literal["accepted", "ingested"]
+
+
+class SourceListData(BaseModel):
+    run_id: uuid.UUID
+    items: list[SourceData] = Field(default_factory=list)
+
+
+class RecomputeSectionRequest(BaseModel):
+    report_version_id: uuid.UUID
+    section_key: str = Field(min_length=1, max_length=128)
+    instructions: str | None = Field(default=None, max_length=4000)
+
+
+class RecomputeReportRequest(BaseModel):
+    report_version_id: uuid.UUID
+    include_sections: list[str] = Field(default_factory=list, max_length=32)
+    reason: str | None = Field(default=None, max_length=2000)
+
+
+class RecomputeData(BaseModel):
+    job_id: uuid.UUID
+    report_version_id: uuid.UUID
+    status: Literal["queued", "running", "completed", "failed"] = "queued"
+
+
+class HealthDependencyData(BaseModel):
+    name: str
+    enabled: bool
+    healthy: bool | None = None
+    message: str | None = None
+
+
+class DeepResearchHealthData(BaseModel):
+    service: str
+    environment: str
+    dependencies: list[HealthDependencyData]
+
