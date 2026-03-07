@@ -118,6 +118,30 @@ class SourceData(BaseModel):
     run_id: uuid.UUID
     source_type: str
     status: Literal["accepted", "ingested"]
+    title: str | None = None
+    url: str | None = None
+    chunk_count: int | None = None
+
+
+class SearchCompanySourcesRequest(BaseModel):
+    company_name: str = Field(min_length=1, max_length=512)
+    orgnr: str | None = Field(default=None, min_length=4, max_length=32)
+    company_id: uuid.UUID | None = None
+    website: str | None = Field(default=None, max_length=2048)
+    run_id: uuid.UUID | None = None
+    max_results_per_query: int = Field(default=5, ge=1, le=20)
+    max_queries: int = Field(default=3, ge=1, le=10)
+
+
+class SearchCompanySourcesData(BaseModel):
+    run_id: uuid.UUID
+    company_id: uuid.UUID
+    provider: str
+    queries: list[str] = Field(default_factory=list)
+    sources_stored: int
+    chunks_stored: int
+    skipped_urls: int
+    warnings: list[str] = Field(default_factory=list)
 
 
 class SourceListData(BaseModel):

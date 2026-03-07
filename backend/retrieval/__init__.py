@@ -1,6 +1,7 @@
-"""Retrieval module scaffolding for Deep Research."""
+"""Deep Research retrieval modules."""
 
 from .service import RetrievalService
+from .types import RetrievalRequest, RetrievalResult
 
-__all__ = ["RetrievalService"]
+__all__ = ["RetrievalRequest", "RetrievalResult", "RetrievalService"]
 
