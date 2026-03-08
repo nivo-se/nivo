@@ -104,9 +104,32 @@ def build_debug_artifact(
         "ebitda_margin_start": ai.model_assumptions.ebitda_margin_start,
     }
 
+    cu_critical_fields = ["summary", "business_model", "products_services", "geographies", "customer_segments"]
+    cu_missing = sum(
+        1 for f in cu_critical_fields
+        if not getattr(ai, f, None) or (isinstance(getattr(ai, f, None), (list, str)) and not getattr(ai, f))
+    )
+    company_understanding_payload = {
+        "summary": bool(ai.summary),
+        "business_model": bool(ai.business_model),
+        "products_services": list(ai.products_services),
+        "geographies": list(ai.geographies),
+        "customer_segments": list(ai.customer_segments) if hasattr(ai, "customer_segments") else [],
+        "quality_score": max(0, 100 - cu_missing * 20),
+    }
+
     assumptions_source = "unknown"
     if assumptions_output and isinstance(assumptions_output, dict):
         assumptions_source = assumptions_output.get("assumptions_source", "synthetic_seed")
+
+    model_input_payload = {
+        "historical_financials_count": len(ai.historical_financials),
+        "has_derived_metrics": ai.derived_financial_history.latest_revenue_msek is not None,
+        "assumptions_source": assumptions_source,
+        "has_market_growth": ai.market.market_growth_base is not None,
+        "has_strategy": bool(ai.strategy.investment_thesis or ai.strategy.acquisition_rationale),
+        "has_value_creation": len(ai.value_creation_initiatives) > 0,
+    }
 
     data_source_map = {
         "orgnr": "public.companies" if orgnr_is_real else "synthetic_tmp",
@@ -128,6 +151,7 @@ def build_debug_artifact(
         "company_id": str(ai.company_id) if ai.company_id else None,
         "identity": identity_summary,
         "profile": profile_summary,
+        "company_understanding_payload": company_understanding_payload,
         "historical_financials": historicals_summary,
         "derived_metrics": derived,
         "market": market_summary,
@@ -136,10 +160,20 @@ def build_debug_artifact(
         "value_creation": vc_summary,
         "verification": verification_summary,
         "model_assumptions": model_assumptions_summary,
+        "model_input_payload": model_input_payload,
         "completeness": completeness_report,
         "assumptions_engine_output": assumptions_output,
         "projection_output_summary": _summarize_projection(projection_output),
         "valuation_output": valuation_output,
+        "proprietary_sources_summary": {
+            "proprietary_source_count": ai.proprietary_source_count,
+            "total_source_count": len(ai.source_refs),
+            "proprietary_source_types": sorted({
+                sr.source_type
+                for sr in ai.source_refs
+                if sr.provenance == "proprietary"
+            }),
+        },
         "source_refs_count": len(ai.source_refs),
         "stage_flags": dict(ai.stage_flags),
         "stage_evaluations": stage_evaluations or {},

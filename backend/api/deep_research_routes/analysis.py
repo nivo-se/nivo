@@ -7,9 +7,10 @@ import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 
 from backend.db import SessionLocal
-from backend.db.models.deep_research import AnalysisRun
+from backend.db.models.deep_research import AnalysisRun, RunNodeState
 from backend.orchestrator import LangGraphAgentOrchestrator
 from backend.orchestrator.persistence import RunStateRepository
 
@@ -144,4 +145,20 @@ async def list_analysis_runs() -> ApiResponse[list[AnalysisStatusData]]:
             for r in runs
         ]
     )
+
+
+@router.get("/runs/{run_id}/debug", response_model=ApiResponse[dict])
+async def get_run_debug(run_id: uuid.UUID) -> ApiResponse[dict]:
+    """Expose debug artifact for developer/analyst inspection."""
+    with SessionLocal() as session:
+        row = session.execute(
+            select(RunNodeState).where(
+                RunNodeState.run_id == run_id,
+                RunNodeState.node_name == "analysis_input_debug",
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            raise HTTPException(status_code=404, detail="Debug artifact not found for this run")
+        debug_data = row.output_json if isinstance(row.output_json, dict) else {}
+        return ok(debug_data)
 

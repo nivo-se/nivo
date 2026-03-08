@@ -96,6 +96,7 @@ class SourceRef:
     title: str | None = None
     url: str | None = None
     source_type: str = "unknown"
+    provenance: str | None = None
 
 
 @dataclass(slots=True)
@@ -178,6 +179,7 @@ class AnalysisInput:
 
     # Source refs
     source_refs: list[SourceRef] = field(default_factory=list)
+    proprietary_source_count: int = 0
 
     # Model assumptions (populated by AssumptionsEngine or assembler)
     model_assumptions: ModelAssumptions = field(default_factory=ModelAssumptions)

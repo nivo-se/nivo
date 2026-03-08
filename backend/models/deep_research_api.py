@@ -94,6 +94,22 @@ class ReportDetailData(ReportVersionData):
     company_id: uuid.UUID | None = None
     company_name: str | None = None
     sections: list[ReportSectionData] = Field(default_factory=list)
+    report_degraded: bool = False
+    report_degraded_reasons: list[str] = Field(default_factory=list)
+
+
+class ReportVersionSummary(BaseModel):
+    report_version_id: uuid.UUID
+    run_id: uuid.UUID
+    version_number: int | None = None
+    status: str
+    title: str | None = None
+    created_at: datetime | None = None
+
+
+class ReportVersionListData(BaseModel):
+    company_id: uuid.UUID
+    versions: list[ReportVersionSummary] = Field(default_factory=list)
 
 
 class CompanyWithReportData(BaseModel):
@@ -120,6 +136,20 @@ class CompetitorItem(BaseModel):
 class CompetitorListData(BaseModel):
     company_id: uuid.UUID
     items: list[CompetitorItem] = Field(default_factory=list)
+
+
+class AddCompetitorRequest(BaseModel):
+    company_id: uuid.UUID
+    run_id: uuid.UUID
+    competitor_name: str = Field(min_length=1, max_length=512)
+    website: str | None = Field(default=None, max_length=2048)
+    relation_score: float | None = Field(default=None, ge=0, le=1)
+
+
+class UpdateCompetitorRequest(BaseModel):
+    competitor_name: str | None = Field(default=None, min_length=1, max_length=512)
+    website: str | None = Field(default=None, max_length=2048)
+    relation_score: float | None = Field(default=None, ge=0, le=1)
 
 
 class VerificationRequest(BaseModel):

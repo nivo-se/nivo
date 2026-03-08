@@ -15,6 +15,8 @@ from backend.models.deep_research_api import (
     ReportDetailData,
     ReportGenerateRequest,
     ReportSectionData,
+    ReportVersionListData,
+    ReportVersionSummary,
 )
 from backend.orchestrator.persistence import RunStateRepository
 from backend.report_engine import ReportComposer
@@ -26,6 +28,7 @@ router = APIRouter(prefix="/reports", tags=["deep-research-reports"])
 
 def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> ReportDetailData:
     sections = sorted(list(row.sections), key=lambda s: (s.sort_order, s.section_key))
+    extra = row.extra if isinstance(row.extra, dict) else {}
     return ReportDetailData(
         report_version_id=row.id,
         run_id=row.run_id,
@@ -34,6 +37,8 @@ def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> Re
         status=row.status,
         title=row.title,
         version_number=row.version_number,
+        report_degraded=extra.get("report_degraded", False),
+        report_degraded_reasons=extra.get("report_degraded_reasons", []),
         sections=[
             ReportSectionData(
                 section_key=section.section_key,
@@ -141,4 +146,26 @@ async def get_latest_report_for_run(
         if row is None:
             raise HTTPException(status_code=404, detail="no report found for run")
         return ok(_to_report_detail(row, company_name=_resolve_company_name(session, row.company_id)))
+
+
+@router.get("/company/{company_id}/versions", response_model=ApiResponse[ReportVersionListData])
+async def list_report_versions(company_id: uuid.UUID) -> ApiResponse[ReportVersionListData]:
+    with SessionLocal() as session:
+        rows = session.execute(
+            select(ReportVersion)
+            .where(ReportVersion.company_id == company_id)
+            .order_by(ReportVersion.created_at.desc())
+        ).scalars().all()
+        items = [
+            ReportVersionSummary(
+                report_version_id=r.id,
+                run_id=r.run_id,
+                version_number=r.version_number,
+                status=r.status,
+                title=r.title,
+                created_at=r.created_at,
+            )
+            for r in rows
+        ]
+        return ok(ReportVersionListData(company_id=company_id, versions=items))
 

@@ -411,9 +411,25 @@ class LangGraphAgentOrchestrator:
 
         def financial_model(state: OrchestratorState):
             def compute(_state: OrchestratorState):
+                from backend.services.deep_research.financials_loader import (
+                    load_historical_financials,
+                    compute_derived_metrics,
+                )
+
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
                 context = repo.build_agent_context(run_id, company_id)
+
+                orgnr = _state.get("orgnr", "")
+                if orgnr and not orgnr.startswith("tmp-"):
+                    hist = load_historical_financials(orgnr)
+                    if hist:
+                        context.historical_financials = hist
+                        context.derived_metrics = compute_derived_metrics(hist)
+
+                market_data = _state.get("node_results", {}).get("market_analysis", {})
+                context.market_data = market_data
+
                 strategy_data = _state.get("node_results", {}).get("strategy", {})
                 value_creation_data = _state.get("node_results", {}).get(
                     "value_creation", {}
@@ -675,6 +691,7 @@ class LangGraphAgentOrchestrator:
         *,
         run_id: uuid.UUID,
         start_from_node: str,
+        instructions: str | None = None,
     ) -> OrchestratorRunResult:
         """Execute pipeline from a specific node, reusing upstream completed outputs."""
         if start_from_node not in PIPELINE_NODES:
@@ -718,6 +735,7 @@ class LangGraphAgentOrchestrator:
                 "stage_evaluations": {},
                 "report_degraded": False,
                 "report_degraded_reasons": [],
+                "recompute_instructions": instructions,
             }
             try:
                 final_state = graph.invoke(init_state)

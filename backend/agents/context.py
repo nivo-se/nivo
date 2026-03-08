@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(slots=True)
@@ -32,6 +32,9 @@ class AgentContext:
     website: str | None
     sources: list[SourceRecord]
     chunks: list[SourceChunkRecord]
+    historical_financials: list[dict] = field(default_factory=list)
+    derived_metrics: dict = field(default_factory=dict)
+    market_data: dict = field(default_factory=dict)
 
     def joined_text(self, max_chars: int = 10000) -> str:
         chunk_text = " ".join(c.text for c in self.chunks if c.text)

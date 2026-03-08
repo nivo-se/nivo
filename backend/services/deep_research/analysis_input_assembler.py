@@ -24,6 +24,8 @@ from backend.db.models.deep_research import (
     ValueCreation,
 )
 
+from .financials_loader import load_historical_financials
+
 from .analysis_input import (
     AnalysisInput,
     CompetitorInput,
@@ -237,13 +239,20 @@ class AnalysisInputAssembler:
         rows = self.session.execute(
             select(Source).where(Source.run_id == run_id, Source.company_id == company_id)
         ).scalars().all()
+        proprietary_count = 0
         for s in rows:
+            extra = s.extra if isinstance(s.extra, dict) else {}
+            provenance = extra.get("provenance", "public")
+            if provenance == "proprietary":
+                proprietary_count += 1
             ai.source_refs.append(SourceRef(
                 source_id=str(s.id),
                 title=s.title,
                 url=s.url,
                 source_type=s.source_type,
+                provenance=provenance,
             ))
+        ai.proprietary_source_count = proprietary_count
 
     # ------------------------------------------------------------------
     # Historical financials (from main app DB if orgnr exists)
@@ -259,56 +268,15 @@ class AnalysisInputAssembler:
             )
             ai.stage_flags["financials_skipped_tmp_orgnr"] = True
             return
-        try:
-            from backend.services.db_factory import get_database_service
-            db = get_database_service()
-        except Exception:
-            logger.debug("Cannot load main-app financials: DB service unavailable")
-            return
 
-        try:
-            sql = """
-                WITH ranked AS (
-                    SELECT
-                        year,
-                        COALESCE(si_sek, sdi_sek) as revenue_sek,
-                        dr_sek as profit_sek,
-                        COALESCE(ebitda_sek, ors_sek) as ebitda_sek,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY year
-                            ORDER BY COALESCE(period::text, '') DESC
-                        ) AS rn
-                    FROM financials
-                    WHERE orgnr = ?
-                      AND (currency IS NULL OR currency = 'SEK')
-                      AND year >= 2018
-                )
-                SELECT year, revenue_sek, profit_sek, ebitda_sek
-                FROM ranked
-                WHERE rn = 1
-                ORDER BY year ASC
-                LIMIT 4
-            """
-            rows = db.run_raw_query(sql, params=[ai.orgnr])
-        except Exception as e:
-            logger.debug("Historical financials query failed: %s", e)
-            return
-
-        for row in rows:
-            rev_sek = row.get("revenue_sek")
-            ebitda_sek = row.get("ebitda_sek")
-            rev_msek = round(float(rev_sek) / 1_000_000, 2) if rev_sek else None
-            ebitda_msek = round(float(ebitda_sek) / 1_000_000, 2) if ebitda_sek else None
-            margin = _safe_pct(ebitda_msek, rev_msek) if rev_msek and ebitda_msek else None
-            profit_sek = row.get("profit_sek")
-            net_msek = round(float(profit_sek) / 1_000_000, 2) if profit_sek else None
-
+        raw_rows = load_historical_financials(ai.orgnr)
+        for row in raw_rows:
             ai.historical_financials.append(HistoricalYear(
-                year=int(row["year"]),
-                revenue_msek=rev_msek,
-                ebitda_msek=ebitda_msek,
-                ebitda_margin_pct=margin,
-                net_income_msek=net_msek,
+                year=row["year"],
+                revenue_msek=row.get("revenue_msek"),
+                ebitda_msek=row.get("ebitda_msek"),
+                ebitda_margin_pct=row.get("ebitda_margin_pct"),
+                net_income_msek=row.get("net_income_msek"),
             ))
 
     # ------------------------------------------------------------------

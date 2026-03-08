@@ -25,15 +25,30 @@ def _round4(value: float) -> float:
 
 
 def _extract_real_historicals(context: AgentContext) -> dict | None:
-    """Try to extract real historical financials from context sources/chunks.
+    """Try to extract real historical financials from context.
 
-    Returns a dict with starting_revenue, growth, margins if available.
+    Checks context.historical_financials / derived_metrics first (populated by
+    the orchestrator from the shared financials loader), then falls back to
+    the legacy chunk-metadata lookup.
     """
+    if context.historical_financials and context.derived_metrics.get("latest_revenue_msek"):
+        dm = context.derived_metrics
+        margin = dm.get("latest_ebitda_margin_pct")
+        cagr = dm.get("revenue_cagr_pct")
+        logger.info("_extract_real_historicals: using context.historical_financials (%d years)", len(context.historical_financials))
+        return {
+            "starting_revenue_msek": dm["latest_revenue_msek"],
+            "revenue_growth": round(cagr / 100.0, 4) if cagr is not None else 0.10,
+            "ebitda_margin": round(margin / 100.0, 4) if margin is not None else 0.18,
+        }
+
     chunks = context.chunks or []
     for chunk in chunks:
         meta = chunk.metadata if hasattr(chunk, "metadata") else {}
         if isinstance(meta, dict) and meta.get("type") == "historical_financials":
+            logger.info("_extract_real_historicals: using chunk metadata fallback")
             return meta
+
     return None
 
 
@@ -80,6 +95,16 @@ class AssumptionsEngine:
                 "Assumptions built from synthetic seed: company=%s",
                 context.company_name,
             )
+
+        market_growth_base = None
+        if context.market_data and context.market_data.get("market_growth_base") is not None:
+            try:
+                market_growth_base = float(context.market_data["market_growth_base"])
+            except (ValueError, TypeError):
+                pass
+        if market_growth_base is not None:
+            growth_start = (growth_start + market_growth_base) / 2.0
+            logger.info("growth_start blended with market_growth_base=%.4f -> %.4f", market_growth_base, growth_start)
 
         key = f"{context.company_id}:{context.company_name}:{context.orgnr or ''}:{context.website or ''}"
         growth_terminal = _stable_range(f"{key}:g_term", 0.02, 0.045)

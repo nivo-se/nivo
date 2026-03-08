@@ -11,8 +11,10 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from backend.db.models.deep_research import AnalysisRun, Company, Source, SourceChunk
+from backend.services.deep_research.source_taxonomy import classify_provenance
 
 from .chunking import TextChunk
+from .source_scoring import SourceQualityScorer
 
 
 @dataclass(slots=True)
@@ -98,7 +100,11 @@ class SourceStorage:
         url: str | None,
         content_text: str | None,
         metadata: dict | None = None,
+        provenance: str | None = None,
     ) -> Source:
+        provenance = provenance or classify_provenance(source_type)
+        extra = dict(metadata) if metadata else {}
+        extra["provenance"] = provenance
         source = Source(
             run_id=run_id,
             company_id=company_id,
@@ -106,8 +112,17 @@ class SourceStorage:
             title=title,
             url=url,
             content_text=content_text,
-            extra=metadata or {},
+            extra=extra,
         )
+        scorer = SourceQualityScorer()
+        quality = scorer.score(
+            url=url or "",
+            content_length=len(content_text) if content_text else None,
+        )
+        if source.extra is None:
+            source.extra = {}
+        source.extra["quality_score"] = quality["quality_score"]
+        source.extra["quality_breakdown"] = quality
         self.session.add(source)
         self.session.flush()
         return source

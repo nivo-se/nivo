@@ -17,6 +17,8 @@ DEEP_RESEARCH_THRESHOLDS: dict[str, Any] = {
     "require_starting_revenue": True,
     "require_market_label": True,
     "require_business_model": True,
+    "require_products_services": True,
+    "require_geographies": True,
 }
 
 

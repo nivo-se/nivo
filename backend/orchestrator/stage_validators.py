@@ -48,11 +48,29 @@ def validate_identity(output: dict) -> StageValidation:
 
 def validate_company_profile(output: dict) -> StageValidation:
     issues: list[str] = []
-    for key in ("summary", "business_model"):
-        val = output.get(key)
-        if not val or (isinstance(val, str) and not val.strip()):
-            issues.append(f"{key} missing from company profile")
+    fail = False
 
+    bm = output.get("business_model")
+    if not bm or (isinstance(bm, str) and not bm.strip()):
+        issues.append("business_model missing from company profile")
+        fail = True
+
+    summary_val = output.get("summary")
+    if not summary_val or (isinstance(summary_val, str) and not summary_val.strip()):
+        issues.append("summary missing from company profile")
+
+    thresholds = DEEP_RESEARCH_THRESHOLDS
+    if thresholds.get("require_products_services"):
+        ps = output.get("products_services", [])
+        if not ps:
+            issues.append("products_services empty in company profile")
+    if thresholds.get("require_geographies"):
+        geo = output.get("geographies", [])
+        if not geo:
+            issues.append("geographies empty in company profile")
+
+    if fail:
+        return StageValidation(status="fail", issues=issues, score=0)
     if issues:
         return StageValidation(status="warn", issues=issues, score=60)
     return StageValidation(status="pass", score=100)
@@ -122,6 +140,35 @@ def validate_report_quality(output: dict) -> StageValidation:
     return StageValidation(status="pass", score=100)
 
 
+def validate_strategy(output: dict) -> StageValidation:
+    issues: list[str] = []
+    thesis = output.get("investment_thesis")
+    rationale = output.get("acquisition_rationale")
+    if not thesis and not rationale:
+        issues.append("neither investment_thesis nor acquisition_rationale present")
+        return StageValidation(status="warn", issues=issues, score=60)
+    return StageValidation(status="pass", score=100)
+
+
+def validate_value_creation(output: dict) -> StageValidation:
+    issues: list[str] = []
+    initiatives = output.get("initiatives", [])
+    if not initiatives:
+        issues.append("value creation initiatives list is empty")
+        return StageValidation(status="warn", issues=issues, score=60)
+    return StageValidation(status="pass", score=100)
+
+
+def validate_valuation(output: dict) -> StageValidation:
+    issues: list[str] = []
+    ev = output.get("enterprise_value")
+    eq = output.get("equity_value")
+    if ev is None and eq is None:
+        issues.append("neither enterprise_value nor equity_value present")
+        return StageValidation(status="warn", issues=issues, score=60)
+    return StageValidation(status="pass", score=100)
+
+
 STAGE_VALIDATORS: dict[str, Callable[[dict], StageValidation]] = {
     "identity": validate_identity,
     "company_profile": validate_company_profile,
@@ -129,4 +176,7 @@ STAGE_VALIDATORS: dict[str, Callable[[dict], StageValidation]] = {
     "competitor_discovery": validate_competitors,
     "financial_model": validate_financial_model,
     "report_generation": validate_report_quality,
+    "strategy": validate_strategy,
+    "value_creation": validate_value_creation,
+    "valuation": validate_valuation,
 }

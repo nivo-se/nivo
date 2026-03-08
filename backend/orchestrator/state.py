@@ -21,4 +21,5 @@ class OrchestratorState(TypedDict, total=False):
     stage_evaluations: dict[str, Any]
     report_degraded: bool
     report_degraded_reasons: list[str]
+    recompute_instructions: str | None
 

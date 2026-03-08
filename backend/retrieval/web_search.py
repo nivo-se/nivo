@@ -132,16 +132,16 @@ class WebSearch:
         self._provider = None
 
         provider_preference = (settings.retrieval_provider or "auto").strip().lower()
-        if provider_preference in {"serpapi", "auto"} and settings.serpapi_key:
-            self.provider_name = "serpapi"
-            self._provider = SerpApiSearch(
-                api_key=settings.serpapi_key,
-                timeout_seconds=settings.retrieval_http_timeout_seconds,
-            )
-        elif provider_preference in {"tavily", "auto"} and settings.tavily_api_key:
+        if provider_preference in {"tavily", "auto"} and settings.tavily_api_key:
             self.provider_name = "tavily"
             self._provider = TavilySearch(
                 api_key=settings.tavily_api_key,
+                timeout_seconds=settings.retrieval_http_timeout_seconds,
+            )
+        elif provider_preference in {"serpapi", "auto"} and settings.serpapi_key:
+            self.provider_name = "serpapi"
+            self._provider = SerpApiSearch(
+                api_key=settings.serpapi_key,
                 timeout_seconds=settings.retrieval_http_timeout_seconds,
             )
         elif provider_preference == "serpapi" and not settings.serpapi_key:

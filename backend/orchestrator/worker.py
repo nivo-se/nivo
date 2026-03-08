@@ -41,6 +41,7 @@ def run_partial_pipeline_job(
     *,
     run_id: str,
     start_from_node: str,
+    instructions: str | None = None,
 ) -> dict:
     """RQ job function: execute a partial pipeline recompute starting from a specific node."""
     from backend.orchestrator import LangGraphAgentOrchestrator
@@ -50,6 +51,7 @@ def run_partial_pipeline_job(
     result = orchestrator.execute_partial_run(
         run_id=uuid.UUID(run_id),
         start_from_node=start_from_node,
+        instructions=instructions,
     )
     logger.info(
         "Worker finished partial run_id=%s status=%s",
