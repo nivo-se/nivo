@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut } from "lucide-react";
+import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ const navItems = [
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },
   { path: "/ai/runs", label: "Recent Runs", icon: Cpu, indent: true },
+  { path: "/deep-research/runs", label: "Deep Research", icon: Search },
 ];
 
 export default function AppLayout() {

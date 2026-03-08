@@ -50,6 +50,14 @@ import { UniversePage } from "./pages/app/UniversePage";
 import { HomePage } from "./pages/app/HomePage";
 import { AdminPage } from "./pages/app/AdminPage";
 import { CompanyPage } from "./pages/app/CompanyPage";
+import RunListPage from "./pages/deep-research/RunListPage";
+import RunStatusPage from "./pages/deep-research/RunStatusPage";
+import DeepResearchWorkbench from "./pages/deep-research/DeepResearchWorkbench";
+import ReportViewerPage from "./pages/deep-research/ReportViewerPage";
+import ReportVersionsPage from "./pages/deep-research/ReportVersionsPage";
+import VerificationPanel from "./pages/deep-research/VerificationPanel";
+import CompetitorEditorPage from "./pages/deep-research/CompetitorEditorPage";
+import AssumptionOverridePage from "./pages/deep-research/AssumptionOverridePage";
 
 const queryClient = new QueryClient();
 
@@ -167,6 +175,15 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
+              <Route path="deep-research/runs" element={<RunListPage />} />
+              <Route path="deep-research/runs/:runId" element={<RunStatusPage />} />
+              <Route path="deep-research/company/:companyId" element={<DeepResearchWorkbench />}>
+                <Route path="report/latest" element={<ReportViewerPage />} />
+                <Route path="report/versions" element={<ReportVersionsPage />} />
+                <Route path="verification" element={<VerificationPanel />} />
+                <Route path="competitors" element={<CompetitorEditorPage />} />
+                <Route path="assumptions" element={<AssumptionOverridePage />} />
+              </Route>
             </Route>
 
             {/* Old UI (may use mock/sample data). More specific paths first. */}
