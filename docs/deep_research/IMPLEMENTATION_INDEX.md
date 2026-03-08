@@ -1,5 +1,11 @@
 # IMPLEMENTATION_INDEX.md
 
+## Current focus: final task (live validation)
+
+**To pick up the final task from another computer**, see **[FINAL_TASK_LIVE_VALIDATION.md](./FINAL_TASK_LIVE_VALIDATION.md)**. It describes how to run the Deep Research pipeline on two real companies (e.g. Segers Fabriker and Texstar), which services to start, and how to confirm the four release gates.
+
+---
+
 ## Purpose
 
 This file is the entry point for all Cursor cloud/web agent sessions related to the Nivo deep research system.
