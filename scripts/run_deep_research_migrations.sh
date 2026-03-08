@@ -64,6 +64,9 @@ run_sql "database/migrations/024_deep_research_persistence.sql"
 if [ -f "database/migrations/025_deep_research_run_node_states.sql" ]; then
   run_sql "database/migrations/025_deep_research_run_node_states.sql"
 fi
+if [ -f "database/migrations/025_claim_verifications.sql" ]; then
+  run_sql "database/migrations/025_claim_verifications.sql"
+fi
 
 echo "Deep Research migration applied."
 
