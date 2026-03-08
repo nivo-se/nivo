@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -32,6 +33,12 @@ from backend.db.models.deep_research import (
 from backend.agents.context import AgentContext, SourceChunkRecord, SourceRecord
 from backend.agents.schemas import AgentClaim, IdentityAgentOutput
 
+logger = logging.getLogger(__name__)
+
+
+class CompanyResolutionError(Exception):
+    """Raised when a company cannot be resolved from the main database."""
+
 
 def _safe_dict(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
@@ -59,6 +66,46 @@ def _json_safe(value: Any) -> Any:
     return value
 
 
+def _resolve_from_main_db(
+    orgnr: str | None, company_name: str | None
+) -> tuple[str, str, str | None, str, float] | None:
+    """Resolve company identity from public.companies.
+
+    Returns (orgnr, company_name, homepage, source, confidence) or None.
+    """
+    try:
+        from backend.services.db_factory import get_database_service
+        db = get_database_service()
+    except Exception:
+        logger.debug("Main DB service unavailable for company resolution")
+        return None
+
+    try:
+        if orgnr and not orgnr.startswith("tmp-"):
+            rows = db.run_raw_query(
+                "SELECT orgnr, company_name, homepage FROM companies WHERE orgnr = %s LIMIT 1",
+                params=[orgnr],
+            )
+            if rows:
+                r = rows[0]
+                return (r["orgnr"], r["company_name"], r.get("homepage"), "main_db_by_orgnr", 1.0)
+
+        if company_name:
+            normalized = company_name.strip()
+            rows = db.run_raw_query(
+                "SELECT orgnr, company_name, homepage FROM companies "
+                "WHERE lower(trim(company_name)) = lower(trim(%s)) LIMIT 1",
+                params=[normalized],
+            )
+            if rows:
+                r = rows[0]
+                return (r["orgnr"], r["company_name"], r.get("homepage"), "main_db_by_name", 0.9)
+    except Exception as exc:
+        logger.warning("Main DB company resolution failed: %s", exc)
+
+    return None
+
+
 @dataclass(slots=True)
 class RunStateRepository:
     """Repository for orchestrator-related persistence operations."""
@@ -73,37 +120,99 @@ class RunStateRepository:
         company_name: str | None,
         website: str | None,
     ) -> Company:
-        company: Company | None = None
+        # Step 1: if resuming by company_id, return existing deep-research row
         if company_id:
             company = self.session.get(Company, company_id)
-        if not company and orgnr and not orgnr.startswith("tmp-"):
+            if company:
+                upgraded = self._upgrade_company_from_main_db(company, company_name, website)
+                if upgraded:
+                    self.session.flush()
+                return company
+
+        # Step 2: resolve real identity from public.companies
+        main_result = _resolve_from_main_db(orgnr, company_name)
+        if main_result:
+            real_orgnr, real_name, real_homepage, source, confidence = main_result
+            logger.info(
+                "Company resolved: orgnr=%s source=%s confidence=%.1f name=%s",
+                real_orgnr, source, confidence, real_name,
+            )
+            orgnr = real_orgnr
+            company_name = company_name or real_name
+            website = website or real_homepage
+
+        # Step 3: look up existing deep-research company by resolved orgnr
+        company: Company | None = None
+        if orgnr and not orgnr.startswith("tmp-"):
             company = self.session.execute(
                 select(Company).where(Company.orgnr == orgnr)
             ).scalar_one_or_none()
+
+        # Step 4: fall back to name lookup in deep-research
         if not company and company_name:
             company = self.session.execute(
                 select(Company)
                 .where(Company.name == company_name)
                 .order_by(Company.created_at.desc())
             ).scalars().first()
+
+        # Step 5: if found, upgrade tmp-orgnr and fill missing fields
         if company:
             if company_name:
                 company.name = company_name
             if website and not company.website:
                 company.website = website
             if orgnr and not orgnr.startswith("tmp-") and company.orgnr.startswith("tmp-"):
+                logger.info(
+                    "Upgrading company orgnr from %s to %s", company.orgnr, orgnr,
+                )
                 company.orgnr = orgnr
             self.session.flush()
             return company
 
+        # Step 6: create new deep-research company — require real orgnr
+        if not orgnr or orgnr.startswith("tmp-"):
+            raise CompanyResolutionError(
+                f"Company not found in main DB: name={company_name!r} orgnr={orgnr!r}. "
+                "Deep Research requires companies that exist in the main database."
+            )
+
         company = Company(
-            orgnr=orgnr or f"tmp-{uuid.uuid4().hex[:20]}",
-            name=company_name or f"Company {orgnr or 'Unknown'}",
+            orgnr=orgnr,
+            name=company_name or f"Company {orgnr}",
             website=website,
         )
         self.session.add(company)
         self.session.flush()
+        logger.info(
+            "Created deep-research company: orgnr=%s name=%s", orgnr, company.name,
+        )
         return company
+
+    def _upgrade_company_from_main_db(
+        self, company: Company, company_name: str | None, website: str | None,
+    ) -> bool:
+        """If the company has a tmp-orgnr, try to resolve the real one from main DB."""
+        changed = False
+        if company.orgnr.startswith("tmp-"):
+            main_result = _resolve_from_main_db(None, company_name or company.name)
+            if main_result:
+                real_orgnr, real_name, real_homepage, source, confidence = main_result
+                logger.info(
+                    "Upgrading existing company from tmp- to real orgnr: %s -> %s (source=%s)",
+                    company.orgnr, real_orgnr, source,
+                )
+                company.orgnr = real_orgnr
+                if real_homepage and not company.website:
+                    company.website = real_homepage
+                changed = True
+        if company_name and company_name != company.name:
+            company.name = company_name
+            changed = True
+        if website and not company.website:
+            company.website = website
+            changed = True
+        return changed
 
     def create_or_resume_run(
         self,

@@ -188,6 +188,9 @@ class AnalysisInput:
     # Valuation output
     valuation_output: ValuationOutput = field(default_factory=ValuationOutput)
 
+    # Stage flags for downstream validators (set by assembler guards)
+    stage_flags: dict[str, bool] = field(default_factory=dict)
+
     def to_debug_dict(self) -> dict[str, Any]:
         """Serialize to a JSON-safe dict for debug dumps."""
         import dataclasses

@@ -110,6 +110,8 @@ class ReportComposer:
         *,
         analysis_input: AnalysisInput,
         completeness_report: dict | None = None,
+        report_degraded: bool = False,
+        degraded_reasons: list[str] | None = None,
     ) -> dict:
         """Primary compose path: build report from the canonical AnalysisInput."""
         ai = analysis_input
@@ -122,6 +124,20 @@ class ReportComposer:
             for ctype, counts in ai.verification.per_type.items():
                 if isinstance(counts, dict) and counts.get("unsupported", 0) > 0:
                     unsupported_types.add(ctype)
+
+        degraded_banner = ""
+        if report_degraded and degraded_reasons:
+            degraded_banner = (
+                "> **Notice:** This report was generated with incomplete data. "
+                f"Issues: {', '.join(degraded_reasons)}.\n\n"
+            )
+
+        financials_warning = ""
+        if not ai.historical_financials:
+            financials_warning = (
+                "> **Warning:** Financial history incomplete "
+                "— projections are less reliable.\n\n"
+            )
 
         # Derived history
         d = ai.derived_financial_history
@@ -177,6 +193,7 @@ class ReportComposer:
                 "section_key": "executive_summary",
                 "heading": "Executive Summary",
                 "content_md": (
+                    f"{degraded_banner}"
                     f"## Executive Summary\n\n"
                     f"**Company:** {company_name}\n\n"
                     f"{ai.summary or 'No summary available.'}\n\n"
@@ -208,6 +225,7 @@ class ReportComposer:
                 "section_key": "historical_financials",
                 "heading": "Historical Financials",
                 "content_md": (
+                    f"{financials_warning}"
                     f"### Financial History ({cr.get('historical_financials_years', 0)} years)\n\n"
                     f"{_historicals_table(ai)}\n\n"
                     f"### Derived Metrics\n"
@@ -254,6 +272,7 @@ class ReportComposer:
                 "section_key": "financials_and_valuation",
                 "heading": "Financial Projections & Valuation",
                 "content_md": (
+                    f"{financials_warning}"
                     f"### {proj_years}-Year Projection (Base Case)\n\n"
                     f"{_projection_table(ai, 'base')}\n\n"
                     f"- Final year revenue (MSEK): {revenue_final}\n"

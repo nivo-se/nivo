@@ -16,17 +16,24 @@ def build_debug_artifact(
     assumptions_output: dict | None = None,
     projection_output: dict | None = None,
     valuation_output: dict | None = None,
+    stage_evaluations: dict[str, Any] | None = None,
+    report_degraded: bool = False,
+    report_degraded_reasons: list[str] | None = None,
 ) -> dict[str, Any]:
     """Build a JSON-safe debug artifact for the run.
 
     Includes: assembled input summary, completeness, assumptions,
-    projection outputs, and valuation outputs.
+    projection outputs, valuation outputs, stage evaluations,
+    resolution source, and data source map.
     """
     ai = analysis_input
+
+    orgnr_is_real = bool(ai.orgnr and not ai.orgnr.startswith("tmp-"))
 
     identity_summary = {
         "canonical_name": ai.canonical_name,
         "orgnr": ai.orgnr,
+        "orgnr_is_real": orgnr_is_real,
         "website": ai.website,
         "industry": ai.industry,
         "headquarters": ai.headquarters,
@@ -97,6 +104,24 @@ def build_debug_artifact(
         "ebitda_margin_start": ai.model_assumptions.ebitda_margin_start,
     }
 
+    assumptions_source = "unknown"
+    if assumptions_output and isinstance(assumptions_output, dict):
+        assumptions_source = assumptions_output.get("assumptions_source", "synthetic_seed")
+
+    data_source_map = {
+        "orgnr": "public.companies" if orgnr_is_real else "synthetic_tmp",
+        "financials": "public.financials" if ai.historical_financials else "none",
+        "kpis": "public.company_kpis" if ai.derived_financial_history.latest_revenue_msek else "derived",
+        "assumptions": assumptions_source,
+    }
+
+    # Extract stage timing from evaluations
+    pipeline_stage_times: dict[str, int] = {}
+    if stage_evaluations:
+        for stage_name, ev in stage_evaluations.items():
+            if isinstance(ev, dict) and "elapsed_ms" in ev:
+                pipeline_stage_times[f"{stage_name}_ms"] = ev["elapsed_ms"]
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "run_id": str(ai.run_id) if ai.run_id else None,
@@ -116,6 +141,14 @@ def build_debug_artifact(
         "projection_output_summary": _summarize_projection(projection_output),
         "valuation_output": valuation_output,
         "source_refs_count": len(ai.source_refs),
+        "stage_flags": dict(ai.stage_flags),
+        "stage_evaluations": stage_evaluations or {},
+        "pipeline_integrity_passed": not report_degraded,
+        "report_degraded": report_degraded,
+        "report_degraded_reasons": report_degraded_reasons or [],
+        "data_source_map": data_source_map,
+        "assumptions_source": assumptions_source,
+        "pipeline_stage_times": pipeline_stage_times,
     }
 
 

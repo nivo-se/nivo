@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
@@ -13,6 +14,13 @@ from backend.agents import AgentRegistry
 from backend.db import SessionLocal
 from backend.db.models.deep_research import AnalysisRun, Company
 from backend.orchestrator.persistence import RunStateRepository
+from backend.orchestrator.stage_validators import (
+    MAX_STAGE_RETRIES,
+    STAGE_VALIDATORS,
+    STRICT_STAGE_GATING,
+    StageValidation,
+    StageValidationError,
+)
 from backend.orchestrator.state import OrchestratorState
 from backend.report_engine import ReportComposer
 from backend.verification import VerificationPipeline
@@ -82,8 +90,54 @@ class LangGraphAgentOrchestrator:
             output_json={},
             error_message=None,
         )
+
+        validator_fn = STAGE_VALIDATORS.get(node_name)
+        validation = StageValidation(status="pass")
+        attempt = 0
+        output: dict = {}
+        t0 = time.monotonic()
+
         try:
-            output = compute_fn(state)
+            for attempt in range(MAX_STAGE_RETRIES + 1):
+                output = compute_fn(state)
+
+                if validator_fn is None:
+                    break
+
+                validation = validator_fn(output)
+                if validation.status == "pass":
+                    break
+
+                if attempt < MAX_STAGE_RETRIES:
+                    logger.warning(
+                        "Stage %s validation failed (attempt %d/%d): %s — retrying",
+                        node_name, attempt + 1, MAX_STAGE_RETRIES, validation.issues,
+                    )
+                    continue
+
+                logger.warning(
+                    "Stage %s validation failed after %d attempts: %s — marking degraded",
+                    node_name, MAX_STAGE_RETRIES + 1, validation.issues,
+                )
+                if STRICT_STAGE_GATING:
+                    raise StageValidationError(
+                        f"Stage {node_name} failed validation after {MAX_STAGE_RETRIES + 1} "
+                        f"attempts: {validation.issues}"
+                    )
+
+            elapsed_ms = int((time.monotonic() - t0) * 1000)
+
+            stage_result = {
+                "stage": node_name,
+                "status": validation.status,
+                "issues": validation.issues,
+                "score": validation.score,
+                "retry_count": attempt,
+                "elapsed_ms": elapsed_ms,
+            }
+            evaluations = dict(state.get("stage_evaluations", {}))
+            evaluations[node_name] = stage_result
+
             repo.upsert_node_state(
                 run_id=uuid.UUID(state["run_id"]),
                 node_name=node_name,
@@ -92,7 +146,10 @@ class LangGraphAgentOrchestrator:
                 output_json=output,
                 error_message=None,
             )
-            return self._merge_node_result(state, node_name, output)
+            merged = self._merge_node_result(state, node_name, output)
+            merged["stage_evaluations"] = evaluations
+            return merged
+
         except Exception as exc:
             repo.session.rollback()
             try:
@@ -111,6 +168,21 @@ class LangGraphAgentOrchestrator:
                     node_name,
                 )
             raise
+
+    @staticmethod
+    def _evaluate_pipeline_integrity(state: OrchestratorState) -> tuple[bool, list[str]]:
+        """Check all stage evaluations for failures before report generation.
+
+        Returns (is_degraded, list_of_failed_stage_names).
+        """
+        evaluations = state.get("stage_evaluations", {})
+        failed_stages = [
+            name for name, ev in evaluations.items()
+            if ev.get("status") == "fail"
+        ]
+        if failed_stages:
+            logger.warning("Pipeline integrity: failed stages: %s", failed_stages)
+        return (bool(failed_stages), failed_stages)
 
     def _build_graph(self, repo: RunStateRepository):
         if StateGraph is None:
@@ -431,6 +503,8 @@ class LangGraphAgentOrchestrator:
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
 
+                is_degraded, degraded_reasons = self._evaluate_pipeline_integrity(_state)
+
                 from backend.services.deep_research.analysis_input_assembler import AnalysisInputAssembler
                 from backend.services.deep_research.input_completeness import InputCompletenessValidator
                 from backend.services.deep_research.debug_dump import build_debug_artifact
@@ -444,6 +518,8 @@ class LangGraphAgentOrchestrator:
                 data = self.report_composer.compose_from_analysis_input(
                     analysis_input=analysis_input,
                     completeness_report=completeness_report,
+                    report_degraded=is_degraded,
+                    degraded_reasons=degraded_reasons,
                 )
                 report = repo.persist_report(
                     run_id=run_id,
@@ -459,12 +535,17 @@ class LangGraphAgentOrchestrator:
                 assumptions_output = fm_output.get("assumption_set") if isinstance(fm_output, dict) else None
                 projection_output = fm_output.get("forecast") if isinstance(fm_output, dict) else None
 
+                stage_evaluations = dict(_state.get("stage_evaluations", {}))
+
                 debug_artifact = build_debug_artifact(
                     analysis_input=analysis_input,
                     completeness_report=completeness_report,
                     assumptions_output=assumptions_output,
                     projection_output=projection_output,
                     valuation_output=val_output if isinstance(val_output, dict) else None,
+                    stage_evaluations=stage_evaluations,
+                    report_degraded=is_degraded,
+                    report_degraded_reasons=degraded_reasons,
                 )
                 repo.upsert_node_state(
                     run_id=run_id,
@@ -550,6 +631,9 @@ class LangGraphAgentOrchestrator:
                 "current_node": "identity",
                 "node_results": {},
                 "errors": [],
+                "stage_evaluations": {},
+                "report_degraded": False,
+                "report_degraded_reasons": [],
             }
             try:
                 final_state = graph.invoke(init_state)
@@ -631,6 +715,9 @@ class LangGraphAgentOrchestrator:
                 "current_node": start_from_node,
                 "node_results": node_results,
                 "errors": [],
+                "stage_evaluations": {},
+                "report_degraded": False,
+                "report_degraded_reasons": [],
             }
             try:
                 final_state = graph.invoke(init_state)

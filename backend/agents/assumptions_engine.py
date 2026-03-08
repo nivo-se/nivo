@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import dataclass
 
 from .context import AgentContext
+
+logger = logging.getLogger(__name__)
 
 
 def _stable_unit(seed: str) -> float:
@@ -19,6 +22,19 @@ def _stable_range(seed: str, low: float, high: float) -> float:
 
 def _round4(value: float) -> float:
     return round(value, 4)
+
+
+def _extract_real_historicals(context: AgentContext) -> dict | None:
+    """Try to extract real historical financials from context sources/chunks.
+
+    Returns a dict with starting_revenue, growth, margins if available.
+    """
+    chunks = context.chunks or []
+    for chunk in chunks:
+        meta = chunk.metadata if hasattr(chunk, "metadata") else {}
+        if isinstance(meta, dict) and meta.get("type") == "historical_financials":
+            return meta
+    return None
 
 
 @dataclass(slots=True)
@@ -41,11 +57,32 @@ class AssumptionsEngine:
             initiatives = initiatives.get("items", [])
         initiative_count = len(initiatives) if isinstance(initiatives, list) else 0
 
+        # Determine assumptions source: prefer real historicals over synthetic seed
+        real_hist = _extract_real_historicals(context)
+        assumptions_source: str
+
+        if real_hist and real_hist.get("starting_revenue_msek"):
+            assumptions_source = "real_historicals"
+            base_revenue = float(real_hist["starting_revenue_msek"])
+            growth_start = float(real_hist.get("revenue_growth", 0.10))
+            margin_start = float(real_hist.get("ebitda_margin", 0.18))
+            logger.info(
+                "Assumptions built from real historicals: revenue=%.1f growth=%.4f margin=%.4f company=%s",
+                base_revenue, growth_start, margin_start, context.company_name,
+            )
+        else:
+            assumptions_source = "synthetic_seed"
+            key = f"{context.company_id}:{context.company_name}:{context.orgnr or ''}:{context.website or ''}"
+            base_revenue = round(_stable_range(f"{key}:rev", 350.0, 2200.0), 2)
+            growth_start = _stable_range(f"{key}:g_start", 0.09, 0.22)
+            margin_start = _stable_range(f"{key}:m_start", 0.14, 0.30)
+            logger.info(
+                "Assumptions built from synthetic seed: company=%s",
+                context.company_name,
+            )
+
         key = f"{context.company_id}:{context.company_name}:{context.orgnr or ''}:{context.website or ''}"
-        base_revenue = round(_stable_range(f"{key}:rev", 350.0, 2200.0), 2)
-        growth_start = _stable_range(f"{key}:g_start", 0.09, 0.22)
         growth_terminal = _stable_range(f"{key}:g_term", 0.02, 0.045)
-        margin_start = _stable_range(f"{key}:m_start", 0.14, 0.30)
         margin_terminal = min(0.4, margin_start + _stable_range(f"{key}:m_exp", 0.01, 0.06))
         capex_pct = _stable_range(f"{key}:capex", 0.03, 0.08)
         nwc_pct = _stable_range(f"{key}:nwc", 0.015, 0.06)
@@ -54,7 +91,6 @@ class AssumptionsEngine:
         wacc = _stable_range(f"{key}:wacc", 0.085, 0.13)
         net_debt = round(base_revenue * _stable_range(f"{key}:debt", 0.15, 0.45), 2)
 
-        # Deterministic adjustment from strategic signals.
         strategy_risk_items = strategy_payload.get("key_risks", [])
         if isinstance(strategy_risk_items, dict):
             strategy_risk_items = strategy_risk_items.get("items", [])
@@ -97,6 +133,7 @@ class AssumptionsEngine:
 
         return {
             "horizon_years": self.horizon_years,
+            "assumptions_source": assumptions_source,
             "base": base,
             "scenarios": scenarios,
             "driver_summary": {

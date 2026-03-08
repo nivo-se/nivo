@@ -18,4 +18,7 @@ class OrchestratorState(TypedDict, total=False):
     errors: list[str]
     started_at: str
     completed_at: str
+    stage_evaluations: dict[str, Any]
+    report_degraded: bool
+    report_degraded_reasons: list[str]
 

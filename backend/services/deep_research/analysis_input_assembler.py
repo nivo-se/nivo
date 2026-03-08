@@ -251,6 +251,13 @@ class AnalysisInputAssembler:
 
     def _load_historical_financials(self, ai: AnalysisInput) -> None:
         if not ai.orgnr:
+            ai.stage_flags["financials_skipped_no_orgnr"] = True
+            return
+        if ai.orgnr.startswith("tmp-"):
+            logger.warning(
+                "Historical financials skipped: synthetic orgnr %s", ai.orgnr,
+            )
+            ai.stage_flags["financials_skipped_tmp_orgnr"] = True
             return
         try:
             from backend.services.db_factory import get_database_service
