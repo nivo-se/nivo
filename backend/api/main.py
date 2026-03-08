@@ -129,6 +129,7 @@ async def health_check():
 # Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
 from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, me, prospects, shortlists, status, analysis, saved_lists, universe, views
 from .chat import router as chat_router
+from .deep_research import router as deep_research_router
 from .enrichment import router as enrichment_router
 
 app.include_router(me.router)
@@ -158,6 +159,7 @@ app.include_router(shortlists.router)
 app.include_router(saved_lists.router)
 app.include_router(analysis.router)
 app.include_router(chat_router)
+app.include_router(deep_research_router)
 
 # TODO: Add when implemented
 # from . import search

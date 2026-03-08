@@ -518,6 +518,12 @@ class LangGraphAgentOrchestrator:
     ) -> OrchestratorRunResult:
         with SessionLocal() as session:
             repo = RunStateRepository(session)
+
+            # If resuming an existing run, use its already-assigned company
+            existing_run = session.get(AnalysisRun, run_id) if run_id else None
+            if existing_run and existing_run.company_id:
+                company_id = company_id or existing_run.company_id
+
             company = repo.resolve_company(
                 company_id=company_id,
                 orgnr=orgnr,

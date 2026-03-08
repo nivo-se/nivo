@@ -76,15 +76,23 @@ class RunStateRepository:
         company: Company | None = None
         if company_id:
             company = self.session.get(Company, company_id)
-        if not company and orgnr:
+        if not company and orgnr and not orgnr.startswith("tmp-"):
             company = self.session.execute(
                 select(Company).where(Company.orgnr == orgnr)
             ).scalar_one_or_none()
+        if not company and company_name:
+            company = self.session.execute(
+                select(Company)
+                .where(Company.name == company_name)
+                .order_by(Company.created_at.desc())
+            ).scalars().first()
         if company:
             if company_name:
                 company.name = company_name
             if website and not company.website:
                 company.website = website
+            if orgnr and not orgnr.startswith("tmp-") and company.orgnr.startswith("tmp-"):
+                company.orgnr = orgnr
             self.session.flush()
             return company
 

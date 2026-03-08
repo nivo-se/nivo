@@ -29,7 +29,7 @@ router = APIRouter(prefix="/analysis", tags=["deep-research-analysis"])
 orchestrator = LangGraphAgentOrchestrator()
 
 
-def _enqueue_pipeline(run_id: uuid.UUID, body: AnalysisStartRequest) -> None:
+def _enqueue_pipeline(run_id: uuid.UUID, company_id: uuid.UUID, body: AnalysisStartRequest) -> None:
     """Enqueue a full pipeline job on the deep_research RQ queue."""
     try:
         from rq import Queue
@@ -45,7 +45,7 @@ def _enqueue_pipeline(run_id: uuid.UUID, body: AnalysisStartRequest) -> None:
                 "run_id": str(run_id),
                 "company_name": body.company_name,
                 "orgnr": body.orgnr,
-                "company_id": str(body.company_id) if body.company_id else None,
+                "company_id": str(company_id),
                 "website": body.website,
                 "query": body.query,
             },
@@ -57,7 +57,7 @@ def _enqueue_pipeline(run_id: uuid.UUID, body: AnalysisStartRequest) -> None:
             run_id=run_id,
             company_name=body.company_name,
             orgnr=body.orgnr,
-            company_id=body.company_id,
+            company_id=company_id,
             website=body.website,
             query=body.query,
         )
@@ -81,8 +81,9 @@ async def start_analysis(body: AnalysisStartRequest) -> ApiResponse[AnalysisStar
         )
         session.commit()
         run_id = run.id
+        resolved_company_id = company.id
 
-    _enqueue_pipeline(run_id, body)
+    _enqueue_pipeline(run_id, resolved_company_id, body)
 
     return ok(
         AnalysisStartData(
