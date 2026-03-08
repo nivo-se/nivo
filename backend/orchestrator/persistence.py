@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from backend.db.models.deep_research import (
     AnalysisRun,
     Claim,
+    ClaimVerification,
     Company,
     CompanyProfile,
     Competitor,
@@ -102,6 +103,7 @@ class RunStateRepository:
         run_id: uuid.UUID | None,
         company_id: uuid.UUID,
         query: str,
+        initial_status: str = "running",
     ) -> AnalysisRun:
         run = self.session.get(AnalysisRun, run_id) if run_id else None
         if run:
@@ -114,9 +116,9 @@ class RunStateRepository:
         run = AnalysisRun(
             id=run_id or uuid.uuid4(),
             company_id=company_id,
-            status="running",
+            status=initial_status,
             query=query,
-            started_at=datetime.utcnow(),
+            started_at=datetime.utcnow() if initial_status == "running" else None,
             extra={"orchestrator": "langgraph"},
         )
         self.session.add(run)
@@ -480,4 +482,45 @@ class RunStateRepository:
             self.session.add(row_section)
         self.session.flush()
         return row
+
+    def persist_claim_verifications(
+        self,
+        *,
+        run_id: uuid.UUID,
+        claim_updates: list[dict],
+    ) -> int:
+        """Write per-claim verification rows to claim_verifications table."""
+        count = 0
+        for item in claim_updates:
+            claim_id_str = item.get("claim_id")
+            if not claim_id_str:
+                continue
+            try:
+                claim_id = uuid.UUID(str(claim_id_str))
+            except ValueError:
+                continue
+            claim = self.session.get(Claim, claim_id)
+            if claim is None:
+                continue
+
+            row = ClaimVerification(
+                run_id=run_id,
+                claim_id=claim_id,
+                status=item.get("verification_status", "UNCERTAIN"),
+                confidence_score=float(claim.confidence) if claim.confidence is not None else None,
+                source_ids=_json_safe([str(claim.source_chunk_id)] if claim.source_chunk_id else []),
+                notes=None,
+            )
+            self.session.add(row)
+            count += 1
+        self.session.flush()
+        return count
+
+    def list_claim_verifications(self, run_id: uuid.UUID) -> list[ClaimVerification]:
+        rows = self.session.execute(
+            select(ClaimVerification)
+            .where(ClaimVerification.run_id == run_id)
+            .order_by(ClaimVerification.created_at.asc())
+        ).scalars()
+        return list(rows)
 

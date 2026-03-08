@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from backend.agents import AgentRegistry
 from backend.db import SessionLocal
-from backend.db.models.deep_research import AnalysisRun
+from backend.db.models.deep_research import AnalysisRun, Company
 from backend.orchestrator.persistence import RunStateRepository
 from backend.orchestrator.state import OrchestratorState
 from backend.report_engine import ReportComposer
@@ -414,9 +414,13 @@ class LangGraphAgentOrchestrator:
                 result = self.verification_pipeline.run(claims, strict_mode=False)
                 verified_updates = result.pop("claim_updates", [])
                 updated_claims = repo.apply_claim_verification(verified_updates)
+                persisted_verifications = repo.persist_claim_verifications(
+                    run_id=run_id, claim_updates=verified_updates,
+                )
                 result["metadata"] = {
                     "pipeline": self.verification_pipeline.name,
                     "updated_claims": updated_claims,
+                    "persisted_verifications": persisted_verifications,
                 }
                 return result
 
@@ -427,11 +431,13 @@ class LangGraphAgentOrchestrator:
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
                 node_results = dict(_state.get("node_results", {}))
+                verification_output = node_results.get("verification")
                 data = self.report_composer.compose(
                     company_name=str(
                         _state.get("company_name") or _state.get("orgnr") or "Unknown Company"
                     ),
                     node_results=node_results,
+                    verification_output=verification_output,
                 )
                 report = repo.persist_report(
                     run_id=run_id,
@@ -547,6 +553,120 @@ class LangGraphAgentOrchestrator:
                     errors=[str(exc)],
                 )
 
+    def execute_partial_run(
+        self,
+        *,
+        run_id: uuid.UUID,
+        start_from_node: str,
+    ) -> OrchestratorRunResult:
+        """Execute pipeline from a specific node, reusing upstream completed outputs."""
+        if start_from_node not in PIPELINE_NODES:
+            raise ValueError(f"Unknown node: {start_from_node}")
+
+        start_idx = PIPELINE_NODES.index(start_from_node)
+        with SessionLocal() as session:
+            repo = RunStateRepository(session)
+            run = session.get(AnalysisRun, run_id)
+            if run is None:
+                raise ValueError(f"Run not found: {run_id}")
+            company = session.get(Company, run.company_id) if run.company_id else None
+            if company is None:
+                raise ValueError(f"Company not found for run: {run_id}")
+
+            run.status = "running"
+            run.error_message = None
+            run.completed_at = None
+            session.flush()
+
+            existing_nodes = repo.list_node_states(run_id)
+            node_results: dict[str, Any] = {}
+            for row in existing_nodes:
+                if row.node_name in PIPELINE_NODES:
+                    idx = PIPELINE_NODES.index(row.node_name)
+                    if idx < start_idx and row.status == "completed" and isinstance(row.output_json, dict):
+                        node_results[row.node_name] = row.output_json
+
+            graph = self._build_graph(repo)
+            init_state: OrchestratorState = {
+                "run_id": str(run_id),
+                "company_id": str(company.id),
+                "orgnr": company.orgnr,
+                "company_name": company.name,
+                "website": company.website,
+                "query": run.query or company.name,
+                "status": "running",
+                "current_node": start_from_node,
+                "node_results": node_results,
+                "errors": [],
+            }
+            try:
+                final_state = graph.invoke(init_state)
+                repo.finalize_run(run_id, status="completed", error=None)
+                node_rows = repo.list_node_states(run_id)
+                session.commit()
+                return OrchestratorRunResult(
+                    run_id=run_id,
+                    company_id=company.id,
+                    status="completed",
+                    stage=str(final_state.get("current_node", "report_generation")),
+                    progress_pct=self._progress_from_node_states(
+                        [{"status": row.status} for row in node_rows]
+                    ),
+                    node_results=dict(final_state.get("node_results", {})),
+                    errors=[],
+                )
+            except Exception as exc:
+                session.rollback()
+                logger.exception("Partial pipeline failed for run %s: %s", run_id, exc)
+                repo.finalize_run(run_id, status="failed", error=str(exc))
+                node_rows = repo.list_node_states(run_id)
+                session.commit()
+                return OrchestratorRunResult(
+                    run_id=run_id,
+                    company_id=company.id,
+                    status="failed",
+                    stage="failed",
+                    progress_pct=self._progress_from_node_states(
+                        [{"status": row.status} for row in node_rows]
+                    ),
+                    node_results={},
+                    errors=[str(exc)],
+                )
+
+    @staticmethod
+    def _build_stages(node_rows: list) -> list[dict[str, Any]]:
+        """Build stages[] in PIPELINE_NODES order from RunNodeState rows."""
+        by_name = {row.node_name: row for row in node_rows}
+        stages: list[dict[str, Any]] = []
+        for node_name in PIPELINE_NODES:
+            row = by_name.get(node_name)
+            if row:
+                stages.append({
+                    "stage": node_name,
+                    "status": row.status,
+                    "started_at": row.started_at,
+                    "finished_at": row.completed_at,
+                })
+            else:
+                stages.append({
+                    "stage": node_name,
+                    "status": "pending",
+                    "started_at": None,
+                    "finished_at": None,
+                })
+        return stages
+
+    @staticmethod
+    def _current_stage_from_rows(node_rows: list) -> str:
+        """Derive current_stage: the latest non-pending node, or 'identity' if none started."""
+        by_name = {row.node_name: row for row in node_rows}
+        current = "identity"
+        for node_name in PIPELINE_NODES:
+            row = by_name.get(node_name)
+            if row and row.status in ("running", "completed", "failed"):
+                current = node_name
+        return current
+
     def get_run_status(self, run_id: uuid.UUID) -> dict[str, Any] | None:
         with SessionLocal() as session:
             run = session.get(AnalysisRun, run_id)
@@ -554,24 +674,14 @@ class LangGraphAgentOrchestrator:
                 return None
             repo = RunStateRepository(session)
             node_rows = repo.list_node_states(run_id)
-            node_states = [
-                {
-                    "node_name": row.node_name,
-                    "status": row.status,
-                    "started_at": row.started_at.isoformat() if row.started_at else None,
-                    "completed_at": row.completed_at.isoformat() if row.completed_at else None,
-                    "error_message": row.error_message,
-                }
-                for row in node_rows
-            ]
-            stage = node_states[-1]["node_name"] if node_states else "identity"
+            stages = self._build_stages(node_rows)
+            current_stage = self._current_stage_from_rows(node_rows)
             return {
                 "run_id": run.id,
                 "company_id": run.company_id,
                 "status": run.status,
-                "stage": stage,
-                "progress_pct": self._progress_from_node_states(node_states),
-                "node_states": node_states,
+                "current_stage": current_stage,
+                "stages": stages,
             }
 
     def list_runs(self, limit: int = 20) -> list[dict[str, Any]]:
@@ -582,17 +692,16 @@ class LangGraphAgentOrchestrator:
             out: list[dict[str, Any]] = []
             repo = RunStateRepository(session)
             for row in rows:
-                node_states = repo.list_node_states(row.id)
-                stage = node_states[-1].node_name if node_states else "identity"
+                node_rows = repo.list_node_states(row.id)
+                stages = self._build_stages(node_rows)
+                current_stage = self._current_stage_from_rows(node_rows)
                 out.append(
                     {
                         "run_id": row.id,
                         "company_id": row.company_id,
                         "status": row.status,
-                        "stage": stage,
-                        "progress_pct": self._progress_from_node_states(
-                            [{"status": n.status} for n in node_states]
-                        ),
+                        "current_stage": current_stage,
+                        "stages": stages,
                     }
                 )
             return out

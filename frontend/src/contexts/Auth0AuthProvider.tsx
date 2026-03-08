@@ -1,13 +1,13 @@
 /**
  * Auth provider that uses Auth0. Must be rendered inside Auth0Provider.
- * Fetches GET /api/me to get role from local Postgres (user_roles).
+ * Calls POST /api/enroll on login to register email and get role + bootstrap status.
  */
 import React, { useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { AuthContext } from './AuthContext'
 import type { AuthContextType, AppUser } from './AuthContext'
 import { setAccessTokenGetter } from '../lib/authToken'
-import { getMe } from '../lib/meService'
+import { postEnroll } from '../lib/services/enrollService'
 
 function auth0UserToAppUser(auth0User: { sub: string; email?: string; name?: string } | undefined): AppUser | null {
   if (!auth0User) return null
@@ -32,6 +32,7 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
     getAccessTokenSilently,
   } = useAuth0()
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [isBootstrapped, setIsBootstrapped] = useState(false)
   const [meLoaded, setMeLoaded] = useState(false)
 
   useEffect(() => {
@@ -49,17 +50,20 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAuthenticated || !auth0User) {
       setUserRole(null)
+      setIsBootstrapped(false)
       setMeLoaded(true)
       return
     }
     setMeLoaded(false)
-    getMe()
-      .then((me) => {
-        setUserRole(me?.role ?? null)
+    postEnroll(auth0User.email ?? null, auth0User.name ?? null)
+      .then((result) => {
+        setUserRole(result?.role ?? null)
+        setIsBootstrapped(result?.is_bootstrapped ?? false)
         setMeLoaded(true)
       })
       .catch(() => {
         setUserRole(null)
+        setIsBootstrapped(false)
         setMeLoaded(true)
       })
   }, [isAuthenticated, auth0User?.sub])
@@ -74,6 +78,7 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     setUserRole(null)
+    setIsBootstrapped(false)
     logout({ logoutParams: { returnTo: window.location.origin } })
     return { error: null }
   }
@@ -83,6 +88,7 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
     session: null,
     loading,
     userRole,
+    isBootstrapped,
     isApproved: isAuthenticated,
     signUp: async () => ({ error: { name: 'Auth0', message: 'Use Sign up on the login page', status: 400 } as any }),
     signIn,

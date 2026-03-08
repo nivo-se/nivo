@@ -5,6 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+_UNVERIFIED = "[unverified]"
+
+_GUARDED_SECTIONS = frozenset({
+    "financials_and_valuation",
+    "market_and_competitive_landscape",
+})
+
 
 def _as_list(value: Any) -> list:
     if isinstance(value, list):
@@ -21,13 +28,40 @@ def _lines(items: list[str]) -> str:
     return "\n".join(f"- {x}" for x in items)
 
 
+def _build_unsupported_types(verification: dict) -> set[str]:
+    """Return claim_types that have at least one UNSUPPORTED claim."""
+    stats = verification.get("stats", {})
+    per_type: dict[str, dict] = stats.get("per_type", {})
+    bad_types: set[str] = set()
+    for claim_type, counts in per_type.items():
+        if isinstance(counts, dict) and counts.get("unsupported", 0) > 0:
+            bad_types.add(claim_type)
+    return bad_types
+
+
+def _guard_numeric(value: Any, unsupported_types: set[str], types_to_check: tuple[str, ...]) -> Any:
+    """Replace value with [unverified] if any of the given claim types are unsupported."""
+    if not unsupported_types:
+        return value
+    for t in types_to_check:
+        if t in unsupported_types:
+            return _UNVERIFIED
+    return value
+
+
 @dataclass(slots=True)
 class ReportComposer:
     """Composes markdown report payloads from orchestrator node outputs."""
 
     version: str = "v1"
 
-    def compose(self, *, company_name: str, node_results: dict[str, dict]) -> dict:
+    def compose(
+        self,
+        *,
+        company_name: str,
+        node_results: dict[str, dict],
+        verification_output: dict | None = None,
+    ) -> dict:
         identity = node_results.get("identity", {})
         profile = node_results.get("company_profile", {})
         market = node_results.get("market_analysis", {})
@@ -36,7 +70,9 @@ class ReportComposer:
         value_creation = node_results.get("value_creation", {})
         financial = node_results.get("financial_model", {})
         valuation = node_results.get("valuation", {})
-        verification = node_results.get("verification", {})
+        verification = verification_output or node_results.get("verification", {})
+
+        unsupported_types = _build_unsupported_types(verification)
 
         competitor_items = _as_list(competitors.get("competitors"))
         competitor_names = [c.get("name") for c in competitor_items if isinstance(c, dict) and c.get("name")]
@@ -50,6 +86,16 @@ class ReportComposer:
             else []
         )
         year7 = base_forecast[-1] if isinstance(base_forecast, list) and base_forecast else {}
+
+        revenue = _guard_numeric(year7.get("revenue_msek", "N/A"), unsupported_types, ("financial_model",))
+        ebitda = _guard_numeric(year7.get("ebitda_margin_pct", "N/A"), unsupported_types, ("financial_model",))
+        ev = _guard_numeric(valuation.get("enterprise_value", "N/A"), unsupported_types, ("valuation",))
+        eq = _guard_numeric(valuation.get("equity_value", "N/A"), unsupported_types, ("valuation",))
+        vr_low = _guard_numeric(valuation.get("valuation_range_low", "N/A"), unsupported_types, ("valuation",))
+        vr_high = _guard_numeric(valuation.get("valuation_range_high", "N/A"), unsupported_types, ("valuation",))
+
+        market_size = _guard_numeric(market.get("market_size", "N/A"), unsupported_types, ("market_analysis",))
+        growth_rate = _guard_numeric(market.get("growth_rate", "N/A"), unsupported_types, ("market_analysis",))
 
         sections = [
             {
@@ -81,6 +127,9 @@ class ReportComposer:
                 "section_key": "market_and_competitive_landscape",
                 "heading": "Market & Competitive Landscape",
                 "content_md": (
+                    f"### Market Size & Growth\n"
+                    f"- Market size: {market_size}\n"
+                    f"- Growth rate: {growth_rate}\n\n"
                     "### Market Trends\n"
                     f"{_lines([str(x) for x in trends])}\n\n"
                     "### Key Competitors\n"
@@ -108,13 +157,13 @@ class ReportComposer:
                 "heading": "Financial Model & Valuation",
                 "content_md": (
                     "### 7-Year Projection (Base Case)\n"
-                    f"- Year 7 Revenue (MSEK): {year7.get('revenue_msek', 'N/A')}\n"
-                    f"- Year 7 EBITDA Margin (%): {year7.get('ebitda_margin_pct', 'N/A')}\n\n"
+                    f"- Year 7 Revenue (MSEK): {revenue}\n"
+                    f"- Year 7 EBITDA Margin (%): {ebitda}\n\n"
                     "### Valuation\n"
-                    f"- Enterprise Value (MSEK): {valuation.get('enterprise_value', 'N/A')}\n"
-                    f"- Equity Value (MSEK): {valuation.get('equity_value', 'N/A')}\n"
-                    f"- Valuation Range (MSEK): {valuation.get('valuation_range_low', 'N/A')} "
-                    f"to {valuation.get('valuation_range_high', 'N/A')}\n"
+                    f"- Enterprise Value (MSEK): {ev}\n"
+                    f"- Equity Value (MSEK): {eq}\n"
+                    f"- Valuation Range (MSEK): {vr_low} "
+                    f"to {vr_high}\n"
                 ),
                 "sort_order": 5,
             },
@@ -127,6 +176,7 @@ class ReportComposer:
             "metadata": {
                 "composer_version": self.version,
                 "node_count": len(node_results),
+                "unsupported_claim_types": sorted(unsupported_types),
             },
         }
 

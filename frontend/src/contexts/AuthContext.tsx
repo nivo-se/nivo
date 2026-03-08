@@ -19,6 +19,8 @@ export interface AuthContextType {
   session: unknown
   loading: boolean
   userRole: string | null
+  /** True once at least one user has a role in the DB (bootstrap is complete). */
+  isBootstrapped: boolean
   isApproved: boolean
   signUp: (email: string, password: string) => Promise<{ error: { name: string; message: string; status: number } | null }>
   signIn: (email: string, password: string) => Promise<{ error: { name: string; message: string; status: number } | null }>
@@ -60,6 +62,7 @@ export function NoAuthProvider({ children }: { children: React.ReactNode }) {
     session: null,
     loading,
     userRole: null,
+    isBootstrapped: false,
     isApproved: false,
     signUp: async () => ({ error: notConfiguredError() }),
     signIn: async () => ({ error: notConfiguredError() }),

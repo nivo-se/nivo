@@ -7,6 +7,8 @@ export type UserRole = "admin" | "analyst";
 export interface UserRoleRow {
   sub: string;
   role: string;
+  email: string | null;
+  name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -19,9 +21,19 @@ export interface AllowedUserRow {
   updated_at: string;
 }
 
+/** A user who has logged in at least once but has not been assigned a role yet. */
+export interface PendingUserRow {
+  sub: string;
+  email: string | null;
+  name: string | null;
+  first_seen: string;
+  last_seen: string;
+}
+
 export interface AdminUsersResponse {
   user_roles: UserRoleRow[];
   allowed_users: AllowedUserRow[];
+  pending_users: PendingUserRow[];
 }
 
 /** List all user_roles and allowed_users. Admin only. */

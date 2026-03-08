@@ -4,22 +4,25 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
-import { Loader2, Users, Shield, Mail, Eye, Info, UserPlus, XCircle, CheckCircle } from 'lucide-react';
+import { Loader2, Users, Shield, Eye, UserPlus, XCircle, CheckCircle, Clock } from 'lucide-react';
 import {
   getAdminUsers,
   setUserRole,
   setUserAllow,
   type UserRole,
   type AdminUsersResponse,
+  type PendingUserRow,
 } from '../lib/services/adminService';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-/** Merged row: sub + role (from user_roles) + allowed (from allowed_users). */
+/** Merged row: sub + role (from user_roles) + allowed (from allowed_users) + profile email/name. */
 interface UserRow {
   sub: string;
   role: string;
+  email: string | null;
+  name: string | null;
   created_at: string;
   updated_at: string;
   enabled: boolean;
@@ -36,6 +39,8 @@ function mergeAdminUsers(data: AdminUsersResponse): UserRow[] {
     bySub.set(r.sub, {
       sub: r.sub,
       role: r.role,
+      email: r.email ?? null,
+      name: r.name ?? null,
       created_at: r.created_at,
       updated_at: r.updated_at,
       enabled: true,
@@ -51,6 +56,8 @@ function mergeAdminUsers(data: AdminUsersResponse): UserRow[] {
       bySub.set(a.sub, {
         sub: a.sub,
         role: '',
+        email: null,
+        name: null,
         created_at: a.created_at,
         updated_at: a.updated_at,
         enabled: a.enabled,
@@ -61,8 +68,21 @@ function mergeAdminUsers(data: AdminUsersResponse): UserRow[] {
   return Array.from(bySub.values()).sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
 }
 
+/** Generate initials from email or name for the avatar. */
+function getInitials(email: string | null, name: string | null): string {
+  if (name) {
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : parts[0].slice(0, 2).toUpperCase();
+  }
+  if (email) return email[0].toUpperCase();
+  return '?';
+}
+
 const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<PendingUserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -84,9 +104,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       setError(null);
       const data = await getAdminUsers();
       setUsers(mergeAdminUsers(data));
+      setPendingUsers(data.pending_users ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load users');
       setUsers([]);
+      setPendingUsers([]);
     } finally {
       setLoading(false);
     }
@@ -153,6 +175,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
     setIsUserDialogOpen(true);
   };
 
+  /** Open the grant-access dialog pre-filled from a pending user row. */
+  const handleGrantAccess = (pending: PendingUserRow) => {
+    setAddSub(pending.sub);
+    setAddRole('analyst');
+    setAddError(null);
+    setIsAddDialogOpen(true);
+  };
+
   const handleAddBySub = async () => {
     const sub = addSub.trim();
     if (!sub) {
@@ -199,7 +229,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           <p className="text-sm text-muted-foreground">Roles and allowlist by Auth0 sub (local Postgres)</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsAddDialogOpen(true)}>
+          <Button variant="outline" onClick={() => { setAddSub(''); setAddRole('analyst'); setAddError(null); setIsAddDialogOpen(true); }}>
             <UserPlus className="w-4 h-4 mr-2" />
             Add by sub
           </Button>
@@ -238,6 +268,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </div>
       </div>
 
+      {/* Active users */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -255,19 +286,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
                 key={user.sub}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/40 transition-colors"
               >
-                <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => handleUserClick(user)}>
-                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-muted-foreground" />
+                <div className="flex items-center space-x-4 flex-1 cursor-pointer min-w-0" onClick={() => handleUserClick(user)}>
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold text-primary">
+                    {getInitials(user.email, user.name)}
                   </div>
-                  <div>
-                    <p className="font-mono text-sm font-medium">{user.sub}</p>
+                  <div className="min-w-0">
+                    {user.email ? (
+                      <p className="text-sm font-medium text-foreground truncate">{user.email}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">No email on file</p>
+                    )}
+                    {user.name && (
+                      <p className="text-xs text-muted-foreground truncate">{user.name}</p>
+                    )}
+                    <p className="font-mono text-xs text-muted-foreground truncate">{user.sub}</p>
                     <p className="text-xs text-muted-foreground">
                       Updated: {formatDate(user.updated_at)}
                       {user.note ? ` · ${user.note}` : ''}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap flex-shrink-0 ml-4">
                   {getRoleBadge(user.role)}
                   {!user.enabled && (
                     <Badge variant="outline">Disabled</Badge>
@@ -305,6 +344,66 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </CardContent>
       </Card>
 
+      {/* Pending users */}
+      {pendingUsers.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Clock className="w-5 h-5 mr-2" />
+              Pending approval ({pendingUsers.length})
+            </CardTitle>
+            <CardDescription>
+              These users have logged in but have not been assigned a role yet.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {pendingUsers.map((pending) => (
+                <div
+                  key={pending.sub}
+                  className="flex items-center justify-between p-4 border rounded-lg bg-muted/20"
+                >
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold text-muted-foreground">
+                      {getInitials(pending.email, pending.name)}
+                    </div>
+                    <div className="min-w-0">
+                      {pending.email ? (
+                        <p className="text-sm font-medium text-foreground truncate">{pending.email}</p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">No email on file</p>
+                      )}
+                      {pending.name && (
+                        <p className="text-xs text-muted-foreground truncate">{pending.name}</p>
+                      )}
+                      <p className="font-mono text-xs text-muted-foreground truncate">{pending.sub}</p>
+                      <p className="text-xs text-muted-foreground">
+                        First seen: {formatDate(pending.first_seen)} · Last seen: {formatDate(pending.last_seen)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                    <Button
+                      size="sm"
+                      onClick={() => handleGrantAccess(pending)}
+                      disabled={actionLoading === pending.sub}
+                    >
+                      {actionLoading === pending.sub ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <UserPlus className="w-4 h-4 mr-1" />
+                      )}
+                      Grant access
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* User detail / edit dialog */}
       <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
         <DialogContent className="max-w-lg bg-card text-foreground border-border shadow-xl">
           <DialogHeader>
@@ -313,6 +412,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-4">
+              {selectedUser.email && (
+                <div>
+                  <Label className="text-sm font-medium">Email</Label>
+                  <p className="text-sm mt-1">{selectedUser.email}</p>
+                </div>
+              )}
+              {selectedUser.name && (
+                <div>
+                  <Label className="text-sm font-medium">Name</Label>
+                  <p className="text-sm mt-1">{selectedUser.name}</p>
+                </div>
+              )}
               <div>
                 <Label className="text-sm font-medium">Sub</Label>
                 <p className="font-mono text-sm bg-muted p-2 rounded mt-1">{selectedUser.sub}</p>
@@ -370,6 +481,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
         </DialogContent>
       </Dialog>
 
+      {/* Add / grant access dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
         setIsAddDialogOpen(open);
         if (!open) {
@@ -380,9 +492,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
       }}>
         <DialogContent className="max-w-md text-foreground">
           <DialogHeader>
-            <DialogTitle>Add user by sub</DialogTitle>
+            <DialogTitle>Grant access</DialogTitle>
             <DialogDescription>
-              Enter the Auth0 sub (e.g. from GET /api/me or Auth0 logs). They will get the chosen role.
+              Assign a role to this user. Enter their Auth0 sub or use the pre-filled value from the pending list.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -392,7 +504,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               </Alert>
             )}
             <div>
-              <Label htmlFor="add-sub">Sub</Label>
+              <Label htmlFor="add-sub">Auth0 sub</Label>
               <Input
                 id="add-sub"
                 placeholder="auth0|xxxxxxxx"
@@ -420,7 +532,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ currentUser }) => {
               </Button>
               <Button onClick={handleAddBySub} disabled={addSubmitting}>
                 {addSubmitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                Add
+                Grant access
               </Button>
             </div>
           </div>

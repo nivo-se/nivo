@@ -1,10 +1,12 @@
-"""Search provider wrappers (SerpAPI/Tavily) for retrieval pipeline."""
+"""Search provider wrappers (SerpAPI/Tavily) for retrieval pipeline with dedup."""
 
 from __future__ import annotations
 
 import logging
 import re
+from collections import defaultdict
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 import certifi
 import requests
@@ -18,12 +20,25 @@ logger = logging.getLogger(__name__)
 SERP_API_URL = "https://serpapi.com/search.json"
 TAVILY_API_URL = "https://api.tavily.com/search"
 
+_MAX_PER_DOMAIN = 2
+
+
+def _root_domain(url: str) -> str:
+    """Extract root domain (e.g. 'example.com') from a URL."""
+    try:
+        host = urlparse(url).hostname or ""
+        parts = host.split(".")
+        if len(parts) >= 2:
+            return ".".join(parts[-2:])
+        return host
+    except Exception:
+        return ""
+
 
 def _looks_like_url(text: str) -> bool:
     candidate = text.strip().lower()
     if candidate.startswith("http://") or candidate.startswith("https://"):
         return True
-    # Treat bare domains as direct URLs (e.g. example.com).
     return " " not in candidate and "." in candidate and not candidate.startswith("/")
 
 
@@ -135,7 +150,6 @@ class WebSearch:
             logger.warning("retrieval_provider=tavily but TAVILY_API_KEY is not configured")
 
     def search(self, query: str, max_results: int) -> list[SearchResult]:
-        # Direct URL queries bypass external search APIs.
         if _looks_like_url(query):
             normalized = query.strip()
             if not re.match(r"^https?://", normalized):
@@ -155,8 +169,24 @@ class WebSearch:
             return []
 
         try:
-            return self._provider.search(query, max_results=max_results)
+            raw = self._provider.search(query, max_results=max_results + 5)
+            return self._deduplicate(raw, max_results)
         except Exception as exc:  # pragma: no cover - network dependent
             logger.warning("Web search failed for query '%s': %s", query, exc)
             return []
+
+    @staticmethod
+    def _deduplicate(results: list[SearchResult], max_results: int) -> list[SearchResult]:
+        """Limit to _MAX_PER_DOMAIN results per root domain and prefer newer results."""
+        domain_counts: dict[str, int] = defaultdict(int)
+        deduped: list[SearchResult] = []
+        for r in results:
+            domain = _root_domain(r.url)
+            if domain_counts[domain] >= _MAX_PER_DOMAIN:
+                continue
+            domain_counts[domain] += 1
+            deduped.append(r)
+            if len(deduped) >= max_results:
+                break
+        return deduped
 

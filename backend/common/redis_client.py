@@ -7,7 +7,7 @@ from typing import Optional
 
 import redis
 
-from backend.config.settings import AppSettings
+from backend.config.settings import AppSettings, get_settings
 
 
 @dataclass(slots=True)
@@ -25,4 +25,10 @@ class RedisClientManager:
             return True, None
         except Exception as exc:  # pragma: no cover - defensive runtime check
             return False, str(exc)
+
+    @staticmethod
+    def get_connection() -> redis.Redis:
+        """Return a Redis connection using the current app settings."""
+        settings = get_settings()
+        return redis.Redis.from_url(settings.redis_url, socket_connect_timeout=5)
 

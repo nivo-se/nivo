@@ -30,24 +30,63 @@ class PutAllowBody(BaseModel):
     note: Optional[str] = None
 
 
+def _get_db():
+    from ..services.db_factory import get_database_service
+    return get_database_service()
+
+
+def _list_user_profiles() -> list:
+    """Return all rows from user_profiles."""
+    try:
+        db = _get_db()
+        return db.run_raw_query(
+            "SELECT sub, email, name, first_seen, last_seen FROM user_profiles ORDER BY last_seen DESC"
+        )
+    except Exception:
+        return []
+
+
 @router.get("/users")
 def list_users(_sub: str = Depends(require_role("admin"))):
     """
-    List all user_roles and allowed_users. Admin only.
-    Returns { "user_roles": [...], "allowed_users": [...] }.
+    List all user_roles, allowed_users, and pending_users (profiles with no role). Admin only.
+    Returns { "user_roles": [...], "allowed_users": [...], "pending_users": [...] }.
     """
     roles = list_user_roles()
     allowed = list_allowed_users()
-    # Serialize datetimes for JSON
+    profiles = _list_user_profiles()
+
+    # Build lookup: sub → profile (email, name)
+    profile_by_sub = {p["sub"]: p for p in profiles}
+    role_subs = {r["sub"] for r in roles}
+
     def row_to_json(r):
         d = dict(r)
-        for k in ("created_at", "updated_at"):
+        for k in ("created_at", "updated_at", "first_seen", "last_seen"):
             if k in d and hasattr(d[k], "isoformat"):
                 d[k] = d[k].isoformat()
         return d
+
+    # Enrich user_roles rows with email/name from profiles
+    enriched_roles = []
+    for r in roles:
+        row = row_to_json(r)
+        profile = profile_by_sub.get(r["sub"])
+        row["email"] = profile["email"] if profile else None
+        row["name"] = profile["name"] if profile else None
+        enriched_roles.append(row)
+
+    # pending_users: profiles whose sub has no entry in user_roles
+    pending = [
+        row_to_json(p)
+        for p in profiles
+        if p["sub"] not in role_subs
+    ]
+
     return {
-        "user_roles": [row_to_json(r) for r in roles],
+        "user_roles": enriched_roles,
         "allowed_users": [row_to_json(a) for a in allowed],
+        "pending_users": pending,
     }
 
 

@@ -54,11 +54,19 @@ class AnalysisStartData(BaseModel):
     accepted_at: datetime
 
 
+class RunStageData(BaseModel):
+    stage: str
+    status: Literal["pending", "running", "completed", "failed", "skipped"]
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
 class AnalysisStatusData(BaseModel):
     run_id: uuid.UUID
+    company_id: uuid.UUID | None = None
     status: Literal["pending", "running", "completed", "failed", "cancelled"]
-    stage: str
-    progress_pct: int = Field(ge=0, le=100)
+    current_stage: str
+    stages: list[RunStageData] = Field(default_factory=list)
 
 
 class ReportGenerateRequest(BaseModel):

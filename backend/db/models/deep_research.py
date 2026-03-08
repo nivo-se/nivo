@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Any, Optional
 
 from sqlalchemy import (
@@ -215,6 +216,37 @@ class Claim(TimestampMixin, Base):
     confidence: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     evidence: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class ClaimVerification(TimestampMixin, Base):
+    __tablename__ = "claim_verifications"
+    __table_args__ = (
+        Index("ix_dr_claim_verifications_run", "run_id"),
+        Index("ix_dr_claim_verifications_claim", "claim_id"),
+        Index("ix_dr_claim_verifications_status", "status"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    claim_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.claims.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    confidence_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    verified_at: Mapped[Optional[Any]] = mapped_column(
+        DateTime(timezone=True), nullable=True, default=datetime.utcnow
+    )
+    source_ids: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
 class CompanyProfile(TimestampMixin, Base):
