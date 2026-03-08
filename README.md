@@ -116,7 +116,7 @@ python -m uvicorn backend.api.main:app --reload --port 8000
 npm install && npm run dev
 ```
 
-See [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md) and [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md) for Postgres. See [START_ALL_SERVERS.md](START_ALL_SERVERS.md) for a quick server reference.
+See [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md) and [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md) for Postgres. See [QUICK_START.md](QUICK_START.md) for a quick server reference.
 
 ### Mac Mini (production)
 

@@ -16,7 +16,6 @@ AGENTS.md
 
 docs/deep_research/IMPLEMENTATION_INDEX.md  
 docs/deep_research/CURSOR_CONTEXT_PLAYBOOK.md  
-docs/deep_research/CURSOR_AGENT_EXECUTION_PLAN.md  
 docs/deep_research/CURSOR_AGENT_RULES.md  
 
 These documents define:
@@ -88,9 +87,8 @@ docs/deep_research/
 
 3. Identify the modules required to implement the platform.
 
-4. Produce the following planning documents:
+4. Produce or update planning documents:
 
-docs/deep_research/execution-plan.md  
 docs/deep_research/module-dependency-map.md  
 docs/deep_research/open-questions.md
 
@@ -133,11 +131,10 @@ Definition of Done
 
 The repository contains:
 
-execution-plan.md  
 module-dependency-map.md  
-open-questions.md
+open-questions.md  
 
-These documents clearly describe the engineering roadmap.
+These documents (together with IMPLEMENTATION_INDEX.md and FRONTEND_IMPLEMENTATION_PROMPTS.md) describe the engineering roadmap.
 
 
 ⸻

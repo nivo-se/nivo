@@ -72,4 +72,4 @@ python3 scripts/smoke_test_postgres_mode.py
 cd backend && uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
 
-See [LOCAL_POSTGRES_BOOTSTRAP.md](./LOCAL_POSTGRES_BOOTSTRAP.md) and [POSTGRES_MIGRATION_VALIDATION.md](./POSTGRES_MIGRATION_VALIDATION.md).
+See [LOCAL_POSTGRES_BOOTSTRAP.md](./LOCAL_POSTGRES_BOOTSTRAP.md).

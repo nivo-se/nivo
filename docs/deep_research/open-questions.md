@@ -50,7 +50,7 @@
 
 ## I2. List scope state appears inconsistent across docs
 
-- `docs/PLAN_BACKEND_WORKFLOW.md` describes public scope as a change to be made.
+- Public scope for saved lists was in a since-removed plan doc.
 - Migration `database/migrations/023_saved_lists_public_scope.sql` already exists.
 - `backend/api/lists.py` supports `scope in ('private','team','public')`.
 

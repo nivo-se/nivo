@@ -22,13 +22,11 @@ The source of truth for this system is the documentation in:
 
 - `docs/deep_research/IMPLEMENTATION_INDEX.md`
 - `docs/deep_research/CURSOR_CONTEXT_PLAYBOOK.md`
-- `docs/deep_research/CURSOR_AGENT_EXECUTION_PLAN.md`
-- `docs/deep_research/database-schema-spec.md`
-- `docs/deep_research/api-contract-spec.md`
-- `docs/deep_research/backend-implementation-plan.md`
-- `docs/deep_research/retrieval-system-design.md`
-- `docs/deep_research/agent-prompts.md`
-- `docs/deep_research/langgraph-agent-orchestrator.md`
+- `docs/deep_research/13_database-schema-spec.md`
+- `docs/deep_research/12_backend-implementation-plan.md`
+- `docs/deep_research/11_retrieval-system-design.md`
+- `docs/deep_research/08_agent-prompts.md`
+- `docs/deep_research/07_langgraph-agent-orchestrator.md`
 
 If code and docs conflict, do not silently invent a new architecture.
 Instead:

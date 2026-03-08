@@ -15,7 +15,7 @@ Use this checklist so the Vite app (Vercel or local) talks to the tunneled API a
 | 5 | **Tunnel:** cloudflared running (`cloudflared tunnel --config config/cloudflared.yml run internal-api` or LaunchAgent per `RUN_SERVICES_PERSISTENTLY.md`). |
 | 6 | **Smoke test:** Open production frontend → log in → DevTools Network: `GET https://api.nivogroup.se/api/me` returns 200 with `sub` and `role`. |
 
-**Test in this branch first; merge to main when done.** To keep API and tunnel running after you close Cursor, see [TEST_THEN_MERGE_AND_KEEP_SERVICES_RUNNING.md](TEST_THEN_MERGE_AND_KEEP_SERVICES_RUNNING.md).
+**Test in this branch first; merge to main when done.** See [RUN_SERVICES_PERSISTENTLY.md](RUN_SERVICES_PERSISTENTLY.md) to keep API and tunnel running after you close Cursor.
 
 ---
 

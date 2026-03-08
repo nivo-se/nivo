@@ -164,7 +164,6 @@ The agent should:
 This index is intended to be used together with:
 
 - `CURSOR_CONTEXT_PLAYBOOK.md`
-- `CURSOR_AGENT_EXECUTION_PLAN.md`
 - root `AGENTS.md`
 - optional `SUPERVISOR_INTEGRATION_CHECKLIST.md`
 

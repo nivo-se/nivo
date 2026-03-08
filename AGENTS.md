@@ -17,7 +17,6 @@ When working on the Nivo deep research system, always read and follow:
 
 - docs/deep_research/IMPLEMENTATION_INDEX.md
 - docs/deep_research/CURSOR_CONTEXT_PLAYBOOK.md
-- docs/deep_research/CURSOR_AGENT_EXECUTION_PLAN.md
 - docs/deep_research/CURSOR_AGENT_RULES.md
 
 ---
