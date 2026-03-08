@@ -430,14 +430,20 @@ class LangGraphAgentOrchestrator:
             def compute(_state: OrchestratorState):
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
-                node_results = dict(_state.get("node_results", {}))
-                verification_output = node_results.get("verification")
-                data = self.report_composer.compose(
-                    company_name=str(
-                        _state.get("company_name") or _state.get("orgnr") or "Unknown Company"
-                    ),
-                    node_results=node_results,
-                    verification_output=verification_output,
+
+                from backend.services.deep_research.analysis_input_assembler import AnalysisInputAssembler
+                from backend.services.deep_research.input_completeness import InputCompletenessValidator
+                from backend.services.deep_research.debug_dump import build_debug_artifact
+
+                assembler = AnalysisInputAssembler(repo.session)
+                analysis_input = assembler.assemble(run_id, company_id)
+
+                validator = InputCompletenessValidator()
+                completeness_report = validator.validate(analysis_input)
+
+                data = self.report_composer.compose_from_analysis_input(
+                    analysis_input=analysis_input,
+                    completeness_report=completeness_report,
                 )
                 report = repo.persist_report(
                     run_id=run_id,
@@ -446,6 +452,27 @@ class LangGraphAgentOrchestrator:
                 )
                 data["report_version_id"] = str(report.id)
                 data["version_number"] = report.version_number
+
+                node_results = dict(_state.get("node_results", {}))
+                fm_output = node_results.get("financial_model", {})
+                val_output = node_results.get("valuation", {})
+                assumptions_output = fm_output.get("assumption_set") if isinstance(fm_output, dict) else None
+                projection_output = fm_output.get("forecast") if isinstance(fm_output, dict) else None
+
+                debug_artifact = build_debug_artifact(
+                    analysis_input=analysis_input,
+                    completeness_report=completeness_report,
+                    assumptions_output=assumptions_output,
+                    projection_output=projection_output,
+                    valuation_output=val_output if isinstance(val_output, dict) else None,
+                )
+                repo.upsert_node_state(
+                    run_id=run_id,
+                    node_name="analysis_input_debug",
+                    status="completed",
+                    output_json=debug_artifact,
+                )
+
                 return data
 
             return self._node_wrapper(repo, "report_generation", state, compute)
@@ -672,13 +699,16 @@ class LangGraphAgentOrchestrator:
             run = session.get(AnalysisRun, run_id)
             if run is None:
                 return None
+            company = session.get(Company, run.company_id) if run.company_id else None
             repo = RunStateRepository(session)
             node_rows = repo.list_node_states(run_id)
             stages = self._build_stages(node_rows)
             current_stage = self._current_stage_from_rows(node_rows)
+            company_name = (company.name if company else None) or run.query
             return {
                 "run_id": run.id,
                 "company_id": run.company_id,
+                "company_name": company_name,
                 "status": run.status,
                 "current_stage": current_stage,
                 "stages": stages,
@@ -688,17 +718,27 @@ class LangGraphAgentOrchestrator:
         with SessionLocal() as session:
             rows = session.execute(
                 select(AnalysisRun).order_by(AnalysisRun.created_at.desc()).limit(limit)
-            ).scalars()
+            ).scalars().all()
+            company_ids = {r.company_id for r in rows if r.company_id}
+            companies_by_id: dict[uuid.UUID, str] = {}
+            if company_ids:
+                for comp in session.execute(
+                    select(Company).where(Company.id.in_(company_ids))
+                ).scalars():
+                    companies_by_id[comp.id] = comp.name
+
             out: list[dict[str, Any]] = []
             repo = RunStateRepository(session)
             for row in rows:
                 node_rows = repo.list_node_states(row.id)
                 stages = self._build_stages(node_rows)
                 current_stage = self._current_stage_from_rows(node_rows)
+                company_name = (companies_by_id.get(row.company_id) if row.company_id else None) or row.query
                 out.append(
                     {
                         "run_id": row.id,
                         "company_id": row.company_id,
+                        "company_name": company_name,
                         "status": row.status,
                         "current_stage": current_stage,
                         "stages": stages,

@@ -1,6 +1,6 @@
 # Final task: Live validation (pick up from another computer)
 
-**Status:** Pending  
+**Status:** Validated (2026-03-08)  
 **Branch:** `cursor/deep-research-system-planning-f59c`  
 **Goal:** Run the Deep Research pipeline on 2 real companies (Segers Fabriker, Texstar) and confirm the analyst workbench works end-to-end.
 
@@ -142,13 +142,13 @@ curl -X POST "http://localhost:8000/api/deep-research/analysis/start" \
 
 ## 4. Definition of done for this task
 
-- [ ] Two analysis runs started (Segers Fabriker and Texstar, or two other real companies).
-- [ ] Runs complete (or fail with observable error in run status / worker logs).
-- [ ] For at least one completed run:
-  - [ ] Run status page shows stages and terminal state.
-  - [ ] Latest report opens and is readable (sections, content).
-  - [ ] Verification panel shows claim counts (supported / unsupported / uncertain).
-- [ ] Release gates A–D (DEEP_RESEARCH_STOP_CRITERIA.md) briefly confirmed or gaps noted.
+- [x] Two analysis runs started (Segers Fabriker and Texstar, or two other real companies).
+- [x] Runs complete (or fail with observable error in run status / worker logs).
+- [x] For at least one completed run:
+  - [x] Run status page shows stages and terminal state.
+  - [x] Latest report opens and is readable (sections, content).
+  - [x] Verification panel shows claim counts (supported / unsupported / uncertain).
+- [x] Release gates A–D (DEEP_RESEARCH_STOP_CRITERIA.md) briefly confirmed or gaps noted.
 
 Document any failures (API errors, worker crashes, missing data) and where they occurred (backend log, worker log, browser console). That is enough to “pick up” the final task on another computer and either complete validation or hand back a clear bug list.
 

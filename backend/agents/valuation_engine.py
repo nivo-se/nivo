@@ -23,7 +23,7 @@ class ValuationEngine:
         base = assumptions.get("base", {})
         scenario_inputs = assumptions.get("scenarios", {})
         scenario_rows = projections.get("scenarios", {})
-        horizon_years = int(assumptions.get("horizon_years", 7))
+        horizon_years = int(assumptions.get("horizon_years", 3))
 
         base_wacc = float(base.get("discount_rate_wacc", 0.1))
         terminal_growth = float(base.get("terminal_growth", 0.025))

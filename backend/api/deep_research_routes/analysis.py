@@ -103,6 +103,7 @@ async def get_analysis_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStatusData]
         AnalysisStatusData(
             run_id=run_id,
             company_id=status.get("company_id"),
+            company_name=status.get("company_name"),
             status=status["status"],
             current_stage=status["current_stage"],
             stages=[
@@ -126,6 +127,7 @@ async def list_analysis_runs() -> ApiResponse[list[AnalysisStatusData]]:
             AnalysisStatusData(
                 run_id=r["run_id"],
                 company_id=r.get("company_id"),
+                company_name=r.get("company_name"),
                 status=r["status"],
                 current_stage=r["current_stage"],
                 stages=[

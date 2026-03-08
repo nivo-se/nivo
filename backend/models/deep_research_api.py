@@ -42,8 +42,8 @@ class AnalysisStartRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_target(self) -> "AnalysisStartRequest":
-        if not self.company_id and not self.orgnr:
-            raise ValueError("Either company_id or orgnr must be provided")
+        if not self.company_id and not self.orgnr and not self.company_name:
+            raise ValueError("Either company_id, orgnr, or company_name must be provided")
         return self
 
 
@@ -64,6 +64,7 @@ class RunStageData(BaseModel):
 class AnalysisStatusData(BaseModel):
     run_id: uuid.UUID
     company_id: uuid.UUID | None = None
+    company_name: str | None = None
     status: Literal["pending", "running", "completed", "failed", "cancelled"]
     current_stage: str
     stages: list[RunStageData] = Field(default_factory=list)
@@ -91,7 +92,17 @@ class ReportSectionData(BaseModel):
 
 class ReportDetailData(ReportVersionData):
     company_id: uuid.UUID | None = None
+    company_name: str | None = None
     sections: list[ReportSectionData] = Field(default_factory=list)
+
+
+class CompanyWithReportData(BaseModel):
+    company_id: uuid.UUID
+    company_name: str
+    latest_report_id: uuid.UUID | None = None
+    latest_report_title: str | None = None
+    updated_at: datetime | None = None
+    run_count: int = 0
 
 
 class CompetitorRequest(BaseModel):

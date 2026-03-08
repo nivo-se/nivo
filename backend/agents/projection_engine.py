@@ -1,4 +1,4 @@
-"""Deterministic projection engine for 7-year financial forecasts."""
+"""Deterministic projection engine for multi-year financial forecasts."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ class ProjectionEngine:
     def build(self, assumptions: dict) -> dict:
         base = assumptions.get("base", {})
         scenarios = assumptions.get("scenarios", {})
-        horizon_years = int(assumptions.get("horizon_years", 7))
+        horizon_years = int(assumptions.get("horizon_years", 3))
 
         start_revenue = float(base.get("starting_revenue_msek", 500.0))
         tax_rate = float(base.get("tax_rate", 0.22))
@@ -86,8 +86,8 @@ class ProjectionEngine:
             scenario_summary[scenario_name] = {
                 "revenue_cagr_pct": round(((rows[-1]["revenue_msek"] / start_revenue) ** (1 / horizon_years) - 1) * 100, 2),
                 "total_fcf_msek": _round2(total_fcf),
-                "year7_revenue_msek": rows[-1]["revenue_msek"],
-                "year7_ebitda_margin_pct": rows[-1]["ebitda_margin_pct"],
+                "final_year_revenue_msek": rows[-1]["revenue_msek"],
+                "final_year_ebitda_margin_pct": rows[-1]["ebitda_margin_pct"],
             }
 
         return {

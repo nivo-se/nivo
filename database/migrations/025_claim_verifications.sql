@@ -9,8 +9,13 @@ CREATE TABLE IF NOT EXISTS deep_research.claim_verifications (
   verified_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   source_ids JSONB DEFAULT '[]'::jsonb,
   notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Backfill for tables created before updated_at was added
+ALTER TABLE deep_research.claim_verifications
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
 CREATE INDEX IF NOT EXISTS ix_dr_claim_verifications_run ON deep_research.claim_verifications (run_id);
 CREATE INDEX IF NOT EXISTS ix_dr_claim_verifications_claim ON deep_research.claim_verifications (claim_id);

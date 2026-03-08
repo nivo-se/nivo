@@ -52,6 +52,7 @@ import { AdminPage } from "./pages/app/AdminPage";
 import { CompanyPage } from "./pages/app/CompanyPage";
 import RunListPage from "./pages/deep-research/RunListPage";
 import RunStatusPage from "./pages/deep-research/RunStatusPage";
+import CompaniesPage from "./pages/deep-research/CompaniesPage";
 import DeepResearchWorkbench from "./pages/deep-research/DeepResearchWorkbench";
 import ReportViewerPage from "./pages/deep-research/ReportViewerPage";
 import ReportVersionsPage from "./pages/deep-research/ReportVersionsPage";
@@ -175,6 +176,7 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
+              <Route path="deep-research/companies" element={<CompaniesPage />} />
               <Route path="deep-research/runs" element={<RunListPage />} />
               <Route path="deep-research/runs/:runId" element={<RunStatusPage />} />
               <Route path="deep-research/company/:companyId" element={<DeepResearchWorkbench />}>

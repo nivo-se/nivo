@@ -3,7 +3,9 @@
 set -e
 cd "$(dirname "$0")/.."
 
-if [ -d backend/venv ]; then
+if [ -d .venv ]; then
+  source .venv/bin/activate
+elif [ -d backend/venv ]; then
   source backend/venv/bin/activate
 elif [ -d venv ]; then
   source venv/bin/activate

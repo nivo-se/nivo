@@ -1,17 +1,27 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search } from "lucide-react";
+import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search, Building2, LayoutList } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
+interface NavItem {
+  path: string;
+  label: string;
+  icon: typeof Home;
+  indent?: boolean;
+  adminOnly?: boolean;
+}
+
+const navItems: NavItem[] = [
   { path: "/", label: "Dashboard", icon: Home },
   { path: "/universe", label: "Universe", icon: Globe },
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },
   { path: "/ai/runs", label: "Recent Runs", icon: Cpu, indent: true },
-  { path: "/deep-research/runs", label: "Deep Research", icon: Search },
+  { path: "/deep-research/companies", label: "Deep Research", icon: Search },
+  { path: "/deep-research/companies", label: "Companies", icon: Building2, indent: true },
+  { path: "/deep-research/runs", label: "Runs", icon: LayoutList, indent: true, adminOnly: true },
 ];
 
 export default function AppLayout() {
@@ -51,18 +61,18 @@ export default function AppLayout() {
         </div>
         <nav className="flex-1 p-3 space-y-0.5 overflow-auto">
           {navItems.map((item) => {
+            if (item.adminOnly && !isAdmin) return null;
             const Icon = item.icon;
             const active = isActive(item.path);
-            const indent = "indent" in item && item.indent;
             return (
               <Link
-                key={item.path}
+                key={`${item.path}-${item.label}`}
                 to={item.path === "/" ? "/" : item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                   active
                     ? "bg-sidebar-hover-bg !text-sidebar-fg font-medium"
                     : "!text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
-                } ${indent ? "pl-8" : ""}`}
+                } ${item.indent ? "pl-8" : ""}`}
               >
                 <Icon className="w-4 h-4" />
                 {item.label}

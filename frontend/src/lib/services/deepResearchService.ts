@@ -28,6 +28,7 @@ export interface RunStage {
 export interface AnalysisStatus {
   run_id: string
   company_id: string | null
+  company_name: string | null
   status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
   current_stage: string
   stages: RunStage[]
@@ -51,10 +52,20 @@ export interface ReportVersion {
   report_version_id: string
   run_id: string
   company_id?: string | null
+  company_name?: string | null
   status: 'draft' | 'review' | 'published' | 'archived'
   title: string | null
   version_number: number | null
   sections?: ReportSection[]
+}
+
+export interface CompanyWithReport {
+  company_id: string
+  company_name: string
+  latest_report_id: string | null
+  latest_report_title: string | null
+  updated_at: string | null
+  run_count: number
 }
 
 export interface CompetitorItem {
@@ -149,11 +160,27 @@ export async function listRuns(): Promise<AnalysisStatus[] | null> {
 }
 
 // ---------------------------------------------------------------------------
+// Companies
+// ---------------------------------------------------------------------------
+
+export async function listCompaniesWithReports(): Promise<CompanyWithReport[] | null> {
+  return drFetch<CompanyWithReport[]>('/companies')
+}
+
+export async function getCompany(companyId: string): Promise<CompanyWithReport | null> {
+  return drFetch<CompanyWithReport>(`/companies/${companyId}`)
+}
+
+// ---------------------------------------------------------------------------
 // Reports
 // ---------------------------------------------------------------------------
 
 export async function getLatestReport(companyId: string): Promise<ReportVersion | null> {
   return drFetch<ReportVersion>(`/reports/company/${companyId}/latest`)
+}
+
+export async function getLatestReportForRun(runId: string): Promise<ReportVersion | null> {
+  return drFetch<ReportVersion>(`/reports/run/${runId}/latest`)
 }
 
 export async function getReportVersion(versionId: string): Promise<ReportVersion | null> {

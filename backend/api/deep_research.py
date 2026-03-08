@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from backend.api.deep_research_routes import (
     analysis_router,
+    companies_router,
     competitors_router,
     recompute_router,
     reports_router,
@@ -65,6 +66,7 @@ async def health() -> ApiResponse[DeepResearchHealthData]:
 
 
 router.include_router(analysis_router)
+router.include_router(companies_router)
 router.include_router(reports_router)
 router.include_router(competitors_router)
 router.include_router(verification_router)

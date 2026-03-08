@@ -1,10 +1,14 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   getLatestReport,
+  getLatestReportForRun,
+  getReportVersion,
   type ReportVersion,
   type ReportSection,
 } from '@/lib/services/deepResearchService'
@@ -39,40 +43,53 @@ function SectionSidebar({ sections }: { sections: ReportSection[] }) {
   )
 }
 
-function ContentParagraphs({ content }: { content: string }) {
-  const paragraphs = useMemo(
-    () => content.split(/\n\n+/).filter((p) => p.trim()),
-    [content],
-  )
-
+function MarkdownContent({ content }: { content: string }) {
   return (
-    <div className="space-y-4">
-      {paragraphs.map((para, i) => (
-        <p key={i} className="text-sm leading-relaxed whitespace-pre-wrap">
-          {para}
-        </p>
-      ))}
+    <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-table:text-sm">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   )
 }
 
 export default function ReportViewerPage() {
   const { companyId } = useParams<{ companyId: string }>()
+  const [searchParams] = useSearchParams()
+  const runId = searchParams.get('runId')
+  const versionId = searchParams.get('versionId')
   const [report, setReport] = useState<ReportVersion | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [errorDetail, setErrorDetail] = useState<string | null>(null)
 
   useEffect(() => {
     if (!companyId) return
-    getLatestReport(companyId).then((data) => {
+
+    async function fetchReport() {
+      setErrorDetail(null)
+      let data: ReportVersion | null = null
+      // 1) Prefer explicit version (e.g. from Companies list)
+      if (versionId) {
+        data = await getReportVersion(versionId)
+      }
+      // 2) By company
+      if (!data) {
+        data = await getLatestReport(companyId!)
+      }
+      // 3) Fallback by run (handles company_id mismatch)
+      if (!data && runId) {
+        data = await getLatestReportForRun(runId)
+      }
       if (data) {
         setReport(data)
       } else {
         setError(true)
+        setErrorDetail('Report could not be loaded. Check that the backend is running at the API URL.')
       }
       setLoading(false)
-    })
-  }, [companyId])
+    }
+
+    fetchReport()
+  }, [companyId, runId, versionId])
 
   const sortedSections = useMemo(() => {
     if (!report?.sections) return []
@@ -104,8 +121,19 @@ export default function ReportViewerPage() {
     return (
       <div className="max-w-5xl mx-auto p-6 space-y-4">
         <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            No report available for this company.
+          <CardContent className="py-12 text-center space-y-2">
+            <p className="text-muted-foreground">
+              No report available for this company yet.
+            </p>
+            {errorDetail && (
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                {errorDetail}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              If you&apos;re running locally, ensure the backend and Postgres are running and that
+              this company and its report exist in the database.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -114,13 +142,12 @@ export default function ReportViewerPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      {/* Report header */}
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <CardTitle className="text-xl">
-                {report.title || 'Untitled Report'}
+                {report.title || 'Research Report'}
               </CardTitle>
               {report.version_number != null && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -135,7 +162,6 @@ export default function ReportViewerPage() {
         </CardHeader>
       </Card>
 
-      {/* Body: sidebar + sections */}
       {sortedSections.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-8">
           <aside className="hidden lg:block">
@@ -152,7 +178,7 @@ export default function ReportViewerPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ContentParagraphs content={section.content_md} />
+                    <MarkdownContent content={section.content_md} />
                   </CardContent>
                 </Card>
               </section>

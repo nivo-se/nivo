@@ -12,24 +12,36 @@ import {
   XCircle,
   SkipForward,
   Circle,
+  ChevronDown,
+  ChevronUp,
+  FileText,
 } from 'lucide-react'
 import {
   getRunStatus,
   type AnalysisStatus,
   type RunStage,
 } from '@/lib/services/deepResearchService'
+import { isAdminLinkVisible } from '@/lib/isAdmin'
+import { useAuth } from '@/contexts/AuthContext'
 
 const POLL_INTERVAL = 3000
 
-const STATUS_CONFIG: Record<
-  RunStage['status'],
-  { icon: typeof CheckCircle; color: string; label: string }
-> = {
-  completed: { icon: CheckCircle, color: 'text-green-500', label: 'Completed' },
-  running: { icon: Loader2, color: 'text-amber-500', label: 'Running' },
-  pending: { icon: Circle, color: 'text-muted-foreground', label: 'Pending' },
-  failed: { icon: XCircle, color: 'text-red-500', label: 'Failed' },
-  skipped: { icon: SkipForward, color: 'text-muted-foreground', label: 'Skipped' },
+const STAGE_LABELS: Record<string, string> = {
+  identity: 'Company Identification',
+  market_research: 'Market Research',
+  competitor_discovery: 'Competitor Discovery',
+  financial_analysis: 'Financial Analysis',
+  strategy_analysis: 'Strategy Analysis',
+  report_generation: 'Report Generation',
+  verification: 'Fact Verification',
+}
+
+const STATUS_ICON: Record<RunStage['status'], { icon: typeof CheckCircle; color: string }> = {
+  completed: { icon: CheckCircle, color: 'text-green-500' },
+  running: { icon: Loader2, color: 'text-amber-500' },
+  pending: { icon: Circle, color: 'text-muted-foreground' },
+  failed: { icon: XCircle, color: 'text-red-500' },
+  skipped: { icon: SkipForward, color: 'text-muted-foreground' },
 }
 
 const RUN_STATUS_VARIANT: Record<AnalysisStatus['status'], string> = {
@@ -38,6 +50,10 @@ const RUN_STATUS_VARIANT: Record<AnalysisStatus['status'], string> = {
   completed: 'bg-green-500/15 text-green-600 border-green-500/30',
   failed: 'bg-red-500/15 text-red-600 border-red-500/30',
   cancelled: 'bg-muted text-muted-foreground',
+}
+
+function humanStage(stage: string): string {
+  return STAGE_LABELS[stage] ?? stage.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function formatTimestamp(ts: string | null): string {
@@ -52,52 +68,70 @@ function formatTimestamp(ts: string | null): string {
   })
 }
 
-function StageTimeline({ stages }: { stages: RunStage[] }) {
+function StageChecklist({ stages }: { stages: RunStage[] }) {
   return (
-    <div className="relative space-y-0">
+    <div className="space-y-0">
       {stages.map((stage, idx) => {
-        const cfg = STATUS_CONFIG[stage.status]
+        const cfg = STATUS_ICON[stage.status]
         const Icon = cfg.icon
         const isLast = idx === stages.length - 1
 
         return (
-          <div key={stage.stage} className="relative flex gap-4">
-            {/* Vertical line */}
+          <div key={stage.stage} className="relative flex gap-3">
             <div className="flex flex-col items-center">
-              <div className={`mt-1 shrink-0 ${cfg.color}`}>
-                <Icon
-                  className={`h-5 w-5 ${stage.status === 'running' ? 'animate-spin' : ''}`}
-                />
+              <div className={`mt-0.5 shrink-0 ${cfg.color}`}>
+                <Icon className={`h-4 w-4 ${stage.status === 'running' ? 'animate-spin' : ''}`} />
               </div>
-              {!isLast && (
-                <div className="w-px flex-1 bg-border min-h-[24px]" />
-              )}
+              {!isLast && <div className="w-px flex-1 bg-border min-h-[20px]" />}
             </div>
-
-            {/* Content */}
-            <div className="pb-6 flex-1 min-w-0">
-              <p
-                className={`font-medium text-sm ${
-                  stage.status === 'skipped' ? 'line-through text-muted-foreground' : ''
-                }`}
-              >
-                {stage.stage}
+            <div className="pb-4 flex-1 min-w-0">
+              <p className={`text-sm font-medium ${stage.status === 'skipped' ? 'line-through text-muted-foreground' : ''}`}>
+                {humanStage(stage.stage)}
               </p>
-              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                {stage.started_at && (
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {formatTimestamp(stage.started_at)}
-                  </span>
-                )}
-                {stage.finished_at && (
-                  <span>→ {formatTimestamp(stage.finished_at)}</span>
-                )}
-              </div>
             </div>
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function AdminDetails({ run, stages }: { run: AnalysisStatus; stages: RunStage[] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="border-t pt-3 mt-3">
+      <button
+        type="button"
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        onClick={() => setOpen(!open)}
+      >
+        {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        Technical details
+      </button>
+      {open && (
+        <div className="mt-3 space-y-4">
+          <div className="space-y-1 text-xs text-muted-foreground font-mono">
+            <div>Run ID: {run.run_id}</div>
+            <div>Company ID: {run.company_id ?? '—'}</div>
+            <div>Raw stage: {run.current_stage}</div>
+          </div>
+          {stages.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Stage timing:</p>
+              {stages.map((s) => (
+                <div key={s.stage} className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="font-mono">{s.stage}</span>
+                  <span>
+                    {formatTimestamp(s.started_at)}
+                    {s.finished_at && ` → ${formatTimestamp(s.finished_at)}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -108,6 +142,8 @@ export default function RunStatusPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const { user, userRole } = useAuth()
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user)
 
   const fetchStatus = useCallback(async () => {
     if (!runId) return
@@ -115,19 +151,18 @@ export default function RunStatusPage() {
     if (data) {
       setRun(data)
       setError(false)
-    } else if (!run) {
+    } else {
       setError(true)
     }
     setLoading(false)
-  }, [runId, run])
+  }, [runId])
 
   useEffect(() => {
     fetchStatus()
   }, [fetchStatus])
 
   useEffect(() => {
-    const shouldPoll =
-      run && (run.status === 'pending' || run.status === 'running')
+    const shouldPoll = run && (run.status === 'pending' || run.status === 'running')
     if (shouldPoll) {
       timerRef.current = setInterval(fetchStatus, POLL_INTERVAL)
     }
@@ -141,7 +176,6 @@ export default function RunStatusPage() {
       <div className="max-w-2xl mx-auto p-6 space-y-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-64 w-full" />
       </div>
     )
   }
@@ -156,17 +190,24 @@ export default function RunStatusPage() {
           </Button>
         </Link>
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-12 text-center space-y-2">
             <XCircle className="mx-auto h-10 w-10 text-red-500 mb-3" />
             <p className="text-lg font-medium">Failed to load run</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Run <code className="text-xs">{runId}</code> could not be found or an error occurred.
+            <p className="text-sm text-muted-foreground">
+              The requested analysis run could not be found.
+            </p>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              If you&apos;re running locally, ensure the backend and Postgres are running and that
+              migrations have been applied. The run may not exist in this database.
             </p>
           </CardContent>
         </Card>
       </div>
     )
   }
+
+  const companyName = run.company_name || 'Analysis'
+  const isComplete = run.status === 'completed'
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -181,42 +222,35 @@ export default function RunStatusPage() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <CardTitle className="text-lg">Analysis Run</CardTitle>
-              <p className="text-xs text-muted-foreground font-mono mt-1 truncate">
-                {run.run_id}
+              <CardTitle className="text-lg">{companyName}</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                {humanStage(run.current_stage)}
               </p>
             </div>
             <Badge className={RUN_STATUS_VARIANT[run.status]}>
-              {run.status}
+              {run.status === 'running' && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+              {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {run.company_id && (
-            <div className="text-sm">
-              <span className="text-muted-foreground">Company:</span>{' '}
-              <Link to={`/deep-research/company/${run.company_id}/report/latest`} className="font-medium text-primary hover:underline">
-                {run.company_id}
-              </Link>
+        <CardContent className="space-y-4">
+          {isComplete && run.company_id && (
+            <Link to={`/deep-research/company/${run.company_id}/report/latest?runId=${run.run_id}`}>
+              <Button className="w-full">
+                <FileText className="h-4 w-4 mr-2" />
+                View Report
+              </Button>
+            </Link>
+          )}
+
+          {run.stages.length > 0 && (
+            <div className="pt-2">
+              <p className="text-sm font-medium mb-3">Pipeline Progress</p>
+              <StageChecklist stages={run.stages} />
             </div>
           )}
-          <div className="text-sm">
-            <span className="text-muted-foreground">Current stage:</span>{' '}
-            <span className="font-medium">{run.current_stage}</span>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Stages</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {run.stages.length > 0 ? (
-            <StageTimeline stages={run.stages} />
-          ) : (
-            <p className="text-sm text-muted-foreground">No stages reported yet.</p>
-          )}
+          {isAdmin && <AdminDetails run={run} stages={run.stages} />}
         </CardContent>
       </Card>
     </div>

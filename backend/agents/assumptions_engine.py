@@ -25,7 +25,7 @@ def _round4(value: float) -> float:
 class AssumptionsEngine:
     """Builds deterministic financial assumptions from context."""
 
-    horizon_years: int = 7
+    horizon_years: int = 3
 
     def build(
         self,

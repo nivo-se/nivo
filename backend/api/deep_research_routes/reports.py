@@ -24,12 +24,13 @@ from .utils import ok
 router = APIRouter(prefix="/reports", tags=["deep-research-reports"])
 
 
-def _to_report_detail(row: ReportVersion) -> ReportDetailData:
+def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> ReportDetailData:
     sections = sorted(list(row.sections), key=lambda s: (s.sort_order, s.section_key))
     return ReportDetailData(
         report_version_id=row.id,
         run_id=row.run_id,
         company_id=row.company_id,
+        company_name=company_name,
         status=row.status,
         title=row.title,
         version_number=row.version_number,
@@ -43,6 +44,13 @@ def _to_report_detail(row: ReportVersion) -> ReportDetailData:
             for section in sections
         ],
     )
+
+
+def _resolve_company_name(session, company_id: uuid.UUID | None) -> str | None:
+    if not company_id:
+        return None
+    company = session.get(Company, company_id)
+    return company.name if company else None
 
 
 @router.post("/generate", response_model=ApiResponse[ReportDetailData])
@@ -86,7 +94,7 @@ async def generate_report(body: ReportGenerateRequest) -> ApiResponse[ReportDeta
             .options(selectinload(ReportVersion.sections))
             .where(ReportVersion.id == report.id)
         ).scalar_one()
-        return ok(_to_report_detail(row))
+        return ok(_to_report_detail(row, company_name=company.name if company else None))
 
 
 @router.get("/versions/{report_version_id}", response_model=ApiResponse[ReportDetailData])
@@ -99,7 +107,7 @@ async def get_report_version(report_version_id: uuid.UUID) -> ApiResponse[Report
         ).scalar_one_or_none()
         if row is None:
             raise HTTPException(status_code=404, detail="report version not found")
-        return ok(_to_report_detail(row))
+        return ok(_to_report_detail(row, company_name=_resolve_company_name(session, row.company_id)))
 
 
 @router.get("/company/{company_id}/latest", response_model=ApiResponse[ReportDetailData])
@@ -115,5 +123,22 @@ async def get_latest_report_for_company(
         ).scalars().first()
         if row is None:
             raise HTTPException(status_code=404, detail="no report found for company")
-        return ok(_to_report_detail(row))
+        return ok(_to_report_detail(row, company_name=_resolve_company_name(session, company_id)))
+
+
+@router.get("/run/{run_id}/latest", response_model=ApiResponse[ReportDetailData])
+async def get_latest_report_for_run(
+    run_id: uuid.UUID,
+) -> ApiResponse[ReportDetailData]:
+    """Fallback: fetch latest report linked to a specific analysis run."""
+    with SessionLocal() as session:
+        row = session.execute(
+            select(ReportVersion)
+            .options(selectinload(ReportVersion.sections))
+            .where(ReportVersion.run_id == run_id)
+            .order_by(ReportVersion.created_at.desc())
+        ).scalars().first()
+        if row is None:
+            raise HTTPException(status_code=404, detail="no report found for run")
+        return ok(_to_report_detail(row, company_name=_resolve_company_name(session, row.company_id)))
 

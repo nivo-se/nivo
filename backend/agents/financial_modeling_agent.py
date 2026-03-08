@@ -12,7 +12,7 @@ from .schemas import AgentClaim, FinancialModelingAgentOutput, SourceEvidence
 
 @dataclass(slots=True)
 class FinancialModelingAgent:
-    """Generates deterministic 7-year financial models with scenarios."""
+    """Generates deterministic financial models with scenario projections."""
 
     assumptions_engine: AssumptionsEngine = field(default_factory=AssumptionsEngine)
     projection_engine: ProjectionEngine = field(default_factory=ProjectionEngine)
@@ -31,7 +31,7 @@ class FinancialModelingAgent:
         projections = self.projection_engine.build(assumptions)
         sensitivity = {
             "scenario_analysis": projections.get("scenario_summary", {}),
-            "horizon_years": assumptions.get("horizon_years", 7),
+            "horizon_years": assumptions.get("horizon_years", 3),
         }
 
         source = context.primary_source()
@@ -40,7 +40,7 @@ class FinancialModelingAgent:
             AgentClaim(
                 claim_text=(
                     f"Deterministic financial model generated for {context.company_name} "
-                    f"with {assumptions.get('horizon_years', 7)}-year scenario projections."
+                    f"with {assumptions.get('horizon_years', 3)}-year scenario projections."
                 ),
                 claim_type="financial_model",
                 confidence=0.66,

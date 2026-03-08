@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Outlet, Link, useParams, useLocation } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -8,6 +9,8 @@ import {
   Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getCompany } from '@/lib/services/deepResearchService'
 
 const tabs = [
   { label: 'Report', path: 'report/latest', icon: FileText },
@@ -20,23 +23,35 @@ const tabs = [
 export default function DeepResearchWorkbench() {
   const { companyId } = useParams<{ companyId: string }>()
   const location = useLocation()
+  const [companyName, setCompanyName] = useState<string | null>(null)
+  const [nameLoading, setNameLoading] = useState(true)
+
+  useEffect(() => {
+    if (!companyId) return
+    getCompany(companyId).then((data) => {
+      setCompanyName(data?.company_name ?? null)
+      setNameLoading(false)
+    })
+  }, [companyId])
 
   const basePath = `/deep-research/company/${companyId}`
+  const displayName = companyName || 'Company Report'
 
   return (
     <div className="flex flex-col h-full">
       <header className="flex items-center gap-3 px-6 py-4 border-b">
         <Link
-          to="/deep-research/runs"
+          to="/deep-research/companies"
           className="text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div className="flex items-center gap-3 min-w-0">
-          <h1 className="text-lg font-semibold">Deep Research</h1>
-          <span className="text-xs text-muted-foreground font-mono truncate">
-            {companyId}
-          </span>
+          {nameLoading ? (
+            <Skeleton className="h-6 w-40" />
+          ) : (
+            <h1 className="text-lg font-semibold truncate">{displayName}</h1>
+          )}
         </div>
       </header>
 
