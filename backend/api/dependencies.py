@@ -27,6 +27,17 @@ def get_current_user_id(request: Request) -> Optional[str]:
     return str(sub) if sub else None
 
 
+def get_current_user(request: Request) -> Optional[dict]:
+    """
+    Get full user dict from request.state.user (set by JWTAuthMiddleware).
+    Includes sub, email, name when present in JWT. Returns None when auth disabled.
+    """
+    user = getattr(request.state, "user", None)
+    if not user or not isinstance(user, dict):
+        return None
+    return user
+
+
 @lru_cache()
 def get_redis_client() -> redis.Redis:
     """Get Redis client (singleton)"""

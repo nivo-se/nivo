@@ -2,12 +2,16 @@
 Enroll: capture sub + email for any authenticated user on login.
 No allowlist or role check — any valid JWT can enroll.
 Also used to determine whether the app is bootstrapped (any users have a role).
+
+Email/name: prefer JWT claims (from Auth0) when present; fall back to request body from frontend.
+See docs/AUTH_AUTH0_SETUP.md for adding email to the access token via Auth0 Action.
 """
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
+from .dependencies import get_current_user
 from .rbac import get_current_sub, get_role_for_sub, list_user_roles
 
 router = APIRouter(prefix="/api", tags=["enroll"])
@@ -40,17 +44,27 @@ class EnrollRequest(BaseModel):
 
 
 @router.post("/enroll")
-def enroll(body: EnrollRequest, sub: str = Depends(get_current_sub)):
+def enroll(
+    body: EnrollRequest,
+    request: Request,
+    sub: str = Depends(get_current_sub),
+):
     """
     Register the current user's email in user_profiles and return their role + bootstrap status.
     Called on every login by the frontend. Requires valid JWT; no role or allowlist check.
+
+    Email/name: prefer JWT claims (Auth0) when present; otherwise use body from frontend.
     """
-    upsert_user_profile(sub, body.email, body.name)
+    user = get_current_user(request)
+    # Prefer email/name from JWT (Auth0) when present; fall back to body from frontend
+    email = (user.get("email") if user else None) or body.email
+    name = (user.get("name") if user else None) or body.name
+    upsert_user_profile(sub, email, name)
     role = get_role_for_sub(sub)
     is_bootstrapped = len(list_user_roles()) > 0
     return {
         "sub": sub,
-        "email": body.email,
+        "email": email,
         "role": role,
         "is_bootstrapped": is_bootstrapped,
     }

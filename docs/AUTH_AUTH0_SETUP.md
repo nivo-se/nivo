@@ -109,6 +109,32 @@ We request `scope: "openid profile email"`, but the **access token** may not inc
 
 For allowlisting, Pattern A is simplest: allowlist by `sub`.
 
+### 7c. Email in DB for admin panel (user_profiles)
+
+The admin panel shows users by email. Email is stored in `user_profiles` (populated by `POST /api/enroll` on login). The backend prefers email from the JWT when present; otherwise it uses the email sent by the frontend (from Auth0 userinfo).
+
+**To get email from Auth0 into the JWT (recommended for admin):**
+
+1. Auth0 Dashboard → Actions → Library → Build Custom.
+2. Name: "Add email to access token".
+3. Trigger: "Login / Post Login".
+4. Code (use namespaced claims per Auth0 recommendation):
+   ```javascript
+   const NS = 'https://nivogroup.se/';
+   exports.onExecutePostLogin = async (event, api) => {
+     if (event.user.email) {
+       api.accessToken.setCustomClaim(NS + 'email', event.user.email);
+     }
+     if (event.user.name) {
+       api.accessToken.setCustomClaim(NS + 'name', event.user.name);
+     }
+   };
+   ```
+5. Deploy, then add the Action to your Application's Login flow (Actions → Flows → Login).
+6. New logins will have `https://nivogroup.se/email` and `https://nivogroup.se/name` in the access token; the backend reads these and stores them in `user_profiles` on enroll.
+
+**Without the Action:** The frontend still sends `auth0User.email` from Auth0 userinfo to `/api/enroll`, so email is stored. The Action makes the backend use JWT claims directly (more robust).
+
 ## 8. Express example as smoke test
 
 Use `docs/auth0-express-gateway-example.js` as a “known good” verifier before debugging FastAPI:
