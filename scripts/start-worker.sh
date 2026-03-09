@@ -4,17 +4,25 @@ set -euo pipefail
 echo "👷 Starting RQ Worker"
 echo "====================="
 
-cd "$(dirname "$0")/../backend"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
-# Check if virtual environment exists
-if [ -d "venv" ]; then
-    source venv/bin/activate
+# Activate venv
+if [ -d "backend/venv" ]; then
+    source backend/venv/bin/activate
+elif [ -d "backend/.venv" ]; then
+    source backend/.venv/bin/activate
 elif [ -d ".venv" ]; then
     source .venv/bin/activate
+elif [ -d "venv" ]; then
+    source venv/bin/activate
 else
     echo "❌ Virtual environment not found. Run start-backend.sh first."
     exit 1
 fi
+
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$PROJECT_ROOT"
 
 # Check if Redis is running
 if ! redis-cli ping &> /dev/null; then
@@ -22,7 +30,7 @@ if ! redis-cli ping &> /dev/null; then
     exit 1
 fi
 
-echo "✅ Starting RQ worker for queues: enrichment, ai_analysis"
+echo "✅ Starting RQ worker for queues: enrichment, ai_analysis, deep_research"
 echo ""
-rq worker enrichment ai_analysis --url "${REDIS_URL:-redis://localhost:6379/0}"
+rq worker enrichment ai_analysis deep_research --url "${REDIS_URL:-redis://localhost:6379/0}"
 

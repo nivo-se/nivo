@@ -48,19 +48,28 @@ echo "To start worker (optional):"
 echo "  ./scripts/start-worker.sh"
 echo ""
 
-# Try to start backend if not running
+# Try to start backend (and worker) if not running
 if ! curl -s http://localhost:8000/health &> /dev/null; then
-    echo "Starting backend API..."
-    cd "$PROJECT_ROOT/backend"
-    if [ -d "venv" ] || [ -d ".venv" ]; then
+    echo "Starting backend API and RQ worker..."
+    cd "$PROJECT_ROOT"
+    if [ -d "backend/venv" ] || [ -d "backend/.venv" ] || [ -d ".venv" ]; then
         "$SCRIPT_DIR/start-backend.sh" &
-        echo "✅ Backend starting in background"
+        echo "✅ Backend and worker starting in background"
         echo "   Check http://localhost:8000/health"
+        echo "   Worker logs: /tmp/nivo-worker.log"
     else
         echo "⚠️  Backend venv not found. Run: ./scripts/start-backend.sh"
     fi
 else
     echo "✅ Backend already running on port 8000"
+    # Ensure worker is running if Redis is up
+    if redis-cli ping &> /dev/null && ! pgrep -f "rq worker" &> /dev/null; then
+        echo "Starting RQ worker..."
+        cd "$PROJECT_ROOT"
+        "$SCRIPT_DIR/start-worker.sh" &>/tmp/nivo-worker.log &
+        sleep 1
+        echo "✅ Worker started (logs: /tmp/nivo-worker.log)"
+    fi
 fi
 
 echo ""

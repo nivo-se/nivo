@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Start the Nivo backend API (FastAPI). Run from project root.
 # Default 8000; cloud platforms inject PORT automatically.
+# Also starts the RQ worker in background (enrichment, ai_analysis, deep_research).
 set -e
 cd "$(dirname "$0")/.."
 PORT="${PORT:-8000}"
@@ -14,6 +15,14 @@ elif [ -d venv ]; then
 fi
 
 export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
+
+# Start RQ worker in background if Redis is up and worker not already running
+if redis-cli ping &> /dev/null && ! pgrep -f "rq worker.*deep_research" &> /dev/null; then
+  echo "Starting RQ worker (enrichment, ai_analysis, deep_research)..."
+  ./scripts/start-worker.sh &>/tmp/nivo-worker.log &
+  sleep 1
+  echo "Worker started (logs: /tmp/nivo-worker.log)"
+fi
 
 echo "Starting backend at http://localhost:$PORT"
 echo "Health: curl http://localhost:$PORT/health"

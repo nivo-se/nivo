@@ -23,16 +23,35 @@ export interface RunStage {
   status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
   started_at: string | null
   finished_at: string | null
+  error_message?: string | null
 }
 
 export interface AnalysisStatus {
   run_id: string
   company_id: string | null
   company_name: string | null
+  orgnr?: string | null
+  created_at?: string | null
   status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
   current_stage: string
   stages: RunStage[]
+  error_message?: string | null
 }
+
+/** Unified run summary for Deep Research Home list display */
+export interface ResearchRunSummary {
+  run_id: string
+  company_id: string | null
+  company_name: string | null
+  orgnr?: string | null
+  created_at: string | null
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+  current_stage: string
+  confidence?: number | null
+}
+
+/** Research mode for New Report wizard */
+export type ResearchMode = 'quick' | 'standard' | 'full'
 
 export interface AnalysisStartResult {
   run_id: string
@@ -94,6 +113,19 @@ export interface RecomputeResult {
   status: 'queued' | 'running' | 'completed' | 'failed'
 }
 
+export interface HealthDependencyData {
+  name: string
+  enabled: boolean
+  healthy: boolean | null
+  message: string | null
+}
+
+export interface DeepResearchHealthData {
+  service: string
+  environment: string
+  dependencies: HealthDependencyData[]
+}
+
 // ---------------------------------------------------------------------------
 // Request types
 // ---------------------------------------------------------------------------
@@ -153,6 +185,10 @@ export async function startAnalysis(req: StartAnalysisRequest): Promise<Analysis
 
 export async function getRunStatus(runId: string): Promise<AnalysisStatus | null> {
   return drFetch<AnalysisStatus>(`/analysis/runs/${runId}`)
+}
+
+export async function getDeepResearchHealth(): Promise<DeepResearchHealthData | null> {
+  return drFetch<DeepResearchHealthData>('/health')
 }
 
 export async function listRuns(): Promise<AnalysisStatus[] | null> {

@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   ArrowLeft,
   CheckCircle,
-  Clock,
   Loader2,
   XCircle,
   SkipForward,
@@ -18,22 +17,36 @@ import {
 } from 'lucide-react'
 import {
   getRunStatus,
+  getDeepResearchHealth,
   type AnalysisStatus,
   type RunStage,
 } from '@/lib/services/deepResearchService'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { isAdminLinkVisible } from '@/lib/isAdmin'
 import { useAuth } from '@/contexts/AuthContext'
 
 const POLL_INTERVAL = 3000
 
 const STAGE_LABELS: Record<string, string> = {
-  identity: 'Company Identification',
-  market_research: 'Market Research',
-  competitor_discovery: 'Competitor Discovery',
-  financial_analysis: 'Financial Analysis',
-  strategy_analysis: 'Strategy Analysis',
-  report_generation: 'Report Generation',
-  verification: 'Fact Verification',
+  identity: 'Company resolution',
+  company_profile: 'Company understanding',
+  web_retrieval: 'Web intelligence',
+  market_analysis: 'Market synthesis',
+  competitor_discovery: 'Competitors',
+  strategy: 'Strategy / value creation',
+  value_creation: 'Strategy / value creation',
+  financial_model: 'Financial grounding',
+  valuation: 'Valuation',
+  verification: 'Verification',
+  report_generation: 'Final report',
+}
+
+const STAGE_STATUS_LABELS: Record<RunStage['status'], string> = {
+  pending: 'Queued',
+  running: 'Running',
+  completed: 'Passed',
+  failed: 'Blocked',
+  skipped: 'Skipped',
 }
 
 const STATUS_ICON: Record<RunStage['status'], { icon: typeof CheckCircle; color: string }> = {
@@ -52,6 +65,15 @@ const RUN_STATUS_VARIANT: Record<AnalysisStatus['status'], string> = {
   cancelled: 'bg-muted text-muted-foreground',
 }
 
+const SUGGESTED_ACTIONS: Record<string, string[]> = {
+  identity: ['Add company website', 'Verify org nr'],
+  company_profile: ['Broaden search', 'Lower strictness'],
+  web_retrieval: ['Check Tavily key', 'Add company website'],
+  market_analysis: ['Broaden search', 'Lower strictness'],
+  competitor_discovery: ['Broaden search', 'Lower strictness'],
+  default: ['Rerun with more context', 'Add company website'],
+}
+
 function humanStage(stage: string): string {
   return STAGE_LABELS[stage] ?? stage.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
@@ -68,31 +90,83 @@ function formatTimestamp(ts: string | null): string {
   })
 }
 
-function StageChecklist({ stages }: { stages: RunStage[] }) {
+function getSuggestedActions(stage: string): string[] {
+  return SUGGESTED_ACTIONS[stage] ?? SUGGESTED_ACTIONS.default
+}
+
+function StageRail({ stages, currentStage }: { stages: RunStage[]; currentStage: string }) {
+  const displayStages = stages.filter((s) => s.stage !== 'value_creation')
+
   return (
-    <div className="space-y-0">
-      {stages.map((stage, idx) => {
+    <nav className="space-y-0">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        Pipeline
+      </p>
+      {displayStages.map((stage, idx) => {
         const cfg = STATUS_ICON[stage.status]
         const Icon = cfg.icon
-        const isLast = idx === stages.length - 1
+        const isLast = idx === displayStages.length - 1
+        const isActive = stage.stage === currentStage
 
         return (
           <div key={stage.stage} className="relative flex gap-3">
             <div className="flex flex-col items-center">
-              <div className={`mt-0.5 shrink-0 ${cfg.color}`}>
+              <div
+                className={`mt-0.5 shrink-0 ${cfg.color} ${isActive ? 'ring-2 ring-offset-2 ring-primary/30 rounded-full' : ''}`}
+              >
                 <Icon className={`h-4 w-4 ${stage.status === 'running' ? 'animate-spin' : ''}`} />
               </div>
               {!isLast && <div className="w-px flex-1 bg-border min-h-[20px]" />}
             </div>
             <div className="pb-4 flex-1 min-w-0">
-              <p className={`text-sm font-medium ${stage.status === 'skipped' ? 'line-through text-muted-foreground' : ''}`}>
+              <p
+                className={`text-sm font-medium ${stage.status === 'skipped' ? 'line-through text-muted-foreground' : ''}`}
+              >
                 {humanStage(stage.stage)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {STAGE_STATUS_LABELS[stage.status]}
               </p>
             </div>
           </div>
         )
       })}
-    </div>
+    </nav>
+  )
+}
+
+function BlockedStageCard({
+  stageName,
+  reason,
+  suggestedActions,
+}: {
+  stageName: string
+  reason: string
+  suggestedActions: string[]
+}) {
+  return (
+    <Card className="border-red-500/30 bg-red-500/5">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <XCircle className="h-4 w-4 text-red-500" />
+          {humanStage(stageName)} — Blocked
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-sm font-medium text-muted-foreground mb-1">Reason</p>
+          <p className="text-sm">{reason || 'Stage failed validation or encountered an error.'}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-muted-foreground mb-2">Suggested actions</p>
+          <ul className="list-disc list-inside text-sm space-y-1">
+            {suggestedActions.map((action) => (
+              <li key={action}>{action}</li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -141,6 +215,7 @@ export default function RunStatusPage() {
   const [run, setRun] = useState<AnalysisStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [redisUnhealthy, setRedisUnhealthy] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { user, userRole } = useAuth()
   const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user)
@@ -171,11 +246,33 @@ export default function RunStatusPage() {
     }
   }, [run?.status, fetchStatus])
 
+  useEffect(() => {
+    if (run?.status !== 'pending') {
+      setRedisUnhealthy(false)
+      return
+    }
+    let cancelled = false
+    getDeepResearchHealth().then((health) => {
+      if (cancelled || !health) return
+      const redis = health.dependencies.find((d) => d.name === 'redis')
+      setRedisUnhealthy(redis ? !redis.healthy : false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [run?.status])
+
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto p-6 space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-40 w-full" />
+      <div className="flex h-[calc(100vh-4rem)]">
+        <div className="w-56 shrink-0 border-r p-4">
+          <Skeleton className="h-6 w-24 mb-4" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+        <div className="flex-1 p-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-40 w-full mt-4" />
+        </div>
       </div>
     )
   }
@@ -183,10 +280,10 @@ export default function RunStatusPage() {
   if (error || !run) {
     return (
       <div className="max-w-2xl mx-auto p-6 space-y-4">
-        <Link to="/deep-research/runs">
+        <Link to="/deep-research">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to runs
+            Back to Deep Research
           </Button>
         </Link>
         <Card>
@@ -208,51 +305,99 @@ export default function RunStatusPage() {
 
   const companyName = run.company_name || 'Analysis'
   const isComplete = run.status === 'completed'
+  const isFailed = run.status === 'failed'
+  const failedStage = run.stages.find((s) => s.status === 'failed')
+  const runError = run.error_message
+  const stageError = failedStage?.error_message
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <Link to="/deep-research/runs">
-        <Button variant="ghost" size="sm">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to runs
-        </Button>
-      </Link>
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="flex flex-1 min-h-0">
+        <aside className="w-56 shrink-0 border-r bg-muted/20 p-4 overflow-y-auto">
+          <Link to="/deep-research" className="block mb-4">
+            <Button variant="ghost" size="sm" className="w-full justify-start">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          </Link>
+          <StageRail stages={run.stages} currentStage={run.current_stage} />
+        </aside>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <CardTitle className="text-lg">{companyName}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                {humanStage(run.current_stage)}
-              </p>
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-2xl space-y-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-xl font-semibold">{companyName}</h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {humanStage(run.current_stage)}
+                </p>
+              </div>
+              <Badge className={RUN_STATUS_VARIANT[run.status]}>
+                {run.status === 'running' && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                {run.status === 'failed' ? 'Blocked' : run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+              </Badge>
             </div>
-            <Badge className={RUN_STATUS_VARIANT[run.status]}>
-              {run.status === 'running' && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-              {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
-            </Badge>
+
+            {run.status === 'running' && (
+              <Card>
+                <CardContent className="py-4">
+                  <p className="text-sm flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
+                    Running {humanStage(run.current_stage)}…
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This may take several minutes. The page will update automatically.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {run.status === 'pending' && redisUnhealthy && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Redis is unhealthy. The worker cannot process jobs until Redis is running.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {run.status === 'pending' && (
+              <Card className="border-amber-500/30 bg-amber-500/5">
+                <CardContent className="py-4">
+                  <p className="text-sm font-medium">Waiting for worker to process this run</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    The run is queued. Ensure the RQ worker is running. From the repo root:
+                  </p>
+                  <code className="block mt-2 p-2 rounded bg-muted text-xs font-mono">
+                    ./scripts/start-deep-research-worker.sh
+                  </code>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Redis must be running. Check with: <code className="rounded bg-muted px-1">redis-cli ping</code>
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {isComplete && run.company_id && (
+              <Link to={`/deep-research/company/${run.company_id}/report/latest?runId=${run.run_id}`}>
+                <Button variant="primary" className="w-full">
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Report
+                </Button>
+              </Link>
+            )}
+
+            {isFailed && (
+              <BlockedStageCard
+                stageName={failedStage?.stage ?? run.current_stage}
+                reason={stageError || runError || ''}
+                suggestedActions={getSuggestedActions(failedStage?.stage ?? run.current_stage)}
+              />
+            )}
+
+            {isAdmin && <AdminDetails run={run} stages={run.stages} />}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isComplete && run.company_id && (
-            <Link to={`/deep-research/company/${run.company_id}/report/latest?runId=${run.run_id}`}>
-              <Button className="w-full">
-                <FileText className="h-4 w-4 mr-2" />
-                View Report
-              </Button>
-            </Link>
-          )}
-
-          {run.stages.length > 0 && (
-            <div className="pt-2">
-              <p className="text-sm font-medium mb-3">Pipeline Progress</p>
-              <StageChecklist stages={run.stages} />
-            </div>
-          )}
-
-          {isAdmin && <AdminDetails run={run} stages={run.stages} />}
-        </CardContent>
-      </Card>
+        </main>
+      </div>
     </div>
   )
 }

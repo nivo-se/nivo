@@ -36,6 +36,14 @@ if [ -z "${OPENAI_API_KEY:-}" ]; then
     echo "⚠️  Warning: OPENAI_API_KEY not set (required for AI reports)"
 fi
 
+# Start RQ worker in background if Redis is up and worker not already running
+if redis-cli ping &> /dev/null 2>/dev/null && ! pgrep -f "rq worker" &> /dev/null; then
+    echo "👷 Starting RQ worker in background..."
+    PYTHONPATH="$PROJECT_ROOT" "$PROJECT_ROOT/scripts/start-worker.sh" &>/tmp/nivo-worker.log &
+    sleep 1
+    echo "   Worker logs: /tmp/nivo-worker.log"
+fi
+
 # Start FastAPI server from project root
 echo "✅ Starting FastAPI server on http://localhost:8000"
 echo "📚 API docs available at http://localhost:8000/docs"
