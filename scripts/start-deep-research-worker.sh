@@ -12,6 +12,9 @@ elif [ -d venv ]; then
 fi
 
 export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(pwd)"
+PROJECT_ROOT="$(pwd)"
 
 echo "Starting Deep Research worker (queue: deep_research)"
-exec rq worker deep_research --url "${REDIS_URL:-redis://localhost:6379/0}"
+# macOS: avoid fork crash when RQ spawns work horse (objc NSCharacterSet init)
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+exec rq worker deep_research --url "${REDIS_URL:-redis://localhost:6379/0}" --path "$PROJECT_ROOT"

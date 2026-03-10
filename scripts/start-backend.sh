@@ -9,15 +9,15 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Check if virtual environment exists
-if [ ! -d "backend/venv" ] && [ ! -d "backend/.venv" ]; then
+if [ ! -d ".venv" ] && [ ! -d "backend/venv" ] && [ ! -d "backend/.venv" ]; then
     echo "📦 Creating Python virtual environment..."
-    cd backend
-    python3 -m venv venv
-    cd ..
+    python3 -m venv .venv
 fi
 
-# Activate virtual environment
-if [ -d "backend/venv" ]; then
+# Activate virtual environment (prefer .venv; backend/venv may be stale if project moved)
+if [ -d ".venv" ] && [ -x .venv/bin/python ]; then
+    source .venv/bin/activate
+elif [ -d "backend/venv" ] && [ -x backend/venv/bin/python ]; then
     source backend/venv/bin/activate
 elif [ -d "backend/.venv" ]; then
     source backend/.venv/bin/activate

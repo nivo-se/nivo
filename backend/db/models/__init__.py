@@ -17,6 +17,9 @@ from .deep_research import (
     Strategy,
     Valuation,
     ValueCreation,
+    WebEvidence,
+    WebEvidenceRejected,
+    WebSearchSession,
 )
 
 __all__ = [
@@ -36,5 +39,8 @@ __all__ = [
     "Strategy",
     "Valuation",
     "ValueCreation",
+    "WebEvidence",
+    "WebEvidenceRejected",
+    "WebSearchSession",
 ]
 

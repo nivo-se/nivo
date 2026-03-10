@@ -127,7 +127,7 @@ async def health_check():
     return {"status": "healthy", "service": "nivo-intelligence-api"}
 
 # Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
-from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, me, prospects, shortlists, status, analysis, saved_lists, universe, views
+from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, me, prospects, report_settings, shortlists, status, analysis, saved_lists, universe, views
 from .chat import router as chat_router
 from .deep_research import router as deep_research_router
 from .enrichment import router as enrichment_router
@@ -137,6 +137,7 @@ app.include_router(bootstrap.router)
 app.include_router(enroll.router)
 app.include_router(admin_users.router)
 app.include_router(ai_credits.router)
+app.include_router(report_settings.router)
 app.include_router(coverage.router)
 app.include_router(home.router)
 app.include_router(views.router)

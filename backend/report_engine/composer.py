@@ -30,6 +30,141 @@ def _lines(items: list[str]) -> str:
     return "\n".join(f"- {x}" for x in items)
 
 
+def _competitor_table(competitors: list) -> str | None:
+    """Render competitor table when any competitor has revenue_msek or ebitda_margin_pct."""
+    has_metrics = any(
+        getattr(c, "revenue_msek", None) is not None or getattr(c, "ebitda_margin_pct", None) is not None
+        for c in competitors
+    )
+    if not has_metrics:
+        return None
+    header = "| Name | Revenue (MSEK) | EBITDA Margin | Strengths |"
+    sep = "|------|---------------|--------------|-----------|"
+    rows = []
+    for c in competitors:
+        rev = _fmt_num(getattr(c, "revenue_msek", None))
+        margin = _fmt_num(getattr(c, "ebitda_margin_pct", None), "%")
+        strengths = getattr(c, "strengths", None) or []
+        strengths_str = "; ".join(str(s)[:80] for s in (strengths[:2] if isinstance(strengths, list) else []))
+        if len(strengths_str) > 60:
+            strengths_str = strengths_str[:57] + "..."
+        rows.append(f"| {getattr(c, 'name', '')} | {rev} | {margin} | {strengths_str or '-'} |")
+    return "\n".join([header, sep] + rows)
+
+
+def _value_creation_with_rationale(initiatives: list) -> str:
+    """Render value creation initiatives with rationale and impact_assumption when present."""
+    if not initiatives:
+        return "- N/A"
+    lines = []
+    for i in initiatives:
+        desc = getattr(i, "description", None) or str(i)
+        lines.append(f"- {desc}")
+        rationale = getattr(i, "rationale", None)
+        impact = getattr(i, "impact_assumption", None)
+        if rationale:
+            lines.append(f"  - **Rationale:** {rationale}")
+        if impact:
+            lines.append(f"  - **Impact assumption:** {impact}")
+    return "\n".join(lines)
+
+
+def _scenario_valuation_table(v) -> str:
+    """Render scenario valuation table from scenario_valuations."""
+    sv = getattr(v, "scenario_valuations", None) or {}
+    if not sv:
+        return ""
+    header = "| Scenario | EV (MSEK) | Equity (MSEK) | WACC | Terminal Growth |"
+    sep = "|----------|-----------|---------------|------|-----------------|"
+    rows = []
+    for name, data in sv.items():
+        if isinstance(data, dict):
+            ev = _fmt_num(data.get("enterprise_value_msek"))
+            eq = _fmt_num(data.get("equity_value_msek"))
+            wacc = data.get("discount_rate_wacc")
+            tg = data.get("terminal_growth")
+            wacc_str = f"{wacc:.1%}" if wacc is not None else "-"
+            tg_str = f"{tg:.1%}" if tg is not None else "-"
+            rows.append(f"| {name} | {ev} | {eq} | {wacc_str} | {tg_str} |")
+    if not rows:
+        return ""
+    return "\n".join([header, sep] + rows)
+
+
+def _valuation_methodology_block(v) -> str:
+    """Render methodology, implied EV/EBITDA, sector sanity, lint, terminal dominance."""
+    parts = []
+    method = getattr(v, "method", "deterministic_dcf") or "deterministic_dcf"
+    parts.append(f"- **Methodology:** {method}")
+    implied = getattr(v, "implied_ev_ebitda", None)
+    if implied is not None:
+        parts.append(f"- **Implied EV/EBITDA:** {implied:.1f}×")
+    low = getattr(v, "sector_sanity_range_low", 4.1)
+    high = getattr(v, "sector_sanity_range_high", 8.0)
+    parts.append(f"- **Sector sanity range (Nordic mid-market):** {low}–{high}×")
+    if implied is not None and (implied < low or implied > high):
+        parts.append(f"  - *Cross-check: implied multiple {'below' if implied < low else 'above'} sector range*")
+    lint_passed = getattr(v, "lint_passed", True)
+    lint_warnings = getattr(v, "lint_warnings", []) or []
+    if lint_warnings:
+        for w in lint_warnings:
+            parts.append(f"- **Lint warning:** {w}")
+    elif not lint_passed:
+        parts.append("- **Lint:** Review recommended")
+    if getattr(v, "terminal_value_dominance_warning", False):
+        parts.append("- **Stability note:** Terminal value >80% of EV — sensitivity to terminal assumptions is high")
+    return "\n".join(parts)
+
+
+def _assumption_commentary(ma) -> list[str]:
+    """Generate 2–4 bullet points from model_assumptions for projection section."""
+    bullets: list[str] = []
+    if ma.growth_start is not None:
+        if ma.starting_revenue_msek is not None:
+            term = f" → {ma.growth_terminal:.1%} (terminal)" if ma.growth_terminal is not None else ""
+            bullets.append(f"Revenue growth: {ma.growth_start:.1%} (start){term} over horizon")
+        else:
+            bullets.append(f"Revenue growth: {ma.growth_start:.1%} (blended with market growth when available)")
+    if ma.ebitda_margin_start is not None:
+        if ma.ebitda_margin_terminal is not None:
+            bullets.append(
+                f"EBITDA margin: {ma.ebitda_margin_start:.1%} → {ma.ebitda_margin_terminal:.1%} over horizon"
+            )
+        else:
+            bullets.append(f"EBITDA margin: {ma.ebitda_margin_start:.1%} (start)")
+    if ma.assumptions_source:
+        label = "real historicals" if ma.assumptions_source == "real_historicals" else "synthetic seed"
+        bullets.append(f"Assumptions built from: {label}")
+    return bullets[:4]  # Cap at 4
+
+
+def _key_assumptions_block(ma) -> str:
+    """Render Key Assumptions subsection from ModelAssumptions."""
+    parts = []
+    if ma.starting_revenue_msek is not None:
+        parts.append(f"- Starting revenue: {_fmt_num(ma.starting_revenue_msek)} MSEK")
+    if ma.growth_start is not None:
+        parts.append(f"- Revenue growth (start): {ma.growth_start:.1%}")
+    if ma.growth_terminal is not None:
+        parts.append(f"- Revenue growth (terminal): {ma.growth_terminal:.1%}")
+    if ma.ebitda_margin_start is not None:
+        parts.append(f"- EBITDA margin (start): {ma.ebitda_margin_start:.1%}")
+    if ma.ebitda_margin_terminal is not None:
+        parts.append(f"- EBITDA margin (terminal): {ma.ebitda_margin_terminal:.1%}")
+    if ma.discount_rate_wacc is not None:
+        parts.append(f"- WACC: {ma.discount_rate_wacc:.1%}")
+    if ma.terminal_growth is not None:
+        parts.append(f"- Terminal growth: {ma.terminal_growth:.1%}")
+    if ma.net_debt_msek is not None:
+        parts.append(f"- Net debt: {_fmt_num(ma.net_debt_msek)} MSEK")
+    if ma.assumptions_source:
+        label = "real historicals" if ma.assumptions_source == "real_historicals" else "synthetic seed"
+        parts.append(f"- Assumptions built from: {label}")
+    if not parts:
+        return ""
+    return "\n".join(parts)
+
+
 def _build_unsupported_types(verification: dict) -> set[str]:
     """Return claim_types that have at least one UNSUPPORTED claim."""
     stats = verification.get("stats", {})
@@ -55,7 +190,10 @@ def _fmt_num(val: Any, suffix: str = "") -> str:
     if val is None:
         return "N/A"
     try:
-        return f"{float(val):,.1f}{suffix}"
+        v = float(val)
+        if suffix == "%" and 0 < abs(v) < 1 and v != 0:
+            v = v * 100  # decimal 0.15 -> 15%
+        return f"{v:,.1f}{suffix}"
     except (TypeError, ValueError):
         return str(val)
 
@@ -182,7 +320,6 @@ class ReportComposer:
         )
 
         competitor_names = [c.name for c in ai.competitors if c.name]
-        initiatives = [i.description for i in ai.value_creation_initiatives]
         risks = ai.strategy.key_risks
 
         verification_status = "Passed" if ai.verification.verified else "Needs review"
@@ -247,8 +384,11 @@ class ReportComposer:
                     + f"\n### Market Trends\n"
                     f"{_lines([str(x) for x in ai.market.key_trends])}\n\n"
                     f"### Key Competitors ({len(competitor_names)})\n"
-                    f"{_lines([str(x) for x in competitor_names])}\n\n"
-                    f"### Risk Signals\n"
+                    + (
+                        (_competitor_table(ai.competitors) or _lines([str(x) for x in competitor_names]))
+                        + "\n\n"
+                    )
+                    + f"### Risk Signals\n"
                     f"{_lines([str(x) for x in risks])}\n"
                     + _missing_note(missing, ["market.", "competitors"])
                 ),
@@ -262,8 +402,8 @@ class ReportComposer:
                     f"{ai.strategy.investment_thesis or 'N/A'}\n\n"
                     "### Acquisition Rationale\n"
                     f"{ai.strategy.acquisition_rationale or 'N/A'}\n\n"
-                    f"### Value Creation Initiatives ({len(initiatives)})\n"
-                    f"{_lines([str(x) for x in initiatives])}\n"
+                    f"### Value Creation Initiatives ({len(ai.value_creation_initiatives)})\n"
+                    f"{_value_creation_with_rationale(ai.value_creation_initiatives)}\n"
                     + _missing_note(missing, ["value_creation_initiatives"])
                 ),
                 "sort_order": 5,
@@ -277,15 +417,37 @@ class ReportComposer:
                     f"{_projection_table(ai, 'base')}\n\n"
                     f"- Final year revenue (MSEK): {revenue_final}\n"
                     f"- Final year EBITDA margin: {ebitda_final}\n\n"
+                    + (
+                        "### Assumption Commentary\n"
+                        + "\n".join(f"- {b}" for b in _assumption_commentary(ai.model_assumptions))
+                        + "\n\n"
+                        if _assumption_commentary(ai.model_assumptions)
+                        else ""
+                    )
                     "### Valuation\n"
                     f"- Enterprise Value (MSEK): {ev}\n"
                     f"- Equity Value (MSEK): {eq}\n"
-                    f"- Valuation Range (MSEK): {vr_low} to {vr_high}\n"
+                    f"- Valuation Range (MSEK): {vr_low} to {vr_high}\n\n"
+                    "### Methodology & Cross-Checks\n"
+                    f"{_valuation_methodology_block(ai.valuation_output)}\n\n"
+                    + (
+                        f"### Scenario Range\n\n{_scenario_valuation_table(ai.valuation_output)}\n\n"
+                        if _scenario_valuation_table(ai.valuation_output)
+                        else ""
+                    )
+                    + "### Key Assumptions\n"
+                    f"{_key_assumptions_block(ai.model_assumptions) or '- No assumption details available.'}\n"
                     + _missing_note(missing, ["model_assumptions.", "valuation_output."])
                 ),
                 "sort_order": 6,
             },
         ]
+
+        v = ai.valuation_output
+        validation_status = {
+            "lint_passed": getattr(v, "lint_passed", True),
+            "lint_warnings": getattr(v, "lint_warnings", []) or [],
+        }
 
         return {
             "status": "draft",
@@ -295,6 +457,7 @@ class ReportComposer:
                 "composer_version": self.version,
                 "unsupported_claim_types": sorted(unsupported_types),
                 "completeness": cr,
+                "validation_status": validation_status,
             },
         }
 

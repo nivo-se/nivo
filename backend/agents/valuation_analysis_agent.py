@@ -19,10 +19,17 @@ class ValuationAnalysisAgent:
         self,
         context: AgentContext,
         financial_model_payload: dict,
+        sector_range_low: float | None = None,
+        sector_range_high: float | None = None,
     ) -> ValuationAnalysisAgentOutput:
         assumptions = financial_model_payload.get("assumption_set", {})
         forecast = financial_model_payload.get("forecast", {})
-        valuation = self.valuation_engine.build(assumptions, forecast)
+        valuation = self.valuation_engine.build(
+            assumptions,
+            forecast,
+            sector_range_low=sector_range_low,
+            sector_range_high=sector_range_high,
+        )
 
         source = context.primary_source()
         chunk = context.primary_chunk()
@@ -57,6 +64,13 @@ class ValuationAnalysisAgent:
                 "deterministic": True,
                 "net_debt_msek": valuation.get("net_debt_msek"),
                 "scenario_valuations": valuation.get("scenario_valuations", {}),
+                "implied_ev_ebitda": valuation.get("implied_ev_ebitda"),
+                "sector_sanity_range_low": valuation.get("sector_sanity_range_low"),
+                "sector_sanity_range_high": valuation.get("sector_sanity_range_high"),
+                "lint_passed": valuation.get("lint_passed", True),
+                "lint_warnings": valuation.get("lint_warnings", []),
+                "primary_method": valuation.get("primary_method", "dcf"),
+                "terminal_value_dominance_warning": valuation.get("terminal_value_dominance_warning", False),
             },
         )
 

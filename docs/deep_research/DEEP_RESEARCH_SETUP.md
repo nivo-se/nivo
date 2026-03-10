@@ -69,6 +69,8 @@ This runs `rq worker enrichment ai_analysis deep_research` — one worker handle
 
 ## Troubleshooting
 
-- **Runs stay "Pending"** — The RQ worker is not running. Start it with `./scripts/start-deep-research-worker.sh`.
+- **Runs stay "Pending"** — The RQ worker is not running, or it fails to import job functions. Start it with `./scripts/start-worker.sh` or `./scripts/start-deep-research-worker.sh` (these use `--path` so the worker can import `backend.orchestrator.worker`). Restart the worker after pulling code changes.
+- **Worker import error** (`module 'backend' has no attribute 'orchestrator.worker'`) — The worker was started without the project root in its path. Stop the worker and restart with `./scripts/start-worker.sh` from the repo root.
+- **Worker crashes on macOS** (`Work-horse terminated unexpectedly; signal 6` / `NSCharacterSet initialize`) — Use `./scripts/start-worker.sh`; it sets `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` to avoid the macOS fork crash.
 - **Redis connection refused** — Start Redis (e.g. `redis-server` or Docker) and verify with `redis-cli ping`.
 - **Health endpoint fails** — Ensure the backend is running and reachable at `http://localhost:8000`.

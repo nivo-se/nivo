@@ -29,6 +29,8 @@ SECTION_TO_START_NODE: dict[str, str] = {
     "company_identity_and_profile": "identity",
     "company": "identity",
     "company_profile": "company_profile",
+    "web_retrieval": "web_retrieval",
+    "web_evidence": "web_retrieval",
     "market_and_competitive_landscape": "market_analysis",
     "market": "market_analysis",
     "market_analysis": "market_analysis",

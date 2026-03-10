@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import uuid
 
 from fastapi import APIRouter, HTTPException
+from sqlalchemy.orm import Session
 
 from backend.config import get_settings
 from backend.db import SessionLocal
@@ -16,14 +18,76 @@ from backend.models.deep_research_api import (
     SourceCreateRequest,
     SourceData,
     SourceListData,
+    UserSourceInput,
 )
 from backend.retrieval import RetrievalRequest, RetrievalService
 from backend.retrieval.chunking import Chunker
 from backend.retrieval.source_storage import SourceStorage
+from backend.services.web_intel.tavily_client import TavilyClient
 
 from .utils import ok
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/sources", tags=["deep-research-sources"])
+
+
+def _fetch_url_content(url: str) -> str | None:
+    """Fetch content from URL via Tavily Extract. Returns None if fetch fails."""
+    client = TavilyClient()
+    if not client.api_key:
+        logger.warning("Tavily not configured; cannot fetch URL content")
+        return None
+    results = client.extract([url])
+    for r in results:
+        if r.url == url and not r.failed and r.raw_content:
+            return r.raw_content
+    return None
+
+
+def ingest_user_sources(
+    session: Session,
+    *,
+    run_id: uuid.UUID,
+    company_id: uuid.UUID,
+    sources: list[UserSourceInput],
+) -> int:
+    """
+    Ingest user-provided sources for a run. Fetches URL content when url-only.
+    Returns count of sources ingested.
+    """
+    settings = get_settings()
+    storage = SourceStorage(session)
+    chunker = Chunker(settings)
+    count = 0
+    for src in sources:
+        content_text: str | None = None
+        url = src.url
+        title = src.title or (url or "Manual source")
+
+        if src.raw_text:
+            content_text = src.raw_text.strip()
+        elif src.source_type == "url" and url:
+            content_text = _fetch_url_content(url)  # None if fetch fails; store URL-only
+
+        source = storage.save_source(
+            run_id=run_id,
+            company_id=company_id,
+            source_type=src.source_type,
+            title=title,
+            url=url,
+            content_text=content_text or None,
+            metadata={"manual_ingest": True},
+        )
+        if content_text and len(content_text.strip()) >= 30:
+            chunks = chunker.split(content_text)
+            storage.save_chunks(
+                source_id=source.id,
+                chunks=chunks,
+                embedding_model=None,
+            )
+        count += 1
+    return count
 
 
 @router.post("/search-company", response_model=ApiResponse[SearchCompanySourcesData])

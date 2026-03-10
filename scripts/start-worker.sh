@@ -8,13 +8,13 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Activate venv
-if [ -d "backend/venv" ]; then
+# Activate venv (prefer .venv at project root; backend/venv may be stale if project moved)
+if [ -d ".venv" ] && [ -x .venv/bin/python ]; then
+    source .venv/bin/activate
+elif [ -d "backend/venv" ] && [ -x backend/venv/bin/python ]; then
     source backend/venv/bin/activate
 elif [ -d "backend/.venv" ]; then
     source backend/.venv/bin/activate
-elif [ -d ".venv" ]; then
-    source .venv/bin/activate
 elif [ -d "venv" ]; then
     source venv/bin/activate
 else
@@ -32,5 +32,7 @@ fi
 
 echo "✅ Starting RQ worker for queues: enrichment, ai_analysis, deep_research"
 echo ""
-rq worker enrichment ai_analysis deep_research --url "${REDIS_URL:-redis://localhost:6379/0}"
+# macOS: avoid fork crash when RQ spawns work horse (objc NSCharacterSet init)
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+rq worker enrichment ai_analysis deep_research --url "${REDIS_URL:-redis://localhost:6379/0}" --path "$PROJECT_ROOT"
 

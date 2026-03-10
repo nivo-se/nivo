@@ -30,6 +30,23 @@ class ApiResponse(BaseModel, Generic[T]):
     meta: ApiMeta = Field(default_factory=ApiMeta)
 
 
+class UserSourceInput(BaseModel):
+    """User-provided source for inline ingestion at analysis start."""
+
+    source_type: Literal["url", "document", "note"]
+    url: str | None = Field(default=None, max_length=2048)
+    raw_text: str | None = Field(default=None, max_length=50000)
+    title: str | None = Field(default=None, max_length=256)
+
+    @model_validator(mode="after")
+    def validate_source_payload(self) -> "UserSourceInput":
+        if self.source_type == "url" and not self.url:
+            raise ValueError("url is required when source_type=url")
+        if not self.url and not self.raw_text:
+            raise ValueError("At least one of url or raw_text must be provided")
+        return self
+
+
 class AnalysisStartRequest(BaseModel):
     run_id: uuid.UUID | None = None
     company_id: uuid.UUID | None = None
@@ -39,11 +56,14 @@ class AnalysisStartRequest(BaseModel):
     analysis_type: Literal["full", "refresh", "quick"] = "full"
     priority: Literal["low", "normal", "high"] = "normal"
     query: str | None = Field(default=None, max_length=4000)
+    sources: list[UserSourceInput] | None = Field(default=None)
 
     @model_validator(mode="after")
     def validate_target(self) -> "AnalysisStartRequest":
         if not self.company_id and not self.orgnr and not self.company_name:
             raise ValueError("Either company_id, orgnr, or company_name must be provided")
+        if self.sources and len(self.sources) > 20:
+            raise ValueError("At most 20 sources per request")
         return self
 
 
@@ -59,15 +79,19 @@ class RunStageData(BaseModel):
     status: Literal["pending", "running", "completed", "failed", "skipped"]
     started_at: datetime | None = None
     finished_at: datetime | None = None
+    error_message: str | None = None
 
 
 class AnalysisStatusData(BaseModel):
     run_id: uuid.UUID
     company_id: uuid.UUID | None = None
     company_name: str | None = None
+    orgnr: str | None = None
+    created_at: datetime | None = None
     status: Literal["pending", "running", "completed", "failed", "cancelled"]
     current_stage: str
     stages: list[RunStageData] = Field(default_factory=list)
+    error_message: str | None = None
 
 
 class ReportGenerateRequest(BaseModel):
@@ -90,12 +114,19 @@ class ReportSectionData(BaseModel):
     sort_order: int
 
 
+class ValidationStatusData(BaseModel):
+    """Report-level validation status (lint, reconciliation)."""
+    lint_passed: bool = True
+    lint_warnings: list[str] = Field(default_factory=list)
+
+
 class ReportDetailData(ReportVersionData):
     company_id: uuid.UUID | None = None
     company_name: str | None = None
     sections: list[ReportSectionData] = Field(default_factory=list)
     report_degraded: bool = False
     report_degraded_reasons: list[str] = Field(default_factory=list)
+    validation_status: ValidationStatusData | None = None
 
 
 class ReportVersionSummary(BaseModel):

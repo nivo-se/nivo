@@ -19,8 +19,7 @@ const navItems: NavItem[] = [
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },
   { path: "/ai/runs", label: "Recent Runs", icon: Cpu, indent: true },
-  { path: "/deep-research/companies", label: "Deep Research", icon: Search },
-  { path: "/deep-research/companies", label: "Companies", icon: Building2, indent: true },
+  { path: "/deep-research", label: "Deep Research", icon: Search },
   { path: "/deep-research/runs", label: "Runs", icon: LayoutList, indent: true, adminOnly: true },
 ];
 

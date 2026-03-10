@@ -46,6 +46,11 @@ class MarketInput:
     customer_segments: list[str] = field(default_factory=list)
     risks: list[str] = field(default_factory=list)
     source_confidence: float | None = None
+    # Workstream 3: market model fields
+    market_subsegment: str | None = None
+    concentration_signal: str | None = None
+    fragmentation_signal: str | None = None
+    market_maturity_signal: str | None = None
 
 
 @dataclass(slots=True)
@@ -114,6 +119,7 @@ class ModelAssumptions:
     terminal_growth: float | None = None
     net_debt_msek: float | None = None
     scenario_names: list[str] = field(default_factory=lambda: ["base", "upside", "downside"])
+    assumptions_source: str | None = None  # "real_historicals" | "synthetic_seed" | "unknown"
 
 
 @dataclass(slots=True)
@@ -135,6 +141,14 @@ class ValuationOutput:
     valuation_range_high_msek: float | None = None
     net_debt_msek: float | None = None
     scenario_valuations: dict[str, dict] = field(default_factory=dict)
+    # Phase B: valuation lint and cross-checks
+    implied_ev_ebitda: float | None = None
+    sector_sanity_range_low: float = 4.1
+    sector_sanity_range_high: float = 8.0
+    lint_passed: bool = True
+    lint_warnings: list[str] = field(default_factory=list)
+    primary_method: str = "dcf"
+    terminal_value_dominance_warning: bool = False
 
 
 @dataclass(slots=True)
@@ -168,6 +182,9 @@ class AnalysisInput:
     # Competitors
     competitors: list[CompetitorInput] = field(default_factory=list)
 
+    # Precedent transactions (from transaction_research node)
+    transactions: list[dict] = field(default_factory=list)
+
     # Strategy
     strategy: StrategyInput = field(default_factory=StrategyInput)
 
@@ -192,6 +209,11 @@ class AnalysisInput:
 
     # Stage flags for downstream validators (set by assembler guards)
     stage_flags: dict[str, bool] = field(default_factory=dict)
+
+    # Workstream 3: market model, positioning, synthesis (for report/strategy)
+    market_model: dict = field(default_factory=dict)
+    positioning_analysis: dict = field(default_factory=dict)
+    market_synthesis: dict = field(default_factory=dict)
 
     def to_debug_dict(self) -> dict[str, Any]:
         """Serialize to a JSON-safe dict for debug dumps."""

@@ -1,4 +1,4 @@
-"""Company profile research agent."""
+"""Company profile research agent with LLM-driven company understanding."""
 
 from __future__ import annotations
 
@@ -14,12 +14,110 @@ def _sentences(text: str) -> list[str]:
     return [b.strip() for b in bits if len(b.strip()) > 20]
 
 
+def _build_source_refs(context: AgentContext) -> list[dict]:
+    """Build source_refs for company understanding payload."""
+    refs: list[dict] = []
+    for s in context.sources[:10]:
+        refs.append({
+            "source_id": str(s.source_id) if s.source_id else None,
+            "url": s.url,
+            "title": s.title,
+        })
+    return refs
+
+
 @dataclass(slots=True)
 class CompanyProfileAgent:
-    """Generates structured company profile from source content."""
+    """Generates structured company profile from source content.
+
+    Uses LLM-driven extraction when raw text is available and OPENAI_API_KEY is set.
+    Falls back to heuristic extraction otherwise.
+    """
 
     def run(self, context: AgentContext) -> CompanyProfileAgentOutput:
         joined = context.joined_text(max_chars=15000)
+        company_name = context.company_name or "Company"
+
+        # Try LLM extraction first when we have enough text
+        llm_result = None
+        try:
+            from backend.llm.company_understanding import extract_company_understanding
+
+            llm_result = extract_company_understanding(company_name, joined)
+        except Exception:
+            pass
+
+        if llm_result:
+            return self._build_from_llm(llm_result, context, joined)
+        return self._build_from_heuristic(context, joined)
+
+    def _build_from_llm(
+        self, llm_result: dict, context: AgentContext, joined: str
+    ) -> CompanyProfileAgentOutput:
+        """Build output from LLM extraction result."""
+        summary = llm_result.get("company_description") or ""
+        business_model = llm_result.get("business_model") or "Business model not identified."
+        products = llm_result.get("products_services") or []
+        if isinstance(products, str):
+            products = [products]
+        customers = llm_result.get("target_customers") or []
+        if isinstance(customers, str):
+            customers = [customers]
+        geographies = llm_result.get("geographies") or []
+        if isinstance(geographies, str):
+            geographies = [geographies]
+        market_niche = llm_result.get("market_niche") or ""
+        confidence = float(llm_result.get("confidence_score", 0.5))
+
+        if not summary and business_model:
+            summary = business_model[:300]
+
+        primary_source = context.primary_source()
+        primary_chunk = context.primary_chunk()
+        evidence = SourceEvidence(
+            source_id=primary_source.source_id if primary_source else None,
+            source_chunk_id=primary_chunk.chunk_id if primary_chunk else None,
+            source_url=primary_source.url if primary_source else None,
+            source_title=primary_source.title if primary_source else None,
+            excerpt=primary_chunk.text[:280] if primary_chunk else None,
+        )
+
+        claims = [
+            AgentClaim(
+                claim_text=f"Profile summary: {summary[:220]}",
+                claim_type="company_profile_summary",
+                confidence=confidence,
+                evidence=evidence,
+            ),
+            AgentClaim(
+                claim_text=f"Business model: {business_model[:220]}",
+                claim_type="company_profile_business_model",
+                confidence=confidence,
+                evidence=evidence,
+            ),
+        ]
+
+        return CompanyProfileAgentOutput(
+            summary=summary,
+            business_model=business_model,
+            products_services=products,
+            customer_segments=customers,
+            geographies=geographies,
+            source_ids=[s.source_id for s in context.sources],
+            claims=claims,
+            metadata={
+                "source_count": len(context.sources),
+                "chunk_count": len(context.chunks),
+                "extraction_method": "llm",
+            },
+            company_description=summary or None,
+            market_niche=market_niche or None,
+            confidence_score=confidence,
+            source_refs=_build_source_refs(context),
+        )
+
+    def _build_from_heuristic(self, context: AgentContext, joined: str) -> CompanyProfileAgentOutput:
+        """Build output from heuristic extraction (fallback)."""
         sentences = _sentences(joined)
 
         summary = (
@@ -73,6 +171,9 @@ class CompanyProfileAgent:
         if not geographies:
             geographies.append("Geography not explicitly stated")
 
+        # Infer market_niche from products or business model
+        market_niche = products[0][:100] if products else (business_model[:80] if business_model else None)
+
         primary_source = context.primary_source()
         primary_chunk = context.primary_chunk()
         evidence = SourceEvidence(
@@ -106,6 +207,13 @@ class CompanyProfileAgent:
             geographies=geographies,
             source_ids=[s.source_id for s in context.sources],
             claims=claims,
-            metadata={"source_count": len(context.sources), "chunk_count": len(context.chunks)},
+            metadata={
+                "source_count": len(context.sources),
+                "chunk_count": len(context.chunks),
+                "extraction_method": "heuristic",
+            },
+            company_description=summary or None,
+            market_niche=market_niche,
+            confidence_score=0.6 if sentences else 0.35,
+            source_refs=_build_source_refs(context),
         )
-

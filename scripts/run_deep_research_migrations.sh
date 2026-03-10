@@ -67,6 +67,21 @@ fi
 if [ -f "database/migrations/025_claim_verifications.sql" ]; then
   run_sql "database/migrations/025_claim_verifications.sql"
 fi
+if [ -f "database/migrations/026_web_intelligence.sql" ]; then
+  run_sql "database/migrations/026_web_intelligence.sql"
+fi
+if [ -f "database/migrations/027_competitor_market_synthesis.sql" ]; then
+  run_sql "database/migrations/027_competitor_market_synthesis.sql"
+fi
+if [ -f "database/migrations/028_fix_timestamp_columns.sql" ]; then
+  run_sql "database/migrations/028_fix_timestamp_columns.sql"
+fi
+if [ -f "database/migrations/029_report_retrieval_config.sql" ]; then
+  run_sql "database/migrations/029_report_retrieval_config.sql"
+fi
+if [ -f "database/migrations/030_sector_multiple_reference.sql" ]; then
+  run_sql "database/migrations/030_sector_multiple_reference.sql"
+fi
 
 echo "Deep Research migration applied."
 

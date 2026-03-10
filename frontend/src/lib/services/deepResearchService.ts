@@ -65,6 +65,12 @@ export interface ReportSection {
   heading: string | null
   content_md: string
   sort_order: number
+  extra?: Record<string, unknown>
+}
+
+export interface ValidationStatus {
+  lint_passed: boolean
+  lint_warnings: string[]
 }
 
 export interface ReportVersion {
@@ -76,6 +82,9 @@ export interface ReportVersion {
   title: string | null
   version_number: number | null
   sections?: ReportSection[]
+  report_degraded?: boolean
+  report_degraded_reasons?: string[]
+  validation_status?: ValidationStatus | null
 }
 
 export interface CompanyWithReport {
@@ -130,6 +139,13 @@ export interface DeepResearchHealthData {
 // Request types
 // ---------------------------------------------------------------------------
 
+export interface UserSourceInput {
+  source_type: 'url' | 'document' | 'note'
+  url?: string
+  raw_text?: string
+  title?: string
+}
+
 export interface StartAnalysisRequest {
   company_id?: string
   orgnr?: string
@@ -138,6 +154,7 @@ export interface StartAnalysisRequest {
   query?: string
   analysis_type?: 'full' | 'refresh' | 'quick'
   priority?: 'low' | 'normal' | 'high'
+  sources?: UserSourceInput[]
 }
 
 export interface RecomputeReportRequest {
@@ -185,6 +202,30 @@ export async function startAnalysis(req: StartAnalysisRequest): Promise<Analysis
 
 export async function getRunStatus(runId: string): Promise<AnalysisStatus | null> {
   return drFetch<AnalysisStatus>(`/analysis/runs/${runId}`)
+}
+
+export type RestartResult = { success: true; data: AnalysisStartResult } | { success: false; error: string }
+
+export async function restartRun(runId: string): Promise<RestartResult> {
+  const res = await fetchWithAuth(`${DR_BASE}/analysis/runs/${runId}/restart`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  })
+  const bodyText = await res.text()
+  let parsed: ApiResponse<AnalysisStartResult> & { detail?: string } | null = null
+  try {
+    parsed = JSON.parse(bodyText) as ApiResponse<AnalysisStartResult> & { detail?: string }
+  } catch {
+    /* ignore */
+  }
+  if (!res.ok) {
+    const msg = parsed?.detail ?? parsed?.error?.message ?? `HTTP ${res.status}`
+    return { success: false, error: typeof msg === 'string' ? msg : JSON.stringify(msg) }
+  }
+  const data = parsed?.data ?? null
+  if (!data) return { success: false, error: 'No data in response' }
+  return { success: true, data }
 }
 
 export async function getDeepResearchHealth(): Promise<DeepResearchHealthData | null> {

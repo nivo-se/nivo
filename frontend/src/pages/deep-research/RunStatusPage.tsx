@@ -18,10 +18,12 @@ import {
 import {
   getRunStatus,
   getDeepResearchHealth,
+  restartRun,
   type AnalysisStatus,
   type RunStage,
 } from '@/lib/services/deepResearchService'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { toast } from 'sonner'
 import { isAdminLinkVisible } from '@/lib/isAdmin'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -216,6 +218,7 @@ export default function RunStatusPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [redisUnhealthy, setRedisUnhealthy] = useState(false)
+  const [restarting, setRestarting] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { user, userRole } = useAuth()
   const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user)
@@ -373,6 +376,31 @@ export default function RunStatusPage() {
                   <p className="text-xs text-muted-foreground mt-2">
                     Redis must be running. Check with: <code className="rounded bg-muted px-1">redis-cli ping</code>
                   </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-4"
+                    disabled={restarting}
+                    onClick={async () => {
+                      setRestarting(true)
+                      try {
+                        const result = await restartRun(run.run_id)
+                        if (result.success) {
+                          toast.success('Run re-queued — worker will pick it up shortly')
+                          await fetchStatus()
+                        } else {
+                          toast.error(result.error)
+                        }
+                      } catch (e) {
+                        toast.error(e instanceof Error ? e.message : 'Restart failed')
+                      } finally {
+                        setRestarting(false)
+                      }
+                    }}
+                  >
+                    {restarting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Restart run
+                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -387,11 +415,37 @@ export default function RunStatusPage() {
             )}
 
             {isFailed && (
-              <BlockedStageCard
-                stageName={failedStage?.stage ?? run.current_stage}
-                reason={stageError || runError || ''}
-                suggestedActions={getSuggestedActions(failedStage?.stage ?? run.current_stage)}
-              />
+              <>
+                <BlockedStageCard
+                  stageName={failedStage?.stage ?? run.current_stage}
+                  reason={stageError || runError || ''}
+                  suggestedActions={getSuggestedActions(failedStage?.stage ?? run.current_stage)}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={restarting}
+                  onClick={async () => {
+                      setRestarting(true)
+                      try {
+                        const result = await restartRun(run.run_id)
+                        if (result.success) {
+                          toast.success('Run re-queued — worker will pick it up shortly')
+                          await fetchStatus()
+                        } else {
+                          toast.error(result.error)
+                        }
+                      } catch (e) {
+                        toast.error(e instanceof Error ? e.message : 'Restart failed')
+                      } finally {
+                        setRestarting(false)
+                      }
+                    }}
+                >
+                  {restarting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Restart run
+                </Button>
+              </>
             )}
 
             {isAdmin && <AdminDetails run={run} stages={run.stages} />}

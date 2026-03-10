@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
 from backend.db import SessionLocal
-from backend.db.models.deep_research import AnalysisRun, RunNodeState
+from backend.db.models.deep_research import AnalysisRun, Company, RunNodeState
 from backend.orchestrator import LangGraphAgentOrchestrator
 from backend.orchestrator.persistence import RunStateRepository
 
@@ -22,6 +22,7 @@ from backend.models.deep_research_api import (
     RunStageData,
 )
 
+from .sources import ingest_user_sources
 from .utils import ok
 
 logger = logging.getLogger(__name__)
@@ -84,6 +85,16 @@ async def start_analysis(body: AnalysisStartRequest) -> ApiResponse[AnalysisStar
         run_id = run.id
         resolved_company_id = company.id
 
+    if body.sources:
+        with SessionLocal() as ingest_session:
+            ingest_user_sources(
+                ingest_session,
+                run_id=run_id,
+                company_id=resolved_company_id,
+                sources=body.sources,
+            )
+            ingest_session.commit()
+
     _enqueue_pipeline(run_id, resolved_company_id, body)
 
     return ok(
@@ -106,6 +117,8 @@ async def get_analysis_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStatusData]
             run_id=run_id,
             company_id=status.get("company_id"),
             company_name=status.get("company_name"),
+            orgnr=status.get("orgnr"),
+            created_at=status.get("created_at"),
             status=status["status"],
             current_stage=status["current_stage"],
             stages=[
@@ -114,9 +127,11 @@ async def get_analysis_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStatusData]
                     status=s["status"],
                     started_at=s.get("started_at"),
                     finished_at=s.get("finished_at"),
+                    error_message=s.get("error_message"),
                 )
                 for s in status.get("stages", [])
             ],
+            error_message=status.get("error_message"),
         )
     )
 
@@ -130,6 +145,8 @@ async def list_analysis_runs() -> ApiResponse[list[AnalysisStatusData]]:
                 run_id=r["run_id"],
                 company_id=r.get("company_id"),
                 company_name=r.get("company_name"),
+                orgnr=r.get("orgnr"),
+                created_at=r.get("created_at"),
                 status=r["status"],
                 current_stage=r["current_stage"],
                 stages=[
@@ -138,12 +155,63 @@ async def list_analysis_runs() -> ApiResponse[list[AnalysisStatusData]]:
                         status=s["status"],
                         started_at=s.get("started_at"),
                         finished_at=s.get("finished_at"),
+                        error_message=s.get("error_message"),
                     )
                     for s in r.get("stages", [])
                 ],
+                error_message=r.get("error_message"),
             )
             for r in runs
         ]
+    )
+
+
+@router.post("/runs/{run_id}/restart", response_model=ApiResponse[AnalysisStartData])
+async def restart_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStartData]:
+    """Re-enqueue a pending or failed run. Use when the job was lost (e.g. Redis restarted) or stuck."""
+    with SessionLocal() as session:
+        run = session.get(AnalysisRun, run_id)
+        if not run:
+            raise HTTPException(status_code=404, detail="Run not found")
+        if run.status == "running":
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot restart a run that is currently running",
+            )
+        if run.status == "completed":
+            raise HTTPException(
+                status_code=400,
+                detail="Run already completed. Start a new analysis instead.",
+            )
+        company = session.get(Company, run.company_id) if run.company_id else None
+        if not company:
+            raise HTTPException(status_code=400, detail="Run has no company")
+
+        repo = RunStateRepository(session)
+        repo.clear_run_analysis_data(run_id)
+
+        run.status = "pending"
+        run.started_at = None
+        run.completed_at = None
+        run.error_message = None
+        session.commit()
+
+        body = AnalysisStartRequest(
+            company_id=str(run.company_id),
+            orgnr=company.orgnr,
+            company_name=company.name,
+            website=company.website,
+            query=run.query or company.name,
+        )
+        _enqueue_pipeline(run_id, run.company_id, body)
+
+    return ok(
+        AnalysisStartData(
+            run_id=run_id,
+            status="pending",
+            message="Run re-queued",
+            accepted_at=datetime.utcnow(),
+        )
     )
 
 

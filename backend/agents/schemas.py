@@ -37,6 +37,8 @@ class IdentityAgentOutput(BaseModel):
 
 
 class CompanyProfileAgentOutput(BaseModel):
+    """Canonical company understanding payload per FINAL_DEEP_RESEARCH_ARCHITECTURE.md Layer 3."""
+
     agent: Literal["company_profile"] = "company_profile"
     summary: str
     business_model: str | None = None
@@ -46,6 +48,47 @@ class CompanyProfileAgentOutput(BaseModel):
     source_ids: list[uuid.UUID] = Field(default_factory=list)
     claims: list[AgentClaim] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
+    # First-class company understanding fields (for QueryPlanner, gating, debug)
+    company_description: str | None = None
+    market_niche: str | None = None
+    confidence_score: float | None = None
+    source_refs: list[dict] = Field(default_factory=list)
+
+
+class TransactionRecord(BaseModel):
+    """Single precedent transaction per DEEP_RESEARCH_AGENT_PROMPTS_PRO Section 5."""
+
+    target: str = ""
+    buyer: str = ""
+    year: str | int | None = None
+    enterprise_value: str | float | None = None
+    ebitda: str | float | None = None
+    ev_ebitda_multiple: str | float | None = None
+    source_url: str | None = None
+
+
+class TransactionAgentOutput(BaseModel):
+    """Transaction discovery output per DEEP_RESEARCH_AGENT_PROMPTS_PRO Section 5."""
+
+    agent: Literal["transaction"] = "transaction"
+    transactions: list[TransactionRecord] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+class ProductAgentOutput(BaseModel):
+    """Product intelligence per DEEP_RESEARCH_AGENT_PROMPTS_PRO Section 4."""
+
+    agent: Literal["product"] = "product"
+    product_categories: list[str] = Field(default_factory=list)
+    pricing_position: str | None = None
+    brand_positioning: str | None = None
+    differentiators: list[str] = Field(default_factory=list)
+    source_ids: list[uuid.UUID] = Field(default_factory=list)
+    claims: list[AgentClaim] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+    sources: list[dict] = Field(default_factory=list)
 
 
 class MarketAnalysisAgentOutput(BaseModel):
@@ -66,6 +109,10 @@ class CompetitorCandidate(BaseModel):
     relation_score: float = Field(ge=0.0, le=1.0, default=0.5)
     source_ids: list[uuid.UUID] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
+    # Workstream 3: evidence-backed candidate classification
+    candidate_type: Literal["direct", "adjacent", "substitute"] | None = None
+    inclusion_rationale: str | None = None
+    evidence_refs: list[dict] = Field(default_factory=list)
 
 
 class CompetitorDiscoveryAgentOutput(BaseModel):

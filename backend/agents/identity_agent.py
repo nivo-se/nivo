@@ -7,21 +7,7 @@ from dataclasses import dataclass
 
 from .context import AgentContext
 from .schemas import AgentClaim, IdentityAgentOutput, SourceEvidence
-
-
-def _infer_industry(text: str) -> str | None:
-    lowered = text.lower()
-    mapping = {
-        "software": ["software", "saas", "platform", "cloud"],
-        "manufacturing": ["manufacturing", "factory", "industrial", "production"],
-        "healthcare": ["health", "hospital", "medical", "clinic", "pharma"],
-        "retail": ["retail", "store", "e-commerce", "shop"],
-        "financial services": ["bank", "fintech", "insurance", "financial"],
-    }
-    for industry, keywords in mapping.items():
-        if any(k in lowered for k in keywords):
-            return industry
-    return None
+from .text_extraction import infer_industry
 
 
 def _infer_headquarters(text: str) -> str | None:
@@ -48,7 +34,7 @@ class IdentityAgent:
         if not website and primary_source and primary_source.url:
             website = primary_source.url
 
-        industry = _infer_industry(text)
+        industry = infer_industry(text)
         hq = _infer_headquarters(text)
 
         claims: list[AgentClaim] = []

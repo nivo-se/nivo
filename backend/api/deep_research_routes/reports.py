@@ -17,6 +17,7 @@ from backend.models.deep_research_api import (
     ReportSectionData,
     ReportVersionListData,
     ReportVersionSummary,
+    ValidationStatusData,
 )
 from backend.orchestrator.persistence import RunStateRepository
 from backend.report_engine import ReportComposer
@@ -29,6 +30,13 @@ router = APIRouter(prefix="/reports", tags=["deep-research-reports"])
 def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> ReportDetailData:
     sections = sorted(list(row.sections), key=lambda s: (s.sort_order, s.section_key))
     extra = row.extra if isinstance(row.extra, dict) else {}
+    vs = extra.get("validation_status")
+    validation_status = None
+    if isinstance(vs, dict):
+        validation_status = ValidationStatusData(
+            lint_passed=vs.get("lint_passed", True),
+            lint_warnings=vs.get("lint_warnings", []) or [],
+        )
     return ReportDetailData(
         report_version_id=row.id,
         run_id=row.run_id,
@@ -39,6 +47,7 @@ def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> Re
         version_number=row.version_number,
         report_degraded=extra.get("report_degraded", False),
         report_degraded_reasons=extra.get("report_degraded_reasons", []),
+        validation_status=validation_status,
         sections=[
             ReportSectionData(
                 section_key=section.section_key,

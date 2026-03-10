@@ -11,6 +11,8 @@ from .competitor_profiling_agent import CompetitorProfilingAgent
 from .financial_modeling_agent import FinancialModelingAgent
 from .identity_agent import IdentityAgent
 from .market_analysis_agent import MarketAnalysisAgent
+from .product_agent import ProductAgent
+from .transaction_agent import TransactionAgent
 from .strategy_analysis_agent import StrategyAnalysisAgent
 from .valuation_analysis_agent import ValuationAnalysisAgent
 from .value_creation_identification_agent import ValueCreationIdentificationAgent
@@ -29,6 +31,8 @@ class AgentRegistry:
         registry.register("company_profile", CompanyProfileAgent())
         registry.register("market_analysis", MarketAnalysisAgent())
         registry.register("competitor_discovery", CompetitorDiscoveryAgent())
+        registry.register("product", ProductAgent())
+        registry.register("transaction", TransactionAgent())
         registry.register("competitor_profiling", CompetitorProfilingAgent())
         registry.register("strategy_analysis", StrategyAnalysisAgent())
         registry.register("financial_modeling", FinancialModelingAgent())

@@ -6,6 +6,7 @@ import logging
 import math
 import uuid
 from typing import Any
+from urllib.parse import urlparse
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,12 +18,18 @@ from backend.db.models.deep_research import (
     CompetitorProfile,
     FinancialModel,
     MarketAnalysis,
+    MarketModel as MarketModelRow,
+    MarketSynthesis as MarketSynthesisRow,
+    PositioningAnalysis as PositioningAnalysisRow,
     RunNodeState,
     Source,
     Strategy,
     Valuation,
     ValueCreation,
+    WebEvidence,
 )
+
+from backend.agents.text_extraction import extract_products_from_text, infer_industry
 
 from .financials_loader import load_historical_financials
 
@@ -55,6 +62,15 @@ def _safe_list(val: Any) -> list:
 
 def _safe_dict(val: Any) -> dict:
     return val if isinstance(val, dict) else {}
+
+
+def _safe_float(val: Any) -> float | None:
+    if val is None:
+        return None
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return None
 
 
 def _parse_growth_rate(raw: str | None) -> float | None:
@@ -98,7 +114,10 @@ class AnalysisInputAssembler:
         self._load_company_identity(ai, company_id)
         self._load_company_profile(ai, run_id, company_id)
         self._load_market_analysis(ai, run_id, company_id)
+        self._load_market_model(ai, run_id, company_id)
         self._load_competitors(ai, run_id, company_id)
+        self._load_positioning(ai, run_id, company_id)
+        self._load_market_synthesis(ai, run_id, company_id)
         self._load_strategy(ai, run_id, company_id)
         self._load_value_creation(ai, run_id, company_id)
         self._load_verification(ai, run_id, company_id)
@@ -109,6 +128,7 @@ class AnalysisInputAssembler:
         self._load_valuation(ai, run_id, company_id)
         self._build_model_assumptions(ai, run_id, company_id)
         self._backfill_from_node_states(ai, run_id)
+        self._backfill_from_web_evidence(ai, run_id, company_id)
 
         return ai
 
@@ -139,6 +159,10 @@ class AnalysisInputAssembler:
         ai.products_services = _safe_list(row.products_services)
         ai.customer_segments_profile = _safe_list(row.customer_segments)
         ai.geographies = _safe_list(row.geographies)
+        # Load first-class company understanding from extra (market_niche, etc.)
+        extra = _safe_dict(row.extra)
+        if extra.get("market_niche") and not ai.market.niche_label:
+            ai.market.niche_label = str(extra["market_niche"])
 
     def _load_market_analysis(self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID) -> None:
         row = self.session.execute(
@@ -159,6 +183,34 @@ class AnalysisInputAssembler:
             risks=[str(r) for r in _safe_list(row.risks)],
         )
 
+    def _load_market_model(
+        self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID
+    ) -> None:
+        """Load Workstream 3 market model; enrich market input."""
+        row = self.session.execute(
+            select(MarketModelRow).where(
+                MarketModelRow.run_id == run_id,
+                MarketModelRow.company_id == company_id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return
+        ai.market_model = {
+            "market_label": row.market_label,
+            "market_subsegment": row.market_subsegment,
+            "demand_drivers": _safe_list(row.demand_drivers),
+            "market_growth_signal": row.market_growth_signal,
+            "concentration_signal": row.concentration_signal,
+            "fragmentation_signal": row.fragmentation_signal,
+            "confidence_score": float(row.confidence_score) if row.confidence_score else None,
+        }
+        if row.market_label and not ai.market.market_label:
+            ai.market.market_label = row.market_label
+        ai.market.market_subsegment = row.market_subsegment
+        ai.market.concentration_signal = row.concentration_signal
+        ai.market.fragmentation_signal = row.fragmentation_signal
+        ai.market.market_maturity_signal = row.market_maturity_signal
+
     def _load_competitors(self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID) -> None:
         comps = self.session.execute(
             select(Competitor).where(
@@ -169,16 +221,63 @@ class AnalysisInputAssembler:
             profile_row = self.session.execute(
                 select(CompetitorProfile).where(CompetitorProfile.competitor_id == comp.id)
             ).scalar_one_or_none()
+            comp_extra = _safe_dict(comp.extra) if hasattr(comp, "extra") else {}
+            profile_extra = _safe_dict(profile_row.extra) if profile_row and hasattr(profile_row, "extra") else {}
             ci = CompetitorInput(
                 name=comp.competitor_name,
                 website=comp.website,
                 relation_score=float(comp.relation_score) if comp.relation_score is not None else None,
+                revenue_msek=_safe_float(comp_extra.get("revenue_msek") or profile_extra.get("revenue_msek")),
+                ebitda_margin_pct=_safe_float(comp_extra.get("ebitda_margin_pct") or profile_extra.get("ebitda_margin_pct")),
             )
             if profile_row:
                 ci.strengths = _safe_list(profile_row.strengths)
                 ci.weaknesses = _safe_list(profile_row.weaknesses)
                 ci.differentiation = _safe_list(profile_row.differentiation)
             ai.competitors.append(ci)
+
+    def _load_positioning(
+        self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID
+    ) -> None:
+        """Load Workstream 3 positioning analysis."""
+        row = self.session.execute(
+            select(PositioningAnalysisRow).where(
+                PositioningAnalysisRow.run_id == run_id,
+                PositioningAnalysisRow.company_id == company_id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return
+        ai.positioning_analysis = {
+            "differentiated_axes": _safe_list(row.differentiated_axes),
+            "parity_axes": _safe_list(row.parity_axes),
+            "disadvantage_axes": _safe_list(row.disadvantage_axes),
+            "unclear_axes": _safe_list(row.unclear_axes),
+            "positioning_summary": row.positioning_summary,
+        }
+
+    def _load_market_synthesis(
+        self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID
+    ) -> None:
+        """Load Workstream 3 market synthesis."""
+        row = self.session.execute(
+            select(MarketSynthesisRow).where(
+                MarketSynthesisRow.run_id == run_id,
+                MarketSynthesisRow.company_id == company_id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            return
+        ai.market_synthesis = {
+            "market_attractiveness_score": float(row.market_attractiveness_score) if row.market_attractiveness_score else None,
+            "competition_intensity_score": float(row.competition_intensity_score) if row.competition_intensity_score else None,
+            "niche_defensibility_score": float(row.niche_defensibility_score) if row.niche_defensibility_score else None,
+            "growth_support_score": float(row.growth_support_score) if row.growth_support_score else None,
+            "synthesis_summary": row.synthesis_summary,
+            "key_supporting_claims": _safe_list(row.key_supporting_claims),
+            "key_uncertainties": _safe_list(row.key_uncertainties),
+            "confidence_score": float(row.confidence_score) if row.confidence_score else None,
+        }
 
     def _load_strategy(self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID) -> None:
         row = self.session.execute(
@@ -357,13 +456,23 @@ class AnalysisInputAssembler:
         ).scalars().first()
         if row is None:
             return
+        extra = _safe_dict(row.extra) if hasattr(row, "extra") and row.extra else {}
+        scenario_vals = extra.get("scenario_valuations", {})
         ai.valuation_output = ValuationOutput(
             method=row.method or "deterministic_dcf",
             enterprise_value_msek=float(row.enterprise_value) if row.enterprise_value is not None else None,
             equity_value_msek=float(row.equity_value) if row.equity_value is not None else None,
             valuation_range_low_msek=float(row.valuation_range_low) if row.valuation_range_low is not None else None,
             valuation_range_high_msek=float(row.valuation_range_high) if row.valuation_range_high is not None else None,
-            net_debt_msek=None,
+            net_debt_msek=_safe_float(extra.get("net_debt_msek")),
+            scenario_valuations=scenario_vals if isinstance(scenario_vals, dict) else {},
+            implied_ev_ebitda=_safe_float(extra.get("implied_ev_ebitda")),
+            sector_sanity_range_low=float(extra.get("sector_sanity_range_low", 4.1)),
+            sector_sanity_range_high=float(extra.get("sector_sanity_range_high", 8.0)),
+            lint_passed=bool(extra.get("lint_passed", True)),
+            lint_warnings=[str(w) for w in extra.get("lint_warnings", []) if w],
+            primary_method=str(extra.get("primary_method", "dcf")),
+            terminal_value_dominance_warning=bool(extra.get("terminal_value_dominance_warning", False)),
         )
 
     def _build_model_assumptions(self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID) -> None:
@@ -387,14 +496,42 @@ class AnalysisInputAssembler:
         if d.latest_ebitda_margin_pct is not None:
             margin_start = d.latest_ebitda_margin_pct / 100.0
 
+        assumptions_source: str | None = None
+        growth_terminal = None
+        margin_terminal = None
+        discount_wacc = None
+        terminal_growth = None
+        net_debt = None
+        fm_row = self.session.execute(
+            select(FinancialModel).where(
+                FinancialModel.run_id == run_id, FinancialModel.company_id == company_id
+            )
+        ).scalar_one_or_none()
+        if fm_row and fm_row.assumption_set:
+            aset = _safe_dict(fm_row.assumption_set)
+            assumptions_source = aset.get("assumptions_source") or None
+            base_dict = _safe_dict(aset.get("base"))
+            if base_dict:
+                growth_terminal = _safe_float(base_dict.get("growth_terminal"))
+                margin_terminal = _safe_float(base_dict.get("ebitda_margin_terminal"))
+                discount_wacc = _safe_float(base_dict.get("discount_rate_wacc"))
+                terminal_growth = _safe_float(base_dict.get("terminal_growth"))
+                net_debt = _safe_float(base_dict.get("net_debt_msek"))
+
         ai.model_assumptions = ModelAssumptions(
             base_year=base_year,
             projection_years=3,
             starting_revenue_msek=starting_rev,
             growth_start=round(growth_start, 4) if growth_start else None,
+            growth_terminal=round(growth_terminal, 4) if growth_terminal else None,
             ebitda_margin_start=round(margin_start, 4) if margin_start else None,
+            ebitda_margin_terminal=round(margin_terminal, 4) if margin_terminal else None,
             capex_pct_revenue=d.avg_capex_pct_revenue / 100.0 if d.avg_capex_pct_revenue else None,
             nwc_pct_revenue=d.avg_nwc_pct_revenue / 100.0 if d.avg_nwc_pct_revenue else None,
+            discount_rate_wacc=round(discount_wacc, 4) if discount_wacc else None,
+            terminal_growth=round(terminal_growth, 4) if terminal_growth else None,
+            net_debt_msek=net_debt,
+            assumptions_source=assumptions_source,
         )
 
     # ------------------------------------------------------------------
@@ -422,6 +559,16 @@ class AnalysisInputAssembler:
             ai.products_services = ai.products_services or _safe_list(profile.get("products_services"))
             ai.geographies = ai.geographies or _safe_list(profile.get("geographies"))
 
+        if not ai.products_services:
+            product_research = by_name.get("product_research", {})
+            ai.products_services = _safe_list(product_research.get("product_categories"))
+
+        if not ai.transactions:
+            tx_research = by_name.get("transaction_research", {})
+            for t in _safe_list(tx_research.get("transactions")):
+                if isinstance(t, dict):
+                    ai.transactions.append(t)
+
         if not ai.market.key_trends:
             market = by_name.get("market_analysis", {})
             if market:
@@ -441,6 +588,8 @@ class AnalysisInputAssembler:
                     ai.competitors.append(CompetitorInput(
                         name=item.get("name") or "",
                         website=item.get("website"),
+                        revenue_msek=_safe_float(item.get("revenue_msek")),
+                        ebitda_margin_pct=_safe_float(item.get("ebitda_margin_pct")),
                     ))
 
         if not ai.strategy.investment_thesis:
@@ -461,3 +610,89 @@ class AnalysisInputAssembler:
                     ))
                 elif isinstance(item, str):
                     ai.value_creation_initiatives.append(ValueCreationInitiative(description=item))
+
+    # ------------------------------------------------------------------
+    # Back-fill from WebEvidence (Tavily) when identity/profile lack data
+    # ------------------------------------------------------------------
+
+    def _backfill_from_web_evidence(
+        self, ai: AnalysisInput, run_id: uuid.UUID, company_id: uuid.UUID
+    ) -> None:
+        """Fill website, industry, products from Tavily web evidence when empty."""
+        # Website: prefer tavily_company_facts Source URLs (homepage-like)
+        if not ai.website:
+            sources = self.session.execute(
+                select(Source).where(
+                    Source.run_id == run_id,
+                    Source.company_id == company_id,
+                    Source.source_type == "tavily_company_facts",
+                ).order_by(Source.created_at.asc())
+            ).scalars().all()
+            if sources:
+                # Prefer URL with shortest path (homepage)
+                def path_len(url: str | None) -> int:
+                    if not url:
+                        return 9999
+                    try:
+                        p = urlparse(url)
+                        path = (p.path or "/").rstrip("/")
+                        return len(path) if path else 0
+                    except Exception:
+                        return 9999
+
+                best = min(sources, key=lambda s: path_len(s.url))
+                if best.url:
+                    ai.website = best.url
+                    logger.debug("Backfilled website from web evidence: %s", best.url[:60])
+
+        # Industry and products: from company_facts WebEvidence
+        company_facts_evidence: list[Any] = []
+        we_rows = self.session.execute(
+            select(WebEvidence).where(
+                WebEvidence.run_id == run_id,
+                WebEvidence.company_id == company_id,
+            )
+        ).scalars().all()
+        for row in we_rows:
+            extra = _safe_dict(row.extra)
+            if extra.get("query_group") == "company_facts":
+                company_facts_evidence.append(row)
+
+        if company_facts_evidence:
+            combined_text = " ".join(
+                (r.claim or "") + " " + (r.supporting_text or "")
+                for r in company_facts_evidence
+            ).strip()
+
+            if not ai.industry and combined_text:
+                inferred = infer_industry(combined_text)
+                if inferred:
+                    ai.industry = inferred
+                    logger.debug("Backfilled industry from web evidence: %s", inferred)
+
+            if not ai.products_services and combined_text:
+                products = extract_products_from_text(combined_text)
+                if products:
+                    ai.products_services = products
+                    logger.debug("Backfilled %d products from web evidence", len(products))
+
+        # Persist back to Company/CompanyProfile so future runs see enriched data
+        if ai.website or ai.industry:
+            company = self.session.get(Company, company_id)
+            if company:
+                if ai.website and not company.website:
+                    company.website = ai.website
+                if ai.industry and not company.industry:
+                    company.industry = ai.industry
+                self.session.flush()
+
+        if ai.products_services:
+            profile = self.session.execute(
+                select(CompanyProfile).where(
+                    CompanyProfile.run_id == run_id,
+                    CompanyProfile.company_id == company_id,
+                )
+            ).scalar_one_or_none()
+            if profile and not _safe_list(profile.products_services):
+                profile.products_services = {"items": ai.products_services}
+                self.session.flush()

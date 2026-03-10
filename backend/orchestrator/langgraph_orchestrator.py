@@ -36,9 +36,13 @@ logger = logging.getLogger(__name__)
 
 PIPELINE_NODES: list[str] = [
     "identity",
+    "company_understanding",
+    "web_retrieval",
     "company_profile",
     "market_analysis",
     "competitor_discovery",
+    "product_research",
+    "transaction_research",
     "strategy",
     "value_creation",
     "financial_model",
@@ -90,6 +94,7 @@ class LangGraphAgentOrchestrator:
             output_json={},
             error_message=None,
         )
+        repo.session.commit()  # Commit so UI shows progress per node
 
         validator_fn = STAGE_VALIDATORS.get(node_name)
         validation = StageValidation(status="pass")
@@ -146,6 +151,7 @@ class LangGraphAgentOrchestrator:
                 output_json=output,
                 error_message=None,
             )
+            repo.session.commit()  # Commit so UI shows completed stages
             merged = self._merge_node_result(state, node_name, output)
             merged["stage_evaluations"] = evaluations
             return merged
@@ -161,6 +167,7 @@ class LangGraphAgentOrchestrator:
                     output_json={},
                     error_message=str(exc),
                 )
+                repo.session.commit()  # Persist failed state so UI shows it
             except Exception:
                 logger.exception(
                     "Failed to persist failed node state for run=%s node=%s",
@@ -215,6 +222,56 @@ class LangGraphAgentOrchestrator:
 
             return self._node_wrapper(repo, "identity", state, compute)
 
+        def company_understanding(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                from backend.llm.company_understanding import extract_company_understanding
+
+                identity_output = _state.get("node_results", {}).get("identity", {})
+                company_name = _state.get("company_name") or identity_output.get("canonical_name") or "Company"
+                claims = identity_output.get("claims", [])
+                if isinstance(claims, list):
+                    claim_texts = [
+                        c.get("claim_text", "") if isinstance(c, dict) else getattr(c, "claim_text", "")
+                        for c in claims
+                    ]
+                else:
+                    claim_texts = []
+
+                parts = [f"Company: {company_name}."]
+                if identity_output.get("industry"):
+                    parts.append(f"Industry: {identity_output.get('industry')}.")
+                if identity_output.get("website"):
+                    parts.append(f"Website: {identity_output.get('website')}.")
+                if identity_output.get("orgnr"):
+                    parts.append(f"Organization number: {identity_output.get('orgnr')}.")
+                if identity_output.get("headquarters"):
+                    parts.append(f"Headquarters: {identity_output.get('headquarters')}.")
+                if claim_texts:
+                    parts.append("Available information:")
+                    parts.extend(claim_texts)
+                raw_text = " ".join(parts)
+
+                result = extract_company_understanding(company_name, raw_text)
+                if result is None:
+                    result = {
+                        "company_description": "",
+                        "products_services": [],
+                        "business_model": "",
+                        "target_customers": [],
+                        "geographies": [],
+                        "market_niche": "",
+                        "confidence_score": 0.3,
+                        "source_refs": [],
+                        "extraction_method": "fallback_minimal",
+                    }
+                else:
+                    result = dict(result)
+                    result["source_refs"] = result.get("source_refs") or []
+                    result["extraction_method"] = "llm"
+                return result
+
+            return self._node_wrapper(repo, "company_understanding", state, compute)
+
         def company_profile(state: OrchestratorState):
             def compute(_state: OrchestratorState):
                 run_id = uuid.UUID(_state["run_id"])
@@ -244,6 +301,114 @@ class LangGraphAgentOrchestrator:
                 return payload
 
             return self._node_wrapper(repo, "company_profile", state, compute)
+
+        def web_retrieval(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                from backend.services.deep_research.input_completeness import (
+                    DEEP_RESEARCH_THRESHOLDS,
+                )
+                from backend.services.web_intel import WebRetrievalService
+
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                company_understanding = _state.get("node_results", {}).get(
+                    "company_understanding", {}
+                )
+                company_profile_legacy = _state.get("node_results", {}).get(
+                    "company_profile", {}
+                )
+                company_name = _state.get("company_name") or ""
+                orgnr = _state.get("orgnr")
+                website = _state.get("website")
+
+                conf_threshold = DEEP_RESEARCH_THRESHOLDS.get(
+                    "company_understanding_confidence_threshold", 0.5
+                )
+                cu_confidence = company_understanding.get("confidence_score")
+                cu_meets_threshold = (
+                    cu_confidence is not None
+                    and isinstance(cu_confidence, (int, float))
+                    and cu_confidence >= conf_threshold
+                )
+                cu_has_business_model = bool(
+                    (company_understanding.get("business_model") or "").strip()
+                )
+                cu_has_market_niche = bool(
+                    (company_understanding.get("market_niche") or "").strip()
+                )
+                market_retrieval_gated = cu_meets_threshold and (
+                    cu_has_business_model or cu_has_market_niche
+                )
+
+                profile_for_queries = (
+                    company_understanding
+                    if market_retrieval_gated
+                    else None
+                )
+                market_label = (
+                    company_understanding.get("market_niche")
+                    or company_profile_legacy.get("market_niche")
+                    if market_retrieval_gated
+                    else None
+                )
+
+                service = WebRetrievalService()
+                bundle = service.retrieve(
+                    run_id=run_id,
+                    company_id=company_id,
+                    company_name=company_name,
+                    company_profile=profile_for_queries,
+                    orgnr=orgnr,
+                    company_website=website,
+                    market_label=market_label,
+                )
+
+                session_ids: list[uuid.UUID] = []
+                for group in {"company_facts", "market", "competitors", "news"}:
+                    group_queries = [
+                        q for q in bundle.queries_executed
+                        if q.get("query_group") == group
+                    ]
+                    if group_queries:
+                        sid = repo.persist_web_search_session(
+                            run_id=run_id,
+                            company_id=company_id,
+                            query_group=group,
+                            queries=[q.get("query", "") for q in group_queries],
+                            provider="tavily",
+                            metadata={"result_counts": [q.get("result_count", 0) for q in group_queries]},
+                        )
+                        session_ids.append(sid)
+
+                session_id = session_ids[0] if session_ids else None
+                if bundle.accepted_evidence:
+                    repo.persist_web_evidence(
+                        run_id=run_id,
+                        company_id=company_id,
+                        session_id=session_id,
+                        evidence_items=bundle.accepted_evidence,
+                    )
+                if bundle.rejected_evidence:
+                    repo.persist_web_evidence_rejected(
+                        run_id=run_id,
+                        company_id=company_id,
+                        items_with_reasons=bundle.rejected_evidence,
+                    )
+
+                payload = {
+                    "queries_executed": bundle.queries_executed,
+                    "accepted_count": len(bundle.accepted_evidence),
+                    "rejected_count": len(bundle.rejected_evidence),
+                    "normalized_sources": bundle.normalized_sources,
+                    "metadata": {
+                        **bundle.metadata,
+                        "market_retrieval_gated": market_retrieval_gated,
+                        "company_understanding_confidence": cu_confidence,
+                    },
+                }
+                return payload
+
+            return self._node_wrapper(repo, "web_retrieval", state, compute)
 
         def market_analysis(state: OrchestratorState):
             def compute(_state: OrchestratorState):
@@ -277,67 +442,248 @@ class LangGraphAgentOrchestrator:
 
         def competitor_discovery(state: OrchestratorState):
             def compute(_state: OrchestratorState):
-                run_id = uuid.UUID(_state["run_id"])
-                company_id = uuid.UUID(_state["company_id"])
-                context = repo.build_agent_context(run_id, company_id)
+                from sqlalchemy import select
 
-                discovery_agent = self.agent_registry.get("competitor_discovery")
-                profiling_agent = self.agent_registry.get("competitor_profiling")
-                if discovery_agent is None:
-                    raise RuntimeError("competitor_discovery agent not registered")
-                if profiling_agent is None:
-                    raise RuntimeError("competitor_profiling agent not registered")
-
-                discovery_output = discovery_agent.run(context)
-                profiling_output = profiling_agent.run(
-                    context, discovery_output.competitors
+                from backend.db.models.deep_research import CompanyProfile, MarketAnalysis
+                from backend.services.deep_research.competitor_discovery import (
+                    CompetitorDiscoveryService,
+                )
+                from backend.services.deep_research.competitor_market_schemas import (
+                    CompetitorMarketSynthesisOutput,
+                )
+                from backend.services.deep_research.competitor_profiler import (
+                    CompetitorProfiler,
+                )
+                from backend.services.deep_research.competitor_verifier import (
+                    CompetitorVerifier,
+                )
+                from backend.services.deep_research.evidence_loader import (
+                    load_validated_evidence,
+                )
+                from backend.services.deep_research.market_model_builder import (
+                    MarketModelBuilder,
+                )
+                from backend.services.deep_research.market_synthesis import (
+                    MarketSynthesisService,
+                )
+                from backend.services.deep_research.positioning_engine import (
+                    PositioningEngine,
                 )
 
-                profile_by_name = {p.name.lower(): p for p in profiling_output.profiles}
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                company_name = _state.get("company_name") or ""
+                company_website = _state.get("website")
+
+                # Load inputs
+                company_profile_row = repo.session.execute(
+                    select(CompanyProfile).where(
+                        CompanyProfile.run_id == run_id,
+                        CompanyProfile.company_id == company_id,
+                    )
+                ).scalar_one_or_none()
+                def _to_list(val):
+                    if val is None:
+                        return []
+                    if isinstance(val, list):
+                        return val
+                    if isinstance(val, dict) and "items" in val:
+                        return val["items"] or []
+                    return []
+
+                company_profile = {}
+                if company_profile_row:
+                    cp = company_profile_row
+                    company_profile = {
+                        "market_niche": (cp.extra or {}).get("market_niche"),
+                        "products_services": _to_list(cp.products_services),
+                        "customer_segments": _to_list(cp.customer_segments),
+                        "geographies": _to_list(cp.geographies),
+                    }
+
+                market_row = repo.session.execute(
+                    select(MarketAnalysis).where(
+                        MarketAnalysis.run_id == run_id,
+                        MarketAnalysis.company_id == company_id,
+                    )
+                ).scalar_one_or_none()
+                market_analysis = {}
+                if market_row:
+                    market_analysis = {
+                        "market_size": market_row.market_size,
+                        "growth_rate": market_row.growth_rate,
+                        "trends": (
+                            market_row.trends.get("items")
+                            if isinstance(market_row.trends, dict)
+                            else market_row.trends or []
+                        ),
+                        "risks": (
+                            market_row.risks.get("items")
+                            if isinstance(market_row.risks, dict)
+                            else market_row.risks or []
+                        ),
+                    }
+
+                evidence = load_validated_evidence(
+                    repo.session, run_id, company_id
+                )
+
+                # Workstream 3 pipeline
+                discovery_svc = CompetitorDiscoveryService()
+                candidates = discovery_svc.discover(
+                    company_name=company_name,
+                    company_profile=company_profile,
+                    evidence=evidence,
+                    company_website=company_website,
+                )
+
+                verifier = CompetitorVerifier()
+                verified = verifier.verify(
+                    candidates=candidates,
+                    company_profile=company_profile,
+                    evidence=evidence,
+                )
+
+                profiler = CompetitorProfiler()
+                profiles = profiler.profile(verified=verified, evidence=evidence)
+
+                model_builder = MarketModelBuilder()
+                market_model = model_builder.build(
+                    company_profile=company_profile,
+                    market_analysis=market_analysis,
+                    evidence=evidence,
+                )
+
+                positioning_engine = PositioningEngine()
+                positioning = positioning_engine.analyze(
+                    company_profile=company_profile,
+                    competitor_profiles=profiles,
+                    evidence=evidence,
+                )
+
+                synthesis_svc = MarketSynthesisService()
+                synthesis = synthesis_svc.synthesize(
+                    market_model=market_model,
+                    positioning_analysis=positioning,
+                    competitor_profiles=profiles,
+                    evidence=evidence,
+                )
+
+                # Persist
+                repo.persist_competitor_candidates(
+                    run_id, company_id, candidates, verified
+                )
+                repo.persist_market_model(
+                    run_id,
+                    company_id,
+                    market_model.model_dump(mode="json"),
+                )
+                repo.persist_positioning_analysis(
+                    run_id,
+                    company_id,
+                    positioning.model_dump(mode="json"),
+                )
+                repo.persist_market_synthesis(
+                    run_id,
+                    company_id,
+                    synthesis.model_dump(mode="json"),
+                )
+
+                # Build competitors payload for strategy agent (backward compat)
                 competitors_payload = []
-                for competitor in discovery_output.competitors:
-                    profile = profile_by_name.get(competitor.name.lower())
+                for p in profiles:
                     competitors_payload.append(
                         {
-                            "name": competitor.name,
-                            "website": competitor.website,
-                            "relation_score": competitor.relation_score,
+                            "name": p.company_name,
+                            "website": None,
+                            "relation_score": p.profile_confidence,
                             "metadata": {
-                                **competitor.metadata,
-                                "source_ids": [str(x) for x in competitor.source_ids],
+                                "verification_status": p.verification_status,
+                                "profile_confidence": p.profile_confidence,
                             },
-                            "profile_text": profile.profile_text if profile else None,
-                            "strengths": profile.strengths if profile else [],
-                            "weaknesses": profile.weaknesses if profile else [],
-                            "differentiation": profile.differentiation if profile else [],
-                            "profile_metadata": profile.metadata if profile else {},
+                            "profile_text": p.description,
+                            "strengths": [],
+                            "weaknesses": [],
+                            "differentiation": p.product_focus,
+                            "profile_metadata": p.metadata,
                         }
                     )
-
                 repo.persist_competitors(
                     run_id=run_id,
                     company_id=company_id,
                     payload={"competitors": competitors_payload},
                 )
-                all_claims = list(discovery_output.claims) + list(
-                    profiling_output.claims
+
+                output = CompetitorMarketSynthesisOutput(
+                    candidates=candidates,
+                    verified_competitors=verified,
+                    competitor_profiles=profiles,
+                    market_model=market_model,
+                    positioning_analysis=positioning,
+                    market_synthesis=synthesis,
+                    metadata={
+                        "method": "workstream3_evidence_backed",
+                        "candidate_count": len(candidates),
+                        "verified_count": len([v for v in verified if v.verification_status != "rejected"]),
+                        "profile_count": len(profiles),
+                    },
                 )
+                result = output.model_dump(mode="json")
+                # Backward compat: strategy agent expects "competitors"
+                result["competitors"] = competitors_payload
+                return result
+
+            return self._node_wrapper(repo, "competitor_discovery", state, compute)
+
+        def product_research(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                agent = self.agent_registry.get("product")
+                if agent is None:
+                    raise RuntimeError("product agent not registered")
+                output = agent.run(context)
                 claim_ids = repo.persist_claims(
                     run_id=run_id,
                     company_id=company_id,
-                    claims=all_claims,
-                    default_claim_type="competitor_intelligence",
+                    claims=output.claims,
+                    default_claim_type="product",
                 )
-                return {
-                    "competitors": competitors_payload,
-                    "metadata": {
-                        "method": "semantic_similarity_plus_profiling",
-                        "claim_ids": [str(x) for x in claim_ids],
-                        "source_ids": [str(x) for x in discovery_output.source_ids],
-                    },
+                payload = output.model_dump(mode="json")
+                payload["metadata"] = {
+                    **payload.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
                 }
+                return payload
 
-            return self._node_wrapper(repo, "competitor_discovery", state, compute)
+            return self._node_wrapper(repo, "product_research", state, compute)
+
+        def transaction_research(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                context = repo.build_agent_context(run_id, company_id)
+                agent = self.agent_registry.get("transaction")
+                if agent is None:
+                    raise RuntimeError("transaction agent not registered")
+                output = agent.run(context)
+                claim_ids = repo.persist_claims(
+                    run_id=run_id,
+                    company_id=company_id,
+                    claims=output.claims,
+                    default_claim_type="transaction",
+                )
+                payload = output.model_dump(mode="json")
+                payload["metadata"] = {
+                    **payload.get("metadata", {}),
+                    "claim_ids": [str(x) for x in claim_ids],
+                    "source_ids": [str(x) for x in output.source_ids],
+                }
+                return payload
+
+            return self._node_wrapper(repo, "transaction_research", state, compute)
 
         def strategy(state: OrchestratorState):
             def compute(_state: OrchestratorState):
@@ -462,16 +808,30 @@ class LangGraphAgentOrchestrator:
 
         def valuation(state: OrchestratorState):
             def compute(_state: OrchestratorState):
+                from backend.services.valuation.sector_multiple_loader import (
+                    load_sector_range,
+                )
+
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
                 context = repo.build_agent_context(run_id, company_id)
                 fm_data = _state.get("node_results", {}).get("financial_model", {})
                 fm_id = fm_data.get("financial_model_id")
                 parsed_fm_id = uuid.UUID(fm_id) if fm_id else None
+
+                company = repo.session.get(Company, company_id)
+                industry = company.industry if company else None
+                sector_range = load_sector_range(repo.session, industry)
+
                 agent = self.agent_registry.get("valuation_analysis")
                 if agent is None:
                     raise RuntimeError("valuation_analysis agent not registered")
-                output = agent.run(context, fm_data)
+                output = agent.run(
+                    context,
+                    fm_data,
+                    sector_range_low=sector_range.ev_ebitda_low,
+                    sector_range_high=sector_range.ev_ebitda_high,
+                )
                 claim_ids = repo.persist_claims(
                     run_id=run_id,
                     company_id=company_id,
@@ -537,6 +897,23 @@ class LangGraphAgentOrchestrator:
                     report_degraded=is_degraded,
                     degraded_reasons=degraded_reasons,
                 )
+
+                from backend.services.deep_research.memo_reviewer import run_memo_review
+
+                stage_evaluations = dict(_state.get("stage_evaluations", {}))
+                review = run_memo_review(
+                    report_sections=data.get("sections", {}),
+                    completeness_report=completeness_report,
+                    stage_evaluations=stage_evaluations,
+                    report_degraded=is_degraded,
+                    degraded_reasons=degraded_reasons,
+                )
+                data["memo_review"] = {
+                    "approved": review.approved,
+                    "issues": review.issues,
+                    "recommended_changes": review.recommended_changes,
+                }
+
                 report = repo.persist_report(
                     run_id=run_id,
                     company_id=company_id,
@@ -551,7 +928,9 @@ class LangGraphAgentOrchestrator:
                 assumptions_output = fm_output.get("assumption_set") if isinstance(fm_output, dict) else None
                 projection_output = fm_output.get("forecast") if isinstance(fm_output, dict) else None
 
-                stage_evaluations = dict(_state.get("stage_evaluations", {}))
+                web_intel_output = node_results.get("web_retrieval")
+                competitor_market_output = node_results.get("competitor_discovery")
+                company_understanding_output = node_results.get("company_understanding")
 
                 debug_artifact = build_debug_artifact(
                     analysis_input=analysis_input,
@@ -562,6 +941,9 @@ class LangGraphAgentOrchestrator:
                     stage_evaluations=stage_evaluations,
                     report_degraded=is_degraded,
                     report_degraded_reasons=degraded_reasons,
+                    web_intel_output=web_intel_output if isinstance(web_intel_output, dict) else None,
+                    competitor_market_synthesis_output=competitor_market_output if isinstance(competitor_market_output, dict) else None,
+                    company_understanding_output=company_understanding_output if isinstance(company_understanding_output, dict) else None,
                 )
                 repo.upsert_node_state(
                     run_id=run_id,
@@ -575,9 +957,13 @@ class LangGraphAgentOrchestrator:
             return self._node_wrapper(repo, "report_generation", state, compute)
 
         graph.add_node("identity", identity)
+        graph.add_node("company_understanding", company_understanding)
         graph.add_node("company_profile", company_profile)
+        graph.add_node("web_retrieval", web_retrieval)
         graph.add_node("market_analysis", market_analysis)
         graph.add_node("competitor_discovery", competitor_discovery)
+        graph.add_node("product_research", product_research)
+        graph.add_node("transaction_research", transaction_research)
         graph.add_node("strategy", strategy)
         graph.add_node("value_creation", value_creation)
         graph.add_node("financial_model", financial_model)
@@ -586,10 +972,14 @@ class LangGraphAgentOrchestrator:
         graph.add_node("report_generation", report_generation)
 
         graph.add_edge(START, "identity")
-        graph.add_edge("identity", "company_profile")
+        graph.add_edge("identity", "company_understanding")
+        graph.add_edge("company_understanding", "web_retrieval")
+        graph.add_edge("web_retrieval", "company_profile")
         graph.add_edge("company_profile", "market_analysis")
         graph.add_edge("market_analysis", "competitor_discovery")
-        graph.add_edge("competitor_discovery", "strategy")
+        graph.add_edge("competitor_discovery", "product_research")
+        graph.add_edge("product_research", "transaction_research")
+        graph.add_edge("transaction_research", "strategy")
         graph.add_edge("strategy", "value_creation")
         graph.add_edge("value_creation", "financial_model")
         graph.add_edge("financial_model", "valuation")
@@ -634,6 +1024,7 @@ class LangGraphAgentOrchestrator:
             )
             run_uuid = run.id
             company_uuid = company.id
+            session.commit()  # Commit so UI shows "running" immediately
 
             graph = self._build_graph(repo)
             init_state: OrchestratorState = {
@@ -710,7 +1101,7 @@ class LangGraphAgentOrchestrator:
             run.status = "running"
             run.error_message = None
             run.completed_at = None
-            session.flush()
+            session.commit()  # Commit so UI shows "running" immediately
 
             existing_nodes = repo.list_node_states(run_id)
             node_results: dict[str, Any] = {}
@@ -784,6 +1175,7 @@ class LangGraphAgentOrchestrator:
                     "status": row.status,
                     "started_at": row.started_at,
                     "finished_at": row.completed_at,
+                    "error_message": row.error_message,
                 })
             else:
                 stages.append({
@@ -791,6 +1183,7 @@ class LangGraphAgentOrchestrator:
                     "status": "pending",
                     "started_at": None,
                     "finished_at": None,
+                    "error_message": None,
                 })
         return stages
 
@@ -816,13 +1209,17 @@ class LangGraphAgentOrchestrator:
             stages = self._build_stages(node_rows)
             current_stage = self._current_stage_from_rows(node_rows)
             company_name = (company.name if company else None) or run.query
+            orgnr = company.orgnr if company else None
             return {
                 "run_id": run.id,
                 "company_id": run.company_id,
                 "company_name": company_name,
+                "orgnr": orgnr,
+                "created_at": run.created_at,
                 "status": run.status,
                 "current_stage": current_stage,
                 "stages": stages,
+                "error_message": run.error_message,
             }
 
     def list_runs(self, limit: int = 20) -> list[dict[str, Any]]:
@@ -831,12 +1228,12 @@ class LangGraphAgentOrchestrator:
                 select(AnalysisRun).order_by(AnalysisRun.created_at.desc()).limit(limit)
             ).scalars().all()
             company_ids = {r.company_id for r in rows if r.company_id}
-            companies_by_id: dict[uuid.UUID, str] = {}
+            companies_by_id: dict[uuid.UUID, tuple[str, str]] = {}
             if company_ids:
                 for comp in session.execute(
                     select(Company).where(Company.id.in_(company_ids))
                 ).scalars():
-                    companies_by_id[comp.id] = comp.name
+                    companies_by_id[comp.id] = (comp.name, comp.orgnr)
 
             out: list[dict[str, Any]] = []
             repo = RunStateRepository(session)
@@ -844,15 +1241,20 @@ class LangGraphAgentOrchestrator:
                 node_rows = repo.list_node_states(row.id)
                 stages = self._build_stages(node_rows)
                 current_stage = self._current_stage_from_rows(node_rows)
-                company_name = (companies_by_id.get(row.company_id) if row.company_id else None) or row.query
+                comp_info = companies_by_id.get(row.company_id) if row.company_id else None
+                company_name = (comp_info[0] if comp_info else None) or row.query
+                orgnr = comp_info[1] if comp_info else None
                 out.append(
                     {
                         "run_id": row.id,
                         "company_id": row.company_id,
                         "company_name": company_name,
+                        "orgnr": orgnr,
+                        "created_at": row.created_at,
                         "status": row.status,
                         "current_stage": current_stage,
                         "stages": stages,
+                        "error_message": row.error_message,
                     }
                 )
             return out

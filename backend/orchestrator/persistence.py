@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Optional
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from backend.db.models.deep_research import (
@@ -18,9 +18,13 @@ from backend.db.models.deep_research import (
     Company,
     CompanyProfile,
     Competitor,
+    CompetitorCandidate,
     CompetitorProfile,
     FinancialModel,
     MarketAnalysis,
+    MarketModel,
+    MarketSynthesis,
+    PositioningAnalysis,
     ReportSection,
     ReportVersion,
     RunNodeState,
@@ -29,6 +33,9 @@ from backend.db.models.deep_research import (
     Strategy,
     Valuation,
     ValueCreation,
+    WebEvidence,
+    WebEvidenceRejected,
+    WebSearchSession,
 )
 from backend.agents.context import AgentContext, SourceChunkRecord, SourceRecord
 from backend.agents.schemas import AgentClaim, IdentityAgentOutput
@@ -420,6 +427,55 @@ class RunStateRepository:
         ).scalars()
         return list(rows)
 
+    def clear_run_analysis_data(self, run_id: uuid.UUID) -> None:
+        """Remove all analysis data for a run so it can be restarted from scratch.
+        Preserves the run and company records. Call before re-enqueuing a failed/pending run."""
+        # Delete in FK order: children before parents
+        # ReportSection -> ReportVersion
+        self.session.execute(
+            delete(ReportSection).where(
+                ReportSection.report_version_id.in_(
+                    select(ReportVersion.id).where(ReportVersion.run_id == run_id)
+                )
+            )
+        )
+        self.session.execute(delete(ReportVersion).where(ReportVersion.run_id == run_id))
+        # WebEvidence references session_id, source_id — delete before WebSearchSession, Source
+        self.session.execute(delete(WebEvidence).where(WebEvidence.run_id == run_id))
+        self.session.execute(delete(WebEvidenceRejected).where(WebEvidenceRejected.run_id == run_id))
+        self.session.execute(delete(WebSearchSession).where(WebSearchSession.run_id == run_id))
+        # SourceChunk -> Source
+        self.session.execute(
+            delete(SourceChunk).where(
+                SourceChunk.source_id.in_(select(Source.id).where(Source.run_id == run_id))
+            )
+        )
+        self.session.execute(delete(Source).where(Source.run_id == run_id))
+        # ClaimVerification -> Claim
+        self.session.execute(
+            delete(ClaimVerification).where(
+                ClaimVerification.claim_id.in_(select(Claim.id).where(Claim.run_id == run_id))
+            )
+        )
+        self.session.execute(delete(Claim).where(Claim.run_id == run_id))
+        # Run-scoped tables (CompetitorProfile cascades when Competitor is deleted)
+        for model in (
+            CompetitorCandidate,
+            MarketModel,
+            PositioningAnalysis,
+            MarketSynthesis,
+            MarketAnalysis,
+            CompanyProfile,
+            Competitor,
+            Strategy,
+            ValueCreation,
+            FinancialModel,
+            Valuation,
+            RunNodeState,
+        ):
+            self.session.execute(delete(model).where(model.run_id == run_id))
+        self.session.flush()
+
     def persist_company_profile(self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict) -> None:
         row = self.session.execute(
             select(CompanyProfile).where(
@@ -435,7 +491,120 @@ class RunStateRepository:
         row.products_services = _json_field(data.get("products_services"))
         row.customer_segments = _json_field(data.get("customer_segments"))
         row.geographies = _json_field(data.get("geographies"))
-        row.extra = _safe_dict(data.get("metadata"))
+        extra = _safe_dict(data.get("metadata"))
+        # Persist first-class company understanding fields for QueryPlanner and gating
+        if data.get("market_niche") is not None:
+            extra["market_niche"] = data.get("market_niche")
+        if data.get("confidence_score") is not None:
+            extra["confidence_score"] = data.get("confidence_score")
+        if data.get("company_description") is not None:
+            extra["company_description"] = data.get("company_description")
+        if data.get("source_refs"):
+            extra["source_refs"] = data.get("source_refs")
+        row.extra = extra
+        self.session.flush()
+
+    def persist_web_search_session(
+        self,
+        run_id: uuid.UUID,
+        company_id: uuid.UUID,
+        query_group: str,
+        queries: list,
+        provider: str = "tavily",
+        metadata: dict | None = None,
+    ) -> uuid.UUID:
+        """Persist a web search session; return session id."""
+        row = WebSearchSession(
+            run_id=run_id,
+            company_id=company_id,
+            query_group=query_group,
+            queries=queries if isinstance(queries, dict) else {"items": queries},
+            provider=provider,
+            extra=_safe_dict(metadata),
+        )
+        self.session.add(row)
+        self.session.flush()
+        return row.id
+
+    def persist_web_evidence(
+        self,
+        run_id: uuid.UUID,
+        company_id: uuid.UUID,
+        session_id: uuid.UUID | None,
+        evidence_items: list,
+        source_id_map: dict | None = None,
+    ) -> list[uuid.UUID]:
+        """Persist accepted evidence; create Source records for build_agent_context. Return evidence ids."""
+        source_id_map = source_id_map or {}
+        ids: list[uuid.UUID] = []
+        for item in evidence_items:
+            source_id = source_id_map.get(item.source_url)
+            if not source_id:
+                src = Source(
+                    run_id=run_id,
+                    company_id=company_id,
+                    source_type=f"tavily_{item.query_group}",
+                    title=item.source_title,
+                    url=item.source_url,
+                    content_text=item.supporting_text,
+                    extra={
+                        "claim": item.claim,
+                        "claim_type": item.claim_type,
+                        "value": item.value,
+                        "unit": item.unit,
+                        "overall_score": item.overall_score,
+                        "verification_status": item.verification_status,
+                        "provenance": "public",
+                    },
+                )
+                self.session.add(src)
+                self.session.flush()
+                source_id = src.id
+
+            row = WebEvidence(
+                run_id=run_id,
+                company_id=company_id,
+                session_id=session_id,
+                source_id=source_id,
+                claim=item.claim,
+                claim_type=item.claim_type,
+                value=item.value,
+                unit=item.unit,
+                source_url=item.source_url,
+                source_title=item.source_title,
+                source_domain=item.source_domain,
+                source_type=item.source_type,
+                supporting_text=item.supporting_text,
+                confidence=item.confidence,
+                overall_score=item.overall_score,
+                verification_status=item.verification_status,
+                extra={"query_group": item.query_group, "query": item.query},
+            )
+            self.session.add(row)
+            self.session.flush()
+            ids.append(row.id)
+        return ids
+
+    def persist_web_evidence_rejected(
+        self,
+        run_id: uuid.UUID,
+        company_id: uuid.UUID,
+        items_with_reasons: list[tuple],
+    ) -> None:
+        """Persist rejected evidence with rejection reasons."""
+        for item, reason in items_with_reasons:
+            snapshot = {
+                "claim": getattr(item, "claim", ""),
+                "claim_type": getattr(item, "claim_type", ""),
+                "source_url": getattr(item, "source_url", ""),
+            }
+            row = WebEvidenceRejected(
+                run_id=run_id,
+                company_id=company_id,
+                evidence_snapshot=snapshot,
+                rejection_reason=str(reason),
+            )
+            self.session.add(row)
         self.session.flush()
 
     def persist_market_analysis(self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict) -> None:
@@ -480,6 +649,111 @@ class RunStateRepository:
                 extra=_json_field(info.get("profile_metadata")),
             )
             self.session.add(profile)
+        self.session.flush()
+
+    def persist_competitor_candidates(
+        self,
+        run_id: uuid.UUID,
+        company_id: uuid.UUID,
+        candidates: list,
+        verified_results: list,
+    ) -> None:
+        """Persist competitor candidates and their verification status (Workstream 3)."""
+        verified_by_name = {v.name: v for v in verified_results if hasattr(v, "name")}
+        for c in candidates:
+            v = verified_by_name.get(getattr(c, "name", ""))
+            status = getattr(v, "verification_status", "pending") if v else "pending"
+            rejection = getattr(v, "rejection_reason", None) if v else None
+            refs = _json_safe([r.model_dump() if hasattr(r, "model_dump") else r for r in getattr(c, "evidence_refs", [])])
+            row = CompetitorCandidate(
+                run_id=run_id,
+                company_id=company_id,
+                candidate_name=getattr(c, "name", "Unknown"),
+                candidate_type=getattr(c, "candidate_type", "adjacent"),
+                inclusion_rationale=getattr(c, "inclusion_rationale", None),
+                evidence_refs=refs,
+                verification_status=status,
+                rejection_reason=rejection,
+                extra=_safe_dict(getattr(c, "metadata", {})),
+            )
+            self.session.add(row)
+        self.session.flush()
+
+    def persist_market_model(self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict) -> None:
+        """Persist market model (Workstream 3)."""
+        data = _safe_dict(payload)
+        row = self.session.execute(
+            select(MarketModel).where(
+                MarketModel.run_id == run_id, MarketModel.company_id == company_id
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            row = MarketModel(run_id=run_id, company_id=company_id)
+            self.session.add(row)
+        row.market_label = data.get("market_label") or row.market_label or "Unspecified"
+        row.market_subsegment = data.get("market_subsegment")
+        row.geography_scope = data.get("geography_scope")
+        row.customer_segment = data.get("customer_segment")
+        row.buying_model = data.get("buying_model")
+        row.demand_drivers = _json_field(data.get("demand_drivers"))
+        row.market_growth_signal = data.get("market_growth_signal")
+        row.concentration_signal = data.get("concentration_signal")
+        row.fragmentation_signal = data.get("fragmentation_signal")
+        row.market_maturity_signal = data.get("market_maturity_signal")
+        row.cyclicality_signal = data.get("cyclicality_signal")
+        row.regulatory_signal = data.get("regulatory_signal")
+        row.evidence_refs = _json_safe(data.get("evidence_refs", []))
+        row.confidence_score = data.get("confidence_score")
+        row.extra = _safe_dict(data.get("metadata", {}))
+        self.session.flush()
+
+    def persist_positioning_analysis(
+        self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict
+    ) -> None:
+        """Persist positioning analysis (Workstream 3)."""
+        data = _safe_dict(payload)
+        row = self.session.execute(
+            select(PositioningAnalysis).where(
+                PositioningAnalysis.run_id == run_id,
+                PositioningAnalysis.company_id == company_id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            row = PositioningAnalysis(run_id=run_id, company_id=company_id)
+            self.session.add(row)
+        row.differentiated_axes = _json_field(data.get("differentiated_axes"))
+        row.parity_axes = _json_field(data.get("parity_axes"))
+        row.disadvantage_axes = _json_field(data.get("disadvantage_axes"))
+        row.unclear_axes = _json_field(data.get("unclear_axes"))
+        row.positioning_summary = data.get("positioning_summary")
+        row.evidence_refs = _json_safe(data.get("evidence_refs", []))
+        row.extra = _safe_dict(data.get("metadata", {}))
+        self.session.flush()
+
+    def persist_market_synthesis(
+        self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict
+    ) -> None:
+        """Persist market synthesis (Workstream 3)."""
+        data = _safe_dict(payload)
+        row = self.session.execute(
+            select(MarketSynthesis).where(
+                MarketSynthesis.run_id == run_id,
+                MarketSynthesis.company_id == company_id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            row = MarketSynthesis(run_id=run_id, company_id=company_id)
+            self.session.add(row)
+        row.market_attractiveness_score = data.get("market_attractiveness_score")
+        row.competition_intensity_score = data.get("competition_intensity_score")
+        row.niche_defensibility_score = data.get("niche_defensibility_score")
+        row.growth_support_score = data.get("growth_support_score")
+        row.synthesis_summary = data.get("synthesis_summary") or ""
+        row.key_supporting_claims = _json_field(data.get("key_supporting_claims"))
+        row.key_uncertainties = _json_field(data.get("key_uncertainties"))
+        row.evidence_refs = _json_safe(data.get("evidence_refs", []))
+        row.confidence_score = data.get("confidence_score")
+        row.extra = _safe_dict(data.get("metadata", {}))
         self.session.flush()
 
     def persist_strategy(self, run_id: uuid.UUID, company_id: uuid.UUID, payload: dict) -> Strategy:

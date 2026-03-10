@@ -145,3 +145,41 @@ export async function getAiCreditsUsage(period: string = "current_month"): Promi
   }
   return res.json();
 }
+
+// --- Report retrieval settings (admin): Deep Research web retrieval limits ---
+
+export interface ReportRetrievalConfig {
+  max_queries_per_stage: number;
+  max_results_per_query: number;
+  max_extracted_urls: number;
+  max_per_domain: number;
+  updated_at: string | null;
+  updated_by: string | null;
+}
+
+export async function getReportSettingsAdmin(): Promise<ReportRetrievalConfig> {
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/report-settings`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Failed to load report settings");
+  }
+  return res.json();
+}
+
+export async function updateReportSettingsAdmin(updates: {
+  max_queries_per_stage?: number;
+  max_results_per_query?: number;
+  max_extracted_urls?: number;
+  max_per_domain?: number;
+}): Promise<ReportRetrievalConfig> {
+  const res = await fetchWithAuth(`${API_BASE}/api/admin/report-settings`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? "Failed to update report settings");
+  }
+  return res.json();
+}

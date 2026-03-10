@@ -576,3 +576,246 @@ class ReportSection(TimestampMixin, Base):
 
     report_version: Mapped["ReportVersion"] = relationship(back_populates="sections")
 
+
+class WebSearchSession(TimestampMixin, Base):
+    __tablename__ = "web_search_sessions"
+    __table_args__ = (
+        Index("ix_dr_web_search_sessions_run", "run_id"),
+        Index("ix_dr_web_search_sessions_company", "company_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    query_group: Mapped[str] = mapped_column(String(64), nullable=False)
+    queries: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, default="tavily")
+    extra: Mapped[dict] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict
+    )
+
+
+class WebEvidence(TimestampMixin, Base):
+    __tablename__ = "web_evidence"
+    __table_args__ = (
+        Index("ix_dr_web_evidence_run", "run_id"),
+        Index("ix_dr_web_evidence_company", "company_id"),
+        Index("ix_dr_web_evidence_session", "session_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    session_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.web_search_sessions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    source_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.sources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    claim: Mapped[str] = mapped_column(Text, nullable=False)
+    claim_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    value: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    unit: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    source_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
+    source_title: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    source_domain: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
+    source_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    retrieved_at: Mapped[Optional[Any]] = mapped_column(DateTime(timezone=True), nullable=True)
+    supporting_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    confidence: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    overall_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    verification_status: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class WebEvidenceRejected(TimestampMixin, Base):
+    __tablename__ = "web_evidence_rejected"
+    __table_args__ = (
+        Index("ix_dr_web_evidence_rejected_run", "run_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    evidence_snapshot: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    rejection_reason: Mapped[str] = mapped_column(Text, nullable=False)
+    rejected_at: Mapped[Any] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+    )
+
+
+class CompetitorCandidate(TimestampMixin, Base):
+    """Workstream 3: competitor candidates with verification status."""
+
+    __tablename__ = "competitor_candidates"
+    __table_args__ = (
+        Index("ix_dr_competitor_candidates_run", "run_id"),
+        Index("ix_dr_competitor_candidates_company", "company_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    candidate_name: Mapped[str] = mapped_column(Text, nullable=False)
+    candidate_type: Mapped[str] = mapped_column(String(32), nullable=False, default="adjacent")
+    inclusion_rationale: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evidence_refs: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    verification_status: Mapped[str] = mapped_column(String(64), nullable=False, default="pending")
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class MarketModel(TimestampMixin, Base):
+    """Workstream 3: structured market model from validated evidence."""
+
+    __tablename__ = "market_models"
+    __table_args__ = (
+        UniqueConstraint("run_id", "company_id", name="uq_dr_market_models_run_company"),
+        Index("ix_dr_market_models_run", "run_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    market_label: Mapped[str] = mapped_column(Text, nullable=False)
+    market_subsegment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    geography_scope: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    customer_segment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    buying_model: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    demand_drivers: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    market_growth_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    concentration_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fragmentation_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    market_maturity_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    cyclicality_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    regulatory_signal: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evidence_refs: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    confidence_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class PositioningAnalysis(TimestampMixin, Base):
+    """Workstream 3: target vs competitors positioning analysis."""
+
+    __tablename__ = "positioning_analyses"
+    __table_args__ = (
+        UniqueConstraint("run_id", "company_id", name="uq_dr_positioning_analyses_run_company"),
+        Index("ix_dr_positioning_analyses_run", "run_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    differentiated_axes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    parity_axes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    disadvantage_axes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    unclear_axes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    positioning_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    evidence_refs: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class MarketSynthesis(TimestampMixin, Base):
+    """Workstream 3: evidence-backed market synthesis."""
+
+    __tablename__ = "market_syntheses"
+    __table_args__ = (
+        UniqueConstraint("run_id", "company_id", name="uq_dr_market_syntheses_run_company"),
+        Index("ix_dr_market_syntheses_run", "run_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    market_attractiveness_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    competition_intensity_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    niche_defensibility_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    growth_support_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    synthesis_summary: Mapped[str] = mapped_column(Text, nullable=False)
+    key_supporting_claims: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    key_uncertainties: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    evidence_refs: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    confidence_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
+    extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+

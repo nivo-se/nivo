@@ -140,8 +140,42 @@ export default function ReportViewerPage() {
     )
   }
 
+  const validationStatus = report.validation_status
+  const hasLintWarnings = (validationStatus?.lint_warnings?.length ?? 0) > 0
+  const lintFailed = validationStatus && !validationStatus.lint_passed
+  const showStatusBanner = report.report_degraded || hasLintWarnings || lintFailed
+
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
+      {showStatusBanner && (
+        <Card className={
+          report.report_degraded
+            ? 'border-amber-500/50 bg-amber-500/5'
+            : hasLintWarnings || lintFailed
+              ? 'border-amber-500/50 bg-amber-500/5'
+              : ''
+        }>
+          <CardContent className="pt-4">
+            <div className="flex items-start gap-2">
+              <span className="text-sm font-medium">
+                {report.report_degraded ? 'Report generated with incomplete data' : 'Valuation validation'}
+              </span>
+            </div>
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+              {report.report_degraded_reasons?.map((r, i) => (
+                <li key={i}>• {r}</li>
+              ))}
+              {hasLintWarnings && validationStatus?.lint_warnings?.map((w, i) => (
+                <li key={`lint-${i}`}>• {w}</li>
+              ))}
+              {lintFailed && !hasLintWarnings && (
+                <li>• Valuation lint review recommended</li>
+              )}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-4">

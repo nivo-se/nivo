@@ -12,6 +12,7 @@ class PlannedQuery:
     query: str
     reason: str
     priority: int = 0
+    query_group: str | None = None  # company_facts | market | competitors | news
 
 
 @dataclass(slots=True)

@@ -19,6 +19,24 @@ DEEP_RESEARCH_THRESHOLDS: dict[str, Any] = {
     "require_business_model": True,
     "require_products_services": True,
     "require_geographies": True,
+    "require_market_niche": False,
+    "company_understanding_confidence_threshold": 0.5,
+    # Web intelligence (Workstream 2)
+    "require_verified_market_evidence": False,
+    "minimum_market_evidence_items": 1,
+    "minimum_competitor_evidence_items": 1,
+    "minimum_average_evidence_score": 0.4,
+    "require_source_diversity": True,
+    "max_unresolved_conflicts": 2,
+    "max_extracted_urls_per_stage": 10,
+    "max_queries_per_stage": 6,
+    # Workstream 3: Competitor + Market Synthesis
+    "minimum_verified_competitors": 1,
+    "minimum_direct_competitors": 0,
+    "minimum_competitor_profile_confidence": 0.4,
+    "minimum_market_model_confidence": 0.4,
+    "maximum_unclear_positioning_ratio": 0.7,
+    "minimum_market_synthesis_confidence": 0.4,
 }
 
 

@@ -7,9 +7,13 @@ cd "$(dirname "$0")/.."
 PORT="${PORT:-8000}"
 export PORT
 
-# Activate venv if it exists
-if [ -d backend/venv ]; then
+# Activate venv if it exists (prefer .venv at project root; backend/venv may be stale if project moved)
+if [ -d .venv ] && [ -x .venv/bin/python ]; then
+  source .venv/bin/activate
+elif [ -d backend/venv ] && [ -x backend/venv/bin/python ]; then
   source backend/venv/bin/activate
+elif [ -d backend/.venv ]; then
+  source backend/.venv/bin/activate
 elif [ -d venv ]; then
   source venv/bin/activate
 fi
