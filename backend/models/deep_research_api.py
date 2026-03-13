@@ -80,6 +80,24 @@ class RunStageData(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     error_message: str | None = None
+    output: dict | None = None  # Stage output (e.g. skipped reason, blocked_reasons)
+
+
+class RunDiagnosticsData(BaseModel):
+    """Phase 7: Run-level diagnostics for observability and debug."""
+
+    stage_durations: dict[str, float] = Field(default_factory=dict)
+    failure_reason_codes: list[str] = Field(default_factory=list)
+    evidence_accepted_count: int | None = None
+    evidence_rejected_count: int | None = None
+    assumption_valuation_ready: bool | None = None
+    assumption_blocked_reasons: list[str] = Field(default_factory=list)
+    valuation_skipped: bool = False
+    valuation_readiness: bool | None = None
+    report_degraded: bool = False
+    report_quality_status: str | None = None
+    report_quality_reason_codes: list[str] = Field(default_factory=list)
+    report_quality_limitation_summary: list[str] = Field(default_factory=list)
 
 
 class AnalysisStatusData(BaseModel):
@@ -92,6 +110,8 @@ class AnalysisStatusData(BaseModel):
     current_stage: str
     stages: list[RunStageData] = Field(default_factory=list)
     error_message: str | None = None
+    diagnostics: RunDiagnosticsData | None = None
+    report_quality_status: str | None = None  # complete | complete_with_limitations | blocked | failed
 
 
 class ReportGenerateRequest(BaseModel):
@@ -126,6 +146,8 @@ class ReportDetailData(ReportVersionData):
     sections: list[ReportSectionData] = Field(default_factory=list)
     report_degraded: bool = False
     report_degraded_reasons: list[str] = Field(default_factory=list)
+    report_quality_status: str | None = None  # complete | complete_with_limitations | blocked | failed
+    report_quality_limitation_summary: list[str] = Field(default_factory=list)
     validation_status: ValidationStatusData | None = None
 
 

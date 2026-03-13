@@ -1,0 +1,11 @@
+{
+  "archetype": "noisy_competitor",
+  "company_name": "Fixture Noisy Competitors AB",
+  "orgnr": "556000-0004",
+  "website": "https://fixture-noisy.example.com",
+  "has_3y_financials": true,
+  "has_homepage": true,
+  "competitor_count": 50,
+  "competitor_confidence_avg": 0.35,
+  "notes": "Many competitors, low confidence — tests competitor synthesis robustness"
+}

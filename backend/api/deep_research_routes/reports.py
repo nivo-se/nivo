@@ -47,6 +47,8 @@ def _to_report_detail(row: ReportVersion, company_name: str | None = None) -> Re
         version_number=row.version_number,
         report_degraded=extra.get("report_degraded", False),
         report_degraded_reasons=extra.get("report_degraded_reasons", []),
+        report_quality_status=extra.get("report_quality_status"),
+        report_quality_limitation_summary=extra.get("report_quality_limitation_summary", []) or [],
         validation_status=validation_status,
         sections=[
             ReportSectionData(

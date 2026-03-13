@@ -1,0 +1,11 @@
+{
+  "archetype": "valuation_skip",
+  "company_name": "Fixture Valuation Skip AB",
+  "orgnr": "556000-0003",
+  "website": "https://fixture-skip.example.com",
+  "has_3y_financials": true,
+  "has_homepage": true,
+  "assumption_registry_ready": false,
+  "blocked_reasons": ["missing_terminal_growth_proxy", "insufficient_evidence_for_wacc"],
+  "notes": "Triggers assumption_registry not ready → valuation skipped"
+}

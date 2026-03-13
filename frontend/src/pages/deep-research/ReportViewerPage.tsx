@@ -20,6 +20,20 @@ const REPORT_STATUS_CLASSES: Record<ReportVersion['status'], string> = {
   archived: 'bg-muted text-muted-foreground',
 }
 
+const REPORT_QUALITY_LABELS: Record<string, string> = {
+  complete: 'Complete',
+  complete_with_limitations: 'Complete with limitations',
+  blocked: 'Blocked',
+  failed: 'Failed',
+}
+
+const REPORT_QUALITY_VARIANTS: Record<string, string> = {
+  complete: 'bg-green-500/15 text-green-600 border-green-500/30',
+  complete_with_limitations: 'bg-amber-500/15 text-amber-600 border-amber-500/30',
+  blocked: 'bg-red-500/15 text-red-600 border-red-500/30',
+  failed: 'bg-red-500/15 text-red-600 border-red-500/30',
+}
+
 function sectionAnchor(section: ReportSection): string {
   return `section-${section.section_key}`
 }

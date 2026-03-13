@@ -14,6 +14,7 @@ from backend.agents import AgentRegistry
 from backend.db import SessionLocal
 from backend.db.models.deep_research import AnalysisRun, Company
 from backend.orchestrator.persistence import RunStateRepository
+from backend.orchestrator.run_diagnostics import build_run_diagnostics
 from backend.orchestrator.stage_validators import (
     MAX_STAGE_RETRIES,
     STAGE_VALIDATORS,
@@ -1076,6 +1077,32 @@ class LangGraphAgentOrchestrator:
                     "recommended_changes": review.recommended_changes,
                 }
 
+                from backend.services.deep_research.report_quality_gate import (
+                    evaluate_report_quality,
+                )
+
+                node_results = dict(_state.get("node_results", {}))
+                val_output = node_results.get("valuation", {})
+                valuation_skipped = (
+                    isinstance(val_output, dict)
+                    and val_output.get("skipped") is True
+                    and val_output.get("reason") == "valuation_not_ready"
+                )
+                quality_result = evaluate_report_quality(
+                    sections=data.get("sections", []),
+                    report_degraded=is_degraded,
+                    report_degraded_reasons=degraded_reasons,
+                    valuation_skipped=valuation_skipped,
+                    node_results=node_results,
+                )
+                meta = dict(data.get("metadata", {}))
+                meta["report_quality_status"] = quality_result.status
+                meta["report_quality_reason_codes"] = quality_result.reason_codes
+                meta["report_quality_limitation_summary"] = quality_result.limitation_summary
+                meta["report_degraded"] = is_degraded
+                meta["report_degraded_reasons"] = degraded_reasons
+                data["metadata"] = meta
+
                 report = repo.persist_report(
                     run_id=run_id,
                     company_id=company_id,
@@ -1210,8 +1237,18 @@ class LangGraphAgentOrchestrator:
             }
             try:
                 final_state = graph.invoke(init_state)
-                repo.finalize_run(run_uuid, status="completed", error=None)
                 node_rows = repo.list_node_states(run_uuid)
+                report_output = final_state.get("node_results", {}).get("report_generation") or {}
+                diagnostics = build_run_diagnostics(
+                    node_rows=node_rows,
+                    report_generation_output=report_output,
+                )
+                repo.finalize_run(
+                    run_uuid,
+                    status="completed",
+                    error=None,
+                    run_diagnostics=diagnostics,
+                )
                 session.commit()
                 node_results = dict(final_state.get("node_results", {}))
                 return OrchestratorRunResult(
@@ -1379,7 +1416,7 @@ class LangGraphAgentOrchestrator:
             current_stage = self._current_stage_from_rows(node_rows)
             company_name = (company.name if company else None) or run.query
             orgnr = company.orgnr if company else None
-            return {
+            result: dict[str, Any] = {
                 "run_id": run.id,
                 "company_id": run.company_id,
                 "company_name": company_name,
@@ -1390,6 +1427,13 @@ class LangGraphAgentOrchestrator:
                 "stages": stages,
                 "error_message": run.error_message,
             }
+            extra = run.extra or {}
+            if "run_diagnostics" in extra:
+                result["diagnostics"] = extra["run_diagnostics"]
+                rd = extra["run_diagnostics"]
+                if isinstance(rd, dict) and "report_quality_status" in rd:
+                    result["report_quality_status"] = rd["report_quality_status"]
+            return result
 
     def list_runs(self, limit: int = 20) -> list[dict[str, Any]]:
         with SessionLocal() as session:

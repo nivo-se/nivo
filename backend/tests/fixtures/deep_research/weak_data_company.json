@@ -1,0 +1,10 @@
+{
+  "archetype": "weak_data",
+  "company_name": "Fixture Weak Data AB",
+  "orgnr": "556000-0002",
+  "website": null,
+  "has_3y_financials": false,
+  "has_homepage": false,
+  "market_data_present": false,
+  "notes": "Minimal financials, no website — triggers degraded report path"
+}

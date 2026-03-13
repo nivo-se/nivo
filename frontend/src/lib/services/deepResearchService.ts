@@ -38,6 +38,23 @@ export interface AnalysisStatus {
   current_stage: string
   stages: RunStage[]
   error_message?: string | null
+  diagnostics?: RunDiagnostics | null
+  report_quality_status?: string | null
+}
+
+/** Run diagnostics for observability (admin/debug) */
+export interface RunDiagnostics {
+  stage_durations?: Record<string, number>
+  failure_reason_codes?: string[]
+  evidence_accepted_count?: number | null
+  evidence_rejected_count?: number | null
+  assumption_valuation_ready?: boolean | null
+  assumption_blocked_reasons?: string[]
+  valuation_skipped?: boolean
+  report_degraded?: boolean
+  report_quality_status?: string | null
+  report_quality_reason_codes?: string[]
+  report_quality_limitation_summary?: string[]
 }
 
 /** Unified run summary for Deep Research Home list display */
@@ -86,8 +103,17 @@ export interface ReportVersion {
   sections?: ReportSection[]
   report_degraded?: boolean
   report_degraded_reasons?: string[]
+  report_quality_status?: string | null
+  report_quality_limitation_summary?: string[]
   validation_status?: ValidationStatus | null
 }
+
+/** Report-level status for UX trust signals */
+export type ReportLevelStatus =
+  | 'complete'
+  | 'complete_with_limitations'
+  | 'blocked'
+  | 'failed'
 
 export interface CompanyWithReport {
   company_id: string

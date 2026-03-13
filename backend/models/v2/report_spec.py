@@ -1,6 +1,6 @@
 """Report spec schema — machine-readable contract for a research run.
 
-Per docs/deep_research/tightning/02-report-spec-schema.md.
+Per docs/deep_research/tightning/02-report-spec-schema.md. Phase 7 frozen contract.
 """
 
 from __future__ import annotations

@@ -128,10 +128,13 @@ async def get_analysis_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStatusData]
                     started_at=s.get("started_at"),
                     finished_at=s.get("finished_at"),
                     error_message=s.get("error_message"),
+                    output=s.get("output"),
                 )
                 for s in status.get("stages", [])
             ],
             error_message=status.get("error_message"),
+            diagnostics=status.get("diagnostics"),
+            report_quality_status=status.get("report_quality_status"),
         )
     )
 
@@ -217,16 +220,64 @@ async def restart_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStartData]:
 
 @router.get("/runs/{run_id}/debug", response_model=ApiResponse[dict])
 async def get_run_debug(run_id: uuid.UUID) -> ApiResponse[dict]:
-    """Expose debug artifact for developer/analyst inspection."""
+    """Expose debug artifact and run diagnostics for developer/analyst inspection."""
     with SessionLocal() as session:
+        run = session.get(AnalysisRun, run_id)
+        if run is None:
+            raise HTTPException(status_code=404, detail="Run not found")
         row = session.execute(
             select(RunNodeState).where(
                 RunNodeState.run_id == run_id,
                 RunNodeState.node_name == "analysis_input_debug",
             )
         ).scalar_one_or_none()
-        if row is None:
-            raise HTTPException(status_code=404, detail="Debug artifact not found for this run")
-        debug_data = row.output_json if isinstance(row.output_json, dict) else {}
+        debug_data = (row.output_json if isinstance(row.output_json, dict) else {}) if row else {}
+        run_extra = run.extra if isinstance(run.extra, dict) else {}
+        run_diagnostics = run_extra.get("run_diagnostics")
+        if run_diagnostics is not None:
+            debug_data = {**debug_data, "run_diagnostics": run_diagnostics}
+        # Always return something for existing run (helps admin/debug)
+        if not debug_data:
+            debug_data = {
+                "run_id": str(run_id),
+                "status": run.status,
+                "error_message": run.error_message,
+                "message": "No debug artifact yet (run may not have reached report_generation)",
+            }
         return ok(debug_data)
+
+
+def _build_validation_summary(run: AnalysisRun) -> dict:
+    """Build compact release-validation summary from run diagnostics."""
+    extra = run.extra if isinstance(run.extra, dict) else {}
+    diag = extra.get("run_diagnostics") or {}
+    return {
+        "run_id": str(run.id),
+        "status": run.status,
+        "error_message": run.error_message,
+        "report_quality_status": diag.get("report_quality_status"),
+        "report_quality_reason_codes": diag.get("report_quality_reason_codes") or [],
+        "report_quality_limitation_summary": diag.get("report_quality_limitation_summary") or [],
+        "assumption_valuation_ready": diag.get("assumption_valuation_ready"),
+        "assumption_blocked_reasons": diag.get("assumption_blocked_reasons") or [],
+        "valuation_skipped": diag.get("valuation_skipped", False),
+        "valuation_readiness": diag.get("valuation_readiness"),
+        "report_degraded": diag.get("report_degraded", False),
+        "report_degraded_reasons": extra.get("report_degraded_reasons") or diag.get("report_degraded_reasons") or [],
+        "evidence_accepted_count": diag.get("evidence_accepted_count"),
+        "evidence_rejected_count": diag.get("evidence_rejected_count"),
+        "failure_reason_codes": diag.get("failure_reason_codes") or [],
+        "stage_durations": diag.get("stage_durations") or {},
+    }
+
+
+@router.get("/runs/{run_id}/validation-summary", response_model=ApiResponse[dict])
+async def get_run_validation_summary(run_id: uuid.UUID) -> ApiResponse[dict]:
+    """Compact release-validation summary: diagnostics, quality status, readiness flags.
+    Useful for admin, scripts, and release-validation pass."""
+    with SessionLocal() as session:
+        run = session.get(AnalysisRun, run_id)
+        if run is None:
+            raise HTTPException(status_code=404, detail="Run not found")
+        return ok(_build_validation_summary(run))
 

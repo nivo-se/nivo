@@ -1,0 +1,10 @@
+{
+  "archetype": "strong_data",
+  "company_name": "Fixture Strong Data AB",
+  "orgnr": "556000-0001",
+  "website": "https://fixture-strong.example.com",
+  "has_3y_financials": true,
+  "has_homepage": true,
+  "market_data_present": true,
+  "notes": "Full financials, website, market data — ideal for full pipeline success"
+}

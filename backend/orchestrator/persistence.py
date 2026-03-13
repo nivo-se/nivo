@@ -288,13 +288,25 @@ class RunStateRepository:
         row.updated_at = datetime.utcnow()
         self.session.flush()
 
-    def finalize_run(self, run_id: uuid.UUID, *, status: str, error: str | None = None) -> None:
+    def finalize_run(
+        self,
+        run_id: uuid.UUID,
+        *,
+        status: str,
+        error: str | None = None,
+        run_diagnostics: dict | None = None,
+    ) -> None:
+        """Finalize run and optionally persist run diagnostics to run.extra."""
         run = self.session.get(AnalysisRun, run_id)
         if not run:
             return
         run.status = status
         run.completed_at = datetime.utcnow()
         run.error_message = error
+        if run_diagnostics:
+            extra = dict(run.extra) if isinstance(run.extra, dict) else {}
+            extra["run_diagnostics"] = run_diagnostics
+            run.extra = extra
         self.session.flush()
 
     def build_agent_context(self, run_id: uuid.UUID, company_id: uuid.UUID) -> AgentContext:

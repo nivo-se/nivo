@@ -24,6 +24,7 @@ import {
   type RunStage,
 } from '@/lib/services/deepResearchService'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { toast } from 'sonner'
 import { isAdminLinkVisible } from '@/lib/isAdmin'
 import { useAuth } from '@/contexts/AuthContext'
@@ -179,6 +180,65 @@ function BlockedStageCard({
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+function ValidationSummaryBlock({ run }: { run: AnalysisStatus }) {
+  const d = run.diagnostics
+  if (!d) return null
+  const hasContent =
+    d.report_quality_status ||
+    (d.report_quality_reason_codes?.length ?? 0) > 0 ||
+    (d.report_quality_limitation_summary?.length ?? 0) > 0 ||
+    d.assumption_valuation_ready !== undefined ||
+    d.valuation_skipped ||
+    d.report_degraded ||
+    d.evidence_accepted_count !== undefined
+  if (!hasContent) return null
+
+  const summaryLine = [
+    d.report_quality_status && `Quality: ${d.report_quality_status}`,
+    d.assumption_valuation_ready !== undefined && `Assumptions: ${d.assumption_valuation_ready ? 'ready' : 'not ready'}`,
+    d.valuation_skipped && 'Valuation skipped',
+    d.evidence_accepted_count !== undefined && `Evidence: ${d.evidence_accepted_count} accepted`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  return (
+    <Collapsible defaultOpen={false}>
+      <CollapsibleTrigger className="flex items-center gap-1 w-full text-left text-xs text-muted-foreground hover:text-foreground py-1.5">
+        <ChevronDown className="h-3 w-3 shrink-0" />
+        <span>Validation summary</span>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-2 pt-2 border-t border-border space-y-2 text-xs text-muted-foreground">
+          {summaryLine && <p>{summaryLine}</p>}
+          {(d.report_quality_reason_codes?.length ?? 0) > 0 && (
+            <div>
+              <span className="font-medium text-foreground">Reason codes:</span>{' '}
+              {d.report_quality_reason_codes!.join(', ')}
+            </div>
+          )}
+          {(d.report_quality_limitation_summary?.length ?? 0) > 0 && (
+            <ul className="list-disc list-inside space-y-0.5">
+              {d.report_quality_limitation_summary!.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          )}
+          {(d.assumption_blocked_reasons?.length ?? 0) > 0 && (
+            <div>
+              <span className="font-medium text-foreground">Assumption blockers:</span>{' '}
+              {d.assumption_blocked_reasons!.join('; ')}
+            </div>
+          )}
+          {d.report_degraded && (d.report_quality_limitation_summary?.length ?? 0) === 0 && (
+            <p>Report generated with incomplete data.</p>
+          )}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
@@ -445,6 +505,46 @@ export default function RunStatusPage() {
                 </AlertDescription>
               </Alert>
             )}
+
+            {isComplete && (run.report_quality_status || run.diagnostics?.report_quality_limitation_summary?.length) && (
+              <Card className="border-muted">
+                <CardContent className="py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                    Report quality
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      className={
+                        run.report_quality_status === 'complete'
+                          ? 'bg-green-500/15 text-green-600 border-green-500/30'
+                          : run.report_quality_status === 'complete_with_limitations'
+                            ? 'bg-amber-500/15 text-amber-600 border-amber-500/30'
+                            : run.report_quality_status === 'blocked'
+                              ? 'bg-red-500/15 text-red-600 border-red-500/30'
+                              : 'bg-muted text-muted-foreground'
+                      }
+                    >
+                      {run.report_quality_status === 'complete'
+                        ? 'Complete'
+                        : run.report_quality_status === 'complete_with_limitations'
+                          ? 'Complete with limitations'
+                          : run.report_quality_status === 'blocked'
+                            ? 'Blocked'
+                            : run.report_quality_status ?? '—'}
+                    </Badge>
+                  </div>
+                  {run.diagnostics?.report_quality_limitation_summary?.length ? (
+                    <ul className="mt-2 text-sm text-muted-foreground list-disc list-inside space-y-0.5">
+                      {run.diagnostics.report_quality_limitation_summary.slice(0, 5).map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </CardContent>
+              </Card>
+            )}
+
+            {isComplete && <ValidationSummaryBlock run={run} />}
 
             {isComplete && run.company_id && (
               <Link to={`/deep-research/company/${run.company_id}/report/latest?runId=${run.run_id}`}>
