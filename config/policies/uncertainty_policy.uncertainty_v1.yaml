@@ -1,0 +1,11 @@
+# Uncertainty policy v1 — per docs/deep_research/tightning/03-policy-framework.md
+uncertainty_policy:
+  version: "uncertainty_v1"
+  interval_rules:
+    default_mode: "low_base_high"
+    widen_interval_when_conflicts_exist: true
+    widen_interval_when_source_diversity_is_low: true
+  fallback:
+    allow_proxy_inputs: true
+    require_proxy_labeling: true
+    allow_manual_override: false

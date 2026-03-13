@@ -2,14 +2,17 @@
 
 from .deep_research import (
     AnalysisRun,
+    AssumptionRegistryPersistence,
     Claim,
     Company,
     CompanyProfile,
     Competitor,
     CompetitorProfile,
+    EvidenceBundlePersistence,
     FinancialModel,
     MarketAnalysis,
     ReportSection,
+    ReportSpecPersistence,
     ReportVersion,
     RunNodeState,
     Source,

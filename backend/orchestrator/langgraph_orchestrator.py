@@ -37,7 +37,9 @@ logger = logging.getLogger(__name__)
 PIPELINE_NODES: list[str] = [
     "identity",
     "company_understanding",
+    "report_spec",
     "web_retrieval",
+    "evidence_validation",
     "company_profile",
     "market_analysis",
     "competitor_discovery",
@@ -46,6 +48,7 @@ PIPELINE_NODES: list[str] = [
     "strategy",
     "value_creation",
     "financial_model",
+    "assumption_registry",
     "valuation",
     "verification",
     "report_generation",
@@ -143,10 +146,11 @@ class LangGraphAgentOrchestrator:
             evaluations = dict(state.get("stage_evaluations", {}))
             evaluations[node_name] = stage_result
 
+            node_status = "skipped" if output.get("skipped") is True else "completed"
             repo.upsert_node_state(
                 run_id=uuid.UUID(state["run_id"]),
                 node_name=node_name,
-                status="completed",
+                status=node_status,
                 input_json=input_payload,
                 output_json=output,
                 error_message=None,
@@ -272,6 +276,38 @@ class LangGraphAgentOrchestrator:
 
             return self._node_wrapper(repo, "company_understanding", state, compute)
 
+        def report_spec(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                from backend.services.deep_research.report_spec_builder import (
+                    build_and_persist_report_spec,
+                )
+
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                company_understanding_output = _state.get("node_results", {}).get(
+                    "company_understanding", {}
+                )
+                identity_output = _state.get("node_results", {}).get("identity", {})
+
+                spec, persisted = build_and_persist_report_spec(
+                    run_id=run_id,
+                    company_id=company_id,
+                    session=repo.session,
+                    company_understanding=company_understanding_output,
+                    identity=identity_output,
+                    run_mode="standard_deep_research",
+                    analyst_note=_state.get("query"),
+                )
+                return {
+                    "report_id": str(spec.report_id),
+                    "run_mode": spec.run_mode,
+                    "policy_versions": spec.policy_versions.model_dump(),
+                    "required_metrics_count": len(spec.required_metrics),
+                    "persisted": persisted,
+                }
+
+            return self._node_wrapper(repo, "report_spec", state, compute)
+
         def company_profile(state: OrchestratorState):
             def compute(_state: OrchestratorState):
                 run_id = uuid.UUID(_state["run_id"])
@@ -306,6 +342,9 @@ class LangGraphAgentOrchestrator:
             def compute(_state: OrchestratorState):
                 from backend.services.deep_research.input_completeness import (
                     DEEP_RESEARCH_THRESHOLDS,
+                )
+                from backend.services.deep_research.report_spec_builder import (
+                    load_report_spec_for_run,
                 )
                 from backend.services.web_intel import WebRetrievalService
 
@@ -352,6 +391,7 @@ class LangGraphAgentOrchestrator:
                     else None
                 )
 
+                report_spec = load_report_spec_for_run(repo.session, run_id)
                 service = WebRetrievalService()
                 bundle = service.retrieve(
                     run_id=run_id,
@@ -361,6 +401,7 @@ class LangGraphAgentOrchestrator:
                     orgnr=orgnr,
                     company_website=website,
                     market_label=market_label,
+                    report_spec=report_spec,
                 )
 
                 session_ids: list[uuid.UUID] = []
@@ -370,13 +411,17 @@ class LangGraphAgentOrchestrator:
                         if q.get("query_group") == group
                     ]
                     if group_queries:
+                        meta = {"result_counts": [q.get("result_count", 0) for q in group_queries]}
+                        metric_keys = [q.get("metric_key") for q in group_queries if q.get("metric_key")]
+                        if metric_keys:
+                            meta["metric_keys"] = metric_keys
                         sid = repo.persist_web_search_session(
                             run_id=run_id,
                             company_id=company_id,
                             query_group=group,
                             queries=[q.get("query", "") for q in group_queries],
                             provider="tavily",
-                            metadata={"result_counts": [q.get("result_count", 0) for q in group_queries]},
+                            metadata=meta,
                         )
                         session_ids.append(sid)
 
@@ -409,6 +454,51 @@ class LangGraphAgentOrchestrator:
                 return payload
 
             return self._node_wrapper(repo, "web_retrieval", state, compute)
+
+        def evidence_validation(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                from backend.services.deep_research.evidence_bundle_builder import (
+                    build_from_db,
+                    persist_evidence_bundle,
+                )
+                from backend.services.deep_research.report_spec_builder import (
+                    load_report_spec_for_run,
+                )
+
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+                web_retrieval_output = _state.get("node_results", {}).get("web_retrieval", {})
+                queries_executed = web_retrieval_output.get("queries_executed") or []
+
+                report_spec = load_report_spec_for_run(repo.session, run_id)
+                required_metrics = []
+                if report_spec:
+                    required_metrics = report_spec.required_metrics
+
+                bundle = build_from_db(
+                    session=repo.session,
+                    run_id=run_id,
+                    company_id=company_id,
+                    required_metrics=required_metrics,
+                    queries_executed=queries_executed,
+                )
+                persist_evidence_bundle(
+                    repo.session,
+                    run_id,
+                    company_id,
+                    bundle,
+                )
+                repo.session.commit()
+
+                return {
+                    "items_count": len(bundle.items),
+                    "rejected_count": len(bundle.rejected_items),
+                    "coverage_rate": bundle.coverage_summary.coverage_rate,
+                    "required_covered": bundle.coverage_summary.required_metrics_covered,
+                    "required_total": bundle.coverage_summary.required_metrics_total,
+                }
+
+            return self._node_wrapper(repo, "evidence_validation", state, compute)
 
         def market_analysis(state: OrchestratorState):
             def compute(_state: OrchestratorState):
@@ -806,6 +896,31 @@ class LangGraphAgentOrchestrator:
 
             return self._node_wrapper(repo, "financial_model", state, compute)
 
+        def assumption_registry(state: OrchestratorState):
+            def compute(_state: OrchestratorState):
+                from backend.services.deep_research.assumption_registry_builder import (
+                    build_and_persist_assumption_registry,
+                )
+
+                run_id = uuid.UUID(_state["run_id"])
+                company_id = uuid.UUID(_state["company_id"])
+
+                registry, persisted = build_and_persist_assumption_registry(
+                    session=repo.session,
+                    run_id=run_id,
+                    company_id=company_id,
+                )
+                return {
+                    "valuation_ready": registry.readiness.valuation_ready,
+                    "blocked_reasons": registry.readiness.blocked_reasons,
+                    "accepted_total": registry.completeness.accepted_total,
+                    "required_total": registry.completeness.required_total,
+                    "missing_keys": registry.completeness.missing_keys,
+                    "persisted": bool(persisted),
+                }
+
+            return self._node_wrapper(repo, "assumption_registry", state, compute)
+
         def valuation(state: OrchestratorState):
             def compute(_state: OrchestratorState):
                 from backend.services.valuation.sector_multiple_loader import (
@@ -814,6 +929,53 @@ class LangGraphAgentOrchestrator:
 
                 run_id = uuid.UUID(_state["run_id"])
                 company_id = uuid.UUID(_state["company_id"])
+                assump = _state.get("node_results", {}).get("assumption_registry", {})
+                valuation_ready = assump.get("valuation_ready", True)
+                if not valuation_ready:
+                    return {
+                        "skipped": True,
+                        "reason": "valuation_not_ready",
+                        "blocked_reasons": assump.get("blocked_reasons", []),
+                        "metadata": {"valuation_skipped_gracefully": True},
+                    }
+
+                # Phase 5: Try deterministic DCF when assumption registry is valuation-ready
+                try:
+                    from backend.services.valuation.dcf_engine import (
+                        run_deterministic_valuation,
+                    )
+                    from backend.services.deep_research.assumption_registry_builder import (
+                        load_assumption_registry_for_run,
+                    )
+
+                    registry = load_assumption_registry_for_run(
+                        repo.session, run_id, company_id
+                    )
+                    if registry and registry.readiness.valuation_ready:
+                        dcf_result = run_deterministic_valuation(
+                            session=repo.session,
+                            run_id=run_id,
+                            company_id=company_id,
+                            registry=registry,
+                        )
+                        if dcf_result:
+                            fm_data = _state.get("node_results", {}).get(
+                                "financial_model", {}
+                            )
+                            fm_id = fm_data.get("financial_model_id")
+                            parsed_fm_id = uuid.UUID(fm_id) if fm_id else None
+                            repo.persist_valuation(
+                                run_id=run_id,
+                                company_id=company_id,
+                                financial_model_id=parsed_fm_id,
+                                payload=dcf_result,
+                            )
+                            return dcf_result
+                except Exception as e:
+                    logger.warning(
+                        "Deterministic DCF failed, falling back to agent: %s", e
+                    )
+
                 context = repo.build_agent_context(run_id, company_id)
                 fm_data = _state.get("node_results", {}).get("financial_model", {})
                 fm_id = fm_data.get("financial_model_id")
@@ -958,8 +1120,10 @@ class LangGraphAgentOrchestrator:
 
         graph.add_node("identity", identity)
         graph.add_node("company_understanding", company_understanding)
+        graph.add_node("report_spec", report_spec)
         graph.add_node("company_profile", company_profile)
         graph.add_node("web_retrieval", web_retrieval)
+        graph.add_node("evidence_validation", evidence_validation)
         graph.add_node("market_analysis", market_analysis)
         graph.add_node("competitor_discovery", competitor_discovery)
         graph.add_node("product_research", product_research)
@@ -973,8 +1137,10 @@ class LangGraphAgentOrchestrator:
 
         graph.add_edge(START, "identity")
         graph.add_edge("identity", "company_understanding")
-        graph.add_edge("company_understanding", "web_retrieval")
-        graph.add_edge("web_retrieval", "company_profile")
+        graph.add_edge("company_understanding", "report_spec")
+        graph.add_edge("report_spec", "web_retrieval")
+        graph.add_edge("web_retrieval", "evidence_validation")
+        graph.add_edge("evidence_validation", "company_profile")
         graph.add_edge("company_profile", "market_analysis")
         graph.add_edge("market_analysis", "competitor_discovery")
         graph.add_edge("competitor_discovery", "product_research")
@@ -1170,13 +1336,16 @@ class LangGraphAgentOrchestrator:
         for node_name in PIPELINE_NODES:
             row = by_name.get(node_name)
             if row:
-                stages.append({
+                stage_data: dict[str, Any] = {
                     "stage": node_name,
                     "status": row.status,
                     "started_at": row.started_at,
                     "finished_at": row.completed_at,
                     "error_message": row.error_message,
-                })
+                }
+                if isinstance(row.output_json, dict) and row.output_json:
+                    stage_data["output"] = row.output_json
+                stages.append(stage_data)
             else:
                 stages.append({
                     "stage": node_name,
@@ -1194,7 +1363,7 @@ class LangGraphAgentOrchestrator:
         current = "identity"
         for node_name in PIPELINE_NODES:
             row = by_name.get(node_name)
-            if row and row.status in ("running", "completed", "failed"):
+            if row and row.status in ("running", "completed", "failed", "skipped"):
                 current = node_name
         return current
 

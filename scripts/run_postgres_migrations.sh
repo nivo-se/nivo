@@ -84,7 +84,8 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/023_user_ids_text_for_auth0.sql \
          database/migrations/024_deep_research_persistence.sql \
          database/migrations/025_deep_research_run_node_states.sql \
-         database/migrations/025_claim_verifications.sql; do
+         database/migrations/025_claim_verifications.sql \
+         database/migrations/031_deep_research_v2_schemas.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"

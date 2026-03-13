@@ -1,5 +1,7 @@
 # Nivo Deep Research - Open Questions and Architectural Inconsistencies
 
+**Phase 0 (V2 baseline) completed:** See [V2_BASELINE_INVENTORY.md](V2_BASELINE_INVENTORY.md). Deep Research V2 implementation plan in [tightning/09-implementation-roadmap.md](tightning/09-implementation-roadmap.md).
+
 ## 1) Critical blockers (resolve first)
 
 ## Q1. Missing source-of-truth documentation folder

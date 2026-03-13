@@ -142,12 +142,22 @@ class WebRetrievalService:
                     "content": r.content,
                     "query": pq.query,
                 })
-            queries_executed.append({
+            entry: dict = {
                 "query": pq.query,
                 "query_group": group,
                 "result_count": count,
                 "round": round_label,
-            })
+            }
+            metric_key = getattr(pq, "metric_key", None)
+            if metric_key:
+                entry["metric_key"] = metric_key
+                logger.info(
+                    "Query-to-metric: metric_key=%s query=%s results=%d",
+                    metric_key,
+                    pq.query[:60] + "..." if len(pq.query) > 60 else pq.query,
+                    count,
+                )
+            queries_executed.append(entry)
 
         for group, items in results_by_group.items():
             for item in items:

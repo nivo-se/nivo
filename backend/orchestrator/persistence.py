@@ -17,6 +17,7 @@ from backend.db.models.deep_research import (
     ClaimVerification,
     Company,
     CompanyProfile,
+    ReportSpecPersistence,
     Competitor,
     CompetitorCandidate,
     CompetitorProfile,

@@ -1,0 +1,15 @@
+# Valuation policy v1 — per docs/deep_research/tightning/03-policy-framework.md
+valuation_policy:
+  version: "dcf_v1"
+  allowed_models:
+    - dcf_fcff
+    - trading_comps
+  terminal_growth:
+    max_relative_to_long_run_nominal_growth: true
+    hard_cap_percent: 4.0
+  consistency:
+    require_fcff_with_wacc: true
+    require_fcfe_with_cost_of_equity: true
+  scenarios:
+    required: true
+    labels: ["bear", "base", "bull"]

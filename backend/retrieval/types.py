@@ -13,6 +13,7 @@ class PlannedQuery:
     reason: str
     priority: int = 0
     query_group: str | None = None  # company_facts | market | competitors | news
+    metric_key: str | None = None  # V2: traceability to report_spec required_metric
 
 
 @dataclass(slots=True)

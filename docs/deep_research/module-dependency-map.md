@@ -1,5 +1,7 @@
 # Nivo Deep Research - Module Dependency Map
 
+**V2 alignment:** For the policy-driven research-to-valuation upgrade, see [docs/deep_research/tightning/](tightning/README.md) and [V2_BASELINE_INVENTORY.md](V2_BASELINE_INVENTORY.md).
+
 ## 1) Target backend module map
 
 ```text
@@ -110,30 +112,24 @@ Dependency rules:
 
 ## 5) Mapping from current code to target modules
 
-Current -> Target:
+### Current Deep Research path (primary for V2)
 
-- `backend/api/ai_analysis_api.py`, `backend/api/analysis.py`
-  - retain request routing in `api`
-  - move business orchestration logic to `orchestrator`
+- **Orchestrator:** `backend/orchestrator/langgraph_orchestrator.py` — LangGraph pipeline with nodes: identity, company_understanding, web_retrieval, company_profile, market_analysis, competitor_discovery, product_research, transaction_research, strategy, value_creation, financial_model, valuation, verification, report_generation.
+- **API:** `backend/api/deep_research.py` + `deep_research_routes/*` — `/api/deep-research/` health, analysis, companies, reports, competitors, verification, sources, recompute.
+- **Persistence:** `backend/db/models/deep_research.py` — `deep_research` schema: companies, analysis_runs, run_node_states, sources, reports, claims, claim_sources, etc.
+- **Retrieval:** `backend/services/web_intel/web_retrieval_service.py` + Tavily, query_planner — bounded retrieval loop.
+- **Verification:** `backend/verification/` — claim verification pipeline.
+- **Report:** `backend/report_engine/composer.py` — report assembly.
 
-- `backend/analysis/workflow.py`
-  - core sequence logic -> `orchestrator`
+### Legacy paths (to be deprecated or merged)
 
-- `backend/analysis/stage2_research.py`, `backend/agentic_pipeline/web_enrichment.py`
-  - merge into `retrieval`
-
-- `backend/analysis/stage3_analysis.py`, `backend/agentic_pipeline/ai_analysis.py`
-  - agent prompts/model calls -> `agents`
-
-- moderation and output checks currently implicit
-  - formalize into `verification`
-
-- report-shaping logic spread across API/services
-  - centralize into `report_engine`
-
-- `backend/services/postgres_db_service.py` + direct SQL in routers/workflow
-  - keep infra in `services` short-term
-  - extract repositories into `db` module
+- `backend/api/ai_analysis_api.py`, `backend/api/analysis.py` — retain request routing in `api`, move orchestration to `orchestrator`.
+- `backend/analysis/workflow.py` — core sequence logic -> `orchestrator`.
+- `backend/analysis/stage2_research.py`, `backend/agentic_pipeline/web_enrichment.py` — merge into `retrieval`.
+- `backend/analysis/stage3_analysis.py`, `backend/agentic_pipeline/ai_analysis.py` — agent prompts/model calls -> `agents`.
+- moderation and output checks currently implicit — formalize into `verification`.
+- report-shaping logic spread across API/services — centralize into `report_engine`.
+- `backend/services/postgres_db_service.py` + direct SQL — keep infra in `services` short-term, extract repositories into `db` module.
 
 ---
 

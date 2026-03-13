@@ -819,3 +819,87 @@ class MarketSynthesis(TimestampMixin, Base):
     confidence_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 4), nullable=True)
     extra: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
 
+
+class ReportSpecPersistence(TimestampMixin, Base):
+    """V2: Machine-readable report spec per run (docs/deep_research/tightning/02-report-spec-schema)."""
+
+    __tablename__ = "report_specs"
+    __table_args__ = (
+        UniqueConstraint("run_id", name="uq_dr_report_specs_run"),
+        Index("ix_dr_report_specs_run", "run_id"),
+        Index("ix_dr_report_specs_company", "company_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    spec_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    policy_versions_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class EvidenceBundlePersistence(TimestampMixin, Base):
+    """V2: Validated evidence bundle per run (docs/deep_research/tightning/04-evidence-and-assumption-registry)."""
+
+    __tablename__ = "evidence_bundles"
+    __table_args__ = (
+        UniqueConstraint("run_id", name="uq_dr_evidence_bundles_run"),
+        Index("ix_dr_evidence_bundles_run", "run_id"),
+        Index("ix_dr_evidence_bundles_company", "company_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    bundle_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    coverage_summary_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+
+class AssumptionRegistryPersistence(TimestampMixin, Base):
+    """V2: Assumption registry per run (docs/deep_research/tightning/04-evidence-and-assumption-registry)."""
+
+    __tablename__ = "assumption_registries"
+    __table_args__ = (
+        UniqueConstraint("run_id", name="uq_dr_assumption_registries_run"),
+        Index("ix_dr_assumption_registries_run", "run_id"),
+        Index("ix_dr_assumption_registries_company", "company_id"),
+        {"schema": DEEP_RESEARCH_SCHEMA},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    registry_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    completeness_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    readiness_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)

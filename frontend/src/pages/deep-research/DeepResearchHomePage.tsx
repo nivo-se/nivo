@@ -53,13 +53,17 @@ const STATUS_CONFIG: Record<
 
 const STAGE_LABELS: Record<string, string> = {
   identity: 'Company resolution',
-  company_profile: 'Company understanding',
+  company_understanding: 'Company understanding',
+  report_spec: 'Report spec',
+  company_profile: 'Company profile',
   web_retrieval: 'Web intelligence',
+  evidence_validation: 'Evidence validation',
   market_analysis: 'Market synthesis',
   competitor_discovery: 'Competitors',
   strategy: 'Strategy / value creation',
   value_creation: 'Strategy / value creation',
   financial_model: 'Financial grounding',
+  assumption_registry: 'Assumption registry',
   valuation: 'Valuation',
   verification: 'Verification',
   report_generation: 'Final report',

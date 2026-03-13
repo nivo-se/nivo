@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   ArrowLeft,
   CheckCircle,
+  Info,
   Loader2,
   XCircle,
   SkipForward,
@@ -31,13 +32,19 @@ const POLL_INTERVAL = 3000
 
 const STAGE_LABELS: Record<string, string> = {
   identity: 'Company resolution',
-  company_profile: 'Company understanding',
+  company_understanding: 'Company understanding',
+  report_spec: 'Report spec',
+  company_profile: 'Company profile',
   web_retrieval: 'Web intelligence',
+  evidence_validation: 'Evidence validation',
   market_analysis: 'Market synthesis',
   competitor_discovery: 'Competitors',
+  product_research: 'Product research',
+  transaction_research: 'Transaction research',
   strategy: 'Strategy / value creation',
   value_creation: 'Strategy / value creation',
   financial_model: 'Financial grounding',
+  assumption_registry: 'Assumption registry',
   valuation: 'Valuation',
   verification: 'Verification',
   report_generation: 'Final report',
@@ -71,8 +78,11 @@ const SUGGESTED_ACTIONS: Record<string, string[]> = {
   identity: ['Add company website', 'Verify org nr'],
   company_profile: ['Broaden search', 'Lower strictness'],
   web_retrieval: ['Check Tavily key', 'Add company website'],
+  evidence_validation: ['Add more sources', 'Lower evidence thresholds'],
   market_analysis: ['Broaden search', 'Lower strictness'],
   competitor_discovery: ['Broaden search', 'Lower strictness'],
+  assumption_registry: ['Verify financial model', 'Add evidence for key metrics'],
+  valuation: ['Verify assumption registry', 'Check financial model completeness'],
   default: ['Rerun with more context', 'Add company website'],
 }
 
@@ -403,6 +413,37 @@ export default function RunStatusPage() {
                   </Button>
                 </CardContent>
               </Card>
+            )}
+
+            {run.stages.some(
+              (s) => s.stage === 'valuation' && s.status === 'skipped' && s.output?.reason === 'valuation_not_ready'
+            ) && (
+              <Alert className="border-amber-500/30 bg-amber-500/5">
+                <Info className="h-4 w-4 text-amber-600" />
+                <AlertDescription>
+                  <p className="font-medium">Valuation skipped</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Insufficient evidence or assumptions to run deterministic valuation. The report will omit valuation
+                    figures.
+                  </p>
+                  {(() => {
+                    const valStage = run.stages.find(
+                      (s) => s.stage === 'valuation' && s.output?.blocked_reasons?.length
+                    )
+                    const reasons = (valStage?.output as { blocked_reasons?: string[] })?.blocked_reasons
+                    if (reasons?.length) {
+                      return (
+                        <ul className="mt-2 list-disc list-inside text-sm text-muted-foreground">
+                          {reasons.map((r) => (
+                            <li key={r}>{r}</li>
+                          ))}
+                        </ul>
+                      )
+                    }
+                    return null
+                  })()}
+                </AlertDescription>
+              </Alert>
             )}
 
             {isComplete && run.company_id && (

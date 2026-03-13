@@ -24,6 +24,8 @@ export interface RunStage {
   started_at: string | null
   finished_at: string | null
   error_message?: string | null
+  /** Stage output from orchestrator (e.g. skipped reason, blocked_reasons) */
+  output?: Record<string, unknown>
 }
 
 export interface AnalysisStatus {

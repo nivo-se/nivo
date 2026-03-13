@@ -424,11 +424,11 @@ class ReportComposer:
                         if _assumption_commentary(ai.model_assumptions)
                         else ""
                     )
-                    "### Valuation\n"
+                    + "### Valuation\n"
                     f"- Enterprise Value (MSEK): {ev}\n"
                     f"- Equity Value (MSEK): {eq}\n"
                     f"- Valuation Range (MSEK): {vr_low} to {vr_high}\n\n"
-                    "### Methodology & Cross-Checks\n"
+                    + "### Methodology & Cross-Checks\n"
                     f"{_valuation_methodology_block(ai.valuation_output)}\n\n"
                     + (
                         f"### Scenario Range\n\n{_scenario_valuation_table(ai.valuation_output)}\n\n"
@@ -481,6 +481,8 @@ class ReportComposer:
         financial = node_results.get("financial_model", {})
         valuation = node_results.get("valuation", {})
         verification = verification_output or node_results.get("verification", {})
+        valuation_skipped = valuation.get("skipped") is True and valuation.get("reason") == "valuation_not_ready"
+        blocked_reasons = valuation.get("blocked_reasons") or []
 
         unsupported_types = _build_unsupported_types(verification)
 
@@ -500,10 +502,26 @@ class ReportComposer:
 
         revenue = _guard_numeric(final_year.get("revenue_msek", "N/A"), unsupported_types, ("financial_model",))
         ebitda = _guard_numeric(final_year.get("ebitda_margin_pct", "N/A"), unsupported_types, ("financial_model",))
-        ev = _guard_numeric(valuation.get("enterprise_value", valuation.get("enterprise_value_msek", "N/A")), unsupported_types, ("valuation",))
-        eq = _guard_numeric(valuation.get("equity_value", valuation.get("equity_value_msek", "N/A")), unsupported_types, ("valuation",))
-        vr_low = _guard_numeric(valuation.get("valuation_range_low", valuation.get("valuation_range_low_msek", "N/A")), unsupported_types, ("valuation",))
-        vr_high = _guard_numeric(valuation.get("valuation_range_high", valuation.get("valuation_range_high_msek", "N/A")), unsupported_types, ("valuation",))
+        ev = _guard_numeric(
+            valuation.get("enterprise_value", valuation.get("enterprise_value_msek", "N/A"))
+            if not valuation_skipped else "N/A",
+            unsupported_types, ("valuation",)
+        )
+        eq = _guard_numeric(
+            valuation.get("equity_value", valuation.get("equity_value_msek", "N/A"))
+            if not valuation_skipped else "N/A",
+            unsupported_types, ("valuation",)
+        )
+        vr_low = _guard_numeric(
+            valuation.get("valuation_range_low", valuation.get("valuation_range_low_msek", "N/A"))
+            if not valuation_skipped else "N/A",
+            unsupported_types, ("valuation",)
+        )
+        vr_high = _guard_numeric(
+            valuation.get("valuation_range_high", valuation.get("valuation_range_high_msek", "N/A"))
+            if not valuation_skipped else "N/A",
+            unsupported_types, ("valuation",)
+        )
 
         market_size = _guard_numeric(market.get("market_size", "N/A"), unsupported_types, ("market_analysis",))
         growth_rate = _guard_numeric(market.get("growth_rate", "N/A"), unsupported_types, ("market_analysis",))
@@ -571,22 +589,40 @@ class ReportComposer:
                     f"- Final Year Revenue (MSEK): {revenue}\n"
                     f"- Final Year EBITDA Margin (%): {ebitda}\n\n"
                     "### Valuation\n"
-                    f"- Enterprise Value (MSEK): {ev}\n"
-                    f"- Equity Value (MSEK): {eq}\n"
-                    f"- Valuation Range (MSEK): {vr_low} "
-                    f"to {vr_high}\n"
+                    + (
+                        (
+                            "> **Valuation skipped** — insufficient evidence or assumptions to run deterministic valuation.\n"
+                            + (
+                                f"Blocked reasons: {', '.join(str(r) for r in blocked_reasons)}\n\n"
+                                if blocked_reasons else "\n"
+                            )
+                        )
+                        if valuation_skipped
+                        else ""
+                    )
+                    + f"- Enterprise Value (MSEK): {ev}\n"
+                    + f"- Equity Value (MSEK): {eq}\n"
+                    + f"- Valuation Range (MSEK): {vr_low} to {vr_high}\n"
                 ),
                 "sort_order": 5,
             },
         ]
 
+        metadata = {
+            "composer_version": self.version,
+            "node_count": len(node_results),
+            "unsupported_claim_types": sorted(unsupported_types),
+        }
+        if valuation_skipped:
+            metadata["report_degraded"] = True
+            metadata["report_degraded_reasons"] = (
+                metadata.get("report_degraded_reasons", [])
+                + ["Valuation skipped (valuation not ready)"]
+            )
+
         return {
             "status": "draft",
             "title": f"Deep Research Report - {company_name}",
             "sections": sections,
-            "metadata": {
-                "composer_version": self.version,
-                "node_count": len(node_results),
-                "unsupported_claim_types": sorted(unsupported_types),
-            },
+            "metadata": metadata,
         }

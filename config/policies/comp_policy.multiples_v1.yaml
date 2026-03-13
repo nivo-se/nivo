@@ -1,0 +1,14 @@
+# Multiples / comp policy v1 — per docs/deep_research/tightning/03-policy-framework.md
+comp_policy:
+  version: "multiples_v1"
+  allowed_multiples:
+    software:
+      - ev_revenue_forward
+      - ev_ebitda_forward
+    industrial:
+      - ev_ebitda_ltm
+      - p_e_ntm
+  peer_rules:
+    min_peer_count: 4
+    require_uniform_definition: true
+    require_reason_for_inclusion: true
