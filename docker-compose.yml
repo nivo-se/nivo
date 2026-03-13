@@ -19,9 +19,9 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-    # Expose for bootstrap/migrations from host (127.0.0.1:5433 → container 5432)
+    # Expose for bootstrap/migrations and remote dev (0.0.0.0 so laptop can connect via LAN or Tailscale)
     ports:
-      - "127.0.0.1:5433:5432"
+      - "0.0.0.0:5433:5432"
 
   api:
     build:

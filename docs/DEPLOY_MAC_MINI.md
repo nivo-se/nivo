@@ -125,8 +125,35 @@ This rebuilds and restarts the API; Postgres keeps running and keeps its data (i
 
 ## 5. Ports and security
 
-- **Postgres:** Exposed on `127.0.0.1:5433` on the host (maps to container 5432) so you can run migrations or `pg_dump` from the mini host.
+- **Postgres:** Exposed on `0.0.0.0:5433` on the host (maps to container 5432) so you can run migrations from the mini host and connect from your dev machine (see §5a).
 - **FastAPI:** Exposed on port 8000. Later you can put **Cloudflare Tunnel** (or similar) in front so the outside world sees only `api.<domain>`.
+
+### 5a. Connecting to the DB from your laptop (home and office)
+
+The DB lives on the Mac mini on your private LAN. To use it from your dev machine in both locations:
+
+- **At home (same LAN):** Use the mini’s LAN IP as `POSTGRES_HOST` in your local `.env`, e.g. `192.168.1.50`. Find it on the mini with `ipconfig getifaddr en0` (or System Settings → Network).
+- **At office (different network):** Use a private overlay so the mini is reachable without opening ports. Recommended: **Tailscale**.
+  1. Install [Tailscale](https://tailscale.com) on the Mac mini and on your laptop; sign in with the same account.
+  2. On the mini, note its Tailscale IP (e.g. `100.x.x.x`) in the Tailscale admin or with `tailscale ip -4`.
+  3. On your laptop, use that IP as `POSTGRES_HOST` when at the office (or use it everywhere so one config works at home and office).
+
+**Example `.env` on your laptop** (one config for both locations if you use Tailscale):
+
+```bash
+DATABASE_SOURCE=postgres
+# Use mini's Tailscale IP so it works from home and office
+POSTGRES_HOST=100.x.x.x   # replace with mini's Tailscale IP
+POSTGRES_PORT=5433
+POSTGRES_DB=nivo
+POSTGRES_USER=nivo
+POSTGRES_PASSWORD=your_mini_postgres_password
+DATABASE_URL=postgresql://nivo:your_mini_postgres_password@100.x.x.x:5433/nivo
+```
+
+If you prefer to use the mini’s LAN IP when at home (e.g. lower latency), you can switch `POSTGRES_HOST` between the LAN IP and the Tailscale IP depending on where you are, or use the Tailscale IP everywhere for simplicity.
+
+**Security:** Postgres is only reachable on your LAN and (with Tailscale) over Tailscale’s encrypted mesh. Restrict port 5433 to LAN/Tailscale in the mini’s firewall if you want an extra layer.
 
 ### 5b. AI runs / “Recent Runs” not showing
 
