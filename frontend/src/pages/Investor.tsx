@@ -221,7 +221,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
 
         <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
-            We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital modernisation — not technology risk.
+            We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital modernisation — not technology risk. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.
           </p>
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
@@ -257,7 +257,6 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
             <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />~15,000 companies in our focus revenue band</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Primarily owner-managed B2B services and niche manufacturing</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Established business models with stable customer relationships</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Clear operational and systems gaps → strong improvement potential</li>
             </ul>
           </div>
@@ -275,7 +274,6 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
             <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Manual workflows, spreadsheets and ad-hoc processes</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Fragmented systems with limited data integration</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited operational visibility and slow reporting</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Cost-plus pricing and weak margin transparency</li>
             </ul>
           </div>
@@ -294,7 +292,6 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strong institutions and transparent markets</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Educated workforce and high digital adoption</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Generational transitions creating significant deal flow</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited dedicated buyout capital below SEK 200m</li>
             </ul>
           </div>
 
@@ -312,25 +309,8 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Proprietary AI-enabled platform for sourcing, analysis and operational upgrades</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Identify opportunities faster and implement improvements more effectively</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strengthen commercial execution, improve operational performance and modernise through digitalisation and selective use of AI</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />We buy operational improvement potential — not technology risk</li>
             </ul>
           </div>
-        </div>
-      </Section>
-
-      {/* Overview */}
-      <Section title="Investment Overview">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>A disciplined operational compounder</p>
-        <div className="space-y-4">
-          <p className="leading-relaxed" style={{ color: tokens.text }}>
-            We acquire profitable, under-digitised Nordic SMEs, typically with SEK 50–200m in revenue. Our model is simple: acquire strong businesses where operational execution can be improved, modernise operations through better processes and digital tools, and compound value through higher margins and stronger cash flow.
-          </p>
-          <p className="leading-relaxed" style={{ color: tokens.text }}>
-            Nivo combines hands-on ownership with a proprietary AI-enabled platform used for sourcing, analysis and operational upgrades. This allows us to identify opportunities systematically and implement improvements faster.
-          </p>
-          <p className="leading-relaxed" style={{ color: tokens.text }}>
-            Our edge is disciplined execution and systematic sourcing. Our focus is operational improvement and long-term compounding — not technology risk.
-          </p>
         </div>
       </Section>
 

@@ -113,7 +113,7 @@ export function Investor2LongFormNivo() {
           {/* One-line thesis + key selling points — for investors who only read this section */}
           <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <p className="text-lg sm:text-xl font-semibold text-profile-fg mb-4 leading-snug">
-              We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital modernisation — not technology risk.
+              We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital modernisation — not technology risk. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.
             </p>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
@@ -150,7 +150,6 @@ export function Investor2LongFormNivo() {
               <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />~15,000 companies in our focus revenue band</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Primarily owner-managed B2B services and niche manufacturing</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Established business models with stable customer relationships</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Clear operational and systems gaps → strong improvement potential</li>
               </ul>
             </div>
@@ -168,7 +167,6 @@ export function Investor2LongFormNivo() {
               <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Manual workflows, spreadsheets and ad-hoc processes</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Fragmented systems with limited data integration</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited operational visibility and slow reporting</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Cost-plus pricing and weak margin transparency</li>
               </ul>
             </div>
@@ -187,7 +185,6 @@ export function Investor2LongFormNivo() {
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strong institutions and transparent markets</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Educated workforce and high digital adoption</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Generational transitions creating significant deal flow</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited dedicated buyout capital below SEK 200m</li>
               </ul>
             </div>
 
@@ -205,30 +202,8 @@ export function Investor2LongFormNivo() {
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Proprietary AI-enabled platform for sourcing, analysis and operational upgrades</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Identify opportunities faster and implement improvements more effectively</li>
                 <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strengthen commercial execution, improve operational performance and modernise through digitalisation and selective use of AI</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />We buy operational improvement potential — not technology risk</li>
               </ul>
             </div>
-          </div>
-        </div>
-        </div>
-      </section>
-
-      {/* ─── Investment overview ────────────────────────────────────────── */}
-      <section className="w-full" id="overview" style={{ backgroundColor: tokens.bgAlt }}>
-        <div className={DECK_SECTION_CLASS}>
-        <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>Investment Overview</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>A disciplined operational compounder</p>
-          <div className="space-y-6">
-            <p className={PROSE_CLASS}>
-              We acquire profitable, under-digitised Nordic SMEs, typically with SEK 50–200m in revenue. Our model is simple: acquire strong businesses where operational execution can be improved, modernise operations through better processes and digital tools, and compound value through higher margins and stronger cash flow.
-            </p>
-            <p className={PROSE_CLASS}>
-              Nivo combines hands-on ownership with a proprietary AI-enabled platform used for sourcing, analysis and operational upgrades. This allows us to identify opportunities systematically and implement improvements faster.
-            </p>
-            <p className={PROSE_CLASS}>
-              Our edge is disciplined execution and systematic sourcing. Our focus is operational improvement and long-term compounding — not technology risk.
-            </p>
           </div>
         </div>
         </div>
@@ -285,7 +260,7 @@ export function Investor2LongFormNivo() {
               <p className={LABEL_OLIVE_CLASS + " mb-4"}>Illustrative investment outcome</p>
               <div className="rounded-lg py-3 px-4 w-full" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
                 <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                  The following example illustrates how operational improvements and reinvestment can compound equity value over time. The chart and table below are based on the assumptions set out in this section: entry and exit multiples, revenue growth, margin progression, leverage and hold period. Outcomes are illustrative and do not represent a forecast.
+                  The following example illustrates how operational improvements and reinvestment can compound equity value over time.
                 </p>
               </div>
             </div>
@@ -334,40 +309,7 @@ export function Investor2LongFormNivo() {
             </div>
           </div>
 
-          <div className="mt-10 w-full">
-            <p className={LABEL_OLIVE_CLASS}>Projection detail (illustrative)</p>
-            <p className="text-[13px] text-profile-fg mb-3">7-year investment horizon; target 20–25% IRR and 4–5x MOIC. Reinvestment of returns and 20% ROIC at portfolio level drive MoM growth.</p>
-            <div className="overflow-x-auto rounded-lg border" style={{ borderColor: tokens.border }}>
-              <table className="w-full text-sm min-w-[520px]">
-                <thead style={{ backgroundColor: tokens.bg }}>
-                  <tr>
-                    <th className="px-3 py-2.5 text-left font-semibold text-profile-fg">Year</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">Equity</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">Debt</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">EV</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">Return</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">Reinvestment</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">ROIC</th>
-                    <th className="px-3 py-2.5 text-right font-semibold text-profile-fg">MoM</th>
-                  </tr>
-                </thead>
-                <tbody style={{ backgroundColor: tokens.bg }}>
-                  {PROJ.map((row) => (
-                    <tr key={row.year} className="border-t" style={{ borderColor: tokens.border }}>
-                      <td className="px-3 py-2.5 text-profile-fg">{row.label}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums font-medium text-profile-accent">{row.equityValue}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.debt}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.ev}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.return || "—"}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.reinvestment || "—"}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.roic}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-profile-fg">{row.mom}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <p className="text-[13px] text-profile-fg mt-6">7-year horizon; target 20–25% IRR, 4–5x MOIC.</p>
         </div>
         </div>
       </section>
@@ -379,7 +321,7 @@ export function Investor2LongFormNivo() {
           <h2 className={H2_CLASS}>Value Creation</h2>
           <p className={SECTION_SUBTITLE_CLASS}>From acquisition to compounding</p>
           <p className={PROSE_CLASS + " mb-10"}>
-            We acquire profitable Nordic SMEs and work closely with management to improve operational performance. When we acquire a business we invest time in understanding it thoroughly—the people, the operations, the numbers—so we can act from day one. We focus on what moves the needle: pricing, sales, back-office execution, and how data is used. We target a clear return on the capital we deploy, reinvest what the businesses generate, and use modest debt where it helps. Then we do it again. We apply the same approach every time; the more we do it, the sharper we get.
+            We acquire profitable Nordic SMEs and work closely with management. We focus on pricing, sales, back-office execution, and data. We reinvest what the businesses generate and use modest debt where it helps.
           </p>
           <div className="mb-4">
             <p className={LABEL_CLASS}>Where we focus when we're in the business</p>
@@ -387,30 +329,32 @@ export function Investor2LongFormNivo() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10">
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Revenue</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Getting pricing right, keeping customers, and making sure the sales team is focused and accountable.</p>
+              <ul className="space-y-1.5 text-profile-fg text-[15px] leading-relaxed mt-2">
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Getting pricing right</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Keeping customers</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Making sure the sales team is focused and accountable</li>
+              </ul>
             </div>
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Margins</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Trimming unnecessary cost, tightening how we buy and hold stock, and making sure we know where the money goes.</p>
+              <ul className="space-y-1.5 text-profile-fg text-[15px] leading-relaxed mt-2">
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Trimming unnecessary cost</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Tightening how we buy and hold stock</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Making sure we know where the money goes</li>
+              </ul>
             </div>
             <div className="pl-6 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
               <p className={LABEL_CLASS}>Digital & AI</p>
-              <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>Less manual work and spreadsheets, clearer numbers every month, and using data—and AI where it clearly helps—so decisions are based on fact, not gut.</p>
+              <ul className="space-y-1.5 text-profile-fg text-[15px] leading-relaxed mt-2">
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Less manual work and spreadsheets, clearer numbers every month</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Using data—and AI where it clearly helps—so decisions are based on fact, not gut</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />AI for faster reporting and margin visibility; supports judgment rather than replacing it</li>
+              </ul>
             </div>
           </div>
           <p className={PROSE_CLASS + " mt-10"}>
-            We go in with a clear plan. Each company reinforces what works; we get faster at spotting and fixing the same issues, and we carry that into the next. Where it helps, we use data and tools so the team can do more without adding headcount.
+            We enter each acquisition with a structured plan and systematically apply proven practices across the portfolio.
           </p>
-
-          <div className="mt-16 pt-10 border-t" style={{ borderColor: tokens.border }}>
-            <h3 className={H3_CLASS}>AI enablement</h3>
-            <p className={PROSE_CLASS + " mb-6"}>
-              We use AI where it clearly saves time or improves decisions—for example, replacing manual scheduling and slow, spreadsheet-based reporting. Companies often produce reliable monthly reporting weeks faster and see margin by customer and product. We tighten how they price and discount so they stop leaving money on the table; in practice that often means a percentage or two of margin.
-            </p>
-            <p className={PROSE_CLASS}>
-              We only use AI where we can see the impact—faster turnaround, better margin, clearer numbers. It supports how we work; it does not replace judgment or hands-on management.
-            </p>
-          </div>
         </div>
         </div>
       </section>
@@ -475,11 +419,8 @@ export function Investor2LongFormNivo() {
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Sourcing Edge</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Pipeline development</p>
-          <p className={PROSE_CLASS + " mb-8"}>
-            We use a proprietary AI sourcing engine built in-house to analyse the Swedish SME universe within the target size band. Our platform analyses Swedish SMEs in the SEK 50–200m revenue range, evaluating stable base economics, margin stagnation signals, and niche positioning. The engine outputs a ranked Target 100 shortlist and supports consistent, repeatable screening at scale.
-          </p>
           <p className={PROSE_CLASS + " mb-10"}>
-            Before engagement the same platform powers analysis of products and services, customer segments, go-to-market model, pricing structure, and operational signals. We arrive at dialogue with structured intelligence and disciplined entry criteria—all driven by our own technology stack.
+            We use a proprietary AI sourcing engine built in-house to analyse the Swedish SME universe (SEK 50–200m revenue). It evaluates stable base economics, margin stagnation signals, and niche positioning, outputs a ranked Target 100 shortlist, and powers pre-engagement analysis of products, customer segments, pricing, and operational signals. We arrive at dialogue with structured intelligence and disciplined entry criteria.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 py-10 text-base sm:text-lg font-medium text-profile-fg">
             <span className="flex items-center gap-2 text-profile-accent">
@@ -503,10 +444,6 @@ export function Investor2LongFormNivo() {
             </span>
           </div>
           <div className="mt-10 w-full">
-            <p className={LABEL_OLIVE_CLASS + " text-center mb-2"}>Proprietary AI sourcing engine</p>
-            <p className="text-center text-profile-fg text-[15px] sm:text-[16px] leading-relaxed mb-6 max-w-2xl mx-auto">
-              We built an in-house proprietary sourcing engine that leverages AI as well as financial analysis. We can analyse any Swedish company.
-            </p>
             <div className="rounded-lg overflow-hidden border relative" style={{ borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
               <img
                 src="/sourcing-ai-screenshot.png"
@@ -538,66 +475,21 @@ export function Investor2LongFormNivo() {
         </div>
       </section>
 
-      {/* ─── Investment process ──────────────────────────────────────────── */}
+      {/* ─── Investment Process & Pipeline ───────────────────────────────── */}
       <section className="w-full" id="process" style={{ backgroundColor: tokens.bgAlt }}>
         <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>Investment process</h2>
-          <p className="text-profile-accent font-medium uppercase tracking-widest text-sm mb-8">Sourcing to value creation</p>
-          <div className="space-y-8">
-            <p className={PROSE_CLASS}>
-              Sourcing combines direct outreach, broker relationships, and our own data-driven playbook. Due diligence focuses on quality of earnings, identification of operational improvement levers, and management assessment. Negotiation covers structure, management alignment, and risk provisions. Execution starts with a Day 1 plan, a structured first 100 days, and then value creation initiatives.
-            </p>
-            <div className="w-full">
-              <p className={LABEL_OLIVE_CLASS + " text-center"}>Current pipeline status</p>
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4">
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
-                  <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>12</p>
-                  <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Initial screen</p>
-                  <p className="text-xs mt-0.5" style={{ color: tokens.text }}>Under review</p>
-                </div>
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
-                  <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>2</p>
-                  <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Due diligence</p>
-                  <p className="text-xs mt-0.5" style={{ color: tokens.text }}>Active</p>
-                </div>
-                <div className="rounded-lg p-5 border text-center min-w-[140px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
-                  <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>1</p>
-                  <p className="text-sm font-medium mt-1" style={{ color: tokens.text }}>Negotiation</p>
-                  <p className="text-xs mt-0.5" style={{ color: tokens.text }}>LOI+</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </section>
-
-      {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full" style={{ backgroundColor: tokens.bgAlt }}>
-        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <img
-            src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=80"
-            alt="Nordic nature"
-            className="w-full h-full object-cover opacity-85"
-          />
-        </div>
-        </div>
-      </section>
-
-      {/* ─── Pipeline ────────────────────────────────────────────────────── */}
-      <section className="w-full" id="pipeline" style={{ backgroundColor: tokens.bg }}>
-        <div className={DECK_SECTION_CLASS}>
-        <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>Pipeline</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>Target 100 by operational improvement potential</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+          <h2 className={H2_CLASS}>Investment Process & Pipeline</h2>
+          <p className={SECTION_SUBTITLE_CLASS}>Sourcing to value creation</p>
+          <p className={PROSE_CLASS + " mb-10"}>
+            Sourcing combines direct outreach, broker relationships, and our own data-driven playbook. Due diligence focuses on quality of earnings, operational improvement levers, and management assessment. Negotiation covers structure, alignment, and risk provisions. Execution starts with a Day 1 plan and value creation initiatives.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
             {[
-              { stage: "Active due diligence", count: "2" },
-              { stage: "Advanced discussion", count: "5" },
-              { stage: "Initial contact", count: "12" },
               { stage: "Identified", count: "81" },
+              { stage: "Initial contact", count: "12" },
+              { stage: "Advanced discussion", count: "5" },
+              { stage: "Active due diligence", count: "2" },
             ].map((item) => (
               <div key={item.stage} className="rounded-lg p-4 sm:p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
                 <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
@@ -605,7 +497,7 @@ export function Investor2LongFormNivo() {
               </div>
             ))}
           </div>
-          <p className="text-sm mb-8" style={{ color: tokens.text }}>Active targets (illustrative)</p>
+          <p className="text-sm mb-6" style={{ color: tokens.text }}>Active targets (illustrative)</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 overflow-x-auto pb-2">
             {[
               { name: "Company A", sector: "Industrial", revenue: "SEK 120m", status: "Due diligence" },
@@ -632,7 +524,7 @@ export function Investor2LongFormNivo() {
           <p className={SECTION_SUBTITLE_CLASS}>How operational improvements drive returns</p>
           <div className="space-y-8">
             <p className={PROSE_CLASS}>
-              We focus on product companies that scale—not pure services. Services are stable but tend to scale less well. Example: a Nordic industrial products company. At entry: equity SEK 100m, debt SEK 30m (enterprise value SEK 130m). Revenue and margin had clear upside from pricing, operations and cost.
+              Example: a Nordic industrial products company. Entry: equity SEK 100m, debt SEK 30m (EV SEK 130m). Clear upside from pricing, operations and cost.
             </p>
             <div className="max-w-2xl space-y-4">
               <p className={LABEL_CLASS}>Value creation over 24 months</p>
@@ -652,22 +544,9 @@ export function Investor2LongFormNivo() {
               </div>
             </div>
             <p className={PUNCH_CLASS}>
-              Operational improvements compound into equity value and cash flow. We reinvest in the business and compound over time—we are compounders, not exit-driven.
+              Operational improvements compound into equity value; we reinvest and compound over time.
             </p>
           </div>
-        </div>
-        </div>
-      </section>
-
-      {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full" style={{ backgroundColor: tokens.bg }}>
-        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <img
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80"
-            alt="Minimal workspace"
-            className="w-full h-full object-cover opacity-90"
-          />
         </div>
         </div>
       </section>
@@ -762,11 +641,6 @@ export function Investor2LongFormNivo() {
               Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon with the ambition to become a listed entity within 10 years. Capital is deployed into Nordic SMEs and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. All material investments are subject to investment committee approval; the committee includes independent members and meets for quarterly reviews. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
             </p>
 
-            <div className="pt-6 border-t border-profile-divider">
-              <p className={LABEL_OLIVE_CLASS + " mb-2"}>Alignment of interest</p>
-              <p className="text-[14px] sm:text-[15px] text-profile-fg leading-relaxed">We use a classic Swedish A/B share structure. A-shares (voting-strong) are held by Founders and Founding Investors and are entitled to 20% of dividends and excess returns; A-shares also have a catch-up on 20% of the B-shares’ return threshold. B-shares are entitled to 80% of dividends and excess returns and include a 1x liquidation preference and a 20% return threshold (adjusted for distributed capital). Shared incentives: focus on better deals, not on higher AUM.</p>
-            </div>
-
             <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
               <h3 className={H3_CLASS}>Corporate and investment structure</h3>
               <p className="text-sm mb-4" style={{ color: tokens.text }}>Evergreen Swedish AB structure. Deal-by-deal financing.</p>
@@ -816,26 +690,12 @@ export function Investor2LongFormNivo() {
                 </div>
                 {/* Right: Financing model text */}
                 <div>
-                  <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model</p>
+                  <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model & share classes</p>
                   <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
-                    All acquisitions are consolidated under Nivo Group AB. New acquisitions are financed on a deal-by-deal basis through newly formed BidCos. Investors participate through share ownership in the Parent Company (A- and B-shares). There are no capital commitments; participation in future share issues is voluntary, with pre-emptive rights. Nivo’s strategy focuses on long-term ownership of stable Nordic SMEs within an evergreen structure. In the event of additional capital needs within a portfolio company, capital may be provided either through retained earnings at the Parent level or through new share issues. With each new acquisition, the portfolio NAV is revalued, allowing early investors to benefit from value uplift prior to new capital being introduced.
+                    All acquisitions are consolidated under Nivo Group AB and financed deal-by-deal through BidCos. No capital commitments; participation in future issues is voluntary, with pre-emptive rights. A-shares (Founders & Founding Investors): voting-strong, 20% of dividends and excess returns, catch-up on B-shares threshold. B-shares: 80% of dividends and excess returns, 1x liquidation preference, 20% return threshold. Each exit triggers distribution per these rights. Portfolio NAV is revalued with each acquisition, rewarding early capital.
                   </p>
                 </div>
               </div>
-            </div>
-
-            <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
-              <h3 className={H3_CLASS}>Share classes (classic Swedish A/B)</h3>
-              <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-4">
-                <strong className="text-profile-fg">A-shares</strong> are voting-strong shares held by Founders and Founding Investors, entitled to 20% of dividends and excess returns. A-shares have a catch-up on 20% of the B-shares’ return threshold. <strong className="text-profile-fg">B-shares</strong> are held by Founding Investors and other investors, entitled to 80% of dividends and excess returns. B-shares include a 1x liquidation preference (priority to recover invested capital) and a 20% return threshold, with adjustments for distributed capital (e.g. dividends). Each divestment or exit triggers a distribution according to these rights.
-              </p>
-            </div>
-
-            <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
-              <h3 className={H3_CLASS}>Financing and rewards for early capital</h3>
-              <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-4">
-                New acquisitions are financed on a <strong className="text-profile-fg">deal-by-deal</strong> basis. Investors commit only to their initial investment; participation in future new issues is welcomed (with pre-emptive rights) but not obligatory. In the event of additional capital needs in a portfolio company, funding is provided either from Nivo Group (e.g. dividends from other portfolio companies) or through new issues in which investors may voluntarily participate. With each new acquisition, the existing portfolio NAV is re-valued, providing value uplift for early investors before new capital is committed. This structure rewards early capital injection.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
@@ -887,9 +747,9 @@ export function Investor2LongFormNivo() {
             </div>
 
             <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
-              <h3 className={H3_CLASS}>Governance — portfolio companies</h3>
+              <h3 className={H3_CLASS}>Governance</h3>
               <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
-                We typically take majority control (51–100%) with operational oversight at board level and incentives tied to ROIC and cash flow. Decision rights are clear: the board retains strategy, capital allocation, and M&A; management runs day-to-day operations and hiring within defined thresholds. Reporting is monthly (financials, KPI, cash flow), quarterly (board, strategy, investor updates), and annual (audit, valuations, planning). Shareholders receive transparent updates and annual meetings. Documentation follows sound corporate practice with an independent administrator and auditor. Disciplined governance protects capital and alignment.
+                Majority control (51–100%) with board oversight; incentives tied to ROIC and cash flow. Board retains strategy, capital allocation, M&A; management runs operations within thresholds. Monthly financials, quarterly investor updates, annual audit. Independent administrator and auditor.
               </p>
             </div>
 
@@ -899,9 +759,9 @@ export function Investor2LongFormNivo() {
           </div>
 
           <div className="pt-8 border-t" style={{ borderColor: tokens.border }}>
-            <h3 className={H3_CLASS}>Exit strategy and value drivers</h3>
+            <h3 className={H3_CLASS}>Exit strategy</h3>
             <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
-              Primary exit route is strategic sale to trade or corporate buyers. Secondary buyout to larger PE or growth equity is a viable alternative. Recapitalisation (dividend recap while retaining control) may be used where appropriate. Value creation follows a clear timeline: in years 1–2 we focus on margin expansion of 200–300 bps; years 3–4 on cash conversion and debt reduction; years 5–6 on sustaining ROIC at 20%+ and strategic positioning; year 7+ on exit or recap depending on market and portfolio readiness.
+              Primary exit: strategic sale to trade or corporate buyers. Secondary buyout or recap where appropriate. Years 1–2: margin expansion; 3–4: cash conversion and debt reduction; 5–6: ROIC 20%+ and strategic positioning; 7+: exit or recap.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
               {[
@@ -951,16 +811,9 @@ export function Investor2LongFormNivo() {
                 <p className="text-[15px] text-profile-fg">Retain management, 12–24 month transition, process documentation.</p>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl">
-              <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-                <p className={LABEL_CLASS}>Concentration</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>3–4 companies implies meaningful impact per holding. Mitigated by screening, sector diversity, and deep operational involvement.</p>
-              </div>
-              <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-                <p className={LABEL_CLASS}>Liquidity</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>SME exits can be illiquid. We build for strategic buyers, maintain flexibility on timing, and focus on ROIC to justify valuation.</p>
-              </div>
-            </div>
+            <p className="text-[15px] text-profile-fg max-w-2xl">
+              Concentration (3–4 companies) and liquidity (SME exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
+            </p>
             <p className={PUNCH_CLASS}>
               Risks are managed through discipline, transparency, and operational excellence.
             </p>
