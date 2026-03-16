@@ -1,0 +1,54 @@
+import { CRM_SCHEMA } from './types.js'
+import { InteractionsService } from './interactions.service.js'
+
+export class TrackingService {
+  constructor(private readonly supabase: any, private readonly interactionsService: InteractionsService) {}
+
+  async trackOpen(trackingId: string, context: Record<string, string | undefined>) {
+    return this.track('open', trackingId, context)
+  }
+
+  async trackClick(trackingId: string, context: Record<string, string | undefined>) {
+    return this.track('click', trackingId, context)
+  }
+
+  async track(type: 'open' | 'click', trackingId: string, context: Record<string, any>) {
+    const { data: email } = await this.supabase
+      .schema(CRM_SCHEMA)
+      .from('emails')
+      .select('id, deal_id, contact_id')
+      .eq('tracking_id', trackingId)
+      .maybeSingle()
+
+    const eventPayload = {
+      tracking_id: trackingId,
+      email_id: email?.id ?? null,
+      event_type: type,
+      user_agent: context.user_agent ?? null,
+      ip_address: context.ip_address ?? null,
+      referer: context.referer ?? null,
+      redirect_url: context.redirect_url ?? null,
+      metadata: context.metadata ?? null,
+    }
+
+    await this.supabase.schema(CRM_SCHEMA).from('tracking_events').insert(eventPayload)
+
+    if (!email?.id || !email?.deal_id) return
+    const { count } = await this.supabase
+      .schema(CRM_SCHEMA)
+      .from('tracking_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('tracking_id', trackingId)
+      .eq('event_type', type)
+
+    if (count === 1) {
+      await this.interactionsService.create({
+        deal_id: email.deal_id,
+        contact_id: email.contact_id,
+        email_id: email.id,
+        type: type === 'open' ? 'email_opened' : 'email_clicked',
+        summary: type === 'open' ? 'Email opened' : 'Tracked link clicked',
+      })
+    }
+  }
+}

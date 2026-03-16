@@ -33,12 +33,13 @@ import {
   createAssumptions,
   deleteAssumptions
 } from './valuation/assumptions.js'
-import { 
+import {
   getLLMSuggestions, 
   convertSuggestionsToAssumptions,
   validateSuggestions,
   CompanyContext 
 } from './valuation/llm-advisor.js'
+import { registerCrmRoutes } from './routes/crm.routes.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -60,6 +61,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001
 
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
+registerCrmRoutes(app, getSupabase)
 
 // FastAPI backend URL for proxying lists, views, universe, etc.
 const FASTAPI_BACKEND = process.env.FASTAPI_BACKEND_URL || process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
