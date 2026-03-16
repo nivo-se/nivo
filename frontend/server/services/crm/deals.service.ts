@@ -4,16 +4,22 @@ export class DealsService {
   constructor(private readonly supabase: any) {}
 
   async getOrCreateByCompany(companyId: string) {
-    const query = this.supabase.schema(CRM_SCHEMA).from('deals')
-    const { data: existing } = await query.select('*').eq('company_id', companyId).maybeSingle()
-    if (existing) return existing
-
-    const { data, error } = await query
+    const table = this.supabase.schema(CRM_SCHEMA).from('deals')
+    const { data: inserted, error: insertError } = await table
       .insert({ company_id: companyId, status: 'target_identified' satisfies DealStatus })
       .select('*')
       .single()
-    if (error) throw error
-    return data
+    if (!insertError) return inserted
+    // Unique constraint violation: row exists, fetch it (atomic for concurrent requests)
+    if (insertError.code === '23505') {
+      const { data: existing, error: selectError } = await table
+        .select('*')
+        .eq('company_id', companyId)
+        .maybeSingle()
+      if (selectError) throw selectError
+      if (existing) return existing
+    }
+    throw insertError
   }
 
   async updateStatus(dealId: string, status: DealStatus) {
