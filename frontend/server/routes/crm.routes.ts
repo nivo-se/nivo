@@ -1,5 +1,5 @@
 import type { Express, Request, Response, NextFunction } from 'express'
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { CrmDb } from '../services/crm/db-interface.js'
 import { addNoteSchema, approveEmailSchema, createContactSchema, enrollSequenceSchema, fromCompanySchema, generateEmailSchema, updateContactSchema, updateStatusSchema } from '../services/crm/validation.js'
 import { DealsService } from '../services/crm/deals.service.js'
 import { ContactsService } from '../services/crm/contacts.service.js'
@@ -9,13 +9,12 @@ import { SequencesService } from '../services/crm/sequences.service.js'
 import { GmailService } from '../services/gmail/gmail.service.js'
 import { EmailsService } from '../services/crm/emails.service.js'
 import { OutreachEmailService } from '../services/ai/outreach-email.service.js'
-import { CRM_SCHEMA } from '../services/crm/types.js'
 import { CRMOverviewService } from '../services/crm/overview.service.js'
 
 const PIXEL_BUFFER = Buffer.from('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==', 'base64')
 
-function requireSupabase(res: Response, supabase: SupabaseClient | null): supabase is SupabaseClient {
-  if (!supabase) {
+function requireCrmDb(res: Response, db: CrmDb | null): db is CrmDb {
+  if (!db) {
     res.status(500).json({ success: false, error: 'Database client unavailable' })
     return false
   }
@@ -40,42 +39,51 @@ function asyncHandler(
   }
 }
 
-async function loadOutreachContext(supabase: SupabaseClient, companyId: string) {
+async function loadOutreachContext(db: CrmDb, companyId: string) {
   const [company, profile, strategy, valueCreation] = await Promise.all([
-    supabase.schema(CRM_SCHEMA).from('companies').select('id,name,industry,website,headquarters').eq('id', companyId).single(),
-    supabase.schema(CRM_SCHEMA).from('company_profiles').select('summary,business_model').eq('company_id', companyId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-    supabase.schema(CRM_SCHEMA).from('strategy').select('investment_thesis,acquisition_rationale').eq('company_id', companyId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-    supabase.schema(CRM_SCHEMA).from('value_creation').select('initiatives').eq('company_id', companyId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    db.getCompany(companyId),
+    db.getCompanyProfile(companyId),
+    db.getStrategy(companyId),
+    db.getValueCreation(companyId),
   ])
 
   return {
-    company: company.data,
-    profile: profile.data,
-    strategy: strategy.data,
-    valueCreation: valueCreation.data,
+    company,
+    profile,
+    strategy,
+    valueCreation,
   }
 }
 
-export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClient | null) {
+export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
+  app.get('/crm/companies', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const search = typeof req.query.search === 'string' ? req.query.search : undefined
+    const limit = typeof req.query.limit === 'string' ? Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50)) : 50
+    const data = await db.listCompanies(search, limit)
+    return res.json({ success: true, data })
+  }))
+
   app.post('/crm/deals/from-company', asyncHandler(async (req, res) => {
     const parsed = fromCompanySchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
 
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const dealsService = new DealsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const dealsService = new DealsService(db)
     const deal = await dealsService.getOrCreateByCompany(parsed.data.company_id)
     return res.json({ success: true, data: deal })
   }))
 
   app.get('/crm/company/:companyId', asyncHandler(async (req, res) => {
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const interactions = new InteractionsService(supabase)
-    const deals = new DealsService(supabase)
-    const contacts = new ContactsService(supabase)
-    const emails = new EmailsService(supabase, interactions, new GmailService(), deals)
-    const overview = new CRMOverviewService(supabase, deals, contacts, emails, interactions)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const interactions = new InteractionsService(db)
+    const deals = new DealsService(db)
+    const contacts = new ContactsService(db)
+    const emails = new EmailsService(db, interactions, new GmailService(), deals)
+    const overview = new CRMOverviewService(db, deals, contacts, emails, interactions)
     const payload = await overview.companyOverview(req.params.companyId)
     return res.json({ success: true, data: payload })
   }))
@@ -83,9 +91,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/contacts', asyncHandler(async (req, res) => {
     const parsed = createContactSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const service = new ContactsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const service = new ContactsService(db)
     const data = await service.create(parsed.data)
     return res.json({ success: true, data })
   }))
@@ -93,9 +101,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.patch('/crm/contacts/:contactId', asyncHandler(async (req, res) => {
     const parsed = updateContactSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const service = new ContactsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const service = new ContactsService(db)
     const data = await service.update(req.params.contactId, parsed.data)
     return res.json({ success: true, data })
   }))
@@ -103,20 +111,20 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/emails/generate', asyncHandler(async (req, res) => {
     const parsed = generateEmailSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
 
-    const deals = new DealsService(supabase)
-    const interactions = new InteractionsService(supabase)
-    const emails = new EmailsService(supabase, interactions, new GmailService(), deals)
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const emails = new EmailsService(db, interactions, new GmailService(), deals)
     const aiService = new OutreachEmailService()
 
     const deal = await deals.getOrCreateByCompany(parsed.data.company_id)
-    const { data: contact, error: contactError } = await supabase.schema(CRM_SCHEMA).from('contacts').select('*').eq('id', parsed.data.contact_id).single()
-    if (contactError || !contact) return res.status(404).json({ success: false, error: 'Contact not found' })
+    const contact = await db.getContactById(parsed.data.contact_id)
+    if (!contact) return res.status(404).json({ success: false, error: 'Contact not found' })
     if (contact.company_id !== parsed.data.company_id) return res.status(400).json({ success: false, error: 'Contact does not belong to the specified company' })
 
-    const context = await loadOutreachContext(supabase, parsed.data.company_id)
+    const context = await loadOutreachContext(db, parsed.data.company_id)
 
     const draft = await aiService.generateDraft({
       companyName: context.company?.name,
@@ -146,23 +154,23 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/emails/:emailId/approve', asyncHandler(async (req, res) => {
     const parsed = approveEmailSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
 
-    const deals = new DealsService(supabase)
-    const interactions = new InteractionsService(supabase)
-    const service = new EmailsService(supabase, interactions, new GmailService(), deals)
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const service = new EmailsService(db, interactions, new GmailService(), deals)
     const data = await service.approve(req.params.emailId, parsed.data)
     return res.json({ success: true, data })
   }))
 
   app.post('/crm/emails/:emailId/send', asyncHandler(async (req, res) => {
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
 
-    const deals = new DealsService(supabase)
-    const interactions = new InteractionsService(supabase)
-    const service = new EmailsService(supabase, interactions, new GmailService(), deals)
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const service = new EmailsService(db, interactions, new GmailService(), deals)
     const data = await service.send(req.params.emailId)
     return res.json({ success: true, data })
   }))
@@ -170,9 +178,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/deals/:dealId/notes', asyncHandler(async (req, res) => {
     const parsed = addNoteSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const interactions = new InteractionsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const interactions = new InteractionsService(db)
     const data = await interactions.create({
       deal_id: req.params.dealId,
       type: 'note_added',
@@ -185,10 +193,10 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/deals/:dealId/status', asyncHandler(async (req, res) => {
     const parsed = updateStatusSchema.safeParse(req.body)
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const deals = new DealsService(supabase)
-    const interactions = new InteractionsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
     const updated = await deals.updateStatus(req.params.dealId, parsed.data.status as any)
     await interactions.create({
       deal_id: req.params.dealId,
@@ -200,9 +208,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   }))
 
   app.get('/crm/deals/:dealId/timeline', asyncHandler(async (req, res) => {
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const interactions = new InteractionsService(supabase)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const interactions = new InteractionsService(db)
     const data = await interactions.timeline(req.params.dealId)
     return res.json({ success: true, data })
   }))
@@ -210,10 +218,10 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   app.post('/crm/deals/:dealId/enroll-sequence', asyncHandler(async (req, res) => {
     const parsed = enrollSequenceSchema.safeParse(req.body || {})
     if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const interactions = new InteractionsService(supabase)
-    const sequences = new SequencesService(supabase, interactions)
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const interactions = new InteractionsService(db)
+    const sequences = new SequencesService(db, interactions)
     const sequenceId = parsed.data.sequence_id || (await sequences.getDefaultSequenceId())
     if (!sequenceId) return res.status(400).json({ success: false, error: 'No sequence available' })
     const data = await sequences.enrollDeal(req.params.dealId, sequenceId)
@@ -221,9 +229,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
   }))
 
   app.get('/track/open/:trackingId', asyncHandler(async (req, res) => {
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const tracking = new TrackingService(supabase, new InteractionsService(supabase))
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const tracking = new TrackingService(db, new InteractionsService(db))
 
     await tracking.trackOpen(req.params.trackingId, {
       user_agent: req.get('user-agent'),
@@ -240,9 +248,9 @@ export function registerCrmRoutes(app: Express, getSupabase: () => SupabaseClien
     const redirectUrl = typeof req.query.url === 'string' ? req.query.url : undefined
     if (!isSafeRedirect(redirectUrl)) return res.status(400).send('Invalid redirect URL')
 
-    const supabase = getSupabase()
-    if (!requireSupabase(res, supabase)) return
-    const tracking = new TrackingService(supabase, new InteractionsService(supabase))
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const tracking = new TrackingService(db, new InteractionsService(db))
 
     await tracking.trackClick(req.params.trackingId, {
       user_agent: req.get('user-agent'),

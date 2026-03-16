@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search, Building2, LayoutList } from "lucide-react";
+import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search, Building2, LayoutList, Briefcase } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const navItems: NavItem[] = [
   { path: "/deep-research/companies", label: "Deep Research", icon: Search },
   { path: "/deep-research/companies", label: "Companies", icon: Building2, indent: true },
   { path: "/deep-research/runs", label: "Runs", icon: LayoutList, indent: true, adminOnly: true },
+  { path: "/crm", label: "CRM", icon: Briefcase },
 ];
 
 export default function AppLayout() {

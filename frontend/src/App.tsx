@@ -59,6 +59,7 @@ import ReportVersionsPage from "./pages/deep-research/ReportVersionsPage";
 import VerificationPanel from "./pages/deep-research/VerificationPanel";
 import CompetitorEditorPage from "./pages/deep-research/CompetitorEditorPage";
 import AssumptionOverridePage from "./pages/deep-research/AssumptionOverridePage";
+import CrmPage from "./pages/crm/CrmPage";
 
 const queryClient = new QueryClient();
 
@@ -176,6 +177,8 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
+              <Route path="crm" element={<CrmPage />} />
+              <Route path="crm/company/:companyId" element={<CrmPage />} />
               <Route path="deep-research/companies" element={<CompaniesPage />} />
               <Route path="deep-research/runs" element={<RunListPage />} />
               <Route path="deep-research/runs/:runId" element={<RunStatusPage />} />

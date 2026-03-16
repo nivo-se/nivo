@@ -1,4 +1,4 @@
-import { CRM_SCHEMA } from './types.js'
+import type { CrmDb } from './db-interface.js'
 import { ContactsService } from './contacts.service.js'
 import { EmailsService } from './emails.service.js'
 import { InteractionsService } from './interactions.service.js'
@@ -6,7 +6,7 @@ import { DealsService } from './deals.service.js'
 
 export class CRMOverviewService {
   constructor(
-    private readonly supabase: any,
+    private readonly db: CrmDb,
     private readonly dealsService: DealsService,
     private readonly contactsService: ContactsService,
     private readonly emailsService: EmailsService,
@@ -14,31 +14,19 @@ export class CRMOverviewService {
   ) {}
 
   async companyOverview(companyId: string) {
-    const { data: company } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('companies')
-      .select('id,name,industry,website,headquarters')
-      .eq('id', companyId)
-      .single()
-
+    const company = await this.db.getCompany(companyId)
     const deal = await this.dealsService.getOrCreateByCompany(companyId)
     const contacts = await this.contactsService.listByCompany(companyId)
     const latestOutboundEmail = await this.emailsService.latestOutboundByDeal(deal.id)
     const timeline = await this.interactionsService.timeline(deal.id)
 
-    const { count: opens } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('tracking_events')
-      .select('id', { head: true, count: 'exact' })
-      .eq('event_type', 'open')
-      .in('email_id', (timeline.filter((t: any) => t.email_id).map((t: any) => t.email_id) || ['00000000-0000-0000-0000-000000000000']))
-
-    const { count: clicks } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('tracking_events')
-      .select('id', { head: true, count: 'exact' })
-      .eq('event_type', 'click')
-      .in('email_id', (timeline.filter((t: any) => t.email_id).map((t: any) => t.email_id) || ['00000000-0000-0000-0000-000000000000']))
+    const emailIds = timeline.filter((t: any) => t.email_id).map((t: any) => t.email_id)
+    const opens = emailIds.length
+      ? await this.db.countTrackingEventsByEmailIds(emailIds, 'open')
+      : 0
+    const clicks = emailIds.length
+      ? await this.db.countTrackingEventsByEmailIds(emailIds, 'click')
+      : 0
 
     return {
       company,
@@ -51,8 +39,8 @@ export class CRMOverviewService {
         status: deal.status,
       },
       engagement_summary: {
-        open_count: opens || 0,
-        click_count: clicks || 0,
+        open_count: opens,
+        click_count: clicks,
         interaction_count: timeline.length,
       },
     }

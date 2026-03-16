@@ -1,8 +1,8 @@
-import { CRM_SCHEMA } from './types.js'
-import { InteractionsService } from './interactions.service.js'
+import type { CrmDb } from './db-interface.js'
+import type { InteractionsService } from './interactions.service.js'
 
 export class TrackingService {
-  constructor(private readonly supabase: any, private readonly interactionsService: InteractionsService) {}
+  constructor(private readonly db: CrmDb, private readonly interactionsService: InteractionsService) {}
 
   async trackOpen(trackingId: string, context: Record<string, string | undefined>) {
     return this.track('open', trackingId, context)
@@ -13,14 +13,9 @@ export class TrackingService {
   }
 
   async track(type: 'open' | 'click', trackingId: string, context: Record<string, any>) {
-    const { data: email } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .select('id, deal_id, contact_id')
-      .eq('tracking_id', trackingId)
-      .maybeSingle()
+    const email = await this.db.getEmailByTrackingId(trackingId)
 
-    const eventPayload = {
+    await this.db.insertTrackingEvent({
       tracking_id: trackingId,
       email_id: email?.id ?? null,
       event_type: type,
@@ -29,18 +24,10 @@ export class TrackingService {
       referer: context.referer ?? null,
       redirect_url: context.redirect_url ?? null,
       metadata: context.metadata ?? null,
-    }
-
-    await this.supabase.schema(CRM_SCHEMA).from('tracking_events').insert(eventPayload)
+    })
 
     if (!email?.id || !email?.deal_id) return
-    const { count } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('tracking_events')
-      .select('id', { count: 'exact', head: true })
-      .eq('tracking_id', trackingId)
-      .eq('event_type', type)
-
+    const count = await this.db.countTrackingEvents(trackingId, type)
     if (count === 1) {
       await this.interactionsService.create({
         deal_id: email.deal_id,

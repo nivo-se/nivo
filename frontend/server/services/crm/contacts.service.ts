@@ -1,46 +1,17 @@
-import { CRM_SCHEMA } from './types.js'
+import type { CrmDb } from './db-interface.js'
 
 export class ContactsService {
-  constructor(private readonly supabase: any) {}
+  constructor(private readonly db: CrmDb) {}
 
   async listByCompany(companyId: string) {
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('contacts')
-      .select('*')
-      .eq('company_id', companyId)
-      .order('is_primary', { ascending: false })
-      .order('created_at', { ascending: false })
-    if (error) throw error
-    return data || []
+    return this.db.listContactsByCompany(companyId)
   }
 
   async create(payload: Record<string, any>) {
-    if (payload.is_primary) {
-      await this.clearPrimary(payload.company_id)
-    }
-    const { data, error } = await this.supabase.schema(CRM_SCHEMA).from('contacts').insert(payload).select('*').single()
-    if (error) throw error
-    return data
+    return this.db.createContact(payload)
   }
 
   async update(contactId: string, payload: Record<string, any>) {
-    if (payload.is_primary) {
-      const { data: contact } = await this.supabase.schema(CRM_SCHEMA).from('contacts').select('company_id').eq('id', contactId).single()
-      if (contact?.company_id) await this.clearPrimary(contact.company_id)
-    }
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('contacts')
-      .update(payload)
-      .eq('id', contactId)
-      .select('*')
-      .single()
-    if (error) throw error
-    return data
-  }
-
-  private async clearPrimary(companyId: string) {
-    await this.supabase.schema(CRM_SCHEMA).from('contacts').update({ is_primary: false }).eq('company_id', companyId).eq('is_primary', true)
+    return this.db.updateContact(contactId, payload)
   }
 }

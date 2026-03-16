@@ -1,12 +1,12 @@
 import { randomUUID } from 'crypto'
-import { CRM_SCHEMA } from './types.js'
-import { InteractionsService } from './interactions.service.js'
-import { GmailService } from '../gmail/gmail.service.js'
-import { DealsService } from './deals.service.js'
+import type { CrmDb } from './db-interface.js'
+import type { InteractionsService } from './interactions.service.js'
+import type { GmailService } from '../gmail/gmail.service.js'
+import type { DealsService } from './deals.service.js'
 
 export class EmailsService {
   constructor(
-    private readonly supabase: any,
+    private readonly db: CrmDb,
     private readonly interactions: InteractionsService,
     private readonly gmailService: GmailService,
     private readonly dealsService: DealsService,
@@ -34,18 +34,13 @@ export class EmailsService {
   }) {
     const trackingId = randomUUID()
     const instrumentedHtml = this.buildInstrumentedHtml(input.body_html, trackingId)
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .insert({
-        ...input,
-        body_html: instrumentedHtml,
-        tracking_id: trackingId,
-        status: 'draft',
-      })
-      .select('*')
-      .single()
-    if (error) throw error
+    const data = await this.db.insertEmail({
+      ...input,
+      body_html: instrumentedHtml,
+      tracking_id: trackingId,
+      status: 'draft',
+      direction: 'outbound',
+    })
 
     await this.interactions.create({
       deal_id: input.deal_id,
@@ -59,23 +54,19 @@ export class EmailsService {
   }
 
   async approve(emailId: string, payload: Record<string, any>) {
-    const body_html = payload.body_html ? this.buildInstrumentedHtml(payload.body_html, (await this.findById(emailId)).tracking_id) : undefined
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .update({ ...payload, body_html, status: 'approved' })
-      .eq('id', emailId)
-      .select('*')
-      .single()
-    if (error) throw error
+    const email = await this.db.getEmailById(emailId)
+    const body_html = payload.body_html
+      ? this.buildInstrumentedHtml(payload.body_html, email.tracking_id)
+      : undefined
+    const data = await this.db.updateEmail(emailId, { ...payload, body_html, status: 'approved' })
     return data
   }
 
   async send(emailId: string) {
-    const email = await this.findById(emailId)
+    const email = await this.db.getEmailById(emailId)
     if (email.status !== 'approved') throw new Error('Email must be approved before send')
 
-    const { data: contact } = await this.supabase.schema(CRM_SCHEMA).from('contacts').select('*').eq('id', email.contact_id).single()
+    const contact = await this.db.getContactById(email.contact_id)
     const sender = process.env.GOOGLE_WORKSPACE_SENDER
     if (!sender) throw new Error('GOOGLE_WORKSPACE_SENDER is not configured')
 
@@ -87,19 +78,12 @@ export class EmailsService {
       bodyHtml: email.body_html,
     })
 
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .update({
-        status: 'sent',
-        gmail_message_id: gmail.messageId,
-        gmail_thread_id: gmail.threadId,
-        sent_at: new Date().toISOString(),
-      })
-      .eq('id', emailId)
-      .select('*')
-      .single()
-    if (error) throw error
+    const data = await this.db.updateEmail(emailId, {
+      status: 'sent',
+      gmail_message_id: gmail.messageId,
+      gmail_thread_id: gmail.threadId,
+      sent_at: new Date().toISOString(),
+    })
 
     await this.interactions.create({
       deal_id: email.deal_id,
@@ -109,12 +93,7 @@ export class EmailsService {
       summary: `Sent email: ${email.subject}`,
     })
 
-    const { count } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .select('id', { count: 'exact', head: true })
-      .eq('deal_id', email.deal_id)
-      .eq('status', 'sent')
+    const count = await this.db.countSentEmailsByDeal(email.deal_id)
     if (count === 1) await this.dealsService.updateStatus(email.deal_id, 'outreach_sent')
     await this.dealsService.touchLastContacted(email.deal_id)
 
@@ -122,22 +101,10 @@ export class EmailsService {
   }
 
   async latestOutboundByDeal(dealId: string) {
-    const { data, error } = await this.supabase
-      .schema(CRM_SCHEMA)
-      .from('emails')
-      .select('*')
-      .eq('deal_id', dealId)
-      .eq('direction', 'outbound')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-    if (error) throw error
-    return data
+    return this.db.getLatestOutboundEmailByDeal(dealId)
   }
 
   async findById(emailId: string) {
-    const { data, error } = await this.supabase.schema(CRM_SCHEMA).from('emails').select('*').eq('id', emailId).single()
-    if (error) throw error
-    return data
+    return this.db.getEmailById(emailId)
   }
 }
