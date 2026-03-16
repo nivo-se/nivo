@@ -109,7 +109,7 @@ See also: [docs/FINANCIALS_SOURCE_OF_TRUTH.md](FINANCIALS_SOURCE_OF_TRUTH.md).
 Prints counts and samples for the `financials` table. Informational only; exit code always 0.
 
 ```bash
-python scripts/audit_financial_coverage.py
+python3 scripts/audit_financial_coverage.py
 ```
 
 Prints:
@@ -151,6 +151,6 @@ When opening an issue, include:
 3. `./scripts/smoke_api_endpoints.sh` exits `0`.
 4. `python3 scripts/smoke_frontend_services.py` exits `0`.
 5. `./scripts/smoke_financials_endpoint.sh` exits `0` (financials endpoint no ambiguous error).
-6. Optional: `python scripts/audit_financial_coverage.py` to inspect financials/account_codes coverage.
+6. Optional: `python3 scripts/audit_financial_coverage.py` to inspect financials/account_codes coverage.
 7. Auth flow validated in target environment (no accidental public/protected mismatch).
 8. `sourceViewId` update contract validated in an authenticated run.

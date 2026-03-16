@@ -11,6 +11,8 @@
     "install:frontend": "cd frontend && npm install",
     "install:backend": "cd backend && pip install -r requirements.txt",
     "setup": "npm run install:frontend && npm run install:backend",
+    "setup:fresh": "./scripts/setup_fresh_mac.sh",
+    "setup:postgres": "./scripts/setup_local_postgres.sh",
     "deploy": "vercel --prod"
   },
   "workspaces": [
@@ -28,5 +30,8 @@
   "overrides": {
     "path-to-regexp": "^6.2.3",
     "undici": "^6.22.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
   }
 }

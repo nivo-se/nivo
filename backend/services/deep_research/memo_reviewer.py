@@ -44,9 +44,23 @@ def run_memo_review(
         recommended.append("Re-run failed stages or accept limited analysis")
 
     required_sections = ("executive_summary", "company")
-    sections = report_sections.get("sections", {})
+    # Support both formats: dict with "sections" key, or list of section dicts
+    if isinstance(report_sections, list):
+        sections_by_key = {
+            s.get("section_key"): s
+            for s in report_sections
+            if isinstance(s, dict) and s.get("section_key")
+        }
+    elif isinstance(report_sections, dict):
+        sections_by_key = report_sections.get("sections", {}) or {}
+    else:
+        sections_by_key = {}
     for key in required_sections:
-        if key not in sections or not sections.get(key):
+        sec = sections_by_key.get(key) if isinstance(sections_by_key, dict) else None
+        has_content = (
+            isinstance(sec, dict) and (sec.get("content_md") or sec.get("content"))
+        ) or (sec and not isinstance(sec, dict))
+        if not has_content:
             issues.append(f"Report section '{key}' is empty")
             recommended.append(f"Populate {key} section")
 

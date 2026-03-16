@@ -36,19 +36,19 @@ const STATUS_CONFIG: Record<
   AnalysisStatus['status'],
   { label: string; className: string; icon: typeof CheckCircle }
 > = {
-  pending: { label: 'Not started', className: 'bg-muted text-muted-foreground', icon: Clock },
+  pending: { label: 'Not started', className: 'bg-profile-bg-subtle text-profile-fg-muted border-profile-divider', icon: Clock },
   running: {
     label: 'Running',
-    className: 'bg-amber-500/15 text-amber-600 border-amber-500/30',
+    className: 'bg-profile-accent-muted/80 text-profile-accent-secondary border-profile-sage-muted',
     icon: Loader2,
   },
   completed: {
     label: 'Complete',
-    className: 'bg-green-500/15 text-green-600 border-green-500/30',
+    className: 'bg-profile-sage-muted text-profile-accent border-profile-divider',
     icon: CheckCircle,
   },
-  failed: { label: 'Blocked', className: 'bg-red-500/15 text-red-600 border-red-500/30', icon: XCircle },
-  cancelled: { label: 'Cancelled', className: 'bg-muted text-muted-foreground', icon: XCircle },
+  failed: { label: 'Blocked', className: 'bg-red-500/10 text-red-600 border-red-500/20', icon: XCircle },
+  cancelled: { label: 'Cancelled', className: 'bg-profile-bg-subtle text-profile-fg-muted border-profile-divider', icon: XCircle },
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -181,48 +181,52 @@ export default function DeepResearchHomePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Deep Research</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Evidence-first research and investment analysis. Launch reports, monitor progress, and access completed analysis.
-          </p>
+    <div className="min-h-[60vh] bg-profile-bg-subtle">
+      <div className="max-w-3xl mx-auto p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-profile-fg">Deep Research</h1>
+            <p className="text-sm text-profile-fg-muted mt-1">
+              Evidence-first research and investment analysis. Launch reports, monitor progress, and access completed analysis.
+            </p>
+          </div>
+          <Button
+            onClick={() => setWizardOpen(true)}
+            className="bg-profile-accent hover:bg-profile-accent-secondary text-white border-0"
+          >
+            <Plus className="h-4 w-4" />
+            New report
+          </Button>
         </div>
-        <Button variant="primary" onClick={() => setWizardOpen(true)}>
-          <Plus className="h-4 w-4" />
-          New report
-        </Button>
-      </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Input
-          placeholder="Search by company name or org nr…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="sm:max-w-xs"
-        />
-        <div className="flex flex-wrap gap-2">
-          {statusOptions.map((opt) => (
-            <button
-              key={opt.value ?? 'all'}
-              type="button"
-              onClick={() => setStatusFilter(opt.value)}
-              className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors ${
-                statusFilter === opt.value
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Input
+            placeholder="Search by company name or org nr…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="sm:max-w-xs border-profile-divider focus:ring-profile-accent"
+          />
+          <div className="flex flex-wrap gap-2">
+            {statusOptions.map((opt) => (
+              <button
+                key={opt.value ?? 'all'}
+                type="button"
+                onClick={() => setStatusFilter(opt.value)}
+                className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                  statusFilter === opt.value
+                    ? 'border-profile-accent bg-profile-accent-muted text-profile-accent'
+                    : 'border-profile-divider text-profile-fg-muted hover:text-profile-fg hover:border-profile-sage-muted'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {filtered.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
+        {filtered.length === 0 && (
+          <Card className="border-profile-divider bg-profile-bg-surface">
+            <CardContent className="py-12 text-center text-profile-fg-muted">
             {merged.length === 0
               ? 'No reports or runs yet. Start an analysis run to generate a report.'
               : 'No matching reports or runs.'}
@@ -244,12 +248,12 @@ export default function DeepResearchHomePage() {
                 : `/deep-research/company/${item.company_id}/report/latest`
 
           return (
-            <Card key={hasRun ? item.run_id : item.company_id!} className="transition-colors hover:border-primary/40">
+            <Card key={hasRun ? item.run_id : item.company_id!} className="transition-colors border-profile-divider bg-profile-bg-surface hover:border-profile-accent/50">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-4">
                   <Link to={linkTarget} className="flex items-center gap-2 min-w-0 group">
-                    <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors truncate">
+                    <Building2 className="h-4 w-4 text-profile-fg-muted shrink-0" />
+                    <CardTitle className="text-base font-semibold text-profile-fg group-hover:text-profile-accent transition-colors truncate">
                       {companyName}
                     </CardTitle>
                   </Link>
@@ -261,13 +265,13 @@ export default function DeepResearchHomePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-3 text-sm text-profile-fg-muted">
                     {item.orgnr && <span>{item.orgnr}</span>}
                     <span>{formatDate(item.created_at)}</span>
                     <span>{humanStage(item.current_stage)}</span>
                   </div>
                   <Link to={linkTarget}>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-profile-divider text-profile-accent hover:bg-profile-accent-muted hover:border-profile-accent">
                       {item.status === 'completed' ? (
                         <>
                           <FileText className="h-3.5 w-3.5 mr-1" />
@@ -288,7 +292,8 @@ export default function DeepResearchHomePage() {
         })}
       </div>
 
-      <NewReportWizard open={wizardOpen} onClose={() => setWizardOpen(false)} onSuccess={() => setWizardOpen(false)} />
+        <NewReportWizard open={wizardOpen} onClose={() => setWizardOpen(false)} onSuccess={() => setWizardOpen(false)} />
+      </div>
     </div>
   )
 }

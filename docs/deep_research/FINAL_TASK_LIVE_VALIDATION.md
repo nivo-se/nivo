@@ -61,7 +61,7 @@ From repo root (with `.env` loaded):
 
 ```bash
 # If you use a bootstrap script that applies migrations:
-python scripts/bootstrap_postgres_schema.py
+python3 scripts/bootstrap_postgres_schema.py
 
 # Or apply manually, e.g.:
 psql "$DATABASE_URL" -f database/migrations/024_deep_research_persistence.sql

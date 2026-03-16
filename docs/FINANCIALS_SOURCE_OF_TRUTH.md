@@ -74,5 +74,5 @@ No extra financial tables exist only in the original DB; the only difference is 
 ## Verification
 
 - **Smoke test:** `./scripts/smoke_financials_endpoint.sh`
-- **Coverage audit:** `python scripts/audit_financial_coverage.py`
+- **Coverage audit:** `python3 scripts/audit_financial_coverage.py`
 - **Account code mapping:** `database/ACCOUNT_CODE_MAPPING_GUIDE.md`, `database/allabolag_account_code_mapping.json`

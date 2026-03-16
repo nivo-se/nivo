@@ -7,8 +7,8 @@ database/local_postgres_schema.sql to create tables, indexes, and views.
 
 Usage:
     cd /path/to/nivo
-    docker compose up -d   # start Postgres first
-    python scripts/bootstrap_postgres_schema.py
+    docker compose -f docker-compose.postgres.yml up -d   # start Postgres first
+    python3 scripts/bootstrap_postgres_schema.py
 
 Requires: psycopg2 (backend/requirements.txt)
 """

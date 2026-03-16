@@ -5,6 +5,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
+# NEVER use these for company research — aggregators, registries, financial platforms.
+# Prefer the company's own website (e.g. texstar.se over krafman.se).
+BLOCKED_DOMAINS = frozenset({
+    "allabolag.se", "krafman.se", "koll.se", "ratsit.se", "merinfo.se",
+    "solidinfo.se", "bolagsverket.se", "verifiera.se", "uc.se",
+    "indeed.com", "linkedin.com", "glassdoor.com", "monster.com",
+    "arbetsformedlingen.se", "jobb.blocket.se", "careerjet.se",
+    "jobbmaskinen.se", "jobbland.se", "stepstone.com", "xing.com",
+})
+
 # Domain sets for classification (plan: company_site, news, database, public_authority, industry_report, marketplace, unknown)
 KNOWN_PUBLIC_AUTHORITY_DOMAINS = frozenset({
     "bolagsverket.se", "scb.se", "skatteverket.se",
@@ -48,6 +58,16 @@ def normalize_domain(url: str) -> str:
         return host.lower()
     except Exception:
         return ""
+
+
+def is_blocked_domain(url: str) -> bool:
+    """True if URL is from a blocked domain (aggregators, registries) — never use for research."""
+    domain = normalize_domain(url)
+    if not domain:
+        return False
+    return domain in BLOCKED_DOMAINS or any(
+        domain == d or domain.endswith(f".{d}") for d in BLOCKED_DOMAINS
+    )
 
 
 def classify_source_type(url: str, company_website: str | None = None) -> str:

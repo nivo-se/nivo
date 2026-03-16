@@ -19,6 +19,7 @@ from backend.models.deep_research_api import (
     AnalysisStartRequest,
     AnalysisStatusData,
     ApiResponse,
+    RunDiagnosticsData,
     RunStageData,
 )
 
@@ -135,51 +136,64 @@ async def get_analysis_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStatusData]
             error_message=status.get("error_message"),
             diagnostics=status.get("diagnostics"),
             report_quality_status=status.get("report_quality_status"),
+            quick_check_suggestion=status.get("quick_check_suggestion"),
+            suggested_action=status.get("suggested_action"),
         )
+    )
+
+
+def _run_to_analysis_status(r: dict) -> AnalysisStatusData:
+    """Map list_runs entry to AnalysisStatusData, including pilot diagnostics when available."""
+    diag = r.get("diagnostics")
+    return AnalysisStatusData(
+        run_id=r["run_id"],
+        company_id=r.get("company_id"),
+        company_name=r.get("company_name"),
+        orgnr=r.get("orgnr"),
+        created_at=r.get("created_at"),
+        status=r["status"],
+        current_stage=r["current_stage"],
+        stages=[
+            RunStageData(
+                stage=s["stage"],
+                status=s["status"],
+                started_at=s.get("started_at"),
+                finished_at=s.get("finished_at"),
+                error_message=s.get("error_message"),
+            )
+            for s in r.get("stages", [])
+        ],
+        error_message=r.get("error_message"),
+        diagnostics=RunDiagnosticsData.model_validate(diag) if diag and isinstance(diag, dict) else None,
+        report_quality_status=r.get("report_quality_status") or (diag.get("report_quality_status") if isinstance(diag, dict) else None),
+        quick_check_suggestion=r.get("quick_check_suggestion"),
+        suggested_action=r.get("suggested_action"),
     )
 
 
 @router.get("/runs", response_model=ApiResponse[list[AnalysisStatusData]])
 async def list_analysis_runs() -> ApiResponse[list[AnalysisStatusData]]:
     runs = orchestrator.list_runs(limit=20)
-    return ok(
-        [
-            AnalysisStatusData(
-                run_id=r["run_id"],
-                company_id=r.get("company_id"),
-                company_name=r.get("company_name"),
-                orgnr=r.get("orgnr"),
-                created_at=r.get("created_at"),
-                status=r["status"],
-                current_stage=r["current_stage"],
-                stages=[
-                    RunStageData(
-                        stage=s["stage"],
-                        status=s["status"],
-                        started_at=s.get("started_at"),
-                        finished_at=s.get("finished_at"),
-                        error_message=s.get("error_message"),
-                    )
-                    for s in r.get("stages", [])
-                ],
-                error_message=r.get("error_message"),
-            )
-            for r in runs
-        ]
-    )
+    return ok([_run_to_analysis_status(r) for r in runs])
 
 
 @router.post("/runs/{run_id}/restart", response_model=ApiResponse[AnalysisStartData])
-async def restart_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStartData]:
-    """Re-enqueue a pending or failed run. Use when the job was lost (e.g. Redis restarted) or stuck."""
+async def restart_run(
+    run_id: uuid.UUID,
+    force: bool = False,
+    website: str | None = None,
+) -> ApiResponse[AnalysisStartData]:
+    """Re-enqueue a pending or failed run. Use when the job was lost (e.g. Redis restarted) or stuck.
+    Set force=true to reset a run stuck in 'running' (e.g. worker crashed).
+    Pass website= to add/update company website before restart (e.g. after quick check failure)."""
     with SessionLocal() as session:
         run = session.get(AnalysisRun, run_id)
         if not run:
             raise HTTPException(status_code=404, detail="Run not found")
-        if run.status == "running":
+        if run.status == "running" and not force:
             raise HTTPException(
                 status_code=400,
-                detail="Cannot restart a run that is currently running",
+                detail="Cannot restart a run that is currently running. Use force=true to reset a stuck run.",
             )
         if run.status == "completed":
             raise HTTPException(
@@ -190,6 +204,10 @@ async def restart_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStartData]:
         if not company:
             raise HTTPException(status_code=400, detail="Run has no company")
 
+        if website and website.strip():
+            company.website = website.strip()
+            session.flush()
+
         repo = RunStateRepository(session)
         repo.clear_run_analysis_data(run_id)
 
@@ -197,6 +215,9 @@ async def restart_run(run_id: uuid.UUID) -> ApiResponse[AnalysisStartData]:
         run.started_at = None
         run.completed_at = None
         run.error_message = None
+        if run.extra and isinstance(run.extra, dict):
+            extra = {k: v for k, v in run.extra.items() if k not in ("quick_check_suggestion", "quick_check_queries_tried")}
+            run.extra = extra
         session.commit()
 
         body = AnalysisStartRequest(

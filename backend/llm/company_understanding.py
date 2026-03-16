@@ -53,7 +53,11 @@ COMPANY_UNDERSTANDING_SCHEMA = {
 }
 
 
-def extract_company_understanding(company_name: str, raw_text: str) -> dict[str, Any] | None:
+def extract_company_understanding(
+    company_name: str,
+    raw_text: str,
+    orgnr: str | None = None,
+) -> dict[str, Any] | None:
     """Extract structured company understanding from raw text using OpenAI.
 
     Returns a dict with company_description, products_services, business_model,
@@ -81,11 +85,18 @@ def extract_company_understanding(company_name: str, raw_text: str) -> dict[str,
 
     system_prompt = """You are an analyst extracting structured company information from text.
 Output valid JSON only. Be concise. Infer from context when explicit facts are missing.
-confidence_score: 0.0-1.0 based on how much evidence supports each field (0.5 = partial, 0.8+ = strong)."""
+confidence_score: 0.0-1.0 based on how much evidence supports each field (0.5 = partial, 0.8+ = strong).
 
-    user_prompt = f"""Company: {company_name}
+CRITICAL: Extract information ONLY about the target company specified in the prompt. The text may contain
+job listings, aggregator pages, or mentions of other companies — IGNORE all of those. Only describe
+the one company the user asked about. If the text does not clearly describe the target company,
+return low confidence_score (e.g. 0.2) and minimal fields."""
 
-Extract structured company understanding from this text:
+    disambiguate = f" (orgnr {orgnr})" if orgnr and not (orgnr or "").startswith("tmp-") else ""
+    user_prompt = f"""Target company (extract information ONLY about this company): {company_name}{disambiguate}
+
+The text below may contain multiple companies, job listings, or aggregator content. Extract structured
+company understanding ONLY for "{company_name}". Ignore any other companies or organizations.
 
 ---
 {text[:12000]}

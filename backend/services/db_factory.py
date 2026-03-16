@@ -32,7 +32,7 @@ def get_database_service() -> DatabaseService:
             "SQLite (DATABASE_SOURCE=local) is disabled. Use Postgres for local development.\n"
             "  1. Set DATABASE_SOURCE=postgres in .env\n"
             "  2. Run: docker compose up -d\n"
-            "  3. Run: python scripts/bootstrap_postgres_schema.py && ./scripts/run_postgres_migrations.sh\n"
+            "  3. Run: python3 scripts/bootstrap_postgres_schema.py && ./scripts/run_postgres_migrations.sh\n"
             "See docs/LOCAL_POSTGRES_SETUP.md"
         )
 

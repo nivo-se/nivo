@@ -29,6 +29,7 @@ nivo/
 
 Key docs:
 
+- **Fresh Mac setup:** [docs/FRESH_MAC_SETUP.md](docs/FRESH_MAC_SETUP.md) — one-command setup for new machines
 - **Local Postgres:** [docs/LOCAL_POSTGRES_SETUP.md](docs/LOCAL_POSTGRES_SETUP.md), [docs/LOCAL_POSTGRES_BOOTSTRAP.md](docs/LOCAL_POSTGRES_BOOTSTRAP.md)
 - **Deploy (Mac Mini):** [docs/DEPLOY_MAC_MINI.md](docs/DEPLOY_MAC_MINI.md)
 - **Financials (source of truth):** [docs/FINANCIALS_SOURCE_OF_TRUTH.md](docs/FINANCIALS_SOURCE_OF_TRUTH.md)

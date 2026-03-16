@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import time
 import uuid
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Any
 
@@ -255,8 +256,9 @@ class LangGraphAgentOrchestrator:
                     parts.append("Available information:")
                     parts.extend(claim_texts)
                 raw_text = " ".join(parts)
+                orgnr = identity_output.get("orgnr") or _state.get("orgnr")
 
-                result = extract_company_understanding(company_name, raw_text)
+                result = extract_company_understanding(company_name, raw_text, orgnr=orgnr)
                 if result is None:
                     result = {
                         "company_description": "",
@@ -304,7 +306,7 @@ class LangGraphAgentOrchestrator:
                     "run_mode": spec.run_mode,
                     "policy_versions": spec.policy_versions.model_dump(),
                     "required_metrics_count": len(spec.required_metrics),
-                    "persisted": persisted,
+                    "persisted_id": str(persisted.id),
                 }
 
             return self._node_wrapper(repo, "report_spec", state, compute)
@@ -343,9 +345,6 @@ class LangGraphAgentOrchestrator:
             def compute(_state: OrchestratorState):
                 from backend.services.deep_research.input_completeness import (
                     DEEP_RESEARCH_THRESHOLDS,
-                )
-                from backend.services.deep_research.report_spec_builder import (
-                    load_report_spec_for_run,
                 )
                 from backend.services.web_intel import WebRetrievalService
 
@@ -392,7 +391,6 @@ class LangGraphAgentOrchestrator:
                     else None
                 )
 
-                report_spec = load_report_spec_for_run(repo.session, run_id)
                 service = WebRetrievalService()
                 bundle = service.retrieve(
                     run_id=run_id,
@@ -402,7 +400,6 @@ class LangGraphAgentOrchestrator:
                     orgnr=orgnr,
                     company_website=website,
                     market_label=market_label,
-                    report_spec=report_spec,
                 )
 
                 session_ids: list[uuid.UUID] = []
@@ -459,8 +456,7 @@ class LangGraphAgentOrchestrator:
         def evidence_validation(state: OrchestratorState):
             def compute(_state: OrchestratorState):
                 from backend.services.deep_research.evidence_bundle_builder import (
-                    build_from_db,
-                    persist_evidence_bundle,
+                    build_and_persist_evidence_bundle,
                 )
                 from backend.services.deep_research.report_spec_builder import (
                     load_report_spec_for_run,
@@ -474,20 +470,15 @@ class LangGraphAgentOrchestrator:
                 report_spec = load_report_spec_for_run(repo.session, run_id)
                 required_metrics = []
                 if report_spec:
-                    required_metrics = report_spec.required_metrics
+                    required_metrics = [m.model_dump() for m in report_spec.required_metrics]
 
-                bundle = build_from_db(
+                bundle, _ = build_and_persist_evidence_bundle(
                     session=repo.session,
                     run_id=run_id,
                     company_id=company_id,
-                    required_metrics=required_metrics,
+                    load_from_db=True,
+                    required_metrics=required_metrics or None,
                     queries_executed=queries_executed,
-                )
-                persist_evidence_bundle(
-                    repo.session,
-                    run_id,
-                    company_id,
-                    bundle,
                 )
                 repo.session.commit()
 
@@ -1217,6 +1208,46 @@ class LangGraphAgentOrchestrator:
             )
             run_uuid = run.id
             company_uuid = company.id
+
+            # Quick check: if no website, try 1-2 Tavily searches to find it
+            if not company.website and (company.name or company.orgnr):
+                from backend.services.deep_research.quick_check import (
+                    run_quick_check,
+                )
+
+                qc = run_quick_check(
+                    company_name=company.name,
+                    orgnr=company.orgnr if (company.orgnr and not company.orgnr.startswith("tmp-")) else None,
+                    max_queries=2,
+                )
+                if qc.found and qc.website:
+                    company.website = qc.website
+                    session.flush()
+                    logger.info(
+                        "Quick check found website for %s: %s",
+                        company.name,
+                        qc.website,
+                    )
+                elif not qc.found and qc.suggestion_message:
+                    run.status = "failed"
+                    run.started_at = None
+                    run.completed_at = datetime.now(timezone.utc)
+                    run.error_message = qc.suggestion_message
+                    extra = dict(run.extra or {})
+                    extra["quick_check_suggestion"] = qc.suggestion_message
+                    extra["quick_check_queries_tried"] = qc.queries_tried
+                    run.extra = extra
+                    session.commit()
+                    return OrchestratorRunResult(
+                        run_id=run_uuid,
+                        company_id=company_uuid,
+                        status="failed",
+                        stage="quick_check",
+                        progress_pct=0,
+                        node_results={},
+                        errors=[qc.suggestion_message],
+                    )
+
             session.commit()  # Commit so UI shows "running" immediately
 
             graph = self._build_graph(repo)
@@ -1240,6 +1271,9 @@ class LangGraphAgentOrchestrator:
                 node_rows = repo.list_node_states(run_uuid)
                 report_output = final_state.get("node_results", {}).get("report_generation") or {}
                 diagnostics = build_run_diagnostics(
+                    session=repo.session,
+                    run_id=run_uuid,
+                    company_id=company_uuid,
                     node_rows=node_rows,
                     report_generation_output=report_output,
                 )
@@ -1433,6 +1467,9 @@ class LangGraphAgentOrchestrator:
                 rd = extra["run_diagnostics"]
                 if isinstance(rd, dict) and "report_quality_status" in rd:
                     result["report_quality_status"] = rd["report_quality_status"]
+            if "quick_check_suggestion" in extra:
+                result["quick_check_suggestion"] = extra["quick_check_suggestion"]
+                result["suggested_action"] = "add_company_website"
             return result
 
     def list_runs(self, limit: int = 20) -> list[dict[str, Any]]:
@@ -1457,18 +1494,33 @@ class LangGraphAgentOrchestrator:
                 comp_info = companies_by_id.get(row.company_id) if row.company_id else None
                 company_name = (comp_info[0] if comp_info else None) or row.query
                 orgnr = comp_info[1] if comp_info else None
-                out.append(
-                    {
-                        "run_id": row.id,
-                        "company_id": row.company_id,
-                        "company_name": company_name,
-                        "orgnr": orgnr,
-                        "created_at": row.created_at,
-                        "status": row.status,
-                        "current_stage": current_stage,
-                        "stages": stages,
-                        "error_message": row.error_message,
-                    }
-                )
+                entry: dict[str, Any] = {
+                    "run_id": row.id,
+                    "company_id": row.company_id,
+                    "company_name": company_name,
+                    "orgnr": orgnr,
+                    "created_at": row.created_at,
+                    "status": row.status,
+                    "current_stage": current_stage,
+                    "stages": stages,
+                    "error_message": row.error_message,
+                }
+                extra = row.extra if isinstance(row.extra, dict) else {}
+                if "run_diagnostics" in extra:
+                    entry["diagnostics"] = extra["run_diagnostics"]
+                    rd = extra["run_diagnostics"]
+                    if isinstance(rd, dict) and "report_quality_status" in rd:
+                        entry["report_quality_status"] = rd["report_quality_status"]
+                if "quick_check_suggestion" in extra:
+                    entry["quick_check_suggestion"] = extra["quick_check_suggestion"]
+                    entry["suggested_action"] = "add_company_website"
+                report_degraded = extra.get("report_degraded_reasons")
+                if report_degraded is not None:
+                    entry["report_degraded_reasons"] = report_degraded
+                elif isinstance(extra.get("run_diagnostics"), dict):
+                    entry["report_degraded_reasons"] = extra["run_diagnostics"].get(
+                        "report_degraded_reasons", []
+                    )
+                out.append(entry)
             return out
 

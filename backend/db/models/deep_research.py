@@ -839,10 +839,19 @@ class ReportSpecPersistence(TimestampMixin, Base):
         ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.analysis_runs.id", ondelete="CASCADE"),
         nullable=False,
     )
+    report_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        nullable=False,
+    )
     company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey(f"{DEEP_RESEARCH_SCHEMA}.companies.id", ondelete="SET NULL"),
         nullable=True,
+    )
+    run_mode: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        default="standard_deep_research",
     )
     spec_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     policy_versions_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)

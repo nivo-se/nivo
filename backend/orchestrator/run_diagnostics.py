@@ -44,6 +44,7 @@ def build_run_diagnostics(
         "valuation_skipped": False,
         "valuation_readiness": True,
         "report_degraded": False,
+        "report_degraded_reasons": [],
         "report_quality_status": None,
         "report_quality_reason_codes": [],
         "report_quality_limitation_summary": [],
@@ -100,6 +101,7 @@ def build_run_diagnostics(
     if isinstance(report_generation_output, dict):
         meta = report_generation_output.get("metadata", {}) or {}
         diagnostics["report_degraded"] = meta.get("report_degraded", False)
+        diagnostics["report_degraded_reasons"] = meta.get("report_degraded_reasons", []) or []
         diagnostics["report_quality_status"] = meta.get("report_quality_status")
         diagnostics["report_quality_reason_codes"] = meta.get("report_quality_reason_codes", []) or []
         diagnostics["report_quality_limitation_summary"] = meta.get("report_quality_limitation_summary", []) or []

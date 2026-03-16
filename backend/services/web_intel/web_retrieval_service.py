@@ -25,7 +25,7 @@ from backend.retrieval.query_planner import QueryPlanner
 from .evidence_extractor import EvidenceItem, extract_evidence
 from .evidence_scorer import EvidenceScorer
 from .evidence_verifier import EvidenceVerifier
-from .source_normalizer import normalize_source
+from .source_normalizer import is_blocked_domain, normalize_source
 from .tavily_client import TavilyClient
 
 logger = logging.getLogger(__name__)
@@ -129,6 +129,8 @@ class WebRetrievalService:
             for r in search_results:
                 url = r.url.strip()
                 if not url or url in seen_urls:
+                    continue
+                if is_blocked_domain(url):
                     continue
                 domain = normalize_source(url, company_website=company_website).domain
                 if domain_counts[domain] >= max_per_domain:

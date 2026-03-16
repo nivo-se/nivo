@@ -84,8 +84,8 @@ def _record_to_v2(
         specificity_score=0.6,
         overall_score=item.overall_score or item.confidence or 0.5,
     )
-    if getattr(item, "score_breakdown", None):
-        sb = item.score_breakdown
+    sb = getattr(item, "score_breakdown", None)
+    if isinstance(sb, dict):
         scores.relevance_score = sb.get("relevance", 0.5)
         scores.authority_score = sb.get("authority", 0.5)
         scores.freshness_score = sb.get("freshness", 0.5)
@@ -129,6 +129,8 @@ def build_validated_bundle(
 
     query_to_metric: dict[str, str] = {}
     for qe in queries_executed:
+        if not isinstance(qe, dict):
+            continue
         mk = qe.get("metric_key")
         q = qe.get("query")
         if mk and q:
@@ -153,7 +155,14 @@ def build_validated_bundle(
         except Exception:
             pass
 
-    required_keys = {m.key if hasattr(m, "key") else m.get("key") for m in required_metrics}
+    required_keys: set[str] = set()
+    for m in required_metrics:
+        if hasattr(m, "key"):
+            required_keys.add(m.key)
+        elif isinstance(m, dict):
+            k = m.get("key")
+            if k:
+                required_keys.add(k)
     covered = {i.metric_key for i in items}
     covered &= required_keys
     coverage = EvidenceCoverageSummary(

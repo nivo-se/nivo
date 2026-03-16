@@ -189,17 +189,24 @@ def persist_report_spec(session: Session, run_id: uuid.UUID, spec: ReportSpec) -
     existing = session.execute(
         select(ReportSpecPersistence).where(ReportSpecPersistence.run_id == run_id)
     ).scalar_one_or_none()
+    report_id = spec.report_id
+    run_mode = spec.run_mode
+
     if existing:
         existing.spec_json = spec_dict
         existing.policy_versions_json = policy_versions
         existing.company_id = company_id
+        existing.report_id = report_id
+        existing.run_mode = run_mode
         session.flush()
         logger.info("Updated report_spec for run %s", run_id)
         return existing
 
     row = ReportSpecPersistence(
         run_id=run_id,
+        report_id=report_id,
         company_id=company_id,
+        run_mode=run_mode,
         spec_json=spec_dict,
         policy_versions_json=policy_versions,
     )

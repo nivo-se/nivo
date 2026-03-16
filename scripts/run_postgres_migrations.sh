@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run Postgres migrations. Uses DATABASE_URL from env, or default local Docker URL.
-# Prerequisite: run bootstrap first: python scripts/bootstrap_postgres_schema.py
+# Prerequisite: run bootstrap first: python3 scripts/bootstrap_postgres_schema.py
 # Usage: ./scripts/run_postgres_migrations.sh
 # WARNING: Confirm you are targeting the intended DB (dev vs prod) before running.
 set -euo pipefail
@@ -85,6 +85,11 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/024_deep_research_persistence.sql \
          database/migrations/025_deep_research_run_node_states.sql \
          database/migrations/025_claim_verifications.sql \
+         database/migrations/026_web_intelligence.sql \
+         database/migrations/027_competitor_market_synthesis.sql \
+         database/migrations/028_fix_timestamp_columns.sql \
+         database/migrations/029_report_retrieval_config.sql \
+         database/migrations/030_sector_multiple_reference.sql \
          database/migrations/031_deep_research_v2_schemas.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."

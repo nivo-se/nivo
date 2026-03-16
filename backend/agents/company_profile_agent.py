@@ -5,8 +5,26 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from backend.services.web_intel.source_normalizer import is_blocked_domain
+
 from .context import AgentContext
 from .schemas import AgentClaim, CompanyProfileAgentOutput, SourceEvidence
+
+
+def _joined_text_filtered(context: AgentContext, max_chars: int = 15000) -> str:
+    """Build joined text excluding content from blocked domains (aggregators, registries, job boards)."""
+    excluded_ids = {s.source_id for s in context.sources if s.url and is_blocked_domain(s.url)}
+    chunk_text = " ".join(
+        c.text for c in context.chunks
+        if c.source_id not in excluded_ids and c.text
+    )
+    source_text = " ".join(
+        s.content_text or ""
+        for s in context.sources
+        if s.source_id not in excluded_ids
+    )
+    text = f"{chunk_text} {source_text}".strip()
+    return text[:max_chars]
 
 
 def _sentences(text: str) -> list[str]:
@@ -35,7 +53,8 @@ class CompanyProfileAgent:
     """
 
     def run(self, context: AgentContext) -> CompanyProfileAgentOutput:
-        joined = context.joined_text(max_chars=15000)
+        # Exclude job aggregator sources to avoid mixing in other companies
+        joined = _joined_text_filtered(context, max_chars=15000) or context.joined_text(max_chars=15000)
         company_name = context.company_name or "Company"
 
         # Try LLM extraction first when we have enough text
@@ -43,7 +62,8 @@ class CompanyProfileAgent:
         try:
             from backend.llm.company_understanding import extract_company_understanding
 
-            llm_result = extract_company_understanding(company_name, joined)
+            orgnr = getattr(context, "orgnr", None)
+            llm_result = extract_company_understanding(company_name, joined, orgnr=orgnr)
         except Exception:
             pass
 

@@ -123,7 +123,7 @@ def verify_database_setup() -> Tuple[bool, List[str]]:
         port = os.getenv("POSTGRES_PORT", "5433")
         dbname = os.getenv("POSTGRES_DB", "nivo")
         results.append(f"   Host: {host}:{port}/{dbname}")
-        results.append(f"   Run: docker compose up -d && python scripts/bootstrap_postgres_schema.py")
+        results.append(f"   Run: docker compose up -d && python3 scripts/bootstrap_postgres_schema.py")
 
     return all_good, results
 

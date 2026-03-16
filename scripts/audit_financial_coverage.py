@@ -5,7 +5,7 @@ Prints counts and samples for the financials table. Exit code 0 always; informat
 
 Usage:
   export DATABASE_SOURCE=postgres  # optional if using POSTGRES_* or DATABASE_URL
-  python scripts/audit_financial_coverage.py
+  python3 scripts/audit_financial_coverage.py
 
 Requires: psycopg2 (backend/requirements.txt)
 """

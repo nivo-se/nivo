@@ -12,10 +12,32 @@ import {
   ChevronDown,
   ChevronUp,
   Building2,
+  Filter,
 } from 'lucide-react'
 import { listRuns, type AnalysisStatus } from '@/lib/services/deepResearchService'
 import { isAdminLinkVisible } from '@/lib/isAdmin'
 import { useAuth } from '@/contexts/AuthContext'
+
+type PilotFilter = 'all' | 'degraded' | 'valuation_skipped' | 'blocked'
+
+function matchesPilotFilter(run: AnalysisStatus, filter: PilotFilter): boolean {
+  if (filter === 'all') return true
+  if (filter === 'degraded') return run.diagnostics?.report_degraded === true
+  if (filter === 'valuation_skipped') return run.diagnostics?.valuation_skipped === true
+  if (filter === 'blocked') return run.report_quality_status === 'blocked'
+  return true
+}
+
+function computeReasonCodeCounts(runs: AnalysisStatus[]): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const run of runs) {
+    const codes = run.diagnostics?.report_quality_reason_codes ?? []
+    for (const code of codes) {
+      counts[code] = (counts[code] ?? 0) + 1
+    }
+  }
+  return counts
+}
 
 const STAGE_LABELS: Record<string, string> = {
   identity: 'Identity',
@@ -44,6 +66,7 @@ export default function RunListPage() {
   const [runs, setRuns] = useState<AnalysisStatus[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedAdmin, setExpandedAdmin] = useState<string | null>(null)
+  const [pilotFilter, setPilotFilter] = useState<PilotFilter>('all')
   const { user, userRole } = useAuth()
   const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user)
 
@@ -53,6 +76,9 @@ export default function RunListPage() {
       setLoading(false)
     })
   }, [])
+
+  const filteredRuns = runs?.filter((r) => matchesPilotFilter(r, pilotFilter)) ?? []
+  const reasonCodeCounts = computeReasonCodeCounts(runs ?? [])
 
   if (loading) {
     return (
@@ -69,16 +95,48 @@ export default function RunListPage() {
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Analysis Runs</h1>
 
-      {runs && runs.length === 0 && (
+      {isAdmin && runs && runs.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-xs font-medium text-muted-foreground">Filter:</span>
+            {(['all', 'degraded', 'valuation_skipped', 'blocked'] as PilotFilter[]).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setPilotFilter(f)}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  pilotFilter === f
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                {f === 'all' ? 'All' : f === 'valuation_skipped' ? 'Val. skipped' : f.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+          {Object.keys(reasonCodeCounts).length > 0 && (
+            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              <span className="font-medium">Reason-code counts (recent):</span>{' '}
+              {Object.entries(reasonCodeCounts)
+                .sort(([, a], [, b]) => b - a)
+                .map(([code, n]) => `${code}: ${n}`)
+                .join(', ')}
+            </div>
+          )}
+        </div>
+      )}
+
+      {filteredRuns.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No analysis runs found.
+            {runs && runs.length > 0 ? 'No runs match the filter.' : 'No analysis runs found.'}
           </CardContent>
         </Card>
       )}
 
       <div className="space-y-3">
-        {runs?.map((run) => {
+        {filteredRuns.map((run) => {
           const cfg = STATUS_CONFIG[run.status]
           const Icon = cfg.icon
           const companyName = run.company_name || 'Unknown Company'
@@ -133,10 +191,28 @@ export default function RunListPage() {
                       Technical details
                     </button>
                     {expandedAdmin === run.run_id && (
-                      <div className="mt-2 space-y-1 text-xs text-muted-foreground font-mono">
+                      <div className="mt-2 space-y-2 text-xs text-muted-foreground font-mono">
                         <div>Run ID: {run.run_id}</div>
-                        <div>Company ID: {run.company_id ?? '—'}</div>
+                        <div>Company: {run.company_name ?? '—'}</div>
                         <div>Stage: {run.current_stage}</div>
+                        {run.report_quality_status && (
+                          <div>Quality: <span className="text-foreground">{run.report_quality_status}</span></div>
+                        )}
+                        {run.diagnostics?.valuation_skipped && (
+                          <div>Valuation skipped: yes</div>
+                        )}
+                        {run.diagnostics?.report_degraded && (
+                          <div>Degraded: yes</div>
+                        )}
+                        {(run.diagnostics?.report_degraded_reasons?.length ?? 0) > 0 && (
+                          <div>Degraded reasons: {run.diagnostics!.report_degraded_reasons!.join('; ')}</div>
+                        )}
+                        {(run.diagnostics?.assumption_blocked_reasons?.length ?? 0) > 0 && (
+                          <div>Assumption blockers: {run.diagnostics!.assumption_blocked_reasons!.join('; ')}</div>
+                        )}
+                        {(run.diagnostics?.evidence_accepted_count != null || run.diagnostics?.evidence_rejected_count != null) && (
+                          <div>Evidence: accepted={run.diagnostics?.evidence_accepted_count ?? '—'}, rejected={run.diagnostics?.evidence_rejected_count ?? '—'}</div>
+                        )}
                       </div>
                     )}
                   </div>

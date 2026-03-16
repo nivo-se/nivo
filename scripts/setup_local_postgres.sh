@@ -58,7 +58,24 @@ echo ""
 # 5. Check coverage_metrics exists (required for Universe page)
 echo "5. Checking coverage_metrics view..."
 URL="${DATABASE_URL:-postgresql://nivo:nivo@localhost:5433/nivo}"
-if psql "$URL" -tAc "SELECT 1 FROM information_schema.views WHERE table_name='coverage_metrics'" 2>/dev/null | grep -q 1; then
+check_coverage() {
+  if command -v psql >/dev/null 2>&1; then
+    psql "$URL" -tAc "SELECT 1 FROM information_schema.views WHERE table_name='coverage_metrics'" 2>/dev/null | grep -q 1
+  else
+    DATABASE_URL="$URL" python3 -c "
+import os, sys
+try:
+  import psycopg2
+  conn = psycopg2.connect(os.environ['DATABASE_URL'], connect_timeout=5)
+  cur = conn.cursor()
+  cur.execute(\"SELECT 1 FROM information_schema.views WHERE table_name='coverage_metrics'\")
+  sys.exit(0 if cur.fetchone() else 1)
+except Exception:
+  sys.exit(1)
+"
+  fi
+}
+if check_coverage; then
   echo "   coverage_metrics view: OK"
 else
   echo "   ⚠ coverage_metrics view missing (Universe page needs it)"

@@ -307,6 +307,23 @@ class RunStateRepository:
             extra = dict(run.extra) if isinstance(run.extra, dict) else {}
             extra["run_diagnostics"] = run_diagnostics
             run.extra = extra
+            # Lightweight pilot logging: compact summary for review
+            import logging
+            _log = logging.getLogger("deep_research.pilot")
+            comp = self.session.get(Company, run.company_id) if run.company_id else None
+            comp_name = comp.name if comp else str(run.company_id)
+            _log.info(
+                "run_complete run_id=%s company=%s status=%s quality=%s degraded=%s val_skipped=%s blockers=%s ev_accepted=%s ev_rejected=%s",
+                str(run_id),
+                comp_name,
+                status,
+                run_diagnostics.get("report_quality_status"),
+                run_diagnostics.get("report_degraded_reasons", []),
+                run_diagnostics.get("valuation_skipped", False),
+                run_diagnostics.get("assumption_blocked_reasons", []),
+                run_diagnostics.get("evidence_accepted_count"),
+                run_diagnostics.get("evidence_rejected_count"),
+            )
         self.session.flush()
 
     def build_agent_context(self, run_id: uuid.UUID, company_id: uuid.UUID) -> AgentContext:
@@ -548,9 +565,14 @@ class RunStateRepository:
         source_id_map: dict | None = None,
     ) -> list[uuid.UUID]:
         """Persist accepted evidence; create Source records for build_agent_context. Return evidence ids."""
+        from backend.services.web_intel.source_normalizer import is_blocked_domain
+
         source_id_map = source_id_map or {}
         ids: list[uuid.UUID] = []
         for item in evidence_items:
+            url = getattr(item, "source_url", None) or (item.get("source_url") if isinstance(item, dict) else None)
+            if url and is_blocked_domain(url):
+                continue
             source_id = source_id_map.get(item.source_url)
             if not source_id:
                 src = Source(

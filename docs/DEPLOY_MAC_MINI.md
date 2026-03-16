@@ -156,7 +156,7 @@ The list comes from the `acquisition_runs` table, created by migration `018_crea
 
    ```bash
    export DATABASE_URL="postgresql://nivo:YOUR_POSTGRES_PASSWORD@127.0.0.1:5433/nivo"
-   python scripts/bootstrap_postgres_schema.py
+   python3 scripts/bootstrap_postgres_schema.py
    ```
 
    Then run `./scripts/run_postgres_migrations.sh` again.

@@ -98,6 +98,7 @@ class RunDiagnosticsData(BaseModel):
     report_quality_status: str | None = None
     report_quality_reason_codes: list[str] = Field(default_factory=list)
     report_quality_limitation_summary: list[str] = Field(default_factory=list)
+    report_degraded_reasons: list[str] = Field(default_factory=list)
 
 
 class AnalysisStatusData(BaseModel):
@@ -112,6 +113,8 @@ class AnalysisStatusData(BaseModel):
     error_message: str | None = None
     diagnostics: RunDiagnosticsData | None = None
     report_quality_status: str | None = None  # complete | complete_with_limitations | blocked | failed
+    quick_check_suggestion: str | None = None  # When quick check fails: user-friendly message
+    suggested_action: str | None = None  # e.g. "add_company_website"
 
 
 class ReportGenerateRequest(BaseModel):

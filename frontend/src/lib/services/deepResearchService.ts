@@ -40,6 +40,10 @@ export interface AnalysisStatus {
   error_message?: string | null
   diagnostics?: RunDiagnostics | null
   report_quality_status?: string | null
+  /** When quick check fails: user-friendly message on how to add website */
+  quick_check_suggestion?: string | null
+  /** e.g. "add_company_website" — use to show primary action */
+  suggested_action?: string | null
 }
 
 /** Run diagnostics for observability (admin/debug) */
@@ -55,6 +59,7 @@ export interface RunDiagnostics {
   report_quality_status?: string | null
   report_quality_reason_codes?: string[]
   report_quality_limitation_summary?: string[]
+  report_degraded_reasons?: string[]
 }
 
 /** Unified run summary for Deep Research Home list display */
@@ -234,8 +239,13 @@ export async function getRunStatus(runId: string): Promise<AnalysisStatus | null
 
 export type RestartResult = { success: true; data: AnalysisStartResult } | { success: false; error: string }
 
-export async function restartRun(runId: string): Promise<RestartResult> {
-  const res = await fetchWithAuth(`${DR_BASE}/analysis/runs/${runId}/restart`, {
+export async function restartRun(runId: string, force = false, website?: string): Promise<RestartResult> {
+  const params = new URLSearchParams()
+  if (force) params.set('force', 'true')
+  if (website?.trim()) params.set('website', website.trim())
+  const qs = params.toString()
+  const url = `${DR_BASE}/analysis/runs/${runId}/restart${qs ? `?${qs}` : ''}`
+  const res = await fetchWithAuth(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: '{}',

@@ -3,6 +3,13 @@
 set -e
 cd "$(dirname "$0")/.."
 
+# Load .env so worker gets POSTGRES_HOST, DATABASE_URL, etc. (required when DB is on Mac Mini)
+if [ -f .env ]; then
+  set -a
+  source .env
+  set +a
+fi
+
 if [ -d .venv ]; then
   source .venv/bin/activate
 elif [ -d backend/venv ]; then
