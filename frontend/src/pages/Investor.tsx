@@ -9,7 +9,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Input } from "@/components/ui/input";
 import { Lock, Building2, Target, TrendingUp, BarChart3, Clock, Globe, User, Shield, Check, Workflow } from "lucide-react";
@@ -22,21 +21,6 @@ const INVESTOR_STORAGE_KEY = "nivo_investor_unlocked";
 const INVESTOR_PASSWORD = "nivo2020";
 
 // ─── Data (condensed for short form) ─────────────────────────────────────
-const PROJ = [
-  { year: 0, label: "Year 0", equityValue: 100, debt: 30 },
-  { year: 1, label: "Year 1", equityValue: 120, debt: 36 },
-  { year: 2, label: "Year 2", equityValue: 143, debt: 43 },
-  { year: 3, label: "Year 3", equityValue: 171, debt: 51 },
-  { year: 4, label: "Year 4", equityValue: 204, debt: 61 },
-  { year: 5, label: "Year 5", equityValue: 244, debt: 73 },
-  { year: 6, label: "Year 6", equityValue: 291, debt: 87 },
-  { year: 7, label: "Year 7", equityValue: 348, debt: 104 },
-];
-const ENTRY_EQUITY = 100;
-const EXIT_EQUITY = PROJ[PROJ.length - 1].equityValue;
-const GROSS_MOIC = (EXIT_EQUITY / ENTRY_EQUITY).toFixed(2);
-const GROSS_IRR = ((Math.pow(EXIT_EQUITY / ENTRY_EQUITY, 1 / 7) - 1) * 100).toFixed(1);
-
 const PIPELINE_ITEMS = [
   { stage: "Active due diligence", count: "2" },
   { stage: "Advanced discussion", count: "5" },
@@ -45,15 +29,15 @@ const PIPELINE_ITEMS = [
 ];
 
 const TEAM = [
-  { name: "Jesper Kreuger", role: "Founding Partner", bio: "15+ years Nordic SME operations, 8+ transformations, M.Sc. Industrial Engineering." },
-  { name: "Henrik Cavalli", role: "Founding Partner", bio: "12+ years PE and growth investing, 20+ Nordic companies, MBA SSE." },
-  { name: "Sebastian Robson", role: "Founding Partner", bio: "10+ years M&A, tech and industrials, M.Sc. Economics." },
+  { name: "Jesper Kreuger", role: "Founding Partner", bio: "15+ years in venture capital, capital raising and company building. Led investments and scaling across early and growth-stage Nordic companies.", linkedin: "https://www.linkedin.com/in/jesper-kreuger-91b14/" },
+  { name: "Henrik Cavalli", role: "Founding Partner", bio: "15+ years of commercial leadership across startups and global companies. Scaled businesses from zero to €60m+ revenue and led growth across multiple markets.", linkedin: "https://www.linkedin.com/in/henrikc1/" },
+  { name: "Sebastian Robson", role: "Founding Partner", bio: "15+ years in CFO and corporate finance roles with experience in acquisitions, capital markets and IPO preparation across technology and industrial sectors.", linkedin: "https://www.linkedin.com/in/sebastian-robson-7418b82b2/" },
 ];
 
 // ─── Section wrapper (design profile) — background full width, content constrained ───
-function Section({ title, bg = "bg", children }: { title: string; bg?: "bg" | "bgAlt"; children: React.ReactNode }) {
+function Section({ title, bg = "bg", id, children }: { title: string; bg?: "bg" | "bgAlt"; id?: string; children: React.ReactNode }) {
   return (
-    <section className="w-full" style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
+    <section className={"w-full" + (id ? " scroll-mt-[100px]" : "")} id={id} style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
       <div className={SECTION_CLASS}>
         <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>{title}</h2>
         {children}
@@ -123,10 +107,10 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-// Header height for fixed header — use same value for content pt (section menus can go here later)
+// Header height for fixed header
 const INVESTOR_HEADER_HEIGHT = 68;
 
-// ─── Shared header (short vs long form) — fixed so it stays visible when scrolling; section nav can be added later ───
+// ─── Shared header (short vs long form) — fixed ───
 function InvestorHeader({ onSignOut }: { onSignOut: () => void }) {
   return (
     <header
@@ -161,53 +145,74 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
-                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-28 sm:h-36 w-auto max-w-none object-contain" />
+              <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
+                <div className="h-28 w-28 sm:h-36 sm:w-36 flex items-center justify-center">
+                  <img src="/nivo-n-logo-black.svg" alt="Nivo" className="max-h-full max-w-full w-auto h-auto object-contain" style={{ objectPosition: "49% center" }} />
+                </div>
               </div>
-              <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
-                Nordic Operational Compounder
-              </h1>
-              <p className="text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                We acquire profitable Nordic SMEs that already have <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
+              <p className="text-2xl sm:text-3xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                We acquire profitable Nordic SMEs with <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
               </p>
               <p className="mt-6 text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                Through <span className="font-semibold" style={{ color: tokens.accent }}>hands-on ownership</span>, structured <span className="font-semibold" style={{ color: tokens.accent }}>operational improvement</span> and selective use of <span className="font-semibold" style={{ color: tokens.accent }}>AI</span>, we unlock <span className="font-semibold" style={{ color: tokens.accent }}>value</span> that the current owner has overlooked.
+                Many of these companies operate with manual workflows, fragmented systems and limited operational visibility. The businesses themselves are sound; execution can be significantly improved.
+              </p>
+              <p className="mt-6 text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                Nivo combines <span className="font-semibold" style={{ color: tokens.accent }}>hands-on ownership</span> with a proprietary <span className="font-semibold" style={{ color: tokens.accent }}>AI-enabled platform</span> used for sourcing, analysis and operational upgrades. This allows us to identify opportunities faster, analyse companies systematically and implement improvements more effectively.
               </p>
               <blockquote className="mt-12 text-lg sm:text-xl font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
-                We do not buy technology risk.
-                <br />
-                We only invest where better execution creates disproportionate value.
+                Our focus is operational improvement rather than technology risk.
               </blockquote>
-              <div className="mt-14 max-w-2xl mx-auto pt-8 border-t" style={{ borderColor: tokens.border }}>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Building2 className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Investment Company</span>
-                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
+              <p className="mt-10 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>Key terms</p>
+              <div className="mt-3 max-w-2xl mx-auto pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Investment Company</span>
+                    <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Shield className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Management Fee</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Management Fee</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>0%</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Target className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target size</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Target className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target Acquisition Capital</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>SEK 1,000m</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross IRR</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross IRR</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>20–25%</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><BarChart3 className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross MOIC</span>
-                    <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4x–5x</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross MOIC</span>
+                    <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Clock className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Base case hold</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Base case hold</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
                   </div>
                 </div>
               </div>
-              <p className="mt-8 sm:mt-10 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-bold" style={{ color: tokens.text }}>
-                Operational excellence will add value driven by added revenue growth, EBITDA expansion and only modest multiple expansion.
+              <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>Team with core capabilities</p>
+              <ul className="mt-3 max-w-2xl mx-auto space-y-2 text-left">
+                {[
+                  "Corporate finance and capital markets — valuation, structuring and execution expertise",
+                  "Venture and growth investing — sourcing, due diligence and exit experience",
+                  "Operational scaling and digital transformation — hands-on business building",
+                  "Institutional investment combined with operational leadership — full lifecycle coverage",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div id="why-now" className="mt-8 max-w-2xl mx-auto text-left scroll-mt-[100px]">
+                <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>Why Now</h2>
+                <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+                  Practical AI and modern SaaS now allow smaller companies to upgrade systems, pricing and operations cost-effectively. We bring that capability to portfolio businesses — operational improvement, not technology speculation.
+                </p>
+              </div>
+              <p className="mt-6 sm:mt-8 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-bold" style={{ color: tokens.text }}>
+                Value creation is driven primarily by operational improvement — including revenue optimisation, margin expansion and digital upgrades — with only modest reliance on multiple expansion.
               </p>
             </div>
           </div>
@@ -215,29 +220,32 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
       </section>
 
       {/* Opportunity — full section with cards (same as long form) */}
-      <Section title="The Opportunity" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Why Nordic SMEs, why now</p>
+      <Section title="The Opportunity" bg="bgAlt" id="the-opportunity">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Why Nordic SMEs, why now</p>
+        <p className="leading-relaxed mb-8" style={{ color: tokens.text }}>
+          A large share of Nordic SMEs were built before modern digital tools became widely adopted. Many remain profitable but operationally under-digitised. At the same time, practical AI and modern SaaS infrastructure now allow smaller companies to upgrade systems, pricing, reporting and operational workflows quickly and cost-effectively. This creates a narrow window where operational improvements can unlock disproportionate value.
+        </p>
 
         <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
-            We buy profitable, under-digitised Nordic SMEs and compound value through operational improvement — not technology risk.
+            We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital modernisation — not technology risk. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.
           </p>
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Globe className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              15,000+ target companies
+              15,000+ Nordic SMEs in target segment
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Target className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              20% ROIC target
+              20–25% target ROIC through operational improvement
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Shield className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              Operational upside, not tech risk
+              AI-enabled sourcing and operational upgrades
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              Nordic specialist
+              Operational upside — not technology risk
             </span>
           </div>
         </div>
@@ -250,13 +258,13 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               </div>
               <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>The universe</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Nordic SMEs in our target band are profitable but under-digitised. Large, underserved opportunity set.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              Nordic SMEs in our target band are profitable but structurally under-digitised, creating a large and underserved opportunity set.
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />~15,000 companies in focus revenue band</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Owner-managed, stable B2B & manufacturing</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Clear process and systems gap → improvement room</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />~15,000 companies in our focus revenue band</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Primarily owner-managed B2B services and niche manufacturing</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Clear operational and systems gaps → strong improvement potential</li>
             </ul>
           </div>
 
@@ -265,15 +273,15 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Workflow className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>The gap</h3>
+              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>Operational gap</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Same inefficiencies across the set. They need operational elevation, not disruption.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              Across the segment we observe the same operational inefficiencies. These businesses rarely need disruption — they need better execution and modern tools.
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Manual workflows, spreadsheets, ad-hoc processes</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Fragmented systems, little data flow</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Cost-plus pricing, low margin transparency</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Manual workflows, spreadsheets and ad-hoc processes</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Fragmented systems with limited data integration</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Cost-plus pricing and weak margin transparency</li>
             </ul>
           </div>
 
@@ -284,13 +292,13 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               </div>
               <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>Why Nordic</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Favourable environment for long-term, operational value creation.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              The Nordic region offers a favourable environment for long-term operational value creation.
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Rule of law, transparency, educated workforce</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Generational transitions driving deal flow</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited dedicated PE below SEK 200m</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strong institutions and transparent markets</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Educated workforce and high digital adoption</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Generational transitions creating significant deal flow</li>
             </ul>
           </div>
 
@@ -301,58 +309,14 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               </div>
               <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>Our take</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-medium flex-1" style={{ color: tokens.text }}>
-              Nivo targets this gap with a disciplined, repeatable playbook. We buy operational improvement potential — not technology risk.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              Nivo targets this opportunity through a disciplined, repeatable approach.
             </p>
-          </div>
-        </div>
-      </Section>
-
-      {/* Overview */}
-      <Section title="Investment overview">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Disciplined approach</p>
-        <p className="leading-relaxed" style={{ color: tokens.text }}>
-          We acquire profitable, under-digitised SMEs in the Nordic region, typically SEK 50–200m revenue. The model is an operational compounder: we use a proprietary segmentation engine to identify targets and create value through structured execution. Our edge is systematic sourcing; our value proposition is operational improvement and long-term compounding, not technology risk.
-        </p>
-      </Section>
-
-      {/* Model + chart + metrics */}
-      <Section title="The Nordic Compounder Model" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Three pillars</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {["Acquire right", "Execute relentlessly", "Compound with discipline"].map((title, i) => (
-            <div key={i} className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>{title}</p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg p-4 border mb-6" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <p className="text-sm font-medium mb-4" style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
-          <div className="h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={tokens.border} vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} />
-                <YAxis tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} width={36} />
-                <Tooltip cursor={false} contentStyle={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}`, borderRadius: 6, fontSize: 12 }} formatter={(v: number, n: string) => [v.toFixed(0), n === "equityValue" ? "Equity" : "Debt"]} />
-                <Bar dataKey="equityValue" stackId="a" fill={tokens.accent} radius={[0, 4, 0, 0]} name="equityValue" />
-                <Bar dataKey="debt" stackId="a" fill={`${tokens.accentSecondary}99`} radius={[0, 4, 0, 0]} name="debt" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Entry → Exit (illustrative)</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY}</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Gross MOIC</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>IRR</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Proprietary AI-enabled platform for sourcing, analysis and operational upgrades</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Identify opportunities faster and implement improvements more effectively</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strengthen commercial execution, improve operational performance and modernise through digitalisation and selective use of AI</li>
+            </ul>
           </div>
         </div>
       </Section>
@@ -385,7 +349,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
       </Section>
 
       {/* Team */}
-      <Section title="Team" bg="bgAlt">
+      <Section title="Team" bg="bgAlt" id="team">
         <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Operational experience meets disciplined capital</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {TEAM.map((member) => (
@@ -396,6 +360,9 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <p className="font-semibold mt-4" style={{ color: tokens.text }}>{member.name}</p>
               <p className="text-sm font-medium mt-1" style={{ color: tokens.accent }}>{member.role}</p>
               <p className="text-sm mt-2 leading-relaxed" style={{ color: tokens.text }}>{member.bio}</p>
+              {member.linkedin && (
+                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block">Read more →</a>
+              )}
             </div>
           ))}
         </div>
