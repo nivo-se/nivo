@@ -9,7 +9,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Input } from "@/components/ui/input";
 import { Lock, Building2, Target, TrendingUp, BarChart3, Clock, Globe, User, Shield, Check, Workflow } from "lucide-react";
@@ -22,21 +21,6 @@ const INVESTOR_STORAGE_KEY = "nivo_investor_unlocked";
 const INVESTOR_PASSWORD = "nivo2020";
 
 // ─── Data (condensed for short form) ─────────────────────────────────────
-const PROJ = [
-  { year: 0, label: "Year 0", equityValue: 100, debt: 30 },
-  { year: 1, label: "Year 1", equityValue: 120, debt: 36 },
-  { year: 2, label: "Year 2", equityValue: 143, debt: 43 },
-  { year: 3, label: "Year 3", equityValue: 171, debt: 51 },
-  { year: 4, label: "Year 4", equityValue: 204, debt: 61 },
-  { year: 5, label: "Year 5", equityValue: 244, debt: 73 },
-  { year: 6, label: "Year 6", equityValue: 291, debt: 87 },
-  { year: 7, label: "Year 7", equityValue: 348, debt: 104 },
-];
-const ENTRY_EQUITY = 100;
-const EXIT_EQUITY = PROJ[PROJ.length - 1].equityValue;
-const GROSS_MOIC = (EXIT_EQUITY / ENTRY_EQUITY).toFixed(2);
-const GROSS_IRR = ((Math.pow(EXIT_EQUITY / ENTRY_EQUITY, 1 / 7) - 1) * 100).toFixed(1);
-
 const PIPELINE_ITEMS = [
   { stage: "Active due diligence", count: "2" },
   { stage: "Advanced discussion", count: "5" },
@@ -161,8 +145,10 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
-                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-28 sm:h-36 w-auto max-w-none object-contain" />
+              <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
+                <div className="h-28 w-28 sm:h-36 sm:w-36 flex items-center justify-center">
+                  <img src="/nivo-n-logo-black.svg" alt="Nivo" className="max-h-full max-w-full w-auto h-auto object-contain" style={{ objectPosition: "49% center" }} />
+                </div>
               </div>
               <p className="text-2xl sm:text-3xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
                 We acquire profitable Nordic SMEs with <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
@@ -176,7 +162,8 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <blockquote className="mt-12 text-lg sm:text-xl font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
                 Our focus is operational improvement rather than technology risk.
               </blockquote>
-              <div className="mt-10 max-w-2xl mx-auto pt-6 border-t text-left" style={{ borderColor: tokens.border }}>
+              <p className="mt-10 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>Key terms</p>
+              <div className="mt-3 max-w-2xl mx-auto pt-6 border-t text-left" style={{ borderColor: tokens.border }}>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Investment Company</span>
@@ -204,6 +191,20 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
                   </div>
                 </div>
               </div>
+              <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>Team with core capabilities</p>
+              <ul className="mt-3 max-w-2xl mx-auto space-y-2 text-left">
+                {[
+                  "Corporate finance and capital markets — valuation, structuring and execution expertise",
+                  "Venture and growth investing — sourcing, due diligence and exit experience",
+                  "Operational scaling and digital transformation — hands-on business building",
+                  "Institutional investment combined with operational leadership — full lifecycle coverage",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
               <p className="mt-6 sm:mt-8 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-bold" style={{ color: tokens.text }}>
                 Value creation is driven primarily by operational improvement — including revenue optimisation, margin expansion and digital upgrades — with only modest reliance on multiple expansion.
               </p>
@@ -310,47 +311,6 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Identify opportunities faster and implement improvements more effectively</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Strengthen commercial execution, improve operational performance and modernise through digitalisation and selective use of AI</li>
             </ul>
-          </div>
-        </div>
-      </Section>
-
-      {/* Model + chart + metrics */}
-      <Section title="The Nordic Compounder Model" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Three pillars</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {["Acquire right", "Execute relentlessly", "Compound with discipline"].map((title, i) => (
-            <div key={i} className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>{title}</p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg p-4 border mb-6" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <p className="text-sm font-medium mb-4" style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
-          <div className="h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={tokens.border} vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} />
-                <YAxis tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} width={36} />
-                <Tooltip cursor={false} contentStyle={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}`, borderRadius: 6, fontSize: 12 }} formatter={(v: number, n: string) => [v.toFixed(0), n === "equityValue" ? "Equity" : "Debt"]} />
-                <Bar dataKey="equityValue" stackId="a" fill={tokens.accent} radius={[0, 4, 0, 0]} name="equityValue" />
-                <Bar dataKey="debt" stackId="a" fill={`${tokens.accentSecondary}99`} radius={[0, 4, 0, 0]} name="debt" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Entry → Exit (illustrative)</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY}</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Gross MOIC</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>IRR</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
           </div>
         </div>
       </Section>
