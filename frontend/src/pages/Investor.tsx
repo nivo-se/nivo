@@ -35,9 +35,9 @@ const TEAM = [
 ];
 
 // ─── Section wrapper (design profile) — background full width, content constrained ───
-function Section({ title, bg = "bg", children }: { title: string; bg?: "bg" | "bgAlt"; children: React.ReactNode }) {
+function Section({ title, bg = "bg", id, children }: { title: string; bg?: "bg" | "bgAlt"; id?: string; children: React.ReactNode }) {
   return (
-    <section className="w-full" style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
+    <section className={"w-full" + (id ? " scroll-mt-[100px]" : "")} id={id} style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
       <div className={SECTION_CLASS}>
         <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>{title}</h2>
         {children}
@@ -107,10 +107,10 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-// Header height for fixed header — use same value for content pt (section menus can go here later)
+// Header height for fixed header
 const INVESTOR_HEADER_HEIGHT = 68;
 
-// ─── Shared header (short vs long form) — fixed so it stays visible when scrolling; section nav can be added later ───
+// ─── Shared header (short vs long form) — fixed ───
 function InvestorHeader({ onSignOut }: { onSignOut: () => void }) {
   return (
     <header
@@ -163,7 +163,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
                 Our focus is operational improvement rather than technology risk.
               </blockquote>
               <p className="mt-10 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>Key terms</p>
-              <div className="mt-3 max-w-2xl mx-auto pt-6 border-t text-left" style={{ borderColor: tokens.border }}>
+              <div className="mt-3 max-w-2xl mx-auto pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Investment Company</span>
@@ -205,6 +205,12 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
                   </li>
                 ))}
               </ul>
+              <div id="why-now" className="mt-8 max-w-2xl mx-auto text-left scroll-mt-[100px]">
+                <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>Why Now</h2>
+                <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+                  Practical AI and modern SaaS now allow smaller companies to upgrade systems, pricing and operations cost-effectively. We bring that capability to portfolio businesses — operational improvement, not technology speculation.
+                </p>
+              </div>
               <p className="mt-6 sm:mt-8 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-bold" style={{ color: tokens.text }}>
                 Value creation is driven primarily by operational improvement — including revenue optimisation, margin expansion and digital upgrades — with only modest reliance on multiple expansion.
               </p>
@@ -214,7 +220,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
       </section>
 
       {/* Opportunity — full section with cards (same as long form) */}
-      <Section title="The Opportunity" bg="bgAlt">
+      <Section title="The Opportunity" bg="bgAlt" id="the-opportunity">
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Why Nordic SMEs, why now</p>
         <p className="leading-relaxed mb-8" style={{ color: tokens.text }}>
           A large share of Nordic SMEs were built before modern digital tools became widely adopted. Many remain profitable but operationally under-digitised. At the same time, practical AI and modern SaaS infrastructure now allow smaller companies to upgrade systems, pricing, reporting and operational workflows quickly and cost-effectively. This creates a narrow window where operational improvements can unlock disproportionate value.
@@ -343,7 +349,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
       </Section>
 
       {/* Team */}
-      <Section title="Team" bg="bgAlt">
+      <Section title="Team" bg="bgAlt" id="team">
         <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Operational experience meets disciplined capital</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {TEAM.map((member) => (
