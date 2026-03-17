@@ -12,7 +12,15 @@ export class TrackingService {
     return this.track('click', trackingId, context)
   }
 
-  async track(type: 'open' | 'click', trackingId: string, context: Record<string, any>) {
+  async trackPageView(trackingId: string, context: Record<string, string | undefined>) {
+    return this.track('page_view', trackingId, context)
+  }
+
+  async trackSectionView(trackingId: string, sectionId: string, context: Record<string, string | undefined>) {
+    return this.track('section_view', trackingId, { ...context, metadata: { section_id: sectionId } })
+  }
+
+  async track(type: 'open' | 'click' | 'page_view' | 'section_view', trackingId: string, context: Record<string, any>) {
     const email = await this.db.getEmailByTrackingId(trackingId)
 
     await this.db.insertTrackingEvent({
@@ -29,13 +37,33 @@ export class TrackingService {
     if (!email?.id || !email?.deal_id) return
     const count = await this.db.countTrackingEvents(trackingId, type)
     if (count === 1) {
-      await this.interactionsService.create({
-        deal_id: email.deal_id,
-        contact_id: email.contact_id,
-        email_id: email.id,
-        type: type === 'open' ? 'email_opened' : 'email_clicked',
-        summary: type === 'open' ? 'Email opened' : 'Tracked link clicked',
-      })
+      const interactionType =
+        type === 'open'
+          ? 'email_opened'
+          : type === 'click'
+            ? 'email_clicked'
+            : type === 'page_view'
+              ? 'email_clicked'
+              : null
+      const summary =
+        type === 'open'
+          ? 'Email opened'
+          : type === 'click'
+            ? 'Tracked link clicked'
+            : type === 'page_view'
+              ? 'Sellers page viewed'
+              : 'Tracked'
+      if (interactionType) {
+        await this.interactionsService.create({
+          deal_id: email.deal_id,
+          contact_id: email.contact_id,
+          email_id: email.id,
+          type: interactionType,
+          summary,
+        })
+      }
+      // section_view events are stored in tracking_events only (metadata.section_id)
+      // for analytics; no interaction created to avoid timeline noise
     }
   }
 }

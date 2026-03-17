@@ -16,7 +16,18 @@ export class EmailsService {
     const appBase = (process.env.APP_BASE_URL || 'http://localhost:3001').replace(/\/$/, '')
     const html = baseHtml || ''
     const withLinks = html.replace(/href="(https?:\/\/[^"]+)"/g, (_m: string, href: string) => {
-      const wrapped = `${appBase}/track/click/${trackingId}?url=${encodeURIComponent(href)}`
+      // Append tid to sellers page links so the page can report page_view and section_view
+      let targetUrl = href
+      try {
+        const u = new URL(href)
+        if (u.pathname === '/sellers' || u.pathname.endsWith('/sellers')) {
+          u.searchParams.set('tid', trackingId)
+          targetUrl = u.toString()
+        }
+      } catch {
+        // leave href as-is if URL parsing fails
+      }
+      const wrapped = `${appBase}/track/click/${trackingId}?url=${encodeURIComponent(targetUrl)}`
       return `href="${wrapped}"`
     })
     const pixel = `<img src="${appBase}/track/open/${trackingId}" width="1" height="1" style="display:none;" alt="" />`

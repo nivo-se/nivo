@@ -19,6 +19,11 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
         secure: false,
       },
+      "/track": {
+        target: process.env.VITE_CRM_SERVER_URL || "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   plugins: [

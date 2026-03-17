@@ -23,6 +23,7 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import ClaimFirstAdmin from "./pages/ClaimFirstAdmin";
 import Investor from "./pages/Investor";
+import Sellers from "./pages/Sellers";
 import NotFound from "./pages/NotFound";
 import StyleGuide from "./pages/StyleGuide";
 import Colors from "./pages/Colors";
@@ -160,6 +161,7 @@ const App = () => (
             <Route path="/design-profile" element={<DesignProfile />} />
             <Route path="/landing" element={<Index />} />
             <Route path="/investor" element={<Investor />} />
+            <Route path="/sellers" element={<Sellers />} />
 
             {/* Default UI: landing for guests, app for logged-in users */}
             <Route path="/" element={<RootOrLanding />}>

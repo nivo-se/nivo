@@ -244,6 +244,41 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     return res.send(PIXEL_BUFFER)
   }))
 
+  app.get('/track/page/:trackingId', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const tracking = new TrackingService(db, new InteractionsService(db))
+
+    await tracking.trackPageView(req.params.trackingId, {
+      user_agent: req.get('user-agent'),
+      ip_address: req.ip,
+      referer: req.get('referer'),
+    })
+
+    res.setHeader('Content-Type', 'image/gif')
+    res.setHeader('Cache-Control', 'no-store')
+    return res.send(PIXEL_BUFFER)
+  }))
+
+  app.get('/track/section/:trackingId', asyncHandler(async (req: Request, res: Response) => {
+    const sectionId = typeof req.query.section === 'string' ? req.query.section : undefined
+    if (!sectionId) return res.status(400).send('Missing section query param')
+
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const tracking = new TrackingService(db, new InteractionsService(db))
+
+    await tracking.trackSectionView(req.params.trackingId, sectionId, {
+      user_agent: req.get('user-agent'),
+      ip_address: req.ip,
+      referer: req.get('referer'),
+    })
+
+    res.setHeader('Content-Type', 'image/gif')
+    res.setHeader('Cache-Control', 'no-store')
+    return res.send(PIXEL_BUFFER)
+  }))
+
   app.get('/track/click/:trackingId', asyncHandler(async (req: Request, res: Response) => {
     const redirectUrl = typeof req.query.url === 'string' ? req.query.url : undefined
     if (!isSafeRedirect(redirectUrl)) return res.status(400).send('Invalid redirect URL')
