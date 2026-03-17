@@ -19,7 +19,7 @@ export const investorTranslations = {
     // Hero / Short version
     oneLiner:
       "We acquire profitable Nordic SMEs and compound value through pricing, cost control and digital workflows — not financial engineering.",
-    shortVersion: "Short version",
+    shortVersion: "Executive summary",
     shortVersionText:
       "Nivo is an investment company focused on long-term ownership of Nordic SMEs. We target SEK 50–200m revenue companies with strong products and loyal customers but operational upside. We improve margins through pricing discipline, cost control, reporting and workflows — not leverage or multiple expansion.",
     shortVersionBullet1: "~15,000 Nordic SMEs in target segment; targeting 20–25% ROIC",
@@ -158,7 +158,7 @@ export const investorTranslations = {
     // Hero / Short version
     oneLiner:
       "Vi förvärvar lönsamma nordiska små och medelstora företag och ackumulerar värde genom prissättning, kostnadskontroll och digitala arbetsflöden — inte finansiell engineering.",
-    shortVersion: "Kort version",
+    shortVersion: "Sammanfattning",
     shortVersionText:
       "Nivo är ett investeringsbolag inriktat på långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på företag med omsättning SEK 50–200 mkr med starka produkter och lojala kunder men med operativt förbättringspotential. Vi förbättrar marginaler genom prissättningsdisciplin, kostnadskontroll, rapportering och arbetsflöden — inte hävstång eller multipelexpansion.",
     shortVersionBullet1: "~15 000 nordiska små och medelstora företag i målsegmentet; mål 20–25 % ROIC",
