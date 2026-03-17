@@ -33,12 +33,14 @@ import {
   createAssumptions,
   deleteAssumptions
 } from './valuation/assumptions.js'
-import { 
+import {
   getLLMSuggestions, 
   convertSuggestionsToAssumptions,
   validateSuggestions,
   CompanyContext 
 } from './valuation/llm-advisor.js'
+import { registerCrmRoutes } from './routes/crm.routes.js'
+import { getCrmPool, PostgresCrmDb, isCrmPostgresConfigured } from './services/crm/postgres-db.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -60,6 +62,13 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3001
 
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
+function getCrmDb() {
+  if (!isCrmPostgresConfigured()) return null
+  const pool = getCrmPool()
+  if (!pool) return null
+  return new PostgresCrmDb(pool)
+}
+registerCrmRoutes(app, getCrmDb)
 
 // FastAPI backend URL for proxying lists, views, universe, etc.
 const FASTAPI_BACKEND = process.env.FASTAPI_BACKEND_URL || process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
@@ -103,20 +112,20 @@ app.use(async (req, res, next) => {
 // AI config status (for debugging live/Mac Mini: curl http://<host>:<port>/api/ai-status)
 app.get('/api/ai-status', (_req, res) => {
   const openaiConfigured = Boolean(process.env.OPENAI_API_KEY)
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SERVICE_KEY ||
-    process.env.VITE_SUPABASE_ANON_KEY
-  const supabaseConfigured = Boolean(supabaseUrl && supabaseKey)
+  const dbUrl = process.env.DATABASE_URL
+  const dbHost = process.env.POSTGRES_HOST || 'localhost'
+  const dbPort = process.env.POSTGRES_PORT || '5433'
+  const dbName = process.env.POSTGRES_DB || 'nivo'
+  const crmConfigured = Boolean(dbUrl || dbHost)
   res.json({
     openaiConfigured,
-    supabaseConfigured,
+    crmConfigured,
+    crmDatabase: dbUrl ? 'DATABASE_URL' : `Postgres ${dbHost}:${dbPort}/${dbName}`,
     message: !openaiConfigured
       ? 'Set OPENAI_API_KEY in .env (project root) or frontend/.env.local'
-      : !supabaseConfigured
-        ? 'Set VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or VITE_SUPABASE_ANON_KEY) in .env or frontend/.env.local'
-        : 'AI and Supabase configured',
+      : !crmConfigured
+        ? 'Set POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD for CRM'
+        : 'AI and CRM (Postgres) configured',
   })
 })
 

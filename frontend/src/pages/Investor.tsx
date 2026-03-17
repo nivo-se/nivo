@@ -9,7 +9,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Input } from "@/components/ui/input";
 import { Lock, Building2, Target, TrendingUp, BarChart3, Clock, Globe, User, Shield, Check, Workflow } from "lucide-react";
@@ -17,43 +16,29 @@ import { NIVO_AURORA_COLORS } from "@/lib/nivoPalette";
 import { tokens, SECTION_CLASS } from "@/lib/designProfileTokens";
 // Direct import from Nivo long-form file only (do not use Investor2LongForm / inv2)
 import { Investor2LongFormNivo } from "./investor-deck/Investor2LongFormNivo";
+import { investorTranslations, type InvestorLang } from "./investor-deck/investorTranslations";
 
 const INVESTOR_STORAGE_KEY = "nivo_investor_unlocked";
 const INVESTOR_PASSWORD = "nivo2020";
 
 // ─── Data (condensed for short form) ─────────────────────────────────────
-const PROJ = [
-  { year: 0, label: "Year 0", equityValue: 100, debt: 30 },
-  { year: 1, label: "Year 1", equityValue: 120, debt: 36 },
-  { year: 2, label: "Year 2", equityValue: 143, debt: 43 },
-  { year: 3, label: "Year 3", equityValue: 171, debt: 51 },
-  { year: 4, label: "Year 4", equityValue: 204, debt: 61 },
-  { year: 5, label: "Year 5", equityValue: 244, debt: 73 },
-  { year: 6, label: "Year 6", equityValue: 291, debt: 87 },
-  { year: 7, label: "Year 7", equityValue: 348, debt: 104 },
-];
-const ENTRY_EQUITY = 100;
-const EXIT_EQUITY = PROJ[PROJ.length - 1].equityValue;
-const GROSS_MOIC = (EXIT_EQUITY / ENTRY_EQUITY).toFixed(2);
-const GROSS_IRR = ((Math.pow(EXIT_EQUITY / ENTRY_EQUITY, 1 / 7) - 1) * 100).toFixed(1);
-
 const PIPELINE_ITEMS = [
-  { stage: "Active due diligence", count: "2" },
-  { stage: "Advanced discussion", count: "5" },
-  { stage: "Initial contact", count: "12" },
-  { stage: "Identified", count: "81" },
+  { stageKey: "pipelineActiveDD" as const, count: "2" },
+  { stageKey: "pipelineAdvanced" as const, count: "5" },
+  { stageKey: "pipelineContact" as const, count: "12" },
+  { stageKey: "pipelineIdentified" as const, count: "81" },
 ];
 
 const TEAM = [
-  { name: "Jesper Kreuger", role: "Founding Partner", bio: "15+ years Nordic SME operations, 8+ transformations, M.Sc. Industrial Engineering." },
-  { name: "Henrik Cavalli", role: "Founding Partner", bio: "12+ years PE and growth investing, 20+ Nordic companies, MBA SSE." },
-  { name: "Sebastian Robson", role: "Founding Partner", bio: "10+ years M&A, tech and industrials, M.Sc. Economics." },
+  { name: "Jesper Kreuger", bioKey: "teamJesperBio" as const, linkedin: "https://www.linkedin.com/in/jesper-kreuger-91b14/" },
+  { name: "Henrik Cavalli", bioKey: "teamHenrikBio" as const, linkedin: "https://www.linkedin.com/in/henrikc1/" },
+  { name: "Sebastian Robson", bioKey: "teamSebastianBio" as const, linkedin: "https://www.linkedin.com/in/sebastian-robson-7418b82b2/" },
 ];
 
 // ─── Section wrapper (design profile) — background full width, content constrained ───
-function Section({ title, bg = "bg", children }: { title: string; bg?: "bg" | "bgAlt"; children: React.ReactNode }) {
+function Section({ title, bg = "bg", id, children }: { title: string; bg?: "bg" | "bgAlt"; id?: string; children: React.ReactNode }) {
   return (
-    <section className="w-full" style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
+    <section className={"w-full" + (id ? " scroll-mt-[100px]" : "")} id={id} style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}>
       <div className={SECTION_CLASS}>
         <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>{title}</h2>
         {children}
@@ -123,91 +108,177 @@ function InvestorGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-// Header height for fixed header — use same value for content pt (section menus can go here later)
+// Header height for fixed header
 const INVESTOR_HEADER_HEIGHT = 68;
 
-// ─── Shared header (short vs long form) — fixed so it stays visible when scrolling; section nav can be added later ───
-function InvestorHeader({ onSignOut }: { onSignOut: () => void }) {
+// ─── Shared header (short vs long form) — fixed ───
+const ANCHOR_LINKS = [
+  { href: "#why-invest", labelKey: "navWhyInvest" as const },
+  { href: "#why-now", labelKey: "navWhyNow" as const },
+  { href: "#approach", labelKey: "navApproach" as const },
+  { href: "#value-creation", labelKey: "navValueCreation" as const },
+  { href: "#team", labelKey: "navTeam" as const },
+  { href: "#returns", labelKey: "navStructure" as const },
+];
+
+function InvestorHeader({
+  onSignOut,
+  lang,
+  onLangChange,
+}: {
+  onSignOut: () => void;
+  lang: InvestorLang;
+  onLangChange: (l: InvestorLang) => void;
+}) {
+  const t = investorTranslations[lang];
   return (
     <header
       className="border-b fixed top-0 left-0 right-0 z-20 bg-white dark:bg-zinc-50"
       style={{ borderColor: "var(--profile-border, #e4e4e7)", height: INVESTOR_HEADER_HEIGHT }}
     >
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 h-full flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 h-full flex items-center justify-between gap-4">
         <div className="flex items-center justify-start flex-shrink-0 min-w-0">
           <img src="/Nivo%20-%20Wordmark%20-%20black.svg" alt="Nivo" className="h-5 sm:h-6 w-auto object-contain" />
         </div>
-        <button
-          type="button"
-          onClick={onSignOut}
-          className="flex items-center gap-2 min-h-[44px] px-4 py-2.5 rounded-lg text-zinc-700 dark:text-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-200 text-sm font-medium transition-colors"
-        >
-          <Lock className="h-4 w-4" />
-          Lås sidan
-        </button>
+        <nav className="flex items-center gap-1 overflow-x-auto flex-wrap justify-center min-w-0 flex-1">
+          {ANCHOR_LINKS.map(({ href, labelKey }) => (
+            <a key={href} href={href} className="px-2 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-950 whitespace-nowrap">
+              {t[labelKey]}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => onLangChange("en")}
+            className={`px-2 py-1 text-xs font-medium rounded transition-colors ${lang === "en" ? "bg-zinc-200 dark:bg-zinc-300 text-zinc-900" : "text-zinc-600 dark:text-zinc-800 hover:text-zinc-900"}`}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => onLangChange("sv")}
+            className={`px-2 py-1 text-xs font-medium rounded transition-colors ${lang === "sv" ? "bg-zinc-200 dark:bg-zinc-300 text-zinc-900" : "text-zinc-600 dark:text-zinc-800 hover:text-zinc-900"}`}
+          >
+            SV
+          </button>
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="flex items-center gap-2 min-h-[44px] px-4 py-2.5 rounded-lg text-zinc-700 dark:text-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-200 text-sm font-medium transition-colors"
+          >
+            <Lock className="h-4 w-4" />
+            {t.lockPage}
+          </button>
+        </div>
       </div>
     </header>
   );
 }
 
 // ─── Short-form content (design profile UX) ────────────────────────────────
-function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => void; onOpenLongForm: () => void }) {
+function InvestorShortForm({
+  onSignOut,
+  onOpenLongForm,
+  lang,
+  onLangChange,
+}: {
+  onSignOut: () => void;
+  onOpenLongForm: () => void;
+  lang: InvestorLang;
+  onLangChange: (l: InvestorLang) => void;
+}) {
+  const t = investorTranslations[lang];
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: tokens.bg }} data-design-profile="nivo">
-      <InvestorHeader onSignOut={onSignOut} />
+      <InvestorHeader onSignOut={onSignOut} lang={lang} onLangChange={onLangChange} />
       <div style={{ paddingTop: INVESTOR_HEADER_HEIGHT }}>
-        {/* Hero — Aurora background; same text structure/formatting as long-form (max-w-3xl, typography) */}
-        <section className="relative">
+        {/* Hero — Aurora background; one-liner, short version, what we don't do */}
+        <section className="relative" id="overview">
         <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
           <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible">
             <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="flex justify-center py-5 px-8 sm:py-6 sm:px-10 mb-5 sm:mb-6 overflow-visible min-h-[100px] sm:min-h-[120px] items-center">
-                <img src="/nivo-n-logo-black.svg" alt="Nivo" className="h-28 sm:h-36 w-auto max-w-none object-contain" />
+              <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-4 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
+                <div className="h-28 w-28 sm:h-36 sm:w-36 flex items-center justify-center">
+                  <img src="/nivo-n-logo-black.svg" alt="Nivo" className="max-h-full max-w-full w-auto h-auto object-contain" style={{ objectPosition: "49% center" }} />
+                </div>
               </div>
-              <h1 className="font-heading font-semibold tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6" style={{ color: tokens.text }}>
-                Nordic Operational Compounder
-              </h1>
-              <p className="text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                We acquire profitable Nordic SMEs that already have <span className="font-semibold" style={{ color: tokens.accent }}>strong products</span>, <span className="font-semibold" style={{ color: tokens.accent }}>loyal customers</span> and <span className="font-semibold" style={{ color: tokens.accent }}>proven business models</span> — but where <span className="font-semibold" style={{ color: tokens.accent }}>operational potential</span> remains untapped.
+              <p className="text-xl sm:text-2xl font-semibold max-w-2xl mx-auto leading-snug" style={{ color: tokens.text }}>
+                {t.oneLiner}
               </p>
-              <p className="mt-6 text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                Through <span className="font-semibold" style={{ color: tokens.accent }}>hands-on ownership</span>, structured <span className="font-semibold" style={{ color: tokens.accent }}>operational improvement</span> and selective use of <span className="font-semibold" style={{ color: tokens.accent }}>AI</span>, we unlock <span className="font-semibold" style={{ color: tokens.accent }}>value</span> that the current owner has overlooked.
+              <div id="why-invest" className="mt-8 max-w-2xl mx-auto text-left rounded-lg p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
+                <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: tokens.accent }}>{t.shortVersion}</p>
+                <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
+                  {t.shortVersionText}
+                </p>
+                <ul className="space-y-1.5 text-sm mb-4" style={{ color: tokens.text }}>
+                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
+                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
+                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet3}</li>
+                </ul>
+                <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.whatWeDontDo}</p>
+                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
+                  {t.whatWeDontDoText}
+                </p>
+              </div>
+              <p className="mt-8 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                {t.companiesIntro}
               </p>
-              <blockquote className="mt-12 text-lg sm:text-xl font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
-                We do not buy technology risk.
-                <br />
-                We only invest where better execution creates disproportionate value.
+              <p className="mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                {t.manyOperate}
+              </p>
+              <p className="mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
+                {t.sourcingEngine}
+              </p>
+              <blockquote className="mt-10 text-base sm:text-lg font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
+                {t.focusQuote}
               </blockquote>
-              <div className="mt-14 max-w-2xl mx-auto pt-8 border-t" style={{ borderColor: tokens.border }}>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-base sm:text-[17px]">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Building2 className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Investment Company</span>
-                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
+              <p className="mt-10 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>{t.keyTerms}</p>
+              <div id="structure" className="mt-3 max-w-2xl mx-auto pt-6 pb-6 border-t border-b text-left scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
+                    <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Shield className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Management Fee</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.managementFee}</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>0%</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Target className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target size</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Target className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetAcquisitionCapital}</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>SEK 1,000m</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross IRR</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetIRR}</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>20–25%</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><BarChart3 className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Target gross MOIC</span>
-                    <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4x–5x</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetMOIC}</span>
+                    <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2" style={{ color: tokens.text }}><Clock className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />Base case hold</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
                     <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
                   </div>
                 </div>
               </div>
-              <p className="mt-8 sm:mt-10 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-bold" style={{ color: tokens.text }}>
-                Operational excellence will add value driven by added revenue growth, EBITDA expansion and only modest multiple expansion.
+              <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl mx-auto text-left" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
+              <ul className="mt-3 max-w-2xl mx-auto space-y-2 text-left">
+                {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div id="why-now" className="mt-8 max-w-2xl mx-auto text-left scroll-mt-[100px]">
+                <h2 className="text-xl font-semibold mb-3" style={{ color: tokens.text }}>{t.whyNow}</h2>
+                <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+                  {t.whyNowText}
+                </p>
+              </div>
+              <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto font-semibold" style={{ color: tokens.text }}>
+                {t.valueCreationLine}
               </p>
             </div>
           </div>
@@ -215,29 +286,32 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
       </section>
 
       {/* Opportunity — full section with cards (same as long form) */}
-      <Section title="The Opportunity" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Why Nordic SMEs, why now</p>
+      <Section title={t.theOpportunity} bg="bgAlt" id="approach">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.whyNordicSmes}</p>
+        <p className="leading-relaxed mb-8" style={{ color: tokens.text }}>
+          {t.opportunityIntro}
+        </p>
 
         <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
-            We buy profitable, under-digitised Nordic SMEs and compound value through operational improvement — not technology risk.
+            {t.opportunityThesis}
           </p>
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Globe className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              15,000+ target companies
+              {t.badge1}
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Target className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              20% ROIC target
+              {t.badge2}
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <Shield className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              Operational upside, not tech risk
+              {t.badge3}
             </span>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
               <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              Nordic specialist
+              {t.badge4}
             </span>
           </div>
         </div>
@@ -248,15 +322,15 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>The universe</h3>
+              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>{t.theUniverse}</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Nordic SMEs in our target band are profitable but under-digitised. Large, underserved opportunity set.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              {t.universeText}
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />~15,000 companies in focus revenue band</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Owner-managed, stable B2B & manufacturing</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Clear process and systems gap → improvement room</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
             </ul>
           </div>
 
@@ -265,15 +339,15 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Workflow className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>The gap</h3>
+              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>{t.operationalGap}</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Same inefficiencies across the set. They need operational elevation, not disruption.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              {t.gapText}
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Manual workflows, spreadsheets, ad-hoc processes</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Fragmented systems, little data flow</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Cost-plus pricing, low margin transparency</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
             </ul>
           </div>
 
@@ -282,15 +356,15 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>Why Nordic</h3>
+              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>{t.whyNordic}</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3 flex-1" style={{ color: tokens.text }}>
-              Favourable environment for long-term, operational value creation.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              {t.whyNordicText}
             </p>
-            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Rule of law, transparency, educated workforce</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Generational transitions driving deal flow</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />Limited dedicated PE below SEK 200m</li>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
             </ul>
           </div>
 
@@ -299,94 +373,64 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: tokens.accent }}>
                 <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>Our take</h3>
+              <h3 className="text-lg font-semibold mb-0" style={{ color: tokens.text }}>{t.ourTake}</h3>
             </div>
-            <p className="text-[15px] sm:text-[16px] leading-relaxed font-medium flex-1" style={{ color: tokens.text }}>
-              Nivo targets this gap with a disciplined, repeatable playbook. We buy operational improvement potential — not technology risk.
+            <p className="text-[15px] sm:text-[16px] leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
+              {t.ourTakeText}
             </p>
-          </div>
-        </div>
-      </Section>
-
-      {/* Overview */}
-      <Section title="Investment overview">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Disciplined approach</p>
-        <p className="leading-relaxed" style={{ color: tokens.text }}>
-          We acquire profitable, under-digitised SMEs in the Nordic region, typically SEK 50–200m revenue. The model is an operational compounder: we use a proprietary segmentation engine to identify targets and create value through structured execution. Our edge is systematic sourcing; our value proposition is operational improvement and long-term compounding, not technology risk.
-        </p>
-      </Section>
-
-      {/* Model + chart + metrics */}
-      <Section title="The Nordic Compounder Model" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Three pillars</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {["Acquire right", "Execute relentlessly", "Compound with discipline"].map((title, i) => (
-            <div key={i} className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>{title}</p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg p-4 border mb-6" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <p className="text-sm font-medium mb-4" style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
-          <div className="h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={tokens.border} vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} />
-                <YAxis tick={{ fontSize: 11, fill: tokens.text }} stroke={tokens.border} width={36} />
-                <Tooltip cursor={false} contentStyle={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}`, borderRadius: 6, fontSize: 12 }} formatter={(v: number, n: string) => [v.toFixed(0), n === "equityValue" ? "Equity" : "Debt"]} />
-                <Bar dataKey="equityValue" stackId="a" fill={tokens.accent} radius={[0, 4, 0, 0]} name="equityValue" />
-                <Bar dataKey="debt" stackId="a" fill={`${tokens.accentSecondary}99`} radius={[0, 4, 0, 0]} name="debt" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Entry → Exit (illustrative)</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY}</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>Gross MOIC</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
-          </div>
-          <div className="pl-4 rounded-r-lg py-3 pr-4" style={{ borderLeft: `4px solid ${tokens.accent}`, backgroundColor: tokens.washSage }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>IRR</p>
-            <p className="text-xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
+            <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
+              <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
+            </ul>
           </div>
         </div>
       </Section>
 
       {/* Pipeline */}
-      <Section title="Pipeline">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>Target 100 by operational improvement potential</p>
+      <Section title={t.pipeline} id="returns">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.pipelineLabel}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {PIPELINE_ITEMS.map((item) => (
-            <div key={item.stage} className="rounded-lg p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
+            <div key={item.stageKey} className="rounded-lg p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
-              <p className="text-sm mt-1" style={{ color: tokens.text }}>{item.stage}</p>
+              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[item.stageKey]}</p>
             </div>
           ))}
         </div>
-        <p className="text-sm mb-4" style={{ color: tokens.text }}>Active targets (illustrative)</p>
+        <p className="text-sm mb-4" style={{ color: tokens.text }}>{t.activeTargets}</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { name: "Company A", sector: "Industrial", revenue: "SEK 120m", status: "Due diligence" },
-            { name: "Company B", sector: "Business services", revenue: "SEK 75m", status: "Advanced" },
-            { name: "Company C", sector: "Distribution", revenue: "SEK 165m", status: "Due diligence" },
+            { name: "Company A", sectorKey: "sectorIndustrial" as const, revenue: "SEK 120m", statusKey: "dueDiligence" as const },
+            { name: "Company B", sectorKey: "sectorBusinessServices" as const, revenue: "SEK 75m", statusKey: "advanced" as const },
+            { name: "Company C", sectorKey: "sectorDistribution" as const, revenue: "SEK 165m", statusKey: "dueDiligence" as const },
           ].map((c) => (
             <div key={c.name} className="rounded-lg p-5 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <p className="font-semibold" style={{ color: tokens.text }}>{c.name}</p>
-              <p className="text-sm mt-1" style={{ color: tokens.text }}>{c.sector} · {c.revenue}</p>
-              <p className="text-sm font-medium mt-3" style={{ color: tokens.accent }}>{c.status}</p>
+              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[c.sectorKey]} · {c.revenue}</p>
+              <p className="text-sm font-medium mt-3" style={{ color: tokens.accent }}>{t.status}: {t[c.statusKey]}</p>
             </div>
           ))}
         </div>
       </Section>
 
+      {/* Value creation + Case — brief */}
+      <Section title={t.valueCreation} id="value-creation">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: tokens.accent }}>{t.valueCreationFocus}</p>
+        <p className="leading-relaxed mb-4" style={{ color: tokens.text }}>
+          {t.valueCreationText}
+        </p>
+        <div id="case" className="scroll-mt-[100px]">
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.illustrativeCase}</p>
+          <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>
+            {t.caseText}
+          </p>
+        </div>
+      </Section>
+
       {/* Team */}
-      <Section title="Team" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>Operational experience meets disciplined capital</p>
+      <Section title={t.team} bg="bgAlt" id="team">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>{t.teamSubtitle}</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {TEAM.map((member) => (
             <div key={member.name} className="flex flex-col items-center text-center">
@@ -394,17 +438,27 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
                 <User className="w-14 h-14" style={{ color: tokens.text }} />
               </div>
               <p className="font-semibold mt-4" style={{ color: tokens.text }}>{member.name}</p>
-              <p className="text-sm font-medium mt-1" style={{ color: tokens.accent }}>{member.role}</p>
-              <p className="text-sm mt-2 leading-relaxed" style={{ color: tokens.text }}>{member.bio}</p>
+              <p className="text-sm font-medium mt-1" style={{ color: tokens.accent }}>{t.foundingPartner}</p>
+              <p className="text-sm mt-2 leading-relaxed" style={{ color: tokens.text }}>{t[member.bioKey]}</p>
+              {member.linkedin && (
+                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block">{t.readMore}</a>
+              )}
             </div>
           ))}
         </div>
       </Section>
 
+      {/* Risks — brief */}
+      <Section title={t.risks} id="risks">
+        <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>
+          {t.risksText}
+        </p>
+      </Section>
+
       {/* CTA — reveal full long-form on same page */}
-      <section className="w-full" style={{ backgroundColor: tokens.bg, borderTop: `1px solid ${tokens.border}` }}>
+      <section id="contact" className="w-full scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderTop: `1px solid ${tokens.border}` }}>
         <div className={SECTION_CLASS}>
-        <p className="text-center mb-4" style={{ color: tokens.text }}>Full long-form memo with structure, sourcing, value creation and case study.</p>
+        <p className="text-center mb-4" style={{ color: tokens.text }}>{t.ctaText}</p>
         <div className="flex justify-center gap-4">
           <button
             type="button"
@@ -412,7 +466,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
             className="inline-flex items-center justify-center min-h-[48px] px-6 py-3 rounded-md text-white text-base font-semibold hover:opacity-90 transition-opacity"
             style={{ backgroundColor: tokens.primaryBtn }}
           >
-            Open long-form version
+            {t.openLongForm}
           </button>
         </div>
         </div>
@@ -425,6 +479,7 @@ function InvestorShortForm({ onSignOut, onOpenLongForm }: { onSignOut: () => voi
 export default function Investor() {
   const [unlocked, setUnlocked] = useState(false);
   const [showLongForm, setShowLongForm] = useState(false);
+  const [lang, setLang] = useState<InvestorLang>("en");
 
   useEffect(() => {
     if (sessionStorage.getItem(INVESTOR_STORAGE_KEY) === "1") setUnlocked(true);
@@ -442,13 +497,20 @@ export default function Investor() {
   if (showLongForm) {
     return (
       <div className="min-h-screen overflow-x-hidden" data-design-profile="nivo" data-investor-view="long-form-nivo">
-        <InvestorHeader onSignOut={handleSignOut} />
+        <InvestorHeader onSignOut={handleSignOut} lang={lang} onLangChange={setLang} />
         <div style={{ paddingTop: INVESTOR_HEADER_HEIGHT }}>
-          <Investor2LongFormNivo key="nivo-long-form" />
+          <Investor2LongFormNivo key="nivo-long-form" lang={lang} />
         </div>
       </div>
     );
   }
 
-  return <InvestorShortForm onSignOut={handleSignOut} onOpenLongForm={() => setShowLongForm(true)} />;
+  return (
+    <InvestorShortForm
+      onSignOut={handleSignOut}
+      onOpenLongForm={() => setShowLongForm(true)}
+      lang={lang}
+      onLangChange={setLang}
+    />
+  );
 }

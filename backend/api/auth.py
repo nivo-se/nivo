@@ -211,10 +211,16 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         if not payload:
             return _json_401(request)
 
+        # Email/name: standard claims or Auth0 Action namespaced (https://nivogroup.se/email)
+        _ns = "https://nivogroup.se/"
+        email = payload.get("email") or payload.get(_ns + "email")
+        name = payload.get("name") or payload.get(_ns + "name")
+
         request.state.user = {
             "sub": payload.get("sub"),
-            "email": payload.get("email"),
+            "email": email,
+            "name": name,
             "role": payload.get("role"),
-            **{k: v for k, v in payload.items() if k not in ("sub", "email", "role")},
+            **{k: v for k, v in payload.items() if k not in ("sub", "email", "name", "role")},
         }
         return await call_next(request)
