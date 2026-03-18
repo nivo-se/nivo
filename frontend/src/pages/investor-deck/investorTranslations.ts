@@ -28,11 +28,11 @@ export const investorTranslations = {
       "Team: extensive capital markets and venture experience; scaled a direct-to-consumer business from zero",
     whatWeDontDo: "What we don't do",
     whatWeDontDoText:
-      "No turnarounds. No technology risk. No aggressive leverage. No reliance on multiple expansion.",
+      "We avoid turnarounds, technology risk, and aggressive leverage; we bet on better operations and higher margins — multiple expansion could be a result, not our primary bet.",
 
     // Hero paragraphs
     companiesIntro:
-      "These companies often have strong products, loyal customers and proven business models — but operational potential remains untapped.",
+      "Our target companies often have strong products, loyal customers and proven business models — but operational potential remains untapped.",
     manyOperate:
       "Many operate with manual workflows; fragmented systems; limited visibility. The businesses are sound; execution can be improved.",
     sourcingEngine:
@@ -63,6 +63,7 @@ export const investorTranslations = {
     valueCreationLine: "Value creation: pricing, cost control, reporting and digital workflows.",
 
     // Sections
+    overviewSection: "Overview",
     theOpportunity: "The Opportunity",
     whyNordicSmes: "Why Nordic SMEs, why now",
     opportunityIntro:
@@ -167,11 +168,11 @@ export const investorTranslations = {
       "Team: omfattande erfarenhet från kapitalmarknader och venture; byggt ett direkt-till-konsument-företag från noll",
     whatWeDontDo: "Vad vi inte gör",
     whatWeDontDoText:
-      "Inga turnaround-fall. Ingen teknologirisk. Ingen aggressiv hävstång. Ingen förlitan på multipelexpansion.",
+      "Vi undviker turnaround-fall, teknologirisk och aggressiv hävstång; vi satsar på bättre operationer och högre marginaler — multipelexpansion kan bli resultatet, inte vårt primära spel.",
 
     // Hero paragraphs
     companiesIntro:
-      "Dessa företag har ofta starka produkter, lojala kunder och beprövade affärsmodeller — men operativ potential finns kvar att utnyttja.",
+      "Våra målbolag har ofta starka produkter, lojala kunder och beprövade affärsmodeller — men operativ potential finns kvar att utnyttja.",
     manyOperate:
       "Många arbetar med manuella arbetsflöden; fragmenterade system; begränsad insyn. Företagen är sunda; exekveringen kan förbättras.",
     sourcingEngine:
@@ -202,6 +203,7 @@ export const investorTranslations = {
     valueCreationLine: "Värdeskapande: prissättning, kostnadskontroll, rapportering och digitala arbetsflöden.",
 
     // Sections
+    overviewSection: "Översikt",
     theOpportunity: "Möjligheten",
     whyNordicSmes: "Varför nordiska små och medelstora företag, varför nu",
     opportunityIntro:

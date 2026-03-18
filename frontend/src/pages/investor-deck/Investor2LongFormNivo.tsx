@@ -1,9 +1,7 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Database, Filter, Search, Target, User, TrendingUp, BarChart3, Clock, Building2, Globe, Workflow, Shield, Check, ChevronDown, Handshake, FileCheck, ArrowRight } from "lucide-react";
-import { AuroraBackground } from "@/components/ui/aurora-background";
 import { SECTION_CLASS as SECTION_CLASS_TOKEN, tokens } from "@/lib/designProfileTokens";
-import { NIVO_AURORA_COLORS } from "@/lib/nivoPalette";
 import { investorTranslations, type InvestorLang } from "./investorTranslations";
 
 // ─── Projection data: 7-year horizon, target IRR 20–25% / MOIC 4–5x; reinvestment and 20% ROIC at portfolio level drive MoM growth ─────────
@@ -58,58 +56,120 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
   const t = investorTranslations[lang];
   return (
     <div className="text-profile-fg antialiased min-h-screen overflow-x-hidden [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)] [padding-bottom:env(safe-area-inset-bottom)]" style={{ backgroundColor: tokens.bg }}>
-      {/* ─── Hero: one-liner, short version, what we don't do, overview ─── */}
-      <section className="relative scroll-mt-[100px]" id="overview">
-        <AuroraBackground auroraColors={[...NIVO_AURORA_COLORS]} showRadialGradient className="!min-h-[75vh]">
-          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-10 sm:pb-12 min-h-[75vh] overflow-visible">
-            <div className="max-w-3xl mx-auto text-center overflow-visible" style={{ color: tokens.text }}>
-              <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-4 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
-                <div className="h-28 w-28 sm:h-36 sm:w-36 flex items-center justify-center">
-                  <img src="/nivo-n-logo-black.svg" alt="Nivo" className="max-h-full max-w-full w-auto h-auto object-contain" style={{ objectPosition: "49% center" }} />
-                </div>
-              </div>
-              <p className="text-xl sm:text-2xl font-semibold max-w-2xl mx-auto leading-snug" style={{ color: tokens.text }}>
-                {t.oneLiner}
+      {/* ─── Hero: video background, white text (like Sellers) ─── */}
+      <section className="relative flex min-h-[75vh] w-full overflow-hidden scroll-mt-[100px]" id="overview">
+        <div className="pointer-events-none absolute inset-0">
+          <video
+            className="h-full w-full object-cover object-[50%_30%] sm:object-center"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-label="Background video for hero section"
+          >
+            <source src="/uploads/nivo-hero-video.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent" />
+        </div>
+        <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible w-full">
+          <div className="max-w-3xl mx-auto text-center overflow-visible text-white">
+            <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-4 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
+              <img
+                src="/nivo-logo-white.svg"
+                alt="Nivo"
+                className="h-20 sm:h-24 w-auto object-contain"
+              />
+            </div>
+            <p className="text-xl sm:text-2xl font-semibold max-w-2xl mx-auto leading-snug text-white">
+              {t.oneLiner}
+            </p>
+            <div id="why-invest" className="mt-6 max-w-2xl mx-auto text-left rounded-lg p-4 sm:p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
+              <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.shortVersion}</p>
+              <p className="text-[14px] leading-relaxed mb-3" style={{ color: tokens.text }}>
+                {t.shortVersionText}
               </p>
-              <div id="why-invest" className="mt-8 max-w-2xl mx-auto text-left rounded-lg p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-                <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: tokens.accent }}>{t.shortVersion}</p>
-                <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
-                  {t.shortVersionText}
-                </p>
-                <ul className="space-y-1.5 text-sm mb-4" style={{ color: tokens.text }}>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet3}</li>
-                </ul>
-                <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.whatWeDontDo}</p>
-                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.whatWeDontDoText}
-                </p>
-              </div>
-              <p className="mt-8 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                {t.companiesIntro}
-              </p>
-              <p className="mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                {t.manyOperate}
-              </p>
-              <p className="mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style={{ color: tokens.text }}>
-                {t.sourcingEngine}
-              </p>
-              <blockquote className="mt-10 text-base sm:text-lg font-bold max-w-xl mx-auto" style={{ color: tokens.text }}>
-                {t.focusQuote}
-              </blockquote>
-              <div className="mt-8 max-w-2xl mx-auto text-left scroll-mt-[100px]" id="why-now">
-                <h2 className={H2_CLASS}>{t.whyNow}</h2>
-                <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
-                  {t.whyNowText}
-                </p>
-              </div>
-              <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto font-semibold" style={{ color: tokens.text }}>
-                {t.valueCreationLine}
+              <ul className="space-y-1 text-sm mb-3" style={{ color: tokens.text }}>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
+                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet3}</li>
+              </ul>
+              <p className="text-sm font-semibold uppercase tracking-wider mb-1.5" style={{ color: tokens.accent }}>{t.whatWeDontDo}</p>
+              <p className="text-[13px] leading-relaxed" style={{ color: tokens.text }}>
+                {t.whatWeDontDoText}
               </p>
             </div>
           </div>
-        </AuroraBackground>
+        </div>
+      </section>
+
+      {/* ─── Executive summary Part 2 (rest of overview below hero) ─── */}
+      <section className="w-full scroll-mt-[100px]" id="executive-summary" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
+          <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
+            <p className="text-[16px] sm:text-[18px] leading-relaxed mb-4" style={{ color: tokens.text }}>
+              {t.companiesIntro}
+            </p>
+            <p className="text-sm sm:text-base leading-relaxed mb-4" style={{ color: tokens.text }}>
+              {t.manyOperate}
+            </p>
+            <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
+              {t.sourcingEngine}
+            </p>
+            <blockquote className="text-base sm:text-lg font-bold max-w-xl mb-8" style={{ color: tokens.text }}>
+              {t.focusQuote}
+            </blockquote>
+            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
+            <div id="key-terms" className="pt-6 pb-6 border-t border-b mb-8 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
+                  <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.managementFee}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>0%</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Target className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetAcquisitionCapital}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>SEK 1,000m</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetIRR}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>20–25%</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetMOIC}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
+            <ul className="space-y-2 mb-8 max-w-2xl">
+              {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div id="why-now" className="scroll-mt-[100px]">
+              <h2 className={H2_CLASS}>{t.whyNow}</h2>
+              <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+                {t.whyNowText}
+              </p>
+            </div>
+            <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-2xl font-semibold" style={{ color: tokens.text }}>
+              {t.valueCreationLine}
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ─── The Opportunity ────────────────────────────────────────────── */}
