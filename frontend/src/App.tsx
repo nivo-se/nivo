@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 
 function RedirectWithParam({ to, param }: { to: string; param: string }) {
   const params = useParams();
@@ -11,6 +11,12 @@ function RedirectWithParam({ to, param }: { to: string; param: string }) {
   const target = to.replace(`:${param}`, value ?? "");
   return <Navigate to={target} replace />;
 }
+
+function RedirectSellersToIntro() {
+  const { search } = useLocation();
+  return <Navigate to={`/intro${search}`} replace />;
+}
+
 import { Auth0Provider } from "@auth0/auth0-react";
 import { NoAuthProvider, useAuth } from "./contexts/AuthContext";
 import { Auth0AuthProvider } from "./contexts/Auth0AuthProvider";
@@ -162,7 +168,8 @@ const App = () => (
             <Route path="/design-profile" element={<DesignProfile />} />
             <Route path="/landing" element={<Index />} />
             <Route path="/investor" element={<Investor />} />
-            <Route path="/sellers" element={<Sellers />} />
+            <Route path="/intro" element={<Sellers />} />
+            <Route path="/sellers" element={<RedirectSellersToIntro />} />
 
             {/* Default UI: landing for guests, app for logged-in users */}
             <Route path="/" element={<RootOrLanding />}>

@@ -1,5 +1,5 @@
 /**
- * Sellers page (target company owners). Route: /sellers.
+ * Sellers page (target company owners). Route: /intro.
  * Password-gated page for potential acquisition targets.
  * Swedish only. Norrstigen-inspired tonality.
  */
@@ -23,6 +23,9 @@ import {
   Workflow,
   ArrowRight,
   RefreshCw,
+  Zap,
+  UserCheck,
+  Hammer,
 } from "lucide-react";
 import { tokens, SECTION_CLASS } from "@/lib/designProfileTokens";
 import { sellersTranslations } from "./sellers-deck/sellersTranslations";
@@ -174,6 +177,8 @@ const SELLERS_HEADER_HEIGHT = 68;
 
 const ANCHOR_LINKS = [
   { href: "#sammanfattning", labelKey: "navSammanfattning" as const },
+  { href: "#samarbete", labelKey: "navSamarbete" as const },
+  { href: "#vad-vi-inte-gor", labelKey: "navVadViInteGor" as const },
   { href: "#varfor-annorlunda", labelKey: "navVarförAnnorlunda" as const },
   { href: "#vem-bakom-oss", labelKey: "navVemBakomOss" as const },
   { href: "#team", labelKey: "navTeam" as const },
@@ -214,7 +219,7 @@ function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
-const TRACKABLE_SECTION_IDS = ["overview", "sammanfattning", "varfor-annorlunda", "vem-bakom-oss", "team", "varfor-spelar-roll"];
+const TRACKABLE_SECTION_IDS = ["overview", "sammanfattning", "samarbete", "vad-vi-inte-gor", "varfor-annorlunda", "vem-bakom-oss", "team", "varfor-spelar-roll"];
 
 function SellersContent({ onSignOut }: { onSignOut: () => void }) {
   const t = sellersTranslations;
@@ -290,6 +295,9 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         <Section title={t.sammanfattningTitle} id="sammanfattning">
           <div className="rounded-lg p-5 border mb-6" style={{ backgroundColor: tokens.bgAlt, borderColor: tokens.border }}>
             <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
+              {t.sammanfattningIntro}
+            </p>
+            <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
               {t.sammanfattningText}
             </p>
             <ul className="space-y-1.5 text-sm mb-4" style={{ color: tokens.text }}>
@@ -307,10 +315,86 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
               </li>
             </ul>
             <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>
+              {t.vadHandlarOmPraktiken}
+            </p>
+            <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>
+              {t.vadHandlarOmPraktikenText}
+            </p>
+            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>
               {t.merAnKapital}
             </p>
             <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
               {t.merAnKapitalText}
+            </p>
+          </div>
+        </Section>
+
+        {/* Så upplever grundare samarbetet med oss */}
+        <Section title={t.samarbeteTitle} bg="bgAlt" id="samarbete">
+          <p className="text-[15px] leading-relaxed mb-6" style={{ color: tokens.text }}>
+            {t.samarbeteIntro}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: Zap, titleKey: "samarbeteSnabbBeslut" as const, textKey: "samarbeteSnabbBeslutText" as const },
+              { icon: UserCheck, titleKey: "samarbeteNärvarandeMenIntePåträngande" as const, textKey: "samarbeteNärvarandeMenIntePåträngandeText" as const },
+              { icon: Hammer, titleKey: "samarbeteByggaInteRapportera" as const, textKey: "samarbeteByggaInteRapporteraText" as const },
+            ].map(({ icon: Icon, titleKey, textKey }) => (
+              <div
+                key={titleKey}
+                className="rounded-lg p-5 border"
+                style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
+                  style={{ backgroundColor: tokens.washSage, borderColor: tokens.accent, borderWidth: 1 }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
+                </div>
+                <h4 className="font-semibold mb-2" style={{ color: tokens.text }}>
+                  {t[titleKey]}
+                </h4>
+                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
+                  {t[textKey]}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* Vad vi inte gör */}
+        <Section title={t.vadViInteGor} id="vad-vi-inte-gor">
+          <p className="text-[15px] leading-relaxed mb-6" style={{ color: tokens.text }}>
+            {t.vadViInteGorIntro}
+          </p>
+          <ul className="space-y-3 mb-6" style={{ color: tokens.text }}>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem1}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem2}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem3}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem4}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem5}</span>
+            </li>
+          </ul>
+          <div
+            className="rounded-lg p-5 border-l-4"
+            style={{ backgroundColor: tokens.washSage, borderLeftColor: tokens.accent }}
+          >
+            <p className="text-[15px] font-medium leading-relaxed" style={{ color: tokens.text }}>
+              {t.vadViInteGorAvslutning}
             </p>
           </div>
         </Section>

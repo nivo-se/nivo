@@ -51,7 +51,7 @@ export class TrackingService {
           : type === 'click'
             ? 'Tracked link clicked'
             : type === 'page_view'
-              ? 'Sellers page viewed'
+              ? 'Intro page viewed'
               : 'Tracked'
       if (interactionType) {
         await this.interactionsService.create({

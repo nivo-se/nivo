@@ -16,11 +16,11 @@ export class EmailsService {
     const appBase = (process.env.APP_BASE_URL || 'http://localhost:3001').replace(/\/$/, '')
     const html = baseHtml || ''
     const withLinks = html.replace(/href="(https?:\/\/[^"]+)"/g, (_m: string, href: string) => {
-      // Append tid to sellers page links so the page can report page_view and section_view
+      // Append tid to intro page links so the page can report page_view and section_view
       let targetUrl = href
       try {
         const u = new URL(href)
-        if (u.pathname === '/sellers' || u.pathname.endsWith('/sellers')) {
+        if (u.pathname === '/intro' || u.pathname.endsWith('/intro') || u.pathname === '/sellers' || u.pathname.endsWith('/sellers')) {
           u.searchParams.set('tid', trackingId)
           targetUrl = u.toString()
         }

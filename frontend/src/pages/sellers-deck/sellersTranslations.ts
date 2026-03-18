@@ -1,6 +1,7 @@
 /**
  * Sellers page (target company owners) — Swedish only.
- * Norrstigen-inspired tonality: respectful, legacy-focused, partnership-oriented.
+ * Founder-first perspective: speaks to the emotional reality of selling a life's work.
+ * Calm, respectful, confident — never salesy or corporate.
  */
 
 export const sellersTranslations = {
@@ -16,31 +17,66 @@ export const sellersTranslations = {
 
   // Nav
   navSammanfattning: "Sammanfattning",
+  navSamarbete: "Samarbetet",
+  navVadViInteGor: "Vad vi inte gör",
   navVarförAnnorlunda: "Varför vi är annorlunda",
   navVemBakomOss: "Vem som står bakom oss",
   navTeam: "Team",
   navKontakt: "Kontakt",
 
-  // Hero
+  // Hero — start with founder's reality, not what Nivo does
   heroOneLiner:
-    "Vi förvärvar och utvecklar företag — med långsiktigt kapital, operativt engagemang och respekt för det som redan fungerar.",
+    "Att sälja det man byggt är mer än en affär. Det handlar om människor, arv och identitet. Vi vill vara det rätta långsiktiga hemmet för det du skapat — inte bara en bra köpare.",
 
-  // Sammanfattning (Executive Summary)
+  // Sammanfattning — founder's reality first
   sammanfattningTitle: "Sammanfattning",
+  sammanfattningIntro:
+    "Du har byggt något under många år. Företaget bär ditt namn, din historia, dina beslut. Att sälja är inte bara en transaktion — det är att välja vem som ska ta vid. Vilka som ska vårda det du lämnar. Vilka som ska respektera de människor som har gjort företaget till vad det är.",
   sammanfattningText:
-    "Nivo är ett investeringsbolag inriktat på långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på företag som ert — med omsättning om 50–200 mkr, starka produkter och lojala kunder, där det finns operativ förbättringspotential. Vi förbättrar marginaler genom prissättningsdisciplin, kostnadskontroll, rapportering och arbetssätt — inte genom hög skuldsättning eller värderingsexpansion.",
+    "Nivo är ett investeringsbolag med långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på företag som ert — omsättning 50–200 mkr, starka produkter, lojala kunder — där det finns operativ förbättringspotential. Men vi köper inte för att sälja vidare. Vi köper för att utveckla vidare.",
   sammanfattningBullet1:
     "Kapital till företaget för tillväxt och utveckling — vi investerar i verksamheten, inte bara i affären",
   sammanfattningBullet2:
     "Möjlighet att återinvestera och bli en del av Nivo Group — som säljare kan du ansluta dig som investerare och behålla exponering",
   sammanfattningBullet3:
     "En långsiktig partner som respekterar det du byggt — vi utvecklar vidare, inte säljer vidare",
+  vadHandlarOmPraktiken: "Vad det betyder i praktiken",
+  vadHandlarOmPraktikenText:
+    "När vi säger operativt engagemang menar vi konkret: vi sätter oss in i prissättning och kundsegment, hjälper till att bygga rapportering som styr verksamheten (inte bara rapporterar uppåt), och stramar upp kostnadsstrukturen där det finns slöseri. Vi gör det tillsammans med er — inte genom att ersätta er. På måndag morgon är det fortfarande ert företag som kör; vi är med i styrelsen, i dialogen, i de stora beslut som behöver tas. Vi fokuserar på att bygga, inte på att fylla i Excel-ark.",
   merAnKapital: "Mer än kapital",
   merAnKapitalText:
     "Vi bidrar med operativt engagemang, långsiktighet och respekt för det som redan fungerar. Som partner till dig och ert företag kombinerar vi kapital med erfarenhet och aktivt engagemang.",
+
+  // Så upplever grundare samarbetet med oss
+  samarbeteTitle: "Så upplever grundare samarbetet med oss",
+  samarbeteIntro:
+    "Vi har hört från grundare som arbetat med oss: det som sticker ut är hur vi faktiskt arbetar — inte vad vi lovar.",
+  samarbeteSnabbBeslut: "Snabba beslut",
+  samarbeteSnabbBeslutText:
+    "Vi är ett litet team. Inga långa investerarkommittéer, inga månader av due diligence utan beslut. När något behöver avgöras tar vi det. Du får svar, inte väntan.",
+  samarbeteNärvarandeMenIntePåträngande: "Närvarande men inte påträngande",
+  samarbeteNärvarandeMenIntePåträngandeText:
+    "Vi vill vara tillgängliga — för strategiska frågor, för stora beslut, för när det behövs. Men vi driver inte verksamheten dagligen. Vi litar på att ni känner ert företag bäst. Vår roll är att stötta, utmana och resursstärka — inte att micromanage.",
+  samarbeteByggaInteRapportera: "Fokus på att bygga, inte rapportera",
+  samarbeteByggaInteRapporteraText:
+    "Vi vill ha tydlig rapportering så vi förstår läget. Men vi bygger inte ett rapporteringsmonster. Målet är att ni ska kunna styra verksamheten bättre — inte att fylla i hundra slides till oss. Vi prioriterar det som driver värde.",
+
+  // Vad vi inte gör — build trust through constraints
   vadViInteGor: "Vad vi inte gör",
-  vadViInteGorText:
-    "Inga turnaround-fall. Ingen teknologirisk. Ingen aggressiv hävstång. Ingen förlitan på värderingsexpansion.",
+  vadViInteGorIntro:
+    "Vi tror att det bygger förtroende att vara tydliga med vad vi inte gör. Så skiljer vi oss från många fondägda köpare:",
+  vadViInteGorItem1:
+    "Vi gör inga turnaround-fall. Vi söker företag med stark grund — inte sådana som behöver räddas.",
+  vadViInteGorItem2:
+    "Vi tar inte teknologirisk. Vi vill ha beprövade affärsmodeller, inte experiment som kan gå åt vilket håll som helst.",
+  vadViInteGorItem3:
+    "Vi använder inte aggressiv hävstång. Vi bygger inte värde genom att belåna företaget till max.",
+  vadViInteGorItem4:
+    "Vi räknar inte på värderingsexpansion. Vår modell bygger på operativ förbättring — bättre marginaler, bättre prissättning, bättre kostnadskontroll.",
+  vadViInteGorItem5:
+    "Vi har ingen fondcykel som tvingar oss att sälja. Till skillnad från många PE-fonder har vi ingen deadline. Vi kan hålla 5–10+ år om det behövs.",
+  vadViInteGorAvslutning:
+    "Det betyder att vi säger nej till många affärer. Men det betyder också att när vi säger ja, menar vi det.",
 
   // Varför Nivo är annorlunda
   varforAnnorlundaTitle: "Varför Nivo är annorlunda",
@@ -136,7 +172,7 @@ export const sellersTranslations = {
   varforSpelarRollCta:
     "Vill du bolla idéer eller ta en förutsättningslös kaffe? Vi ser fram emot att höra från dig.",
 
-  // Kontakt (text moved to Varför spelar roll; duplicate "Vi ser fram emot" removed)
+  // Kontakt
   kontaktText: "Tveka inte att höra av dig — oavsett var du är i processen.",
   kontaktCtaButton: "Kontakta oss",
 } as const;
