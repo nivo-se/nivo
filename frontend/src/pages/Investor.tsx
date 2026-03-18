@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Lock, Building2, Target, TrendingUp, BarChart3, Clock, Globe, User, Shield, Check, Workflow } from "lucide-react";
+import { Lock, Building2, Target, TrendingUp, BarChart3, Clock, Globe, User, Shield, Check, Workflow, Search, DollarSign, RefreshCw } from "lucide-react";
 import { tokens, SECTION_CLASS } from "@/lib/designProfileTokens";
 // Direct import from Nivo long-form file only (do not use Investor2LongForm / inv2)
 import { Investor2LongFormNivo } from "./investor-deck/Investor2LongFormNivo";
@@ -113,10 +113,12 @@ const INVESTOR_HEADER_HEIGHT = 68;
 const ANCHOR_LINKS = [
   { href: "#why-invest", labelKey: "navWhyInvest" as const },
   { href: "#why-now", labelKey: "navWhyNow" as const },
+  { href: "#investment-process", labelKey: "navInvestmentProcess" as const },
   { href: "#approach", labelKey: "navApproach" as const },
   { href: "#value-creation", labelKey: "navValueCreation" as const },
+  { href: "#pipeline", labelKey: "navPipeline" as const },
   { href: "#team", labelKey: "navTeam" as const },
-  { href: "#returns", labelKey: "navStructure" as const },
+  { href: "#structure", labelKey: "navStructure" as const },
 ];
 
 function InvestorHeader({
@@ -223,37 +225,52 @@ function InvestorShortForm({
               </p>
               <div id="why-invest" className="mt-6 max-w-2xl mx-auto text-left rounded-lg p-4 sm:p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                 <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.shortVersion}</p>
-                <p className="text-[14px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-                  {t.shortVersionText}
-                </p>
-                <ul className="space-y-1 text-sm mb-3" style={{ color: tokens.text }}>
+                <p className="text-[14px] leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatPara1}</p>
+                <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryWhatPara2}</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryValueLabel}</p>
+                <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
+                <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
+                <ul className="space-y-1 text-sm mb-4 pl-4" style={{ color: tokens.text }}>
                   <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
                   <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
-                  <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet3}</li>
                 </ul>
-                <p className="text-sm font-semibold uppercase tracking-wider mb-1.5" style={{ color: tokens.accent }}>{t.whatWeDontDo}</p>
-                <p className="text-[13px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.whatWeDontDoText}
-                </p>
+                <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryTeamLabel}</p>
+                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Overview — Part 2 (rest of overview content below hero) */}
+        {/* Overview — Part 2 (restructured: What, Model, Why, Edge, Returns, Team) */}
         <Section title={t.overviewSection} id="executive-summary">
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryWhatLabel}</p>
           <p className="text-lg sm:text-xl leading-relaxed mb-4" style={{ color: tokens.text }}>
             {t.companiesIntro}
           </p>
+          <p className="text-lg sm:text-xl leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
+            {t.companiesIntroFollowUp}
+          </p>
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryModelLabel}</p>
+          <p className="text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
+            {t.execSummaryModelSentence}
+          </p>
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryWhyLabel}</p>
           <p className="text-sm sm:text-base leading-relaxed mb-4" style={{ color: tokens.text }}>
             {t.manyOperate}
           </p>
+          <div id="why-now" className="mb-6 scroll-mt-[100px]">
+            <h2 className="text-xl font-semibold mb-3" style={{ color: tokens.text }}>{t.whyNow}</h2>
+            <div className="space-y-4 text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+              {t.whyNowText.split("\n\n").map((para, i, arr) => (
+                <p key={i} className={i === arr.length - 1 ? "font-semibold" : undefined}>{para}</p>
+              ))}
+            </div>
+          </div>
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryEdgeLabel}</p>
           <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
             {t.sourcingEngine}
           </p>
-          <blockquote className="text-base sm:text-lg font-bold mb-8" style={{ color: tokens.text }}>
-            {t.focusQuote}
-          </blockquote>
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
           <div id="structure" className="pt-6 pb-6 border-t border-b mb-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
@@ -284,7 +301,7 @@ function InvestorShortForm({
             </div>
           </div>
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
-          <ul className="space-y-2 mb-8">
+          <ul className="space-y-2">
             {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
               <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
@@ -292,21 +309,46 @@ function InvestorShortForm({
               </li>
             ))}
           </ul>
-          <div id="why-now" className="scroll-mt-[100px]">
-            <h2 className="text-xl font-semibold mb-3" style={{ color: tokens.text }}>{t.whyNow}</h2>
-            <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
-              {t.whyNowText}
-            </p>
-          </div>
-          <p className="mt-6 text-base sm:text-lg leading-relaxed font-semibold" style={{ color: tokens.text }}>
-            {t.valueCreationLine}
-          </p>
         </Section>
 
+      {/* Investment Process — timeline with boxes */}
+      <Section title={t.investmentProcess} bg="bgAlt" id="investment-process">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-8" style={{ color: tokens.accent }}>{t.investmentEngineIntro}</p>
+        <div className="relative">
+          {/* Timeline: vertical on mobile, horizontal on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+            {[
+              { icon: Search, titleKey: "investmentStep1Title" as const, textKey: "investmentStep1Text" as const },
+              { icon: TrendingUp, titleKey: "investmentStep2Title" as const, textKey: "investmentStep2Text" as const },
+              { icon: DollarSign, titleKey: "investmentStep3Title" as const, textKey: "investmentStep3Text" as const },
+              { icon: RefreshCw, titleKey: "investmentStep4Title" as const, textKey: "investmentStep4Text" as const },
+            ].map(({ icon: Icon, titleKey, textKey }) => (
+              <div
+                key={titleKey}
+                className="relative flex flex-col rounded-xl p-5 sm:p-6 border shadow-sm"
+                style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
+              >
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: tokens.accent }}>
+                    <Icon className="w-5 h-5 text-white" aria-hidden />
+                  </div>
+                </div>
+                <p className="font-semibold mb-2 text-[15px] leading-snug" style={{ color: tokens.text }}>{t[titleKey]}</p>
+                <p className="text-[14px] leading-relaxed flex-1" style={{ color: tokens.text }}>{t[textKey]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-8 rounded-xl p-6 border-2" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.investmentResultLabel}</p>
+          <p className="text-[15px] sm:text-base leading-relaxed font-medium" style={{ color: tokens.text }}>{t.investmentResult}</p>
+        </div>
+      </Section>
+
       {/* Opportunity — full section with cards (same as long form) */}
-      <Section title={t.theOpportunity} bg="bgAlt" id="approach">
+      <Section title={t.theOpportunity} id="approach">
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.whyNordicSmes}</p>
-        <p className="leading-relaxed mb-8" style={{ color: tokens.text }}>
+        <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: tokens.text }}>
           {t.opportunityIntro}
         </p>
 
@@ -405,8 +447,8 @@ function InvestorShortForm({
         </div>
       </Section>
 
-      {/* Pipeline */}
-      <Section title={t.pipeline} id="returns">
+      {/* Pipeline — distinct background to separate from approach and value-creation */}
+      <Section title={t.pipeline} id="pipeline" bg="bgAlt">
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.pipelineLabel}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {PIPELINE_ITEMS.map((item) => (
@@ -432,18 +474,27 @@ function InvestorShortForm({
         </div>
       </Section>
 
-      {/* Value creation + Case — brief */}
+      {/* Value creation — Operating toolkit */}
       <Section title={t.valueCreation} id="value-creation">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: tokens.accent }}>{t.valueCreationFocus}</p>
-        <p className="leading-relaxed mb-4" style={{ color: tokens.text }}>
-          {t.valueCreationText}
-        </p>
-        <div id="case" className="scroll-mt-[100px]">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.illustrativeCase}</p>
-          <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>
-            {t.caseText}
-          </p>
+        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.operatingToolkitTitle}</p>
+        <div className="space-y-4 mb-6">
+          {[
+            { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
+            { titleKey: "operatingToolkit2Title" as const, textKey: "operatingToolkit2Text" as const },
+            { titleKey: "operatingToolkit3Title" as const, textKey: "operatingToolkit3Text" as const },
+            { titleKey: "operatingToolkit4Title" as const, textKey: "operatingToolkit4Text" as const },
+            { titleKey: "operatingToolkit5Title" as const, textKey: "operatingToolkit5Text" as const },
+            { titleKey: "operatingToolkit6Title" as const, textKey: "operatingToolkit6Text" as const },
+          ].map(({ titleKey, textKey }) => (
+            <div key={titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+              <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[titleKey]}</p>
+              <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
+            </div>
+          ))}
         </div>
+        <p className="text-base leading-relaxed font-medium" style={{ color: tokens.text }}>
+          {t.operatingToolkitClosing}
+        </p>
       </Section>
 
       {/* Team */}
@@ -464,13 +515,6 @@ function InvestorShortForm({
             </div>
           ))}
         </div>
-      </Section>
-
-      {/* Risks — brief */}
-      <Section title={t.risks} id="risks">
-        <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>
-          {t.risksText}
-        </p>
       </Section>
 
       {/* CTA — reveal full long-form on same page */}

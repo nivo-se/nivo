@@ -10,22 +10,46 @@ export const investorTranslations = {
     // Nav
     navWhyInvest: "Why Invest",
     navWhyNow: "Why Now",
+    navInvestmentProcess: "Investment Process",
     navApproach: "Approach",
     navValueCreation: "Value Creation",
+    navPipeline: "Pipeline",
     navTeam: "Team",
     navStructure: "Structure",
     lockPage: "Lock page",
 
     // Hero / Short version
     oneLiner:
-      "We acquire profitable Nordic SMEs and compound value through pricing, cost control and digital workflows — not financial engineering.",
-    shortVersion: "Executive summary",
-    shortVersionText:
-      "Nivo is an investment company focused on long-term ownership of Nordic SMEs. We target SEK 50–200m revenue companies with strong products and loyal customers but operational upside. We improve margins through pricing discipline, cost control, reporting and workflows — not leverage or multiple expansion.",
-    shortVersionBullet1: "~15,000 Nordic SMEs in target segment; targeting 20–25% ROIC",
-    shortVersionBullet2: "Target 20–25% IRR, 4–5x MOIC; 5–10 year hold",
+      "We acquire profitable, under-digitised companies and create value through operational improvement and digital upgrades. Over time, those improvements compound into value.",
+    shortVersion: "Executive Summary",
+    execSummaryWhatLabel: "What we do",
+    execSummaryWhatPara1:
+      "Partnering with a small group of investors to acquire and improve Nordic SMEs over the long term.",
+    execSummaryWhatPara2:
+      "Focus is on profitable businesses with strong fundamentals — where operational improvements, not market timing, drive value.",
+    execSummaryValueLabel: "How value is created",
+    execSummaryValueApproach: "We follow a disciplined approach:",
+    execSummaryValueFlow:
+      "Acquire good companies → improve execution → generate cash flow → reinvest and compound.",
+    execSummaryValueEdge:
+      "Our edge is hands-on ownership, structured operating playbooks and selective use of AI to accelerate performance. Active ownership in every portfolio company.",
+    execSummaryModelLabel: "How the model works",
+    execSummaryModelSentence:
+      "We follow a simple model: acquire profitable SMEs, improve margins through traditional performance levers with AI-accelerated execution, convert to cash flow, and reinvest over time.",
+    shortVersionBullet1: "20–25% IRR",
+    shortVersionBullet2: "4–5x MOIC",
     shortVersionBullet3:
       "Team: extensive capital markets and venture experience; scaled a direct-to-consumer business from zero",
+    execSummaryReturnsTarget: "We target:",
+    execSummaryReturnsNote:
+      "With returns driven primarily by margin expansion and cash generation.",
+    execSummaryTeamPara1:
+      "The team brings experience from investing and building companies, with a track record of scaling businesses.",
+    execSummaryTeamPara2: "Active ownership in every portfolio company.",
+    execSummaryWhyLabel: "Why it works",
+    execSummaryEdgeLabel: "Edge",
+    execSummaryReturnsLabel: "Target returns",
+    execSummaryTeamLabel: "Team",
     whatWeDontDo: "What we don't do",
     whatWeDontDoText:
       "We avoid turnarounds, technology risk, and aggressive leverage; we bet on better operations and higher margins — multiple expansion could be a result, not our primary bet.",
@@ -33,6 +57,8 @@ export const investorTranslations = {
     // Hero paragraphs
     companiesIntro:
       "Our target companies often have strong products, loyal customers and proven business models — but operational potential remains untapped.",
+    companiesIntroFollowUp:
+      "We focus on applying proven operational practices, supported by modern tools where they clearly improve outcomes.",
     manyOperate:
       "Many operate with manual workflows; fragmented systems; limited visibility. The businesses are sound; execution can be improved.",
     sourcingEngine:
@@ -40,7 +66,7 @@ export const investorTranslations = {
     focusQuote: "Focus: operational improvement over technology risk.",
 
     // Key terms
-    keyTerms: "Key terms",
+    keyTerms: "Investment overview",
     investmentCompany: "Investment Company",
     managementFee: "Management Fee",
     targetAcquisitionCapital: "Target Acquisition Capital",
@@ -54,26 +80,36 @@ export const investorTranslations = {
       "Corporate finance and capital markets — valuation, structuring and execution expertise",
     capability2: "Venture and growth investing — sourcing, due diligence and exit experience",
     capability3: "Operational scaling and digital transformation — hands-on business building",
-    capability4: "Institutional investment and operational leadership — full lifecycle coverage",
+    capability4: "The team brings full lifecycle capabilities — from acquiring to improving and ultimately a potential full exit",
 
     // Why Now
     whyNow: "Why Now",
     whyNowText:
-      "Practical AI and modern SaaS now allow smaller companies to upgrade systems, pricing and operations cost-effectively. We bring that capability to portfolio businesses — operational improvement, not technology speculation.",
-    valueCreationLine: "Value creation: pricing, cost control, reporting and digital workflows.",
-
+      "A large part of the Nordic SME base was built before modern systems. These businesses are often profitable and resilient—but operationally under-optimised.\n\nAt the same time, practical software and AI have matured. What previously required significant investment is now accessible: pricing can be tested and adjusted systematically, reporting can be automated, and workflows can be standardised across functions.\n\nThis creates a clear window. The underlying businesses are strong, but the operating model has not kept pace with available tools.\n\nValue is not created through disruption, but through execution—closing the gap between how these companies operate today and what is now possible.",
     // Sections
     overviewSection: "Overview",
+    investmentProcess: "Investment Process",
+    investmentEngineIntro: "We follow a simple, repeatable model:",
+    investmentStep1Title: "Source better opportunities",
+    investmentStep1Text: "Identify under-digitised SMEs before competitive processes using the in-house sourcing engine.",
+    investmentStep2Title: "Improve margins through execution",
+    investmentStep2Text: "Increase profitability through pricing discipline, cost control and digital workflows.",
+    investmentStep3Title: "Convert margins into cash flow",
+    investmentStep3Text: "Use improved reporting and operational control to strengthen cash conversion.",
+    investmentStep4Title: "Reinvest and compound",
+    investmentStep4Text: "Reinvest cash flow into the business and future acquisitions over time.",
+    investmentResultLabel: "Result",
+    investmentResult: "A repeatable system for compounding equity value through operational improvement.",
     theOpportunity: "The Opportunity",
     whyNordicSmes: "Why Nordic SMEs, why now",
     opportunityIntro:
-      "Many Nordic SMEs were built before modern digital tools. They remain profitable but under-digitised. Practical AI and SaaS now allow smaller companies to upgrade systems, pricing and workflows cost-effectively—creating a window where operational improvements can unlock disproportionate value.",
+      "The opportunity is defined by scale and structure: a large universe of profitable Nordic SMEs with predictable business models and clear operational improvement potential. We target SEK 50–200m revenue companies where execution—not speculation—drives returns.",
     opportunityThesis:
-      "We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital upgrades — not technology risk. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
+      "We acquire profitable, under-digitised Nordic SMEs and compound value through operational improvement and digital upgrades. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
     badge1: "15,000+ Nordic SMEs in target segment",
     badge2: "20–25% target ROIC through operational improvement",
     badge3: "Data-driven sourcing; digital workflows in portfolio",
-    badge4: "Operational upside — not technology risk",
+    badge4: "Operational upside",
 
     theUniverse: "The universe",
     universeText:
@@ -99,6 +135,19 @@ export const investorTranslations = {
     ourTake: "Our take",
     ourTakeText: "Nivo targets this opportunity through a disciplined, repeatable approach.",
     ourTakeBullet1: "Sourcing engine screens universe, ranks targets, delivers pre-engagement memos",
+
+    sourcingEdgeTitle: "Sourcing Edge",
+    sourcingEdgeSubtitle: "Pipeline development",
+    sourcingEdgeMain:
+      "Our in-house sourcing engine screens the Swedish SME universe (SEK 50–200m revenue), ingests financial data, scores companies on base economics and margin signals, and ranks targets. We run deeper analysis—products, customer mix, pricing, operational gaps—before first contact. This gives us earlier identification of targets, better preparation before contact, clearer operational understanding, and stronger positioning in dialogue. Most PE firms depend on broker flow and relationships.",
+    sourcingEdgePreparation:
+      "Our sourcing advantage is not only speed — it is preparation. We know where value can be created before the first meeting.",
+    sourcingEdgePlatform:
+      "The platform screens ~15,000 companies; filters by revenue band, profitability and niche positioning; outputs a ranked Target 100; generates pre-engagement memos with financial profiles and operational signals. AI accelerates analysis and reporting—it does not replace judgment.",
+    sourcingFlowUniverse: "Universe",
+    sourcingFlowFiltering: "Filtering",
+    sourcingFlowResearch: "Research",
+    sourcingFlowTargets: "Targets",
     ourTakeBullet2: "Pricing, cost control, reporting and digital workflows in portfolio",
     ourTakeBullet3: "Operational execution over financial engineering",
 
@@ -114,11 +163,29 @@ export const investorTranslations = {
 
     valueCreation: "Value Creation",
     valueCreationFocus: "Value Creation Focus",
-    valueCreationText:
-      "Pricing discipline, margin expansion, cost control, reporting and digital workflows. We reinvest cash flow; modest leverage where it helps.",
-    illustrativeCase: "Illustrative Case",
-    caseText:
-      "Nordic industrial: entry SEK 100m equity, SEK 30m debt. Pricing +150 bps, operations +100 bps, cost +50 bps over 24 months. Operational improvements compound into equity value.",
+    operatingToolkitTitle: "Operating toolbox",
+    operatingToolkitIntro:
+      "We address common growth constraints in Nordic SMEs through a focused and structured approach.",
+    operatingToolkit1Title: "Growth and direction",
+    operatingToolkit1Text:
+      "Define a clear growth plan, ensure the right capabilities, and pursue acquisitions where relevant.",
+    operatingToolkit2Title: "Organisation",
+    operatingToolkit2Text:
+      "Clarify roles, strengthen teams with key hires, and align incentives with long-term value creation.",
+    operatingToolkit3Title: "Decision-making",
+    operatingToolkit3Text:
+      "Establish a small set of relevant metrics and enable consistent, fact-based decisions.",
+    operatingToolkit4Title: "Systems and tools",
+    operatingToolkit4Text:
+      "Upgrade core systems and apply modern tools, including AI, where they improve efficiency and visibility.",
+    operatingToolkit5Title: "Execution",
+    operatingToolkit5Text:
+      "Improve pricing, sales, and operational processes. Small, consistent improvements compound over time.",
+    operatingToolkit6Title: "Culture",
+    operatingToolkit6Text:
+      "Support teams with clear goals, visible progress, and a sustainable pace of work.",
+    operatingToolkitClosing:
+      "We apply these practices pragmatically—focusing on what drives results in each business.",
 
     team: "Team",
     teamSubtitle: "Operational experience meets disciplined capital",
@@ -150,22 +217,46 @@ export const investorTranslations = {
     // Nav
     navWhyInvest: "Varför investera",
     navWhyNow: "Varför nu",
+    navInvestmentProcess: "Investeringsmodell",
     navApproach: "Tillvägagångssätt",
     navValueCreation: "Värdeskapande",
+    navPipeline: "Pipeline",
     navTeam: "Team",
     navStructure: "Struktur",
     lockPage: "Lås sidan",
 
     // Hero / Short version
     oneLiner:
-      "Vi förvärvar lönsamma nordiska små och medelstora företag och ackumulerar värde genom prissättning, kostnadskontroll och digitala arbetsflöden — inte finansiell engineering.",
+      "Vi förvärvar lönsamma, underdigitaliserade företag och skapar värde genom operativ förbättring och digitala uppgraderingar. Över tid ackumuleras dessa förbättringar till värde.",
     shortVersion: "Sammanfattning",
-    shortVersionText:
-      "Nivo är ett investeringsbolag inriktat på långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på företag med omsättning SEK 50–200 mkr med starka produkter och lojala kunder men med operativt förbättringspotential. Vi förbättrar marginaler genom prissättningsdisciplin, kostnadskontroll, rapportering och arbetsflöden — inte hävstång eller multipelexpansion.",
-    shortVersionBullet1: "~15 000 nordiska små och medelstora företag i målsegmentet; mål 20–25 % ROIC",
-    shortVersionBullet2: "Mål 20–25 % IRR, 4–5x MOIC; 5–10 års innehavstid",
+    execSummaryWhatLabel: "Vad vi gör",
+    execSummaryWhatPara1:
+      "I samarbete med en liten grupp investerare förvärvas och förbättras nordiska små och medelstora företag på lång sikt.",
+    execSummaryWhatPara2:
+      "Fokus ligger på lönsamma företag med starka fundament — där operativa förbättringar, inte marknadstiming, driver värde.",
+    execSummaryValueLabel: "Hur värde skapas",
+    execSummaryValueApproach: "Vi följer ett disciplinerat tillvägagångssätt:",
+    execSummaryValueFlow:
+      "Förvärva bra företag → förbättra exekvering → generera kassaflöde → återinvestera och ackumulera.",
+    execSummaryValueEdge:
+      "Vår styrka är hands-on ägande, strukturerade operativa playbooks och selektiv användning av AI för att accelerera prestationen. Aktivt ägande i varje portföljbolag.",
+    execSummaryModelLabel: "Hur modellen fungerar",
+    execSummaryModelSentence:
+      "Vi arbetar enligt en enkel modell: förvärvar lönsamma SME-bolag, förbättrar marginaler genom traditionella prestationsverktyg med AI-accelererad exekvering, omvandlar till kassaflöde och återinvesterar över tid.",
+    shortVersionBullet1: "20–25 % IRR",
+    shortVersionBullet2: "4–5x MOIC",
     shortVersionBullet3:
       "Team: omfattande erfarenhet från kapitalmarknader och venture; byggt ett direkt-till-konsument-företag från noll",
+    execSummaryReturnsTarget: "Vi riktar in oss på:",
+    execSummaryReturnsNote:
+      "Med avkastning driven främst av marginalexpansion och kassagenerering.",
+    execSummaryTeamPara1:
+      "Teamet har erfarenhet från investeringar och företagsbyggande, med en track record av att skala företag.",
+    execSummaryTeamPara2: "Aktivt ägande i varje portföljbolag.",
+    execSummaryWhyLabel: "Varför det fungerar",
+    execSummaryEdgeLabel: "Vår styrka",
+    execSummaryReturnsLabel: "Målavkastning",
+    execSummaryTeamLabel: "Team",
     whatWeDontDo: "Vad vi inte gör",
     whatWeDontDoText:
       "Vi undviker turnaround-fall, teknologirisk och aggressiv hävstång; vi satsar på bättre operationer och högre marginaler — multipelexpansion kan bli resultatet, inte vårt primära spel.",
@@ -173,6 +264,8 @@ export const investorTranslations = {
     // Hero paragraphs
     companiesIntro:
       "Våra målbolag har ofta starka produkter, lojala kunder och beprövade affärsmodeller — men operativ potential finns kvar att utnyttja.",
+    companiesIntroFollowUp:
+      "Vi fokuserar på att tillämpa beprövade operativa metoder, med stöd av moderna verktyg där de tydligt förbättrar resultatet.",
     manyOperate:
       "Många arbetar med manuella arbetsflöden; fragmenterade system; begränsad insyn. Företagen är sunda; exekveringen kan förbättras.",
     sourcingEngine:
@@ -180,7 +273,7 @@ export const investorTranslations = {
     focusQuote: "Fokus: operativ förbättring framför teknologirisk.",
 
     // Key terms
-    keyTerms: "Nyckelvillkor",
+    keyTerms: "Investeringsöversikt",
     investmentCompany: "Investeringsbolag",
     managementFee: "Förvaltningsavgift",
     targetAcquisitionCapital: "Målinvesteringskapital",
@@ -194,26 +287,37 @@ export const investorTranslations = {
       "Företagsfinansiering och kapitalmarknader — värdering, strukturering och exekvering",
     capability2: "Venture och tillväxtinvesteringar — sourcing, due diligence och exit-erfarenhet",
     capability3: "Operativ skalning och digital transformation — hands-on företagsbyggande",
-    capability4: "Institutionell investering och operativ ledning — full livscykeltäckning",
+    capability4: "Teamet har full livscykelkompetens — från förvärv via förbättring till en potentiell full exit",
 
     // Why Now
     whyNow: "Varför nu",
     whyNowText:
-      "Praktisk AI och modern SaaS gör det nu kostnadseffektivt för mindre företag att uppgradera system, prissättning och verksamhet. Vi tar den kapaciteten till portföljföretag — operativ förbättring, inte teknologispekulation.",
-    valueCreationLine: "Värdeskapande: prissättning, kostnadskontroll, rapportering och digitala arbetsflöden.",
+      "En stor del av den nordiska småföretagsbasen byggdes innan moderna system. Dessa företag är ofta lönsamma och motståndskraftiga—men operativt underoptimerade.\n\nSamtidigt har praktisk mjukvara och AI mognat. Det som tidigare krävde betydande investeringar är nu tillgängligt: prissättning kan testas och justeras systematiskt, rapportering kan automatiseras och arbetsflöden kan standardiseras över funktioner.\n\nDetta skapar ett tydligt fönster. De underliggande företagen är starka, men operativmodellen har inte hållit jämna steg med tillgängliga verktyg.\n\nVärde skapas inte genom disruption, utan genom exekvering—att stänga gapet mellan hur dessa företag opererar idag och vad som nu är möjligt.",
 
     // Sections
     overviewSection: "Översikt",
+    investmentProcess: "Investeringsmodell",
+    investmentEngineIntro: "Vi arbetar enligt en enkel, repeterbar modell:",
+    investmentStep1Title: "Identifiera bättre möjligheter",
+    investmentStep1Text: "Vi identifierar underdigitaliserade SME-bolag innan breda processer genom vår egen sourcingmodell.",
+    investmentStep2Title: "Förbättra marginaler genom operativt arbete",
+    investmentStep2Text: "Vi ökar lönsamheten genom prissättning, kostnadskontroll och digitala arbetsflöden.",
+    investmentStep3Title: "Omvandla marginaler till kassaflöde",
+    investmentStep3Text: "Bättre rapportering och operativ kontroll stärker kassaflödet.",
+    investmentStep4Title: "Återinvestera och skapa tillväxt över tid",
+    investmentStep4Text: "Kassaflödet återinvesteras i bolagen och i nya förvärv.",
+    investmentResultLabel: "Resultat",
+    investmentResult: "En repeterbar modell för att bygga värde genom operativa förbättringar.",
     theOpportunity: "Möjligheten",
     whyNordicSmes: "Varför nordiska små och medelstora företag, varför nu",
     opportunityIntro:
-      "Många nordiska små och medelstora företag byggdes innan moderna digitala verktyg. De förblir lönsamma men underdigitaliserade. Praktisk AI och SaaS gör det nu kostnadseffektivt att uppgradera system, prissättning och arbetsflöden — vilket skapar ett fönster där operativa förbättringar kan frigöra oproportionerligt värde.",
+      "Möjligheten definieras av skala och struktur: ett stort universum av lönsamma nordiska små och medelstora företag med förutsägbara affärsmodeller och tydlig operativ förbättringspotential. Vi riktar oss mot företag med SEK 50–200 mkr omsättning där exekvering—inte spekulation—driver avkastningen.",
     opportunityThesis:
-      "Vi förvärvar lönsamma, underdigitaliserade nordiska små och medelstora företag och ackumulerar värde genom operativ förbättring och digitala uppgraderingar — inte teknologirisk. Vi riktar oss typiskt mot SEK 50–200 mkr omsättning; vår styrka är disciplinerad exekvering och systematisk sourcing.",
+      "Vi förvärvar lönsamma, underdigitaliserade nordiska små och medelstora företag och ackumulerar värde genom operativ förbättring och digitala uppgraderingar. Vi riktar oss typiskt mot SEK 50–200 mkr omsättning; vår styrka är disciplinerad exekvering och systematisk sourcing.",
     badge1: "15 000+ nordiska små och medelstora företag i målsegmentet",
     badge2: "20–25 % mål ROIC genom operativ förbättring",
     badge3: "Datadriven sourcing; digitala arbetsflöden i portföljen",
-    badge4: "Operativ upside — inte teknologirisk",
+    badge4: "Operativ upside",
 
     theUniverse: "Universumet",
     universeText:
@@ -242,6 +346,19 @@ export const investorTranslations = {
     ourTakeBullet2: "Prissättning, kostnadskontroll, rapportering och digitala arbetsflöden i portföljen",
     ourTakeBullet3: "Operativ exekvering framför finansiell engineering",
 
+    sourcingEdgeTitle: "Sourcing Edge",
+    sourcingEdgeSubtitle: "Pipelineutveckling",
+    sourcingEdgeMain:
+      "Vår egen sourcingmodell söker i det svenska SME-universumet (SEK 50–200 mkr omsättning), samlar in finansiell data, poängsätter bolag utifrån basläge och marginal-signaler och rankar mål. Vi genomför djupare analys—produkter, kundmix, prissättning, operativa luckor—innan första kontakten. Det ger oss tidigare identifiering av mål, bättre förberedelse före kontakt, tydligare operativ förståelse och starkare positionering i dialog. De flesta riskkapitalbolag förlitar sig på mäklarflöden och relationer.",
+    sourcingEdgePreparation:
+      "Vår sourcingfördel handlar inte bara om hastighet — utan om förberedelse. Vi vet var värde kan skapas redan innan första mötet.",
+    sourcingEdgePlatform:
+      "Plattformen söker i ~15 000 bolag; filtrerar på omsättningsband, lönsamhet och nischpositionering; levererar en rankad Target 100; genererar memos före engagemang med finansiella profiler och operativa signaler. AI accelererar analys och rapportering—det ersätter inte omdöme.",
+    sourcingFlowUniverse: "Universum",
+    sourcingFlowFiltering: "Filtrering",
+    sourcingFlowResearch: "Analys",
+    sourcingFlowTargets: "Mål",
+
     pipeline: "Pipeline",
     pipelineLabel: "Målpipeline: 100 företag rankade efter operativ förbättringspotential",
     activeTargets: "Aktiva mål (illustrativt)",
@@ -254,11 +371,29 @@ export const investorTranslations = {
 
     valueCreation: "Värdeskapande",
     valueCreationFocus: "Fokus värdeskapande",
-    valueCreationText:
-      "Prissättningsdisciplin, marginalexpansion, kostnadskontroll, rapportering och digitala arbetsflöden. Vi återinvesterar kassaflöde; blygsam hävstång där det hjälper.",
-    illustrativeCase: "Illustrativt fall",
-    caseText:
-      "Nordiskt industriellt: entry SEK 100 mkr eget kapital, SEK 30 mkr skuld. Prissättning +150 bps, operationer +100 bps, kostnad +50 bps över 24 månader. Operativa förbättringar ackumuleras till eget kapitalvärde.",
+    operatingToolkitTitle: "Operativ verktygslåda",
+    operatingToolkitIntro:
+      "Vi adresserar vanliga tillväxthinder i nordiska små och medelstora företag genom ett fokuserat och strukturerat tillvägagångssätt.",
+    operatingToolkit1Title: "Tillväxt och riktning",
+    operatingToolkit1Text:
+      "Definiera en tydlig tillväxtplan, säkerställ rätt kapaciteter och sök förvärv där det är relevant.",
+    operatingToolkit2Title: "Organisation",
+    operatingToolkit2Text:
+      "Förtydliga roller, stärk team med nyckelrekryteringar och anpassa incitament till långsiktigt värdeskapande.",
+    operatingToolkit3Title: "Beslutsfattande",
+    operatingToolkit3Text:
+      "Etablera en liten uppsättning relevanta nyckeltal och möjliggör konsekventa, faktabaserade beslut.",
+    operatingToolkit4Title: "System och verktyg",
+    operatingToolkit4Text:
+      "Uppgradera kärnsystem och tillämpa moderna verktyg, inklusive AI, där de förbättrar effektivitet och insyn.",
+    operatingToolkit5Title: "Exekvering",
+    operatingToolkit5Text:
+      "Förbättra prissättning, försäljning och operativa processer. Små, konsekventa förbättringar ackumuleras över tid.",
+    operatingToolkit6Title: "Kultur",
+    operatingToolkit6Text:
+      "Stöd team med tydliga mål, synlig framgång och en hållbar arbetshastighet.",
+    operatingToolkitClosing:
+      "Vi tillämpar dessa metoder pragmatiskt—med fokus på det som driver resultat i varje företag.",
 
     team: "Team",
     teamSubtitle: "Operativ erfarenhet möter disciplinerat kapital",
