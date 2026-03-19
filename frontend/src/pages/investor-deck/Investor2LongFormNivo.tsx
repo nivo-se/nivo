@@ -27,7 +27,10 @@ const SECTION_CLASS = SECTION_CLASS_TOKEN;
 /** Tighter section padding and top divider for deck. */
 const DECK_SECTION_CLASS = "max-w-4xl mx-auto px-5 sm:px-6 py-6 sm:py-10";
 const SECTION_TOP_CLASS = "border-t pt-4 sm:pt-6";
-const PROSE_CLASS = "w-full text-profile-fg leading-relaxed text-[16px] sm:text-[18px]";
+/** Primary memo body: 16px mobile → 18px sm+ (Tailwind base / lg) */
+const PROSE_CLASS = "w-full text-profile-fg leading-relaxed text-base sm:text-lg";
+/** Supporting labels: chart titles, pipeline hints */
+const CAPTION_CLASS = "text-sm sm:text-base leading-relaxed";
 const PUNCH_CLASS = "text-center text-xl sm:text-2xl font-semibold text-profile-fg py-6";
 
 // Heading hierarchy — Nivo design profile
@@ -88,18 +91,18 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             </p>
             <div id="why-invest" className="mt-6 max-w-2xl mx-auto text-left rounded-lg p-4 sm:p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
               <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.shortVersion}</p>
-              <p className="text-[14px] leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatPara1}</p>
-              <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryWhatPara2}</p>
+              <p className="text-base sm:text-lg leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatPara1}</p>
+              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryWhatPara2}</p>
               <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryValueLabel}</p>
-              <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
-              <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
+              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
+              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
               <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
-              <ul className="space-y-1 text-sm mb-4 pl-4" style={{ color: tokens.text }}>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
+              <ul className="space-y-1 text-base sm:text-lg mb-4 pl-3" style={{ color: tokens.text }}>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
               </ul>
               <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryTeamLabel}</p>
-              <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
+              <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
             </div>
           </div>
         </div>
@@ -110,35 +113,35 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
         <div className={DECK_SECTION_CLASS}>
           <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
             <p className={SECTION_SUBTITLE_CLASS}>{t.execSummaryWhatLabel}</p>
-            <p className="text-[16px] sm:text-[18px] leading-relaxed mb-4" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>
               {t.companiesIntroLong}
             </p>
-            <p className="text-[16px] sm:text-[18px] leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
               {t.companiesIntroFollowUpLong}
             </p>
             <p className={SECTION_SUBTITLE_CLASS}>{t.execSummaryModelLabel}</p>
-            <p className="text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
               {t.execSummaryModelSentenceLong}
             </p>
             <p className={SECTION_SUBTITLE_CLASS}>{t.execSummaryWhyLabel}</p>
-            <p className="text-sm sm:text-base leading-relaxed mb-4" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>
               {t.manyOperateLong}
             </p>
             <div id="why-now" className="mb-6 scroll-mt-[100px]">
               <h2 className={H2_CLASS}>{t.whyNow}</h2>
-              <div className="space-y-4 text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+              <div className="space-y-4 text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>
                 {t.whyNowTextLong.split("\n\n").map((para, i, arr) => (
                   <p key={i} className={i === arr.length - 1 ? "font-semibold" : undefined}>{para}</p>
                 ))}
               </div>
             </div>
             <p className={SECTION_SUBTITLE_CLASS}>{t.execSummaryEdgeLabel}</p>
-            <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
               {t.sourcingEngineLong}
             </p>
             <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
             <div id="key-terms" className="pt-6 pb-6 border-t border-b mb-8 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
                   <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
@@ -166,9 +169,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </div>
             </div>
             <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
-            <ul className="space-y-2 max-w-2xl">
+            <ul className="space-y-2 max-w-2xl pl-3">
               {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-[15px] sm:text-base" style={{ color: tokens.text }}>
+                <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                   <span>{item}</span>
                 </li>
@@ -203,14 +206,14 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                       </div>
                     </div>
                     <p className={H3_CLASS + " mb-2"}>{t[titleKey]}</p>
-                    <p className="text-[14px] leading-relaxed flex-1" style={{ color: tokens.text }}>{t[textKey]}</p>
+                    <p className="text-base sm:text-lg leading-relaxed flex-1" style={{ color: tokens.text }}>{t[textKey]}</p>
                   </div>
                 ))}
               </div>
             </div>
             <div className="mt-8 rounded-xl p-6 border-2" style={{ backgroundColor: tokens.bg, borderColor: tokens.accent }}>
               <p className={SECTION_SUBTITLE_CLASS}>{t.investmentResultLabel}</p>
-              <p className="text-[15px] sm:text-base leading-relaxed font-medium" style={{ color: tokens.text }}>{t.investmentResultLong}</p>
+              <p className="text-base sm:text-lg leading-relaxed font-medium" style={{ color: tokens.text }}>{t.investmentResultLong}</p>
             </div>
           </div>
         </div>
@@ -261,13 +264,13 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
                 <h3 className={H3_CLASS + " mb-0"}>{t.theUniverse}</h3>
               </div>
-              <p className="text-[15px] sm:text-[16px] leading-relaxed text-profile-fg font-semibold mb-3">
+              <p className="text-base sm:text-lg leading-relaxed text-profile-fg font-semibold mb-3">
                 {t.universeTextLong}
               </p>
-              <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
+              <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
               </ul>
             </div>
 
@@ -278,13 +281,13 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
                 <h3 className={H3_CLASS + " mb-0"}>{t.operationalGap}</h3>
               </div>
-              <p className="text-[15px] sm:text-[16px] leading-relaxed text-profile-fg font-semibold mb-3">
+              <p className="text-base sm:text-lg leading-relaxed text-profile-fg font-semibold mb-3">
                 {t.gapTextLong}
               </p>
-              <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
+              <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
               </ul>
             </div>
 
@@ -295,13 +298,13 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
                 <h3 className={H3_CLASS + " mb-0"}>{t.whyNordic}</h3>
               </div>
-              <p className="text-[15px] sm:text-[16px] leading-relaxed text-profile-fg font-semibold mb-3">
+              <p className="text-base sm:text-lg leading-relaxed text-profile-fg font-semibold mb-3">
                 {t.whyNordicText}
               </p>
-              <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
+              <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
               </ul>
             </div>
 
@@ -312,13 +315,13 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
                 <h3 className={H3_CLASS + " mb-0"}>{t.ourTake}</h3>
               </div>
-              <p className="text-[15px] sm:text-[16px] leading-relaxed text-profile-fg font-semibold mb-3">
+              <p className="text-base sm:text-lg leading-relaxed text-profile-fg font-semibold mb-3">
                 {t.ourTakeTextLong}
               </p>
-              <ul className="space-y-1.5 text-profile-fg text-sm sm:text-[15px] leading-relaxed flex-1 min-h-0">
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
-                <li className="flex items-start gap-2"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
+              <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
               </ul>
             </div>
           </div>
@@ -338,20 +341,20 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Acquire right</p>
-                  <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar1Long}</p>
+                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar1Long}</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Execute relentlessly</p>
-                  <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar2Long}</p>
+                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar2Long}</p>
                 </div>
                 <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                   <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Compound with discipline</p>
-                  <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar3Long}</p>
+                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar3Long}</p>
                 </div>
               </div>
               <div className="rounded-lg py-3 px-4 w-full mt-6" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
                 <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>Return drivers</p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>{t.returnDriversLong}</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.returnDriversLong}</p>
               </div>
               <p className="text-base sm:text-lg text-profile-fg mt-6 leading-relaxed font-bold text-center w-full">
                 Execution leads to margins, margins to cash flow, cash flow to equity.
@@ -368,15 +371,15 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 <div className="space-y-3">
                   <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                     <p className={LABEL_CLASS}>Pricing</p>
-                    <p className="text-[15px]" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
                   </div>
                   <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                     <p className={LABEL_CLASS}>Operations</p>
-                    <p className="text-[15px]" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
                   </div>
                   <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                     <p className={LABEL_CLASS}>Cost</p>
-                    <p className="text-[15px]" style={{ color: tokens.text }}>Consolidated functions and vendor renegotiation. Impact: +50 bps.</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Consolidated functions and vendor renegotiation. Impact: +50 bps.</p>
                   </div>
                 </div>
               </div>
@@ -384,13 +387,13 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           </div>
 
           <div className="mt-10 w-full rounded-lg overflow-hidden p-6 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
-            <p className="text-sm font-medium mb-4" style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
+            <p className={`${CAPTION_CLASS} font-medium mb-4`} style={{ color: tokens.text }}>Enterprise value build (illustrative, 7 years)</p>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--profile-divider))" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" />
-                  <YAxis tick={{ fontSize: 11, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" width={36} />
+                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" />
+                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" width={36} />
                   <Tooltip
                     cursor={false}
                     contentStyle={{ backgroundColor: "white", border: "1px solid hsl(var(--profile-divider))", borderRadius: 6, fontSize: 12 }}
@@ -421,7 +424,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <div className="mt-10 w-full">
             <p className={LABEL_OLIVE_CLASS + " mb-4"}>Assumptions</p>
             <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className="text-[15px] text-profile-fg leading-relaxed">{t.assumptionsLong}</p>
+              <p className="text-base sm:text-lg text-profile-fg leading-relaxed">{t.assumptionsLong}</p>
             </div>
           </div>
         </div>
@@ -434,7 +437,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>{t.valueCreation}</h2>
           <p className={SECTION_SUBTITLE_CLASS}>{t.operatingToolkitTitle}</p>
-          <p className="text-[15px] sm:text-base leading-relaxed mb-4" style={{ color: tokens.text }}>{t.operatingToolkitIntroLong}</p>
+          <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.operatingToolkitIntroLong}</p>
           <div className="space-y-4 mb-6">
             {[
               { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
@@ -446,7 +449,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             ].map(({ titleKey, textKey }) => (
               <div key={titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[titleKey]}</p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
               </div>
             ))}
           </div>
@@ -470,7 +473,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS + " mb-3"}>Target profile</p>
-                <ul className="space-y-2 text-[15px] text-profile-fg">
+                <ul className="space-y-2 text-base sm:text-lg text-profile-fg">
                   <li className="flex items-start gap-2">
                     <BarChart3 className="w-4 h-4 text-profile-accent flex-shrink-0 mt-0.5" aria-hidden />
                     <span>Entry valuation: EV/EBITDA 5–7x</span>
@@ -487,7 +490,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS + " mb-3"}>Example</p>
-                <ul className="space-y-2 text-[15px] text-profile-fg">
+                <ul className="space-y-2 text-base sm:text-lg text-profile-fg">
                   <li className="flex items-start gap-2">
                     <BarChart3 className="w-4 h-4 text-profile-accent flex-shrink-0 mt-0.5" aria-hidden />
                     <span>EBITDA 22 MSEK at 6x → EV 130 MSEK</span>
@@ -631,7 +634,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                   </div>
                   <p className="font-semibold mt-4" style={{ color: tokens.text }}>{LONG_FORM_TEAM[0].name}</p>
                   <p className="text-sm font-medium" style={{ color: tokens.accent }}>{t.foundingPartner}</p>
-                  <p className="text-[15px] mt-2 leading-relaxed" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[0].bioKey]}</p>
+                  <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[0].bioKey]}</p>
                   <a href={LONG_FORM_TEAM[0].linkedin} target="_blank" rel="noopener noreferrer" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block">{t.readMore}</a>
                 </div>
                 <div className="flex flex-col items-center text-center">
@@ -640,7 +643,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                   </div>
                   <p className="font-semibold mt-4" style={{ color: tokens.text }}>{LONG_FORM_TEAM[1].name}</p>
                   <p className="text-sm font-medium" style={{ color: tokens.accent }}>{t.foundingPartner}</p>
-                  <p className="text-[15px] mt-2 leading-relaxed" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[1].bioKey]}</p>
+                  <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[1].bioKey]}</p>
                   <a href={LONG_FORM_TEAM[1].linkedin} target="_blank" rel="noopener noreferrer" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block">{t.readMore}</a>
                 </div>
                 <div className="flex flex-col items-center text-center">
@@ -649,7 +652,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                   </div>
                   <p className="font-semibold mt-4" style={{ color: tokens.text }}>{LONG_FORM_TEAM[2].name}</p>
                   <p className="text-sm font-medium" style={{ color: tokens.accent }}>{t.foundingPartner}</p>
-                  <p className="text-[15px] mt-2 leading-relaxed" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[2].bioKey]}</p>
+                  <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t[LONG_FORM_TEAM[2].bioKey]}</p>
                   <a href={LONG_FORM_TEAM[2].linkedin} target="_blank" rel="noopener noreferrer" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block">{t.readMore}</a>
                 </div>
               </div>
@@ -659,22 +662,22 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto justify-items-center">
                 <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Senior Advisor</p>
-                  <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Ex-CEO SEK 400m industrial. 25+ years operations.</p>
+                  <p className="text-base sm:text-lg mt-1" style={{ color: tokens.text }}>Ex-CEO SEK 400m industrial. 25+ years operations.</p>
                 </div>
                 <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Financial Advisor</p>
-                  <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Ex-CFO listed Nordic. Financial systems.</p>
+                  <p className="text-base sm:text-lg mt-1" style={{ color: tokens.text }}>Ex-CFO listed Nordic. Financial systems.</p>
                 </div>
                 <div className="rounded-lg p-4 border w-full max-w-[260px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                   <p className="font-semibold" style={{ color: tokens.text }}>Advisor</p>
-                  <p className="text-[15px] mt-1" style={{ color: tokens.text }}>Strategic and operational advisory.</p>
+                  <p className="text-base sm:text-lg mt-1" style={{ color: tokens.text }}>Strategic and operational advisory.</p>
                 </div>
               </div>
             </div>
 
             <div className="pt-8 border-t" style={{ borderColor: tokens.border }}>
               <h3 className={H3_CLASS}>Why we can execute</h3>
-              <p className="text-[15px] text-profile-fg leading-relaxed mb-6 max-w-2xl">
+              <p className="text-base sm:text-lg text-profile-fg leading-relaxed mb-6 w-full">
                 {t.teamWhyExecuteLong}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -693,7 +696,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 ))}
               </div>
               <div className="mt-6 p-5 sm:p-6 rounded-lg" style={{ backgroundColor: tokens.washSage, borderLeft: `4px solid ${tokens.accent}` }}>
-                <p className="text-[17px] sm:text-[19px] font-semibold leading-relaxed" style={{ color: tokens.text }}>
+                <p className="text-lg sm:text-xl font-semibold leading-relaxed" style={{ color: tokens.text }}>
                   {t.teamPositionLong}
                 </p>
               </div>
@@ -709,31 +712,31 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 <div className="px-5 pb-6 pt-2 space-y-6 border-t" style={{ borderColor: tokens.border }}>
                   <div>
                     <p className={LABEL_CLASS + " mb-2"}>Deal sourcing and transaction execution</p>
-                    <p className="text-[15px] text-profile-fg leading-relaxed">
+                    <p className="text-base sm:text-lg text-profile-fg leading-relaxed">
                       The team has extensive experience in corporate finance and venture investing: <strong style={{ color: tokens.text }}>80+ equity capital markets transactions and 20+ IPOs</strong>, plus <strong style={{ color: tokens.text }}>€50m+ venture investments</strong> including early involvement in iZettle and Readly—iZettle later acquired by PayPal. Strong expertise in valuation, capital raising, transaction structuring and exit strategy.
                     </p>
                   </div>
                   <div>
                     <p className={LABEL_CLASS + " mb-2"}>Operational value creation</p>
-                    <p className="text-[15px] text-profile-fg leading-relaxed">
+                    <p className="text-base sm:text-lg text-profile-fg leading-relaxed">
                       Hands-on operational leadership: <strong style={{ color: tokens.text }}>€60m+ direct-to-consumer business built within Electrolux</strong>, growing the Nordic ecommerce channel from zero to <strong style={{ color: tokens.text }}>€30m revenue</strong>. Direct experience in digitalisation, ecommerce strategy, international expansion and revenue optimisation—highly relevant for Nivo’s target companies.
                     </p>
                   </div>
                   <div>
                     <p className={LABEL_CLASS + " mb-2"}>Financial leadership and governance</p>
-                    <p className="text-[15px] text-profile-fg leading-relaxed">
+                    <p className="text-base sm:text-lg text-profile-fg leading-relaxed">
                       Strong financial leadership from listed companies and international organisations: building finance functions, managing reporting, overseeing capital allocation. Nivo can implement institutional-grade financial discipline, governance and reporting across portfolio companies from day one.
                     </p>
                   </div>
                   <div>
                     <p className={LABEL_CLASS + " mb-2"}>Entrepreneurial and founder perspective</p>
-                    <p className="text-[15px] text-profile-fg leading-relaxed">
+                    <p className="text-base sm:text-lg text-profile-fg leading-relaxed">
                       Institutional experience combined with entrepreneurship—founded and invested in multiple companies, including fintech and digital infrastructure. Strong understanding of founder-led businesses and the operational realities faced by small and mid-sized companies.
                     </p>
                   </div>
                   <div>
                     <p className={LABEL_CLASS + " mb-4"}>Capability matrix</p>
-                    <p className="text-[14px] text-profile-fg mb-4" style={{ color: tokens.text }}>Investment lifecycle → team experience</p>
+                    <p className="text-sm sm:text-base text-profile-fg mb-4" style={{ color: tokens.text }}>Investment lifecycle → team experience</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
                         { phase: "Deal sourcing", exp: "Investment banking, venture capital and private investing networks", icon: Handshake },
@@ -749,8 +752,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                             <Icon className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-semibold text-[15px] mb-1" style={{ color: tokens.text }}>{phase}</p>
-                            <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>{exp}</p>
+                            <p className="font-semibold text-base sm:text-lg mb-1" style={{ color: tokens.text }}>{phase}</p>
+                            <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{exp}</p>
                           </div>
                         </div>
                       ))}
@@ -766,15 +769,15 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Operational</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>20+ years ops leadership, scaling companies, P&L responsibility.</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>20+ years ops leadership, scaling companies, P&L responsibility.</p>
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Capital</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>Value-focused acquisitions, pricing and negotiation, long-term view.</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Value-focused acquisitions, pricing and negotiation, long-term view.</p>
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Technical</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>AI and automation, process optimisation, change management.</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>AI and automation, process optimisation, change management.</p>
               </div>
             </div>
           </div>
@@ -791,7 +794,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
 
           <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl text-left" style={{ color: tokens.accent }}>{t.keyTerms}</p>
           <div className="mt-3 max-w-2xl pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm sm:text-base">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
                 <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
@@ -820,7 +823,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           </div>
 
           <div id="structure" className="space-y-10 mb-12 mt-10 scroll-mt-[100px]">
-            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+            <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
               Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon with the ambition to become a listed entity within 10 years. Capital is deployed into Nordic companies and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. We work closely with our Founding investors alongside the board on investment decisions. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
             </p>
 
@@ -860,11 +863,11 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                         <div key={label} className="flex flex-col items-center">
                           <div className="px-3 py-2 rounded border text-center min-w-[90px]" style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}>
                             <p className="text-xs font-medium" style={{ color: tokens.text }}>{label}</p>
-                            <p className="text-[11px] mt-0.5" style={{ color: tokens.text }}>acquisition vehicle</p>
+                            <p className="text-xs mt-0.5" style={{ color: tokens.text }}>acquisition vehicle</p>
                           </div>
                           <div className="w-px h-3 my-0.5" style={{ backgroundColor: tokens.border }} aria-hidden />
                           <div className="px-2 py-1.5 rounded border text-center min-w-[70px]" style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}>
-                            <p className="text-[11px]" style={{ color: tokens.text }}>{label.replace("BidCo", "Target")}</p>
+                            <p className="text-xs" style={{ color: tokens.text }}>{label.replace("BidCo", "Target")}</p>
                           </div>
                         </div>
                       ))}
@@ -874,10 +877,10 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {/* Right: Financing model text */}
                 <div>
                   <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model & share classes</p>
-                  <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+                  <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
                     All funding flows through Nivo Group AB (the topco). Acquisitions are structured deal-by-deal via BidCos. There are no capital commitments—participation in future issues is voluntary, with pre-emptive rights.
                   </p>
-                  <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mt-4">
+                  <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg mt-4">
                     A-shares (Founders & Founding Investors) carry strong voting rights and receive 20% of dividends and excess returns, plus catch-up on the B-shares threshold. B-shares receive 80% of dividends and excess returns, with 1x liquidation preference and a 20% return threshold. Each exit triggers distribution according to these rights. Portfolio NAV is revalued with each acquisition, rewarding early capital.
                   </p>
                 </div>
@@ -908,19 +911,19 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
 
             <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
               <h3 className={H3_CLASS}>Governance</h3>
-              <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
+              <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg mb-6">
                 Majority control (51–100%) with board oversight; incentives tied to ROIC and cash flow. Board retains strategy, capital allocation, M&A; management runs operations within thresholds. Monthly financials, quarterly investor updates, annual audit. Independent administrator and auditor.
               </p>
             </div>
 
-            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+            <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
               Target close is Q2 2026. We are seeking 2–3 anchor investors. The pipeline is strong and the team is committed. Deployment is expected over 18–24 months; hold per company 5–7 years. Target gross IRR 20–25% and MOIC 4–5x through disciplined reinvestment and operational compounding; base-case underwriting assumes margin expansion and debt paydown with flat-to-modest exit multiples.
             </p>
           </div>
 
           <div className="pt-8 border-t" style={{ borderColor: tokens.border }}>
             <h3 className={H3_CLASS}>Exit strategy</h3>
-            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
+            <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg mb-6">
               Nivo is built as an evergreen holding company with a long-term ownership approach. We aim to hold and develop businesses over time — not trade them. Divestments are selective and driven by exceptional value opportunities. The primary path to liquidity is a listing of Nivo Group within 5–7 years. A strategic sale of the group remains a secondary option.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
@@ -936,7 +939,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
               ))}
             </div>
-            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+            <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
               We grow your capital by improving how the businesses operate, supporting profitable growth and reinvesting the cash flow they generate. Most of the capital is retained and redeployed to compound value over time. As the portfolio develops, we expect to complement this with a gradual and modest dividend, without compromising the long-term compounding strategy.
             </p>
           </div>
@@ -954,24 +957,24 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Execution risk</p>
-                <p className="text-[15px] text-profile-fg mb-2">Initiatives may take longer or cost more than planned.</p>
+                <p className="text-base sm:text-lg text-profile-fg mb-2">Initiatives may take longer or cost more than planned.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
-                <p className="text-[15px] text-profile-fg">Proven playbook, stress scenarios, experienced advisors.</p>
+                <p className="text-base sm:text-lg text-profile-fg">Proven playbook, stress scenarios, experienced advisors.</p>
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Market risk</p>
-                <p className="text-[15px] text-profile-fg mb-2">Downturn or sector-specific challenges.</p>
+                <p className="text-base sm:text-lg text-profile-fg mb-2">Downturn or sector-specific challenges.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
-                <p className="text-[15px] text-profile-fg">Defensive sectors, 3–4 company diversification, leverage below 2x.</p>
+                <p className="text-base sm:text-lg text-profile-fg">Defensive sectors, 3–4 company diversification, leverage below 2x.</p>
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Key person risk</p>
-                <p className="text-[15px] text-profile-fg mb-2">Founder dependence and transition risk.</p>
+                <p className="text-base sm:text-lg text-profile-fg mb-2">Founder dependence and transition risk.</p>
                 <p className={LABEL_OLIVE_CLASS}>Mitigation</p>
-                <p className="text-[15px] text-profile-fg">Retain management, 12–24 month transition, process documentation.</p>
+                <p className="text-base sm:text-lg text-profile-fg">Retain management, 12–24 month transition, process documentation.</p>
               </div>
             </div>
-            <p className="text-[15px] text-profile-fg max-w-2xl">
+            <p className="text-base sm:text-lg text-profile-fg leading-relaxed w-full">
               Concentration (3–4 companies) and liquidity (company exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
             </p>
             <p className={PUNCH_CLASS}>
@@ -993,8 +996,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <p className={PUNCH_CLASS}>
             {t.contactPunchLong}
           </p>
-          <p className="text-profile-fg font-medium mb-2">Contact the investment team</p>
-          <a href="mailto:invest@nivogroup.se" className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded">
+          <p className="text-base sm:text-lg text-profile-fg font-medium mb-2">Contact the investment team</p>
+          <a href="mailto:invest@nivogroup.se" className="text-base sm:text-lg text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded">
             invest@nivogroup.se
           </a>
           <p className="text-sm mt-12 pt-8 border-t" style={{ color: tokens.text, borderColor: tokens.border }}>

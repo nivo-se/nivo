@@ -255,7 +255,7 @@ export const investorTranslations = {
     acquisitionCriteriaLong:
       "Strict valuation: EV/EBITDA 5–7x, operational improvement potential over growth premium. Conservative leverage (debt/capital <30%, net debt/EBITDA <2x). Guardrails: path to 20% ROIC, 12 months runway, capital preservation first.",
     teamWhyExecuteLong:
-      "80+ ECM transactions and 20+ IPOs; €60m+ D2C built at Electrolux; €50m+ venture including iZettle (PayPal). Capital markets discipline plus operational scaling—what Nordic companies need.",
+      "We combine capital markets experience with hands-on operational execution. Having built and scaled businesses ourselves, we focus on the practical improvements that drive performance — allowing us to identify opportunities, underwrite risk and, most importantly, improve companies in a meaningful way.",
     teamPositionLong:
       "Nivo is an investment company focused on long-term compounding. We combine capital markets discipline with hands-on toolbox execution—pricing, cost control, digital workflows—in founder-led Nordic companies.",
     contactIntroLong: "We welcome discussions with investors who value operational discipline, long-term compounding, and execution over financial engineering.",
@@ -511,7 +511,7 @@ export const investorTranslations = {
     acquisitionCriteriaLong:
       "Strikt värdering: EV/EBITDA 5–7x, operativ förbättringspotential framför tillväxtpremie. Konservativ hävstång (skuld/kapital <30%, netto skuld/EBITDA <2x). Räcken: väg till 20% ROIC, 12 månaders runway, kapitalbevarande först.",
     teamWhyExecuteLong:
-      "80+ ECM-transaktioner och 20+ IPO:er; €60m+ D2C byggt på Electrolux; €50m+ venture inkl. iZettle (PayPal). Kapitalmarknadsdisciplin och operativ skalning—vad nordiska bolag behöver.",
+      "Vi kombinerar erfarenhet från kapitalmarknader med hands-on operativ exekvering. Eftersom vi själva har byggt och skalat företag fokuserar vi på de praktiska förbättringar som driver prestation — så att vi kan identifiera möjligheter, bedöma risk och framför allt förbättra bolag på ett meningsfullt sätt.",
     teamPositionLong:
       "Nivo är ett investeringsbolag med fokus på långsiktig ackumulering. Vi kombinerar kapitalmarknadsdisciplin med hands-on verktygslådeexekvering—prissättning, kostnadskontroll, digitala arbetsflöden—i grundarledda nordiska bolag.",
     contactIntroLong: "Vi välkomnar dialog med investerare som värderar operativ disciplin, långsiktig ackumulering och exekvering framför finansiell engineering.",
