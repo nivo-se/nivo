@@ -35,12 +35,19 @@ FILTER_FIELDS = {
     "has_3y_financials": "cm.has_3y_financials",
     "data_quality_score": "cm.data_quality_score",
     "is_stale": "cm.is_stale",
+    "fit_score": "cm.fit_score",
+    "ops_upside_score": "cm.ops_upside_score",
+    "nivo_total_score": "cm.nivo_total_score",
+    "segment_tier": "cm.segment_tier",
+    "research_feasibility_score": "cm.research_feasibility_score",
 }
 
 SORT_FIELDS = {
     "orgnr", "name", "data_quality_score", "last_enriched_at",
     "revenue_latest", "ebitda_margin_latest", "revenue_cagr_3y", "employees_latest",
     "has_homepage", "has_3y_financials", "is_stale",
+    "fit_score", "ops_upside_score", "nivo_total_score", "segment_tier",
+    "research_feasibility_score",
 }
 
 
@@ -73,6 +80,17 @@ FILTER_TAXONOMY = {
             "items": [
                 {"field": "segment_names", "label": "Segment name contains", "type": "text", "ops": ["contains"]},
                 {"field": "name", "label": "Company name contains", "type": "text", "ops": ["contains"]},
+                {"field": "segment_tier", "label": "Segment tier", "type": "text", "ops": ["="]},
+            ],
+        },
+        {
+            "id": "scores",
+            "label": "Screening scores",
+            "items": [
+                {"field": "fit_score", "label": "Fit score (0-100)", "type": "number", "ops": [">=", "<=", "between", "="]},
+                {"field": "ops_upside_score", "label": "Ops upside score (0-100)", "type": "number", "ops": [">=", "<=", "between", "="]},
+                {"field": "nivo_total_score", "label": "Nivo total score (0-200)", "type": "number", "ops": [">=", "<=", "between", "="]},
+                {"field": "research_feasibility_score", "label": "Research feasibility (0-3)", "type": "number", "ops": [">=", "<=", "between", "="]},
             ],
         },
     ],
@@ -173,6 +191,11 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
     metrics_equity_ratio = "NULL"
     metrics_debt_to_equity = "NULL"
     metrics_latest_year = "NULL"
+    scores_join = ""
+    fit_score_expr = "NULL"
+    ops_upside_score_expr = "NULL"
+    nivo_total_score_expr = "NULL"
+    segment_tier_expr = "NULL"
     if metrics_table:
         metrics_join = f"LEFT JOIN {metrics_table} m ON m.orgnr = c.orgnr"
         metrics_revenue = "m.latest_revenue_sek"
@@ -181,6 +204,17 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
         metrics_equity_ratio = "m.equity_ratio_latest"
         metrics_debt_to_equity = "m.debt_to_equity_latest"
         metrics_latest_year = "m.latest_year"
+        if metrics_table == "company_metrics":
+            fit_score_expr = "m.fit_score"
+            ops_upside_score_expr = "m.ops_upside_score"
+            nivo_total_score_expr = "m.nivo_total_score"
+            segment_tier_expr = "m.segment_tier"
+        elif _table_exists(db, "company_metrics"):
+            scores_join = "LEFT JOIN company_metrics m_sc ON m_sc.orgnr = c.orgnr"
+            fit_score_expr = "m_sc.fit_score"
+            ops_upside_score_expr = "m_sc.ops_upside_score"
+            nivo_total_score_expr = "m_sc.nivo_total_score"
+            segment_tier_expr = "m_sc.segment_tier"
 
     fin_latest_annual_join = ""
     fin_latest_any_join = ""
@@ -276,10 +310,20 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
         a.strategic_fit_score AS ai_strategic_fit_score,
         {metrics_equity_ratio} AS equity_ratio_latest,
         {metrics_debt_to_equity} AS debt_to_equity_latest,
-        (COALESCE({metrics_latest_year}, {latest_year_annual}, {latest_year_any}))::int AS latest_year
+        (COALESCE({metrics_latest_year}, {latest_year_annual}, {latest_year_any}))::int AS latest_year,
+        {fit_score_expr} AS fit_score,
+        {ops_upside_score_expr} AS ops_upside_score,
+        {nivo_total_score_expr} AS nivo_total_score,
+        {segment_tier_expr} AS segment_tier,
+        (
+          CASE WHEN (c.homepage IS NOT NULL AND c.homepage != '') THEN 1 ELSE 0 END +
+          CASE WHEN ({has_3y_expr}) THEN 1 ELSE 0 END +
+          CASE WHEN ({raw_revenue_latest_expr}) >= {MIN_VALID_REVENUE_SEK} THEN 1 ELSE 0 END
+        )::int AS research_feasibility_score
       FROM companies c
       LEFT JOIN ai_profiles a ON c.orgnr = a.org_number
       {metrics_join}
+      {scores_join}
       {fin_latest_annual_join}
       {fin_latest_any_join}
     ) cm
@@ -297,11 +341,14 @@ class FilterItem(BaseModel):
 
 class UniverseQueryPayload(BaseModel):
     filters: List[FilterItem] = []
+    excludeFilters: Optional[List[FilterItem]] = None  # server-side exclude: rows matching these are excluded
     logic: str = "and"
     sort: Dict[str, Any] = {}
     limit: int = 50
     offset: int = 0
     q: Optional[str] = None  # search by name or orgnr
+    profileId: Optional[str] = None  # optional screening profile: apply exclusion_rules and profile_weighted_score
+    profileVersionId: Optional[str] = None  # optional; if omitted use active version
 
 
 def _compile_filter(
@@ -313,11 +360,25 @@ def _compile_filter(
         return None
 
     if value_type == "number":
-        if op == ">=":
+        if op in ("gt", ">"):
+            try:
+                v = float(value)
+                params.append(v)
+                return f"{col} > ?"
+            except (TypeError, ValueError):
+                return None
+        if op in ("gte", ">="):
             try:
                 v = float(value)
                 params.append(v)
                 return f"{col} >= ?"
+            except (TypeError, ValueError):
+                return None
+        if op in ("lt", "<"):
+            try:
+                v = float(value)
+                params.append(v)
+                return f"{col} < ?"
             except (TypeError, ValueError):
                 return None
         if op == "<=":
@@ -358,12 +419,24 @@ def _compile_filter(
                 return f / 100.0 if f > 1 else f
             except (TypeError, ValueError):
                 return None
-        if op == ">=":
+        if op in ("gt", ">"):
+            r = to_ratio(value)
+            if r is None:
+                return None
+            params.append(r)
+            return f"{col} > ?"
+        if op in ("gte", ">="):
             r = to_ratio(value)
             if r is None:
                 return None
             params.append(r)
             return f"{col} >= ?"
+        if op in ("lt", "<"):
+            r = to_ratio(value)
+            if r is None:
+                return None
+            params.append(r)
+            return f"{col} < ?"
         if op == "<=":
             r = to_ratio(value)
             if r is None:
@@ -398,20 +471,27 @@ def _compile_filter(
         params.append(b)
         return f"{col} = ?"
 
-    if value_type == "text" and op == "contains":
-        if value is None or str(value).strip() == "":
-            return None
-        pattern = f"%{str(value).strip()}%"
-        if field == "name":
-            params.append(pattern)
-            return "(cm.name ILIKE ?)" if db_is_postgres else "(cm.name LIKE ?)"
-        # segment_names: JSON array search
-        if db_is_postgres:
-            params.append(pattern)
-            return "(cm.segment_names IS NOT NULL AND EXISTS (SELECT 1 FROM jsonb_array_elements_text(cm.segment_names) s WHERE s ILIKE ?))"
-        else:
-            params.append(pattern)
-            return "(cm.segment_names IS NOT NULL AND cm.segment_names != '' AND EXISTS (SELECT 1 FROM json_each(cm.segment_names) WHERE value LIKE ?))"
+    if value_type == "text":
+        if op == "contains":
+            if value is None or str(value).strip() == "":
+                return None
+            pattern = f"%{str(value).strip()}%"
+            if field == "name":
+                params.append(pattern)
+                return "(cm.name ILIKE ?)" if db_is_postgres else "(cm.name LIKE ?)"
+            # segment_names: JSON array search
+            if field == "segment_names":
+                if db_is_postgres:
+                    params.append(pattern)
+                    return "(cm.segment_names IS NOT NULL AND EXISTS (SELECT 1 FROM jsonb_array_elements_text(cm.segment_names) s WHERE s ILIKE ?))"
+                else:
+                    params.append(pattern)
+                    return "(cm.segment_names IS NOT NULL AND cm.segment_names != '' AND EXISTS (SELECT 1 FROM json_each(cm.segment_names) WHERE value LIKE ?))"
+        if op == "=":
+            if value is None:
+                return None
+            params.append(str(value).strip())
+            return f"{col} = ?"
 
     return None
 
@@ -460,6 +540,160 @@ def _build_where_from_stack(
     return " AND ".join(where_parts), params
 
 
+# Field -> type for profile exclusion_rules (no type in JSON)
+_EXCLUSION_FIELD_TYPES: Dict[str, str] = {
+    "revenue_latest": "number",
+    "ebitda_margin_latest": "percent",
+    "revenue_cagr_3y": "percent",
+    "employees_latest": "number",
+    "data_quality_score": "number",
+    "fit_score": "number",
+    "ops_upside_score": "number",
+    "nivo_total_score": "number",
+    "research_feasibility_score": "number",
+}
+
+
+def _get_profile_config(db: Any, profile_id: str, version_id: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Load screening profile version config. Returns config_json or None."""
+    if not getattr(db, "table_exists", lambda _: False)("screening_profile_versions"):
+        return None
+    if version_id:
+        rows = db.run_raw_query(
+            "SELECT config_json FROM screening_profile_versions WHERE id::text = ? AND profile_id::text = ? LIMIT 1",
+            [version_id, profile_id],
+        )
+    else:
+        rows = db.run_raw_query(
+            "SELECT config_json FROM screening_profile_versions WHERE profile_id::text = ? AND is_active = true LIMIT 1",
+            [profile_id],
+        )
+    if not rows or not rows[0].get("config_json"):
+        return None
+    cfg = rows[0]["config_json"]
+    return cfg if isinstance(cfg, dict) else None
+
+
+def _build_profile_exclusion_where(config: Dict[str, Any], params: List[Any], db_is_postgres: bool) -> Optional[str]:
+    """Build SQL fragment NOT (rule1 OR rule2 OR ...) from config exclusion_rules. Returns None if no rules."""
+    rules = config.get("exclusion_rules") or []
+    if not rules:
+        return None
+    parts = []
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        field = rule.get("field")
+        op = rule.get("op")
+        value = rule.get("value")
+        if not field or op is None:
+            continue
+        value_type = _EXCLUSION_FIELD_TYPES.get(field, "number")
+        frag = _compile_filter(field, op, value, value_type, params, db_is_postgres)
+        if frag:
+            parts.append(frag)
+    if not parts:
+        return None
+    return "NOT (" + " OR ".join(parts) + ")"
+
+
+def _match_archetype_criteria(row: Dict[str, Any], criteria: Dict[str, Any]) -> bool:
+    """Return True if row satisfies all criteria (field: { gte, lte, between })."""
+    if not criteria or not isinstance(criteria, dict):
+        return True
+    for field, cond in criteria.items():
+        if not isinstance(cond, dict):
+            continue
+        val = row.get(field)
+        if val is None:
+            return False
+        try:
+            v = float(val)
+        except (TypeError, ValueError):
+            if field in ("segment_tier", "name"):
+                v_str = str(val).strip()
+                if "gte" in cond and v_str < str(cond["gte"]):
+                    return False
+                if "lte" in cond and v_str > str(cond["lte"]):
+                    return False
+                if "eq" in cond and v_str != str(cond["eq"]):
+                    return False
+            continue
+        if "gte" in cond:
+            if v < float(cond["gte"]):
+                return False
+        if "lte" in cond:
+            if v > float(cond["lte"]):
+                return False
+        if "between" in cond:
+            br = cond["between"]
+            if isinstance(br, (list, tuple)) and len(br) >= 2:
+                if v < float(br[0]) or v > float(br[1]):
+                    return False
+    return True
+
+
+def _get_archetype_code(row: Dict[str, Any], config: Dict[str, Any]) -> Optional[str]:
+    """Return first matching archetype code from config.archetypes or None."""
+    archetypes = config.get("archetypes") or []
+    for arch in archetypes:
+        if not isinstance(arch, dict):
+            continue
+        code = arch.get("code")
+        criteria = arch.get("criteria") or arch.get("definition_json") or {}
+        if not code:
+            continue
+        if _match_archetype_criteria(row, criteria):
+            return str(code)
+    return None
+
+
+def _compute_profile_weighted_score(row: Dict[str, Any], config: Dict[str, Any]) -> Optional[float]:
+    """Compute profile_weighted_score from config variables and weights. Returns 0-1 normalized score or None."""
+    variables = config.get("variables") or []
+    weights = config.get("weights") or {}
+    if not variables or not weights:
+        return None
+    total_weight = 0.0
+    weighted_sum = 0.0
+    for var in variables:
+        if not isinstance(var, dict):
+            continue
+        var_id = var.get("id")
+        source = var.get("source")
+        norm = var.get("normalize", "min_max")
+        range_spec = var.get("range")
+        if not var_id or not source or var_id not in weights:
+            continue
+        raw = row.get(source)
+        if raw is None:
+            continue
+        try:
+            val = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if norm == "min_max" and isinstance(range_spec, (list, tuple)) and len(range_spec) >= 2:
+            lo, hi = float(range_spec[0]), float(range_spec[1])
+            if hi <= lo:
+                normalized = 0.0
+            else:
+                normalized = max(0.0, min(1.0, (val - lo) / (hi - lo)))
+        elif norm == "linear" and isinstance(range_spec, (list, tuple)) and len(range_spec) >= 2:
+            lo, hi = float(range_spec[0]), float(range_spec[1])
+            if hi <= lo:
+                normalized = 0.0
+            else:
+                normalized = max(0.0, min(1.0, (val - lo) / (hi - lo)))
+        else:
+            normalized = val if 0 <= val <= 1 else max(0.0, min(1.0, val))
+        w = float(weights.get(var_id, 0))
+        weighted_sum += w * normalized
+        total_weight += w
+    if total_weight <= 0:
+        return None
+    return round(weighted_sum / total_weight, 4)
+
+
 def _build_order(sort: Optional[Dict], db_is_postgres: bool) -> str:
     """Build ORDER BY. Validates sort field; fallback to orgnr if invalid."""
     if not sort or not isinstance(sort, dict):
@@ -497,9 +731,32 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     offset = max(body.offset, 0)
 
     sanitized_filters = _sanitize_filters(body.filters or [])
-    where_sql, params = _build_where_from_stack(
+    include_where, include_params = _build_where_from_stack(
         sanitized_filters, body.q, _IS_POSTGRES
     )
+    sanitized_exclude = _sanitize_filters(body.excludeFilters or [])
+    if sanitized_exclude:
+        exclude_where, exclude_params = _build_where_from_stack(
+            sanitized_exclude, None, _IS_POSTGRES
+        )
+        # Exclude rows that match exclude filters: WHERE include AND NOT (exclude)
+        where_sql = f"({include_where}) AND NOT ({exclude_where})"
+        params = include_params + exclude_params
+    else:
+        where_sql = include_where
+        params = list(include_params)
+
+    profile_config: Optional[Dict[str, Any]] = None
+    if body.profileId and _IS_POSTGRES:
+        try:
+            profile_config = _get_profile_config(db, body.profileId, body.profileVersionId)
+            if profile_config:
+                profile_excl = _build_profile_exclusion_where(profile_config, params, _IS_POSTGRES)
+                if profile_excl:
+                    where_sql = f"({where_sql}) AND ({profile_excl})"
+        except Exception as e:
+            logger.warning("Universe query: profile config load failed: %s", e)
+
     order_sql = _build_order(body.sort, _IS_POSTGRES)
     params.extend([limit, offset])
 
@@ -508,7 +765,9 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
         "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
         "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
         "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "
-        "cm.equity_ratio_latest, cm.debt_to_equity_latest, cm.latest_year"
+        "cm.equity_ratio_latest, cm.debt_to_equity_latest, cm.latest_year, "
+        "cm.fit_score, cm.ops_upside_score, cm.nivo_total_score, cm.segment_tier, "
+        "cm.research_feasibility_score"
     )
 
     if _IS_POSTGRES:
@@ -550,7 +809,11 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
         seg = r.get("segment_names")
         rev = r.get("revenue_latest")
         ai_score = r.get("ai_strategic_fit_score")
-        out.append({
+        fit = r.get("fit_score")
+        ops = r.get("ops_upside_score")
+        nivo = r.get("nivo_total_score")
+        tier = r.get("segment_tier")
+        row_dict = {
             "orgnr": str(r.get("orgnr", "")),
             "name": r.get("name"),
             "segment_names": _parse_segment_names(seg),
@@ -572,6 +835,19 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
             "equity_ratio_latest": float(r.get("equity_ratio_latest")) if r.get("equity_ratio_latest") is not None else None,
             "debt_to_equity_latest": float(r.get("debt_to_equity_latest")) if r.get("debt_to_equity_latest") is not None else None,
             "latest_year": int(r.get("latest_year")) if r.get("latest_year") is not None else None,
-        })
+            "fit_score": int(fit) if fit is not None else None,
+            "ops_upside_score": int(ops) if ops is not None else None,
+            "nivo_total_score": int(nivo) if nivo is not None else None,
+            "segment_tier": str(tier) if tier is not None else None,
+            "research_feasibility_score": int(r.get("research_feasibility_score")) if r.get("research_feasibility_score") is not None else None,
+        }
+        if profile_config:
+            if profile_config.get("weights"):
+                score = _compute_profile_weighted_score(row_dict, profile_config)
+                row_dict["profile_weighted_score"] = score
+            arch_code = _get_archetype_code(row_dict, profile_config)
+            if arch_code:
+                row_dict["archetype_code"] = arch_code
+        out.append(row_dict)
 
     return {"rows": out, "total": total}

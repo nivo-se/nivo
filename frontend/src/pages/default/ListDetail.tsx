@@ -380,7 +380,7 @@ export default function ListDetail() {
             )}
             <Link to={`/ai/run/create?template=default&list=${list.id}`}>
               <Button variant="outline">
-                <Brain className="w-4 h-4 mr-2" /> Run AI Analysis
+                <Brain className="w-4 h-4 mr-2" /> Send to AI Lab
               </Button>
             </Link>
             <Button

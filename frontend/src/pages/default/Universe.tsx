@@ -15,7 +15,7 @@ import {
   getDefaultUniverseStateFromUrl,
   buildDefaultUniverseSearchParams,
 } from "@/lib/defaultUniverseUrlState";
-import { includeRulesToBackendFilters } from "@/lib/filterConversion";
+import { includeRulesToBackendFilters, excludeRulesToBackendFilters } from "@/lib/filterConversion";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -25,9 +25,65 @@ import { AddToListDropdown } from "@/components/default/AddToListDropdown";
 import { CompanySnapshotModal } from "@/components/default/CompanySnapshotModal";
 import { EmptyState } from "@/components/default/EmptyState";
 import { ErrorState } from "@/components/default/ErrorState";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ScoreExplanationTooltip } from "@/components/universe/ScoreExplanationTooltip";
+import { LibrarySidebar } from "@/components/library";
+import type { SavedView } from "@/lib/services/viewsService";
+import type { SavedList } from "@/lib/services/listsService";
+import { ChevronDown, ChevronUp, Send } from "lucide-react";
+import { getUniverseCompaniesWithTotal } from "@/lib/api/universe/service";
 
 const COMPANIES_PER_PAGE = 50;
+const EXPORT_MAX_ROWS = 10_000;
+
+function escapeCsvCell(value: unknown): string {
+  if (value == null) return "";
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function companiesToCsv(companies: Company[]): string {
+  const headers = [
+    "orgnr",
+    "name",
+    "segment",
+    "revenue_latest",
+    "ebitda_margin",
+    "revenue_cagr_3y",
+    "employees",
+    "data_quality_score",
+    "fit_score",
+    "nivo_total_score",
+    "segment_tier",
+    "has_homepage",
+    "has_ai_profile",
+    "has_3y_financials",
+    "municipality",
+    "homepage",
+    "email",
+  ];
+  const rows = companies.map((c) => [
+    c.orgnr,
+    c.display_name ?? c.legal_name ?? "",
+    Array.isArray(c.segment_names) ? c.segment_names.join("; ") : "",
+    c.revenue_latest ?? "",
+    c.ebitda_margin_latest != null ? String(c.ebitda_margin_latest) : "",
+    c.revenue_cagr_3y != null ? String(c.revenue_cagr_3y) : "",
+    c.employees_latest ?? "",
+    c.data_quality_score ?? "",
+    c.fit_score ?? "",
+    c.nivo_total_score ?? "",
+    c.segment_tier ?? "",
+    c.has_homepage ? "1" : "0",
+    c.has_ai_profile ? "1" : "0",
+    c.has_3y_financials ? "1" : "0",
+    c.region ?? c.municipality ?? "",
+    c.website_url ?? "",
+    c.email ?? "",
+  ]);
+  const lines = [headers.map(escapeCsvCell).join(","), ...rows.map((r) => r.map(escapeCsvCell).join(","))];
+  return lines.join("\n");
+}
 const SORT_BY_MAP: Record<string, string> = {
   name: "name",
   industry: "name",
@@ -146,6 +202,8 @@ export default function Universe() {
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set());
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [snapshotOrgnr, setSnapshotOrgnr] = useState<string | null>(null);
+  const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeFilters, setActiveFilters] = useState<{
     include: { id?: string; type: string; rules: unknown[] };
     exclude: { id?: string; type: string; rules: unknown[] };
@@ -189,15 +247,22 @@ export default function Universe() {
       rules.filter((r) => r.field && r.operator).map((r) => ({ field: r.field!, operator: r.operator!, value: r.value }))
     );
   }, [activeFilters.include.rules]);
+  const backendExcludeFilters = useMemo(() => {
+    const rules = (activeFilters.exclude.rules || []) as { field?: string; operator?: string; value?: unknown }[];
+    return excludeRulesToBackendFilters(
+      rules.filter((r) => r.field && r.operator).map((r) => ({ field: r.field!, operator: r.operator!, value: r.value }))
+    );
+  }, [activeFilters.exclude.rules]);
   const queryPayload: Partial<UniverseQueryPayload> = useMemo(
     () => ({
       q: debouncedQ || undefined,
       filters: backendFilters,
+      excludeFilters: backendExcludeFilters.length > 0 ? backendExcludeFilters : undefined,
       limit: COMPANIES_PER_PAGE,
       offset: (currentPage - 1) * COMPANIES_PER_PAGE,
       sort: { by: sortBy, dir: sortDirection },
     }),
-    [debouncedQ, currentPage, sortBy, sortDirection, backendFilters]
+    [debouncedQ, currentPage, sortBy, sortDirection, backendFilters, backendExcludeFilters]
   );
 
   const { data: universeData, isLoading, isError, error, refetch } = useCompaniesWithTotal(queryPayload);
@@ -205,17 +270,19 @@ export default function Universe() {
   const totalCount = universeData?.total ?? 0;
   const createListMutation = useCreateList();
   const createListFromQueryMutation = useCreateListFromQuery();
+  const [exporting, setExporting] = useState(false);
 
+  // When exclude filters are sent to the API, the backend applies both include and exclude; otherwise fall back to client-side exclude.
   const filteredCompanies = useMemo(() => {
-    let result = [...companies];
-    if (activeFilters.include.rules.length > 0) {
-      result = result.filter((c) => evaluateFilterGroup(c, activeFilters.include));
+    if (backendExcludeFilters.length > 0) {
+      return companies; // Backend already applied include + exclude
     }
+    let result = [...companies];
     if (activeFilters.exclude.rules.length > 0) {
       result = result.filter((c) => !evaluateFilterGroup(c, activeFilters.exclude));
     }
     return result;
-  }, [companies, activeFilters]);
+  }, [companies, activeFilters.exclude.rules, backendExcludeFilters.length]);
 
   const toggleSort = (field: string) => {
     setSortField(field);
@@ -257,10 +324,86 @@ export default function Universe() {
     }
   };
 
+  const applyViewToState = (view: SavedView) => {
+    const fj = view.filtersJson as { filters?: { field: string; op?: string; operator?: string; value: unknown }[]; q?: string; sort?: { by?: string; dir?: "asc" | "desc" } };
+    const filters = fj?.filters ?? [];
+    const includeRules = filters.map((f, i) => ({
+      id: `view_${i}`,
+      field: f.field,
+      operator: (f.operator ?? f.op) ?? "gte",
+      value: f.value,
+    }));
+    setActiveFilters({
+      include: { type: "and", rules: includeRules },
+      exclude: { type: "and", rules: [] },
+    });
+    if (fj?.q != null) setSearchInput(String(fj.q));
+    const sort = fj?.sort ?? view.sortJson as { by?: string; dir?: "asc" | "desc" };
+    if (sort?.by) setSortField(sort.by);
+    if (sort?.dir) setSortDirection(sort.dir);
+    setCurrentPage(1);
+  };
+
+  const handleSendToAILab = async () => {
+    const companyIds = Array.from(selectedCompanies);
+    if (companyIds.length === 0) {
+      toast({ title: "No selection", description: "Select companies first, then Send to AI Lab.", variant: "destructive" });
+      return;
+    }
+    try {
+      const list = await createListMutation.mutateAsync({
+        name: `AI Lab ${new Date().toISOString().slice(0, 10)}`,
+        scope: "private",
+      });
+      const { addListItems } = await import("@/lib/services/listsService");
+      await addListItems(list.id, companyIds);
+      navigate(`/ai/run/create?template=default&list=${list.id}`);
+      toast({ title: "Sent to AI Lab", description: `Created list with ${companyIds.length} companies.` });
+    } catch (e) {
+      toast({
+        title: "Failed to send to AI Lab",
+        description: e instanceof Error ? e.message : "Could not create list.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportCsv = async () => {
+    setExporting(true);
+    try {
+      const { companies: exportRows } = await getUniverseCompaniesWithTotal({
+        ...queryPayload,
+        limit: Math.min(EXPORT_MAX_ROWS, totalCount || EXPORT_MAX_ROWS),
+        offset: 0,
+      });
+      const csv = companiesToCsv(exportRows);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `universe-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Export done", description: `Downloaded ${exportRows.length} rows.` });
+    } catch (e) {
+      toast({
+        title: "Export failed",
+        description: e instanceof Error ? e.message : "Could not export.",
+        variant: "destructive",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleSaveViewAsList = async (name: string, isPublic: boolean) => {
     const includeRules = (activeFilters.include.rules || []) as { field?: string; operator?: string; value?: unknown }[];
+    const excludeRules = (activeFilters.exclude.rules || []) as { field?: string; operator?: string; value?: unknown }[];
     const filters = includeRulesToBackendFilters(
       includeRules.filter((r) => r.field && r.operator).map((r) => ({ field: r.field!, operator: r.operator!, value: r.value }))
+    );
+    const excludeFilters = excludeRulesToBackendFilters(
+      excludeRules.filter((r) => r.field && r.operator).map((r) => ({ field: r.field!, operator: r.operator!, value: r.value }))
     );
     try {
       const res = await createListFromQueryMutation.mutateAsync({
@@ -268,6 +411,7 @@ export default function Universe() {
         scope: isPublic ? "team" : "private",
         queryPayload: {
           filters,
+          excludeFilters: excludeFilters.length > 0 ? excludeFilters : undefined,
           logic: "and",
           sort: { by: sortBy, dir: sortDirection },
           q: debouncedQ || undefined,
@@ -302,7 +446,24 @@ export default function Universe() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
+        {sidebarOpen && (
+          <div className="w-56 shrink-0 border-r border-border bg-muted/20">
+            <LibrarySidebar
+              layout="universe"
+              mode="views"
+              selectedId={selectedViewId}
+              onSelectView={(view: SavedView) => {
+                setSelectedViewId(view.id);
+                applyViewToState(view);
+              }}
+              onSelectList={(list: SavedList) => {
+                navigate(`/lists/${list.id}`);
+              }}
+            />
+          </div>
+        )}
+      <div className="flex-1 min-h-0 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 pb-8 h-full min-h-0 flex flex-col gap-4">
         <div className="shrink-0 sticky top-0 z-20 bg-background -mx-8 px-8 pt-2 pb-4 border-b border-border space-y-4">
           <div className="flex flex-col gap-2">
@@ -323,7 +484,13 @@ export default function Universe() {
               <Button variant="outline" onClick={() => setSaveDialogOpen(true)}>
                 Save as list
               </Button>
-              <Button variant="outline">Export</Button>
+              <Button variant="outline" onClick={handleSendToAILab} disabled={selectedCompanies.size === 0}>
+                <Send className="w-4 h-4 mr-2" />
+                Send to AI Lab
+              </Button>
+              <Button variant="outline" onClick={handleExportCsv} disabled={exporting || totalCount === 0}>
+                {exporting ? "Exporting…" : "Export"}
+              </Button>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -419,6 +586,9 @@ export default function Universe() {
                   <SortableHeader label="EBITDA Margin" field="margin" currentField={sortField} direction={sortDirection} onClick={toggleSort} />
                 </th>
                 <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card">Flags</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground bg-card" title="Nivo total score (0-200)">Score</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card" title="Segment tier">Tier</th>
+                <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card" title="Profile archetype">Archetype</th>
                 <th className="px-3 py-2 text-center text-xs font-medium text-muted-foreground bg-card">AI</th>
                 <th className="px-3 py-2 w-20 text-xs font-medium text-muted-foreground bg-card">Actions</th>
               </tr>
@@ -459,6 +629,27 @@ export default function Universe() {
                     <td className="px-3 py-2 text-center text-xs text-muted-foreground">
                       {company.status === "inactive" && <span title="Inactive">INA</span>}
                       {!company.has_3y_financials && <span title="Incomplete financials"> INC</span>}
+                    </td>
+                    <td className="px-3 py-2 text-right text-muted-foreground font-mono tabular-nums">
+                      <ScoreExplanationTooltip
+                        score={company.nivo_total_score}
+                        label="Nivo total score (0–200)"
+                        explanation="fit_score + ops_upside_score"
+                      >
+                        <span>{company.nivo_total_score != null ? company.nivo_total_score : "—"}</span>
+                      </ScoreExplanationTooltip>
+                    </td>
+                    <td className="px-3 py-2 text-center text-muted-foreground">
+                      {company.segment_tier ?? "—"}
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      {company.archetype_code ? (
+                        <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                          {company.archetype_code}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="px-3 py-2 text-center text-muted-foreground">
                       {company.ai_profile ? (
@@ -517,6 +708,7 @@ export default function Universe() {
         )}
         </div>
         </div>
+      </div>
       </div>
 
       <SaveListDialog

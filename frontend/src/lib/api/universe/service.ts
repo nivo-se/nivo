@@ -51,6 +51,13 @@ function mapUniverseRowToCompany(row: UniverseRow): Company {
       : undefined,
     equity_ratio_latest: toNull(row.equity_ratio_latest),
     debt_to_equity_latest: toNull(row.debt_to_equity_latest),
+    fit_score: toNull(row.fit_score),
+    ops_upside_score: toNull(row.ops_upside_score),
+    nivo_total_score: toNull(row.nivo_total_score),
+    segment_tier: row.segment_tier ?? null,
+    research_feasibility_score: toNull(row.research_feasibility_score),
+    profile_weighted_score: toNull(row.profile_weighted_score),
+    archetype_code: row.archetype_code ?? null,
     currency: "SEK",
     years_available: 0,
     latest_year: new Date().getFullYear(),
@@ -74,6 +81,7 @@ export async function getUniverseCompaniesWithTotal(
   const result = await queryUniverseClient(
     {
       filters: payload?.filters ?? [],
+      excludeFilters: payload?.excludeFilters,
       logic: "and",
       sort: payload?.sort ?? { by: "data_quality_score", dir: "asc" },
       limit: payload?.limit ?? 500,

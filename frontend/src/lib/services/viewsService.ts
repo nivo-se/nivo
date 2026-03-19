@@ -9,6 +9,7 @@ export type SavedView = {
   filtersJson: Record<string, unknown>;
   columnsJson: unknown[];
   sortJson: Record<string, unknown>;
+  screeningProfileId?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -25,6 +26,7 @@ export async function createView(payload: {
   filtersJson?: Record<string, unknown>;
   columnsJson?: unknown[];
   sortJson?: Record<string, unknown>;
+  screeningProfileId?: string | null;
 }): Promise<SavedView> {
   const res = await fetchWithAuth(`${API_BASE}/api/views`, {
     method: "POST",
@@ -37,7 +39,7 @@ export async function createView(payload: {
 
 export async function updateView(
   id: string,
-  payload: Partial<Pick<SavedView, "name" | "scope" | "filtersJson" | "columnsJson" | "sortJson">>
+  payload: Partial<Pick<SavedView, "name" | "scope" | "filtersJson" | "columnsJson" | "sortJson" | "screeningProfileId">>
 ): Promise<SavedView> {
   const res = await fetchWithAuth(`${API_BASE}/api/views/${id}`, {
     method: "PUT",

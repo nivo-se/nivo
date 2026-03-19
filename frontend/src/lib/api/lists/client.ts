@@ -19,6 +19,7 @@ export interface CreateFromQueryPayload {
   scope?: "private" | "team";
   queryPayload: {
     filters: { field: string; op: string; value: unknown; type: string }[];
+    excludeFilters?: { field: string; op: string; value: unknown; type: string }[];
     logic?: string;
     sort?: { by?: string; dir?: string };
     q?: string;

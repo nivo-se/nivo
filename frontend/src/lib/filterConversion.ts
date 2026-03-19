@@ -8,11 +8,16 @@ const FIELD_TYPE_MAP: Record<string, string> = {
   employees_latest: "number",
   segment_names: "text",
   name: "text",
+  segment_tier: "text",
   has_homepage: "boolean",
   has_ai_profile: "boolean",
   has_3y_financials: "boolean",
   is_stale: "boolean",
   data_quality_score: "number",
+  fit_score: "number",
+  ops_upside_score: "number",
+  nivo_total_score: "number",
+  research_feasibility_score: "number",
 };
 
 const OP_MAP: Record<string, string> = {
@@ -26,7 +31,7 @@ const OP_MAP: Record<string, string> = {
 
 export type FrontendFilterRule = { field: string; operator: string; value: unknown };
 
-export function includeRulesToBackendFilters(
+function rulesToBackendFilters(
   rules: FrontendFilterRule[]
 ): { field: string; op: string; value: unknown; type: string }[] {
   return rules
@@ -37,4 +42,16 @@ export function includeRulesToBackendFilters(
       const type = FIELD_TYPE_MAP[r.field] ?? "number";
       return { field: r.field, op, value: r.value, type };
     });
+}
+
+export function includeRulesToBackendFilters(
+  rules: FrontendFilterRule[]
+): { field: string; op: string; value: unknown; type: string }[] {
+  return rulesToBackendFilters(rules);
+}
+
+export function excludeRulesToBackendFilters(
+  rules: FrontendFilterRule[]
+): { field: string; op: string; value: unknown; type: string }[] {
+  return rulesToBackendFilters(rules);
 }

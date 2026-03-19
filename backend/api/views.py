@@ -24,6 +24,7 @@ class ViewCreate(BaseModel):
     filtersJson: Dict[str, Any] = {}
     columnsJson: List[Any] = []
     sortJson: Dict[str, Any] = {}
+    screeningProfileId: Optional[str] = None
 
 
 class ViewUpdate(BaseModel):
@@ -32,12 +33,23 @@ class ViewUpdate(BaseModel):
     filtersJson: Optional[Dict[str, Any]] = None
     columnsJson: Optional[List[Any]] = None
     sortJson: Optional[Dict[str, Any]] = None
+    screeningProfileId: Optional[str] = None
 
 
 def _require_postgres():
     import os
     if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         raise HTTPException(503, "Views require DATABASE_SOURCE=postgres")
+
+
+def _has_screening_profile_column(db) -> bool:
+    try:
+        rows = db.run_raw_query(
+            "SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'saved_views' AND column_name = 'screening_profile_id'"
+        )
+        return bool(rows)
+    except Exception:
+        return False
 
 
 def _require_user(request: Request) -> str:
@@ -93,20 +105,38 @@ async def create_view(request: Request, body: ViewCreate):
         raise HTTPException(400, "scope must be private or team")
 
     db = get_database_service()
-    db.run_raw_query(
-        """
-        INSERT INTO saved_views (name, owner_user_id, scope, filters_json, columns_json, sort_json)
-        VALUES (?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)
-        """,
-        [
-            body.name,
-            uid,
-            body.scope,
-            json.dumps(body.filtersJson),
-            json.dumps(body.columnsJson),
-            json.dumps(body.sortJson),
-        ],
-    )
+    has_profile_col = getattr(db, "table_exists", lambda _: False)("saved_views") and _has_screening_profile_column(db)
+    if has_profile_col and body.screeningProfileId:
+        db.run_raw_query(
+            """
+            INSERT INTO saved_views (name, owner_user_id, scope, filters_json, columns_json, sort_json, screening_profile_id)
+            VALUES (?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb, ?::uuid)
+            """,
+            [
+                body.name,
+                uid,
+                body.scope,
+                json.dumps(body.filtersJson),
+                json.dumps(body.columnsJson),
+                json.dumps(body.sortJson),
+                body.screeningProfileId,
+            ],
+        )
+    else:
+        db.run_raw_query(
+            """
+            INSERT INTO saved_views (name, owner_user_id, scope, filters_json, columns_json, sort_json)
+            VALUES (?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)
+            """,
+            [
+                body.name,
+                uid,
+                body.scope,
+                json.dumps(body.filtersJson),
+                json.dumps(body.columnsJson),
+                json.dumps(body.sortJson),
+            ],
+        )
     rows = db.run_raw_query(
         "SELECT * FROM saved_views WHERE owner_user_id::text = ? ORDER BY created_at DESC LIMIT 1",
         [uid],
@@ -148,6 +178,9 @@ async def update_view(request: Request, view_id: str, body: ViewUpdate):
     if body.sortJson is not None:
         updates.append("sort_json = ?::jsonb")
         params.append(json.dumps(body.sortJson))
+    if body.screeningProfileId is not None and _has_screening_profile_column(db):
+        updates.append("screening_profile_id = ?::uuid")
+        params.append(body.screeningProfileId)
 
     if not updates:
         return _row_to_view(row)
@@ -179,7 +212,7 @@ async def delete_view(request: Request, view_id: str):
 
 
 def _row_to_view(r: Dict) -> Dict:
-    return {
+    out = {
         "id": str(r.get("id", "")),
         "name": r.get("name"),
         "owner_user_id": str(r.get("owner_user_id", "")),
@@ -190,3 +223,8 @@ def _row_to_view(r: Dict) -> Dict:
         "created_at": str(r.get("created_at", "")),
         "updated_at": str(r.get("updated_at", "")),
     }
+    if "screening_profile_id" in r and r.get("screening_profile_id"):
+        out["screeningProfileId"] = str(r["screening_profile_id"])
+    else:
+        out["screeningProfileId"] = None
+    return out

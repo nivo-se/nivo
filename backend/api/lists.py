@@ -17,6 +17,7 @@ from .universe import (
     _build_order,
     _build_universe_source_subquery,
     _build_where_from_stack,
+    _sanitize_filters,
 )
 
 logger = logging.getLogger(__name__)
@@ -185,9 +186,22 @@ async def create_list_from_query(request: Request, body: ListFromQuery):
         raise HTTPException(503, "create_list_from_query requires Postgres")
 
     payload = body.queryPayload
-    where_sql, params = _build_where_from_stack(payload.filters, payload.q, db_is_postgres=True)
-    order_sql = _build_order(payload.sort or {}, db_is_postgres=True)
+    sanitized_filters = _sanitize_filters(payload.filters or [])
+    include_where, include_params = _build_where_from_stack(
+        sanitized_filters, getattr(payload, "q", None), db_is_postgres=True
+    )
+    sanitized_exclude = _sanitize_filters(getattr(payload, "excludeFilters", None) or [])
+    if sanitized_exclude:
+        exclude_where, exclude_params = _build_where_from_stack(
+            sanitized_exclude, None, db_is_postgres=True
+        )
+        where_sql = f"({include_where}) AND NOT ({exclude_where})"
+        params = list(include_params) + list(exclude_params)
+    else:
+        where_sql = include_where
+        params = list(include_params)
     params.append(MAX_ORGNR_FROM_QUERY)
+    order_sql = _build_order(payload.sort or {}, db_is_postgres=True)
 
     source_sql, _, _ = _build_universe_source_subquery(db)
     sql_orgnrs = f"""
@@ -389,6 +403,23 @@ async def update_list(request: Request, list_id: str, body: ListUpdate):
         "created_at": str(updated.get("created_at", "")),
         "updated_at": str(updated.get("updated_at", "")),
     }
+
+
+@router.post("/{list_id}/handoff/ai-lab")
+async def handoff_to_ai_lab(request: Request, list_id: str):
+    """Log handoff intent and return redirect URL for AI Lab create run with this list."""
+    _require_postgres()
+    uid = _require_user(request)
+    db = get_database_service()
+    rows = db.run_raw_query("SELECT id, owner_user_id, scope FROM saved_lists WHERE id::text = ?", [list_id])
+    if not rows:
+        raise HTTPException(404, "List not found")
+    r = rows[0]
+    if str(r["owner_user_id"]) != uid and r.get("scope") != "team":
+        raise HTTPException(403, "Not allowed to use this list")
+    redirect_url = f"/ai/run/create?list={list_id}"
+    logger.info("Handoff to AI Lab: list_id=%s user_id=%s", list_id, uid)
+    return {"redirectUrl": redirect_url}
 
 
 @router.delete("/{list_id}")

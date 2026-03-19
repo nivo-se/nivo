@@ -38,6 +38,13 @@ export interface Company {
   data_quality_score: number | null;
   is_stale: boolean;
   last_enriched_at?: string;
+  fit_score?: number | null;
+  ops_upside_score?: number | null;
+  nivo_total_score?: number | null;
+  segment_tier?: string | null;
+  research_feasibility_score?: number | null;
+  profile_weighted_score?: number | null;
+  archetype_code?: string | null;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -94,6 +101,8 @@ export interface List {
 export interface ProspectStatus {
   id?: string;
   companyId: string;
+  /** UUID from deep_research.companies when linked to CRM */
+  deepResearchCompanyId?: string | null;
   status: "new" | "researching" | "contacted" | "in_discussion" | "meeting_scheduled" | "interested" | "not_interested" | "passed" | "deal_in_progress";
   owner?: string;
   lastContact?: string;

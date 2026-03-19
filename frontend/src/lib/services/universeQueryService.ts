@@ -28,11 +28,14 @@ export type FilterItem = {
 
 export type UniverseQueryPayload = {
   filters: FilterItem[];
+  excludeFilters?: FilterItem[];
   logic?: "and";
   sort?: { by?: string; dir?: "asc" | "desc" };
   limit?: number;
   offset?: number;
   q?: string;
+  profileId?: string;
+  profileVersionId?: string;
 };
 
 export type UniverseRow = {
@@ -58,6 +61,13 @@ export type UniverseRow = {
   ai_strategic_fit_score?: number | null;
   equity_ratio_latest?: number | null;
   debt_to_equity_latest?: number | null;
+  fit_score?: number | null;
+  ops_upside_score?: number | null;
+  nivo_total_score?: number | null;
+  segment_tier?: string | null;
+  research_feasibility_score?: number | null;
+  profile_weighted_score?: number | null;
+  archetype_code?: string | null;
 };
 
 export type UniverseQueryResponse = {
@@ -90,6 +100,9 @@ export async function queryUniverse(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       filters: payload.filters ?? [],
+      excludeFilters: payload.excludeFilters ?? undefined,
+      profileId: payload.profileId ?? undefined,
+      profileVersionId: payload.profileVersionId ?? undefined,
       logic: payload.logic ?? "and",
       sort: payload.sort ?? {},
       limit: payload.limit ?? 50,
