@@ -232,8 +232,8 @@ function InvestorShortForm({
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
                 <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
                 <ul className="space-y-1 text-sm mb-4 pl-3" style={{ color: tokens.text }}>
-                  <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
-                  <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
+                  <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
+                  <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
                 </ul>
                 <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryTeamLabel}</p>
                 <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
@@ -304,7 +304,7 @@ function InvestorShortForm({
           <ul className="space-y-2 pl-3">
             {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
               <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                 <span>{item}</span>
               </li>
             ))}
@@ -388,9 +388,9 @@ function InvestorShortForm({
               {t.universeText}
             </p>
             <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
             </ul>
           </div>
 
@@ -405,9 +405,9 @@ function InvestorShortForm({
               {t.gapText}
             </p>
             <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
             </ul>
           </div>
 
@@ -422,9 +422,9 @@ function InvestorShortForm({
               {t.whyNordicText}
             </p>
             <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
             </ul>
           </div>
 
@@ -439,9 +439,9 @@ function InvestorShortForm({
               {t.ourTakeText}
             </p>
             <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
-              <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
+              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
             </ul>
           </div>
         </div>

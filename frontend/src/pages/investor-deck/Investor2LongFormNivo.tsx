@@ -98,8 +98,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
               <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
               <ul className="space-y-1 text-base sm:text-lg mb-4 pl-3" style={{ color: tokens.text }}>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
               </ul>
               <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryTeamLabel}</p>
               <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
@@ -172,7 +172,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <ul className="space-y-2 max-w-2xl pl-3">
               {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
                 <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                  <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                   <span>{item}</span>
                 </li>
               ))}
@@ -235,7 +235,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className="text-lg sm:text-xl font-semibold text-profile-fg mb-4 leading-snug">
               {t.opportunityThesisLong}
             </p>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}>
                 <Globe className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
                 {t.badge1}
@@ -268,9 +268,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {t.universeTextLong}
               </p>
               <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.universeBullet3}</li>
               </ul>
             </div>
 
@@ -285,9 +285,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {t.gapTextLong}
               </p>
               <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.gapBullet3}</li>
               </ul>
             </div>
 
@@ -302,9 +302,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {t.whyNordicText}
               </p>
               <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.whyNordicBullet3}</li>
               </ul>
             </div>
 
@@ -319,9 +319,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {t.ourTakeTextLong}
               </p>
               <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
+                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
               </ul>
             </div>
           </div>
@@ -766,7 +766,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className={PROSE_CLASS}>
               Operators first, investors second. Hands-on execution guided by proven experience. We operate companies; we do not just own them.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Operational</p>
                 <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>20+ years ops leadership, scaling companies, P&L responsibility.</p>
