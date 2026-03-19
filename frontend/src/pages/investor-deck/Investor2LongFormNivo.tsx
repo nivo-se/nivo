@@ -326,19 +326,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
         </div>
       </section>
 
-      {/* Image break ────────────────────────────────────────────────────── */}
-      <section className="w-full" style={{ backgroundColor: tokens.bg }}>
-        <div className="max-w-5xl mx-auto px-5 sm:px-6 py-4 sm:py-5">
-        <div className="aspect-[21/9] rounded-lg overflow-hidden border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-          <img
-            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80"
-            alt="Nordic industrial landscape"
-            className="w-full h-full object-cover opacity-90"
-          />
-        </div>
-        </div>
-      </section>
-
       {/* ─── Approach & Illustrative Case (merged) ────────────────────────── */}
       <section className="w-full scroll-mt-[100px]" id="approach" style={{ backgroundColor: tokens.bgAlt }}>
         <div className={DECK_SECTION_CLASS}>
