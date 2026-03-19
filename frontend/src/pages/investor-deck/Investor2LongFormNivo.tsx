@@ -934,7 +934,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <div className="pt-8 border-t" style={{ borderColor: tokens.border }}>
             <h3 className={H3_CLASS}>Exit strategy</h3>
             <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px] mb-6">
-              Primary exit: strategic sale to trade or corporate buyers. Secondary buyout or recap where appropriate. Years 1–2: margin expansion; 3–4: cash conversion and debt reduction; 5–6: ROIC 20%+ and strategic positioning; 7+: exit or recap.
+              Nivo is built as an evergreen holding company with a long-term ownership approach. We aim to hold and develop businesses over time — not trade them. Divestments are selective and driven by exceptional value opportunities. The primary path to liquidity is a listing of Nivo Group within 5–7 years. A strategic sale of the group remains a secondary option.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
               {[
@@ -949,8 +949,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
               ))}
             </div>
-            <p className="text-[15px] text-profile-fg max-w-2xl">
-              Return drivers: margin expansion ~45%, revenue growth ~35%, debt paydown and cash conversion ~20%. Returns from operations, cash conversion, and disciplined structure.
+            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+              We grow your capital by improving how the businesses operate, supporting profitable growth and reinvesting the cash flow they generate. Most of the capital is retained and redeployed to compound value over time. As the portfolio develops, we expect to complement this with a gradual and modest dividend, without compromising the long-term compounding strategy.
             </p>
           </div>
         </div>
