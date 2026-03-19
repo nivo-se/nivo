@@ -23,7 +23,7 @@ export function Slide1() {
             Nordic Operational Compounder
           </h1>
           <p className="text-sm sm:text-base text-deck-accent max-w-2xl leading-snug">
-            Nivo acquires profitable, under-digitised Nordic SMEs and builds value through pricing discipline, operating rigor, and structured reinvestment.
+            Nivo acquires profitable, under-digitised Nordic companies and builds value through pricing discipline, operating rigor, and structured reinvestment.
           </p>
           <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-3 sm:p-4">
             <p className="text-base sm:text-lg font-bold text-deck-quote-foreground leading-snug">

@@ -593,7 +593,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
       </section>
 
       {/* ─── Investment Process & Pipeline ───────────────────────────────── */}
-      <section className="w-full" id="process" style={{ backgroundColor: tokens.bgAlt }}>
+      <section className="w-full" id="pipeline" style={{ backgroundColor: tokens.bgAlt }}>
         <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Investment Process & Pipeline</h2>
@@ -779,7 +779,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Operational</p>
-                <p className="text-[15px]" style={{ color: tokens.text }}>20+ years ops leadership, scaling SMEs, P&L responsibility.</p>
+                <p className="text-[15px]" style={{ color: tokens.text }}>20+ years ops leadership, scaling companies, P&L responsibility.</p>
               </div>
               <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                 <p className={LABEL_CLASS}>Capital</p>
@@ -834,7 +834,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
 
           <div id="structure" className="space-y-10 mb-12 mt-10 scroll-mt-[100px]">
             <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
-              Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon with the ambition to become a listed entity within 10 years. Capital is deployed into Nordic SMEs and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. We work closely with our Founding investors alongside the board on investment decisions. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
+              Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon with the ambition to become a listed entity within 10 years. Capital is deployed into Nordic companies and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. We work closely with our Founding investors alongside the board on investment decisions. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
             </p>
 
             <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
@@ -985,7 +985,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </div>
             </div>
             <p className="text-[15px] text-profile-fg max-w-2xl">
-              Concentration (3–4 companies) and liquidity (SME exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
+              Concentration (3–4 companies) and liquidity (company exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
             </p>
             <p className={PUNCH_CLASS}>
               Risks are managed through discipline, transparency, and operational excellence.
