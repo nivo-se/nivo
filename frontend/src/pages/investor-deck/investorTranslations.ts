@@ -249,7 +249,7 @@ export const investorTranslations = {
     approachPillar3Long: "Reinvest cash flow, maintain appropriate leverage.",
     returnDriversLong:
       "Operational excellence and technology—including AI—where it accelerates growth and margins. Execution → margins → cash flow → equity.",
-    caseIntroLong: "Nordic industrial products company. Entry: equity SEK 100m, debt SEK 30m (EV SEK 130m). Upside from pricing, operations and cost.",
+    caseIntroLong: "Nordic industrial products company. Entry: equity SEK 100m, debt SEK 30m (EV SEK 130m). Upside from pricing, operations and cost reduction.",
     assumptionsLong:
       "Illustrative: 20–25% IRR, 4–5x MOIC; full reinvestment, ~30% leverage. Operational improvement from hands-on toolbox work. No exit multiple expansion.",
     acquisitionCriteriaLong:
@@ -505,7 +505,7 @@ export const investorTranslations = {
     approachPillar3Long: "Återinvestera kassaflöde, behåll lämplig hävstång.",
     returnDriversLong:
       "Operativ excellens och teknologi—inklusive AI—där det accelererar tillväxt och marginaler. Exekvering → marginaler → kassaflöde → eget kapital.",
-    caseIntroLong: "Nordiskt industriproduktföretag. Entry: eget kapital SEK 100 mkr, skuld SEK 30 mkr (EV SEK 130 mkr). Upside från prissättning, operationer och kostnad.",
+    caseIntroLong: "Nordiskt industriproduktföretag. Entry: eget kapital SEK 100 mkr, skuld SEK 30 mkr (EV SEK 130 mkr). Upside från prissättning, operationer och kostnadsreduktion.",
     assumptionsLong:
       "Illustrativt: 20–25% IRR, 4–5x MOIC; full återinvestering, ~30% hävstång. Operativ förbättring från hands-on verktygslådearbete. Ingen exit-multipleexpansion antagen.",
     acquisitionCriteriaLong:

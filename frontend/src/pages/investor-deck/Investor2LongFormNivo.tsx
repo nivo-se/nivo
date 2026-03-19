@@ -367,7 +367,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 {t.caseIntroLong}
               </p>
               <div className="max-w-2xl space-y-3">
-                <p className={LABEL_CLASS}>Value creation over 24 months</p>
+                <p className={LABEL_CLASS}>Value creation</p>
                 <div className="space-y-3">
                   <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
                     <p className={LABEL_CLASS}>Pricing</p>
@@ -787,13 +787,14 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
 
       {/* ─── Structure & Returns ─────────────────────────────────────────── */}
       <section className="w-full scroll-mt-[100px]" id="returns" style={{ backgroundColor: tokens.bg }}>
+        <div id="structure" className="scroll-mt-[100px]" />
         <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>Structure & Returns</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Capital model and governance</p>
 
           <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl text-left" style={{ color: tokens.accent }}>{t.keyTerms}</p>
-          <div className="mt-3 max-w-2xl pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
+          <div className="mt-3 max-w-2xl mx-auto pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
@@ -822,7 +823,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             </div>
           </div>
 
-          <div id="structure" className="space-y-10 mb-12 mt-10 scroll-mt-[100px]">
+          <div className="space-y-10 mb-12 mt-10">
             <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
               Nivo Group AB is the parent company (no separate management company)—a Swedish AB (aktiebolag) with an evergreen investment horizon with the ambition to become a listed entity within 10 years. Capital is deployed into Nordic companies and compounded over the long term. Founders and Founding Investors hold both Class A and Class B shares; new investors participate via Class B shares. We work closely with our Founding investors alongside the board on investment decisions. Reporting to shareholders includes quarterly updates, portfolio performance, and value-creation milestones.
             </p>
