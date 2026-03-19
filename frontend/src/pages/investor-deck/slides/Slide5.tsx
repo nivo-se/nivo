@@ -6,7 +6,7 @@ import { ArrowRight, TrendingUp, BarChart3, RefreshCw, Target, Repeat } from "lu
  * Fits 16:9 with title, subtitle, steps, and "strengthens with scale" callout.
  */
 const steps = [
-  { id: "01", title: "Acquire", output: "Control", icon: Target, desc: "Profitable, under-digitised SME; stable cash flows." },
+  { id: "01", title: "Acquire", output: "Control", icon: Target, desc: "Profitable, under-digitised company; stable cash flows." },
   { id: "02", title: "Improve", output: "Margin", icon: TrendingUp, desc: "Pricing, sales discipline, cost structure, reporting." },
   { id: "03", title: "Optimize ROIC", output: "ROIC", icon: BarChart3, desc: "Toward normalized 15% through operational excellence." },
   { id: "04", title: "Reinvest", output: "Cash", icon: RefreshCw, desc: "100% operational cash flow + ~30% leverage." },

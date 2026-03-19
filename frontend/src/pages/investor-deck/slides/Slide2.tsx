@@ -13,7 +13,7 @@ export function Slide2() {
           The Opportunity
         </h1>
         <p className="text-xs sm:text-sm text-deck-accent leading-snug">
-          Nordic SMEs are often profitable but structurally under-digitised
+          Nordic companies are often profitable but structurally under-digitised
         </p>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-0">
