@@ -984,8 +984,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 <p className="text-[15px] text-profile-fg">Retain management, 12–24 month transition, process documentation.</p>
               </div>
             </div>
-            <p className="text-[15px] text-profile-fg max-w-2xl">
-              Concentration (3–4 companies) and liquidity (SME exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
+            <p className="w-full text-profile-fg leading-relaxed text-[14px] sm:text-[15px]">
+              Concentration risk and liquidity are managed through careful selection, diversification and active ownership. As we are not reliant on selling individual businesses, we can take a longer-term approach and avoid timing-driven exits.
             </p>
             <p className={PUNCH_CLASS}>
               Risks are managed through discipline, transparency, and operational excellence.
