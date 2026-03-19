@@ -86,12 +86,17 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/024_deep_research_persistence.sql \
          database/migrations/025_deep_research_run_node_states.sql \
          database/migrations/025_claim_verifications.sql \
+         database/migrations/026_crm_foundation.sql \
          database/migrations/026_web_intelligence.sql \
+         database/migrations/027_crm_tracking_page_section.sql \
          database/migrations/027_competitor_market_synthesis.sql \
          database/migrations/028_fix_timestamp_columns.sql \
          database/migrations/029_report_retrieval_config.sql \
          database/migrations/030_sector_multiple_reference.sql \
-         database/migrations/031_deep_research_v2_schemas.sql; do
+         database/migrations/031_deep_research_v2_schemas.sql \
+         database/migrations/032_company_identity_and_prospects_crm_link.sql \
+         database/migrations/033_screening_profiles.sql \
+         database/migrations/036_saved_views_profile_link.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"
