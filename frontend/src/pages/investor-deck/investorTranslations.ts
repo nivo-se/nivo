@@ -212,6 +212,54 @@ export const investorTranslations = {
     pipelineAdvanced: "Advanced discussion",
     pipelineContact: "Initial contact",
     pipelineIdentified: "Identified",
+
+    // Long-form only (tightened copy; short version unchanged)
+    companiesIntroLong: "Our targets have strong products and loyal customers but untapped operational potential.",
+    companiesIntroFollowUpLong: "We apply the Operating Toolbox—pricing, cost control, reporting, workflows—where they clearly improve outcomes.",
+    manyOperateLong: "Manual workflows, fragmented systems, limited visibility; businesses are sound, execution can be improved.",
+    execSummaryModelSentenceLong: "Acquire profitable SMEs, improve margins via toolbox execution and AI-accelerated workflows, convert to cash flow, reinvest.",
+    whyNowTextLong:
+      "Much of the Nordic SME base was built before modern systems—profitable but under-optimised.\n\nSoftware and AI have matured: pricing, reporting and workflows can now be systematised. Value comes from execution: closing the gap between current operations and what's possible.",
+    sourcingEngineLong:
+      "Data-driven sourcing engine screens the Swedish SME universe and delivers pre-ranked targets with financial and operational signals. Earlier identification, better preparation and clearer operational understanding before first contact—structured intelligence most PE firms lack.",
+    investmentStep1TextLong: "Find targets before broad processes via the data-driven sourcing engine.",
+    investmentStep2TextLong: "Toolbox: pricing, cost control, reporting, digital workflows.",
+    investmentStep3TextLong: "Reporting and operational control to strengthen cash conversion.",
+    investmentStep4TextLong: "Reinvest and compound.",
+    investmentResultLong: "One system: sourcing → better opportunities; toolbox → value creation; team → execution.",
+    opportunityIntroLong:
+      "Large universe of profitable Nordic SMEs (SEK 50–200m revenue) with clear operational improvement potential. Execution, not speculation, drives returns.",
+    opportunityThesisLong:
+      "We acquire profitable Nordic SMEs and compound value through the Operating Toolbox and digital upgrades. Edge: disciplined execution and systematic sourcing.",
+    universeTextLong: "Profitable but structurally under-digitised—a large, underserved opportunity.",
+    gapTextLong: "Same operational inefficiencies across the segment. They need better execution and modern tools, not disruption.",
+    ourTakeTextLong: "Nivo addresses this with a disciplined approach: sourcing engine, toolbox in portfolio, operational execution over financial engineering.",
+    sourcingEdgeMainLong:
+      "In-house engine screens Swedish SMEs (SEK 50–200m), scores on economics and margin signals, ranks targets. Deeper analysis—products, pricing, operational gaps—before first contact. Result: earlier identification, better preparation, stronger positioning. Most PE relies on broker flow.",
+    sourcingEdgePreparationLong: "Advantage is preparation. We know where value can be created before the first meeting.",
+    sourcingEdgePlatformLong:
+      "Platform: ~15,000 companies → ranked Target 100; pre-engagement memos with financial and operational signals. AI accelerates analysis and reporting; it supports execution, not judgment.",
+    operatingToolkitIntroLong:
+      "We address growth constraints through the Operating Toolbox—pricing, cost control, reporting, workflows—applied pragmatically in each business.",
+    operatingToolkitClosingLong: "Applied where they drive results.",
+    processIntroLong:
+      "Sourcing: direct outreach, broker relationships, data-driven playbook. Due diligence: quality of earnings, toolbox levers, management. Execution: Day 1 plan and toolbox initiatives.",
+    approachPillar1Long: "Disciplined entry with clear operational improvement potential.",
+    approachPillar2Long: "Pricing discipline, margin expansion, operational visibility—toolbox execution.",
+    approachPillar3Long: "Reinvest cash flow, maintain appropriate leverage.",
+    returnDriversLong:
+      "Operational excellence and technology—including AI—where it accelerates growth and margins. Execution → margins → cash flow → equity.",
+    caseIntroLong: "Nordic industrial products company. Entry: equity SEK 100m, debt SEK 30m (EV SEK 130m). Upside from pricing, operations and cost.",
+    assumptionsLong:
+      "Illustrative: 20–25% IRR, 4–5x MOIC; full reinvestment, ~30% leverage. Operational improvement from hands-on toolbox work. No exit multiple expansion.",
+    acquisitionCriteriaLong:
+      "Strict valuation: EV/EBITDA 5–7x, operational improvement potential over growth premium. Conservative leverage (debt/capital <30%, net debt/EBITDA <2x). Guardrails: path to 20% ROIC, 12 months runway, capital preservation first.",
+    teamWhyExecuteLong:
+      "80+ ECM transactions and 20+ IPOs; €60m+ D2C built at Electrolux; €50m+ venture including iZettle (PayPal). Capital markets discipline plus operational scaling—what Nordic SMEs need.",
+    teamPositionLong:
+      "Nivo is an investment company focused on long-term compounding. We combine capital markets discipline with hands-on toolbox execution—pricing, cost control, digital workflows—in founder-led Nordic SMEs.",
+    contactIntroLong: "We welcome discussions with investors who value operational discipline, long-term compounding, and execution over financial engineering.",
+    contactPunchLong: "Operational improvement in profitable Nordic SMEs.",
   },
   sv: {
     // Nav
@@ -420,5 +468,53 @@ export const investorTranslations = {
     pipelineAdvanced: "Avancerad diskussion",
     pipelineContact: "Första kontakt",
     pipelineIdentified: "Identifierad",
+
+    // Long-form only (tightened copy)
+    companiesIntroLong: "Våra målbolag har starka produkter och lojala kunder men outnyttjad operativ potential.",
+    companiesIntroFollowUpLong: "Vi tillämpar den operativa verktygslådan—prissättning, kostnadskontroll, rapportering, arbetsflöden—där de tydligt förbättrar resultatet.",
+    manyOperateLong: "Manuella arbetsflöden, fragmenterade system, begränsad insyn; företagen är sunda, exekveringen kan förbättras.",
+    execSummaryModelSentenceLong: "Förvärva lönsamma SME-bolag, förbättra marginaler via verktygslåda och AI-accelererade arbetsflöden, omvandla till kassaflöde, återinvestera.",
+    whyNowTextLong:
+      "Mycket av den nordiska SME-basen byggdes före moderna system—lönsam men underoptimerad.\n\nMjukvara och AI har mognat: prissättning, rapportering och arbetsflöden kan nu systematiseras. Värde skapas genom exekvering: att stänga gapet mellan nuvarande drift och vad som är möjligt.",
+    sourcingEngineLong:
+      "Datadriven sökmotor söker i det svenska SME-universumet och levererar förrankade mål med finansiella och operativa signaler. Tidigare identifiering, bättre förberedelse och tydligare operativ förståelse före första kontakten—strukturerad intelligens som de flesta riskkapitalbolag saknar.",
+    investmentStep1TextLong: "Hitta mål före breda processer via den datadrivna sökmotorn.",
+    investmentStep2TextLong: "Verktygslåda: prissättning, kostnadskontroll, rapportering, digitala arbetsflöden.",
+    investmentStep3TextLong: "Rapportering och operativ kontroll för starkare kassakonvertering.",
+    investmentStep4TextLong: "Återinvestera och ackumulera.",
+    investmentResultLong: "Ett system: sourcing → bättre möjligheter; verktygslåda → värdeskapande; team → exekvering.",
+    opportunityIntroLong:
+      "Stort universum av lönsamma nordiska SME-bolag (SEK 50–200 mkr omsättning) med tydlig operativ förbättringspotential. Exekvering, inte spekulation, driver avkastningen.",
+    opportunityThesisLong:
+      "Vi förvärvar lönsamma nordiska SME-bolag och ackumulerar värde genom den operativa verktygslådan och digitala uppgraderingar. Styrka: disciplinerad exekvering och systematisk sourcing.",
+    universeTextLong: "Lönsamma men strukturellt underdigitaliserade—en stor, otillräckligt betjänad möjlighet.",
+    gapTextLong: "Samma operativa ineffektiviteter i segmentet. De behöver bättre exekvering och moderna verktyg, inte disruption.",
+    ourTakeTextLong: "Nivo adresserar detta med ett disciplinerat förhållningssätt: sökmotor, verktygslåda i portföljen, operativ exekvering framför finansiell engineering.",
+    sourcingEdgeMainLong:
+      "Egen motor söker svenska SME-bolag (SEK 50–200 mkr), poängsätter utifrån ekonomi och marginal-signaler, rankar mål. Djupare analys—produkter, prissättning, operativa luckor—före första kontakten. Resultat: tidigare identifiering, bättre förberedelse, starkare positionering. De flesta riskkapitalbolag förlitar sig på mäklarflöden.",
+    sourcingEdgePreparationLong: "Fördel är förberedelse. Vi vet var värde kan skapas före första mötet.",
+    sourcingEdgePlatformLong:
+      "Plattform: ~15 000 bolag → rankad Target 100; memos före engagemang med finansiella och operativa signaler. AI accelererar analys och rapportering; stöder exekvering, ersätter inte omdöme.",
+    operatingToolkitIntroLong:
+      "Vi adresserar tillväxthinder genom den operativa verktygslådan—prissättning, kostnadskontroll, rapportering, arbetsflöden—tillämpad pragmatiskt i varje företag.",
+    operatingToolkitClosingLong: "Tillämpas där de driver resultat.",
+    processIntroLong:
+      "Sourcing: direkt outreach, mäklarrelationer, datadriven playbook. Due diligence: kvalitet på resultat, verktygslådans spakar, ledning. Exekvering: Day 1-plan och verktygslåde-initiativ.",
+    approachPillar1Long: "Disciplinerad entry med tydlig operativ förbättringspotential.",
+    approachPillar2Long: "Prissättningsdisciplin, marginalexpansion, operativ insyn—verktygslådeexekvering.",
+    approachPillar3Long: "Återinvestera kassaflöde, behåll lämplig hävstång.",
+    returnDriversLong:
+      "Operativ excellens och teknologi—inklusive AI—där det accelererar tillväxt och marginaler. Exekvering → marginaler → kassaflöde → eget kapital.",
+    caseIntroLong: "Nordiskt industriproduktföretag. Entry: eget kapital SEK 100 mkr, skuld SEK 30 mkr (EV SEK 130 mkr). Upside från prissättning, operationer och kostnad.",
+    assumptionsLong:
+      "Illustrativt: 20–25% IRR, 4–5x MOIC; full återinvestering, ~30% hävstång. Operativ förbättring från hands-on verktygslådearbete. Ingen exit-multipleexpansion antagen.",
+    acquisitionCriteriaLong:
+      "Strikt värdering: EV/EBITDA 5–7x, operativ förbättringspotential framför tillväxtpremie. Konservativ hävstång (skuld/kapital <30%, netto skuld/EBITDA <2x). Räcken: väg till 20% ROIC, 12 månaders runway, kapitalbevarande först.",
+    teamWhyExecuteLong:
+      "80+ ECM-transaktioner och 20+ IPO:er; €60m+ D2C byggt på Electrolux; €50m+ venture inkl. iZettle (PayPal). Kapitalmarknadsdisciplin och operativ skalning—vad nordiska SME-bolag behöver.",
+    teamPositionLong:
+      "Nivo är ett investeringsbolag med fokus på långsiktig ackumulering. Vi kombinerar kapitalmarknadsdisciplin med hands-on verktygslådeexekvering—prissättning, kostnadskontroll, digitala arbetsflöden—i grundarledda nordiska SME-bolag.",
+    contactIntroLong: "Vi välkomnar dialog med investerare som värderar operativ disciplin, långsiktig ackumulering och exekvering framför finansiell engineering.",
+    contactPunchLong: "Operativ förbättring i lönsamma nordiska SME-bolag.",
   },
 } as const;
