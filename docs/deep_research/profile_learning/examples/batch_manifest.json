@@ -1,0 +1,45 @@
+{
+  "batch_id": "learning-batch-2025-Q1",
+  "batch_name": "Q1 2025 Deep Research learning batch",
+  "created_at": "2025-03-01T10:00:00Z",
+  "analyst": "Nivo team",
+  "notes": "First learning batch from 20 Deep Research reports. Focus: B2B and niche industrials.",
+  "reports": [
+    {
+      "report_id": "report-001",
+      "file_path": "reports/company_a_deep_research.pdf",
+      "orgnr": "556123-4567",
+      "legal_name": "Example AB",
+      "segment": "B2B software",
+      "user_label": "strong",
+      "analyst_notes": "Clear platform play, fragmented niche. Ideal for buy-and-build."
+    },
+    {
+      "report_id": "report-002",
+      "file_path": "reports/company_b_deep_research.pdf",
+      "orgnr": "556234-5678",
+      "legal_name": "Industrial Solutions Sverige AB",
+      "segment": "Industrial services",
+      "user_label": "strong",
+      "analyst_notes": "Stable margins, roll-up potential."
+    },
+    {
+      "report_id": "report-003",
+      "file_path": "reports/company_c_deep_research.pdf",
+      "orgnr": "556345-6789",
+      "legal_name": "Niche Components AB",
+      "segment": "Components & distribution",
+      "user_label": "maybe",
+      "analyst_notes": "Growth good but customer concentration risk."
+    },
+    {
+      "report_id": "report-004",
+      "file_path": "reports/company_d_deep_research.pdf",
+      "orgnr": "556456-7890",
+      "legal_name": "Declining Co AB",
+      "segment": "Traditional manufacturing",
+      "user_label": "reject",
+      "analyst_notes": "Margin pressure, no clear value creation levers."
+    }
+  ]
+}

@@ -172,4 +172,5 @@ This index is intended to be used together with:
 - `CURSOR_CONTEXT_PLAYBOOK.md`
 - root `AGENTS.md`
 - optional `SUPERVISOR_INTEGRATION_CHECKLIST.md`
+- `PROFILE_LEARNING_PIPELINE_DESIGN.md` — offline workflow for converting Deep Research reports into Layer 1 screening profiles (variables, weights, archetypes, exclusions)
 

@@ -1,0 +1,11 @@
+{
+  "report_metadata": {
+    "report_id": "report-001",
+    "user_label": "strong"
+  },
+  "screenability_classification": {
+    "screenable_directly": [],
+    "screenable_by_proxy": [],
+    "not_screenable_in_layer_1": []
+  }
+}

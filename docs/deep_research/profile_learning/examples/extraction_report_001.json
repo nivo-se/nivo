@@ -1,0 +1,93 @@
+{
+  "report_metadata": {
+    "report_id": "report-001",
+    "batch_id": "learning-batch-2025-Q1",
+    "file_path": "reports/company_a_deep_research.pdf",
+    "orgnr": "556123-4567",
+    "legal_name": "Example AB",
+    "segment": "B2B software",
+    "user_label": "strong",
+    "analyst_notes": "Clear platform play, fragmented niche. Ideal for buy-and-build.",
+    "extracted_at": "2025-03-02T14:30:00Z",
+    "extracted_by": "analyst@nivo.se"
+  },
+  "financial_traits": {
+    "revenue_range_sek": [80000000, 180000000],
+    "ebitda_margin_range": [0.10, 0.16],
+    "revenue_cagr_range": [0.08, 0.15],
+    "growth_trajectory": "improving",
+    "margin_trajectory": "stable",
+    "leverage_note": "low",
+    "raw_metrics": {
+      "revenue_latest_sek": 120000000,
+      "ebitda_margin_latest": 0.12,
+      "revenue_cagr_3y": 0.10
+    },
+    "confidence": "high",
+    "source_section": "Financial summary, historical tables"
+  },
+  "business_traits": {
+    "business_model_tags": ["B2B", "recurring revenue", "SaaS", "platform"],
+    "customer_concentration": "low",
+    "geography": ["Nordics", "EU"],
+    "product_scope": ["SaaS", "professional services"],
+    "fragmentation_signal": true,
+    "confidence": "high",
+    "source_section": "Company overview, Business model"
+  },
+  "market_traits": {
+    "market_size_mention": "Nordic TAM ~SEK 2–3 bn",
+    "market_cagr_mention": "5–7% annual",
+    "structural_trends": ["digitalization", "consolidation", "outsourcing"],
+    "niche_attractiveness": "high",
+    "confidence": "medium",
+    "source_section": "Market analysis"
+  },
+  "operational_value_levers": {
+    "levers": ["buy-and-build", "cross-sell", "internationalization", "pricing"],
+    "ops_upside": "high",
+    "professionalization_potential": true,
+    "confidence": "high",
+    "source_section": "Value creation"
+  },
+  "risk_rejection_signals": {
+    "deal_breakers": [],
+    "risk_flags": ["key person dependency in sales"],
+    "rejection_reasons": [],
+    "confidence": "high",
+    "source_section": "Risks, Strategy"
+  },
+  "archetype_hints": {
+    "suggested_codes": ["growth_platform", "b2b_saas"],
+    "criteria_hints": {
+      "revenue_cagr_3y": { "gte": 0.08 },
+      "ebitda_margin_latest": { "gte": 0.10 },
+      "revenue_latest": { "gte": 50000000 }
+    },
+    "narrative_tags": ["platform", "fragmented", "roll-up", "Nordics"],
+    "confidence": "medium"
+  },
+  "exclusion_hints": {
+    "suggested_exclusions": [],
+    "rationale": "Strong candidate; no exclusions suggested.",
+    "confidence": "high"
+  },
+  "screenability_classification": {
+    "screenable_directly": [
+      "revenue_latest",
+      "ebitda_margin_latest",
+      "revenue_cagr_3y",
+      "employees_latest"
+    ],
+    "screenable_by_proxy": [
+      "growth (revenue_cagr_3y)",
+      "profitability (ebitda_margin_latest)",
+      "scale (revenue_latest)"
+    ],
+    "not_screenable_in_layer_1": [
+      "customer concentration",
+      "fragmentation (qualitative)",
+      "key person risk"
+    ]
+  }
+}

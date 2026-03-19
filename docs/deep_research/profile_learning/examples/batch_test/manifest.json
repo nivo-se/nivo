@@ -1,0 +1,13 @@
+{
+  "batch_id": "batch_test",
+  "batch_name": "Test batch for validation",
+  "created_at": "2025-03-01T10:00:00Z",
+  "reports": [
+    {
+      "report_id": "report-001",
+      "file_path": "reports/company_a.pdf",
+      "legal_name": "Example AB",
+      "user_label": "strong"
+    }
+  ]
+}

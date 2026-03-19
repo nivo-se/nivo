@@ -1,0 +1,96 @@
+{
+  "batch_id": "learning-batch-2025-Q1",
+  "approved_by": "analyst@nivo.se",
+  "approved_at": "2025-03-12T16:00:00Z",
+  "revision_notes": "Dropped employees variable; set research_feasibility exclusion to <=0; normalized weights to sum 1; kept two archetypes.",
+  "approved_variables": [
+    {
+      "id": "revenue_growth",
+      "source": "revenue_cagr_3y",
+      "normalize": "min_max",
+      "range": [-0.10, 0.25]
+    },
+    {
+      "id": "margin",
+      "source": "ebitda_margin_latest",
+      "normalize": "min_max",
+      "range": [0, 0.25]
+    },
+    {
+      "id": "scale",
+      "source": "revenue_latest",
+      "normalize": "min_max",
+      "range": [30000000, 500000000]
+    },
+    {
+      "id": "data_quality",
+      "source": "research_feasibility_score",
+      "normalize": "min_max",
+      "range": [0, 3]
+    }
+  ],
+  "approved_weights": {
+    "revenue_growth": 0.35,
+    "margin": 0.35,
+    "scale": 0.20,
+    "data_quality": 0.10
+  },
+  "approved_archetypes": [
+    {
+      "code": "growth_platform",
+      "criteria": {
+        "revenue_cagr_3y": { "gte": 0.08 },
+        "ebitda_margin_latest": { "gte": 0.08 },
+        "revenue_latest": { "gte": 50000000 }
+      },
+      "description": "B2B/platform with solid growth and margin; buy-and-build potential."
+    },
+    {
+      "code": "stable_cashflow",
+      "criteria": {
+        "ebitda_margin_latest": { "gte": 0.10, "lte": 0.25 },
+        "revenue_cagr_3y": { "gte": 0, "lte": 0.15 },
+        "revenue_latest": { "gte": 75000000 }
+      },
+      "description": "Larger, stable margin; roll-up or add-on candidates."
+    }
+  ],
+  "approved_exclusion_rules": [
+    {
+      "field": "ebitda_margin_latest",
+      "op": "<=",
+      "value": 0.05
+    },
+    {
+      "field": "revenue_cagr_3y",
+      "op": "<=",
+      "value": -0.05
+    },
+    {
+      "field": "research_feasibility_score",
+      "op": "<=",
+      "value": 0
+    }
+  ],
+  "approved_review_prompts": [
+    {
+      "id": "prompt-strong-fit",
+      "label": "Strong fit",
+      "prompt_text": "Assess buy-and-build potential, margin sustainability, and customer concentration. Prioritize for deep dive.",
+      "when_archetype": "growth_platform",
+      "when_score_band": "high"
+    },
+    {
+      "id": "prompt-stable-cashflow",
+      "label": "Stable cashflow",
+      "prompt_text": "Verify roll-up or add-on rationale; check for hidden leverage or one-off margin effects.",
+      "when_archetype": "stable_cashflow"
+    },
+    {
+      "id": "prompt-borderline",
+      "label": "Borderline score",
+      "prompt_text": "Review why Layer 1 score is mid-range; confirm whether qualitative factors justify advancement or pass.",
+      "when_score_band": "medium"
+    }
+  ]
+}

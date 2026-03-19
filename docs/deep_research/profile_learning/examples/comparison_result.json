@@ -1,0 +1,201 @@
+{
+  "batch_id": "learning-batch-2025-Q1",
+  "generated_at": "2025-03-10T09:00:00Z",
+  "report_count": 20,
+  "label_counts": {
+    "strong": 8,
+    "maybe": 5,
+    "weak": 4,
+    "reject": 3
+  },
+  "common_positive_traits": {
+    "financial": [
+      {
+        "trait": "revenue_range_sek",
+        "range": [50000000, 300000000],
+        "support_count": 7,
+        "report_ids": ["report-001", "report-002", "report-005", "report-006", "report-007", "report-009", "report-010"]
+      },
+      {
+        "trait": "ebitda_margin_range",
+        "range": [0.08, 0.18],
+        "support_count": 8
+      },
+      {
+        "trait": "revenue_cagr_range",
+        "range": [0.05, 0.20],
+        "support_count": 6
+      }
+    ],
+    "business": [
+      {
+        "trait": "fragmentation_signal",
+        "value": true,
+        "support_count": 6
+      },
+      {
+        "trait": "business_model_tags",
+        "value": ["B2B", "recurring revenue", "platform"],
+        "support_count": 5
+      }
+    ],
+    "market": [
+      {
+        "trait": "niche_attractiveness",
+        "value": "high",
+        "support_count": 5
+      }
+    ],
+    "operational_levers": [
+      {
+        "trait": "levers",
+        "value": ["buy-and-build", "professionalization", "internationalization"],
+        "support_count": 7
+      }
+    ]
+  },
+  "common_negative_traits": {
+    "financial": [
+      {
+        "trait": "ebitda_margin_latest",
+        "range": [null, 0.05],
+        "support_count": 4,
+        "report_ids": ["report-004", "report-012", "report-018", "report-020"]
+      }
+    ],
+    "risk_signals": [
+      {
+        "trait": "rejection_themes",
+        "value": ["customer concentration", "margin pressure", "no value creation levers"],
+        "support_count": 5
+      }
+    ]
+  },
+  "candidate_exclusion_rules": [
+    {
+      "field": "ebitda_margin_latest",
+      "op": "<=",
+      "value": 0.05,
+      "support_count": 3,
+      "rationale": "Reject set had margin ≤5%; strong set consistently >8%."
+    },
+    {
+      "field": "revenue_cagr_3y",
+      "op": "<=",
+      "value": -0.05,
+      "support_count": 2,
+      "rationale": "Exclude sustained revenue decline."
+    },
+    {
+      "field": "research_feasibility_score",
+      "op": "<=",
+      "value": 0,
+      "support_count": 2,
+      "rationale": "Insufficient financial data for screening; exclude when score 0."
+    }
+  ],
+  "candidate_archetypes": [
+    {
+      "code": "growth_platform",
+      "criteria": {
+        "revenue_cagr_3y": { "gte": 0.08 },
+        "ebitda_margin_latest": { "gte": 0.08 },
+        "revenue_latest": { "gte": 50000000 }
+      },
+      "support_count": 6,
+      "description": "B2B/platform companies with solid growth and margin; buy-and-build potential."
+    },
+    {
+      "code": "stable_cashflow",
+      "criteria": {
+        "ebitda_margin_latest": { "gte": 0.10, "lte": 0.25 },
+        "revenue_cagr_3y": { "gte": 0, "lte": 0.15 },
+        "revenue_latest": { "gte": 75000000 }
+      },
+      "support_count": 4,
+      "description": "Larger, stable margin businesses; roll-up or add-on candidates."
+    }
+  ],
+  "candidate_variables": [
+    {
+      "id": "revenue_growth",
+      "source": "revenue_cagr_3y",
+      "normalize": "min_max",
+      "range": [-0.10, 0.25],
+      "support_note": "Strong set showed CAGR 5–20%; growth weighted highly."
+    },
+    {
+      "id": "margin",
+      "source": "ebitda_margin_latest",
+      "normalize": "min_max",
+      "range": [0, 0.25],
+      "support_note": "Strong set had margin 8–18%."
+    },
+    {
+      "id": "scale",
+      "source": "revenue_latest",
+      "normalize": "min_max",
+      "range": [30000000, 500000000],
+      "support_note": "Sweet spot 50–300M SEK from positive traits."
+    },
+    {
+      "id": "data_quality",
+      "source": "research_feasibility_score",
+      "normalize": "min_max",
+      "range": [0, 3],
+      "support_note": "Prefer companies with sufficient financials."
+    }
+  ],
+  "candidate_weights": {
+    "revenue_growth": 0.35,
+    "margin": 0.35,
+    "scale": 0.20,
+    "data_quality": 0.10
+  },
+  "layer2_review_prompts": [
+    {
+      "id": "prompt-strong-fit",
+      "label": "Strong fit",
+      "prompt_text": "Assess buy-and-build potential, margin sustainability, and customer concentration. Prioritize for deep dive.",
+      "when_archetype": "growth_platform",
+      "when_score_band": "high"
+    },
+    {
+      "id": "prompt-stable-cashflow",
+      "label": "Stable cashflow",
+      "prompt_text": "Verify roll-up or add-on rationale; check for hidden leverage or one-off margin effects.",
+      "when_archetype": "stable_cashflow"
+    },
+    {
+      "id": "prompt-borderline",
+      "label": "Borderline score",
+      "prompt_text": "Review why Layer 1 score is mid-range; confirm whether qualitative factors justify advancement or pass.",
+      "when_score_band": "medium"
+    }
+  ],
+  "layer3_research_priorities": [
+    {
+      "topic": "Customer concentration",
+      "rationale": "Frequently cited in weak/reject reports; not screenable in Layer 1.",
+      "source_reports": ["report-003", "report-011", "report-015"]
+    },
+    {
+      "topic": "Regulatory and compliance",
+      "rationale": "Deal-breaker in some segments; needs deep-dive check.",
+      "source_reports": ["report-012", "report-019"]
+    }
+  ],
+  "unresolved_items": [
+    {
+      "type": "conflicting_threshold",
+      "description": "research_feasibility_score: exclude <1 vs <2. Team to decide minimum bar.",
+      "options": [1, 2],
+      "report_ids": ["report-014", "report-017"]
+    },
+    {
+      "type": "missing_field",
+      "description": "employees_latest not consistently in strong-set narrative; include as variable or drop?",
+      "report_ids": ["report-001", "report-002", "report-005"]
+    }
+  ]
+}

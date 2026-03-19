@@ -1,0 +1,69 @@
+{
+  "variables": [
+    {
+      "id": "revenue_growth",
+      "source": "revenue_cagr_3y",
+      "normalize": "min_max",
+      "range": [-0.10, 0.25]
+    },
+    {
+      "id": "margin",
+      "source": "ebitda_margin_latest",
+      "normalize": "min_max",
+      "range": [0, 0.25]
+    },
+    {
+      "id": "scale",
+      "source": "revenue_latest",
+      "normalize": "min_max",
+      "range": [30000000, 500000000]
+    },
+    {
+      "id": "data_quality",
+      "source": "research_feasibility_score",
+      "normalize": "min_max",
+      "range": [0, 3]
+    }
+  ],
+  "weights": {
+    "revenue_growth": 0.35,
+    "margin": 0.35,
+    "scale": 0.20,
+    "data_quality": 0.10
+  },
+  "archetypes": [
+    {
+      "code": "growth_platform",
+      "criteria": {
+        "revenue_cagr_3y": { "gte": 0.08 },
+        "ebitda_margin_latest": { "gte": 0.08 },
+        "revenue_latest": { "gte": 50000000 }
+      }
+    },
+    {
+      "code": "stable_cashflow",
+      "criteria": {
+        "ebitda_margin_latest": { "gte": 0.10, "lte": 0.25 },
+        "revenue_cagr_3y": { "gte": 0, "lte": 0.15 },
+        "revenue_latest": { "gte": 75000000 }
+      }
+    }
+  ],
+  "exclusion_rules": [
+    {
+      "field": "ebitda_margin_latest",
+      "op": "<=",
+      "value": 0.05
+    },
+    {
+      "field": "revenue_cagr_3y",
+      "op": "<=",
+      "value": -0.05
+    },
+    {
+      "field": "research_feasibility_score",
+      "op": "<=",
+      "value": 0
+    }
+  ]
+}
