@@ -231,7 +231,7 @@ function InvestorShortForm({
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
                 <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
-                <ul className="space-y-1 text-sm mb-4 pl-3" style={{ color: tokens.text }}>
+                <ul className="space-y-1 text-base sm:text-lg mb-4 pl-3" style={{ color: tokens.text }}>
                   <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
                   <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
                 </ul>
@@ -296,10 +296,12 @@ function InvestorShortForm({
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
+                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
               </div>
             </div>
           </div>
+          <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>The target acquisition capital is SEK 1,000m. Initially investments are executed on a deal-by-deal basis, with capital raised per transaction.</p>
+          <br />
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
           <ul className="space-y-2 pl-3">
             {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
@@ -347,11 +349,6 @@ function InvestorShortForm({
 
       {/* Opportunity — full section with cards (same as long form) */}
       <Section title={t.theOpportunity} id="approach">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.whyNordicSmes}</p>
-        <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: tokens.text }}>
-          {t.opportunityIntro}
-        </p>
-
         <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
             {t.opportunityThesis}
@@ -438,8 +435,10 @@ function InvestorShortForm({
             <p className="text-base sm:text-lg leading-relaxed font-semibold mb-3" style={{ color: tokens.text }}>
               {t.ourTakeText}
             </p>
-            <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
+            <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: tokens.text }}>
+              {t.ourTakeBullet1}
+            </p>
+            <ul className="space-y-1.5 text-base sm:text-lg leading-relaxed pl-3" style={{ color: tokens.text }}>
               <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
               <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
             </ul>

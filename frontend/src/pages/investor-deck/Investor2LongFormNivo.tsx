@@ -164,7 +164,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
-                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
                 </div>
               </div>
             </div>
@@ -224,12 +224,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
         <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
           <h2 className={H2_CLASS}>{t.theOpportunity}</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>{t.whyNordicSmes}</p>
-
-          <p className={PROSE_CLASS + " mb-8"}>
-            {t.opportunityIntroLong}
-          </p>
-
           {/* One-line thesis + key selling points — for investors who only read this section */}
           <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
             <p className="text-lg sm:text-xl font-semibold text-profile-fg mb-4 leading-snug">
@@ -318,22 +312,50 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <p className="text-base sm:text-lg leading-relaxed text-profile-fg font-semibold mb-3">
                 {t.ourTakeTextLong}
               </p>
-              <ul className="space-y-1.5 text-profile-fg text-base sm:text-lg leading-relaxed flex-1 min-h-0 pl-3">
-                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet2}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-current" style={{ color: tokens.accent }} aria-hidden />{t.ourTakeBullet3}</li>
-              </ul>
+              <p className="text-base sm:text-lg leading-relaxed text-profile-fg">
+                {t.ourTakeBullet1}
+              </p>
             </div>
           </div>
         </div>
         </div>
       </section>
 
+      {/* ─── Value Creation — Operating toolbox (synced with short form) ─── */}
+      <section className="w-full scroll-mt-[100px]" id="value-creation" style={{ backgroundColor: tokens.bg }}>
+        <div className={DECK_SECTION_CLASS}>
+        <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
+          <h2 className={H2_CLASS}>{t.valueCreation}</h2>
+          <p className={SECTION_SUBTITLE_CLASS}>{t.operatingToolkitTitle}</p>
+          <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.operatingToolkitIntroLong}</p>
+          <div className="space-y-4 mb-6">
+            {[
+              { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
+              { titleKey: "operatingToolkit2Title" as const, textKey: "operatingToolkit2Text" as const },
+              { titleKey: "operatingToolkit3Title" as const, textKey: "operatingToolkit3Text" as const },
+              { titleKey: "operatingToolkit4Title" as const, textKey: "operatingToolkit4Text" as const },
+              { titleKey: "operatingToolkit5Title" as const, textKey: "operatingToolkit5Text" as const },
+              { titleKey: "operatingToolkit6Title" as const, textKey: "operatingToolkit6Text" as const },
+            ].map(({ titleKey, textKey }) => (
+              <div key={titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[titleKey]}</p>
+                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
+              </div>
+            ))}
+          </div>
+          <p className={PROSE_CLASS + " font-medium"}>
+            {t.operatingToolkitClosingLong}
+          </p>
+        </div>
+        </div>
+      </section>
+
+
       {/* ─── Approach & Illustrative Case (merged) ────────────────────────── */}
       <section className="w-full scroll-mt-[100px]" id="approach" style={{ backgroundColor: tokens.bgAlt }}>
         <div className={DECK_SECTION_CLASS}>
         <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>Approach — The Nordic Compounder Model</h2>
+          <h2 className={H2_CLASS}>Approach — Updated Nordic Compounder — Accelerating traditional companies through digital transformation to drive compounding growth</h2>
           <p className={SECTION_SUBTITLE_CLASS}>Investment thesis</p>
           <div className="w-full space-y-8">
             <div>
@@ -357,7 +379,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.returnDriversLong}</p>
               </div>
               <p className="text-base sm:text-lg text-profile-fg mt-6 leading-relaxed font-bold text-center w-full">
-                Execution leads to margins, margins to cash flow, cash flow to equity.
+                Execution leads to operating margins, operating margins to cash flow, cash flow to equity.
               </p>
             </div>
 
@@ -427,35 +449,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <p className="text-base sm:text-lg text-profile-fg leading-relaxed">{t.assumptionsLong}</p>
             </div>
           </div>
-        </div>
-        </div>
-      </section>
-
-      {/* ─── Value Creation — Operating toolbox (synced with short form) ─── */}
-      <section className="w-full scroll-mt-[100px]" id="value-creation" style={{ backgroundColor: tokens.bg }}>
-        <div className={DECK_SECTION_CLASS}>
-        <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>{t.valueCreation}</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>{t.operatingToolkitTitle}</p>
-          <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.operatingToolkitIntroLong}</p>
-          <div className="space-y-4 mb-6">
-            {[
-              { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
-              { titleKey: "operatingToolkit2Title" as const, textKey: "operatingToolkit2Text" as const },
-              { titleKey: "operatingToolkit3Title" as const, textKey: "operatingToolkit3Text" as const },
-              { titleKey: "operatingToolkit4Title" as const, textKey: "operatingToolkit4Text" as const },
-              { titleKey: "operatingToolkit5Title" as const, textKey: "operatingToolkit5Text" as const },
-              { titleKey: "operatingToolkit6Title" as const, textKey: "operatingToolkit6Text" as const },
-            ].map(({ titleKey, textKey }) => (
-              <div key={titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[titleKey]}</p>
-                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
-              </div>
-            ))}
-          </div>
-          <p className={PROSE_CLASS + " font-medium"}>
-            {t.operatingToolkitClosingLong}
-          </p>
         </div>
         </div>
       </section>
@@ -553,8 +546,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <div className="mt-10 w-full">
             <div className="rounded-lg overflow-hidden border relative" style={{ borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
               <img
-                src="/sourcing-ai-screenshot.png"
-                alt="AI sourcing engine interface — company financial profile and analysis"
+                src="/sourcing-ai-memo-screenshot.png"
+                alt="AI Investment Score — investment memo and strategic fit"
                 className="w-full h-auto"
                 style={{ maxHeight: "420px", objectFit: "cover" }}
               />
@@ -566,8 +559,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             </div>
             <div className="mt-6 rounded-lg overflow-hidden border relative" style={{ borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
               <img
-                src="/sourcing-ai-memo-screenshot.png"
-                alt="AI Investment Score — investment memo and strategic fit"
+                src="/sourcing-ai-screenshot.png"
+                alt="AI sourcing engine interface — company financial profile and analysis"
                 className="w-full h-auto"
                 style={{ maxHeight: "420px", objectFit: "cover" }}
               />
@@ -818,7 +811,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>5–10 years</span>
+                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
               </div>
             </div>
           </div>

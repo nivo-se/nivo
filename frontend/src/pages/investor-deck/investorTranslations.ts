@@ -20,31 +20,31 @@ export const investorTranslations = {
 
     // Hero / Short version
     oneLiner:
-      "We acquire profitable, under-digitised companies and create value through operational improvement and digital upgrades. Over time, those improvements compound into value.",
+      "We acquire profitable, under-digitised companies and create value through digital and AI-enabled operational improvements. Over time, those improvements compound into value.",
     shortVersion: "Executive Summary",
     execSummaryWhatLabel: "What we do",
     execSummaryWhatPara1:
-      "Partnering with a small group of investors to acquire and improve Nordic companies over the long term.",
+      "Partnering with a small group of investors to acquire and improve Nordic companies, with primary focus on Sweden, over the long term.",
     execSummaryWhatPara2:
       "Focus is on profitable businesses with strong fundamentals — where operational improvements, not market timing, drive value.",
     execSummaryValueLabel: "How value is created",
     execSummaryValueApproach: "We follow a disciplined approach:",
     execSummaryValueFlow:
-      "Acquire good companies → improve execution → generate cash flow → reinvest and compound.",
+      "Acquire resilient companies → improve execution and operating margins → generate cash flow → reinvest and compound.",
     execSummaryValueEdge:
-      "Our edge is hands-on ownership, structured operating playbooks and selective use of AI to accelerate performance. Active ownership in every portfolio company.",
+      "Our edge is hands-on ownership, structured operating playbooks and digital and AI-enabled operational improvements to accelerate performance.",
     execSummaryModelLabel: "How the model works",
     execSummaryModelSentence:
-      "We follow a simple model: acquire profitable companies, improve margins through traditional performance levers with AI-accelerated execution, convert to cash flow, and reinvest over time.",
+      "We follow a simple model: acquire profitable, under-digitised companies, improve operating margins through traditional performance levers and digital and AI-enabled operational improvements, convert to cash flow, and reinvest over time.",
     shortVersionBullet1: "20–25% IRR",
     shortVersionBullet2: "4–5x MOIC",
     shortVersionBullet3:
       "Team: extensive capital markets and venture experience; scaled a direct-to-consumer business from zero",
     execSummaryReturnsTarget: "We target:",
     execSummaryReturnsNote:
-      "With returns driven primarily by margin expansion and cash generation.",
+      "With returns driven primarily by operating margin expansion and cash generation.",
     execSummaryTeamPara1:
-      "The team brings experience from investing and building companies, with a track record of scaling businesses.",
+      "The team combines investing and company-building experience with hands-on experience scaling businesses and driving digital transformation, as well as executing M&A, capital raising and IPO processes.",
     execSummaryTeamPara2: "Active ownership in every portfolio company.",
     execSummaryWhyLabel: "Why it works",
     execSummaryEdgeLabel: "Edge",
@@ -52,7 +52,7 @@ export const investorTranslations = {
     execSummaryTeamLabel: "Team",
     whatWeDontDo: "What we don't do",
     whatWeDontDoText:
-      "We avoid turnarounds, technology risk, and aggressive leverage; we bet on better operations and higher margins — multiple expansion could be a result, not our primary bet.",
+      "We avoid turnarounds, technology risk, and aggressive leverage; we bet on better operations and higher operating margins — multiple expansion could be a result, not our primary bet.",
 
     // Hero paragraphs
     companiesIntro:
@@ -62,7 +62,7 @@ export const investorTranslations = {
     manyOperate:
       "Many operate with manual workflows; fragmented systems; limited visibility. The businesses are sound; execution can be improved.",
     sourcingEngine:
-      "We use a proprietary sourcing engine that analyses the Swedish company universe and delivers pre-ranked targets with financial and operational signals — allowing us to approach companies with structured intelligence most PE firms lack.",
+      "We use a proprietary sourcing engine that analyses the Swedish company universe and delivers pre-ranked targets with financial and operational signals — allowing us to approach companies with structured intelligence.",
     focusQuote: "Focus: operational improvement over technology risk.",
 
     // Key terms
@@ -92,20 +92,20 @@ export const investorTranslations = {
     investmentEngineIntro: "We follow a simple, repeatable model:",
     investmentStep1Title: "Source better opportunities",
     investmentStep1Text: "Identify under-digitised companies before competitive processes using the in-house sourcing engine.",
-    investmentStep2Title: "Improve margins through execution",
+    investmentStep2Title: "Improve operating margins through execution",
     investmentStep2Text: "Increase profitability through pricing discipline, cost control and digital workflows.",
-    investmentStep3Title: "Convert margins into cash flow",
+    investmentStep3Title: "Convert operating margins into cash flow",
     investmentStep3Text: "Use improved reporting and operational control to strengthen cash conversion.",
     investmentStep4Title: "Reinvest and compound",
     investmentStep4Text: "Reinvest cash flow into the business and future acquisitions over time.",
     investmentResultLabel: "Result",
-    investmentResult: "A repeatable system for compounding equity value through operational improvement.",
+    investmentResult: "A repeatable system for compounding equity value through operational improvement, accelerated by AI, enabled by a lean operating model and hands-on execution.",
     theOpportunity: "The Opportunity",
     whyNordicSmes: "Why Nordic companies, why now",
     opportunityIntro:
       "The opportunity is defined by scale and structure: a large universe of profitable Nordic companies with predictable business models and clear operational improvement potential. We target SEK 50–200m revenue companies where execution—not speculation—drives returns.",
     opportunityThesis:
-      "We acquire profitable, under-digitised Nordic companies and compound value through operational improvement and digital upgrades. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
+      "We acquire profitable, under-digitised Nordic companies and compound value through digital and AI-enabled operational improvements. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
     badge1: "15,000+ Nordic companies in target segment",
     badge2: "20–25% target ROIC through operational improvement",
     badge3: "Data-driven sourcing; digital workflows in portfolio",
@@ -123,7 +123,7 @@ export const investorTranslations = {
       "Across the segment we observe the same operational inefficiencies. These businesses rarely need disruption — they need better execution and modern tools.",
     gapBullet1: "Manual workflows, spreadsheets and ad-hoc processes",
     gapBullet2: "Fragmented systems with limited data integration",
-    gapBullet3: "Cost-plus pricing and weak margin transparency",
+    gapBullet3: "Cost-plus pricing and weak operating margin transparency",
 
     whyNordic: "Why Nordic",
     whyNordicText:
@@ -134,12 +134,12 @@ export const investorTranslations = {
 
     ourTake: "Our take",
     ourTakeText: "Nivo targets this opportunity through a disciplined, repeatable approach.",
-    ourTakeBullet1: "Sourcing engine screens universe, ranks targets, delivers pre-engagement memos",
+    ourTakeBullet1: "Nivo is built to capture that gap;",
 
     sourcingEdgeTitle: "Sourcing Edge",
     sourcingEdgeSubtitle: "Pipeline development",
     sourcingEdgeMain:
-      "Our in-house sourcing engine screens the Swedish company universe (SEK 50–200m revenue), ingests financial data, scores companies on base economics and margin signals, and ranks targets. We run deeper analysis—products, customer mix, pricing, operational gaps—before first contact. This gives us earlier identification of targets, better preparation before contact, clearer operational understanding, and stronger positioning in dialogue. Most PE firms depend on broker flow and relationships.",
+      "Our in-house sourcing engine screens the Swedish company universe (SEK 50–200m revenue), ingests financial data, scores companies on base economics and operating margin signals, and ranks targets. We run deeper analysis—products, customer mix, pricing, operational gaps—before first contact. This gives us earlier identification of targets, better preparation before contact, clearer operational understanding, and stronger positioning in dialogue.",
     sourcingEdgePreparation:
       "Our sourcing advantage is not only speed — it is preparation. We know where value can be created before the first meeting.",
     sourcingEdgePlatform:
@@ -148,8 +148,8 @@ export const investorTranslations = {
     sourcingFlowFiltering: "Filtering",
     sourcingFlowResearch: "Research",
     sourcingFlowTargets: "Targets",
-    ourTakeBullet2: "Pricing, cost control, reporting and digital workflows in portfolio",
-    ourTakeBullet3: "Operational execution over financial engineering",
+    ourTakeBullet2: "Systematic sourcing",
+    ourTakeBullet3: "Hands-on operational toolbox",
 
     pipeline: "Pipeline",
     pipelineLabel: "Target pipeline: 100 companies ranked by operational improvement potential",
@@ -217,11 +217,11 @@ export const investorTranslations = {
     companiesIntroLong: "Our targets have strong products and loyal customers but untapped operational potential.",
     companiesIntroFollowUpLong: "We apply the Operating Toolbox—pricing, cost control, reporting, workflows—where they clearly improve outcomes.",
     manyOperateLong: "Manual workflows, fragmented systems, limited visibility; businesses are sound, execution can be improved.",
-    execSummaryModelSentenceLong: "Acquire profitable companies, improve margins via toolbox execution and AI-accelerated workflows, convert to cash flow, reinvest.",
+    execSummaryModelSentenceLong: "Acquire profitable, under-digitised companies, improve operating margins via toolbox execution and digital and AI-enabled operational improvements, convert to cash flow, reinvest.",
     whyNowTextLong:
       "Much of the Nordic company base was built before modern systems—profitable but under-optimised.\n\nSoftware and AI have matured: pricing, reporting and workflows can now be systematised. Value comes from execution: closing the gap between current operations and what's possible.",
     sourcingEngineLong:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals. Earlier identification, better preparation and clearer operational understanding before first contact—structured intelligence most PE firms lack.",
+      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals. Earlier identification, better preparation and clearer operational understanding before first contact—structured intelligence.",
     investmentStep1TextLong: "Find targets before broad processes via the data-driven sourcing engine.",
     investmentStep2TextLong: "Toolbox: pricing, cost control, reporting, digital workflows.",
     investmentStep3TextLong: "Reporting and operational control to strengthen cash conversion.",
@@ -233,9 +233,9 @@ export const investorTranslations = {
       "We acquire profitable Nordic companies and compound value through the Operating Toolbox and digital upgrades. Edge: disciplined execution and systematic sourcing.",
     universeTextLong: "Profitable but structurally under-digitised—a large, underserved opportunity.",
     gapTextLong: "Same operational inefficiencies across the segment. They need better execution and modern tools, not disruption.",
-    ourTakeTextLong: "Nivo addresses this with a disciplined approach: sourcing engine, toolbox in portfolio, operational execution over financial engineering.",
+    ourTakeTextLong: "A large share of companies remain operationally under-digitized with an upside in improving overall execution, accelerated with digital solutions.",
     sourcingEdgeMainLong:
-      "In-house engine screens Swedish companies (SEK 50–200m), scores on economics and margin signals, ranks targets. Deeper analysis—products, pricing, operational gaps—before first contact. Result: earlier identification, better preparation, stronger positioning. Most PE relies on broker flow.",
+      "In-house engine screens Swedish companies (SEK 50–200m), scores on economics and operating margin signals, ranks targets. Deeper analysis—products, pricing, operational gaps—before first contact. Result: earlier identification, better preparation, stronger positioning.",
     sourcingEdgePreparationLong: "Advantage is preparation. We know where value can be created before the first meeting.",
     sourcingEdgePlatformLong:
       "Platform: ~15,000 companies → ranked Target 100; pre-engagement memos with financial and operational signals. AI accelerates analysis and reporting; it supports execution, not judgment.",
@@ -245,13 +245,13 @@ export const investorTranslations = {
     processIntroLong:
       "Sourcing: direct outreach, broker relationships, data-driven playbook. Due diligence: quality of earnings, toolbox levers, management. Execution: Day 1 plan and toolbox initiatives.",
     approachPillar1Long: "Disciplined entry with clear operational improvement potential.",
-    approachPillar2Long: "Pricing discipline, margin expansion, operational visibility—toolbox execution.",
+    approachPillar2Long: "Pricing discipline, operating margin expansion, operational visibility—toolbox execution.",
     approachPillar3Long: "Reinvest cash flow, maintain appropriate leverage.",
     returnDriversLong:
-      "Operational excellence and technology—including AI—where it accelerates growth and margins. Execution → margins → cash flow → equity.",
+      "Operational excellence and technology—including AI—where it accelerates growth and operating margins. Execution → operating margins → cash flow → equity.",
     caseIntroLong: "Nordic industrial products company. Entry: equity SEK 100m, debt SEK 30m (EV SEK 130m). Upside from pricing, operations and cost reduction.",
     assumptionsLong:
-      "Illustrative: 20–25% IRR, 4–5x MOIC; full reinvestment, ~30% leverage. Operational improvement from hands-on toolbox work. No exit multiple expansion.",
+      "Illustrative: 20–25% IRR, 4–5x MOIC; full reinvestment, ~30% leverage. Operational improvement from hands-on toolbox work.",
     acquisitionCriteriaLong:
       "Strict valuation: EV/EBITDA 5–7x, operational improvement potential over growth premium. Conservative leverage (debt/capital <30%, net debt/EBITDA <2x). Guardrails: path to 20% ROIC, 12 months runway, capital preservation first.",
     teamWhyExecuteLong:
@@ -390,9 +390,9 @@ export const investorTranslations = {
 
     ourTake: "Vår syn",
     ourTakeText: "Nivo riktar in sig på denna möjlighet genom ett disciplinerat, upprepbart förhållningssätt.",
-    ourTakeBullet1: "Sökmotor söker universum, rankar mål, levererar förkontaktsmemos",
-    ourTakeBullet2: "Prissättning, kostnadskontroll, rapportering och digitala arbetsflöden i portföljen",
-    ourTakeBullet3: "Operativ exekvering framför finansiell engineering",
+    ourTakeBullet1: "Nivo är byggt för att fånga det gapet;",
+    ourTakeBullet2: "Systematisk sourcing",
+    ourTakeBullet3: "Hands-on operativ verktygslåda",
 
     sourcingEdgeTitle: "Sourcing Edge",
     sourcingEdgeSubtitle: "Pipelineutveckling",
