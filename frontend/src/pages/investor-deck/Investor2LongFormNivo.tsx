@@ -794,7 +794,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <p className={SECTION_SUBTITLE_CLASS}>Capital model and governance</p>
 
           <p className="mt-6 text-sm font-semibold uppercase tracking-wider max-w-2xl text-left" style={{ color: tokens.accent }}>{t.keyTerms}</p>
-          <div className="mt-3 max-w-2xl mx-auto pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
+          <div className="mt-3 max-w-3xl mx-auto pt-6 pb-6 border-t border-b text-left" style={{ borderColor: tokens.border }}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
@@ -830,7 +830,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
 
             <div className="pt-6 border-t" style={{ borderColor: tokens.border }}>
               <h3 className={H3_CLASS}>Corporate and investment structure</h3>
-              <p className="text-sm mb-4" style={{ color: tokens.text }}>Evergreen Swedish AB structure. Deal-by-deal financing.</p>
               <div className="grid grid-cols-1 gap-8">
                 {/* Left: Corporate structure diagram */}
                 <div className="rounded-lg border p-6 sm:p-8" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
@@ -875,6 +874,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                     </div>
                   </div>
                 </div>
+                <p className="text-sm mb-4" style={{ color: tokens.text }}>Evergreen Swedish AB structure. Deal-by-deal financing.</p>
                 {/* Right: Financing model text */}
                 <div>
                   <p className={LABEL_OLIVE_CLASS + " mb-3"}>Financing model & share classes</p>
@@ -976,7 +976,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </div>
             </div>
             <p className="text-base sm:text-lg text-profile-fg leading-relaxed w-full">
-              Concentration (3–4 companies) and liquidity (company exits can be illiquid) are mitigated by screening, sector diversity, operational involvement, and building for strategic buyers with timing flexibility.
+              We acquire resilient companies with strong fundamentals and hold them across an economic cycle, allowing value creation through operational execution rather than short-term timing. Our focused portfolio approach combines disciplined screening, sector diversity and active ownership to compound long-term performance.
             </p>
             <p className={PUNCH_CLASS}>
               Risks are managed through discipline, transparency, and operational excellence.
