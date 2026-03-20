@@ -2,7 +2,7 @@ import { TrendingUp, Globe, Building2, Users } from "lucide-react";
 
 export function Slide16() {
   const metrics = [
-    { icon: Building2, metric: "~15,000", label: "SMEs in target band" },
+    { icon: Building2, metric: "~15,000", label: "companies in target band" },
     { icon: Users, metric: "Owner-managed", label: "Traditional structures" },
     { icon: TrendingUp, metric: "Under-digitised", label: "Process/systems gap" },
     { icon: Globe, metric: "Stable markets", label: "B2B services & manufacturing" },

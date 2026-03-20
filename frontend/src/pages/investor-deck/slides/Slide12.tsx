@@ -2,7 +2,7 @@ import { Target } from "lucide-react";
 
 export function Slide12() {
   const team = [
-    { name: "Partner 1", role: "Founding Partner", bullets: ["15+ years Nordic SME ops", "8+ transformations", "M.Sc. Industrial Eng."] },
+    { name: "Partner 1", role: "Founding Partner", bullets: ["15+ years Nordic company ops", "8+ transformations", "M.Sc. Industrial Eng."] },
     { name: "Partner 2", role: "Founding Partner", bullets: ["12+ years PE/growth", "20+ Nordic companies", "MBA SSE"] },
     { name: "Partner 3", role: "Founding Partner", bullets: ["10+ years M&A", "Tech & industrials", "M.Sc. Economics"] },
   ];

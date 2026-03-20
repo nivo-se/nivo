@@ -2,7 +2,7 @@ import { Users, Award, Briefcase } from "lucide-react";
 
 export function Slide19() {
   const team = [
-    { icon: Briefcase, title: "Operational", items: ["20+ years ops leadership", "Scaling SMEs", "P&L responsibility"] },
+    { icon: Briefcase, title: "Operational", items: ["20+ years ops leadership", "Scaling companies", "P&L responsibility"] },
     { icon: Award, title: "Capital", items: ["Value-focused acquisitions", "Pricing & negotiation", "Long-term view"] },
     { icon: Users, title: "Technical", items: ["AI/automation", "Process optimization", "Change management"] },
   ];

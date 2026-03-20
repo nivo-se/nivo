@@ -45,7 +45,7 @@ export function Slide17() {
         </div>
         <div className="bg-deck-accent/10 border border-deck-accent-border rounded-lg p-2 sm:p-2.5">
           <h3 className="text-xs font-semibold text-deck-fg">Liquidity</h3>
-          <p className="text-[10px] text-deck-fg/80 mt-0.5">SME exits can be illiquid. Build for strategics; flexibility on timing; ROIC justifies valuation.</p>
+          <p className="text-[10px] text-deck-fg/80 mt-0.5">Company exits can be illiquid. Build for strategics; flexibility on timing; ROIC justifies valuation.</p>
         </div>
       </div>
       <p className="text-[10px] sm:text-xs text-deck-fg font-semibold text-center flex-shrink-0">Risks managed through discipline, transparency, operational excellence.</p>
