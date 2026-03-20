@@ -57,8 +57,11 @@ The CRM uses the **`deep_research`** schema. Run migrations so tables exist:
 
 - `024_deep_research_persistence.sql` – companies, company_profiles, strategy, value_creation
 - `026_crm_foundation.sql` – deals, contacts, emails, interactions, tracking_events, sequences
+- `032_company_identity_and_prospects_crm_link.sql` – company identity view, prospects↔CRM link
 
 Run: `./scripts/run_postgres_migrations.sh` or apply migrations manually.
+
+**Company identity:** `orgnr` bridges `public.companies` and `deep_research.companies`. `GET /crm/company/:companyId` accepts either UUID or orgnr.
 
 ## 5. Quick check
 

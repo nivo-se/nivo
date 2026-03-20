@@ -25,6 +25,7 @@ from backend.retrieval.query_planner import QueryPlanner
 from .evidence_extractor import EvidenceItem, extract_evidence
 from .evidence_scorer import EvidenceScorer
 from .evidence_verifier import EvidenceVerifier
+from .openai_search_client import OpenAISearchClient
 from .source_normalizer import is_blocked_domain, normalize_source
 from .tavily_client import TavilyClient
 
@@ -97,6 +98,13 @@ class WebRetrievalService:
         self.settings = get_settings()
         self.planner = QueryPlanner(self.settings)
         self.tavily = TavilyClient()
+        provider = (self.settings.web_retrieval_search_provider or "tavily").lower()
+        if provider == "openai":
+            self._search_client = OpenAISearchClient()
+            self._search_provider_name = "openai"
+        else:
+            self._search_client = self.tavily
+            self._search_provider_name = "tavily"
         self.scorer = EvidenceScorer(minimum_score=0.4)
         self.verifier = EvidenceVerifier(max_unresolved_conflicts=2)
 
@@ -121,7 +129,7 @@ class WebRetrievalService:
 
         for pq in planned:
             group = pq.query_group or "company_facts"
-            search_results = self.tavily.search(
+            search_results = self._search_client.search(
                 pq.query,
                 max_results=max_results_per_query,
             )
@@ -141,7 +149,7 @@ class WebRetrievalService:
                 results_by_group[group].append({
                     "url": url,
                     "title": r.title,
-                    "content": r.content,
+                    "content": getattr(r, "content", None),
                     "query": pq.query,
                 })
             entry: dict = {
@@ -149,6 +157,7 @@ class WebRetrievalService:
                 "query_group": group,
                 "result_count": count,
                 "round": round_label,
+                "search_provider": self._search_provider_name,
             }
             metric_key = getattr(pq, "metric_key", None)
             if metric_key:
@@ -196,9 +205,13 @@ class WebRetrievalService:
         """Execute bounded retrieval: 1 primary + up to 2 supplemental rounds."""
         bundle = RetrievalBundle()
 
-        if not self.tavily.api_key:
-            logger.warning("Tavily not configured; web retrieval skipped")
-            bundle.metadata["skipped"] = "no_tavily_key"
+        search_key = getattr(self._search_client, "api_key", None)
+        if not search_key:
+            logger.warning(
+                "Search provider %s not configured; web retrieval skipped",
+                self._search_provider_name,
+            )
+            bundle.metadata["skipped"] = f"no_{self._search_provider_name}_key"
             return bundle
 
         config = get_report_retrieval_config()

@@ -177,8 +177,8 @@ const SELLERS_HEADER_HEIGHT = 68;
 
 const ANCHOR_LINKS = [
   { href: "#sammanfattning", labelKey: "navSammanfattning" as const },
-  { href: "#samarbete", labelKey: "navSamarbete" as const },
-  { href: "#vad-vi-inte-gor", labelKey: "navVadViInteGor" as const },
+  { href: "#samarbete", labelKey: "navHurViArbetar" as const },
+  { href: "#vad-vi-letar-efter", labelKey: "navVadViLetarEfter" as const },
   { href: "#varfor-annorlunda", labelKey: "navVarförAnnorlunda" as const },
   { href: "#vem-bakom-oss", labelKey: "navVemBakomOss" as const },
   { href: "#team", labelKey: "navTeam" as const },
@@ -219,7 +219,7 @@ function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
-const TRACKABLE_SECTION_IDS = ["overview", "sammanfattning", "samarbete", "vad-vi-inte-gor", "varfor-annorlunda", "vem-bakom-oss", "team", "varfor-spelar-roll"];
+const TRACKABLE_SECTION_IDS = ["overview", "sammanfattning", "samarbete", "vad-vi-letar-efter", "varfor-annorlunda", "vem-bakom-oss", "team", "varfor-spelar-roll"];
 
 function SellersContent({ onSignOut }: { onSignOut: () => void }) {
   const t = sellersTranslations;
@@ -300,32 +300,20 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
             <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
               {t.sammanfattningText}
             </p>
-            <ul className="space-y-1.5 text-sm mb-4" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-2">
+            <ul className="space-y-1.5 text-sm mb-4 pl-6" style={{ color: tokens.text }}>
+              <li className="flex items-start gap-3">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                {t.sammanfattningBullet1}
+                <span className="flex-1">{t.sammanfattningBullet1}</span>
               </li>
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-3">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                {t.sammanfattningBullet2}
+                <span className="flex-1">{t.sammanfattningBullet2}</span>
               </li>
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-3">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                {t.sammanfattningBullet3}
+                <span className="flex-1">{t.sammanfattningBullet3}</span>
               </li>
             </ul>
-            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>
-              {t.vadHandlarOmPraktiken}
-            </p>
-            <p className="text-[14px] leading-relaxed mb-4" style={{ color: tokens.text }}>
-              {t.vadHandlarOmPraktikenText}
-            </p>
-            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>
-              {t.merAnKapital}
-            </p>
-            <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-              {t.merAnKapitalText}
-            </p>
           </div>
         </Section>
 
@@ -362,31 +350,31 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </Section>
 
-        {/* Vad vi inte gör */}
-        <Section title={t.vadViInteGor} id="vad-vi-inte-gor">
+        {/* Vad vi letar efter */}
+        <Section title={t.vadViLetarEfter} id="vad-vi-letar-efter">
           <p className="text-[15px] leading-relaxed mb-6" style={{ color: tokens.text }}>
-            {t.vadViInteGorIntro}
+            {t.vadViLetarEfterIntro}
           </p>
-          <ul className="space-y-3 mb-6" style={{ color: tokens.text }}>
+          <ul className="space-y-3 mb-6 pl-6" style={{ color: tokens.text }}>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem1}</span>
+              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem1}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem2}</span>
+              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem2}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem3}</span>
+              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem3}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem4}</span>
+              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem4}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="text-[15px] leading-relaxed">{t.vadViInteGorItem5}</span>
+              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem5}</span>
             </li>
           </ul>
           <div
@@ -394,7 +382,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
             style={{ backgroundColor: tokens.washSage, borderLeftColor: tokens.accent }}
           >
             <p className="text-[15px] font-medium leading-relaxed" style={{ color: tokens.text }}>
-              {t.vadViInteGorAvslutning}
+              {t.vadViLetarEfterAvslutning}
             </p>
           </div>
         </Section>

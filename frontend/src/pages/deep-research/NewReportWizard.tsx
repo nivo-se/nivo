@@ -21,6 +21,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { searchCompanySummaries } from '@/lib/api/companies/service'
 import {
   startAnalysis,
+  getCostEstimate,
+  type CostEstimate,
   type ResearchMode,
   type StartAnalysisRequest,
 } from '@/lib/services/deepResearchService'
@@ -68,8 +70,20 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
   const [inputUrls, setInputUrls] = useState<string[]>([])
   const [inputUrlDraft, setInputUrlDraft] = useState('')
   const [inputNotes, setInputNotes] = useState('')
+  const [costEstimate, setCostEstimate] = useState<CostEstimate | null>(null)
+  const [costEstimateLoading, setCostEstimateLoading] = useState(false)
 
   const company = selectedCompany || (manualCompanyName ? { orgnr: manualOrgnr || '', display_name: manualCompanyName, website_url: manualWebsite || undefined, has_3y_financials: false, has_homepage: !!manualWebsite } as Company : null)
+
+  useEffect(() => {
+    if (step !== 6) return
+    setCostEstimateLoading(true)
+    const analysisType = refreshWebEvidence ? 'refresh' : RESEARCH_MODES.find((m) => m.value === researchMode)?.analysisType ?? 'full'
+    getCostEstimate(analysisType as 'full' | 'quick' | 'refresh')
+      .then((est) => setCostEstimate(est ?? null))
+      .catch(() => setCostEstimate(null))
+      .finally(() => setCostEstimateLoading(false))
+  }, [step, researchMode, refreshWebEvidence])
 
   const debouncedSearch = useCallback(async () => {
     if (!companySearch.trim() || companySearch.length < 2) {
@@ -425,6 +439,19 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
                   </p>
                 </div>
               )}
+              <div className="rounded-md border bg-muted/30 p-3">
+                <p className="text-sm font-medium mb-2">Estimated cost (OpenAI)</p>
+                {costEstimateLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading estimate…</p>
+                ) : costEstimate ? (
+                  <p className="text-sm">
+                    <span className="font-semibold text-foreground">~${costEstimate.total_usd.toFixed(2)}</span>
+                    <span className="text-muted-foreground"> USD per run</span>
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Estimate unavailable</p>
+                )}
+              </div>
             </div>
           )}
         </div>

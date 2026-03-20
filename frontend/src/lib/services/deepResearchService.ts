@@ -229,6 +229,19 @@ async function drPost<T>(path: string, payload: unknown): Promise<T | null> {
 // Analysis runs
 // ---------------------------------------------------------------------------
 
+export interface CostEstimate {
+  total_usd: number
+  breakdown: { stage: string; model: string; cost_usd: number }[]
+  analysis_type: string
+  openai_market_agent_enabled?: boolean
+  openai_web_search_enabled?: boolean
+}
+
+export async function getCostEstimate(analysisType: 'full' | 'quick' | 'refresh' = 'full'): Promise<CostEstimate | null> {
+  const params = new URLSearchParams({ analysis_type: analysisType })
+  return drFetch<CostEstimate>(`/analysis/estimate-cost?${params}`)
+}
+
 export async function startAnalysis(req: StartAnalysisRequest): Promise<AnalysisStartResult | null> {
   return drPost<AnalysisStartResult>('/analysis/start', req)
 }

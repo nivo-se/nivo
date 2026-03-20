@@ -5,12 +5,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List
 
+from backend.config import get_settings
+
 from .company_profile_agent import CompanyProfileAgent
 from .competitor_discovery_agent import CompetitorDiscoveryAgent
 from .competitor_profiling_agent import CompetitorProfilingAgent
 from .financial_modeling_agent import FinancialModelingAgent
 from .identity_agent import IdentityAgent
 from .market_analysis_agent import MarketAnalysisAgent
+from .market_analysis_agent_openai import MarketAnalysisAgentOpenAI
 from .product_agent import ProductAgent
 from .transaction_agent import TransactionAgent
 from .strategy_analysis_agent import StrategyAnalysisAgent
@@ -29,7 +32,12 @@ class AgentRegistry:
         registry = cls()
         registry.register("identity", IdentityAgent())
         registry.register("company_profile", CompanyProfileAgent())
-        registry.register("market_analysis", MarketAnalysisAgent())
+        market_agent = (
+            MarketAnalysisAgentOpenAI()
+            if get_settings().use_openai_agent_for_market_analysis
+            else MarketAnalysisAgent()
+        )
+        registry.register("market_analysis", market_agent)
         registry.register("competitor_discovery", CompetitorDiscoveryAgent())
         registry.register("product", ProductAgent())
         registry.register("transaction", TransactionAgent())

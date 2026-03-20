@@ -52,6 +52,16 @@ class AppSettings(BaseSettings):
 
     langgraph_enabled: bool = Field(default=True)
 
+    use_openai_agent_for_market_analysis: bool = Field(
+        default=False,
+        description="When true, use OpenAI Agents SDK for market_analysis (pilot).",
+    )
+
+    web_retrieval_search_provider: str = Field(
+        default="tavily",
+        description="Search provider for web_retrieval: tavily (default) or openai (A/B test).",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> AppSettings:

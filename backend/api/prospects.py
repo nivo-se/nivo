@@ -90,6 +90,7 @@ def _to_prospect_response(row: Dict[str, Any], notes: List[Dict[str, Any]]) -> D
     return {
         "id": str(row.get("id", "")),
         "companyId": str(row.get("company_id", "")),
+        "deepResearchCompanyId": str(row["deep_research_company_id"]) if row.get("deep_research_company_id") else None,
         "status": str(row.get("status", "new")),
         "owner": row.get("owner"),
         "lastContact": str(row["last_contact"]) if row.get("last_contact") else None,

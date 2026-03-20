@@ -59,7 +59,7 @@ export class PostgresCrmDb implements CrmDb {
     const whereClause = hasSearch ? 'WHERE c.name ILIKE $1' : ''
     const limitParam = `$${params.length}`
     const { rows } = await this.query(
-      `SELECT c.id, c.name, c.industry, c.website, d.status AS deal_status, d.last_contacted_at
+      `SELECT c.id, c.orgnr, c.name, c.industry, c.website, d.status AS deal_status, d.last_contacted_at
        FROM ${SCHEMA}.companies c
        LEFT JOIN ${SCHEMA}.deals d ON c.id = d.company_id
        ${whereClause}
@@ -72,8 +72,17 @@ export class PostgresCrmDb implements CrmDb {
 
   async getCompany(id: string) {
     const { rows } = await this.query(
-      `SELECT id, name, industry, website, headquarters FROM ${SCHEMA}.companies WHERE id = $1`,
+      `SELECT id, orgnr, name, industry, website, headquarters FROM ${SCHEMA}.companies WHERE id = $1`,
       [id]
+    )
+    return rows[0] ?? null
+  }
+
+  async getCompanyByOrgnr(orgnr: string) {
+    if (!orgnr || orgnr.startsWith('tmp-')) return null
+    const { rows } = await this.query(
+      `SELECT id, orgnr, name, industry, website, headquarters FROM ${SCHEMA}.companies WHERE orgnr = $1`,
+      [orgnr]
     )
     return rows[0] ?? null
   }

@@ -440,6 +440,7 @@ type ProspectApi = {
   id?: string;
   companyId?: string;
   company_id?: string;
+  deepResearchCompanyId?: string | null;
   status?: ProspectStatus["status"];
   owner?: string;
   lastContact?: string;
@@ -453,6 +454,7 @@ function mapProspectApiToStatus(row: ProspectApi): ProspectStatus {
   return {
     id: row.id,
     companyId: String(row.companyId ?? row.company_id ?? ""),
+    deepResearchCompanyId: row.deepResearchCompanyId ?? null,
     status: (row.status ?? "new") as ProspectStatus["status"],
     owner: row.owner,
     lastContact: row.lastContact ?? row.last_contact,

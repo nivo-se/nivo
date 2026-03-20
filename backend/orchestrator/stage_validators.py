@@ -327,7 +327,8 @@ def validate_web_evidence_bundle(output: dict) -> StageValidation:
 
     Checks: source diversity ≥ 2, confidence ≥ 0.6, provenance (sources present).
     """
-    if output.get("metadata", {}).get("skipped") == "no_tavily_key":
+    skipped = output.get("metadata", {}).get("skipped")
+    if skipped in ("no_tavily_key", "no_openai_key"):
         return StageValidation(status="pass", score=80)
 
     thresholds = DEEP_RESEARCH_THRESHOLDS

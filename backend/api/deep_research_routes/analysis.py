@@ -23,6 +23,8 @@ from backend.models.deep_research_api import (
     RunStageData,
 )
 
+from backend.services.deep_research.cost_estimator import estimate_run_cost
+
 from .sources import ingest_user_sources
 from .utils import ok
 
@@ -64,6 +66,15 @@ def _enqueue_pipeline(run_id: uuid.UUID, company_id: uuid.UUID, body: AnalysisSt
             website=body.website,
             query=body.query,
         )
+
+
+@router.get("/estimate-cost", response_model=ApiResponse[dict])
+async def get_cost_estimate(analysis_type: str = "full") -> ApiResponse[dict]:
+    """Return estimated USD cost for a run before starting. Shown before any OpenAI agent query."""
+    if analysis_type not in ("full", "quick", "refresh"):
+        analysis_type = "full"
+    data = estimate_run_cost(analysis_type=analysis_type)
+    return ok(data)
 
 
 @router.post("/start", response_model=ApiResponse[AnalysisStartData])

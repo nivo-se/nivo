@@ -76,15 +76,23 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     return res.json({ success: true, data: deal })
   }))
 
+  /** Resolve company by UUID or orgnr; orgnr enables Prospects/Universe -> CRM linking */
   app.get('/crm/company/:companyId', asyncHandler(async (req, res) => {
     const db = getCrmDb()
     if (!requireCrmDb(res, db)) return
+    let companyId = req.params.companyId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(companyId)) {
+      const byOrgnr = await db.getCompanyByOrgnr(companyId)
+      if (!byOrgnr) return res.status(404).json({ success: false, error: 'Company not found by orgnr' })
+      companyId = byOrgnr.id
+    }
     const interactions = new InteractionsService(db)
     const deals = new DealsService(db)
     const contacts = new ContactsService(db)
     const emails = new EmailsService(db, interactions, new GmailService(), deals)
     const overview = new CRMOverviewService(db, deals, contacts, emails, interactions)
-    const payload = await overview.companyOverview(req.params.companyId)
+    const payload = await overview.companyOverview(companyId)
     return res.json({ success: true, data: payload })
   }))
 

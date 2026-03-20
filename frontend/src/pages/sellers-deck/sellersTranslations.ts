@@ -1,7 +1,7 @@
 /**
  * Sellers page (target company owners) — Swedish only.
- * Founder-first perspective: speaks to the emotional reality of selling a life's work.
- * Calm, respectful, confident — never salesy or corporate.
+ * Investor perspective: tydlig ägarposition, inte rådgivare/partner.
+ * Calm, confident, professional.
  */
 
 export const sellersTranslations = {
@@ -17,84 +17,78 @@ export const sellersTranslations = {
 
   // Nav
   navSammanfattning: "Sammanfattning",
-  navSamarbete: "Samarbetet",
-  navVadViInteGor: "Vad vi inte gör",
+  navHurViArbetar: "Hur vi arbetar",
+  navVadViLetarEfter: "Vad vi letar efter",
   navVarförAnnorlunda: "Varför vi är annorlunda",
   navVemBakomOss: "Vem som står bakom oss",
   navTeam: "Team",
   navKontakt: "Kontakt",
 
-  // Hero — start with founder's reality, not what Nivo does
+  // Hero
   heroOneLiner:
-    "Att sälja det man byggt är mer än en affär. Det handlar om människor, arv och identitet. Vi vill vara det rätta långsiktiga hemmet för det du skapat — inte bara en bra köpare.",
+    "Att sälja det man byggt är mer än en affär. Vi vill vara det rätta hemmet för bolaget — en långsiktig ägare som utvecklar bolaget vidare.",
 
-  // Sammanfattning — founder's reality first
+  // Sammanfattning
   sammanfattningTitle: "Sammanfattning",
   sammanfattningIntro:
-    "Du har byggt något under många år. Företaget bär ditt namn, din historia, dina beslut. Att sälja är inte bara en transaktion — det är att välja vem som ska ta vid. Vilka som ska vårda det du lämnar. Vilka som ska respektera de människor som har gjort företaget till vad det är.",
+    "Du har byggt något under många år. Att sälja är att välja vem som ska ta ansvar för bolagets fortsatta utveckling.",
   sammanfattningText:
-    "Nivo är ett investeringsbolag med långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på företag som ert — omsättning 50–200 mkr, starka produkter, lojala kunder — där det finns operativ förbättringspotential. Men vi köper inte för att sälja vidare. Vi köper för att utveckla vidare.",
+    "Nivo är ett investeringsbolag med långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på ambitiösa bolag som ert — omsättning 50–200 mkr, starka produkter, lojala kunder — med förutsättningar för uthållig affärsutveckling. Vi köper för att utveckla, inte för att sälja vidare. Stabilitet och långsiktighet, kombinerat med aktivt ägararbete och fokus på operativ utveckling.",
   sammanfattningBullet1:
-    "Kapital till företaget för tillväxt och utveckling — vi investerar i verksamheten, inte bara i affären",
+    "Kapital till bolaget för tillväxt och utveckling — vi investerar i verksamheten, inte bara i affären",
   sammanfattningBullet2:
-    "Möjlighet att återinvestera och bli en del av Nivo Group — som säljare kan du ansluta dig som investerare och behålla exponering",
+    "Möjlighet att återinvestera och kvarstå som minoritetsägare",
   sammanfattningBullet3:
-    "En långsiktig partner som respekterar det du byggt — vi utvecklar vidare, inte säljer vidare",
-  vadHandlarOmPraktiken: "Vad det betyder i praktiken",
-  vadHandlarOmPraktikenText:
-    "När vi säger operativt engagemang menar vi konkret: vi sätter oss in i prissättning och kundsegment, hjälper till att bygga rapportering som styr verksamheten (inte bara rapporterar uppåt), och stramar upp kostnadsstrukturen där det finns slöseri. Vi gör det tillsammans med er — inte genom att ersätta er. På måndag morgon är det fortfarande ert företag som kör; vi är med i styrelsen, i dialogen, i de stora beslut som behöver tas. Vi fokuserar på att bygga, inte på att fylla i Excel-ark.",
-  merAnKapital: "Mer än kapital",
-  merAnKapitalText:
-    "Vi bidrar med operativt engagemang, långsiktighet och respekt för det som redan fungerar. Som partner till dig och ert företag kombinerar vi kapital med erfarenhet och aktivt engagemang.",
+    "En långsiktig ägare som utvecklar bolaget vidare",
 
-  // Så upplever grundare samarbetet med oss
-  samarbeteTitle: "Så upplever grundare samarbetet med oss",
+  // Hur vi arbetar som ägare
+  samarbeteTitle: "Hur vi arbetar som ägare",
   samarbeteIntro:
-    "Vi har hört från grundare som arbetat med oss: det som sticker ut är hur vi faktiskt arbetar — inte vad vi lovar.",
-  samarbeteSnabbBeslut: "Snabba beslut",
+    "Vi är aktiva i styrning och utveckling — inte i daglig drift.",
+  samarbeteSnabbBeslut: "Beslutsprocess",
   samarbeteSnabbBeslutText:
-    "Vi är ett litet team. Inga långa investerarkommittéer, inga månader av due diligence utan beslut. När något behöver avgöras tar vi det. Du får svar, inte väntan.",
-  samarbeteNärvarandeMenIntePåträngande: "Närvarande men inte påträngande",
+    "Vi är ett litet team. Inga långa investerarkommittéer. När något behöver avgöras tar vi det. Du får svar, inte väntan.",
+  samarbeteNärvarandeMenIntePåträngande: "Ägarroll",
   samarbeteNärvarandeMenIntePåträngandeText:
-    "Vi vill vara tillgängliga — för strategiska frågor, för stora beslut, för när det behövs. Men vi driver inte verksamheten dagligen. Vi litar på att ni känner ert företag bäst. Vår roll är att stötta, utmana och resursstärka — inte att micromanage.",
-  samarbeteByggaInteRapportera: "Fokus på att bygga, inte rapportera",
+    "Som ägare arbetar vi nära bolaget i strategiska frågor. Vi ansvarar inte för den dagliga driften. Vi driver strategiska initiativ och tillför resurser där det behövs.",
+  samarbeteByggaInteRapportera: "Operativt arbete",
   samarbeteByggaInteRapporteraText:
-    "Vi vill ha tydlig rapportering så vi förstår läget. Men vi bygger inte ett rapporteringsmonster. Målet är att ni ska kunna styra verksamheten bättre — inte att fylla i hundra slides till oss. Vi prioriterar det som driver värde.",
+    "Vi vill ha tydlig rapportering så vi förstår läget. Målet är att bolaget ska kunna styra verksamheten bättre. Vi prioriterar det som driver värde.",
 
-  // Vad vi inte gör — build trust through constraints
-  vadViInteGor: "Vad vi inte gör",
-  vadViInteGorIntro:
-    "Vi tror att det bygger förtroende att vara tydliga med vad vi inte gör. Så skiljer vi oss från många fondägda köpare:",
-  vadViInteGorItem1:
-    "Vi gör inga turnaround-fall. Vi söker företag med stark grund — inte sådana som behöver räddas.",
-  vadViInteGorItem2:
-    "Vi tar inte teknologirisk. Vi vill ha beprövade affärsmodeller, inte experiment som kan gå åt vilket håll som helst.",
-  vadViInteGorItem3:
-    "Vi använder inte aggressiv hävstång. Vi bygger inte värde genom att belåna företaget till max.",
-  vadViInteGorItem4:
-    "Vi räknar inte på värderingsexpansion. Vår modell bygger på operativ förbättring — bättre marginaler, bättre prissättning, bättre kostnadskontroll.",
-  vadViInteGorItem5:
-    "Vi har ingen fondcykel som tvingar oss att sälja. Till skillnad från många PE-fonder har vi ingen deadline. Vi kan hålla 5–10+ år om det behövs.",
-  vadViInteGorAvslutning:
-    "Det betyder att vi säger nej till många affärer. Men det betyder också att när vi säger ja, menar vi det.",
+  // Vad vi letar efter
+  vadViLetarEfter: "Vad vi letar efter",
+  vadViLetarEfterIntro:
+    "Vi är selektiva — endast ett fåtal bolag uppfyller våra kriterier. Det hjälper dig att veta om vi är rätt match:",
+  vadViLetarEfterItem1:
+    "Företag med stark grund och uthålliga konkurrensfördelar — etablerade produkter, lojala kunder och förutsättningar att skapa växande kassaflöden över tid.",
+  vadViLetarEfterItem2:
+    "Beprövade affärsmodeller — verksamhet som visat sig fungera över tid.",
+  vadViLetarEfterItem3:
+    "Operativ förbättringspotential — vi bygger värde genom bättre marginaler, prissättning och kostnadskontroll, inte genom hävstång.",
+  vadViLetarEfterItem4:
+    "Långsiktigt ägande — vi kan hålla 5–10+ år. Evergreen-struktur utan tvingat ägarskifte.",
+  vadViLetarEfterItem5:
+    "Skickliga och drivna företagare som kan tänka sig arbeta kvar — vi är rätt ägare om du vill fortsätta vara verksam och kvarstå som minoritetsägare under en period.",
+  vadViLetarEfterAvslutning:
+    "När vi ser det vi letar efter, engagerar vi oss fullt. Vi tar inte för många affärer samtidigt — de vi investerar i får vår fulla uppmärksamhet.",
 
   // Varför Nivo är annorlunda
   varforAnnorlundaTitle: "Varför Nivo är annorlunda",
   varforAnnorlundaRubrik: "Investeringsbolag — inte riskkapital",
   varforAnnorlundaText:
-    "Nivo är ett svenskt aktiebolag med evergreen-struktur. Ingen fondcykel, inget tvingat ägarskifte. Vi kan hålla 5–10+ år. Kapital återinvesteras i verksamheten. Många köpare har en begränsad tidshorisont — det har inte vi. Det gynnar både företaget och dig som säljare.",
+    "När vi blir ägare till ett företag har vi ingen avsikt att sälja. Det möjliggör långsiktighet i alla beslut, planer och relationer. Nivo är ett svenskt aktiebolag med evergreen-struktur — ingen fondcykel. Vi kan hålla 5–10+ år. Med en långsiktig horisont tar man inga genvägar. Vi skapar verkligt ekonomisk affärsvärde och fokuserar på lönsam tillväxt och starka kassaflöden.",
   varforAnnorlundaBullet1: "Evergreen svenskt aktiebolag",
   varforAnnorlundaBullet2: "Ingen fondcykel — inget tvingat ägarskifte",
-  varforAnnorlundaBullet3: "Lång investeringshorisont — inget tvingat ägarskifte",
-  varforAnnorlundaBullet4: "Kapital återinvesteras i företaget",
+  varforAnnorlundaBullet3: "Lång investeringshorisont",
+  varforAnnorlundaBullet4: "Kapital återinvesteras i bolaget",
 
   // Vem som står bakom oss
   vemBakomOssTitle: "Vem som står bakom oss",
   vemBakomOssRubrik: "Ägd av family offices och privata investerare",
   vemBakomOssText:
-    "Vårt kapital kommer främst från family offices och privata investerare. De har samma investeringsfilosofi som entreprenörer som byggt företag under ett liv — tålamodigt kapital, långsiktigt värde, operativt fokus. De investerar långsiktigt — precis som du har byggt ditt företag. Ingen institutionell press för snabba omsättningar eller aggressiv hävstång.",
+    "Vårt kapital kommer främst från family offices och privata investerare. De har samma investeringsfilosofi som entreprenörer som byggt företag under ett liv — tålamodigt kapital, långsiktigt värde, operativt fokus. Ingen institutionell press för snabba omsättningar eller aggressiv hävstång.",
   vemBakomOssAlignment:
-    "Du kommer att känna igen dig i deras sätt att tänka. Våra ägare tänker som du — de förstår vad det innebär att bygga något över decennier.",
+    "Du kommer att känna igen dig i deras sätt att tänka. Våra ägare förstår vad det innebär att bygga något över decennier.",
 
   // Team
   teamTitle: "Team",
@@ -121,7 +115,7 @@ export const sellersTranslations = {
   // Track record
   trackRecordTitle: "Varför vi kan genomföra",
   trackRecordText:
-    "Teamet har genomfört denna typ av strategi i praktiken: 80+ ECM-transaktioner och 20+ IPO:er; €60m+ D2C-företag byggt inom Electrolux; €50m+ venture investerat inklusive iZettle (PayPal-exit). Vi kombinerar kapitalmarknadsdisciplin med operativ skalning — det som krävs för att utveckla ett företag som ert.",
+    "Teamet har genomfört denna typ av strategi i praktiken: 80+ ECM-transaktioner och 20+ IPO:er; €60m+ D2C-företag byggt inom Electrolux; €50m+ venture investerat inklusive iZettle (PayPal-exit). Vi kombinerar kapitalmarknadsdisciplin med operativ skalning — det som krävs för att utveckla ett bolag som ert.",
   statEcm: "ECM-transaktioner genomförda",
   statIpos: "IPO:er över nordiska marknader",
   statVenture: "Venturekapital investerat",
@@ -163,14 +157,14 @@ export const sellersTranslations = {
 
   // Punch line
   teamPunchLine:
-    "Vi driver företag — inte bara investerar. Praktiskt operativt arbete baserat på beprövad erfarenhet. Det är den typen av partner vi vill vara för dig och ert företag.",
+    "Vi driver utveckling i bolag vi äger. Genom erfarenhet, nätverk och finansiella resurser. Det är den typen av ägare vi är.",
 
   // Varför det här spelar roll
   varforSpelarRollTitle: "Varför det här spelar roll för dig",
   varforSpelarRollText:
-    "Ett företag byggt av dig behöver en köpare som förstår den operativa verkligheten, respekterar vad du byggt och har tålamod att bygga värde över tid. Våra ägare och vårt team delar den inställningen.",
+    "Ett bolag byggt av dig behöver en köpare som förstår den operativa verkligheten och har tålamod att bygga värde över tid. Långsiktighet är en förutsättning för att skapa en miljö där medarbetare är trygga och kan fatta rätt affärsmässiga beslut.",
   varforSpelarRollCta:
-    "Vill du bolla idéer eller ta en förutsättningslös kaffe? Vi ser fram emot att höra från dig.",
+    "Vill du diskutera en möjlig transaktion? Vi ser fram emot att höra från dig.",
 
   // Kontakt
   kontaktText: "Tveka inte att höra av dig — oavsett var du är i processen.",

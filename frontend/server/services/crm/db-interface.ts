@@ -5,6 +5,7 @@
 
 export interface CrmCompanyListItem {
   id: string
+  orgnr?: string | null
   name: string
   industry: string | null
   website: string | null
@@ -15,6 +16,7 @@ export interface CrmCompanyListItem {
 export interface CrmDb {
   listCompanies(search?: string, limit?: number): Promise<CrmCompanyListItem[]>
   getCompany(id: string): Promise<Record<string, any> | null>
+  getCompanyByOrgnr(orgnr: string): Promise<Record<string, any> | null>
   insertDeal(companyId: string): Promise<Record<string, any>>
   getDealByCompanyId(companyId: string): Promise<Record<string, any> | null>
   updateDealStatus(dealId: string, status: string): Promise<Record<string, any>>

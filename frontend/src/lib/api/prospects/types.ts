@@ -22,6 +22,8 @@ export interface ProspectNote {
 export interface Prospect {
   id?: string;
   companyId: string;
+  /** UUID from deep_research.companies when linked to CRM */
+  deepResearchCompanyId?: string | null;
   status: ProspectStatus;
   owner?: string;
   lastContact?: string;
