@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -57,6 +57,7 @@ import type {
   ScreeningCampaignSummary,
 } from "@/lib/api/screeningCampaigns/types";
 import { toast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ChevronDown,
   ChevronRight,
@@ -68,7 +69,10 @@ import {
   Play,
   Plus,
   RefreshCw,
+  Sparkles,
   Trash2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 
 /** Swedish SNI 2007 section prefixes — exclude haulage (49), finance/holdings (64), etc. */
@@ -83,6 +87,11 @@ const SNI_PREFIX_PRESETS: { prefix: string; label: string }[] = [
   { prefix: "84", label: "84 — Public admin & defence" },
   { prefix: "85", label: "85 — Education" },
 ];
+
+/** All preset SNI section prefixes enabled for new runs (user can uncheck in Industry exclusions). */
+function defaultExcludedSniPrefixes(): Set<string> {
+  return new Set(SNI_PREFIX_PRESETS.map((p) => p.prefix));
+}
 
 function buildDeepResearchHandoffUrl(
   orgnr: string,
@@ -119,6 +128,57 @@ function formatScreeningRunSummary(layer0: Record<string, unknown> | undefined):
   return `${parts.join(" · ")}. Shortlist refreshed below.`;
 }
 
+/** One-line summary for GET /api/enrichment/run/:id/status (shown without opening Details). */
+function formatEnrichmentRunStatusInline(st: EnrichmentRunStatus | undefined): string {
+  if (!st) return "Loading status…";
+  const kinds = Object.entries(st.counts_by_kind || {}).filter(([, v]) => v > 0);
+  const kindStr = kinds.length ? ` · ${kinds.map(([k, v]) => `${k}: ${v}`).join(" · ")}` : "";
+  return `${st.completed} saved · ${st.pending ?? 0} pending · ${st.failed} failed${kindStr}`;
+}
+
+/** Drives “recommended next” copy from screening_campaigns.current_stage (layer0 → layer3). */
+function getScreeningNextStepGuide(stage: string | null | undefined): {
+  headline: string;
+  detail: string;
+  /** Which control to emphasize: Layer 1–3 or enrich after layer3 */
+  emphasize: "layer1" | "layer2" | "layer3" | "enrich" | null;
+} {
+  const s = (stage || "layer0").toLowerCase();
+  if (s === "layer0")
+    return {
+      headline: "Recommended next: Layer 1",
+      detail:
+        "Your shortlist is ranked by the screening profile only. Run Layer 1 next: the model applies the investment playbook (screening_output.json) to every row — in mandate, out of mandate, or uncertain. Do not skip to Layer 2 or 3 before Layer 1 finishes.",
+      emphasize: "layer1",
+    };
+  if (s === "layer1")
+    return {
+      headline: "Recommended next: Layer 2",
+      detail:
+        "Mandate labels are saved in the L1 column. Run Layer 2 next: a fit scorecard on companies that are in mandate or uncertain (per your policy). Layer 3 should run after Layer 2.",
+      emphasize: "layer2",
+    };
+  if (s === "layer2")
+    return {
+      headline: "Recommended next: Layer 3",
+      detail:
+        "Fit scores are stored. Run Layer 3 next: it blends profile score and fit into a final rank and marks who is selected — fast, no extra LLM.",
+      emphasize: "layer3",
+    };
+  if (s === "layer3")
+    return {
+      headline: "Screening pipeline complete",
+      detail:
+        "Layers 1–3 are done. Optionally run Enrich public data on this campaign to pull website and structured facts into company profiles before deep diligence. You can also open Deep Research from any row.",
+      emphasize: "enrich",
+    };
+  return {
+    headline: "Continue the screening pipeline",
+    detail: "Run Layer 1, then Layer 2, then Layer 3 in that order. Use Enrich when you want richer company data.",
+    emphasize: "layer1",
+  };
+}
+
 export default function ScreeningCampaignsPage() {
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<ScreeningProfileSummary[]>([]);
@@ -133,6 +193,7 @@ export default function ScreeningCampaignsPage() {
   const [campaignsLoadError, setCampaignsLoadError] = useState<string | null>(null);
   const [profilesLoadError, setProfilesLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [playbookGuideOpen, setPlaybookGuideOpen] = useState(true);
 
   const [name, setName] = useState("Universe screening");
   const [profileId, setProfileId] = useState("");
@@ -143,9 +204,7 @@ export default function ScreeningCampaignsPage() {
   /** Rename field for selected campaign */
   const [campaignRename, setCampaignRename] = useState("");
   /** SNI/NACE 2–5 digit prefixes to drop (any code on the company starting with one of these). */
-  const [excludedSniPrefixes, setExcludedSniPrefixes] = useState<Set<string>>(
-    () => new Set(["49", "64"])
-  );
+  const [excludedSniPrefixes, setExcludedSniPrefixes] = useState<Set<string>>(defaultExcludedSniPrefixes);
   const [customSniPrefixes, setCustomSniPrefixes] = useState("");
   /** Structural SQL floors (SEK revenue, headcount) — merged into campaign filters. */
   const [minRevenueMsek, setMinRevenueMsek] = useState("");
@@ -166,9 +225,25 @@ export default function ScreeningCampaignsPage() {
   const [structuralFiltersOpen, setStructuralFiltersOpen] = useState(false);
   /** Technical enrichment details — collapsed by default. */
   const [enrichmentHelpOpen, setEnrichmentHelpOpen] = useState(false);
+  /** Latest "Enrich public data" run for the shortlist card — progress + verification. */
+  const [enrichRunProgress, setEnrichRunProgress] = useState<{
+    campaignId: string;
+    runId: string;
+    status: EnrichmentRunStatus | null;
+    polling: boolean;
+  } | null>(null);
   const selectedIdRef = useRef<string | null>(null);
   useEffect(() => {
     selectedIdRef.current = selectedId;
+  }, [selectedId]);
+
+  /** Clear enrichment banner when switching campaign or deselecting. */
+  useEffect(() => {
+    setEnrichRunProgress((prev) => {
+      if (!selectedId) return null;
+      if (prev && prev.campaignId !== selectedId) return null;
+      return prev;
+    });
   }, [selectedId]);
 
   /**
@@ -317,6 +392,55 @@ export default function ScreeningCampaignsPage() {
     };
   }, [selectedId]);
 
+  /** Stable key so we do not refetch status on unrelated re-renders. */
+  const enrichmentRunIdsKey = enrichmentRuns.map((r) => r.runId).join("|");
+
+  /** Prefetch status for visible runs (no need to open Details). */
+  useEffect(() => {
+    if (!selectedId || !enrichmentRunIdsKey) return;
+    let cancelled = false;
+    const ids = enrichmentRunIdsKey.split("|").slice(0, 8);
+    void (async () => {
+      await Promise.all(
+        ids.map(async (id) => {
+          try {
+            const st = await getEnrichmentRunStatus(id);
+            if (!cancelled && st) {
+              setEnrichmentStatusByRun((prev) => ({ ...prev, [id]: st }));
+            }
+          } catch {
+            /* ignore */
+          }
+        })
+      );
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId, enrichmentRunIdsKey]);
+
+  const latestEnrichmentRunId = enrichmentRuns[0]?.runId;
+  const latestEnrichmentStatus = latestEnrichmentRunId
+    ? enrichmentStatusByRun[latestEnrichmentRunId]
+    : undefined;
+
+  const hasLatestEnrichmentStatus = latestEnrichmentStatus !== undefined;
+  const latestPendingCount = latestEnrichmentStatus?.pending ?? 0;
+
+  /** While the most recent run still has pending work, poll status so the list updates without Refresh. */
+  useEffect(() => {
+    if (!latestEnrichmentRunId || !hasLatestEnrichmentStatus) return;
+    if (latestPendingCount <= 0) return;
+    const iv = window.setInterval(() => {
+      void getEnrichmentRunStatus(latestEnrichmentRunId).then((st) => {
+        if (st) {
+          setEnrichmentStatusByRun((prev) => ({ ...prev, [latestEnrichmentRunId]: st }));
+        }
+      });
+    }, 4000);
+    return () => window.clearInterval(iv);
+  }, [latestEnrichmentRunId, hasLatestEnrichmentStatus, latestPendingCount]);
+
   function mergedSniExclusions(): string[] {
     const extra = customSniPrefixes
       .split(/[,\s]+/)
@@ -386,8 +510,8 @@ export default function ScreeningCampaignsPage() {
         title: "Screening complete",
         description: formatScreeningRunSummary(layer0),
       });
-      await loadCampaigns();
       await loadCandidates(campaignId);
+      await loadCampaigns();
     } catch (e) {
       toast({
         title: "Screening run failed",
@@ -458,8 +582,8 @@ export default function ScreeningCampaignsPage() {
             ? `Labeled ${st.processed} companies (batched).`
             : "Shortlist updated with relevance labels.",
       });
-      await loadCampaigns();
       await loadCandidates(selectedId);
+      await loadCampaigns();
     } catch (e) {
       toast({
         title: "Layer 1 failed",
@@ -484,8 +608,8 @@ export default function ScreeningCampaignsPage() {
             ? `Scored ${st.processed} in-mandate / uncertain rows.`
             : "Fit scorecards written.",
       });
-      await loadCampaigns();
       await loadCandidates(selectedId);
+      await loadCampaigns();
     } catch (e) {
       toast({
         title: "Layer 2 failed",
@@ -510,8 +634,8 @@ export default function ScreeningCampaignsPage() {
             ? `Ranked ${st.ranked} rows by combined score.`
             : "Final ranks updated.",
       });
-      await loadCampaigns();
       await loadCandidates(selectedId);
+      await loadCampaigns();
     } catch (e) {
       toast({
         title: "Layer 3 failed",
@@ -559,6 +683,67 @@ export default function ScreeningCampaignsPage() {
     }
   }
 
+  async function pollEnrichmentRun(campaignId: string, runId: string) {
+    const maxRounds = 45;
+    for (let i = 0; i < maxRounds; i++) {
+      if (i > 0) await new Promise((r) => setTimeout(r, 2000));
+      let st: EnrichmentRunStatus | null = null;
+      try {
+        st = await getEnrichmentRunStatus(runId);
+      } catch {
+        /* ignore */
+      }
+      if (st) {
+        setEnrichmentStatusByRun((prev) => ({ ...prev, [runId]: st }));
+        setEnrichRunProgress((prev) =>
+          prev?.runId === runId && prev.campaignId === campaignId
+            ? { ...prev, status: st, polling: true }
+            : prev
+        );
+      }
+      try {
+        setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
+      } catch {
+        /* ignore */
+      }
+      if (selectedIdRef.current === campaignId) {
+        try {
+          await loadCandidates(campaignId);
+        } catch {
+          /* ignore */
+        }
+      }
+      if (st && st.pending === 0) {
+        setEnrichRunProgress((prev) =>
+          prev?.runId === runId && prev.campaignId === campaignId
+            ? { ...prev, status: st, polling: false }
+            : prev
+        );
+        const kindSummary = Object.entries(st.counts_by_kind || {})
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(", ");
+        toast({
+          title: "Enrichment run finished",
+          description:
+            `${st.completed} companies with saved enrichment${st.failed ? `, ${st.failed} failed or skipped` : ""}` +
+            (kindSummary ? `. ${kindSummary}` : "") +
+            ". See the Public enrichment column in the table below.",
+        });
+        return;
+      }
+    }
+    setEnrichRunProgress((prev) =>
+      prev?.runId === runId && prev.campaignId === campaignId
+        ? { ...prev, polling: false }
+        : prev
+    );
+    toast({
+      title: "Enrichment still running or status unavailable",
+      description:
+        "Open Scores & enrichment runs under your campaign for details, or refresh this page in a moment.",
+    });
+  }
+
   async function handleEnrichPublic(campaignId: string) {
     setBusy(true);
     let runId = "";
@@ -566,15 +751,41 @@ export default function ScreeningCampaignsPage() {
       const out = await runEnrichmentForScreeningCampaign(campaignId);
       runId = out.runId;
       setCampaignResultsOpen(true);
+      setExpandedEnrichmentRunId(runId);
+      setEnrichRunProgress({
+        campaignId,
+        runId,
+        status: null,
+        polling: true,
+      });
       toast({
-        title: "Enrichment started",
-        description:
-          `Run ${runId.slice(0, 8)}… — ${out.queuedCount} companies. ` +
-          `Results are written to Postgres (enrichment_runs, company_enrichment, ai_profiles). ` +
-          `Open Scores & enrichment runs (left) to watch progress; the table refreshes as rows complete.`,
+        title: "Enrichment queued",
+        description: `Run ${runId.slice(0, 8)}… — ${out.queuedCount} companies. Status updates below.`,
       });
       setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
+      try {
+        const st0 = await getEnrichmentRunStatus(runId);
+        if (st0) {
+          setEnrichmentStatusByRun((prev) => ({ ...prev, [runId]: st0 }));
+          setEnrichRunProgress({
+            campaignId,
+            runId,
+            status: st0,
+            polling: true,
+          });
+        }
+      } catch {
+        /* status optional on first tick */
+      }
+      if (selectedIdRef.current === campaignId) {
+        try {
+          await loadCandidates(campaignId);
+        } catch {
+          /* ignore */
+        }
+      }
     } catch (e) {
+      setEnrichRunProgress(null);
       toast({
         title: "Enrichment failed",
         description: e instanceof Error ? e.message : String(e),
@@ -585,29 +796,120 @@ export default function ScreeningCampaignsPage() {
       setBusy(false);
     }
     if (!runId) return;
-    void (async () => {
-      for (let i = 0; i < 10; i++) {
-        await new Promise((r) => setTimeout(r, 2000));
-        const st = await getEnrichmentRunStatus(runId);
-        if (st) setEnrichmentStatusByRun((prev) => ({ ...prev, [runId]: st }));
-        try {
-          setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
-        } catch {
-          /* ignore */
-        }
-        if (selectedIdRef.current === campaignId) {
-          try {
-            await loadCandidates(campaignId);
-          } catch {
-            /* ignore */
-          }
-        }
-        if (st && (st.completed > 0 || st.failed > 0)) break;
-      }
-    })();
+    void pollEnrichmentRun(campaignId, runId);
   }
 
   const selected = campaigns.find((c) => c.id === selectedId);
+
+  const nextPipelineGuide = useMemo(
+    () => (selected ? getScreeningNextStepGuide(selected.currentStage) : null),
+    [selected]
+  );
+
+  /** Rows in the shortlist table that have any public enrichment / ai_profiles snippet loaded. */
+  const publicEnrichmentRowCount = useMemo(() => {
+    if (!candidates.length) return 0;
+    return candidates.filter(
+      (c) =>
+        (c.enrichmentKinds?.length ?? 0) > 0 ||
+        (typeof c.enrichmentSummary === "string" && c.enrichmentSummary.trim().length > 0) ||
+        Boolean(c.enrichmentStatus && String(c.enrichmentStatus).trim())
+    ).length;
+  }, [candidates]);
+
+  /** Inline feedback after “Enrich public data” — run id, counts, table rows with data. */
+  const enrichProgressBanner = useMemo(() => {
+    if (!selected || !enrichRunProgress || enrichRunProgress.campaignId !== selected.id) {
+      return null;
+    }
+    const erp = enrichRunProgress;
+    const st = erp.status;
+    const pending = st?.pending ?? 0;
+    const enrichFinished = Boolean(st && pending === 0);
+    const enrichStalled = !erp.polling && Boolean(st && pending > 0);
+    const kindParts = st ? Object.entries(st.counts_by_kind || {}).filter(([, v]) => v > 0) : [];
+    return (
+      <Alert
+        className={cn(
+          "mt-2 border-primary/25 bg-primary/[0.06]",
+          enrichFinished && "border-emerald-500/35 bg-emerald-500/[0.07]",
+          enrichStalled && "border-amber-500/35 bg-amber-500/[0.06]"
+        )}
+      >
+        {enrichFinished ? (
+          <CheckCircle2
+            className="h-4 w-4 text-emerald-600 dark:text-emerald-400"
+            aria-hidden
+          />
+        ) : erp.polling ? (
+          <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden />
+        ) : (
+          <AlertCircle
+            className="h-4 w-4 text-amber-600 dark:text-amber-400"
+            aria-hidden
+          />
+        )}
+        <AlertTitle className="text-foreground">
+          {enrichFinished
+            ? "Enrichment run complete"
+            : erp.polling
+              ? "Enrichment in progress"
+              : "Enrichment status"}
+        </AlertTitle>
+        <AlertDescription className="space-y-2 text-muted-foreground">
+          <p>
+            Run{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px] text-foreground">
+              {erp.runId.slice(0, 8)}…
+            </code>
+            {st ? (
+              <>
+                {" "}
+                — <strong className="text-foreground">{st.completed}</strong> saved
+                {st.failed ? (
+                  <>
+                    , <strong className="text-foreground">{st.failed}</strong> failed
+                  </>
+                ) : null}
+                {pending > 0 ? (
+                  <>
+                    , <strong className="text-foreground">{pending}</strong> still processing
+                  </>
+                ) : null}
+              </>
+            ) : erp.polling ? (
+              " — waiting for worker status…"
+            ) : (
+              " — full status was not available; check Scores & enrichment runs."
+            )}
+          </p>
+          {kindParts.length > 0 ? (
+            <p className="text-[11px] leading-relaxed">
+              {kindParts.map(([k, v]) => (
+                <span key={k} className="mr-2 inline-block">
+                  <strong className="text-foreground">{k}</strong>: {v}
+                </span>
+              ))}
+            </p>
+          ) : null}
+          <p className="text-[11px] leading-relaxed">
+            <strong className="text-foreground">{publicEnrichmentRowCount}</strong> of {candidates.length}{" "}
+            visible rows have data in <strong className="text-foreground">Public enrichment</strong> (updates as rows
+            finish).
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs"
+            onClick={() => setEnrichRunProgress(null)}
+          >
+            Dismiss
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }, [selected, enrichRunProgress, publicEnrichmentRowCount, candidates.length]);
 
   function formatShortDate(iso: string | null | undefined): string {
     if (!iso) return "—";
@@ -698,13 +1000,18 @@ export default function ScreeningCampaignsPage() {
         </div>
       ) : null}
       <header className="space-y-4">
-        <div className="space-y-1.5">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Screening</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
-            Build a ranked shortlist from the universe using a <strong className="text-foreground font-medium">screening profile</strong>,
-            then enrich companies for deeper review. Optional industry filters drop whole sectors (e.g. transport, holdings)
-            before scoring.
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Screening</h1>
+            <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
+              Build a ranked shortlist from the universe using a <strong className="text-foreground font-medium">screening profile</strong>,
+              then enrich companies for deeper review. Optional industry filters drop whole sectors (e.g. transport, holdings)
+              before scoring.
+            </p>
+          </div>
+          <Button variant="outline" size="sm" className="shrink-0" asChild>
+            <Link to="/screening-campaigns/exemplars">Playbook &amp; examples</Link>
+          </Button>
         </div>
         <ol className="grid gap-2 sm:grid-cols-3 rounded-xl border border-border/80 bg-muted/25 px-4 py-3 text-sm text-muted-foreground sm:gap-4">
           <li className="flex gap-2 sm:flex-col sm:gap-1">
@@ -732,6 +1039,70 @@ export default function ScreeningCampaignsPage() {
             </span>
           </li>
         </ol>
+
+        <Collapsible
+          open={playbookGuideOpen}
+          onOpenChange={setPlaybookGuideOpen}
+          className="rounded-xl border border-border/80 bg-muted/20"
+        >
+          <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted/40 rounded-xl">
+            <span className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+              Use the playbook JSON as “what we look for” (Layer 1)
+            </span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                playbookGuideOpen && "rotate-180"
+              )}
+              aria-hidden
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3 border-t border-border/60 px-4 pb-4 pt-0 text-sm text-muted-foreground">
+            <Alert className="border-border/80 bg-background/80">
+              <Sparkles className="h-4 w-4" />
+              <AlertTitle className="text-foreground">How it works today</AlertTitle>
+              <AlertDescription className="space-y-2 text-muted-foreground [&_strong]:text-foreground">
+                <p>
+                  The file <strong>screening_output.json</strong> (see{" "}
+                  <Link
+                    to="/screening-campaigns/exemplars"
+                    className="font-medium text-foreground underline underline-offset-2 hover:no-underline"
+                  >
+                    Playbook &amp; examples
+                  </Link>
+                  ) is <strong>not</strong> used to scan the entire database in one go. Instead:
+                </p>
+                <ol className="list-decimal space-y-1.5 pl-5">
+                  <li>
+                    <strong>Run screening</strong> runs <strong>Layer 0</strong>: SQL on the universe + your filters,
+                    then ranks by the <strong>screening profile</strong> (weights and variables). It stores up to{" "}
+                    <strong>Shortlist size</strong> companies in this campaign. This step is fast and does not send the
+                    playbook to the LLM.
+                  </li>
+                  <li>
+                    Click <strong>Layer 1</strong> to run the LLM with the playbook as “what we are looking for”. It
+                    labels each row in your shortlist (in mandate / out / uncertain). That is the step that uses the JSON
+                    as your investment mandate.
+                  </li>
+                  <li>
+                    <strong>Layer 2</strong> and <strong>Layer 3</strong> refine fit and final ranking on the rows you
+                    keep.
+                  </li>
+                </ol>
+              </AlertDescription>
+            </Alert>
+            <div className="rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2.5 text-xs leading-relaxed">
+              <p className="font-medium text-foreground">Want a wide pool, then a strict playbook pass?</p>
+              <p className="mt-1">
+                Increase <strong className="text-foreground">Ranked pool cap</strong> and{" "}
+                <strong className="text-foreground">Shortlist size</strong> above (e.g. hundreds) so Layer 0 keeps more
+                companies from the universe. Then run <strong className="text-foreground">Layer 1</strong>. Layer 1 only
+                sees companies already in this campaign&apos;s shortlist — not every row in Postgres in one shot.
+              </p>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </header>
 
       {!profilesLoading && profiles.length === 0 && !profilesLoadError ? (
@@ -757,7 +1128,7 @@ export default function ScreeningCampaignsPage() {
         <CardHeader className="space-y-1 pb-2 sm:pb-4">
           <CardTitle className="text-lg">Start a run</CardTitle>
           <CardDescription>
-            Pick a screening profile and how many companies to keep. Industry exclusions are optional — expand below if you need them.
+            Pick a screening profile and how many companies to keep. By default, all industry exclusions below are on — expand to adjust.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
@@ -859,7 +1230,7 @@ export default function ScreeningCampaignsPage() {
             aria-expanded={industryExclusionsOpen}
             className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2.5 text-left text-sm font-medium text-foreground hover:bg-muted/30"
           >
-            <span>Industry exclusions (optional)</span>
+            <span>Industry exclusions</span>
             <ChevronDown
               className={cn(
                 "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
@@ -870,8 +1241,8 @@ export default function ScreeningCampaignsPage() {
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-3 pt-3">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Drop companies whose industry codes start with these prefixes (Swedish SNI / NACE). Handy to exclude e.g. haulage
-              or holding shells before scoring.
+              Drop companies whose industry codes start with these prefixes (Swedish SNI / NACE). By default, every option below
+              is enabled; uncheck any sector you want to keep in the universe.
             </p>
             <div className="flex flex-wrap gap-3">
               {SNI_PREFIX_PRESETS.map(({ prefix, label }) => (
@@ -982,8 +1353,8 @@ export default function ScreeningCampaignsPage() {
         </CardContent>
       </Card>
 
-      <section className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
-        <Card className="min-w-0 shadow-sm hover:shadow-sm">
+      <section className="flex min-w-0 flex-col gap-6">
+        <Card className="min-w-0 w-full shadow-sm hover:shadow-sm">
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-3">
             <div>
               <CardTitle className="text-lg">Your campaigns</CardTitle>
@@ -1058,19 +1429,41 @@ export default function ScreeningCampaignsPage() {
             <Collapsible open={campaignResultsOpen} onOpenChange={setCampaignResultsOpen}>
               <CollapsibleTrigger
                 aria-expanded={campaignResultsOpen}
-                className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-left text-sm font-medium hover:bg-muted/50"
+                className="flex w-full items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-left text-sm font-medium hover:bg-muted/50"
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 shrink-0 transition-transform",
-                      campaignResultsOpen ? "rotate-0" : "-rotate-90"
-                    )}
-                    aria-hidden
-                  />
-                  <span className="truncate">Scores &amp; enrichment runs</span>
+                <span className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 shrink-0 transition-transform",
+                        campaignResultsOpen ? "rotate-0" : "-rotate-90"
+                      )}
+                      aria-hidden
+                    />
+                    <span className="truncate">Scores &amp; enrichment runs</span>
+                  </span>
+                  {enrichmentRunsLoading && enrichmentRuns.length === 0 ? (
+                    <span className="pl-6 text-[11px] font-normal text-muted-foreground">
+                      Loading enrichment history…
+                    </span>
+                  ) : enrichmentRuns[0] ? (
+                    <span
+                      className="pl-6 text-[11px] font-normal leading-snug text-muted-foreground"
+                      title="Latest batch enrichment run for this campaign (Postgres enrichment_runs)"
+                    >
+                      Latest enrichment: {formatShortDate(enrichmentRuns[0].createdAt)} ·{" "}
+                      {enrichmentRuns[0].queuedCount != null
+                        ? `${enrichmentRuns[0].queuedCount} queued · `
+                        : ""}
+                      {formatEnrichmentRunStatusInline(latestEnrichmentStatus)}
+                    </span>
+                  ) : (
+                    <span className="pl-6 text-[11px] font-normal text-muted-foreground">
+                      No enrichment runs yet for this campaign.
+                    </span>
+                  )}
                 </span>
-                <span className="text-xs font-normal text-muted-foreground truncate max-w-[45%]">
+                <span className="text-xs font-normal text-muted-foreground truncate max-w-[40%] sm:max-w-[45%]">
                   {selected.name}
                 </span>
               </CollapsibleTrigger>
@@ -1106,11 +1499,23 @@ export default function ScreeningCampaignsPage() {
                     <code className="text-[9px]">company_enrichment</code> and <code className="text-[9px]">ai_profiles</code>{" "}
                     (also visible on each company page).
                   </p>
+                  {latestEnrichmentStatus &&
+                  latestEnrichmentStatus.pending > 0 &&
+                  latestEnrichmentStatus.completed === 0 ? (
+                    <p className="rounded border border-amber-500/25 bg-amber-500/[0.06] px-2 py-1.5 text-[10px] leading-snug text-amber-950 dark:text-amber-100">
+                      <strong className="font-medium">0 saved</strong> with everything still{" "}
+                      <strong className="font-medium">pending</strong> usually means <strong className="font-medium">no RQ worker</strong> is
+                      processing the queue (Docker: start the <code className="text-[9px]">worker</code> service; local dev:{" "}
+                      <code className="text-[9px]">scripts/start-worker.sh</code>). Or the worker is still running / orgs were skipped
+                      (existing <code className="text-[9px]">ai_profiles</code>). Emergency: set{" "}
+                      <code className="text-[9px]">VITE_ENRICHMENT_SYNC_RUN=true</code> to run in the API (slow).
+                    </p>
+                  ) : null}
                   {enrichmentRunsLoading && enrichmentRuns.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Loading runs…</p>
                   ) : enrichmentRuns.length === 0 ? (
                     <p className="text-xs text-muted-foreground">
-                      No enrichment runs for this campaign yet. Run <strong>Enrich public data</strong> (right panel).
+                      No enrichment runs for this campaign yet. Run <strong>Enrich public data</strong> in the shortlist section below.
                     </p>
                   ) : (
                     <ul className="space-y-0 max-h-56 overflow-y-auto" aria-label="Enrichment runs for this campaign">
@@ -1147,6 +1552,13 @@ export default function ScreeningCampaignsPage() {
                                 Details
                               </Button>
                             </div>
+                            <p
+                              className="pb-1.5 pl-0.5 text-[10px] leading-snug text-muted-foreground"
+                              title="GET /api/enrichment/run/:runId/status — counts from company_enrichment and run meta"
+                            >
+                              <span className="text-foreground/80">Status:</span>{" "}
+                              {formatEnrichmentRunStatusInline(st)}
+                            </p>
                             {expanded ? (
                               <div className="pb-2 pl-1 text-muted-foreground border-l-2 border-border ml-1 space-y-1">
                                 {loadingDetail ? (
@@ -1199,18 +1611,19 @@ export default function ScreeningCampaignsPage() {
           </CardContent>
         </Card>
 
-        <Card className="min-h-[280px] min-w-0 shadow-sm hover:shadow-sm">
+        <Card className="min-w-0 w-full min-h-[280px] shadow-sm hover:shadow-sm">
           <CardHeader className="space-y-1 pb-3">
             <CardTitle className="text-lg">Shortlist &amp; next steps</CardTitle>
             <CardDescription>
-              Review ranked companies, skip rows you don&apos;t want, then enrich or open Deep Research.
+              Run <strong className="text-foreground font-medium">Layer 1 → 2 → 3</strong> in order (playbook, then fit, then final rank).{" "}
+              <strong className="text-foreground font-medium">Enrich public data</strong> is separate — optional, for pulling facts into profiles.
             </CardDescription>
           </CardHeader>
           <CardContent className="min-w-0 space-y-4 pt-0">
           {!selectedId || !selected ? (
             <div className="rounded-lg border border-dashed border-border bg-muted/15 px-4 py-8 text-center">
               <p className="text-sm text-muted-foreground">
-                Select a campaign on the left, or start a new run above. Your table of companies will show here.
+                Select a campaign above, or start a new run at the top. Your table of companies will show here.
               </p>
             </div>
           ) : (
@@ -1242,63 +1655,100 @@ export default function ScreeningCampaignsPage() {
                   </Button>
                 </div>
               </div>
+
+              {nextPipelineGuide ? (
+                <Alert className="border-primary/25 bg-primary/[0.06]">
+                  <Sparkles className="h-4 w-4 text-primary" aria-hidden />
+                  <AlertTitle className="text-foreground">{nextPipelineGuide.headline}</AlertTitle>
+                  <AlertDescription className="text-muted-foreground [&_strong]:text-foreground">
+                    {nextPipelineGuide.detail}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-medium capitalize text-foreground">
                     {selected.status}
                   </span>
+                  {selected.currentStage ? (
+                    <span
+                      className="inline-flex items-center rounded-full border border-border/80 bg-background px-2.5 py-0.5 text-xs font-mono text-muted-foreground"
+                      title="Last completed screening stage"
+                    >
+                      Stage: {selected.currentStage}
+                    </span>
+                  ) : null}
                   {selected.errorMessage ? (
                     <span className="text-sm text-destructive truncate max-w-md">
                       {selected.errorMessage}
                     </span>
                   ) : null}
                 </div>
-                <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  LLM pipeline — run in order
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-start">
                   <Button
-                    variant="secondary"
+                    variant={nextPipelineGuide?.emphasize === "layer1" ? "primary" : "secondary"}
                     size="sm"
                     className="w-full sm:w-auto"
                     title="LLM relevance vs exemplar mandate (uses OPENAI_API_KEY / LLM_BASE_URL)"
                     onClick={() => void handleLayer1Run()}
                     disabled={busy || candidatesTotal === 0}
                   >
-                    Layer 1
+                    1 · Layer 1 — Playbook
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant={nextPipelineGuide?.emphasize === "layer2" ? "primary" : "secondary"}
                     size="sm"
                     className="w-full sm:w-auto"
                     title="Fit scorecard on in-mandate / uncertain rows"
                     onClick={() => void handleLayer2Run()}
                     disabled={busy || candidatesTotal === 0}
                   >
-                    Layer 2
+                    2 · Layer 2 — Fit
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant={nextPipelineGuide?.emphasize === "layer3" ? "primary" : "secondary"}
                     size="sm"
                     className="w-full sm:w-auto"
                     title="Deterministic blend + final rank"
                     onClick={() => void handleLayer3Run()}
                     disabled={busy || candidatesTotal === 0}
                   >
-                    Layer 3
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full shrink-0 sm:w-auto"
-                    title={
-                      enrichDisabledReason ??
-                      "Queue website + LLM enrichment for candidates not marked Skip"
-                    }
-                    onClick={() => void handleEnrichPublic(selected.id)}
-                    disabled={busy || candidatesTotal === 0}
-                  >
-                    <Database className="w-4 h-4 mr-1" />
-                    Enrich public data
+                    3 · Layer 3 — Final rank
                   </Button>
                 </div>
+              </div>
+
+              <div className="space-y-2 border-t border-border/60 pt-3">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Optional — not part of the numbered pipeline
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Enrichment fetches public / web data into profiles. You can run it <strong className="text-foreground font-medium">before</strong> Layer 1
+                  to improve short blurbs the model sees, or <strong className="text-foreground font-medium">after</strong> Layer 3 on the names you care about.
+                </p>
+                <Button
+                  variant={nextPipelineGuide?.emphasize === "enrich" ? "primary" : "outline"}
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  title={
+                    enrichDisabledReason ??
+                    "Queue website + LLM enrichment for candidates not marked Skip"
+                  }
+                  onClick={() => void handleEnrichPublic(selected.id)}
+                  disabled={busy || candidatesTotal === 0}
+                >
+                  <Database className="w-4 h-4 mr-1" />
+                  Enrich public data
+                </Button>
+
+                {enrichProgressBanner}
               </div>
 
               <Collapsible open={enrichmentHelpOpen} onOpenChange={setEnrichmentHelpOpen}>
@@ -1317,8 +1767,8 @@ export default function ScreeningCampaignsPage() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-2 pt-2 text-[11px] leading-relaxed text-muted-foreground">
                   <p>
-                    Non-skipped rows are sent to the enrichment worker (queue or sync). Progress appears under{" "}
-                    <strong className="text-foreground">Scores &amp; enrichment runs</strong> on the left.
+                    Non-skipped rows are sent to the enrichment worker (queue or sync). After you click Enrich, a status banner appears here with run id, per-kind counts, and how many table rows already show public data. Full history lives under{" "}
+                    <strong className="text-foreground">Scores &amp; enrichment runs</strong> for your campaign.
                   </p>
                   <p>
                     Data is stored in <code className="rounded bg-muted px-1 py-0.5 text-[10px]">enrichment_runs</code>,{" "}

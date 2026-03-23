@@ -129,6 +129,14 @@ class EnrichmentRunRequest(BaseModel):
         default=None,
         description="Enrichment kinds to produce (default: llm_analysis, company_profile, website_insights)",
     )
+    sync_run: bool = Field(
+        default=False,
+        alias="syncRun",
+        description=(
+            "Run enrichment in the API process (no Redis queue). Use when no RQ worker is running; "
+            "can take minutes for large batches."
+        ),
+    )
 
     model_config = {"populate_by_name": True}
 
@@ -354,6 +362,22 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
     )
     if not run_id:
         raise HTTPException(status_code=500, detail="Failed to create enrichment run")
+
+    if request.sync_run:
+        try:
+            result = enrich_companies_batch(batch, force_refresh=False, run_id=run_id, kinds=kinds)
+            errors = result.get("errors", [])
+            db.update_enrichment_run_meta(run_id, errors, worker_finished=True)
+            logger.info(
+                "Enrichment run %s complete (syncRun): enriched=%d, errors=%d",
+                run_id,
+                result.get("enriched", 0),
+                len(errors),
+            )
+        except Exception as exc:
+            logger.exception("Enrichment run %s failed (syncRun)", run_id)
+            raise HTTPException(status_code=500, detail=f"Enrichment failed: {exc}") from exc
+        return EnrichmentRunResponse(run_id=run_id, queued_count=len(batch), job_id=None)
 
     try:
         from .jobs import get_enrichment_queue

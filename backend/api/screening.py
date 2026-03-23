@@ -57,7 +57,13 @@ async def get_exemplar_chunks(
 
 
 @router.get("/exemplar-mandate")
-async def get_exemplar_mandate(request: Request):
+async def get_exemplar_mandate(
+    request: Request,
+    include_body: bool = Query(
+        False,
+        description="Include full mandate JSON (excluding _meta) for UI / debugging.",
+    ),
+):
     """
     Metadata for `docs/deep_research/screening_exemplars/screening_output.json` (patterns, archetypes, playbook).
     Does not require Postgres; used to align prompts with a versioned mandate file.
@@ -71,12 +77,15 @@ async def get_exemplar_mandate(request: Request):
 
     data = load_screening_exemplar_mandate()
     meta = data.get("_meta") if isinstance(data.get("_meta"), dict) else {}
-    return {
+    out: Dict[str, Any] = {
         "path": str(exemplar_mandate_path()),
         "version": exemplar_mandate_version(data),
         "meta": meta,
         "keys": [k for k in data.keys() if k != "_meta"],
     }
+    if include_body:
+        out["body"] = {k: v for k, v in data.items() if k != "_meta"}
+    return out
 
 
 class ValidateFiltersBody(BaseModel):

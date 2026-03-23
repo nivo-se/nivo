@@ -40,13 +40,19 @@ async function parseJson<T>(res: Response): Promise<T> {
  */
 export async function runEnrichmentForScreeningCampaign(
   campaignId: string,
-  kinds?: string[]
+  kinds?: string[],
+  options?: { syncRun?: boolean }
 ): Promise<EnrichmentRunResponse> {
+  const syncRun =
+    options?.syncRun === true ||
+    (typeof import.meta.env.VITE_ENRICHMENT_SYNC_RUN === "string" &&
+      import.meta.env.VITE_ENRICHMENT_SYNC_RUN.toLowerCase() === "true");
   const res = await fetchWithAuth(`${API_BASE}/api/enrichment/run`, {
     method: "POST",
     body: JSON.stringify({
       campaignId,
       ...(kinds?.length ? { kinds } : {}),
+      ...(syncRun ? { syncRun: true } : {}),
     }),
   });
   const data = await parseJson<{ run_id: string; queued_count: number; job_id?: string | null }>(res);
