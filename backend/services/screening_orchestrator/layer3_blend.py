@@ -1,10 +1,15 @@
-"""Layer 3: deterministic blend + final_rank (no LLM)."""
+"""Layer 3: deterministic blend + final_rank + shortlist selection (no LLM)."""
 
 from __future__ import annotations
 
 import json
 import logging
 from typing import Any, Dict, List, Tuple
+
+from backend.services.screening_orchestrator.policies import (
+    relevance_eligible_for_shortlist,
+    uncertain_relevance_mode,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +24,22 @@ def _norm_map(values: List[float]) -> Dict[int, float]:
     return {i: values[i] / mx for i in range(len(values))}
 
 
+def _final_shortlist_n(params: Dict[str, Any]) -> int:
+    v = params.get("finalShortlistSize") or params.get("final_shortlist_size") or 100
+    try:
+        n = int(v)
+    except (TypeError, ValueError):
+        n = 100
+    return max(1, min(n, 10_000))
+
+
 def run_layer3_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
     """
     combined_score = w_det * norm(profile_weighted_score) + w_fit * norm(fit_total)
-    Missing fit_total uses profile term only. out_of_mandate rows get combined_score 0.
+    Missing fit_total uses profile term only.
+
+    ``out_of_mandate`` and ``uncertain`` (when policy rejects uncertain) get combined_score 0.
+    Sets ``is_selected`` for top ``finalShortlistSize`` eligible rows by combined score.
     """
     row = db.run_raw_query(
         "SELECT params_json FROM screening_campaigns WHERE id::text = ?",
@@ -49,6 +66,9 @@ def run_layer3_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
         w_det, w_fit = 0.5, 0.5
     else:
         w_det, w_fit = w_det / s, w_fit / s
+
+    u_mode = uncertain_relevance_mode(params)
+    shortlist_n = _final_shortlist_n(params)
 
     rows = db.run_raw_query(
         """
@@ -85,6 +105,8 @@ def run_layer3_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
         rel = r.get("relevance_status") or ""
         if rel == "out_of_mandate":
             combined = 0.0
+        elif rel == "uncertain" and u_mode == "reject":
+            combined = 0.0
         else:
             pn = prof_norm.get(i, 0.0)
             fn = fit_norm.get(i, 0.0)
@@ -119,14 +141,49 @@ def run_layer3_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
                 """
                 UPDATE screening_campaign_candidates
                 SET combined_score = 0,
-                    final_rank = NULL
+                    final_rank = NULL,
+                    is_selected = false
                 WHERE campaign_id::text = ? AND orgnr = ?
                 """,
                 [campaign_id, org],
             )
 
+    # Shortlist: top finalShortlistSize among relevance-eligible rows by combined_score
+    eligible: List[Tuple[str, float]] = []
+    score_by_org = {org: sc for org, sc in scored}
+    for r in active:
+        org = str(r["orgnr"])
+        rel = r.get("relevance_status")
+        if not relevance_eligible_for_shortlist(rel, params):
+            continue
+        eligible.append((org, float(score_by_org.get(org, 0.0))))
+
+    eligible.sort(key=lambda x: x[1], reverse=True)
+    selected = {org for org, _ in eligible[:shortlist_n]}
+
+    db.run_raw_query(
+        """
+        UPDATE screening_campaign_candidates
+        SET is_selected = false
+        WHERE campaign_id::text = ?
+        """,
+        [campaign_id],
+    )
+    for org in selected:
+        db.run_raw_query(
+            """
+            UPDATE screening_campaign_candidates
+            SET is_selected = true
+            WHERE campaign_id::text = ? AND orgnr = ?
+            """,
+            [campaign_id, org],
+        )
+
     return {
         "ranked": updated,
         "weights": {"deterministic": w_det, "fit": w_fit},
         "scoreWeightsSource": "params_json.scoreWeights",
+        "uncertainRelevance": u_mode,
+        "finalShortlistSize": shortlist_n,
+        "selected_count": len(selected),
     }

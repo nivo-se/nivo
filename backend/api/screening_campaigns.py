@@ -194,7 +194,7 @@ async def post_layer1_start(request: Request, campaign_id: str) -> Dict[str, Any
 
 @router.post("/{campaign_id}/layer2/start")
 async def post_layer2_start(request: Request, campaign_id: str) -> Dict[str, Any]:
-    """Run Layer 2 fit scorecard (LLM) on in_mandate / uncertain rows."""
+    """Run Layer 2 fit scorecard (LLM) on Layer-1 passes (uncertain only if policy allows)."""
     _require_postgres()
     _require_user(request)
     db = get_database_service()
@@ -287,6 +287,16 @@ async def get_campaign_candidates(
 
         rel_json = _jsonish(r.get("relevance_json"))
         fit_json = _jsonish(r.get("fit_json"))
+        rel_conf = None
+        reason_codes = None
+        if isinstance(rel_json, dict):
+            rel_conf = rel_json.get("relevance_confidence")
+            if rel_conf is None:
+                rel_conf = rel_json.get("confidence")
+            reason_codes = rel_json.get("relevance_reason_codes")
+            if reason_codes is None:
+                rc = rel_json.get("reason_codes")
+                reason_codes = rc if isinstance(rc, list) else None
         item: Dict[str, Any] = {
             "orgnr": str(r.get("orgnr", "")),
             "name": r.get("name"),
@@ -301,6 +311,8 @@ async def get_campaign_candidates(
             "excludedFromAnalysis": bool(r.get("excluded_from_analysis")),
             "exclusionReason": r.get("exclusion_reason"),
             "relevanceStatus": r.get("relevance_status"),
+            "relevanceConfidence": float(rel_conf) if rel_conf is not None else None,
+            "relevanceReasonCodes": reason_codes,
             "relevanceJson": rel_json,
             "fitJson": fit_json,
             "fitTotal": float(r["fit_total"]) if r.get("fit_total") is not None else None,

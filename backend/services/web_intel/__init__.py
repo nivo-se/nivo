@@ -9,6 +9,7 @@ from .evidence_scorer import EvidenceScorer
 from .evidence_verifier import EvidenceVerifier
 from .source_normalizer import NormalizedSource, classify_source_type, normalize_domain
 from .tavily_client import TavilyClient, TavilyExtractResult, TavilySearchResult
+from .screening_retrieval import fetch_screening_evidence_refs
 from .web_retrieval_service import RetrievalBundle, WebRetrievalService
 
 __all__ = [
@@ -23,4 +24,5 @@ __all__ = [
     "EvidenceVerifier",
     "RetrievalBundle",
     "WebRetrievalService",
+    "fetch_screening_evidence_refs",
 ]

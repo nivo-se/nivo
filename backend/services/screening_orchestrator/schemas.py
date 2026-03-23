@@ -21,7 +21,13 @@ class CampaignParams(BaseModel):
     layer1_limit: int = Field(default=800, alias="layer1Limit", ge=1, le=50_000)
     layer2_limit: int = Field(default=300, alias="layer2Limit", ge=1, le=50_000)
     final_shortlist_size: int = Field(default=100, alias="finalShortlistSize", ge=1, le=1000)
-    policy: Dict[str, Any] = Field(default_factory=dict)
+    policy: Dict[str, Any] = Field(
+        default_factory=dict,
+        description=(
+            "uncertainRelevance: pass_to_layer2 | reject; "
+            "layer1WebRetrieval: bool (Tavily snippets for Layer 1, extra cost)"
+        ),
+    )
     score_weights: Dict[str, float] = Field(
         default_factory=lambda: {"deterministic": 0.4, "fit": 0.6},
         alias="scoreWeights",

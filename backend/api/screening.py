@@ -26,6 +26,36 @@ async def get_screening_context(request: Request):
     return {"userId": uid}
 
 
+@router.get("/exemplar-chunks")
+async def get_exemplar_chunks(
+    request: Request,
+    orgnr: str = Query(..., min_length=6, description="Swedish org number linked in exemplar_reports_manifest.json"),
+    limit: int = Query(50, ge=1, le=200),
+):
+    """
+    Optional RAG source: rows in ``ai_ops.exemplar_report_chunks`` (orgnr + analysis_run_id).
+
+    Apply migration ``042_exemplar_report_chunks.sql``, then
+    ``python3 scripts/index_exemplar_markdown.py --postgres`` (optional ``--pgvector``).
+    """
+    _require_postgres()
+    _require_user(request)
+    from ..services.db_factory import get_database_service
+    from ..services.screening_orchestrator.exemplar_chunks import (
+        exemplar_report_chunks_table_exists,
+        list_chunks_for_orgnr,
+    )
+
+    db = get_database_service()
+    if not exemplar_report_chunks_table_exists(db):
+        raise HTTPException(
+            503,
+            "ai_ops.exemplar_report_chunks not found; run migrations and scripts/index_exemplar_markdown.py --postgres.",
+        )
+    rows = list_chunks_for_orgnr(db, orgnr.strip(), limit=limit)
+    return {"orgnr": orgnr.strip(), "count": len(rows), "chunks": rows}
+
+
 @router.get("/exemplar-mandate")
 async def get_exemplar_mandate(request: Request):
     """

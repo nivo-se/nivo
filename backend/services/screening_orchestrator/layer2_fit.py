@@ -8,13 +8,32 @@ from typing import Any, Dict, List, Set
 
 from backend.llm.providers.openai_compat import OpenAICompatProvider
 from backend.services.exemplar_mandate import mandate_text_for_prompt
+from backend.services.screening_orchestrator.policies import relevance_eligible_for_fit
 
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 8
 
 
-def _candidates_for_layer2(db: Any, campaign_id: str) -> List[Dict[str, Any]]:
+def _load_campaign_params(db: Any, campaign_id: str) -> Dict[str, Any]:
+    rows = db.run_raw_query(
+        "SELECT params_json FROM screening_campaigns WHERE id::text = ?",
+        [campaign_id],
+    )
+    if not rows:
+        return {}
+    pj = rows[0].get("params_json")
+    if isinstance(pj, dict):
+        return dict(pj)
+    if isinstance(pj, str):
+        try:
+            return dict(json.loads(pj))
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+
+def _candidates_for_layer2(db: Any, campaign_id: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
     rows = db.run_raw_query(
         """
         SELECT c.orgnr, c.layer0_rank, c.profile_weighted_score,
@@ -25,12 +44,16 @@ def _candidates_for_layer2(db: Any, campaign_id: str) -> List[Dict[str, Any]]:
         LEFT JOIN companies co ON co.orgnr = c.orgnr
         WHERE c.campaign_id::text = ?
           AND c.excluded_from_analysis = false
-          AND c.relevance_status IN ('in_mandate', 'uncertain')
         ORDER BY c.layer0_rank ASC NULLS LAST, c.orgnr
         """,
         [campaign_id],
     )
-    return [dict(r) for r in (rows or [])]
+    out: List[Dict[str, Any]] = []
+    for r in rows or []:
+        d = dict(r)
+        if relevance_eligible_for_fit(d.get("relevance_status"), params):
+            out.append(d)
+    return out
 
 
 def _system_prompt(mandate_block: str) -> str:
@@ -74,7 +97,8 @@ def _user_prompt(batch: List[Dict[str, Any]]) -> str:
 
 
 def run_layer2_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
-    rows = _candidates_for_layer2(db, campaign_id)
+    params = _load_campaign_params(db, campaign_id)
+    rows = _candidates_for_layer2(db, campaign_id, params)
     if not rows:
         return {"processed": 0, "batches": 0, "message": "no_layer2_candidates"}
 
