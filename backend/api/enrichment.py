@@ -143,7 +143,7 @@ class EnrichmentRunRequest(BaseModel):
 
 
 def _enrichment_effective_sync(request: EnrichmentRunRequest) -> bool:
-    """Sync when the client asks, or when ENRICHMENT_DEFAULT_SYNC_RUN is set (local dev without RQ worker)."""
+    """Sync when the client asks, or when ENRICHMENT_DEFAULT_SYNC_RUN is set on the API process (no RQ worker)."""
     if request.sync_run:
         return True
     flag = os.getenv("ENRICHMENT_DEFAULT_SYNC_RUN", "").strip().lower()

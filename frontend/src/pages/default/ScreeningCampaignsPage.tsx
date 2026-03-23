@@ -740,7 +740,7 @@ export default function ScreeningCampaignsPage() {
     toast({
       title: "Enrichment still running or status unavailable",
       description:
-        "If nothing was saved, the job may be stuck in Redis without an RQ worker. Set ENRICHMENT_DEFAULT_SYNC_RUN=true on the API or VITE_ENRICHMENT_SYNC_RUN=true on the frontend, restart, and run Enrich again. You can also check Scores and enrichment runs on the campaign.",
+        "If nothing was saved, the job may be stuck in Redis without an RQ worker. On the API server, set ENRICHMENT_DEFAULT_SYNC_RUN=true in the API environment, restart the API, and run Enrich again. You can also check Scores and enrichment runs on the campaign.",
     });
   }
 
@@ -894,10 +894,10 @@ export default function ScreeningCampaignsPage() {
           ) : null}
           {st && erp.polling && pending > 0 && st.completed === 0 ? (
             <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-200/90">
-              If this never saves rows, Redis may have queued the job without a worker. Use synchronous enrichment
-              (see <code className="rounded bg-muted px-1 font-mono text-[10px]">ENRICHMENT_DEFAULT_SYNC_RUN</code> on
-              the API or <code className="rounded bg-muted px-1 font-mono text-[10px]">VITE_ENRICHMENT_SYNC_RUN</code>{" "}
-              in the frontend env), restart, and run Enrich again.
+              If this never saves rows, Redis may have queued the job without a worker. On the{" "}
+              <strong className="text-foreground">API server</strong>, set{" "}
+              <code className="rounded bg-muted px-1 font-mono text-[10px]">ENRICHMENT_DEFAULT_SYNC_RUN=true</code>, restart
+              the API, and run Enrich again.
             </p>
           ) : null}
           <p className="text-[11px] leading-relaxed">
@@ -1515,8 +1515,9 @@ export default function ScreeningCampaignsPage() {
                       <strong className="font-medium">pending</strong> usually means <strong className="font-medium">no RQ worker</strong> is
                       processing the queue (Docker: start the <code className="text-[9px]">worker</code> service; local dev:{" "}
                       <code className="text-[9px]">scripts/start-worker.sh</code>). Or the worker is still running / orgs were skipped
-                      (existing <code className="text-[9px]">ai_profiles</code>). Emergency: set{" "}
-                      <code className="text-[9px]">VITE_ENRICHMENT_SYNC_RUN=true</code> to run in the API (slow).
+                      (existing <code className="text-[9px]">ai_profiles</code>). Emergency: on the{" "}
+                      <strong className="font-medium">API server</strong>, set{" "}
+                      <code className="text-[9px]">ENRICHMENT_DEFAULT_SYNC_RUN=true</code> to run enrichment inside the API process (slow).
                     </p>
                   ) : null}
                   {enrichmentRunsLoading && enrichmentRuns.length === 0 ? (

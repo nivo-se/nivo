@@ -37,6 +37,7 @@ async function parseJson<T>(res: Response): Promise<T> {
 /**
  * Batch public / LLM enrichment for all orgnrs in a screening campaign
  * (excludes candidates marked excluded_from_analysis when DB supports it).
+ * Work always runs on the API server; `syncRun` only chooses in-process vs RQ there.
  */
 export async function runEnrichmentForScreeningCampaign(
   campaignId: string,
