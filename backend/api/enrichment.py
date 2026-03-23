@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -139,6 +140,14 @@ class EnrichmentRunRequest(BaseModel):
     )
 
     model_config = {"populate_by_name": True}
+
+
+def _enrichment_effective_sync(request: EnrichmentRunRequest) -> bool:
+    """Sync when the client asks, or when ENRICHMENT_DEFAULT_SYNC_RUN is set (local dev without RQ worker)."""
+    if request.sync_run:
+        return True
+    flag = os.getenv("ENRICHMENT_DEFAULT_SYNC_RUN", "").strip().lower()
+    return flag in ("1", "true", "yes", "on")
 
 
 class EnrichmentRunResponse(BaseModel):
@@ -363,7 +372,7 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
     if not run_id:
         raise HTTPException(status_code=500, detail="Failed to create enrichment run")
 
-    if request.sync_run:
+    if _enrichment_effective_sync(request):
         try:
             result = enrich_companies_batch(batch, force_refresh=False, run_id=run_id, kinds=kinds)
             errors = result.get("errors", [])

@@ -740,7 +740,7 @@ export default function ScreeningCampaignsPage() {
     toast({
       title: "Enrichment still running or status unavailable",
       description:
-        "Open Scores & enrichment runs under your campaign for details, or refresh this page in a moment.",
+        "If nothing was saved, the job may be stuck in Redis without an RQ worker. Set ENRICHMENT_DEFAULT_SYNC_RUN=true on the API or VITE_ENRICHMENT_SYNC_RUN=true on the frontend, restart, and run Enrich again. You can also check Scores and enrichment runs on the campaign.",
     });
   }
 
@@ -890,6 +890,14 @@ export default function ScreeningCampaignsPage() {
                   <strong className="text-foreground">{k}</strong>: {v}
                 </span>
               ))}
+            </p>
+          ) : null}
+          {st && erp.polling && pending > 0 && st.completed === 0 ? (
+            <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-200/90">
+              If this never saves rows, Redis may have queued the job without a worker. Use synchronous enrichment
+              (see <code className="rounded bg-muted px-1 font-mono text-[10px]">ENRICHMENT_DEFAULT_SYNC_RUN</code> on
+              the API or <code className="rounded bg-muted px-1 font-mono text-[10px]">VITE_ENRICHMENT_SYNC_RUN</code>{" "}
+              in the frontend env), restart, and run Enrich again.
             </p>
           ) : null}
           <p className="text-[11px] leading-relaxed">
