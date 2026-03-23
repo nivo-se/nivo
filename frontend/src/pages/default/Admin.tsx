@@ -20,22 +20,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type SmokeStep = "idle" | "running" | "pass" | "fail";
 
-export default function Admin() {
-  const { user, userRole, session } = useAuth();
-  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
-
-  if (!isAdmin) {
-    return (
-      <div className="h-full overflow-auto app-bg flex items-center justify-center">
-        <div className="text-center p-8 max-w-md">
-          <p className="text-base font-medium text-foreground mb-2">Access denied</p>
-          <p className="text-sm text-muted-foreground">
-            You need administrator privileges to view this page. If you are an admin, ensure your account has role &quot;admin&quot; in the database or add your email to <code className="text-xs bg-muted px-1 rounded">VITE_ADMIN_EMAILS</code>.
-          </p>
-        </div>
+function AdminAccessDenied() {
+  return (
+    <div className="h-full overflow-auto app-bg flex items-center justify-center">
+      <div className="text-center p-8 max-w-md">
+        <p className="text-base font-medium text-foreground mb-2">Access denied</p>
+        <p className="text-sm text-muted-foreground">
+          You need administrator privileges to view this page. If you are an admin, ensure your account has role &quot;admin&quot; in the database or add your email to <code className="text-xs bg-muted px-1 rounded">VITE_ADMIN_EMAILS</code>.
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+/** All data hooks live here so they only run for admins (Rules of Hooks). */
+function AdminDashboard() {
+  const { user, session } = useAuth();
   const { data: companies = [], isError: companiesError } = useCompanies({ limit: 100 });
   const { data: lists = [], isError: listsError } = useLists();
   const { data: runs = [], isError: runsError } = useAIRuns();
@@ -278,4 +278,15 @@ export default function Admin() {
       </div>
     </div>
   );
+}
+
+export default function Admin() {
+  const { user, userRole } = useAuth();
+  const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
+
+  if (!isAdmin) {
+    return <AdminAccessDenied />;
+  }
+
+  return <AdminDashboard />;
 }
