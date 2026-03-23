@@ -15,6 +15,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: "/", label: "Dashboard", icon: Home },
   { path: "/universe", label: "Universe", icon: Globe },
+  { path: "/screening-campaigns", label: "Screening campaigns", icon: Building2 },
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },

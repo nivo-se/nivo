@@ -736,6 +736,158 @@ def _build_order(sort: Optional[Dict], db_is_postgres: bool) -> str:
     return f"cm.{by} {direction}{nulls}, cm.orgnr ASC"
 
 
+def _materialize_universe_row(
+    r: Dict[str, Any], profile_config: Optional[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """Map a raw SQL row to API row dict; apply profile score + archetype when config present."""
+    seg = r.get("segment_names")
+    rev = r.get("revenue_latest")
+    ai_score = r.get("ai_strategic_fit_score")
+    fit = r.get("fit_score")
+    ops = r.get("ops_upside_score")
+    nivo = r.get("nivo_total_score")
+    tier = r.get("segment_tier")
+    row_dict: Dict[str, Any] = {
+        "orgnr": str(r.get("orgnr", "")),
+        "name": r.get("name"),
+        "segment_names": _parse_segment_names(seg),
+        "has_homepage": bool(r.get("has_homepage")),
+        "has_ai_profile": bool(r.get("has_ai_profile")),
+        "has_3y_financials": bool(r.get("has_3y_financials")),
+        "last_enriched_at": r.get("last_enriched_at"),
+        "is_stale": bool(r.get("is_stale")),
+        "data_quality_score": int(r.get("data_quality_score", 0)),
+        "revenue_latest": float(rev) if rev is not None else None,
+        "ebitda_margin_latest": float(r.get("ebitda_margin_latest")) if r.get("ebitda_margin_latest") is not None else None,
+        "revenue_cagr_3y": float(r.get("revenue_cagr_3y")) if r.get("revenue_cagr_3y") is not None else None,
+        "employees_latest": int(r.get("employees_latest")) if r.get("employees_latest") is not None else None,
+        "municipality": r.get("municipality"),
+        "homepage": r.get("homepage"),
+        "email": r.get("email"),
+        "phone": r.get("phone"),
+        "ai_strategic_fit_score": int(ai_score) if ai_score is not None else None,
+        "equity_ratio_latest": float(r.get("equity_ratio_latest")) if r.get("equity_ratio_latest") is not None else None,
+        "debt_to_equity_latest": float(r.get("debt_to_equity_latest")) if r.get("debt_to_equity_latest") is not None else None,
+        "latest_year": int(r.get("latest_year")) if r.get("latest_year") is not None else None,
+        "fit_score": int(fit) if fit is not None else None,
+        "ops_upside_score": int(ops) if ops is not None else None,
+        "nivo_total_score": int(nivo) if nivo is not None else None,
+        "segment_tier": str(tier) if tier is not None else None,
+        "research_feasibility_score": int(r.get("research_feasibility_score")) if r.get("research_feasibility_score") is not None else None,
+    }
+    if profile_config:
+        if profile_config.get("weights"):
+            score = _compute_profile_weighted_score(row_dict, profile_config)
+            row_dict["profile_weighted_score"] = score
+        arch_code = _get_archetype_code(row_dict, profile_config)
+        if arch_code:
+            row_dict["archetype_code"] = arch_code
+    return row_dict
+
+
+def execute_universe_query(
+    db: Any,
+    body: UniverseQueryPayload,
+    *,
+    max_rows: Optional[int] = 200,
+    offset: int = 0,
+    stable_order_for_bulk: bool = False,
+) -> tuple[list[Dict[str, Any]], int, Optional[Dict[str, Any]]]:
+    """
+    Run the same universe query as POST /api/universe/query.
+
+    When max_rows is None, fetch all matching rows (no LIMIT) — used for screening Layer 0.
+    Use stable_order_for_bulk=True to ORDER BY orgnr (cheap) instead of body.sort.
+
+    Returns (rows, total_count, profile_config).
+    """
+    sanitized_filters = _sanitize_filters(body.filters or [])
+    include_where, include_params = _build_where_from_stack(
+        sanitized_filters, body.q, _IS_POSTGRES
+    )
+    sanitized_exclude = _sanitize_filters(body.excludeFilters or [])
+    if sanitized_exclude:
+        exclude_where, exclude_params = _build_where_from_stack(
+            sanitized_exclude, None, _IS_POSTGRES
+        )
+        where_sql = f"({include_where}) AND NOT ({exclude_where})"
+        params: List[Any] = include_params + exclude_params
+    else:
+        where_sql = include_where
+        params = list(include_params)
+
+    profile_config: Optional[Dict[str, Any]] = None
+    if body.profileId and _IS_POSTGRES:
+        try:
+            profile_config = _get_profile_config(db, body.profileId, body.profileVersionId)
+            if profile_config:
+                profile_excl = _build_profile_exclusion_where(profile_config, params, _IS_POSTGRES)
+                if profile_excl:
+                    where_sql = f"({where_sql}) AND ({profile_excl})"
+        except Exception as e:
+            logger.warning("Universe query: profile config load failed: %s", e)
+
+    if stable_order_for_bulk:
+        order_sql = "cm.orgnr ASC"
+    else:
+        order_sql = _build_order(body.sort, _IS_POSTGRES)
+
+    select_cols = (
+        "cm.orgnr, cm.name, cm.segment_names, cm.has_homepage, cm.has_ai_profile, "
+        "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
+        "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
+        "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "
+        "cm.equity_ratio_latest, cm.debt_to_equity_latest, cm.latest_year, "
+        "cm.fit_score, cm.ops_upside_score, cm.nivo_total_score, cm.segment_tier, "
+        "cm.research_feasibility_score"
+    )
+
+    if not _IS_POSTGRES:
+        return [], 0, profile_config
+
+    source_sql, metrics_table, financials_table = _build_universe_source_subquery(db)
+    logger.debug(
+        "Universe source tables: metrics=%s financials=%s",
+        metrics_table,
+        financials_table,
+    )
+    sql_total = f"SELECT COUNT(*)::int AS total FROM {source_sql} WHERE {where_sql}"
+    total_params = list(params)
+
+    if max_rows is None:
+        sql_rows = f"""
+        SELECT {select_cols}
+        FROM {source_sql}
+        WHERE {where_sql}
+        ORDER BY {order_sql}
+        """
+        query_params = params
+    else:
+        lim = max(1, max_rows)
+        off = max(0, offset)
+        sql_rows = f"""
+        SELECT {select_cols}
+        FROM {source_sql}
+        WHERE {where_sql}
+        ORDER BY {order_sql}
+        LIMIT ? OFFSET ?
+        """
+        query_params = params + [lim, off]
+
+    def _run_query():
+        r = db.run_raw_query(sql_rows, query_params)
+        t = db.run_raw_query(sql_total, total_params)
+        return r, t
+
+    rows, total_rows = _run_query()
+    total = int(total_rows[0]["total"]) if total_rows else 0
+
+    out: list[Dict[str, Any]] = []
+    for r in rows:
+        out.append(_materialize_universe_row(r, profile_config))
+    return out, total, profile_config
+
+
 @router.get("/filters")
 async def get_filter_taxonomy():
     """Return filter taxonomy for UI picker (field, type, ops, unit)."""
@@ -758,124 +910,17 @@ async def universe_query(request: Request, body: UniverseQueryPayload):
     limit = min(max(body.limit, 1), 200)
     offset = max(body.offset, 0)
 
-    sanitized_filters = _sanitize_filters(body.filters or [])
-    include_where, include_params = _build_where_from_stack(
-        sanitized_filters, body.q, _IS_POSTGRES
-    )
-    sanitized_exclude = _sanitize_filters(body.excludeFilters or [])
-    if sanitized_exclude:
-        exclude_where, exclude_params = _build_where_from_stack(
-            sanitized_exclude, None, _IS_POSTGRES
-        )
-        # Exclude rows that match exclude filters: WHERE include AND NOT (exclude)
-        where_sql = f"({include_where}) AND NOT ({exclude_where})"
-        params = include_params + exclude_params
-    else:
-        where_sql = include_where
-        params = list(include_params)
-
-    profile_config: Optional[Dict[str, Any]] = None
-    if body.profileId and _IS_POSTGRES:
-        try:
-            profile_config = _get_profile_config(db, body.profileId, body.profileVersionId)
-            if profile_config:
-                profile_excl = _build_profile_exclusion_where(profile_config, params, _IS_POSTGRES)
-                if profile_excl:
-                    where_sql = f"({where_sql}) AND ({profile_excl})"
-        except Exception as e:
-            logger.warning("Universe query: profile config load failed: %s", e)
-
-    order_sql = _build_order(body.sort, _IS_POSTGRES)
-    params.extend([limit, offset])
-
-    select_cols = (
-        "cm.orgnr, cm.name, cm.segment_names, cm.has_homepage, cm.has_ai_profile, "
-        "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
-        "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
-        "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "
-        "cm.equity_ratio_latest, cm.debt_to_equity_latest, cm.latest_year, "
-        "cm.fit_score, cm.ops_upside_score, cm.nivo_total_score, cm.segment_tier, "
-        "cm.research_feasibility_score"
-    )
-
-    if _IS_POSTGRES:
-        source_sql, metrics_table, financials_table = _build_universe_source_subquery(db)
-        logger.debug(
-            "Universe source tables: metrics=%s financials=%s",
-            metrics_table,
-            financials_table,
-        )
-        sql_rows = f"""
-        SELECT {select_cols}
-        FROM {source_sql}
-        WHERE {where_sql}
-        ORDER BY {order_sql}
-        LIMIT ? OFFSET ?
-        """
-        sql_total = f"SELECT COUNT(*)::int AS total FROM {source_sql} WHERE {where_sql}"
-    else:
-        # SQLite: Universe query requires Postgres (coverage_metrics + financial cols)
-        sql_rows = "SELECT 1 AS _ LIMIT 0"
-        sql_total = "SELECT 0 AS total"
-
-    total_params = params[:-2]
-
-    def _run_query():
-        r = db.run_raw_query(sql_rows, params)
-        t = db.run_raw_query(sql_total, total_params)
-        return r, t
-
     try:
-        rows, total_rows = await asyncio.to_thread(_run_query)
-        total = int(total_rows[0]["total"]) if total_rows else 0
+        rows, total, _ = await asyncio.to_thread(
+            execute_universe_query,
+            db,
+            body,
+            max_rows=limit,
+            offset=offset,
+            stable_order_for_bulk=False,
+        )
     except Exception as e:
         logger.warning("Universe query: execution failed: %s", e)
         return {"rows": [], "total": 0}
 
-    out = []
-    for r in rows:
-        seg = r.get("segment_names")
-        rev = r.get("revenue_latest")
-        ai_score = r.get("ai_strategic_fit_score")
-        fit = r.get("fit_score")
-        ops = r.get("ops_upside_score")
-        nivo = r.get("nivo_total_score")
-        tier = r.get("segment_tier")
-        row_dict = {
-            "orgnr": str(r.get("orgnr", "")),
-            "name": r.get("name"),
-            "segment_names": _parse_segment_names(seg),
-            "has_homepage": bool(r.get("has_homepage")),
-            "has_ai_profile": bool(r.get("has_ai_profile")),
-            "has_3y_financials": bool(r.get("has_3y_financials")),
-            "last_enriched_at": r.get("last_enriched_at"),
-            "is_stale": bool(r.get("is_stale")),
-            "data_quality_score": int(r.get("data_quality_score", 0)),
-            "revenue_latest": float(rev) if rev is not None else None,
-            "ebitda_margin_latest": float(r.get("ebitda_margin_latest")) if r.get("ebitda_margin_latest") is not None else None,
-            "revenue_cagr_3y": float(r.get("revenue_cagr_3y")) if r.get("revenue_cagr_3y") is not None else None,
-            "employees_latest": int(r.get("employees_latest")) if r.get("employees_latest") is not None else None,
-            "municipality": r.get("municipality"),
-            "homepage": r.get("homepage"),
-            "email": r.get("email"),
-            "phone": r.get("phone"),
-            "ai_strategic_fit_score": int(ai_score) if ai_score is not None else None,
-            "equity_ratio_latest": float(r.get("equity_ratio_latest")) if r.get("equity_ratio_latest") is not None else None,
-            "debt_to_equity_latest": float(r.get("debt_to_equity_latest")) if r.get("debt_to_equity_latest") is not None else None,
-            "latest_year": int(r.get("latest_year")) if r.get("latest_year") is not None else None,
-            "fit_score": int(fit) if fit is not None else None,
-            "ops_upside_score": int(ops) if ops is not None else None,
-            "nivo_total_score": int(nivo) if nivo is not None else None,
-            "segment_tier": str(tier) if tier is not None else None,
-            "research_feasibility_score": int(r.get("research_feasibility_score")) if r.get("research_feasibility_score") is not None else None,
-        }
-        if profile_config:
-            if profile_config.get("weights"):
-                score = _compute_profile_weighted_score(row_dict, profile_config)
-                row_dict["profile_weighted_score"] = score
-            arch_code = _get_archetype_code(row_dict, profile_config)
-            if arch_code:
-                row_dict["archetype_code"] = arch_code
-        out.append(row_dict)
-
-    return {"rows": out, "total": total}
+    return {"rows": rows, "total": total}

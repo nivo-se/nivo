@@ -173,4 +173,6 @@ This index is intended to be used together with:
 - root `AGENTS.md`
 - optional `SUPERVISOR_INTEGRATION_CHECKLIST.md`
 - `PROFILE_LEARNING_PIPELINE_DESIGN.md` — offline workflow for converting Deep Research reports into Layer 1 screening profiles (variables, weights, archetypes, exclusions)
+- `SCREENING_ORCHESTRATOR_SPEC.md` — large-universe screening campaigns (SQL-first shortlist, LLM relevance/fit gates, handoff to Deep Research)
+- `SCREENING_PRESET_PROFILES.md` — five team-scoped default screening profiles (migration `039_seed_preset_screening_profiles.sql`)
 

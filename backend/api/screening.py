@@ -17,6 +17,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/screening", tags=["screening"])
 
 
+@router.get("/context")
+async def get_screening_context(request: Request):
+    """Effective user id for screening APIs (JWT sub, or dev user when REQUIRE_AUTH=false)."""
+    _require_postgres()
+    uid = _require_user(request)
+    return {"userId": uid}
+
+
 def _require_postgres():
     if os.getenv("DATABASE_SOURCE", "postgres").lower() != "postgres":
         raise HTTPException(503, "Screening profiles require DATABASE_SOURCE=postgres")
@@ -45,6 +53,7 @@ def _row_to_profile(r: Dict[str, Any], active_version: Optional[Dict[str, Any]] 
         "name": r.get("name"),
         "description": r.get("description"),
         "scope": r.get("scope", "private"),
+        "ownerUserId": str(r.get("owner_user_id", "")) if r.get("owner_user_id") is not None else "",
         "createdAt": r.get("created_at").isoformat() if r.get("created_at") else None,
         "updatedAt": r.get("updated_at").isoformat() if r.get("updated_at") else None,
     }

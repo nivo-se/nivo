@@ -39,6 +39,7 @@ import DesignProfile from "./pages/DesignProfile";
 import AppLayout from "./pages/default/AppLayout";
 import WorkDashboard from "./pages/default/WorkDashboard";
 import Universe from "./pages/default/Universe";
+import ScreeningCampaignsPage from "./pages/default/ScreeningCampaignsPage";
 import MyLists from "./pages/default/MyLists";
 import ListDetail from "./pages/default/ListDetail";
 import AILab from "./pages/default/AILab";
@@ -176,6 +177,7 @@ const App = () => (
               <Route index element={<WorkDashboard />} />
               <Route path="prospects" element={<Prospects />} />
               <Route path="universe" element={<Universe />} />
+              <Route path="screening-campaigns" element={<ScreeningCampaignsPage />} />
               <Route path="lists" element={<MyLists />} />
               <Route path="lists/:listId" element={<ListDetail />} />
               <Route path="company/:companyId" element={<CompanyDetail />} />
