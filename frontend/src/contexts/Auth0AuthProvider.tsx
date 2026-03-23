@@ -9,6 +9,10 @@ import type { AuthContextType, AppUser } from './AuthContext'
 import { setAccessTokenGetter } from '../lib/authToken'
 import { postEnroll } from '../lib/services/enrollService'
 
+/** Must match Auth0Provider.authorizationParams so silent refresh uses the same API audience. */
+const VITE_AUTH0_AUDIENCE = (import.meta.env.VITE_AUTH0_AUDIENCE as string | undefined)?.trim() || undefined
+const ACCESS_TOKEN_SCOPE = 'openid profile email offline_access'
+
 function auth0UserToAppUser(auth0User: { sub: string; email?: string; name?: string } | undefined): AppUser | null {
   if (!auth0User) return null
   return {
@@ -36,11 +40,20 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
   const [meLoaded, setMeLoaded] = useState(false)
 
   useEffect(() => {
-    // Use access token only (not ID token). getAccessTokenSilently() returns the access token for our audience.
+    // Access token for API (audience). Without explicit authorizationParams, silent refresh can omit
+    // the API audience and the backend returns 401; Auth0 token endpoint may return 400 in some cases.
     setAccessTokenGetter(async () => {
       try {
-        return await getAccessTokenSilently()
-      } catch {
+        return await getAccessTokenSilently({
+          authorizationParams: {
+            ...(VITE_AUTH0_AUDIENCE ? { audience: VITE_AUTH0_AUDIENCE } : {}),
+            scope: ACCESS_TOKEN_SCOPE,
+          },
+        })
+      } catch (e) {
+        if (import.meta.env.DEV) {
+          console.error('[Auth0] getAccessTokenSilently failed', e)
+        }
         return null
       }
     })
