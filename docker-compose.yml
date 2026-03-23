@@ -1,7 +1,22 @@
-# Nivo — Mac mini deploy: Postgres + API (minimal; auth via Auth0 cloud)
+# Nivo — Mac mini deploy: Postgres + Redis + API (minimal; auth via Auth0 cloud)
 # See docs/DEPLOY_MAC_MINI.md. Auth: docs/AUTH_AUTH0_SETUP.md.
+#
+# Redis is required for RQ (enrichment, Deep Research async jobs). The API service sets
+# REDIS_URL=redis://redis:6379/0 so the container talks to the Redis service, not localhost.
 
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: nivo-redis
+    networks:
+      - nivo_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   postgres:
     image: postgres:16
     container_name: nivo-pg
@@ -32,12 +47,16 @@ services:
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
+      # Must use Docker service name — localhost inside the API container is not host Redis
+      REDIS_URL: redis://redis:6379/0
     ports:
       - "127.0.0.1:8000:8000"  # Explicit host binding for cloudflared tunnel
     networks:
       - nivo_net
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 

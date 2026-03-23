@@ -1,8 +1,8 @@
 # Deploy Nivo on Mac mini (LAN)
 
-Postgres and the API run **on the same machine (the mini)** using this repo’s `docker-compose.yml`. No separate Postgres host or shared container.
+Postgres, Redis, and the API run **on the same machine (the mini)** using this repo’s `docker-compose.yml`.
 
-**Quick start:** On the mini: clone into `/srv/nivo`, `cp .env.example .env`, set `POSTGRES_PASSWORD` (and any other secrets), then `docker compose up -d --build`. The compose file starts Postgres and the API; the API connects to Postgres by service name (`postgres:5432`).
+**Quick start:** On the mini: clone into `/srv/nivo`, `cp .env.example .env`, set `POSTGRES_PASSWORD` (and any other secrets), then `docker compose up -d --build`. The compose file starts **Postgres**, **Redis** (job queues), and the API. The API connects to Postgres by service name (`postgres:5432`) and to Redis as `redis://redis:6379/0` (set in `docker-compose.yml`; your `.env` may still say `localhost` for host-side tools only).
 
 For **local dev on your Mac**, use `docker-compose.postgres.yml` for Postgres and run the API locally (e.g. `uvicorn` with `POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`).
 
@@ -29,7 +29,7 @@ There is **no automated deploy**. The Mac Mini does not pull from GitHub by itse
 /srv/nivo/                  # This project
 ├── .env                    # Real secrets (not in git)
 ├── .env.example            # From repo
-├── docker-compose.yml      # Postgres + API
+├── docker-compose.yml      # Postgres + Redis + API
 └── ...                     # Rest from git clone
 ```
 
@@ -37,8 +37,10 @@ There is **no automated deploy**. The Mac Mini does not pull from GitHub by itse
 
 ## 2. This project’s Docker Compose
 
-- **Postgres + API** in one `docker-compose.yml`. Both use the `nivo_net` network.
+- **Postgres + Redis + API** in one `docker-compose.yml`. All use the `nivo_net` network.
 - The API container is given `POSTGRES_HOST=postgres` and `POSTGRES_PORT=5432` by the compose file, so it talks to the Postgres service on the same host. You do **not** need to set `POSTGRES_HOST` in `.env` on the mini for the API; set `POSTGRES_PASSWORD` (and optionally `POSTGRES_DB` / `POSTGRES_USER`) for the Postgres service and for any tools that use the same `.env`.
+- **Redis** is required for RQ job queues. Compose sets `REDIS_URL=redis://redis:6379/0` for the **api** service (overrides `localhost` from `.env` inside the container). `/api/status` should report `redis: healthy` after `docker compose up`.
+- **RQ workers** on the host need a reachable Redis URL (e.g. publish port 6379 or run workers in Docker). See `scripts/start-worker.sh` and `scripts/start-deep-research-worker.sh`.
 - **Secrets:** use a real `.env` (from `.env.example`); do not commit `.env`.
 
 ---

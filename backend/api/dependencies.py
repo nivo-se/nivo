@@ -40,12 +40,16 @@ def get_current_user(request: Request) -> Optional[dict]:
 
 @lru_cache()
 def get_redis_client() -> redis.Redis:
-    """Get Redis client (singleton)"""
+    """Get Redis client (singleton). Uses REDIS_URL; in Docker Compose use redis://redis:6379/0 (service name)."""
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     try:
-        client = redis.from_url(redis_url, decode_responses=True)
-        # Test connection
+        client = redis.from_url(
+            redis_url,
+            decode_responses=True,
+            socket_connect_timeout=5,
+            socket_timeout=5,
+        )
         client.ping()
         return client
     except redis.ConnectionError as e:
-        raise ConnectionError(f"Failed to connect to Redis at {redis_url}: {e}")
+        raise ConnectionError(f"Failed to connect to Redis at {redis_url}: {e}") from e

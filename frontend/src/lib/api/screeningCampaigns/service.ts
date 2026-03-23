@@ -6,10 +6,35 @@ import type {
   ScreeningCampaignSummary,
 } from "./types";
 
+/** Readable message from FastAPI / generic JSON error bodies. */
+function errorBodyToMessage(text: string, status: number): string {
+  const trimmed = text.trim();
+  if (!trimmed) return `HTTP ${status}`;
+  try {
+    const j = JSON.parse(trimmed) as { detail?: unknown };
+    const d = j.detail;
+    if (typeof d === "string") return d;
+    if (Array.isArray(d)) {
+      return d
+        .map((item: unknown) => {
+          if (item && typeof item === "object" && "msg" in item) {
+            return String((item as { msg: string }).msg);
+          }
+          return JSON.stringify(item);
+        })
+        .join("; ");
+    }
+    if (d != null && typeof d === "object") return JSON.stringify(d);
+  } catch {
+    /* use raw text */
+  }
+  return trimmed;
+}
+
 async function parseJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text || res.statusText);
+    throw new Error(errorBodyToMessage(text, res.status));
   }
   return res.json() as Promise<T>;
 }

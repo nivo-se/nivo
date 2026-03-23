@@ -98,8 +98,11 @@ export default function ScreeningCampaignsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<ScreeningCampaignCandidate[]>([]);
   const [candidatesTotal, setCandidatesTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  /** Profiles load independently so "Create draft" is not blocked by a slow campaign list. */
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [campaignsLoadError, setCampaignsLoadError] = useState<string | null>(null);
+  const [profilesLoadError, setProfilesLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const [name, setName] = useState("Universe screening");
@@ -142,14 +145,17 @@ export default function ScreeningCampaignsPage() {
     try {
       const items = await listScreeningProfiles("all");
       setProfiles(items);
+      setProfilesLoadError(null);
       setProfileId((prev) => {
         if (prev && items.some((p) => p.id === prev)) return prev;
         return items[0]?.id ?? "";
       });
     } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setProfilesLoadError(msg);
       toast({
         title: "Could not load screening profiles",
-        description: e instanceof Error ? e.message : String(e),
+        description: msg,
         variant: "destructive",
       });
     }
@@ -158,27 +164,39 @@ export default function ScreeningCampaignsPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      setLoading(true);
+      setProfilesLoading(true);
       try {
-        await Promise.all([
-          loadProfiles(),
-          loadCampaigns(),
-          getScreeningContext()
-            .then((c) => {
-              if (!cancelled) setContextUserId(c.userId);
-            })
-            .catch(() => {
-              if (!cancelled) setContextUserId(null);
-            }),
-        ]);
+        await loadProfiles();
+        getScreeningContext()
+          .then((c) => {
+            if (!cancelled) setContextUserId(c.userId);
+          })
+          .catch(() => {
+            if (!cancelled) setContextUserId(null);
+          });
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setProfilesLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [loadCampaigns, loadProfiles]);
+  }, [loadProfiles]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setCampaignsLoading(true);
+      try {
+        await loadCampaigns();
+      } finally {
+        if (!cancelled) setCampaignsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadCampaigns]);
 
   const loadCandidates = useCallback(async (id: string) => {
     const { rows, total } = await listCampaignCandidates(id, { limit: 200, offset: 0 });
@@ -393,6 +411,19 @@ export default function ScreeningCampaignsPage() {
         ? "Run Layer 0 first so this campaign has candidates."
         : undefined;
 
+  const createDraftDisabledReason =
+    busy
+      ? "Wait for the current operation to finish."
+      : profilesLoading
+        ? "Loading screening profiles…"
+        : profilesLoadError
+          ? "Fix the screening profile load error above, then retry."
+          : profiles.length === 0
+            ? "Create a screening profile first (see the notice above)."
+            : !profileId
+              ? "Select a screening profile in the dropdown."
+              : undefined;
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       <BackendStatusBanner />
@@ -402,6 +433,36 @@ export default function ScreeningCampaignsPage() {
           className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           Campaign list failed to load: {campaignsLoadError}. Use Refresh or reload the page.
+        </div>
+      ) : null}
+      {profilesLoadError ? (
+        <div
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive flex flex-wrap items-center justify-between gap-2"
+        >
+          <span>
+            Screening profiles failed to load: {profilesLoadError}. You need at least one profile to create a draft
+            campaign.
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              void (async () => {
+                setProfilesLoading(true);
+                try {
+                  await loadProfiles();
+                } finally {
+                  setProfilesLoading(false);
+                }
+              })();
+            }}
+            disabled={profilesLoading}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 mr-1 ${profilesLoading ? "animate-spin" : ""}`} />
+            Retry profiles
+          </Button>
         </div>
       ) : null}
       <div>
@@ -417,7 +478,7 @@ export default function ScreeningCampaignsPage() {
         </p>
       </div>
 
-      {!loading && profiles.length === 0 ? (
+      {!profilesLoading && profiles.length === 0 && !profilesLoadError ? (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
           <span className="font-medium text-foreground">No screening profiles yet.</span>{" "}
           <Button
@@ -511,8 +572,8 @@ export default function ScreeningCampaignsPage() {
           <Button
             variant="primary"
             onClick={() => void handleCreate()}
-            disabled={busy || loading || !profileId}
-            title={!profileId ? "Select or create a screening profile first." : undefined}
+            disabled={busy || profilesLoading || !profileId || !!profilesLoadError || profiles.length === 0}
+            title={createDraftDisabledReason}
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Create draft
@@ -570,13 +631,13 @@ export default function ScreeningCampaignsPage() {
               variant="outline"
               size="sm"
               onClick={() => void loadCampaigns()}
-              disabled={loading}
+              disabled={campaignsLoading}
             >
               <RefreshCw className="w-4 h-4 mr-1" />
               Refresh
             </Button>
           </div>
-          {loading ? (
+          {campaignsLoading ? (
             <div className="space-y-2" aria-busy="true" aria-label="Loading campaigns">
               <Skeleton className="h-9 w-full" />
               <Skeleton className="h-9 w-full" />
@@ -900,8 +961,13 @@ export default function ScreeningCampaignsPage() {
         profileId={profileEditorId}
         contextUserId={contextUserId}
         onSaved={async ({ profileId: savedId, selectProfileId }) => {
-          await loadProfiles();
-          if (selectProfileId && savedId) setProfileId(savedId);
+          setProfilesLoading(true);
+          try {
+            await loadProfiles();
+            if (selectProfileId && savedId) setProfileId(savedId);
+          } finally {
+            setProfilesLoading(false);
+          }
         }}
       />
     </div>
