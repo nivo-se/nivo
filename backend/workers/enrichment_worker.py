@@ -82,6 +82,48 @@ def _combine_scraped_pages(pages: Dict[str, str], limit: int = 12000) -> Optiona
     return combined[:limit] if combined else None
 
 
+def _company_profile_kind_result(analysis: Dict[str, Any]) -> Dict[str, Any]:
+    """Subset of analyzer output stored as `company_enrichment.kind=company_profile`."""
+    keys = (
+        "product_description",
+        "end_market",
+        "customer_types",
+        "value_chain_position",
+        "business_model_summary",
+        "business_summary",
+        "industry_sector",
+        "industry_subsector",
+        "market_regions",
+        "industry_keywords",
+        "strategic_fit_score",
+        "defensibility_score",
+        "risk_flags",
+        "upside_potential",
+        "fit_rationale",
+        "acquisition_angle",
+        "strategic_playbook",
+        "next_steps",
+        "ai_notes",
+    )
+    return {k: analysis[k] for k in keys if k in analysis}
+
+
+def _website_insights_kind_result(
+    website: Optional[str],
+    scraped_pages: Dict[str, str],
+    analysis: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Metadata + URL list for `company_enrichment.kind=website_insights`."""
+    urls = list((scraped_pages or {}).keys())[:20]
+    return {
+        "website": website,
+        "scraped_page_urls": urls,
+        "page_count": len(urls),
+        "used_llm": analysis.get("used_llm"),
+        "agent_type": analysis.get("agent_type"),
+    }
+
+
 def enrich_companies_batch(
     orgnrs: List[str],
     force_refresh: bool = False,
@@ -158,8 +200,9 @@ def enrich_companies_batch(
 
     for i, orgnr in enumerate(orgnrs):
         try:
-            # Skip if profile already exists (unless force_refresh)
-            if not force_refresh and orgnr in existing_profiles:
+            # Skip existing ai_profiles only for ad-hoc runs (no run_id). Campaign / API runs
+            # pass run_id so we always write company_enrichment rows for that run.
+            if not force_refresh and run_id is None and orgnr in existing_profiles:
                 skipped += 1
                 continue
 
@@ -259,6 +302,33 @@ def enrich_companies_batch(
                         logger.debug("Saved company_enrichment for %s (run %s)", orgnr, run_id)
                     except Exception as ce_exc:
                         logger.warning("Failed to save company_enrichment for %s: %s", orgnr, ce_exc)
+                if "company_profile" in write_kinds:
+                    cp_payload = _company_profile_kind_result(analysis)
+                    if cp_payload:
+                        try:
+                            db.upsert_company_enrichment(
+                                orgnr=orgnr,
+                                run_id=run_id,
+                                kind="company_profile",
+                                result=cp_payload,
+                                score=analysis.get("strategic_fit_score"),
+                                tags={"agent_type": analysis.get("agent_type")},
+                            )
+                        except Exception as ce_exc:
+                            logger.warning("Failed to save company_profile enrichment for %s: %s", orgnr, ce_exc)
+                if "website_insights" in write_kinds:
+                    wi_payload = _website_insights_kind_result(website, scraped_pages, analysis)
+                    try:
+                        db.upsert_company_enrichment(
+                            orgnr=orgnr,
+                            run_id=run_id,
+                            kind="website_insights",
+                            result=wi_payload,
+                            score=None,
+                            tags={"source": website_source} if website_source else None,
+                        )
+                    except Exception as ce_exc:
+                        logger.warning("Failed to save website_insights enrichment for %s: %s", orgnr, ce_exc)
             
             enriched += 1
             existing_profiles.add(orgnr)
