@@ -239,6 +239,61 @@ def list_candidates(
     return rows, total
 
 
+def delete_campaign_record(db: Any, campaign_id: str) -> bool:
+    """Delete a screening campaign. Candidates and stages CASCADE."""
+    rows = db.run_raw_query(
+        "DELETE FROM screening_campaigns WHERE id::text = ? RETURNING id",
+        [campaign_id],
+    )
+    return bool(rows)
+
+
+def attach_public_enrichment_to_candidates(db: Any, rows: List[Dict[str, Any]]) -> None:
+    """
+    Mutate candidate rows in place with enrichmentKinds, enrichmentSummary, enrichmentStatus
+    from company_enrichment + ai_profiles (latest rows).
+    """
+    if not rows:
+        return
+    fetch_ce = getattr(db, "fetch_company_enrichment", None)
+    fetch_ap = getattr(db, "fetch_ai_profiles", None)
+    if not callable(fetch_ce) and not callable(fetch_ap):
+        return
+    orgnrs = [str(r.get("orgnr", "")).strip() for r in rows if r.get("orgnr")]
+    if not orgnrs:
+        return
+    enrich_by_org: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    try:
+        if callable(fetch_ce):
+            enrich_by_org = fetch_ce(orgnrs, latest_run_only=True) or {}
+    except Exception as exc:
+        logger.debug("fetch_company_enrichment for candidates failed: %s", exc)
+    profiles: List[Dict[str, Any]] = []
+    try:
+        if callable(fetch_ap):
+            profiles = fetch_ap(orgnrs) or []
+    except Exception as exc:
+        logger.debug("fetch_ai_profiles for candidates failed: %s", exc)
+    prof_by_org = {str(p.get("org_number")): p for p in profiles if p.get("org_number")}
+
+    for r in rows:
+        o = str(r.get("orgnr", "")).strip()
+        kinds = list(enrich_by_org.get(o, {}).keys()) if enrich_by_org else []
+        prof = prof_by_org.get(o)
+        summary: Optional[str] = None
+        status: Optional[str] = None
+        if prof:
+            raw = (prof.get("business_summary") or prof.get("business_model_summary") or "") or ""
+            raw = str(raw).strip()
+            if len(raw) > 220:
+                raw = raw[:220] + "…"
+            summary = raw or None
+            status = prof.get("enrichment_status")
+        r["enrichmentKinds"] = kinds
+        r["enrichmentSummary"] = summary
+        r["enrichmentStatus"] = status
+
+
 def set_candidate_exclusion(
     db: Any,
     campaign_id: str,
@@ -264,10 +319,12 @@ def set_candidate_exclusion(
 
 __all__ = [
     "create_campaign",
+    "delete_campaign_record",
     "get_campaign",
     "list_campaigns",
     "run_layer0_sync",
     "list_candidates",
     "resolve_profile_version_id",
+    "attach_public_enrichment_to_candidates",
     "set_candidate_exclusion",
 ]

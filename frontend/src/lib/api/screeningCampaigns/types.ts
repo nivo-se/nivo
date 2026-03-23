@@ -22,6 +22,10 @@ export type ScreeningCampaignCandidate = {
   exclusionReason?: string | null;
   isSelected?: boolean;
   finalRank?: number | null;
+  /** Present when candidates were loaded with includeEnrichment=true */
+  enrichmentKinds?: string[];
+  enrichmentSummary?: string | null;
+  enrichmentStatus?: string | null;
 };
 
 export type CreateCampaignPayload = {

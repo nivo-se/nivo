@@ -16,7 +16,9 @@ from pydantic import BaseModel, Field
 
 from ..services.db_factory import get_database_service
 from ..services.screening_orchestrator.campaign_service import (
+    attach_public_enrichment_to_candidates,
     create_campaign,
+    delete_campaign_record,
     get_campaign,
     list_campaigns,
     list_candidates,
@@ -107,6 +109,21 @@ async def get_one_campaign(request: Request, campaign_id: str) -> Dict[str, Any]
     return _campaign_to_summary(row)
 
 
+@router.delete("/{campaign_id}")
+async def delete_screening_campaign(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Remove a campaign and its candidates / stages (CASCADE)."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    ok = delete_campaign_record(db, campaign_id)
+    if not ok:
+        raise HTTPException(500, "Failed to delete campaign")
+    return {"ok": True, "id": campaign_id}
+
+
 @router.post("/{campaign_id}/start")
 async def post_start_campaign(request: Request, campaign_id: str) -> Dict[str, Any]:
     """Run Layer 0 synchronously in a thread pool (full universe scan may take tens of seconds)."""
@@ -157,6 +174,11 @@ async def get_campaign_candidates(
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
     selected_only: bool = Query(False, alias="selectedOnly"),
+    include_enrichment: bool = Query(
+        False,
+        alias="includeEnrichment",
+        description="Include latest public enrichment kinds + ai_profiles summary per row",
+    ),
 ) -> Dict[str, Any]:
     _require_postgres()
     _require_user(request)
@@ -167,24 +189,29 @@ async def get_campaign_candidates(
     rows, total = list_candidates(
         db, campaign_id, limit=limit, offset=offset, selected_only=selected_only
     )
+    if include_enrichment and rows:
+        attach_public_enrichment_to_candidates(db, rows)
     out: List[Dict[str, Any]] = []
     for r in rows:
-        out.append(
-            {
-                "orgnr": str(r.get("orgnr", "")),
-                "name": r.get("name"),
-                "layer0Rank": r.get("layer0_rank"),
-                "profileWeightedScore": float(r["profile_weighted_score"])
-                if r.get("profile_weighted_score") is not None
-                else None,
-                "archetypeCode": r.get("archetype_code"),
-                "isSelected": bool(r.get("is_selected")),
-                "finalRank": r.get("final_rank"),
-                "primaryNace": r.get("primary_nace"),
-                "excludedFromAnalysis": bool(r.get("excluded_from_analysis")),
-                "exclusionReason": r.get("exclusion_reason"),
-            }
-        )
+        item: Dict[str, Any] = {
+            "orgnr": str(r.get("orgnr", "")),
+            "name": r.get("name"),
+            "layer0Rank": r.get("layer0_rank"),
+            "profileWeightedScore": float(r["profile_weighted_score"])
+            if r.get("profile_weighted_score") is not None
+            else None,
+            "archetypeCode": r.get("archetype_code"),
+            "isSelected": bool(r.get("is_selected")),
+            "finalRank": r.get("final_rank"),
+            "primaryNace": r.get("primary_nace"),
+            "excludedFromAnalysis": bool(r.get("excluded_from_analysis")),
+            "exclusionReason": r.get("exclusion_reason"),
+        }
+        if include_enrichment:
+            item["enrichmentKinds"] = list(r.get("enrichmentKinds") or [])
+            item["enrichmentSummary"] = r.get("enrichmentSummary")
+            item["enrichmentStatus"] = r.get("enrichmentStatus")
+        out.append(item)
     return {"rows": out, "total": total}
 
 

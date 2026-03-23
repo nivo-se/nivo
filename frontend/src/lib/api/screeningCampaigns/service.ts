@@ -45,6 +45,13 @@ export async function listScreeningCampaigns(): Promise<ScreeningCampaignSummary
   return data.items ?? [];
 }
 
+export async function deleteScreeningCampaign(id: string): Promise<{ ok: boolean; id: string }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+  return parseJson(res);
+}
+
 export async function createScreeningCampaign(
   body: CreateCampaignPayload
 ): Promise<{ campaignId: string; status: string }> {
@@ -74,12 +81,13 @@ export async function startScreeningCampaign(
 
 export async function listCampaignCandidates(
   id: string,
-  opts?: { limit?: number; offset?: number; selectedOnly?: boolean }
+  opts?: { limit?: number; offset?: number; selectedOnly?: boolean; includeEnrichment?: boolean }
 ): Promise<{ rows: ScreeningCampaignCandidate[]; total: number }> {
   const q = new URLSearchParams();
   if (opts?.limit != null) q.set("limit", String(opts.limit));
   if (opts?.offset != null) q.set("offset", String(opts.offset));
   if (opts?.selectedOnly) q.set("selectedOnly", "true");
+  if (opts?.includeEnrichment) q.set("includeEnrichment", "true");
   const qs = q.toString();
   const url = `${API_BASE}/api/screening/campaigns/${id}/candidates${qs ? `?${qs}` : ""}`;
   const res = await fetchWithAuth(url);

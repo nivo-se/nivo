@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import {
   createScreeningCampaign,
+  deleteScreeningCampaign,
   listCampaignCandidates,
   listScreeningCampaigns,
   patchCandidateExclusion,
@@ -33,7 +34,13 @@ import {
   type EnrichmentRunSummary,
 } from "@/lib/api/enrichmentService";
 import { BackendStatusBanner } from "@/components/BackendStatusBanner";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import type {
   ScreeningCampaignCandidate,
   ScreeningCampaignSummary,
@@ -50,6 +57,7 @@ import {
   Play,
   Plus,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 
 /** Swedish SNI 2007 section prefixes — exclude haulage (49), finance/holdings (64), etc. */
@@ -122,6 +130,12 @@ export default function ScreeningCampaignsPage() {
   const [expandedEnrichmentRunId, setExpandedEnrichmentRunId] = useState<string | null>(null);
   const [enrichmentStatusByRun, setEnrichmentStatusByRun] = useState<Record<string, EnrichmentRunStatus>>({});
   const [loadingEnrichmentDetailId, setLoadingEnrichmentDetailId] = useState<string | null>(null);
+  /** Collapsible "Campaign results" under the campaign list (Layer 0 + enrichment runs). */
+  const [campaignResultsOpen, setCampaignResultsOpen] = useState(true);
+  const selectedIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
 
   const loadCampaigns = useCallback(async () => {
     try {
@@ -199,7 +213,11 @@ export default function ScreeningCampaignsPage() {
   }, [loadCampaigns]);
 
   const loadCandidates = useCallback(async (id: string) => {
-    const { rows, total } = await listCampaignCandidates(id, { limit: 200, offset: 0 });
+    const { rows, total } = await listCampaignCandidates(id, {
+      limit: 200,
+      offset: 0,
+      includeEnrichment: true,
+    });
     setCandidates(rows);
     setCandidatesTotal(total);
   }, []);
@@ -295,6 +313,31 @@ export default function ScreeningCampaignsPage() {
     }
   }
 
+  async function handleDeleteCampaign(id: string, name: string) {
+    if (
+      !window.confirm(
+        `Delete campaign "${name}"? This removes its candidates and stages. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    try {
+      await deleteScreeningCampaign(id);
+      toast({ title: "Campaign deleted", description: name });
+      if (selectedId === id) setSelectedId(null);
+      await loadCampaigns();
+    } catch (e) {
+      toast({
+        title: "Delete failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleToggleExclusion(
     campaignId: string,
     orgnr: string,
@@ -333,23 +376,50 @@ export default function ScreeningCampaignsPage() {
 
   async function handleEnrichPublic(campaignId: string) {
     setBusy(true);
+    let runId = "";
     try {
       const out = await runEnrichmentForScreeningCampaign(campaignId);
+      runId = out.runId;
+      setCampaignResultsOpen(true);
       toast({
-        title: "Enrichment queued",
-        description: `Run ${out.runId.slice(0, 8)}… — ${out.queuedCount} companies queued. Status appears under recent runs below.`,
+        title: "Enrichment started",
+        description:
+          `Run ${runId.slice(0, 8)}… — ${out.queuedCount} companies. ` +
+          `Results are written to Postgres (enrichment_runs, company_enrichment, ai_profiles). ` +
+          `Open Campaign results (left) to watch progress; the table refreshes as rows complete.`,
       });
-      const items = await listEnrichmentRuns({ campaignId, limit: 15 });
-      setEnrichmentRuns(items);
+      setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
     } catch (e) {
       toast({
         title: "Enrichment failed",
         description: e instanceof Error ? e.message : String(e),
         variant: "destructive",
       });
+      return;
     } finally {
       setBusy(false);
     }
+    if (!runId) return;
+    void (async () => {
+      for (let i = 0; i < 10; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const st = await getEnrichmentRunStatus(runId);
+        if (st) setEnrichmentStatusByRun((prev) => ({ ...prev, [runId]: st }));
+        try {
+          setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
+        } catch {
+          /* ignore */
+        }
+        if (selectedIdRef.current === campaignId) {
+          try {
+            await loadCandidates(campaignId);
+          } catch {
+            /* ignore */
+          }
+        }
+        if (st && (st.completed > 0 || st.failed > 0)) break;
+      }
+    })();
   }
 
   async function handleStart(id: string) {
@@ -624,8 +694,8 @@ export default function ScreeningCampaignsPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-border p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="rounded-lg border border-border p-4 space-y-3">
+          <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-medium">Campaigns</h2>
             <Button
               variant="outline"
@@ -648,10 +718,10 @@ export default function ScreeningCampaignsPage() {
           ) : (
             <ul className="space-y-1">
               {campaigns.map((c) => (
-                <li key={c.id}>
+                <li key={c.id} className="flex gap-1 items-stretch">
                   <button
                     type="button"
-                    className={`w-full text-left rounded-md px-3 py-2 text-sm transition-colors ${
+                    className={`flex-1 min-w-0 text-left rounded-md px-3 py-2 text-sm transition-colors ${
                       selectedId === c.id
                         ? "bg-muted font-medium"
                         : "hover:bg-muted/50"
@@ -668,10 +738,160 @@ export default function ScreeningCampaignsPage() {
                       {c.createdAt ? ` · ${formatShortDate(c.createdAt)}` : ""}
                     </span>
                   </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0 px-2 text-destructive hover:text-destructive"
+                    title="Delete campaign"
+                    disabled={busy}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void handleDeleteCampaign(c.id, c.name);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden />
+                    <span className="sr-only">Delete campaign</span>
+                  </Button>
                 </li>
               ))}
             </ul>
           )}
+
+          {selectedId && selected ? (
+            <Collapsible open={campaignResultsOpen} onOpenChange={setCampaignResultsOpen}>
+              <CollapsibleTrigger
+                className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
+              >
+                <span className="flex items-center gap-2 min-w-0">
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 transition-transform",
+                      campaignResultsOpen ? "rotate-0" : "-rotate-90"
+                    )}
+                    aria-hidden
+                  />
+                  <span className="truncate">Campaign results</span>
+                </span>
+                <span className="text-xs font-normal text-muted-foreground truncate max-w-[45%]">
+                  {selected.name}
+                </span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 pt-3">
+                <div className="rounded-md border border-border/80 bg-muted/10 px-3 py-2 text-xs space-y-1">
+                  <p className="font-medium text-foreground">Layer 0 (last run)</p>
+                  <p className="text-muted-foreground">
+                    {formatLayer0Summary(selected.statsJson?.layer0 as Record<string, unknown> | undefined)}
+                  </p>
+                </div>
+
+                <div className="rounded-md border border-border bg-muted/20 px-3 py-2 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-medium text-foreground">Enrichment runs (Postgres)</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        void listEnrichmentRuns({ campaignId: selected.id, limit: 15 }).then(setEnrichmentRuns);
+                      }}
+                      disabled={enrichmentRunsLoading}
+                    >
+                      <RefreshCw className={`w-3 h-3 mr-1 ${enrichmentRunsLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-snug">
+                    Clicking <strong>Enrich public data</strong> calls <code className="text-[9px]">POST /api/enrichment/run</code>{" "}
+                    with this campaign&apos;s orgnrs (skips rows marked Skip). A row is stored in{" "}
+                    <code className="text-[9px]">enrichment_runs</code>; outputs land in{" "}
+                    <code className="text-[9px]">company_enrichment</code> and <code className="text-[9px]">ai_profiles</code>{" "}
+                    (also visible on each company page).
+                  </p>
+                  {enrichmentRunsLoading && enrichmentRuns.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Loading runs…</p>
+                  ) : enrichmentRuns.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      No enrichment runs for this campaign yet. Run <strong>Enrich public data</strong> (right panel).
+                    </p>
+                  ) : (
+                    <ul className="space-y-0 max-h-56 overflow-y-auto" aria-label="Enrichment runs for this campaign">
+                      {enrichmentRuns.map((run) => {
+                        const expanded = expandedEnrichmentRunId === run.runId;
+                        const st = enrichmentStatusByRun[run.runId];
+                        const loadingDetail = loadingEnrichmentDetailId === run.runId;
+                        return (
+                          <li
+                            key={run.runId}
+                            className="border-b border-border/60 last:border-0 text-xs"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2 py-1.5">
+                              <span className="font-mono text-[11px] text-muted-foreground">
+                                {run.runId.slice(0, 8)}…
+                              </span>
+                              <span className="text-muted-foreground">{formatShortDate(run.createdAt)}</span>
+                              <span className="text-muted-foreground">
+                                {run.queuedCount != null ? `${run.queuedCount} queued` : "—"}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-[10px] gap-1"
+                                aria-expanded={expanded}
+                                onClick={() => void toggleEnrichmentRunDetail(run.runId)}
+                              >
+                                {expanded ? (
+                                  <ChevronDown className="h-3 w-3" aria-hidden />
+                                ) : (
+                                  <ChevronRight className="h-3 w-3" aria-hidden />
+                                )}
+                                Details
+                              </Button>
+                            </div>
+                            {expanded ? (
+                              <div className="pb-2 pl-1 text-muted-foreground border-l-2 border-border ml-1 space-y-1">
+                                {loadingDetail ? (
+                                  <p className="flex items-center gap-2">
+                                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                                    Loading status…
+                                  </p>
+                                ) : st ? (
+                                  <>
+                                    <p>
+                                      <span className="text-foreground font-medium">Completed orgs:</span> {st.completed}{" "}
+                                      · <span className="text-foreground font-medium">Failed:</span> {st.failed}
+                                    </p>
+                                    <p>
+                                      <span className="text-foreground font-medium">By kind:</span>{" "}
+                                      {Object.keys(st.counts_by_kind).length
+                                        ? Object.entries(st.counts_by_kind)
+                                            .map(([k, v]) => `${k}: ${v}`)
+                                            .join(", ")
+                                        : "—"}
+                                    </p>
+                                    {st.failures?.length ? (
+                                      <p className="text-destructive text-[11px] break-words">
+                                        Failures: {JSON.stringify(st.failures.slice(0, 3))}
+                                        {st.failures.length > 3 ? "…" : ""}
+                                      </p>
+                                    ) : null}
+                                  </>
+                                ) : (
+                                  <p className="text-destructive">Status unavailable.</p>
+                                )}
+                              </div>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : null}
         </div>
 
         <div className="rounded-lg border border-border p-4 space-y-3">
@@ -712,102 +932,18 @@ export default function ScreeningCampaignsPage() {
                 </Button>
               </div>
 
-              <div className="rounded-md border border-border bg-muted/20 px-3 py-2 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-medium text-foreground">Recent enrichment runs (stored)</p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={() => {
-                      void listEnrichmentRuns({ campaignId: selected.id, limit: 15 }).then(setEnrichmentRuns);
-                    }}
-                    disabled={enrichmentRunsLoading}
-                  >
-                    <RefreshCw className={`w-3 h-3 mr-1 ${enrichmentRunsLoading ? "animate-spin" : ""}`} />
-                    Refresh
-                  </Button>
-                </div>
-                {enrichmentRunsLoading && enrichmentRuns.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">Loading runs…</p>
-                ) : enrichmentRuns.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    No enrichment runs recorded for this campaign yet. Run <strong>Enrich public data</strong> to create one.
-                  </p>
-                ) : (
-                  <ul className="space-y-0 max-h-56 overflow-y-auto" aria-label="Enrichment runs for this campaign">
-                    {enrichmentRuns.map((run) => {
-                      const expanded = expandedEnrichmentRunId === run.runId;
-                      const st = enrichmentStatusByRun[run.runId];
-                      const loadingDetail = loadingEnrichmentDetailId === run.runId;
-                      return (
-                        <li
-                          key={run.runId}
-                          className="border-b border-border/60 last:border-0 text-xs"
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2 py-1.5">
-                            <span className="font-mono text-[11px] text-muted-foreground">
-                              {run.runId.slice(0, 8)}…
-                            </span>
-                            <span className="text-muted-foreground">{formatShortDate(run.createdAt)}</span>
-                            <span className="text-muted-foreground">
-                              {run.queuedCount != null ? `${run.queuedCount} queued` : "—"}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-[10px] gap-1"
-                              aria-expanded={expanded}
-                              onClick={() => void toggleEnrichmentRunDetail(run.runId)}
-                            >
-                              {expanded ? (
-                                <ChevronDown className="h-3 w-3" aria-hidden />
-                              ) : (
-                                <ChevronRight className="h-3 w-3" aria-hidden />
-                              )}
-                              Details
-                            </Button>
-                          </div>
-                          {expanded ? (
-                            <div className="pb-2 pl-1 text-muted-foreground border-l-2 border-border ml-1 space-y-1">
-                              {loadingDetail ? (
-                                <p className="flex items-center gap-2">
-                                  <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-                                  Loading status…
-                                </p>
-                              ) : st ? (
-                                <>
-                                  <p>
-                                    <span className="text-foreground font-medium">Completed orgs:</span> {st.completed}{" "}
-                                    · <span className="text-foreground font-medium">Failed:</span> {st.failed}
-                                  </p>
-                                  <p>
-                                    <span className="text-foreground font-medium">By kind:</span>{" "}
-                                    {Object.keys(st.counts_by_kind).length
-                                      ? Object.entries(st.counts_by_kind)
-                                          .map(([k, v]) => `${k}: ${v}`)
-                                          .join(", ")
-                                      : "—"}
-                                  </p>
-                                  {st.failures?.length ? (
-                                    <p className="text-destructive text-[11px] break-words">
-                                      Failures: {JSON.stringify(st.failures.slice(0, 3))}
-                                      {st.failures.length > 3 ? "…" : ""}
-                                    </p>
-                                  ) : null}
-                                </>
-                              ) : (
-                                <p className="text-destructive">Status unavailable.</p>
-                              )}
-                            </div>
-                          ) : null}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+              <div className="rounded-md border border-dashed border-border bg-muted/10 px-3 py-2 text-[11px] text-muted-foreground space-y-1">
+                <p>
+                  <strong className="text-foreground">What happens:</strong> Non-skipped candidates are sent to the enrichment worker
+                  (Redis queue, or synchronous fallback). Progress and counts for the run appear under{" "}
+                  <strong>Campaign results</strong> on the left.
+                </p>
+                <p>
+                  <strong className="text-foreground">Where it&apos;s stored:</strong>{" "}
+                  <code className="text-[10px]">enrichment_runs</code> (batch),{" "}
+                  <code className="text-[10px]">company_enrichment</code> (per org + kind),{" "}
+                  <code className="text-[10px]">ai_profiles</code> (merged view used on the company page).
+                </p>
               </div>
 
               <p className="text-xs text-muted-foreground">
@@ -842,6 +978,9 @@ export default function ScreeningCampaignsPage() {
                         Profile score
                       </TableHead>
                       <TableHead scope="col">Archetype</TableHead>
+                      <TableHead scope="col" className="min-w-[200px] max-w-[300px]">
+                        Public enrichment
+                      </TableHead>
                       <TableHead scope="col" className="w-[140px] text-right">
                         Deep Research
                       </TableHead>
@@ -850,7 +989,7 @@ export default function ScreeningCampaignsPage() {
                   <TableBody>
                     {candidates.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-muted-foreground text-sm">
+                        <TableCell colSpan={9} className="text-muted-foreground text-sm">
                           No rows yet. Run Layer 0.
                         </TableCell>
                       </TableRow>
@@ -912,6 +1051,50 @@ export default function ScreeningCampaignsPage() {
                                 : "—"}
                             </TableCell>
                             <TableCell>{r.archetypeCode ?? "—"}</TableCell>
+                            <TableCell className="align-top text-xs max-w-[300px]">
+                              {(() => {
+                                const kinds = r.enrichmentKinds ?? [];
+                                const summary = r.enrichmentSummary;
+                                const status = r.enrichmentStatus;
+                                if (!kinds.length && !summary && !status) {
+                                  return <span className="text-muted-foreground">—</span>;
+                                }
+                                return (
+                                  <div className="space-y-1">
+                                    <div className="flex flex-wrap gap-1 items-center">
+                                      {kinds.map((k) => (
+                                        <span
+                                          key={k}
+                                          className="inline-flex rounded bg-muted px-1 py-0.5 text-[10px] font-mono text-muted-foreground"
+                                        >
+                                          {k}
+                                        </span>
+                                      ))}
+                                      {status ? (
+                                        <span
+                                          className="text-[10px] text-muted-foreground"
+                                          title="ai_profiles.enrichment_status"
+                                        >
+                                          {status}
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                    {summary ? (
+                                      <p
+                                        className="text-[10px] text-muted-foreground line-clamp-3 leading-snug"
+                                        title={summary}
+                                      >
+                                        {summary}
+                                      </p>
+                                    ) : kinds.length > 0 ? (
+                                      <p className="text-[10px] text-muted-foreground italic">
+                                        Kinds stored; summary fills when AI profile text is available.
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                );
+                              })()}
+                            </TableCell>
                             <TableCell className="text-right">
                               <Button
                                 type="button"
