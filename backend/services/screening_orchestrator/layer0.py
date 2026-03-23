@@ -37,7 +37,7 @@ def run_layer0_for_campaign(db: Any, campaign: Dict[str, Any]) -> Tuple[List[Dic
 
         params = json.loads(params)
 
-    layer0_limit = int(params.get("layer0Limit", 2000))
+    layer0_limit = int(params.get("layer0Limit", 20))
 
     raw_filters = params.get("filters") or []
     raw_excl = params.get("excludeFilters") or []

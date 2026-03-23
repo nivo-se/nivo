@@ -382,10 +382,18 @@ class PostgresDBService(DatabaseService):
         self,
         run_id: str,
         failures: List[Dict[str, Any]],
+        *,
+        worker_finished: bool = False,
     ) -> None:
         if not self.table_exists("enrichment_runs"):
             return
-        patch = json.dumps({"failures": failures})
+        from datetime import datetime, timezone
+
+        extra: Dict[str, Any] = {"failures": failures}
+        if worker_finished:
+            extra["worker_finished"] = True
+            extra["completed_at"] = datetime.now(timezone.utc).isoformat()
+        patch = json.dumps(extra)
         self._execute(
             "UPDATE enrichment_runs SET meta = COALESCE(meta, '{}'::jsonb) || %s::jsonb WHERE id = %s",
             [patch, run_id],

@@ -18,6 +18,7 @@ import {
   listCampaignCandidates,
   listScreeningCampaigns,
   patchCandidateExclusion,
+  patchScreeningCampaign,
   startScreeningCampaign,
 } from "@/lib/api/screeningCampaigns/service";
 import {
@@ -115,7 +116,10 @@ export default function ScreeningCampaignsPage() {
 
   const [name, setName] = useState("Universe screening");
   const [profileId, setProfileId] = useState("");
-  const [layer0Limit, setLayer0Limit] = useState(2000);
+  const DEFAULT_LAYER0_CAP = 20;
+  const [layer0Limit, setLayer0Limit] = useState(DEFAULT_LAYER0_CAP);
+  /** Rename field for selected campaign */
+  const [campaignRename, setCampaignRename] = useState("");
   /** SNI/NACE 2–5 digit prefixes to drop (any code on the company starting with one of these). */
   const [excludedSniPrefixes, setExcludedSniPrefixes] = useState<Set<string>>(
     () => new Set(["49", "64"])
@@ -136,6 +140,11 @@ export default function ScreeningCampaignsPage() {
   useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
+
+  useEffect(() => {
+    const c = campaigns.find((x) => x.id === selectedId);
+    setCampaignRename(c?.name ?? "");
+  }, [selectedId, campaigns]);
 
   const loadCampaigns = useCallback(async () => {
     try {
@@ -273,7 +282,8 @@ export default function ScreeningCampaignsPage() {
     return [...new Set([...excludedSniPrefixes, ...extra])];
   }
 
-  async function handleCreate() {
+  /** Create campaign in Postgres, then run Layer 0 immediately (single primary action). */
+  async function handleCreateAndRunLayer0() {
     if (!profileId) {
       toast({ title: "Select a screening profile", variant: "destructive" });
       return;
@@ -299,12 +309,20 @@ export default function ScreeningCampaignsPage() {
         params: { layer0Limit },
         filters: naceFilters,
       });
-      toast({ title: "Campaign created", description: campaignId });
       await loadCampaigns();
       setSelectedId(campaignId);
+
+      const result = await startScreeningCampaign(campaignId);
+      const layer0 = result.layer0 as Record<string, unknown> | undefined;
+      toast({
+        title: "Layer 0 complete",
+        description: formatLayer0Summary(layer0),
+      });
+      await loadCampaigns();
+      await loadCandidates(campaignId);
     } catch (e) {
       toast({
-        title: "Create failed",
+        title: "Campaign run failed",
         description: e instanceof Error ? e.message : String(e),
         variant: "destructive",
       });
@@ -330,6 +348,27 @@ export default function ScreeningCampaignsPage() {
     } catch (e) {
       toast({
         title: "Delete failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRenameCampaign() {
+    if (!selectedId || !selected) return;
+    const next = campaignRename.trim();
+    if (!next || next === selected.name) return;
+    setBusy(true);
+    try {
+      const updated = await patchScreeningCampaign(selectedId, { name: next });
+      toast({ title: "Campaign renamed", description: updated.name });
+      await loadCampaigns();
+      setCampaignRename(updated.name);
+    } catch (e) {
+      toast({
+        title: "Rename failed",
         description: e instanceof Error ? e.message : String(e),
         variant: "destructive",
       });
@@ -481,7 +520,7 @@ export default function ScreeningCampaignsPage() {
         ? "Run Layer 0 first so this campaign has candidates."
         : undefined;
 
-  const createDraftDisabledReason =
+  const runNewCampaignDisabledReason =
     busy
       ? "Wait for the current operation to finish."
       : profilesLoading
@@ -563,13 +602,13 @@ export default function ScreeningCampaignsPage() {
           >
             Create a profile
           </Button>{" "}
-          to define Layer 1 scoring (variables, weights, archetypes), then create a campaign.
+          to define Layer 1 scoring (variables, weights, archetypes), then run a campaign below.
         </div>
       ) : null}
 
       <section className="rounded-lg border border-border p-4 space-y-4">
         <h2 className="text-lg font-medium">New campaign</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end">
           <div className="space-y-2">
             <Label htmlFor="camp-name">Name</Label>
             <Input
@@ -636,18 +675,14 @@ export default function ScreeningCampaignsPage() {
               min={1}
               max={50000}
               value={layer0Limit}
-              onChange={(e) => setLayer0Limit(Number(e.target.value) || 2000)}
+              onChange={(e) =>
+                setLayer0Limit(Number(e.target.value) || DEFAULT_LAYER0_CAP)
+              }
             />
+            <p className="text-[10px] text-muted-foreground">
+              Default {DEFAULT_LAYER0_CAP} (max companies ranked after universe + exclusions).
+            </p>
           </div>
-          <Button
-            variant="primary"
-            onClick={() => void handleCreate()}
-            disabled={busy || profilesLoading || !profileId || !!profilesLoadError || profiles.length === 0}
-            title={createDraftDisabledReason}
-          >
-            {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Create draft
-          </Button>
         </div>
 
         <div className="space-y-2 border-t border-border pt-4">
@@ -690,6 +725,23 @@ export default function ScreeningCampaignsPage() {
               onChange={(e) => setCustomSniPrefixes(e.target.value)}
             />
           </div>
+        </div>
+
+        <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground max-w-xl">
+            Saves the campaign and <strong className="text-foreground">runs Layer 0 immediately</strong> so the shortlist
+            appears in the table — no extra click.
+          </p>
+          <Button
+            variant="primary"
+            className="shrink-0 w-full sm:w-auto min-h-10 px-6"
+            onClick={() => void handleCreateAndRunLayer0()}
+            disabled={busy || profilesLoading || !profileId || !!profilesLoadError || profiles.length === 0}
+            title={runNewCampaignDisabledReason}
+          >
+            {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+            Run Layer 0
+          </Button>
         </div>
       </section>
 
@@ -860,7 +912,14 @@ export default function ScreeningCampaignsPage() {
                                 ) : st ? (
                                   <>
                                     <p>
-                                      <span className="text-foreground font-medium">Completed orgs:</span> {st.completed}{" "}
+                                      <span className="text-foreground font-medium">Completed orgs:</span> {st.completed}
+                                      {typeof st.pending === "number" && st.pending > 0 ? (
+                                        <>
+                                          {" "}
+                                          · <span className="text-foreground font-medium">Pending:</span> {st.pending}
+                                        </>
+                                      ) : null}
+                                      {" "}
                                       · <span className="text-foreground font-medium">Failed:</span> {st.failed}
                                     </p>
                                     <p>
@@ -900,6 +959,33 @@ export default function ScreeningCampaignsPage() {
             <p className="text-sm text-muted-foreground">Select a campaign to run Layer 0 and view rows.</p>
           ) : (
             <>
+              <div className="space-y-2 rounded-md border border-border bg-muted/15 px-3 py-2">
+                <Label htmlFor="campaign-rename" className="text-xs text-muted-foreground">
+                  Campaign name
+                </Label>
+                <div className="flex flex-wrap gap-2 items-end">
+                  <Input
+                    id="campaign-rename"
+                    value={campaignRename}
+                    onChange={(e) => setCampaignRename(e.target.value)}
+                    className="max-w-md"
+                    placeholder="Display name in list"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      busy ||
+                      !campaignRename.trim() ||
+                      campaignRename.trim() === selected.name
+                    }
+                    onClick={() => void handleRenameCampaign()}
+                  >
+                    Save name
+                  </Button>
+                </div>
+              </div>
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-sm text-muted-foreground">Status: {selected.status}</span>
                 {selected.errorMessage ? (

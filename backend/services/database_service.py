@@ -118,9 +118,12 @@ class DatabaseService(ABC):
         self,
         run_id: str,
         failures: List[Dict[str, Any]],
+        *,
+        worker_finished: bool = False,
     ) -> None:
         """
-        Merge failures into enrichment_runs.meta for run_id. No-op if table doesn't exist.
+        Merge failures (and optionally worker_finished) into enrichment_runs.meta for run_id.
+        No-op if table doesn't exist.
         """
         pass  # optional; postgres + local implement
 

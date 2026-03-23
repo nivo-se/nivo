@@ -52,6 +52,18 @@ export async function deleteScreeningCampaign(id: string): Promise<{ ok: boolean
   return parseJson(res);
 }
 
+export async function patchScreeningCampaign(
+  id: string,
+  body: { name: string }
+): Promise<ScreeningCampaignSummary> {
+  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: body.name.trim() }),
+  });
+  return parseJson(res);
+}
+
 export async function createScreeningCampaign(
   body: CreateCampaignPayload
 ): Promise<{ campaignId: string; status: string }> {

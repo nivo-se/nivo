@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 class CampaignParams(BaseModel):
     """Tunables for campaign execution."""
 
-    layer0_limit: int = Field(default=2000, alias="layer0Limit", ge=1, le=50_000)
+    layer0_limit: int = Field(default=20, alias="layer0Limit", ge=1, le=50_000)
     layer1_limit: int = Field(default=800, alias="layer1Limit", ge=1, le=50_000)
     layer2_limit: int = Field(default=300, alias="layer2Limit", ge=1, le=50_000)
     final_shortlist_size: int = Field(default=100, alias="finalShortlistSize", ge=1, le=1000)

@@ -21,6 +21,8 @@ export type EnrichmentRunStatus = {
   counts_by_kind: Record<string, number>;
   completed: number;
   failed: number;
+  /** Orgs still processing (worker not finished); not the same as failures */
+  pending?: number;
   failures: unknown[];
 };
 

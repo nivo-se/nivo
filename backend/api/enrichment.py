@@ -141,11 +141,13 @@ class EnrichmentRunResponse(BaseModel):
 
 
 class EnrichmentRunStatusResponse(BaseModel):
-    """Status of an enrichment run"""
+    """Status of an enrichment run (failed = errors; pending = still processing when worker not finished)."""
+
     run_id: str
     counts_by_kind: Dict[str, int]
     completed: int
     failed: int
+    pending: int = 0
     failures: List[Dict[str, Any]] = []
 
 
@@ -377,8 +379,7 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
     try:
         result = enrich_companies_batch(batch, force_refresh=False, run_id=run_id, kinds=kinds)
         errors = result.get("errors", [])
-        if errors:
-            db.update_enrichment_run_meta(run_id, errors)
+        db.update_enrichment_run_meta(run_id, errors, worker_finished=True)
         logger.info(
             "Enrichment run %s complete (sync): enriched=%d, errors=%d",
             run_id, result.get("enriched", 0), len(errors),
@@ -398,13 +399,25 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
         raise HTTPException(status_code=503, detail="Database not available")
 
     if not db.table_exists("company_enrichment"):
-        failures = []
+        failures: List[Dict[str, Any]] = []
+        pending = 0
         if db.table_exists("enrichment_runs"):
             run_rows = db.run_raw_query("SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1", [run_id])
             if run_rows and run_rows[0].get("meta"):
                 meta = run_rows[0]["meta"]
-                failures = meta.get("failures", []) if isinstance(meta, dict) else []
-        return EnrichmentRunStatusResponse(run_id=run_id, counts_by_kind={}, completed=0, failed=len(failures), failures=failures or [])
+                if isinstance(meta, dict):
+                    failures = meta.get("failures", []) or []
+                    orgnrs = meta.get("orgnrs") or []
+                    if orgnrs and not meta.get("worker_finished"):
+                        pending = max(0, len(orgnrs))
+        return EnrichmentRunStatusResponse(
+            run_id=run_id,
+            counts_by_kind={},
+            completed=0,
+            failed=len(failures),
+            pending=pending,
+            failures=failures or [],
+        )
 
     # Count by kind for this run
     rows = db.run_raw_query(
@@ -420,27 +433,50 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
     )
     completed = int(completed_rows[0]["cnt"]) if completed_rows else 0
 
-    # Failed + failures from meta
-    failed = 0
-    failures: List[Dict[str, Any]] = []
+    failures = []
+    pending = 0
     run_rows = db.run_raw_query(
         "SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1",
         [run_id],
     )
+    meta: Dict[str, Any] = {}
     if run_rows and run_rows[0].get("meta"):
-        meta = run_rows[0]["meta"]
-        if isinstance(meta, dict):
-            failures = meta.get("failures") or []
+        raw = run_rows[0]["meta"]
+        if isinstance(raw, dict):
+            meta = raw
+        elif isinstance(raw, str):
+            try:
+                parsed = json.loads(raw)
+                meta = parsed if isinstance(parsed, dict) else {}
+            except json.JSONDecodeError:
+                meta = {}
+
+    failures = list(meta.get("failures") or [])
+    orgnrs = meta.get("orgnrs") or []
+    total_in_batch = len(orgnrs) if orgnrs else 0
+    worker_finished = bool(meta.get("worker_finished"))
+
+    if worker_finished:
+        # Run finished: failed = explicit per-org errors, else orgs with no row written
+        if failures:
             failed = len(failures)
-            if not failures and meta.get("orgnrs"):
-                total_in_batch = len(meta["orgnrs"])
-                failed = max(0, total_in_batch - completed)
+        elif total_in_batch:
+            failed = max(0, total_in_batch - completed)
+        else:
+            failed = 0
+        pending = 0
+    else:
+        # Still running: remaining orgs are pending, not failed
+        failed = len(failures)
+        if total_in_batch:
+            pending = max(0, total_in_batch - completed)
 
     return EnrichmentRunStatusResponse(
         run_id=run_id,
         counts_by_kind=counts_by_kind,
         completed=completed,
         failed=failed,
+        pending=pending,
         failures=failures or [],
     )
 

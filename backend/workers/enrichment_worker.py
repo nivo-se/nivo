@@ -286,5 +286,11 @@ def enrich_companies_batch(
         "Enrichment complete: %s/%s companies enriched (skipped=%s, using DB data only, no external lookup)",
         enriched, total, skipped
     )
-    
+
+    if run_id:
+        try:
+            db.update_enrichment_run_meta(run_id, errors, worker_finished=True)
+        except Exception as exc:  # pragma: no cover
+            logger.warning("update_enrichment_run_meta failed: %s", exc)
+
     return result

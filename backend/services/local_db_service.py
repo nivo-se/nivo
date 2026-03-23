@@ -270,13 +270,20 @@ class LocalDBService(DatabaseService):
         self,
         run_id: str,
         failures: List[Dict[str, Any]],
+        *,
+        worker_finished: bool = False,
     ) -> None:
         if not self.table_exists("enrichment_runs"):
             return
         try:
+            from datetime import datetime, timezone
+
             rows = self._execute("SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1", [run_id])
             meta = json.loads(rows[0]["meta"]) if rows and rows[0].get("meta") else {}
             meta["failures"] = failures
+            if worker_finished:
+                meta["worker_finished"] = True
+                meta["completed_at"] = datetime.now(timezone.utc).isoformat()
             self._execute("UPDATE enrichment_runs SET meta = ? WHERE id = ?", [json.dumps(meta), run_id])
         except Exception:
             pass

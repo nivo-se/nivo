@@ -239,6 +239,23 @@ def list_candidates(
     return rows, total
 
 
+def rename_campaign(db: Any, campaign_id: str, name: str) -> bool:
+    """Update campaign display name. Returns True if a row was updated."""
+    name = (name or "").strip()
+    if not name:
+        return False
+    rows = db.run_raw_query(
+        """
+        UPDATE screening_campaigns
+        SET name = ?, updated_at = NOW()
+        WHERE id::text = ?
+        RETURNING id::text AS id
+        """,
+        [name, campaign_id],
+    )
+    return bool(rows)
+
+
 def delete_campaign_record(db: Any, campaign_id: str) -> bool:
     """Delete a screening campaign. Candidates and stages CASCADE."""
     rows = db.run_raw_query(

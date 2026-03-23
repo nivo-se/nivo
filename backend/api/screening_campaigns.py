@@ -22,6 +22,7 @@ from ..services.screening_orchestrator.campaign_service import (
     get_campaign,
     list_campaigns,
     list_candidates,
+    rename_campaign,
     run_layer0_sync,
     set_candidate_exclusion,
 )
@@ -69,6 +70,12 @@ class PauseBody(BaseModel):
     reason: Optional[str] = None
 
 
+class PatchCampaignBody(BaseModel):
+    """Rename a screening campaign."""
+
+    name: str = Field(..., min_length=1, max_length=500)
+
+
 class CandidateExclusionBody(BaseModel):
     excluded_from_analysis: bool = Field(..., alias="excludedFromAnalysis")
     exclusion_reason: Optional[str] = Field(None, alias="exclusionReason")
@@ -107,6 +114,24 @@ async def get_one_campaign(request: Request, campaign_id: str) -> Dict[str, Any]
     if not row:
         raise HTTPException(404, "Campaign not found")
     return _campaign_to_summary(row)
+
+
+@router.patch("/{campaign_id}")
+async def patch_screening_campaign(
+    request: Request, campaign_id: str, body: PatchCampaignBody
+) -> Dict[str, Any]:
+    """Rename a campaign."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    ok = rename_campaign(db, campaign_id, body.name.strip())
+    if not ok:
+        raise HTTPException(400, "Invalid name")
+    updated = get_campaign(db, campaign_id)
+    return _campaign_to_summary(updated) if updated else {"ok": True, "id": campaign_id}
 
 
 @router.delete("/{campaign_id}")
