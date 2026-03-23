@@ -219,7 +219,37 @@ If analysis completes almost instantly with empty results, the LLM calls are lik
 
 ---
 
-## 6. Command checklist
+## 6. Docker disk and prune
+
+Repeated `docker compose up -d --build` pulls layers and **BuildKit cache** grows. When the host disk is tight or builds slow down, check usage before pruning.
+
+**Quick check (from repo root):**
+
+```bash
+./scripts/docker-disk-check.sh
+```
+
+This prints `docker system df`, `docker builder du`, host `df`, and **warnings** when image reclaimable or build cache exceeds defaults (`WARN_IMAGES_GB`, `WARN_BUILD_CACHE_GB`).
+
+**Manual one-liners:**
+
+```bash
+docker system df
+docker builder du
+```
+
+**Safer cleanup (does not remove named volumes used by Postgres):**
+
+- `docker builder prune -f` — reclaim **build cache** (next image build may be slower).
+- `docker system prune -f` — unused networks, stopped containers, dangling images.
+
+**Aggressive (removes unused images — expect longer rebuilds):** `docker system prune -a -f`
+
+**Never** run `docker system prune --volumes` on the mini unless you intend to delete Docker volumes (that can wipe the Postgres data volume).
+
+---
+
+## 7. Command checklist
 
 ### One-time migration (this Mac → mini)
 
@@ -255,7 +285,7 @@ docker compose up -d --build
 
 ---
 
-## 7. Summary
+## 8. Summary
 
 | Step | Action |
 |------|--------|

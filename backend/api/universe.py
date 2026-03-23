@@ -397,6 +397,39 @@ class UniverseQueryPayload(BaseModel):
     profileVersionId: Optional[str] = None  # optional; if omitted use active version
 
 
+def _compile_nace_prefix_inclusion(
+    value: Any, params: List[Any], db_is_postgres: bool
+) -> Optional[str]:
+    """
+    Require at least one SNI/NACE code in companies.nace_codes to start with one of the
+    given digit prefixes (e.g. 10–33 for manufacturing / NACE section C).
+    """
+    if not db_is_postgres:
+        return None
+    if not isinstance(value, (list, tuple)):
+        return None
+    prefixes: List[str] = []
+    for p in value:
+        s = str(p).strip().replace(" ", "")
+        if not s:
+            continue
+        if s.isdigit() and 2 <= len(s) <= 5:
+            prefixes.append(s)
+    if not prefixes:
+        return None
+    or_parts: List[str] = []
+    for _pfx in prefixes:
+        params.append(f"{_pfx}%")
+        or_parts.append("TRIM(elem) LIKE ?")
+    inner = " OR ".join(or_parts)
+    return (
+        "EXISTS ("
+        "SELECT 1 FROM jsonb_array_elements_text(COALESCE(cm.nace_codes, '[]'::jsonb)) AS elem "
+        "WHERE (" + inner + ")"
+        ")"
+    )
+
+
 def _compile_nace_prefix_exclusion(
     value: Any, params: List[Any], db_is_postgres: bool
 ) -> Optional[str]:
@@ -437,6 +470,8 @@ def _compile_filter(
     """Compile one filter to SQL fragment. Returns None if invalid."""
     if field == "nace_codes" and op == "excludes_prefixes" and value_type == "nace":
         return _compile_nace_prefix_exclusion(value, params, db_is_postgres)
+    if field == "nace_codes" and op == "includes_any_prefix" and value_type == "nace":
+        return _compile_nace_prefix_inclusion(value, params, db_is_postgres)
 
     col = FILTER_FIELDS.get(field)
     if not col:
@@ -596,6 +631,11 @@ def _sanitize_filters(filters: List[FilterItem]) -> List[FilterItem]:
         if field not in FILTER_FIELDS:
             continue
         if field == "nace_codes" and op == "excludes_prefixes":
+            val = getattr(f, "value", None)
+            if isinstance(val, (list, tuple)) and len(val) > 0 and getattr(f, "type", "") == "nace":
+                out.append(f)
+            continue
+        if field == "nace_codes" and op == "includes_any_prefix":
             val = getattr(f, "value", None)
             if isinstance(val, (list, tuple)) and len(val) > 0 and getattr(f, "type", "") == "nace":
                 out.append(f)

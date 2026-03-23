@@ -399,6 +399,16 @@ class PostgresDBService(DatabaseService):
             [patch, run_id],
         )
 
+    def merge_enrichment_run_meta_patch(self, run_id: str, patch: Dict[str, Any]) -> None:
+        """Merge arbitrary top-level keys into enrichment_runs.meta (JSONB ||)."""
+        if not self.table_exists("enrichment_runs") or not patch:
+            return
+        patch_json = json.dumps(patch, default=str)
+        self._execute(
+            "UPDATE enrichment_runs SET meta = COALESCE(meta, '{}'::jsonb) || %s::jsonb WHERE id = %s",
+            [patch_json, run_id],
+        )
+
     def ping(self) -> bool:
         """Lightweight health check: runs SELECT 1. Returns True if OK."""
         try:

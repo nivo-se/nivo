@@ -269,6 +269,24 @@ def enrich_companies_batch(
         progress = int(((i + 1) / max(total, 1)) * 100)
         _update_job_progress(job, progress)
 
+    # Persist failures + counts so GET /run/{id}/status does not treat "skipped" as failed.
+    if run_id:
+        try:
+            db.merge_enrichment_run_meta_patch(
+                run_id,
+                {
+                    "failures": errors,
+                    "run_summary": {
+                        "enriched": enriched,
+                        "skipped": skipped,
+                        "total": total,
+                        "error_count": len(errors),
+                    },
+                },
+            )
+        except Exception as meta_exc:
+            logger.warning("merge_enrichment_run_meta_patch failed: %s", meta_exc)
+
     result = {
         "enriched": enriched,
         "total": total,

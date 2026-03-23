@@ -134,9 +134,7 @@ async def patch_screening_campaign(
     return _campaign_to_summary(updated) if updated else {"ok": True, "id": campaign_id}
 
 
-@router.delete("/{campaign_id}")
-async def delete_screening_campaign(request: Request, campaign_id: str) -> Dict[str, Any]:
-    """Remove a campaign and its candidates / stages (CASCADE)."""
+def _delete_campaign_core(request: Request, campaign_id: str) -> Dict[str, Any]:
     _require_postgres()
     _require_user(request)
     db = get_database_service()
@@ -147,6 +145,18 @@ async def delete_screening_campaign(request: Request, campaign_id: str) -> Dict[
     if not ok:
         raise HTTPException(500, "Failed to delete campaign")
     return {"ok": True, "id": campaign_id}
+
+
+@router.delete("/{campaign_id}")
+async def delete_screening_campaign(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Remove a campaign and its candidates / stages (CASCADE)."""
+    return _delete_campaign_core(request, campaign_id)
+
+
+@router.post("/{campaign_id}/delete")
+async def post_delete_screening_campaign(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Same as DELETE (some proxies / tunnels block DELETE; use this from the UI)."""
+    return _delete_campaign_core(request, campaign_id)
 
 
 @router.post("/{campaign_id}/start")

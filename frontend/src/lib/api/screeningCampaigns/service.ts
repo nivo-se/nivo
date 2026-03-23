@@ -46,9 +46,17 @@ export async function listScreeningCampaigns(): Promise<ScreeningCampaignSummary
 }
 
 export async function deleteScreeningCampaign(id: string): Promise<{ ok: boolean; id: string }> {
-  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${encodeURIComponent(id)}`, {
-    method: "DELETE",
+  const enc = encodeURIComponent(id);
+  const base = `${API_BASE}/api/screening/campaigns/${enc}`;
+  // POST …/delete works through most proxies; fallback to DELETE for older API builds.
+  let res = await fetchWithAuth(`${base}/delete`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
   });
+  if (res.status === 404 || res.status === 405) {
+    res = await fetchWithAuth(base, { method: "DELETE" });
+  }
   return parseJson(res);
 }
 

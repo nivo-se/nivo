@@ -61,13 +61,108 @@ import {
   Trash2,
 } from "lucide-react";
 
-/** Swedish SNI 2007 section prefixes — exclude haulage (49), finance/holdings (64), etc. */
+/** Default Layer 0 cap for **new** drafts (must match backend `CampaignParams.layer0_limit`). */
+const DEFAULT_LAYER0_CAP = 20;
+
+/** NACE Rev. 2 section C — manufacturing divisions (10–33). Used with includes_any_prefix. */
+const MANUFACTURING_NACE_PREFIXES: string[] = Array.from({ length: 24 }, (_, i) => String(10 + i));
+
+/**
+ * Swedish / NACE 2-digit prefixes to drop (non-manufacturing noise: trade, property, public, transport…).
+ * Does not include 10–33 (manufacturing). Tune checkboxes + custom field as needed.
+ */
 const SNI_PREFIX_PRESETS: { prefix: string; label: string }[] = [
-  { prefix: "49", label: "49 — Land transport (Åkeri, spedition…)" },
-  { prefix: "64", label: "64 — Financial & holding (e.g. PE vehicles)" },
-  { prefix: "66", label: "66 — Insurance & pension funds" },
+  { prefix: "01", label: "01 — Crop/animal production" },
+  { prefix: "02", label: "02 — Forestry & logging" },
+  { prefix: "03", label: "03 — Fishing" },
+  { prefix: "35", label: "35 — Electricity, gas, steam" },
+  { prefix: "41", label: "41 — Construction (buildings)" },
+  { prefix: "42", label: "42 — Civil engineering" },
+  { prefix: "43", label: "43 — Specialised construction" },
+  { prefix: "45", label: "45 — Motor vehicle trade" },
+  { prefix: "46", label: "46 — Wholesale" },
+  { prefix: "47", label: "47 — Retail (incl. groceries)" },
+  { prefix: "49", label: "49 — Land transport" },
+  { prefix: "50", label: "50 — Water transport (shipping)" },
+  { prefix: "51", label: "51 — Air transport" },
   { prefix: "52", label: "52 — Warehousing & transport support" },
+  { prefix: "53", label: "53 — Postal/courier" },
+  { prefix: "55", label: "55 — Hotels" },
+  { prefix: "56", label: "56 — Food service" },
+  { prefix: "58", label: "58 — Publishing" },
+  { prefix: "61", label: "61 — Telecom" },
+  { prefix: "62", label: "62 — IT services" },
+  { prefix: "63", label: "63 — Information services" },
+  { prefix: "64", label: "64 — Financial & holding" },
+  { prefix: "65", label: "65 — Insurance" },
+  { prefix: "66", label: "66 — Other financial" },
+  { prefix: "68", label: "68 — Real estate (property)" },
+  { prefix: "69", label: "69 — Legal/accounting" },
+  { prefix: "70", label: "70 — Head offices / holdings (mgmt)" },
+  { prefix: "71", label: "71 — Architecture/engineering" },
+  { prefix: "72", label: "72 — R&D" },
+  { prefix: "73", label: "73 — Advertising/market research" },
+  { prefix: "74", label: "74 — Other professional" },
+  { prefix: "75", label: "75 — Veterinary" },
+  { prefix: "77", label: "77 — Rental / leasing" },
+  { prefix: "78", label: "78 — Employment activities" },
+  { prefix: "79", label: "79 — Travel/tours" },
+  { prefix: "80", label: "80 — Security / investigation" },
+  { prefix: "81", label: "81 — Facilities / cleaning" },
+  { prefix: "82", label: "82 — Office admin / call centres" },
+  { prefix: "84", label: "84 — Public admin (municipalities, agencies)" },
+  { prefix: "85", label: "85 — Education" },
+  { prefix: "86", label: "86 — Human health" },
+  { prefix: "87", label: "87 — Residential care" },
+  { prefix: "88", label: "88 — Social work" },
 ];
+
+/** Defaults: exclude trade, transport, property, public sector, head offices, and most services. */
+const DEFAULT_EXCLUDED_SNI_PREFIXES = new Set<string>([
+  "01",
+  "02",
+  "03",
+  "35",
+  "41",
+  "42",
+  "43",
+  "45",
+  "46",
+  "47",
+  "49",
+  "50",
+  "51",
+  "52",
+  "53",
+  "55",
+  "56",
+  "58",
+  "61",
+  "62",
+  "63",
+  "64",
+  "65",
+  "66",
+  "68",
+  "69",
+  "70",
+  "71",
+  "72",
+  "73",
+  "74",
+  "75",
+  "77",
+  "78",
+  "79",
+  "80",
+  "81",
+  "82",
+  "84",
+  "85",
+  "86",
+  "87",
+  "88",
+]);
 
 function buildDeepResearchHandoffUrl(
   orgnr: string,
@@ -99,6 +194,18 @@ function formatLayer0Summary(layer0: Record<string, unknown> | undefined): strin
   return `${parts.join(" · ")}. Shortlist refreshed below.`;
 }
 
+function formatEnrichmentFailure(f: unknown): string {
+  if (f && typeof f === "object" && "orgnr" in f && "error" in f) {
+    const o = f as { orgnr: string; error: string };
+    return `${o.orgnr}: ${o.error}`;
+  }
+  try {
+    return JSON.stringify(f);
+  } catch {
+    return String(f);
+  }
+}
+
 export default function ScreeningCampaignsPage() {
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<ScreeningProfileSummary[]>([]);
@@ -116,13 +223,14 @@ export default function ScreeningCampaignsPage() {
 
   const [name, setName] = useState("Universe screening");
   const [profileId, setProfileId] = useState("");
-  const DEFAULT_LAYER0_CAP = 20;
   const [layer0Limit, setLayer0Limit] = useState(DEFAULT_LAYER0_CAP);
   /** Rename field for selected campaign */
   const [campaignRename, setCampaignRename] = useState("");
+  /** Require ≥1 NACE in manufacturing divisions 10–33 (NACE C). Strongly reduces non-producers. */
+  const [manufacturingOnly, setManufacturingOnly] = useState(true);
   /** SNI/NACE 2–5 digit prefixes to drop (any code on the company starting with one of these). */
   const [excludedSniPrefixes, setExcludedSniPrefixes] = useState<Set<string>>(
-    () => new Set(["49", "64"])
+    () => new Set(DEFAULT_EXCLUDED_SNI_PREFIXES)
   );
   const [customSniPrefixes, setCustomSniPrefixes] = useState("");
 
@@ -291,17 +399,28 @@ export default function ScreeningCampaignsPage() {
     setBusy(true);
     try {
       const prefixes = mergedSniExclusions().filter((p) => /^\d{2,5}$/.test(p));
-      const naceFilters =
-        prefixes.length > 0
-          ? [
-              {
-                field: "nace_codes",
-                op: "excludes_prefixes",
-                type: "nace",
-                value: prefixes,
-              },
-            ]
-          : [];
+      const naceFilters: Array<{
+        field: string;
+        op: string;
+        type: string;
+        value: string[] | unknown;
+      }> = [];
+      if (manufacturingOnly) {
+        naceFilters.push({
+          field: "nace_codes",
+          op: "includes_any_prefix",
+          type: "nace",
+          value: MANUFACTURING_NACE_PREFIXES,
+        });
+      }
+      if (prefixes.length > 0) {
+        naceFilters.push({
+          field: "nace_codes",
+          op: "excludes_prefixes",
+          type: "nace",
+          value: prefixes,
+        });
+      }
 
       const { campaignId } = await createScreeningCampaign({
         name,
@@ -668,30 +787,64 @@ export default function ScreeningCampaignsPage() {
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="camp-limit">Layer 0 cap</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="camp-limit">Layer 0 cap</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-muted-foreground"
+                onClick={() => setLayer0Limit(DEFAULT_LAYER0_CAP)}
+              >
+                Reset to {DEFAULT_LAYER0_CAP}
+              </Button>
+            </div>
             <Input
               id="camp-limit"
+              name="nivo-screening-layer0-cap"
               type="number"
               min={1}
               max={50000}
+              autoComplete="off"
               value={layer0Limit}
               onChange={(e) =>
                 setLayer0Limit(Number(e.target.value) || DEFAULT_LAYER0_CAP)
               }
             />
-            <p className="text-[10px] text-muted-foreground">
-              Default {DEFAULT_LAYER0_CAP} (max companies ranked after universe + exclusions).
+            <p className="text-xs text-muted-foreground">
+              Default {DEFAULT_LAYER0_CAP} for new drafts (max companies ranked after universe + exclusions).
+              If the field looks wrong after refresh, hard-reload (⌘⇧R) or restart the dev server. “Layer 0
+              (last run)” under a selected campaign shows the limit from the last run, which may differ.
             </p>
           </div>
         </div>
 
         <div className="space-y-2 border-t border-border pt-4">
+          <div className="flex items-start gap-2 rounded-md border border-border bg-muted/20 px-3 py-2">
+            <Checkbox
+              id="manufacturing-only"
+              checked={manufacturingOnly}
+              onCheckedChange={(v) => setManufacturingOnly(v === true)}
+              aria-label="Require manufacturing NACE"
+            />
+            <div className="space-y-0.5">
+              <Label htmlFor="manufacturing-only" className="text-sm font-medium cursor-pointer">
+                Manufacturing focus (recommended)
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Require at least one NACE code in <strong>divisions 10–33</strong> (NACE section C — actual
+                production). Drops pure retail, property, shipping, municipal entities, HQs, etc. that only carry
+                secondary codes. Turn off to use exclusions only.
+              </p>
+            </div>
+          </div>
           <Label className="text-sm">Exclude SNI / NACE prefixes (industry)</Label>
           <p className="text-xs text-muted-foreground">
-            Companies with <em>any</em> code in <code className="text-xs">companies.nace_codes</code> starting
-            with these digits are removed before ranking (typical Swedish SNI sections).
+            After the manufacturing rule (if on), companies with <em>any</em> code in{" "}
+            <code className="text-xs">companies.nace_codes</code> starting with these digits are removed before
+            ranking. Uncheck sectors you want to keep.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 max-h-64 overflow-y-auto pr-1">
             {SNI_PREFIX_PRESETS.map(({ prefix, label }) => (
               <label
                 key={prefix}
@@ -921,6 +1074,15 @@ export default function ScreeningCampaignsPage() {
                                       ) : null}
                                       {" "}
                                       · <span className="text-foreground font-medium">Failed:</span> {st.failed}
+                                      {typeof st.skipped === "number" && st.skipped > 0 ? (
+                                        <>
+                                          {" · "}
+                                          <span className="text-foreground font-medium">Skipped:</span> {st.skipped}{" "}
+                                          <span className="text-muted-foreground">
+                                            (already had an AI profile — skipped without re-fetch)
+                                          </span>
+                                        </>
+                                      ) : null}
                                     </p>
                                     <p>
                                       <span className="text-foreground font-medium">By kind:</span>{" "}
@@ -931,9 +1093,22 @@ export default function ScreeningCampaignsPage() {
                                         : "—"}
                                     </p>
                                     {st.failures?.length ? (
-                                      <p className="text-destructive text-[11px] break-words">
-                                        Failures: {JSON.stringify(st.failures.slice(0, 3))}
-                                        {st.failures.length > 3 ? "…" : ""}
+                                      <ul className="text-destructive text-[11px] break-words list-disc pl-4 space-y-0.5">
+                                        {st.failures.slice(0, 12).map((f, idx) => (
+                                          <li key={idx}>{formatEnrichmentFailure(f)}</li>
+                                        ))}
+                                        {st.failures.length > 12 ? (
+                                          <li className="text-muted-foreground">…and {st.failures.length - 12} more</li>
+                                        ) : null}
+                                      </ul>
+                                    ) : null}
+                                    {st.completed === 0 &&
+                                    st.failed === 0 &&
+                                    (st.skipped == null || st.skipped === 0) ? (
+                                      <p className="text-[10px] text-muted-foreground border-t border-border/60 pt-1 mt-1">
+                                        No rows in <code className="text-[9px]">company_enrichment</code> for this run yet.
+                                        The worker may still be processing, or every org was skipped (already had an AI profile).
+                                        Restart API/worker after upgrading so run metadata includes accurate skipped counts.
                                       </p>
                                     ) : null}
                                   </>

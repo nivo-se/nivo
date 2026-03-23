@@ -127,6 +127,17 @@ class DatabaseService(ABC):
         """
         pass  # optional; postgres + local implement
 
+    def merge_enrichment_run_meta_patch(self, run_id: str, patch: Dict[str, Any]) -> None:
+        """
+        Merge top-level keys into enrichment_runs.meta (e.g. failures + run_summary).
+        No-op if table doesn't exist or not implemented.
+        """
+        if not patch:
+            return
+        # Default: at least persist failures if present (backends may override)
+        if "failures" in patch:
+            self.update_enrichment_run_meta(run_id, patch["failures"])
+
     def close(self) -> None:
         """Optional hook for backends that hold connections."""
         return None

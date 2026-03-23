@@ -23,6 +23,8 @@ export type EnrichmentRunStatus = {
   failed: number;
   /** Orgs still processing (worker not finished); not the same as failures */
   pending?: number;
+  /** Companies skipped because ai_profile already existed (no force_refresh). */
+  skipped?: number;
   failures: unknown[];
 };
 

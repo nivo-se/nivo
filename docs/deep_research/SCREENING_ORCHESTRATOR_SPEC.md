@@ -54,7 +54,7 @@ This is **not** a second “deep research” orchestrator. It is a **screening c
 
 ### Stage 0 — Campaign bootstrap
 
-**Input:** `profile_id`, optional `profile_version_id`, optional extra filters, target `final_shortlist_size` (default 100), `layer0_limit` (e.g. 2000), `layer1_limit` (e.g. 800), etc.
+**Input:** `profile_id`, optional `profile_version_id`, optional extra filters, target `final_shortlist_size` (default 100), `layer0_limit` (default **20** in API/UI; can be raised for larger cohorts), `layer1_limit` (e.g. 800), etc.
 
 **Actions:**
 
@@ -258,7 +258,7 @@ Body:
   "profileId": "uuid",
   "profileVersionId": null,
   "params": {
-    "layer0Limit": 2000,
+    "layer0Limit": 20,
     "layer1Limit": 800,
     "layer2Limit": 300,
     "finalShortlistSize": 100,

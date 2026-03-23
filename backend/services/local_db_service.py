@@ -288,6 +288,18 @@ class LocalDBService(DatabaseService):
         except Exception:
             pass
 
+    def merge_enrichment_run_meta_patch(self, run_id: str, patch: Dict[str, Any]) -> None:
+        if not self.table_exists("enrichment_runs") or not patch:
+            return
+        try:
+            rows = self._execute("SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1", [run_id])
+            meta = json.loads(rows[0]["meta"]) if rows and rows[0].get("meta") else {}
+            for k, v in patch.items():
+                meta[k] = v
+            self._execute("UPDATE enrichment_runs SET meta = ? WHERE id = ?", [json.dumps(meta, default=str), run_id])
+        except Exception:
+            pass
+
     def upsert_company_enrichment(
         self,
         orgnr: str,

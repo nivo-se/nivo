@@ -148,6 +148,7 @@ class EnrichmentRunStatusResponse(BaseModel):
     completed: int
     failed: int
     pending: int = 0
+    skipped: int = 0
     failures: List[Dict[str, Any]] = []
 
 
@@ -399,23 +400,35 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
         raise HTTPException(status_code=503, detail="Database not available")
 
     if not db.table_exists("company_enrichment"):
-        failures: List[Dict[str, Any]] = []
+        failures = []
         pending = 0
+        skipped = 0
+        meta: Dict[str, Any] = {}
         if db.table_exists("enrichment_runs"):
             run_rows = db.run_raw_query("SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1", [run_id])
             if run_rows and run_rows[0].get("meta"):
-                meta = run_rows[0]["meta"]
-                if isinstance(meta, dict):
-                    failures = meta.get("failures", []) or []
-                    orgnrs = meta.get("orgnrs") or []
-                    if orgnrs and not meta.get("worker_finished"):
+                raw = run_rows[0]["meta"]
+                if isinstance(raw, dict):
+                    meta = raw
+                    failures = list(raw.get("failures") or [])
+                    orgnrs = raw.get("orgnrs") or []
+                    if orgnrs and not raw.get("worker_finished"):
                         pending = max(0, len(orgnrs))
+                    rs = raw.get("run_summary")
+                    if isinstance(rs, dict):
+                        skipped = int(rs.get("skipped", 0) or 0)
+        failed_count = len(failures)
+        if not failures:
+            rs = meta.get("run_summary")
+            if isinstance(rs, dict) and rs.get("error_count") is not None:
+                failed_count = int(rs.get("error_count", 0) or 0)
         return EnrichmentRunStatusResponse(
             run_id=run_id,
             counts_by_kind={},
             completed=0,
-            failed=len(failures),
+            failed=failed_count,
             pending=pending,
+            skipped=skipped,
             failures=failures or [],
         )
 
@@ -433,8 +446,9 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
     )
     completed = int(completed_rows[0]["cnt"]) if completed_rows else 0
 
-    failures = []
+    failures: List[Dict[str, Any]] = []
     pending = 0
+    skipped = 0
     run_rows = db.run_raw_query(
         "SELECT meta FROM enrichment_runs WHERE id = ? LIMIT 1",
         [run_id],
@@ -456,6 +470,10 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
     total_in_batch = len(orgnrs) if orgnrs else 0
     worker_finished = bool(meta.get("worker_finished"))
 
+    rs_sum = meta.get("run_summary")
+    if isinstance(rs_sum, dict):
+        skipped = int(rs_sum.get("skipped", 0) or 0)
+
     if worker_finished:
         # Run finished: failed = explicit per-org errors, else orgs with no row written
         if failures:
@@ -471,12 +489,16 @@ async def get_enrichment_run_status(run_id: str) -> EnrichmentRunStatusResponse:
         if total_in_batch:
             pending = max(0, total_in_batch - completed)
 
+    if not failures and worker_finished and isinstance(rs_sum, dict) and rs_sum.get("error_count") is not None:
+        failed = int(rs_sum.get("error_count", 0) or 0)
+
     return EnrichmentRunStatusResponse(
         run_id=run_id,
         counts_by_kind=counts_by_kind,
         completed=completed,
         failed=failed,
         pending=pending,
+        skipped=skipped,
         failures=failures or [],
     )
 
