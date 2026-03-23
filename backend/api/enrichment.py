@@ -4,7 +4,7 @@ import json
 import logging
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel, Field
 
 from ..services.db_factory import get_database_service
@@ -112,10 +112,25 @@ async def start_enrichment(request: EnrichmentStartRequest) -> EnrichmentStartRe
 
 
 class EnrichmentRunRequest(BaseModel):
-    """Request to run batch enrichment"""
+    """Request to run batch enrichment.
+
+    Exactly one source of orgnrs should be provided: explicit ``orgnrs``, ``list_id`` (saved list),
+    or ``campaign_id`` (screening campaign Layer 0 candidates).
+    """
+
     orgnrs: Optional[List[str]] = None
     list_id: Optional[str] = None
-    kinds: Optional[List[str]] = Field(default=None, description="Enrichment kinds to produce (default: llm_analysis, company_profile, website_insights)")
+    campaign_id: Optional[str] = Field(
+        default=None,
+        alias="campaignId",
+        description="Screening campaign UUID: enrich all candidates not marked excluded_from_analysis",
+    )
+    kinds: Optional[List[str]] = Field(
+        default=None,
+        description="Enrichment kinds to produce (default: llm_analysis, company_profile, website_insights)",
+    )
+
+    model_config = {"populate_by_name": True}
 
 
 class EnrichmentRunResponse(BaseModel):
@@ -134,8 +149,126 @@ class EnrichmentRunStatusResponse(BaseModel):
     failures: List[Dict[str, Any]] = []
 
 
-def _resolve_orgnrs(db, orgnrs: Optional[List[str]], list_id: Optional[str]) -> List[str]:
-    """Resolve orgnrs from explicit list or saved_company_lists by list_id."""
+def _meta_dict(meta: Any) -> Dict[str, Any]:
+    if meta is None:
+        return {}
+    if isinstance(meta, dict):
+        return meta
+    if isinstance(meta, str):
+        try:
+            parsed = json.loads(meta)
+            return parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+
+def _list_enrichment_runs_for_campaign(
+    db,
+    campaign_id: str,
+    limit: int,
+) -> List[Dict[str, Any]]:
+    """Return recent enrichment runs whose meta references this screening campaign."""
+    try:
+        rows = db.run_raw_query(
+            """
+            SELECT id, created_at, source, meta
+            FROM enrichment_runs
+            WHERE meta IS NOT NULL
+              AND (meta::jsonb->>'campaign_id') IS NOT NULL
+              AND (meta::jsonb->>'campaign_id')::text = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            [campaign_id, limit],
+        )
+    except Exception:
+        # SQLite / older schemas: scan recent rows and filter in Python
+        rows = db.run_raw_query(
+            "SELECT id, created_at, source, meta FROM enrichment_runs ORDER BY created_at DESC LIMIT 500",
+            None,
+        )
+        rows = [
+            r
+            for r in rows
+            if str(_meta_dict(r.get("meta")).get("campaign_id") or "") == str(campaign_id)
+        ][:limit]
+
+    out: List[Dict[str, Any]] = []
+    for r in rows:
+        meta = _meta_dict(r.get("meta"))
+        orgnrs = meta.get("orgnrs")
+        qc = len(orgnrs) if isinstance(orgnrs, list) else None
+        ca = r.get("created_at")
+        created_s = ca.isoformat() if hasattr(ca, "isoformat") else (str(ca) if ca else None)
+        out.append(
+            {
+                "runId": str(r["id"]),
+                "createdAt": created_s,
+                "source": r.get("source"),
+                "campaignId": meta.get("campaign_id"),
+                "queuedCount": qc,
+            }
+        )
+    return out
+
+
+@router.get("/runs", response_model=Dict[str, Any])
+async def list_enrichment_runs(
+    campaign_id: Optional[str] = Query(None, alias="campaignId", description="Filter runs started from this screening campaign"),
+    limit: int = Query(20, ge=1, le=100),
+) -> Dict[str, Any]:
+    """List stored enrichment runs (Postgres `enrichment_runs`), optionally scoped to a screening campaign."""
+    db = get_database_service()
+    if not db:
+        raise HTTPException(status_code=503, detail="Database not available")
+    if not db.table_exists("enrichment_runs"):
+        return {"items": []}
+
+    if campaign_id:
+        items = _list_enrichment_runs_for_campaign(db, campaign_id.strip(), limit)
+        return {"items": items}
+
+    # Recent global runs (no campaign filter)
+    try:
+        rows = db.run_raw_query(
+            """
+            SELECT id, created_at, source, meta
+            FROM enrichment_runs
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            [limit],
+        )
+    except Exception:
+        rows = []
+
+    items: List[Dict[str, Any]] = []
+    for r in rows:
+        meta = _meta_dict(r.get("meta"))
+        orgnrs = meta.get("orgnrs")
+        qc = len(orgnrs) if isinstance(orgnrs, list) else None
+        ca = r.get("created_at")
+        created_s = ca.isoformat() if hasattr(ca, "isoformat") else (str(ca) if ca else None)
+        items.append(
+            {
+                "runId": str(r["id"]),
+                "createdAt": created_s,
+                "source": r.get("source"),
+                "campaignId": meta.get("campaign_id"),
+                "queuedCount": qc,
+            }
+        )
+    return {"items": items}
+
+
+def _resolve_orgnrs(
+    db,
+    orgnrs: Optional[List[str]],
+    list_id: Optional[str],
+    campaign_id: Optional[str] = None,
+) -> List[str]:
+    """Resolve orgnrs from explicit list, saved_company_lists, or screening campaign candidates."""
     if orgnrs and len(orgnrs) > 0:
         return [str(o).strip() for o in orgnrs if str(o).strip()]
     if list_id:
@@ -157,6 +290,34 @@ def _resolve_orgnrs(db, orgnrs: Optional[List[str]], list_id: Optional[str]) -> 
                         return out
         except Exception as exc:
             logger.warning("Failed to resolve list_id %s: %s", list_id, exc)
+    if campaign_id:
+        if not db.table_exists("screening_campaign_candidates"):
+            return []
+        try:
+            rows = db.run_raw_query(
+                """
+                SELECT orgnr FROM screening_campaign_candidates
+                WHERE campaign_id::text = ?
+                  AND COALESCE(excluded_from_analysis, false) = false
+                ORDER BY layer0_rank ASC NULLS LAST, orgnr
+                """,
+                [campaign_id],
+            )
+            return [str(r["orgnr"]) for r in rows if r.get("orgnr")]
+        except Exception as exc:
+            logger.warning("Campaign candidate query with exclusion failed (%s), retrying without exclusion: %s", campaign_id, exc)
+            try:
+                rows = db.run_raw_query(
+                    """
+                    SELECT orgnr FROM screening_campaign_candidates
+                    WHERE campaign_id::text = ?
+                    ORDER BY layer0_rank ASC NULLS LAST, orgnr
+                    """,
+                    [campaign_id],
+                )
+                return [str(r["orgnr"]) for r in rows if r.get("orgnr")]
+            except Exception as exc2:
+                logger.warning("Failed to resolve campaign_id %s: %s", campaign_id, exc2)
     return []
 
 
@@ -170,9 +331,12 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
     if not db:
         raise HTTPException(status_code=503, detail="Database not available")
 
-    orgnrs = _resolve_orgnrs(db, request.orgnrs, request.list_id)
+    orgnrs = _resolve_orgnrs(db, request.orgnrs, request.list_id, request.campaign_id)
     if not orgnrs:
-        raise HTTPException(status_code=400, detail="Provide orgnrs or list_id with companies")
+        raise HTTPException(
+            status_code=400,
+            detail="Provide orgnrs, list_id with companies, or campaignId (screening campaign with candidates)",
+        )
 
     kinds = request.kinds or DEFAULT_ENRICHMENT_KINDS
     batch = orgnrs[:500]
@@ -180,7 +344,11 @@ async def run_enrichment(request: EnrichmentRunRequest) -> EnrichmentRunResponse
     run_id = db.create_enrichment_run(
         source="enrichment-run-api",
         provider="openai_compat",
-        meta={"orgnrs": batch, "kinds": kinds},
+        meta={
+            "orgnrs": batch,
+            "kinds": kinds,
+            "campaign_id": request.campaign_id,
+        },
     )
     if not run_id:
         raise HTTPException(status_code=500, detail="Failed to create enrichment run")

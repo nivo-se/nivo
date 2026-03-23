@@ -64,5 +64,8 @@ class CandidateRow(BaseModel):
     layer0_rank: Optional[int] = Field(None, alias="layer0Rank")
     profile_weighted_score: Optional[float] = Field(None, alias="profileWeightedScore")
     archetype_code: Optional[str] = Field(None, alias="archetypeCode")
+    primary_nace: Optional[str] = Field(None, alias="primaryNace")
+    excluded_from_analysis: bool = Field(False, alias="excludedFromAnalysis")
+    exclusion_reason: Optional[str] = Field(None, alias="exclusionReason")
 
     model_config = {"populate_by_name": True}

@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useMemo, useCallback } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,8 @@ import {
   type CompanyWithReport,
   type ResearchRunSummary,
 } from '@/lib/services/deepResearchService'
-import { NewReportWizard } from './NewReportWizard'
+import { BackendStatusBanner } from '@/components/BackendStatusBanner'
+import { NewReportWizard, type ReportWizardPrefill } from './NewReportWizard'
 
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Not started',
@@ -128,12 +129,36 @@ function buildMergedList(
 }
 
 export default function DeepResearchHomePage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [runs, setRuns] = useState<AnalysisStatus[] | null>(null)
   const [companies, setCompanies] = useState<CompanyWithReport[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
+  const [wizardPrefill, setWizardPrefill] = useState<ReportWizardPrefill | null>(null)
+
+  const handlePrefillConsumed = useCallback(() => {
+    setWizardPrefill(null)
+  }, [])
+
+  /** Screening / company profile → Deep Research handoff via ?orgnr=…&from=… */
+  useEffect(() => {
+    const orgnr = searchParams.get('orgnr')
+    if (!orgnr || orgnr.trim().length < 4) return
+    const from = searchParams.get('from')
+    const source: ReportWizardPrefill['source'] =
+      from === 'screening' ? 'screening' : from === 'company' ? 'company' : undefined
+    setWizardPrefill({
+      orgnr: orgnr.trim(),
+      name: searchParams.get('name') || undefined,
+      website: searchParams.get('website') || undefined,
+      source,
+      campaignName: searchParams.get('campaign') || undefined,
+    })
+    setWizardOpen(true)
+    setSearchParams({}, { replace: true })
+  }, [searchParams, setSearchParams])
 
   useEffect(() => {
     Promise.all([listRuns(), listCompaniesWithReports()]).then(([runsData, companiesData]) => {
@@ -183,6 +208,7 @@ export default function DeepResearchHomePage() {
   return (
     <div className="min-h-[60vh] bg-profile-bg-subtle">
       <div className="max-w-3xl mx-auto p-6 space-y-6">
+        <BackendStatusBanner />
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-profile-fg">Deep Research</h1>
@@ -292,7 +318,19 @@ export default function DeepResearchHomePage() {
         })}
       </div>
 
-        <NewReportWizard open={wizardOpen} onClose={() => setWizardOpen(false)} onSuccess={() => setWizardOpen(false)} />
+        <NewReportWizard
+          open={wizardOpen}
+          prefill={wizardPrefill}
+          onPrefillConsumed={handlePrefillConsumed}
+          onClose={() => {
+            setWizardOpen(false)
+            setWizardPrefill(null)
+          }}
+          onSuccess={() => {
+            setWizardOpen(false)
+            setWizardPrefill(null)
+          }}
+        />
       </div>
     </div>
   )

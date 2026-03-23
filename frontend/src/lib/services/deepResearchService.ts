@@ -246,6 +246,44 @@ export async function startAnalysis(req: StartAnalysisRequest): Promise<Analysis
   return drPost<AnalysisStartResult>('/analysis/start', req)
 }
 
+/** Same as startAnalysis but returns API error message when the request fails (for user-facing toasts). */
+export async function startAnalysisDetailed(
+  req: StartAnalysisRequest
+): Promise<{ ok: true; data: AnalysisStartResult } | { ok: false; message: string }> {
+  try {
+    const res = await fetchWithAuth(`${DR_BASE}/analysis/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    })
+    const bodyText = await res.text()
+    let parsed: (ApiResponse<AnalysisStartResult> & { detail?: string | string[] | Record<string, unknown> }) | null =
+      null
+    try {
+      parsed = JSON.parse(bodyText) as ApiResponse<AnalysisStartResult> & {
+        detail?: string | string[] | Record<string, unknown>
+      }
+    } catch {
+      /* ignore */
+    }
+    if (!res.ok) {
+      const detail = parsed?.detail
+      let detailStr = ''
+      if (typeof detail === 'string') detailStr = detail
+      else if (Array.isArray(detail)) detailStr = detail.join(', ')
+      else if (detail && typeof detail === 'object') detailStr = JSON.stringify(detail)
+      const msg =
+        (parsed?.error?.message ?? detailStr) || `Could not start analysis (HTTP ${res.status})`
+      return { ok: false, message: msg }
+    }
+    const data = parsed?.data ?? null
+    if (!data?.run_id) return { ok: false, message: 'No run id in response' }
+    return { ok: true, data }
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 export async function getRunStatus(runId: string): Promise<AnalysisStatus | null> {
   return drFetch<AnalysisStatus>(`/analysis/runs/${runId}`)
 }

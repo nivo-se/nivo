@@ -60,3 +60,22 @@ export async function listCampaignCandidates(
   const res = await fetchWithAuth(url);
   return parseJson(res);
 }
+
+export async function patchCandidateExclusion(
+  campaignId: string,
+  orgnr: string,
+  body: { excludedFromAnalysis: boolean; exclusionReason?: string | null }
+): Promise<{ ok: boolean }> {
+  const enc = encodeURIComponent(orgnr);
+  const res = await fetchWithAuth(
+    `${API_BASE}/api/screening/campaigns/${campaignId}/candidates/${enc}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        excludedFromAnalysis: body.excludedFromAnalysis,
+        exclusionReason: body.exclusionReason ?? null,
+      }),
+    }
+  );
+  return parseJson(res);
+}

@@ -21,6 +21,7 @@ from ..services.screening_orchestrator.campaign_service import (
     list_campaigns,
     list_candidates,
     run_layer0_sync,
+    set_candidate_exclusion,
 )
 from ..services.screening_orchestrator.schemas import CreateCampaignBody
 from .dependencies import get_current_user_id
@@ -64,6 +65,13 @@ def _campaign_to_summary(row: Dict[str, Any]) -> Dict[str, Any]:
 
 class PauseBody(BaseModel):
     reason: Optional[str] = None
+
+
+class CandidateExclusionBody(BaseModel):
+    excluded_from_analysis: bool = Field(..., alias="excludedFromAnalysis")
+    exclusion_reason: Optional[str] = Field(None, alias="exclusionReason")
+
+    model_config = {"populate_by_name": True}
 
 
 @router.post("")
@@ -172,6 +180,35 @@ async def get_campaign_candidates(
                 "archetypeCode": r.get("archetype_code"),
                 "isSelected": bool(r.get("is_selected")),
                 "finalRank": r.get("final_rank"),
+                "primaryNace": r.get("primary_nace"),
+                "excludedFromAnalysis": bool(r.get("excluded_from_analysis")),
+                "exclusionReason": r.get("exclusion_reason"),
             }
         )
     return {"rows": out, "total": total}
+
+
+@router.patch("/{campaign_id}/candidates/{orgnr}")
+async def patch_candidate_exclusion(
+    request: Request,
+    campaign_id: str,
+    orgnr: str,
+    body: CandidateExclusionBody,
+) -> Dict[str, Any]:
+    """Mark a candidate excluded from further analysis (e.g. head office, holding shell)."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    ok = set_candidate_exclusion(
+        db,
+        campaign_id,
+        orgnr,
+        excluded=body.excluded_from_analysis,
+        reason=body.exclusion_reason,
+    )
+    if not ok:
+        raise HTTPException(404, "Candidate not found in this campaign")
+    return {"ok": True, "orgnr": orgnr, "excludedFromAnalysis": body.excluded_from_analysis}

@@ -175,4 +175,7 @@ This index is intended to be used together with:
 - `PROFILE_LEARNING_PIPELINE_DESIGN.md` — offline workflow for converting Deep Research reports into Layer 1 screening profiles (variables, weights, archetypes, exclusions)
 - `SCREENING_ORCHESTRATOR_SPEC.md` — large-universe screening campaigns (SQL-first shortlist, LLM relevance/fit gates, handoff to Deep Research)
 - `SCREENING_PRESET_PROFILES.md` — five team-scoped default screening profiles (migration `039_seed_preset_screening_profiles.sql`)
+- `SCREENING_DATA_AND_ENRICHMENT.md` — head offices vs subsidiaries, SNI limits, Tavily / enrichment discipline
+- `SCREENING_PROFILES_AND_ENRICHMENT.md` — where profile JSON lives vs campaigns vs `company_enrichment`; `POST /api/enrichment/run` with `campaignId`
+- `SCREENING_UX_WORKFLOW.md` — full UX workflow (profile → Layer 0 → triage → enrich) + improvement backlog
 

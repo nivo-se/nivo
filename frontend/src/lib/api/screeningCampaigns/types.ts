@@ -17,6 +17,9 @@ export type ScreeningCampaignCandidate = {
   layer0Rank?: number | null;
   profileWeightedScore?: number | null;
   archetypeCode?: string | null;
+  primaryNace?: string | null;
+  excludedFromAnalysis?: boolean;
+  exclusionReason?: string | null;
   isSelected?: boolean;
   finalRank?: number | null;
 };

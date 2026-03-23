@@ -12,7 +12,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service
-from .coverage import _parse_segment_names, _IS_POSTGRES
+from .coverage import _parse_nace_codes, _parse_segment_names, _IS_POSTGRES
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,8 @@ FILTER_FIELDS = {
     "revenue_cagr_3y": "cm.revenue_cagr_3y",
     "employees_latest": "cm.employees_latest",
     "segment_names": "cm.segment_names",
+    "nace_codes": "cm.nace_codes",
+    "primary_nace": "cm.primary_nace",
     "name": "cm.name",
     "has_homepage": "cm.has_homepage",
     "has_ai_profile": "cm.has_ai_profile",
@@ -48,6 +50,7 @@ SORT_FIELDS = {
     "has_homepage", "has_3y_financials", "is_stale",
     "fit_score", "ops_upside_score", "nivo_total_score", "segment_tier",
     "research_feasibility_score",
+    "primary_nace",
 }
 
 
@@ -81,6 +84,19 @@ FILTER_TAXONOMY = {
                 {"field": "segment_names", "label": "Segment name contains", "type": "text", "ops": ["contains"]},
                 {"field": "name", "label": "Company name contains", "type": "text", "ops": ["contains"]},
                 {"field": "segment_tier", "label": "Segment tier", "type": "text", "ops": ["="]},
+            ],
+        },
+        {
+            "id": "industry",
+            "label": "Industry (SNI / NACE)",
+            "items": [
+                {
+                    "field": "nace_codes",
+                    "label": "Exclude SNI/NACE code prefixes (e.g. 49 Åkeri, 64 finance)",
+                    "type": "nace",
+                    "ops": ["excludes_prefixes"],
+                    "unit": "prefixes",
+                },
             ],
         },
         {
@@ -347,7 +363,9 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
           CASE WHEN (c.homepage IS NOT NULL AND c.homepage != '') THEN 1 ELSE 0 END +
           CASE WHEN ({has_3y_expr}) THEN 1 ELSE 0 END +
           CASE WHEN ({raw_revenue_latest_expr}) >= {MIN_VALID_REVENUE_SEK} THEN 1 ELSE 0 END
-        )::int AS research_feasibility_score
+        )::int AS research_feasibility_score,
+        CASE WHEN c.nace_codes IS NULL THEN NULL::jsonb ELSE c.nace_codes::jsonb END AS nace_codes,
+        (CASE WHEN c.nace_codes IS NULL THEN NULL ELSE (c.nace_codes::jsonb->>0) END) AS primary_nace
       FROM companies c
       LEFT JOIN ai_profiles a ON c.orgnr = a.org_number
       {metrics_join}
@@ -379,10 +397,47 @@ class UniverseQueryPayload(BaseModel):
     profileVersionId: Optional[str] = None  # optional; if omitted use active version
 
 
+def _compile_nace_prefix_exclusion(
+    value: Any, params: List[Any], db_is_postgres: bool
+) -> Optional[str]:
+    """
+    Exclude rows where any SNI/NACE code in companies.nace_codes (JSON array) starts with
+    one of the given digit prefixes (e.g. 49 = land transport, 64 = finance).
+    """
+    if not db_is_postgres:
+        return None
+    if not isinstance(value, (list, tuple)):
+        return None
+    prefixes: List[str] = []
+    for p in value:
+        s = str(p).strip().replace(" ", "")
+        if not s:
+            continue
+        # 2–5 digit SNI/NACE section prefixes
+        if s.isdigit() and 2 <= len(s) <= 5:
+            prefixes.append(s)
+    if not prefixes:
+        return None
+    or_parts: List[str] = []
+    for _pfx in prefixes:
+        params.append(f"{_pfx}%")
+        or_parts.append("TRIM(elem) LIKE ?")
+    inner = " OR ".join(or_parts)
+    return (
+        "(cm.nace_codes IS NULL OR NOT EXISTS ("
+        "SELECT 1 FROM jsonb_array_elements_text(COALESCE(cm.nace_codes, '[]'::jsonb)) AS elem "
+        "WHERE (" + inner + ")"
+        "))"
+    )
+
+
 def _compile_filter(
     field: str, op: str, value: Any, value_type: str, params: List[Any], db_is_postgres: bool
 ) -> Optional[str]:
     """Compile one filter to SQL fragment. Returns None if invalid."""
+    if field == "nace_codes" and op == "excludes_prefixes" and value_type == "nace":
+        return _compile_nace_prefix_exclusion(value, params, db_is_postgres)
+
     col = FILTER_FIELDS.get(field)
     if not col:
         return None
@@ -539,6 +594,11 @@ def _sanitize_filters(filters: List[FilterItem]) -> List[FilterItem]:
         field = field.strip()
         op = op.strip()
         if field not in FILTER_FIELDS:
+            continue
+        if field == "nace_codes" and op == "excludes_prefixes":
+            val = getattr(f, "value", None)
+            if isinstance(val, (list, tuple)) and len(val) > 0 and getattr(f, "type", "") == "nace":
+                out.append(f)
             continue
         if op not in ("=", ">=", "<=", "between", "contains", "!="):
             continue
@@ -747,10 +807,13 @@ def _materialize_universe_row(
     ops = r.get("ops_upside_score")
     nivo = r.get("nivo_total_score")
     tier = r.get("segment_tier")
+    nace_raw = r.get("nace_codes")
     row_dict: Dict[str, Any] = {
         "orgnr": str(r.get("orgnr", "")),
         "name": r.get("name"),
         "segment_names": _parse_segment_names(seg),
+        "nace_codes": _parse_nace_codes(nace_raw),
+        "primary_nace": str(r.get("primary_nace")).strip() if r.get("primary_nace") is not None else None,
         "has_homepage": bool(r.get("has_homepage")),
         "has_ai_profile": bool(r.get("has_ai_profile")),
         "has_3y_financials": bool(r.get("has_3y_financials")),
@@ -833,7 +896,7 @@ def execute_universe_query(
         order_sql = _build_order(body.sort, _IS_POSTGRES)
 
     select_cols = (
-        "cm.orgnr, cm.name, cm.segment_names, cm.has_homepage, cm.has_ai_profile, "
+        "cm.orgnr, cm.name, cm.segment_names, cm.nace_codes, cm.primary_nace, cm.has_homepage, cm.has_ai_profile, "
         "cm.has_3y_financials, cm.last_enriched_at, cm.is_stale, cm.data_quality_score, "
         "cm.revenue_latest, cm.ebitda_margin_latest, cm.revenue_cagr_3y, cm.employees_latest, "
         "cm.municipality, cm.homepage, cm.email, cm.phone, cm.ai_strategic_fit_score, "

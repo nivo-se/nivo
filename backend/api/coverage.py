@@ -34,6 +34,21 @@ def _parse_segment_names(val: Any) -> List[str]:
     return []
 
 
+def _parse_nace_codes(val: Any) -> List[str]:
+    """Parse nace_codes JSON array (SNI/NACE strings) from DB row."""
+    if val is None:
+        return []
+    if isinstance(val, list):
+        return [str(x) for x in val if x is not None and str(x).strip()]
+    if isinstance(val, str):
+        try:
+            p = json.loads(val)
+            return [str(x) for x in p] if isinstance(p, list) else []
+        except json.JSONDecodeError:
+            return []
+    return []
+
+
 @router.get("/snapshot")
 async def coverage_snapshot():
     """

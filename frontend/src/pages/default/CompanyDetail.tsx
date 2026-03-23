@@ -41,9 +41,23 @@ import {
   ExternalLink,
   Search,
   Info,
+  FileSearch,
 } from "lucide-react";
 import { upsertProspect } from "@/lib/api/prospects/service";
 import { toast } from "sonner";
+
+function deepResearchHandoffUrl(company: {
+  orgnr: string;
+  display_name: string;
+  website_url?: string | null;
+}) {
+  const p = new URLSearchParams();
+  p.set("orgnr", company.orgnr);
+  p.set("from", "company");
+  if (company.display_name?.trim()) p.set("name", company.display_name.trim());
+  if (company.website_url?.trim()) p.set("website", company.website_url.trim());
+  return `/deep-research?${p.toString()}`;
+}
 
 const SECTION_LABELS: Record<string, string> = {
   revenue: "Revenue",
@@ -336,7 +350,7 @@ export default function CompanyDetail() {
                 <span>{company.region ?? "—"}</span>
               </div>
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-wrap gap-2 items-center justify-end">
               <AddToListDropdown orgnrs={[company.orgnr]} size="default" />
               <Button variant="outline" onClick={handleCreateProspect}>
                 <UserPlus className="w-4 h-4 mr-2" />
@@ -346,6 +360,12 @@ export default function CompanyDetail() {
                 <Button variant="outline">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Run AI Analysis
+                </Button>
+              </Link>
+              <Link to={deepResearchHandoffUrl(company)}>
+                <Button variant="outline" title="Start Deep Research with org.nr and website pre-filled">
+                  <FileSearch className="w-4 h-4 mr-2" />
+                  Deep Research
                 </Button>
               </Link>
             </div>

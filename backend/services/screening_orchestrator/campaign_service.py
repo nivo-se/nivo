@@ -225,7 +225,9 @@ def list_candidates(
     rows = db.run_raw_query(
         f"""
         SELECT c.orgnr, c.layer0_rank, c.profile_weighted_score, c.archetype_code,
-               c.is_selected, c.final_rank, co.company_name AS name
+               c.is_selected, c.final_rank, c.excluded_from_analysis, c.exclusion_reason,
+               co.company_name AS name,
+               (CASE WHEN co.nace_codes IS NULL THEN NULL ELSE (co.nace_codes::jsonb->>0) END) AS primary_nace
         FROM screening_campaign_candidates c
         LEFT JOIN companies co ON co.orgnr = c.orgnr
         WHERE c.campaign_id::text = ?{sel}
@@ -237,6 +239,29 @@ def list_candidates(
     return rows, total
 
 
+def set_candidate_exclusion(
+    db: Any,
+    campaign_id: str,
+    orgnr: str,
+    *,
+    excluded: bool,
+    reason: Optional[str] = None,
+) -> bool:
+    """Set excluded_from_analysis for a campaign candidate row."""
+    reason_val = (reason or "").strip() or None if excluded else None
+    rows = db.run_raw_query(
+        """
+        UPDATE screening_campaign_candidates
+        SET excluded_from_analysis = ?,
+            exclusion_reason = ?
+        WHERE campaign_id::text = ? AND orgnr = ?
+        RETURNING orgnr
+        """,
+        [excluded, reason_val, campaign_id, orgnr],
+    )
+    return bool(rows)
+
+
 __all__ = [
     "create_campaign",
     "get_campaign",
@@ -244,4 +269,5 @@ __all__ = [
     "run_layer0_sync",
     "list_candidates",
     "resolve_profile_version_id",
+    "set_candidate_exclusion",
 ]

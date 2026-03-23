@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
@@ -18,14 +18,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Card, CardContent } from '@/components/ui/card'
-import { searchCompanySummaries } from '@/lib/api/companies/service'
+import { getCompanyByOrgnr, searchCompanySummaries } from '@/lib/api/companies/service'
 import {
-  startAnalysis,
+  startAnalysisDetailed,
   getCostEstimate,
   type CostEstimate,
   type ResearchMode,
   type StartAnalysisRequest,
 } from '@/lib/services/deepResearchService'
+import { toast } from '@/hooks/use-toast'
 import type { Company } from '@/lib/api/types'
 import { Building2, Check, ChevronLeft, ChevronRight, Loader2, Plus, X } from 'lucide-react'
 
@@ -44,13 +45,31 @@ const RESEARCH_MODES: { value: ResearchMode; label: string; analysisType: 'quick
   { value: 'full', label: 'Full IC Prep', analysisType: 'full' },
 ]
 
+/** Prefill when opening the wizard from screening or company profile (avoids re-typing org.nr / name). */
+export type ReportWizardPrefill = {
+  orgnr: string
+  name?: string | null
+  website?: string | null
+  source?: 'screening' | 'company'
+  campaignName?: string | null
+}
+
 interface NewReportWizardProps {
   open: boolean
   onClose: () => void
   onSuccess: () => void
+  /** When set and the dialog opens, company fields are resolved from the universe DB by org.nr. */
+  prefill?: ReportWizardPrefill | null
+  onPrefillConsumed?: () => void
 }
 
-export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardProps) {
+export function NewReportWizard({
+  open,
+  onClose,
+  onSuccess,
+  prefill = null,
+  onPrefillConsumed,
+}: NewReportWizardProps) {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [companySearch, setCompanySearch] = useState('')
@@ -72,6 +91,12 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
   const [inputNotes, setInputNotes] = useState('')
   const [costEstimate, setCostEstimate] = useState<CostEstimate | null>(null)
   const [costEstimateLoading, setCostEstimateLoading] = useState(false)
+  const [prefillLoading, setPrefillLoading] = useState(false)
+  const [handoffSource, setHandoffSource] = useState<'screening' | 'company' | null>(null)
+  const [handoffCampaignName, setHandoffCampaignName] = useState<string | null>(null)
+  /** True when handoff org.nr was not found in universe — user should verify manual fields. */
+  const [prefillManualFallback, setPrefillManualFallback] = useState(false)
+  const prevOpenRef = useRef(false)
 
   const company = selectedCompany || (manualCompanyName ? { orgnr: manualOrgnr || '', display_name: manualCompanyName, website_url: manualWebsite || undefined, has_3y_financials: false, has_homepage: !!manualWebsite } as Company : null)
 
@@ -106,6 +131,48 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
     return () => clearTimeout(t)
   }, [debouncedSearch])
 
+  /** Resolve org.nr from screening / company profile handoff when the dialog opens. */
+  useEffect(() => {
+    const justOpened = open && !prevOpenRef.current
+    prevOpenRef.current = open
+    if (!justOpened || !prefill?.orgnr || prefill.orgnr.trim().length < 4) return
+
+    let cancelled = false
+    setPrefillLoading(true)
+    ;(async () => {
+      try {
+        const trimmedOrgnr = prefill.orgnr.trim()
+        const co = await getCompanyByOrgnr(trimmedOrgnr)
+        if (cancelled) return
+        setSelectedCompany(null)
+        setManualCompanyName('')
+        setManualOrgnr('')
+        setManualWebsite('')
+        setCompanySearch('')
+        setSearchResults([])
+        setStep(1)
+        if (co) {
+          setSelectedCompany(co)
+          setPrefillManualFallback(false)
+        } else {
+          setManualCompanyName(prefill.name?.trim() || '')
+          setManualOrgnr(trimmedOrgnr)
+          setManualWebsite(prefill.website?.trim() || '')
+          setPrefillManualFallback(true)
+        }
+        setHandoffSource(prefill.source ?? null)
+        setHandoffCampaignName(prefill.campaignName?.trim() || null)
+      } finally {
+        if (!cancelled) {
+          setPrefillLoading(false)
+          onPrefillConsumed?.()
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [open, prefill, onPrefillConsumed])
 
   const handleSelectCompany = (c: Company) => {
     setSelectedCompany(c)
@@ -160,11 +227,17 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
         analysis_type: refreshWebEvidence ? 'refresh' : RESEARCH_MODES.find((m) => m.value === researchMode)?.analysisType ?? 'full',
         ...(sources.length > 0 && { sources }),
       }
-      const result = await startAnalysis(req)
-      if (result?.run_id) {
+      const result = await startAnalysisDetailed(req)
+      if (result.ok) {
         onSuccess()
         onClose()
-        navigate(`/deep-research/runs/${result.run_id}`)
+        navigate(`/deep-research/runs/${result.data.run_id}`)
+      } else {
+        toast({
+          title: 'Could not start analysis',
+          description: result.message,
+          variant: 'destructive',
+        })
       }
     } finally {
       setSubmitting(false)
@@ -173,7 +246,7 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
 
   const canProceed =
     step === 1
-      ? !!(selectedCompany || (manualCompanyName.trim().length >= 2))
+      ? !prefillLoading && !!(selectedCompany || (manualCompanyName.trim().length >= 2))
       : step === 2
         ? true
         : step < 6
@@ -197,6 +270,10 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
     setInputUrls([])
     setInputUrlDraft('')
     setInputNotes('')
+    setPrefillLoading(false)
+    setHandoffSource(null)
+    setHandoffCampaignName(null)
+    setPrefillManualFallback(false)
     onClose()
   }
 
@@ -205,14 +282,47 @@ export function NewReportWizard({ open, onClose, onSuccess }: NewReportWizardPro
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New report</DialogTitle>
-          <DialogDescription>
-            Step {step} of 5: {STEPS[step - 1].title}
+          <DialogDescription id="new-report-wizard-desc">
+            Step {step} of {STEPS.length}: {STEPS[step - 1].title}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           {step === 1 && (
             <div className="space-y-4">
+              {handoffSource && (
+                <div
+                  className="rounded-md border border-primary/25 bg-primary/5 px-3 py-2 text-sm text-foreground"
+                  role="status"
+                >
+                  {handoffSource === 'screening' ? (
+                    <>
+                      <span className="font-medium">From screening</span>
+                      {handoffCampaignName ? (
+                        <span className="text-muted-foreground"> — campaign &quot;{handoffCampaignName}&quot;</span>
+                      ) : null}
+                      . Org.nr and company name are pre-filled — continue through the steps when ready.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-medium">From company profile</span>
+                      . Details are pre-filled — adjust if needed and continue.
+                    </>
+                  )}
+                  {prefillManualFallback && handoffSource ? (
+                    <span className="block mt-2 text-muted-foreground">
+                      This org.nr was not found in the universe registry — name and website below are from your handoff;
+                      confirm or edit before running.
+                    </span>
+                  ) : null}
+                </div>
+              )}
+              {prefillLoading && (
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading company from registry…
+                </p>
+              )}
               <div>
                 <Label htmlFor="company-search">Search by company name or org nr</Label>
                 <Input
