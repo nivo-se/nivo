@@ -22,7 +22,8 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:16
+    # Includes pgvector — required by migrations 005 (if applied), 042_exemplar_report_chunks, etc.
+    image: pgvector/pgvector:pg16
     pull_policy: missing
     container_name: nivo-pg
     environment:
