@@ -106,6 +106,28 @@ def _table_exists(db: Any, table_name: str) -> bool:
         return False
 
 
+def _relation_has_columns(db: Any, relation_name: str, columns: Sequence[str]) -> bool:
+    """Return True when all requested columns exist on a table/view."""
+    if not columns:
+        return True
+    if not _table_exists(db, relation_name):
+        return False
+    try:
+        rows = db.run_raw_query(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = %s
+            """,
+            [relation_name],
+        )
+        existing = {str(r.get("column_name")) for r in rows}
+        return all(col in existing for col in columns)
+    except Exception:
+        return False
+
+
 def _count_distinct_orgnrs(db: Any, table_name: str) -> int:
     if table_name not in KNOWN_FINANCIAL_TABLES + KNOWN_METRICS_TABLES:
         return 0
@@ -210,11 +232,17 @@ def _build_universe_source_subquery(db: Any) -> tuple[str, str, str]:
             nivo_total_score_expr = "m.nivo_total_score"
             segment_tier_expr = "m.segment_tier"
         elif _table_exists(db, "company_metrics"):
-            scores_join = "LEFT JOIN company_metrics m_sc ON m_sc.orgnr = c.orgnr"
-            fit_score_expr = "m_sc.fit_score"
-            ops_upside_score_expr = "m_sc.ops_upside_score"
-            nivo_total_score_expr = "m_sc.nivo_total_score"
-            segment_tier_expr = "m_sc.segment_tier"
+            score_cols = ("fit_score", "ops_upside_score", "nivo_total_score", "segment_tier")
+            if _relation_has_columns(db, "company_metrics", score_cols):
+                scores_join = "LEFT JOIN company_metrics m_sc ON m_sc.orgnr = c.orgnr"
+                fit_score_expr = "m_sc.fit_score"
+                ops_upside_score_expr = "m_sc.ops_upside_score"
+                nivo_total_score_expr = "m_sc.nivo_total_score"
+                segment_tier_expr = "m_sc.segment_tier"
+            else:
+                logger.warning(
+                    "Universe source: company_metrics exists but lacks required score columns; using NULL scores"
+                )
 
     fin_latest_annual_join = ""
     fin_latest_any_join = ""
