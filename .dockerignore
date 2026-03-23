@@ -1,0 +1,18 @@
+# Shrink API image build context (docker compose build api) — faster uploads and better layer cache hits.
+.git
+.github
+.cursor
+**/.venv
+**/venv
+**/node_modules
+frontend
+scraper
+test-results
+.pytest_cache
+**/__pycache__
+**/*.pyc
+**/*.pyo
+*.md
+docs
+.env
+.env.*

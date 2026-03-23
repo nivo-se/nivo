@@ -11,6 +11,9 @@ from uuid import uuid4
 
 from backend.api.universe import _get_profile_config
 from backend.services.screening_orchestrator.layer0 import run_layer0_for_campaign
+from backend.services.screening_orchestrator.layer1_relevance import run_layer1_sync as _run_layer1_core
+from backend.services.screening_orchestrator.layer2_fit import run_layer2_sync as _run_layer2_core
+from backend.services.screening_orchestrator.layer3_blend import run_layer3_sync as _run_layer3_core
 from backend.services.screening_orchestrator.schemas import CreateCampaignBody
 
 logger = logging.getLogger(__name__)
@@ -208,6 +211,115 @@ def run_layer0_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
         raise
 
 
+def _merge_campaign_stats(db: Any, campaign_id: str, key: str, stats: Dict[str, Any]) -> None:
+    row = get_campaign(db, campaign_id)
+    merged = dict(row.get("stats_json") or {}) if row else {}
+    if isinstance(merged, str):
+        merged = json.loads(merged)
+    merged[key] = stats
+    db.run_raw_query(
+        """
+        UPDATE screening_campaigns
+        SET stats_json = ?::jsonb, updated_at = NOW()
+        WHERE id::text = ?
+        """,
+        [json.dumps(merged), campaign_id],
+    )
+
+
+def run_layer1_campaign_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
+    if not get_campaign(db, campaign_id):
+        raise ValueError("Campaign not found")
+    db.run_raw_query(
+        "UPDATE screening_campaigns SET status = 'running', error_message = NULL, updated_at = NOW() WHERE id::text = ?",
+        [campaign_id],
+    )
+    _upsert_stage(db, campaign_id, "layer1", "running", {})
+    try:
+        stats = _run_layer1_core(db, campaign_id)
+        _merge_campaign_stats(db, campaign_id, "layer1", stats)
+        db.run_raw_query(
+            """
+            UPDATE screening_campaigns
+            SET status = 'completed', current_stage = 'layer1', updated_at = NOW(), error_message = NULL
+            WHERE id::text = ?
+            """,
+            [campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer1", "completed", stats)
+        return stats
+    except Exception as e:
+        logger.exception("Layer1 failed for campaign %s", campaign_id)
+        db.run_raw_query(
+            "UPDATE screening_campaigns SET status = 'failed', error_message = ?, updated_at = NOW() WHERE id::text = ?",
+            [str(e)[:2000], campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer1", "failed", {}, str(e)[:2000])
+        raise
+
+
+def run_layer2_campaign_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
+    if not get_campaign(db, campaign_id):
+        raise ValueError("Campaign not found")
+    db.run_raw_query(
+        "UPDATE screening_campaigns SET status = 'running', error_message = NULL, updated_at = NOW() WHERE id::text = ?",
+        [campaign_id],
+    )
+    _upsert_stage(db, campaign_id, "layer2", "running", {})
+    try:
+        stats = _run_layer2_core(db, campaign_id)
+        _merge_campaign_stats(db, campaign_id, "layer2", stats)
+        db.run_raw_query(
+            """
+            UPDATE screening_campaigns
+            SET status = 'completed', current_stage = 'layer2', updated_at = NOW(), error_message = NULL
+            WHERE id::text = ?
+            """,
+            [campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer2", "completed", stats)
+        return stats
+    except Exception as e:
+        logger.exception("Layer2 failed for campaign %s", campaign_id)
+        db.run_raw_query(
+            "UPDATE screening_campaigns SET status = 'failed', error_message = ?, updated_at = NOW() WHERE id::text = ?",
+            [str(e)[:2000], campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer2", "failed", {}, str(e)[:2000])
+        raise
+
+
+def run_layer3_campaign_sync(db: Any, campaign_id: str) -> Dict[str, Any]:
+    if not get_campaign(db, campaign_id):
+        raise ValueError("Campaign not found")
+    db.run_raw_query(
+        "UPDATE screening_campaigns SET status = 'running', error_message = NULL, updated_at = NOW() WHERE id::text = ?",
+        [campaign_id],
+    )
+    _upsert_stage(db, campaign_id, "layer3", "running", {})
+    try:
+        stats = _run_layer3_core(db, campaign_id)
+        _merge_campaign_stats(db, campaign_id, "layer3", stats)
+        db.run_raw_query(
+            """
+            UPDATE screening_campaigns
+            SET status = 'completed', current_stage = 'layer3', updated_at = NOW(), error_message = NULL
+            WHERE id::text = ?
+            """,
+            [campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer3", "completed", stats)
+        return stats
+    except Exception as e:
+        logger.exception("Layer3 failed for campaign %s", campaign_id)
+        db.run_raw_query(
+            "UPDATE screening_campaigns SET status = 'failed', error_message = ?, updated_at = NOW() WHERE id::text = ?",
+            [str(e)[:2000], campaign_id],
+        )
+        _upsert_stage(db, campaign_id, "layer3", "failed", {}, str(e)[:2000])
+        raise
+
+
 def list_candidates(
     db: Any,
     campaign_id: str,
@@ -226,6 +338,7 @@ def list_candidates(
         f"""
         SELECT c.orgnr, c.layer0_rank, c.profile_weighted_score, c.archetype_code,
                c.is_selected, c.final_rank, c.excluded_from_analysis, c.exclusion_reason,
+               c.relevance_status, c.relevance_json, c.fit_json, c.fit_total, c.combined_score,
                co.company_name AS name,
                (CASE WHEN co.nace_codes IS NULL THEN NULL ELSE (co.nace_codes::jsonb->>0) END) AS primary_nace
         FROM screening_campaign_candidates c
@@ -240,20 +353,26 @@ def list_candidates(
 
 
 def rename_campaign(db: Any, campaign_id: str, name: str) -> bool:
-    """Update campaign display name. Returns True if a row was updated."""
+    """Update campaign display name. Returns True if the row exists and now has this name."""
     name = (name or "").strip()
     if not name:
         return False
-    rows = db.run_raw_query(
+    # Do not rely on RETURNING rows: PostgresDBService.run_raw_query drops result sets when
+    # cursor.description is unset (UPDATE without RETURNING), and some drivers are inconsistent
+    # for UPDATE...RETURNING. Apply update, then verify.
+    db.run_raw_query(
         """
         UPDATE screening_campaigns
         SET name = ?, updated_at = NOW()
         WHERE id::text = ?
-        RETURNING id::text AS id
         """,
         [name, campaign_id],
     )
-    return bool(rows)
+    check = db.run_raw_query(
+        "SELECT 1 AS ok FROM screening_campaigns WHERE id::text = ? AND name = ?",
+        [campaign_id, name],
+    )
+    return bool(check)
 
 
 def delete_campaign_record(db: Any, campaign_id: str) -> bool:
@@ -340,6 +459,9 @@ __all__ = [
     "get_campaign",
     "list_campaigns",
     "run_layer0_sync",
+    "run_layer1_campaign_sync",
+    "run_layer2_campaign_sync",
+    "run_layer3_campaign_sync",
     "list_candidates",
     "resolve_profile_version_id",
     "attach_public_enrichment_to_candidates",

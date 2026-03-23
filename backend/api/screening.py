@@ -7,8 +7,9 @@ import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from .universe import validate_proposed_filters
 from ..services.db_factory import get_database_service
 from .dependencies import get_current_user_id
 
@@ -23,6 +24,45 @@ async def get_screening_context(request: Request):
     _require_postgres()
     uid = _require_user(request)
     return {"userId": uid}
+
+
+@router.get("/exemplar-mandate")
+async def get_exemplar_mandate(request: Request):
+    """
+    Metadata for `docs/deep_research/screening_exemplars/screening_output.json` (patterns, archetypes, playbook).
+    Does not require Postgres; used to align prompts with a versioned mandate file.
+    """
+    _require_user(request)
+    from ..services.exemplar_mandate import (
+        exemplar_mandate_path,
+        exemplar_mandate_version,
+        load_screening_exemplar_mandate,
+    )
+
+    data = load_screening_exemplar_mandate()
+    meta = data.get("_meta") if isinstance(data.get("_meta"), dict) else {}
+    return {
+        "path": str(exemplar_mandate_path()),
+        "version": exemplar_mandate_version(data),
+        "meta": meta,
+        "keys": [k for k in data.keys() if k != "_meta"],
+    }
+
+
+class ValidateFiltersBody(BaseModel):
+    """Proposed universe FilterItem rows (Phase B: LLM → validator → human approve)."""
+
+    filters: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+@router.post("/validate-filters")
+async def post_validate_filters(request: Request, body: ValidateFiltersBody):
+    """
+    Validate structured filter rules against universe FILTER_FIELDS / ops.
+    Does not execute SQL; returns sanitized filters + per-index errors.
+    """
+    _require_user(request)
+    return validate_proposed_filters(body.filters)
 
 
 def _require_postgres():

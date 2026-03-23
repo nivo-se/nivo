@@ -1,4 +1,4 @@
-/** Layer 1 screening profile (list / detail). */
+/** Screening profile — scoring model for universe screening (list / detail). */
 export type ScreeningProfileSummary = {
   id: string;
   name: string;

@@ -20,6 +20,9 @@ import {
   patchCandidateExclusion,
   patchScreeningCampaign,
   startScreeningCampaign,
+  startScreeningLayer1,
+  startScreeningLayer2,
+  startScreeningLayer3,
 } from "@/lib/api/screeningCampaigns/service";
 import {
   getScreeningContext,
@@ -41,6 +44,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type {
   ScreeningCampaignCandidate,
@@ -67,6 +77,11 @@ const SNI_PREFIX_PRESETS: { prefix: string; label: string }[] = [
   { prefix: "64", label: "64 — Financial & holding (e.g. PE vehicles)" },
   { prefix: "66", label: "66 — Insurance & pension funds" },
   { prefix: "52", label: "52 — Warehousing & transport support" },
+  { prefix: "55", label: "55 — Accommodation (hotels, camping…)" },
+  { prefix: "70", label: "70 — Head offices / mgmt consulting" },
+  { prefix: "77", label: "77 — Rental & leasing activities" },
+  { prefix: "84", label: "84 — Public admin & defence" },
+  { prefix: "85", label: "85 — Education" },
 ];
 
 function buildDeepResearchHandoffUrl(
@@ -81,21 +96,26 @@ function buildDeepResearchHandoffUrl(
   return `/deep-research?${p.toString()}`;
 }
 
-/** Human-readable Layer 0 stats from POST /screening/campaigns/:id/start */
-function formatLayer0Summary(layer0: Record<string, unknown> | undefined): string {
+/** Human-readable stats from POST /screening/campaigns/:id/start (`layer0` payload). */
+function formatScreeningRunSummary(layer0: Record<string, unknown> | undefined): string {
   if (!layer0 || typeof layer0 !== "object") {
-    return "Layer 0 finished. The candidate table below was updated.";
+    return "Screening run finished. The shortlist below was updated.";
   }
   const kept = layer0.kept;
   const total = layer0.total_matched;
   const limit = layer0.layer0_limit;
   const scanned = layer0.scanned_rows;
+  const cohortMax = layer0.max_universe_candidates;
+  const rankedCap = layer0.ranked_after_cohort_cap;
   const parts: string[] = [];
   if (typeof kept === "number") parts.push(`Kept ${kept} companies`);
   if (typeof total === "number") parts.push(`${total} matched the universe query`);
-  if (typeof limit === "number") parts.push(`cap ${limit}`);
+  if (typeof limit === "number") parts.push(`shortlist up to ${limit}`);
+  if (typeof cohortMax === "number" && typeof rankedCap === "number") {
+    parts.push(`ranked pool capped at ${rankedCap} (max ${cohortMax})`);
+  }
   if (typeof scanned === "number") parts.push(`scanned ${scanned} rows`);
-  if (parts.length === 0) return "Layer 0 finished. The candidate table below was updated.";
+  if (parts.length === 0) return "Screening run finished. The shortlist below was updated.";
   return `${parts.join(" · ")}. Shortlist refreshed below.`;
 }
 
@@ -117,7 +137,9 @@ export default function ScreeningCampaignsPage() {
   const [name, setName] = useState("Universe screening");
   const [profileId, setProfileId] = useState("");
   const DEFAULT_LAYER0_CAP = 20;
+  const DEFAULT_MAX_UNIVERSE = 500;
   const [layer0Limit, setLayer0Limit] = useState(DEFAULT_LAYER0_CAP);
+  const [maxUniverseCandidates, setMaxUniverseCandidates] = useState(DEFAULT_MAX_UNIVERSE);
   /** Rename field for selected campaign */
   const [campaignRename, setCampaignRename] = useState("");
   /** SNI/NACE 2–5 digit prefixes to drop (any code on the company starting with one of these). */
@@ -125,6 +147,9 @@ export default function ScreeningCampaignsPage() {
     () => new Set(["49", "64"])
   );
   const [customSniPrefixes, setCustomSniPrefixes] = useState("");
+  /** Structural SQL floors (SEK revenue, headcount) — merged into campaign filters. */
+  const [minRevenueMsek, setMinRevenueMsek] = useState("");
+  const [minEmployees, setMinEmployees] = useState("");
 
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [profileEditorMode, setProfileEditorMode] = useState<"new" | "edit">("new");
@@ -134,16 +159,34 @@ export default function ScreeningCampaignsPage() {
   const [expandedEnrichmentRunId, setExpandedEnrichmentRunId] = useState<string | null>(null);
   const [enrichmentStatusByRun, setEnrichmentStatusByRun] = useState<Record<string, EnrichmentRunStatus>>({});
   const [loadingEnrichmentDetailId, setLoadingEnrichmentDetailId] = useState<string | null>(null);
-  /** Collapsible "Campaign results" under the campaign list (Layer 0 + enrichment runs). */
+  /** Collapsible scores & enrichment runs under the campaign list. */
   const [campaignResultsOpen, setCampaignResultsOpen] = useState(true);
+  /** Industry / NACE exclusions — collapsed by default to reduce noise. */
+  const [industryExclusionsOpen, setIndustryExclusionsOpen] = useState(false);
+  const [structuralFiltersOpen, setStructuralFiltersOpen] = useState(false);
+  /** Technical enrichment details — collapsed by default. */
+  const [enrichmentHelpOpen, setEnrichmentHelpOpen] = useState(false);
   const selectedIdRef = useRef<string | null>(null);
   useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
 
+  /**
+   * Keep rename input in sync when the selected campaign changes, or when the list first loads the row.
+   * Do not reset on every `campaigns` refresh (same selection) — that wiped in-progress edits and caused no-op saves.
+   */
+  const renameSyncedForIdRef = useRef<string | null>(null);
   useEffect(() => {
+    if (!selectedId) {
+      setCampaignRename("");
+      renameSyncedForIdRef.current = null;
+      return;
+    }
     const c = campaigns.find((x) => x.id === selectedId);
-    setCampaignRename(c?.name ?? "");
+    if (!c) return;
+    if (renameSyncedForIdRef.current === selectedId) return;
+    setCampaignRename(c.name ?? "");
+    renameSyncedForIdRef.current = selectedId;
   }, [selectedId, campaigns]);
 
   const loadCampaigns = useCallback(async () => {
@@ -282,8 +325,8 @@ export default function ScreeningCampaignsPage() {
     return [...new Set([...excludedSniPrefixes, ...extra])];
   }
 
-  /** Create campaign in Postgres, then run Layer 0 immediately (single primary action). */
-  async function handleCreateAndRunLayer0() {
+  /** Create campaign in Postgres, then run universe screening + rank (single primary action). */
+  async function handleCreateAndRunScreening() {
     if (!profileId) {
       toast({ title: "Select a screening profile", variant: "destructive" });
       return;
@@ -303,11 +346,36 @@ export default function ScreeningCampaignsPage() {
             ]
           : [];
 
+      const structural: Array<{
+        field: string;
+        op: string;
+        value: number;
+        type: string;
+      }> = [];
+      const rev = Number(minRevenueMsek);
+      if (Number.isFinite(rev) && rev > 0) {
+        structural.push({
+          field: "revenue_latest",
+          op: ">=",
+          value: rev * 1_000_000,
+          type: "number",
+        });
+      }
+      const emp = Number(minEmployees);
+      if (Number.isFinite(emp) && emp > 0) {
+        structural.push({
+          field: "employees_latest",
+          op: ">=",
+          value: emp,
+          type: "number",
+        });
+      }
+
       const { campaignId } = await createScreeningCampaign({
         name,
         profileId,
-        params: { layer0Limit },
-        filters: naceFilters,
+        params: { layer0Limit, maxUniverseCandidates },
+        filters: [...naceFilters, ...structural],
       });
       await loadCampaigns();
       setSelectedId(campaignId);
@@ -315,14 +383,14 @@ export default function ScreeningCampaignsPage() {
       const result = await startScreeningCampaign(campaignId);
       const layer0 = result.layer0 as Record<string, unknown> | undefined;
       toast({
-        title: "Layer 0 complete",
-        description: formatLayer0Summary(layer0),
+        title: "Screening complete",
+        description: formatScreeningRunSummary(layer0),
       });
       await loadCampaigns();
       await loadCandidates(campaignId);
     } catch (e) {
       toast({
-        title: "Campaign run failed",
+        title: "Screening run failed",
         description: e instanceof Error ? e.message : String(e),
         variant: "destructive",
       });
@@ -369,6 +437,84 @@ export default function ScreeningCampaignsPage() {
     } catch (e) {
       toast({
         title: "Rename failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleLayer1Run() {
+    if (!selectedId) return;
+    setBusy(true);
+    try {
+      const out = await startScreeningLayer1(selectedId);
+      const st = out.layer1 as Record<string, unknown> | undefined;
+      toast({
+        title: "Layer 1 relevance complete",
+        description:
+          typeof st?.processed === "number"
+            ? `Labeled ${st.processed} companies (batched).`
+            : "Shortlist updated with relevance labels.",
+      });
+      await loadCampaigns();
+      await loadCandidates(selectedId);
+    } catch (e) {
+      toast({
+        title: "Layer 1 failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleLayer2Run() {
+    if (!selectedId) return;
+    setBusy(true);
+    try {
+      const out = await startScreeningLayer2(selectedId);
+      const st = out.layer2 as Record<string, unknown> | undefined;
+      toast({
+        title: "Layer 2 fit complete",
+        description:
+          typeof st?.processed === "number"
+            ? `Scored ${st.processed} in-mandate / uncertain rows.`
+            : "Fit scorecards written.",
+      });
+      await loadCampaigns();
+      await loadCandidates(selectedId);
+    } catch (e) {
+      toast({
+        title: "Layer 2 failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleLayer3Run() {
+    if (!selectedId) return;
+    setBusy(true);
+    try {
+      const out = await startScreeningLayer3(selectedId);
+      const st = out.layer3 as Record<string, unknown> | undefined;
+      toast({
+        title: "Layer 3 blend complete",
+        description:
+          typeof st?.ranked === "number"
+            ? `Ranked ${st.ranked} rows by combined score.`
+            : "Final ranks updated.",
+      });
+      await loadCampaigns();
+      await loadCandidates(selectedId);
+    } catch (e) {
+      toast({
+        title: "Layer 3 failed",
         description: e instanceof Error ? e.message : String(e),
         variant: "destructive",
       });
@@ -425,7 +571,7 @@ export default function ScreeningCampaignsPage() {
         description:
           `Run ${runId.slice(0, 8)}… — ${out.queuedCount} companies. ` +
           `Results are written to Postgres (enrichment_runs, company_enrichment, ai_profiles). ` +
-          `Open Campaign results (left) to watch progress; the table refreshes as rows complete.`,
+          `Open Scores & enrichment runs (left) to watch progress; the table refreshes as rows complete.`,
       });
       setEnrichmentRuns(await listEnrichmentRuns({ campaignId, limit: 15 }));
     } catch (e) {
@@ -459,28 +605,6 @@ export default function ScreeningCampaignsPage() {
         if (st && (st.completed > 0 || st.failed > 0)) break;
       }
     })();
-  }
-
-  async function handleStart(id: string) {
-    setBusy(true);
-    try {
-      const result = await startScreeningCampaign(id);
-      const layer0 = result.layer0 as Record<string, unknown> | undefined;
-      toast({
-        title: "Layer 0 complete",
-        description: formatLayer0Summary(layer0),
-      });
-      await loadCampaigns();
-      if (selectedId === id) await loadCandidates(id);
-    } catch (e) {
-      toast({
-        title: "Start failed",
-        description: e instanceof Error ? e.message : String(e),
-        variant: "destructive",
-      });
-    } finally {
-      setBusy(false);
-    }
   }
 
   const selected = campaigns.find((c) => c.id === selectedId);
@@ -517,7 +641,7 @@ export default function ScreeningCampaignsPage() {
     busy
       ? "Wait for the current operation to finish."
       : candidatesTotal === 0
-        ? "Run Layer 0 first so this campaign has candidates."
+        ? "This campaign has no candidates yet — use New campaign above to run screening, or select a campaign that already has candidates."
         : undefined;
 
   const runNewCampaignDisabledReason =
@@ -534,7 +658,7 @@ export default function ScreeningCampaignsPage() {
               : undefined;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
       <BackendStatusBanner />
       {campaignsLoadError ? (
         <div
@@ -550,8 +674,7 @@ export default function ScreeningCampaignsPage() {
           className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive flex flex-wrap items-center justify-between gap-2"
         >
           <span>
-            Screening profiles failed to load: {profilesLoadError}. You need at least one profile to create a draft
-            campaign.
+            Screening profiles failed to load: {profilesLoadError}. You need at least one profile to start a run.
           </span>
           <Button
             type="button"
@@ -574,18 +697,42 @@ export default function ScreeningCampaignsPage() {
           </Button>
         </div>
       ) : null}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Screening campaigns</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Layer 0 ranks by profile score. Use <strong>SNI exclusions</strong> to remove weak financial fits
-          (e.g. Åkeri, PE/holding shells) using industry codes on the company — not just revenue growth.
-        </p>
-        <p className="text-xs text-muted-foreground mt-2 max-w-3xl">
-          <strong>Profiles</strong> and <strong>campaigns</strong> are stored in Postgres; enrichment batches create rows in{" "}
-          <code className="text-[10px]">enrichment_runs</code> (recent runs for the selected campaign are listed below after you
-          enrich).
-        </p>
-      </div>
+      <header className="space-y-4">
+        <div className="space-y-1.5">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Screening</h1>
+          <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
+            Build a ranked shortlist from the universe using a <strong className="text-foreground font-medium">screening profile</strong>,
+            then enrich companies for deeper review. Optional industry filters drop whole sectors (e.g. transport, holdings)
+            before scoring.
+          </p>
+        </div>
+        <ol className="grid gap-2 sm:grid-cols-3 rounded-xl border border-border/80 bg-muted/25 px-4 py-3 text-sm text-muted-foreground sm:gap-4">
+          <li className="flex gap-2 sm:flex-col sm:gap-1">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background text-xs font-semibold text-foreground shadow-sm ring-1 ring-border">
+              1
+            </span>
+            <span>
+              <span className="font-medium text-foreground">Configure</span> — name, profile, shortlist size, ranked pool cap, optional industry exclusions.
+            </span>
+          </li>
+          <li className="flex gap-2 sm:flex-col sm:gap-1">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background text-xs font-semibold text-foreground shadow-sm ring-1 ring-border">
+              2
+            </span>
+            <span>
+              <span className="font-medium text-foreground">Run screening</span> — creates the campaign and fills the shortlist in one step.
+            </span>
+          </li>
+          <li className="flex gap-2 sm:flex-col sm:gap-1">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background text-xs font-semibold text-foreground shadow-sm ring-1 ring-border">
+              3
+            </span>
+            <span>
+              <span className="font-medium text-foreground">Enrich</span> — optional public / LLM pass, then open companies or Deep Research.
+            </span>
+          </li>
+        </ol>
+      </header>
 
       {!profilesLoading && profiles.length === 0 && !profilesLoadError ? (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
@@ -602,13 +749,19 @@ export default function ScreeningCampaignsPage() {
           >
             Create a profile
           </Button>{" "}
-          to define Layer 1 scoring (variables, weights, archetypes), then run a campaign below.
+          to define how companies are scored (variables, weights, archetypes), then run a campaign below.
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-border p-4 space-y-4">
-        <h2 className="text-lg font-medium">New campaign</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end">
+      <Card className="shadow-sm hover:shadow-sm">
+        <CardHeader className="space-y-1 pb-2 sm:pb-4">
+          <CardTitle className="text-lg">Start a run</CardTitle>
+          <CardDescription>
+            Pick a screening profile and how many companies to keep. Industry exclusions are optional — expand below if you need them.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-0">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="camp-name">Name</Label>
             <Input
@@ -668,7 +821,7 @@ export default function ScreeningCampaignsPage() {
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="camp-limit">Layer 0 cap</Label>
+            <Label htmlFor="camp-limit">Shortlist size</Label>
             <Input
               id="camp-limit"
               type="number"
@@ -680,75 +833,162 @@ export default function ScreeningCampaignsPage() {
               }
             />
             <p className="text-[10px] text-muted-foreground">
-              Default {DEFAULT_LAYER0_CAP} (max companies ranked after universe + exclusions).
+              Default {DEFAULT_LAYER0_CAP} (rows stored in this campaign after screening).
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="camp-cohort-max">Ranked pool cap</Label>
+            <Input
+              id="camp-cohort-max"
+              type="number"
+              min={1}
+              max={50000}
+              value={maxUniverseCandidates}
+              onChange={(e) =>
+                setMaxUniverseCandidates(Number(e.target.value) || DEFAULT_MAX_UNIVERSE)
+              }
+            />
+            <p className="text-[10px] text-muted-foreground">
+              After sorting by profile score, consider at most this many rows (default {DEFAULT_MAX_UNIVERSE}). Must be ≥ shortlist size.
             </p>
           </div>
         </div>
 
-        <div className="space-y-2 border-t border-border pt-4">
-          <Label className="text-sm">Exclude SNI / NACE prefixes (industry)</Label>
-          <p className="text-xs text-muted-foreground">
-            Companies with <em>any</em> code in <code className="text-xs">companies.nace_codes</code> starting
-            with these digits are removed before ranking (typical Swedish SNI sections).
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {SNI_PREFIX_PRESETS.map(({ prefix, label }) => (
-              <label
-                key={prefix}
-                className="flex items-start gap-2 text-sm cursor-pointer max-w-[280px]"
-              >
-                <input
-                  type="checkbox"
-                  className="mt-1 rounded border-input"
-                  checked={excludedSniPrefixes.has(prefix)}
-                  onChange={() => {
-                    setExcludedSniPrefixes((prev) => {
-                      const n = new Set(prev);
-                      if (n.has(prefix)) n.delete(prefix);
-                      else n.add(prefix);
-                      return n;
-                    });
-                  }}
-                />
-                <span>{label}</span>
-              </label>
-            ))}
-          </div>
-          <div className="space-y-1 max-w-xl">
-            <Label htmlFor="custom-sni" className="text-xs text-muted-foreground">
-              Extra prefixes (comma-separated, 2–5 digits)
-            </Label>
-            <Input
-              id="custom-sni"
-              placeholder="e.g. 77, 841"
-              value={customSniPrefixes}
-              onChange={(e) => setCustomSniPrefixes(e.target.value)}
+        <Collapsible open={industryExclusionsOpen} onOpenChange={setIndustryExclusionsOpen}>
+          <CollapsibleTrigger
+            aria-expanded={industryExclusionsOpen}
+            className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2.5 text-left text-sm font-medium text-foreground hover:bg-muted/30"
+          >
+            <span>Industry exclusions (optional)</span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                industryExclusionsOpen ? "rotate-0" : "-rotate-90"
+              )}
+              aria-hidden
             />
-          </div>
-        </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3 pt-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Drop companies whose industry codes start with these prefixes (Swedish SNI / NACE). Handy to exclude e.g. haulage
+              or holding shells before scoring.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {SNI_PREFIX_PRESETS.map(({ prefix, label }) => (
+                <label
+                  key={prefix}
+                  className="flex max-w-[280px] cursor-pointer items-start gap-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-1 rounded border-input"
+                    checked={excludedSniPrefixes.has(prefix)}
+                    onChange={() => {
+                      setExcludedSniPrefixes((prev) => {
+                        const n = new Set(prev);
+                        if (n.has(prefix)) n.delete(prefix);
+                        else n.add(prefix);
+                        return n;
+                      });
+                    }}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="max-w-xl space-y-1">
+              <Label htmlFor="custom-sni" className="text-xs text-muted-foreground">
+                Extra prefixes (comma-separated, 2–5 digits)
+              </Label>
+              <Input
+                id="custom-sni"
+                placeholder="e.g. 77, 841"
+                value={customSniPrefixes}
+                onChange={(e) => setCustomSniPrefixes(e.target.value)}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        <Collapsible open={structuralFiltersOpen} onOpenChange={setStructuralFiltersOpen}>
+          <CollapsibleTrigger
+            aria-expanded={structuralFiltersOpen}
+            className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2.5 text-left text-sm font-medium text-foreground hover:bg-muted/30"
+          >
+            <span>Structural floors (optional)</span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                structuralFiltersOpen ? "rotate-0" : "-rotate-90"
+              )}
+              aria-hidden
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3 pt-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Applied as SQL filters on coverage metrics before ranking: minimum revenue (latest fiscal, SEK) and minimum
+              employees. Revenue is entered in <strong className="text-foreground">MSEK</strong> (converted to SEK for the
+              API).
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2 max-w-xl">
+              <div className="space-y-1">
+                <Label htmlFor="min-rev-msek" className="text-xs">
+                  Min revenue (MSEK)
+                </Label>
+                <Input
+                  id="min-rev-msek"
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  placeholder="e.g. 50"
+                  value={minRevenueMsek}
+                  onChange={(e) => setMinRevenueMsek(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="min-emp" className="text-xs">
+                  Min employees
+                </Label>
+                <Input
+                  id="min-emp"
+                  type="number"
+                  min={0}
+                  step={1}
+                  placeholder="e.g. 10"
+                  value={minEmployees}
+                  onChange={(e) => setMinEmployees(e.target.value)}
+                />
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground max-w-xl">
-            Saves the campaign and <strong className="text-foreground">runs Layer 0 immediately</strong> so the shortlist
-            appears in the table — no extra click.
+          <p className="max-w-xl text-xs text-muted-foreground leading-relaxed">
+            Creates your campaign and runs screening in one step. Your shortlist appears in the table on the right when it
+            finishes.
           </p>
           <Button
             variant="primary"
-            className="shrink-0 w-full sm:w-auto min-h-10 px-6"
-            onClick={() => void handleCreateAndRunLayer0()}
+            className="min-h-10 w-full shrink-0 px-6 sm:w-auto"
+            onClick={() => void handleCreateAndRunScreening()}
             disabled={busy || profilesLoading || !profileId || !!profilesLoadError || profiles.length === 0}
             title={runNewCampaignDisabledReason}
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-            Run Layer 0
+            Run screening
           </Button>
         </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-border p-4 space-y-3">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-lg font-medium">Campaigns</h2>
+      <section className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
+        <Card className="min-w-0 shadow-sm hover:shadow-sm">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-lg">Your campaigns</CardTitle>
+              <CardDescription className="mt-1">Select one to view the shortlist and enrichment.</CardDescription>
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -758,7 +998,8 @@ export default function ScreeningCampaignsPage() {
               <RefreshCw className="w-4 h-4 mr-1" />
               Refresh
             </Button>
-          </div>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-0">
           {campaignsLoading ? (
             <div className="space-y-2" aria-busy="true" aria-label="Loading campaigns">
               <Skeleton className="h-9 w-full" />
@@ -766,18 +1007,21 @@ export default function ScreeningCampaignsPage() {
               <Skeleton className="h-9 w-3/4" />
             </div>
           ) : campaigns.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No campaigns yet.</p>
+            <p className="rounded-lg border border-dashed border-border bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground">
+              No campaigns yet. Use <strong className="text-foreground">Start a run</strong> above to create your first shortlist.
+            </p>
           ) : (
-            <ul className="space-y-1">
+            <ul className="space-y-1.5">
               {campaigns.map((c) => (
                 <li key={c.id} className="flex gap-1 items-stretch">
                   <button
                     type="button"
-                    className={`flex-1 min-w-0 text-left rounded-md px-3 py-2 text-sm transition-colors ${
+                    className={cn(
+                      "min-w-0 flex-1 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
                       selectedId === c.id
-                        ? "bg-muted font-medium"
-                        : "hover:bg-muted/50"
-                    }`}
+                        ? "border-primary/40 bg-primary/5 font-medium text-foreground shadow-sm"
+                        : "border-transparent hover:bg-muted/60"
+                    )}
                     onClick={() => setSelectedId(c.id)}
                   >
                     <span className="block truncate">{c.name}</span>
@@ -813,9 +1057,10 @@ export default function ScreeningCampaignsPage() {
           {selectedId && selected ? (
             <Collapsible open={campaignResultsOpen} onOpenChange={setCampaignResultsOpen}>
               <CollapsibleTrigger
-                className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-left text-sm font-medium hover:bg-muted/50"
+                aria-expanded={campaignResultsOpen}
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-left text-sm font-medium hover:bg-muted/50"
               >
-                <span className="flex items-center gap-2 min-w-0">
+                <span className="flex min-w-0 items-center gap-2">
                   <ChevronDown
                     className={cn(
                       "h-4 w-4 shrink-0 transition-transform",
@@ -823,7 +1068,7 @@ export default function ScreeningCampaignsPage() {
                     )}
                     aria-hidden
                   />
-                  <span className="truncate">Campaign results</span>
+                  <span className="truncate">Scores &amp; enrichment runs</span>
                 </span>
                 <span className="text-xs font-normal text-muted-foreground truncate max-w-[45%]">
                   {selected.name}
@@ -831,9 +1076,9 @@ export default function ScreeningCampaignsPage() {
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-3 pt-3">
                 <div className="rounded-md border border-border/80 bg-muted/10 px-3 py-2 text-xs space-y-1">
-                  <p className="font-medium text-foreground">Layer 0 (last run)</p>
+                  <p className="font-medium text-foreground">Last screening run</p>
                   <p className="text-muted-foreground">
-                    {formatLayer0Summary(selected.statsJson?.layer0 as Record<string, unknown> | undefined)}
+                    {formatScreeningRunSummary(selected.statsJson?.layer0 as Record<string, unknown> | undefined)}
                   </p>
                 </div>
 
@@ -951,17 +1196,28 @@ export default function ScreeningCampaignsPage() {
               </CollapsibleContent>
             </Collapsible>
           ) : null}
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="rounded-lg border border-border p-4 space-y-3">
-          <h2 className="text-lg font-medium">Run &amp; results</h2>
+        <Card className="min-h-[280px] min-w-0 shadow-sm hover:shadow-sm">
+          <CardHeader className="space-y-1 pb-3">
+            <CardTitle className="text-lg">Shortlist &amp; next steps</CardTitle>
+            <CardDescription>
+              Review ranked companies, skip rows you don&apos;t want, then enrich or open Deep Research.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="min-w-0 space-y-4 pt-0">
           {!selectedId || !selected ? (
-            <p className="text-sm text-muted-foreground">Select a campaign to run Layer 0 and view rows.</p>
+            <div className="rounded-lg border border-dashed border-border bg-muted/15 px-4 py-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                Select a campaign on the left, or start a new run above. Your table of companies will show here.
+              </p>
+            </div>
           ) : (
             <>
-              <div className="space-y-2 rounded-md border border-border bg-muted/15 px-3 py-2">
-                <Label htmlFor="campaign-rename" className="text-xs text-muted-foreground">
-                  Campaign name
+              <div className="space-y-2 rounded-lg border border-border bg-muted/15 px-3 py-3">
+                <Label htmlFor="campaign-rename" className="text-xs font-medium text-foreground">
+                  Rename (optional)
                 </Label>
                 <div className="flex flex-wrap gap-2 items-end">
                   <Input
@@ -986,63 +1242,117 @@ export default function ScreeningCampaignsPage() {
                   </Button>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-sm text-muted-foreground">Status: {selected.status}</span>
-                {selected.errorMessage ? (
-                  <span className="text-sm text-destructive truncate max-w-md">
-                    {selected.errorMessage}
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-medium capitalize text-foreground">
+                    {selected.status}
                   </span>
-                ) : null}
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => void handleStart(selected.id)}
-                  disabled={busy}
-                  title={busy ? "Wait for the current operation to finish." : undefined}
-                >
-                  <Play className="w-4 h-4 mr-1" />
-                  Run Layer 0
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  title={
-                    enrichDisabledReason ??
-                    "Queue website + LLM enrichment for non-skipped candidates (same pipeline as /api/enrichment/run)"
-                  }
-                  onClick={() => void handleEnrichPublic(selected.id)}
-                  disabled={busy || candidatesTotal === 0}
-                >
-                  <Database className="w-4 h-4 mr-1" />
-                  Enrich public data
-                </Button>
+                  {selected.errorMessage ? (
+                    <span className="text-sm text-destructive truncate max-w-md">
+                      {selected.errorMessage}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    title="LLM relevance vs exemplar mandate (uses OPENAI_API_KEY / LLM_BASE_URL)"
+                    onClick={() => void handleLayer1Run()}
+                    disabled={busy || candidatesTotal === 0}
+                  >
+                    Layer 1
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    title="Fit scorecard on in-mandate / uncertain rows"
+                    onClick={() => void handleLayer2Run()}
+                    disabled={busy || candidatesTotal === 0}
+                  >
+                    Layer 2
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    title="Deterministic blend + final rank"
+                    onClick={() => void handleLayer3Run()}
+                    disabled={busy || candidatesTotal === 0}
+                  >
+                    Layer 3
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full shrink-0 sm:w-auto"
+                    title={
+                      enrichDisabledReason ??
+                      "Queue website + LLM enrichment for candidates not marked Skip"
+                    }
+                    onClick={() => void handleEnrichPublic(selected.id)}
+                    disabled={busy || candidatesTotal === 0}
+                  >
+                    <Database className="w-4 h-4 mr-1" />
+                    Enrich public data
+                  </Button>
+                </div>
               </div>
 
-              <div className="rounded-md border border-dashed border-border bg-muted/10 px-3 py-2 text-[11px] text-muted-foreground space-y-1">
-                <p>
-                  <strong className="text-foreground">What happens:</strong> Non-skipped candidates are sent to the enrichment worker
-                  (Redis queue, or synchronous fallback). Progress and counts for the run appear under{" "}
-                  <strong>Campaign results</strong> on the left.
-                </p>
-                <p>
-                  <strong className="text-foreground">Where it&apos;s stored:</strong>{" "}
-                  <code className="text-[10px]">enrichment_runs</code> (batch),{" "}
-                  <code className="text-[10px]">company_enrichment</code> (per org + kind),{" "}
-                  <code className="text-[10px]">ai_profiles</code> (merged view used on the company page).
-                </p>
-              </div>
+              <Collapsible open={enrichmentHelpOpen} onOpenChange={setEnrichmentHelpOpen}>
+                <CollapsibleTrigger
+                  aria-expanded={enrichmentHelpOpen}
+                  className="flex w-full items-center justify-between gap-2 text-left text-xs font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <span>How enrichment works</span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 transition-transform",
+                      enrichmentHelpOpen ? "rotate-0" : "-rotate-90"
+                    )}
+                    aria-hidden
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-2 pt-2 text-[11px] leading-relaxed text-muted-foreground">
+                  <p>
+                    Non-skipped rows are sent to the enrichment worker (queue or sync). Progress appears under{" "}
+                    <strong className="text-foreground">Scores &amp; enrichment runs</strong> on the left.
+                  </p>
+                  <p>
+                    Data is stored in <code className="rounded bg-muted px-1 py-0.5 text-[10px]">enrichment_runs</code>,{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 text-[10px]">company_enrichment</code>, and{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 text-[10px]">ai_profiles</code> — also visible on company pages.
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
 
-              <p className="text-xs text-muted-foreground">
-                Candidates: {candidatesTotal} (showing {candidates.length}). Click a name for the company profile, or{" "}
-                <strong>Deep Research</strong> to start step 7 with org.nr pre-filled (manual run — you confirm in the wizard).
-                Use <strong>Skip</strong> to mark rows to exclude from later stages (e.g. head office / holding).
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <strong className="text-foreground">{candidatesTotal}</strong> companies in this shortlist
+                {candidates.length < candidatesTotal ? ` (showing first ${candidates.length})` : ""}. Open a row for the company
+                profile, use <strong className="text-foreground">Skip</strong> to exclude from later steps, or{" "}
+                <strong className="text-foreground">Research</strong> for Deep Research with org.nr pre-filled.
               </p>
               <div
-                className="rounded-md border overflow-x-auto"
+                className="min-w-0 max-w-full overflow-x-auto rounded-md border [&_th]:h-10 [&_th]:px-2 [&_th]:py-2 [&_td]:p-2"
                 role="region"
                 aria-label="Campaign candidates"
               >
-                <Table>
+                <Table className="w-full min-w-[880px] table-fixed text-xs [&_th]:text-xs">
+                  <colgroup>
+                    <col className="w-10" />
+                    <col className="w-11" />
+                    <col className="w-[6rem]" />
+                    <col className="w-[11rem]" />
+                    <col className="w-[5.25rem]" />
+                    <col className="w-[4.5rem]" />
+                    <col className="w-[5.5rem]" />
+                    <col className="w-[5.5rem]" />
+                    <col className="w-[4rem]" />
+                    <col className="w-[12rem]" />
+                    <col className="w-[7.5rem]" />
+                  </colgroup>
                   <TableHeader>
                     <TableRow>
                       <TableHead
@@ -1052,22 +1362,32 @@ export default function ScreeningCampaignsPage() {
                       >
                         Skip
                       </TableHead>
-                      <TableHead scope="col" className="w-14">
-                        #
+                      <TableHead
+                        scope="col"
+                        className="w-11"
+                        title="Layer 0 rank within this shortlist (1 = best match)"
+                      >
+                        L0
                       </TableHead>
-                      <TableHead scope="col">Org.nr</TableHead>
+                      <TableHead scope="col" className="font-mono">
+                        Org.nr
+                      </TableHead>
                       <TableHead scope="col">Name</TableHead>
-                      <TableHead scope="col" className="font-mono text-xs">
+                      <TableHead scope="col" className="font-mono">
                         Primary SNI
                       </TableHead>
                       <TableHead scope="col" className="text-right">
                         Profile score
                       </TableHead>
                       <TableHead scope="col">Archetype</TableHead>
-                      <TableHead scope="col" className="min-w-[200px] max-w-[300px]">
-                        Public enrichment
+                      <TableHead scope="col" title="Layer 1 relevance (LLM)">
+                        L1
                       </TableHead>
-                      <TableHead scope="col" className="w-[140px] text-right">
+                      <TableHead scope="col" className="text-right" title="Layer 3 final rank after blend">
+                        L3
+                      </TableHead>
+                      <TableHead scope="col">Public enrichment</TableHead>
+                      <TableHead scope="col" className="text-right">
                         Deep Research
                       </TableHead>
                     </TableRow>
@@ -1075,8 +1395,9 @@ export default function ScreeningCampaignsPage() {
                   <TableBody>
                     {candidates.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={9} className="text-muted-foreground text-sm">
-                          No rows yet. Run Layer 0.
+                        <TableCell colSpan={11} className="text-muted-foreground text-sm">
+                          No rows yet. Use{" "}
+                          <strong className="text-foreground">New campaign</strong> above and <strong className="text-foreground">Run screening</strong>.
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -1087,7 +1408,7 @@ export default function ScreeningCampaignsPage() {
                             key={r.orgnr}
                             className={excluded ? "opacity-70 bg-muted/40" : undefined}
                           >
-                            <TableCell className="text-center align-middle">
+                            <TableCell className="text-center align-middle [&:has([role=checkbox])]:pr-0">
                               <Checkbox
                                 checked={excluded}
                                 title="Exclude from further analysis"
@@ -1112,17 +1433,18 @@ export default function ScreeningCampaignsPage() {
                                 {r.orgnr}
                               </Link>
                             </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-0.5">
+                            <TableCell className="max-w-0">
+                              <div className="flex min-w-0 flex-col gap-0.5">
                                 <Link
                                   to={`/company/${r.orgnr}`}
-                                  className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                                  className="inline-flex min-w-0 items-center gap-1 font-medium text-primary hover:underline"
+                                  title={r.name ?? undefined}
                                 >
-                                  {r.name ?? "—"}
-                                  <ExternalLink className="h-3 w-3 opacity-60" aria-hidden />
+                                  <span className="truncate">{r.name ?? "—"}</span>
+                                  <ExternalLink className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
                                 </Link>
                                 {r.exclusionReason ? (
-                                  <span className="text-[10px] text-muted-foreground truncate max-w-[220px]">
+                                  <span className="max-w-full truncate text-[10px] text-muted-foreground">
                                     {r.exclusionReason}
                                   </span>
                                 ) : null}
@@ -1137,7 +1459,19 @@ export default function ScreeningCampaignsPage() {
                                 : "—"}
                             </TableCell>
                             <TableCell>{r.archetypeCode ?? "—"}</TableCell>
-                            <TableCell className="align-top text-xs max-w-[300px]">
+                            <TableCell className="text-[10px] text-muted-foreground">
+                              {r.relevanceStatus === "in_mandate"
+                                ? "in"
+                                : r.relevanceStatus === "out_of_mandate"
+                                  ? "out"
+                                  : r.relevanceStatus === "uncertain"
+                                    ? "?"
+                                    : "—"}
+                            </TableCell>
+                            <TableCell className="text-right font-mono text-[10px]">
+                              {r.finalRank != null ? r.finalRank : "—"}
+                            </TableCell>
+                            <TableCell className="max-w-0 align-top text-xs">
                               {(() => {
                                 const kinds = r.enrichmentKinds ?? [];
                                 const summary = r.enrichmentSummary;
@@ -1146,7 +1480,7 @@ export default function ScreeningCampaignsPage() {
                                   return <span className="text-muted-foreground">—</span>;
                                 }
                                 return (
-                                  <div className="space-y-1">
+                                  <div className="min-w-0 space-y-1">
                                     <div className="flex flex-wrap gap-1 items-center">
                                       {kinds.map((k) => (
                                         <span
@@ -1220,7 +1554,8 @@ export default function ScreeningCampaignsPage() {
               </div>
             </>
           )}
-        </div>
+          </CardContent>
+        </Card>
       </section>
 
       <ScreeningProfileEditorDialog

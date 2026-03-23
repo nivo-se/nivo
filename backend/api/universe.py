@@ -579,6 +579,38 @@ def _compile_filter(
     return None
 
 
+def validate_proposed_filters(
+    raw: Optional[List[Dict[str, Any]]],
+) -> Dict[str, Any]:
+    """
+    Validate proposed FilterItem dicts for Phase B (LLM → rules → human approve).
+    Returns sanitized filters + per-index errors for unknown fields or drop reasons.
+    """
+    errors: List[Dict[str, Any]] = []
+    parsed: List[FilterItem] = []
+    for i, row in enumerate(raw or []):
+        if not isinstance(row, dict):
+            errors.append({"index": i, "message": "not_an_object"})
+            continue
+        field = str(row.get("field", "")).strip()
+        if field and field not in FILTER_FIELDS:
+            errors.append({"index": i, "field": field, "message": "unknown_field"})
+            continue
+        try:
+            fi = FilterItem(**row)
+        except Exception as e:
+            errors.append({"index": i, "message": str(e)})
+            continue
+        parsed.append(fi)
+    sanitized = _sanitize_filters(parsed)
+    dropped = len(parsed) - len(sanitized)
+    return {
+        "filters": [f.model_dump() for f in sanitized],
+        "errors": errors,
+        "droppedIncompleteFilterCount": dropped,
+    }
+
+
 def _sanitize_filters(filters: List[FilterItem]) -> List[FilterItem]:
     """Drop incomplete filter rows (missing field/op/value) to prevent invalid SQL."""
     out = []

@@ -7,6 +7,7 @@ See docs/deep_research/SCREENING_ORCHESTRATOR_SPEC.md
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 from typing import Any, Dict, List, Optional
@@ -24,6 +25,9 @@ from ..services.screening_orchestrator.campaign_service import (
     list_candidates,
     rename_campaign,
     run_layer0_sync,
+    run_layer1_campaign_sync,
+    run_layer2_campaign_sync,
+    run_layer3_campaign_sync,
     set_candidate_exclusion,
 )
 from ..services.screening_orchestrator.schemas import CreateCampaignBody
@@ -171,6 +175,57 @@ async def post_start_campaign(request: Request, campaign_id: str) -> Dict[str, A
     return {"ok": True, "status": "completed", "layer0": stats}
 
 
+@router.post("/{campaign_id}/layer1/start")
+async def post_layer1_start(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Run Layer 1 relevance (batched LLM) synchronously."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    try:
+        stats = await asyncio.to_thread(run_layer1_campaign_sync, db, campaign_id)
+    except Exception as e:
+        logger.exception("Layer1 start failed: %s", e)
+        raise HTTPException(500, str(e)) from e
+    return {"ok": True, "status": "completed", "layer1": stats}
+
+
+@router.post("/{campaign_id}/layer2/start")
+async def post_layer2_start(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Run Layer 2 fit scorecard (LLM) on in_mandate / uncertain rows."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    try:
+        stats = await asyncio.to_thread(run_layer2_campaign_sync, db, campaign_id)
+    except Exception as e:
+        logger.exception("Layer2 start failed: %s", e)
+        raise HTTPException(500, str(e)) from e
+    return {"ok": True, "status": "completed", "layer2": stats}
+
+
+@router.post("/{campaign_id}/layer3/start")
+async def post_layer3_start(request: Request, campaign_id: str) -> Dict[str, Any]:
+    """Run Layer 3 deterministic blend + final_rank."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    row = get_campaign(db, campaign_id)
+    if not row:
+        raise HTTPException(404, "Campaign not found")
+    try:
+        stats = await asyncio.to_thread(run_layer3_campaign_sync, db, campaign_id)
+    except Exception as e:
+        logger.exception("Layer3 start failed: %s", e)
+        raise HTTPException(500, str(e)) from e
+    return {"ok": True, "status": "completed", "layer3": stats}
+
+
 @router.post("/{campaign_id}/pause")
 async def post_pause_campaign(request: Request, campaign_id: str, body: PauseBody | None = None) -> Dict[str, Any]:
     _require_postgres()
@@ -218,6 +273,20 @@ async def get_campaign_candidates(
         attach_public_enrichment_to_candidates(db, rows)
     out: List[Dict[str, Any]] = []
     for r in rows:
+        def _jsonish(v: Any) -> Any:
+            if v is None:
+                return None
+            if isinstance(v, dict):
+                return v
+            if isinstance(v, str):
+                try:
+                    return json.loads(v)
+                except json.JSONDecodeError:
+                    return None
+            return v
+
+        rel_json = _jsonish(r.get("relevance_json"))
+        fit_json = _jsonish(r.get("fit_json"))
         item: Dict[str, Any] = {
             "orgnr": str(r.get("orgnr", "")),
             "name": r.get("name"),
@@ -231,6 +300,11 @@ async def get_campaign_candidates(
             "primaryNace": r.get("primary_nace"),
             "excludedFromAnalysis": bool(r.get("excluded_from_analysis")),
             "exclusionReason": r.get("exclusion_reason"),
+            "relevanceStatus": r.get("relevance_status"),
+            "relevanceJson": rel_json,
+            "fitJson": fit_json,
+            "fitTotal": float(r["fit_total"]) if r.get("fit_total") is not None else None,
+            "combinedScore": float(r["combined_score"]) if r.get("combined_score") is not None else None,
         }
         if include_enrichment:
             item["enrichmentKinds"] = list(r.get("enrichmentKinds") or [])

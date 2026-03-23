@@ -227,7 +227,7 @@ export function ScreeningProfileEditorDialog({
         <DialogHeader>
           <DialogTitle>{mode === "new" ? "New screening profile" : "Edit screening profile"}</DialogTitle>
           <DialogDescription>
-            Layer 1 config: <code className="text-xs">variables</code>, <code className="text-xs">weights</code>,{" "}
+            Scoring model: <code className="text-xs">variables</code>, <code className="text-xs">weights</code>,{" "}
             <code className="text-xs">archetypes</code>, <code className="text-xs">exclusion_rules</code>. Saving creates a
             new version and activates it.
           </DialogDescription>

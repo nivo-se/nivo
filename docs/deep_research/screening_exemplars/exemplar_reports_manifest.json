@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "updated": "2025-03-23",
+    "note": "Per-company exemplar reports (Markdown). Optional orgnr/analysisRunId filled when linked to Postgres."
+  },
+  "reports": [
+    { "slug": "Fladen", "file": "Fladen.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Formenta", "file": "Formenta.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Kryddhuset", "file": "Kryddhuset.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Low Noise Factory", "file": "Low Noise Factory.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Mille Notti", "file": "Mille Notti.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Nordiska Kök", "file": "Nordiska Kök.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Poly Ropes", "file": "Poly Ropes.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Quadpak", "file": "Quadpak.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Snigel design", "file": "Snigel design.md", "orgnr": null, "analysisRunId": null },
+    { "slug": "Texstar", "file": "Texstar.md", "orgnr": null, "analysisRunId": null }
+  ],
+  "synthesis": {
+    "file": "screening_output.json",
+    "role": "Structured mandate patterns + archetypes for agent prompts (see _meta.version inside file)."
+  }
+}

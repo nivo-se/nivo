@@ -4,6 +4,14 @@ Postgres, Redis, and the API run **on the same machine (the mini)** using this r
 
 **Quick start:** On the mini: clone into `/srv/nivo`, `cp .env.example .env`, set `POSTGRES_PASSWORD` (and any other secrets), then `docker compose up -d --build`. The compose file starts **Postgres**, **Redis** (job queues), and the API. The API connects to Postgres by service name (`postgres:5432`) and to Redis as `redis://redis:6379/0` (set in `docker-compose.yml`; your `.env` may still say `localhost` for host-side tools only).
 
+**Routine deploys (avoid re-pulling Redis/Postgres and rebuilding everything):** After `git pull`, rebuild and restart **only the API** when backend code changed:
+
+```bash
+docker compose build api && docker compose up -d api
+```
+
+Or in one step: `docker compose up -d --build api` (only the `api` service is built; `redis` / `postgres` use cached images thanks to `pull_policy: missing` in `docker-compose.yml`). Use a full `docker compose up -d --build` when you change `docker-compose.yml`, base images, or need a clean first-time pull.
+
 For **local dev on your Mac**, use `docker-compose.postgres.yml` for Postgres and run the API locally (e.g. `uvicorn` with `POSTGRES_HOST=localhost`, `POSTGRES_PORT=5433`).
 
 ---
@@ -16,8 +24,9 @@ There is **no automated deploy**. The Mac Mini does not pull from GitHub by itse
    ```bash
    cd /srv/nivo
    git pull
-   docker compose up -d --build
+   docker compose build api && docker compose up -d api
    ```
+   (Use `docker compose up -d --build` only when you need to recreate all services or refresh base images.)
 2. **The Mac Mini keeps its own `.env`** in `/srv/nivo/.env`. That file is **not in git** (and must not be). You create it once from `.env.example` and edit it on the mini with production secrets (e.g. `POSTGRES_PASSWORD`, OpenAI, Auth0). When you `git pull`, `.env` is untouched, so the mini keeps using the same DB (Postgres in Docker on the mini) and the same secrets.
 3. **DB connection on the mini:** The API runs **inside** Docker and gets `POSTGRES_HOST=postgres` and `POSTGRES_PORT=5432` from `docker-compose.yml` (overrides in the compose file), so it talks to the Postgres container on the same host. You do **not** need `DATABASE_URL` or `POSTGRES_HOST` in the mini’s `.env` for the API; the compose file sets them. You only need `POSTGRES_PASSWORD` (and optionally `POSTGRES_DB` / `POSTGRES_USER`) for the Postgres service and for any host-side tools (e.g. migrations, pg_dump).
 

@@ -3,10 +3,14 @@
 #
 # Redis is required for RQ (enrichment, Deep Research async jobs). The API service sets
 # REDIS_URL=redis://redis:6379/0 so the container talks to the Redis service, not localhost.
+#
+# pull_policy: missing — use locally cached redis/postgres images; do not re-pull on every deploy.
+# Rebuild API only when backend changes: docker compose build api && docker compose up -d api
 
 services:
   redis:
     image: redis:7-alpine
+    pull_policy: missing
     container_name: nivo-redis
     networks:
       - nivo_net
@@ -19,6 +23,7 @@ services:
 
   postgres:
     image: postgres:16
+    pull_policy: missing
     container_name: nivo-pg
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nivo}
@@ -39,6 +44,7 @@ services:
       - "0.0.0.0:5433:5432"
 
   api:
+    image: nivo-api:local
     build:
       context: .
       dockerfile: backend/Dockerfile
