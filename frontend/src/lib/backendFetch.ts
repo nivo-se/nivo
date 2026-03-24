@@ -35,7 +35,12 @@ export async function fetchWithAuth(
     headers.set('Content-Type', 'application/json')
   }
   try {
-    return await fetch(url, { ...options, headers })
+    // Avoid stale screening/candidate rows after Layer 1–3 (browser HTTP cache on GET).
+    return await fetch(url, {
+      ...options,
+      headers,
+      cache: options.cache ?? 'no-store',
+    })
   } catch (e) {
     if (isNetworkError(e)) {
       const base = new URL(url).origin

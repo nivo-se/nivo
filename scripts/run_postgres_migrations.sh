@@ -101,7 +101,8 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/038_screening_campaigns.sql \
          database/migrations/039_seed_preset_screening_profiles.sql \
          database/migrations/040_companies_nace_codes.sql \
-         database/migrations/041_screening_candidates_exclusion.sql; do
+         database/migrations/041_screening_candidates_exclusion.sql \
+         database/migrations/042_exemplar_report_chunks.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"

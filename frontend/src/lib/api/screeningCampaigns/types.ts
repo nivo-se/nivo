@@ -26,6 +26,11 @@ export type ScreeningCampaignCandidate = {
   enrichmentKinds?: string[];
   enrichmentSummary?: string | null;
   enrichmentStatus?: string | null;
+  relevanceStatus?: string | null;
+  relevanceJson?: Record<string, unknown> | null;
+  fitJson?: Record<string, unknown> | null;
+  fitTotal?: number | null;
+  combinedScore?: number | null;
 };
 
 export type CreateCampaignPayload = {
@@ -34,6 +39,8 @@ export type CreateCampaignPayload = {
   profileVersionId?: string | null;
   params?: {
     layer0Limit?: number;
+    /** Cap ranked pool after sort (default 500); must be >= layer0Limit for meaningful stats */
+    maxUniverseCandidates?: number;
     layer1Limit?: number;
     layer2Limit?: number;
     finalShortlistSize?: number;

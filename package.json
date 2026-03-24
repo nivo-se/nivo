@@ -13,7 +13,8 @@
     "setup": "npm run install:frontend && npm run install:backend",
     "setup:fresh": "./scripts/setup_fresh_mac.sh",
     "setup:postgres": "./scripts/setup_local_postgres.sh",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "render:social": "node scripts/render-social-images.cjs"
   },
   "workspaces": [
     "frontend"

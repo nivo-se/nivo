@@ -1,0 +1,14 @@
+orgnr,company_name,total_score,homepage,smoke_expectation
+5564551900,Texstar AB,88,https://www.texstar.se,good_product_brand
+5562146018,Fladen Fishing Aktiebolag,85,https://www.fladenfishing.com,good_product_brand
+5591098214,Nordiska Kök AB,90,https://nordiskakok.se,good_product_brand
+5564282738,Mille Notti AB,82,https://www.millenotti.se,good_product_brand
+5565636353,AB Poly-Produkter,86,https://www.polyropes.com,good_product_brand
+5564968039,Formenta AB,62,https://www.formenta.se,ambiguous_hybrid_interior
+5564169786,KRYDDHUSET I LJUNG Aktiebolag,58,https://www.kryddhuset.se,ambiguous_ingredient_brand
+5566816632,Quadpak AB,68,https://www.quadpak.se,ambiguous_b2b_packaging
+5562991009,Scandic Hotels Aktiebolag,72,https://www.scandichotels.com,bad_hospitality
+5561974188,Bravida Sverige AB,70,https://www.bravida.se,bad_installation_services
+5560125220,Beijer Byggmaterial Aktiebolag,78,https://www.beijerbygg.se,bad_building_retail_chain
+5560129206,Ahlsell Sverige AB,80,https://www.ahlsell.se,bad_distributor
+5563027241,Securitas AB,75,https://www.securitas.com,bad_service_security_listed

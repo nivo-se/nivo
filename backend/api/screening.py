@@ -7,8 +7,9 @@ import os
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from .universe import validate_proposed_filters
 from ..services.db_factory import get_database_service
 from .dependencies import get_current_user_id
 
@@ -23,6 +24,84 @@ async def get_screening_context(request: Request):
     _require_postgres()
     uid = _require_user(request)
     return {"userId": uid}
+
+
+@router.get("/exemplar-chunks")
+async def get_exemplar_chunks(
+    request: Request,
+    orgnr: str = Query(..., min_length=6, description="Swedish org number linked in exemplar_reports_manifest.json"),
+    limit: int = Query(50, ge=1, le=200),
+):
+    """
+    Optional RAG source: rows in ``ai_ops.exemplar_report_chunks`` (orgnr + analysis_run_id).
+
+    Apply migration ``042_exemplar_report_chunks.sql``, then
+    ``python3 scripts/index_exemplar_markdown.py --postgres`` (optional ``--pgvector``).
+    """
+    _require_postgres()
+    _require_user(request)
+    from ..services.db_factory import get_database_service
+    from ..services.screening_orchestrator.exemplar_chunks import (
+        exemplar_report_chunks_table_exists,
+        list_chunks_for_orgnr,
+    )
+
+    db = get_database_service()
+    if not exemplar_report_chunks_table_exists(db):
+        raise HTTPException(
+            503,
+            "ai_ops.exemplar_report_chunks not found; run migrations and scripts/index_exemplar_markdown.py --postgres.",
+        )
+    rows = list_chunks_for_orgnr(db, orgnr.strip(), limit=limit)
+    return {"orgnr": orgnr.strip(), "count": len(rows), "chunks": rows}
+
+
+@router.get("/exemplar-mandate")
+async def get_exemplar_mandate(
+    request: Request,
+    include_body: bool = Query(
+        False,
+        description="Include full mandate JSON (excluding _meta) for UI / debugging.",
+    ),
+):
+    """
+    Metadata for `docs/deep_research/screening_exemplars/screening_output.json` (patterns, archetypes, playbook).
+    Does not require Postgres; used to align prompts with a versioned mandate file.
+    """
+    _require_user(request)
+    from ..services.exemplar_mandate import (
+        exemplar_mandate_path,
+        exemplar_mandate_version,
+        load_screening_exemplar_mandate,
+    )
+
+    data = load_screening_exemplar_mandate()
+    meta = data.get("_meta") if isinstance(data.get("_meta"), dict) else {}
+    out: Dict[str, Any] = {
+        "path": str(exemplar_mandate_path()),
+        "version": exemplar_mandate_version(data),
+        "meta": meta,
+        "keys": [k for k in data.keys() if k != "_meta"],
+    }
+    if include_body:
+        out["body"] = {k: v for k, v in data.items() if k != "_meta"}
+    return out
+
+
+class ValidateFiltersBody(BaseModel):
+    """Proposed universe FilterItem rows (Phase B: LLM → validator → human approve)."""
+
+    filters: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+@router.post("/validate-filters")
+async def post_validate_filters(request: Request, body: ValidateFiltersBody):
+    """
+    Validate structured filter rules against universe FILTER_FIELDS / ops.
+    Does not execute SQL; returns sanitized filters + per-index errors.
+    """
+    _require_user(request)
+    return validate_proposed_filters(body.filters)
 
 
 def _require_postgres():

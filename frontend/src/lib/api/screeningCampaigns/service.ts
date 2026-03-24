@@ -99,6 +99,36 @@ export async function startScreeningCampaign(
   return parseJson(res);
 }
 
+export async function startScreeningLayer1(
+  id: string
+): Promise<{ ok: boolean; status: string; layer1?: Record<string, unknown> }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${id}/layer1/start`, {
+    method: "POST",
+    body: "{}",
+  });
+  return parseJson(res);
+}
+
+export async function startScreeningLayer2(
+  id: string
+): Promise<{ ok: boolean; status: string; layer2?: Record<string, unknown> }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${id}/layer2/start`, {
+    method: "POST",
+    body: "{}",
+  });
+  return parseJson(res);
+}
+
+export async function startScreeningLayer3(
+  id: string
+): Promise<{ ok: boolean; status: string; layer3?: Record<string, unknown> }> {
+  const res = await fetchWithAuth(`${API_BASE}/api/screening/campaigns/${id}/layer3/start`, {
+    method: "POST",
+    body: "{}",
+  });
+  return parseJson(res);
+}
+
 export async function listCampaignCandidates(
   id: string,
   opts?: { limit?: number; offset?: number; selectedOnly?: boolean; includeEnrichment?: boolean }

@@ -3,10 +3,15 @@
 #
 # Redis is required for RQ (enrichment, Deep Research async jobs). The API service sets
 # REDIS_URL=redis://redis:6379/0 so the container talks to the Redis service, not localhost.
+# The `worker` service must run too — otherwise jobs enqueue but never execute.
+#
+# pull_policy: missing — use locally cached redis/postgres images; do not re-pull on every deploy.
+# Rebuild API only when backend changes: docker compose build api && docker compose up -d api
 
 services:
   redis:
     image: redis:7-alpine
+    pull_policy: missing
     container_name: nivo-redis
     networks:
       - nivo_net
@@ -18,7 +23,9 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:16
+    # Includes pgvector — required by migrations 005 (if applied), 042_exemplar_report_chunks, etc.
+    image: pgvector/pgvector:pg16
+    pull_policy: missing
     container_name: nivo-pg
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nivo}
@@ -39,6 +46,7 @@ services:
       - "0.0.0.0:5433:5432"
 
   api:
+    image: nivo-api:local
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -51,6 +59,35 @@ services:
       REDIS_URL: redis://redis:6379/0
     ports:
       - "127.0.0.1:8000:8000"  # Explicit host binding for cloudflared tunnel
+    networks:
+      - nivo_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # RQ worker: without this, jobs stay in Redis forever (enrichment, Deep Research, etc.).
+  # Same image/env as api so imports and DB/Redis match.
+  worker:
+    image: nivo-api:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: nivo-worker
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        exec rq worker enrichment ai_analysis deep_research \
+          --url "$${REDIS_URL}" \
+          --path /app
     networks:
       - nivo_net
     depends_on:

@@ -1,0 +1,117 @@
+{
+  "common_patterns": [
+    "Nischade marknader med tydlig specialisering (t.ex. rep, försvarsutrustning, bag-in-box, premiumtextilier) snarare än breda massmarknader",
+    "Vertikalt integrerade affärsmodeller (design/produktion/distribution kontrolleras internt)",
+    "Primärt produktbolag med låg eller ingen äkta SaaS/recurring revenue – men med 'repeat purchase dynamics'",
+    "Kombination av B2B och D2C/kanalstrategier (e-handel, återförsäljare eller direktförsäljning)",
+    "Relativt låg till måttlig EBIT-marginal (ca 3–12%) med tydlig förbättringspotential",
+    "Hög kapitalbindning i lager eller produktion (working capital-intensiva modeller)",
+    "Stark varumärkesposition eller produktdifferentiering inom sin nisch",
+    "Familjeägt eller founder-led i många fall",
+    "Fragmenterade marknader utan tydlig dominant aktör",
+    "Tydliga operativa förbättringshävarmar (pricing, mix, produktion, digitalisering)"
+  ],
+  "archetypes": [
+    {
+      "name": "Nischad produktledare med varumärkesstyrka",
+      "description": "Bolag som säljer premium- eller specialistprodukter med starkt varumärke inom en tydlig nisch.",
+      "key_characteristics": [
+        "Hög produktkvalitet och differentiering",
+        "Premium pricing eller tydlig position",
+        "Relativt låg skala men stark kundlojalitet",
+        "Ofta familjeägt eller founder-led",
+        "Både B2C och B2B förekommer"
+      ],
+      "why_attractive": "Ger pricing power, stabil efterfrågan och möjlighet till varumärkesdriven multipel-expansion vid skalning."
+    },
+    {
+      "name": "Vertikalt integrerad industriell producent",
+      "description": "Produktfokuserade bolag med egen produktion och teknisk kompetens i en specifik kategori.",
+      "key_characteristics": [
+        "Egen produktion och kontroll över supply chain",
+        "B2B-försäljning med repeat orders",
+        "Material- och produktionsintensiv kostnadsbas",
+        "Måttliga marginaler men skalbar kapacitet",
+        "Ofta tekniska eller regulatoriska inträdesbarriärer"
+      ],
+      "why_attractive": "Möjlighet till operativ hävstång via effektivisering, kapacitetsutnyttjande och pricing."
+    },
+    {
+      "name": "Digitalt distribuerad produktplattform",
+      "description": "Bolag som kombinerar fysisk produkt med digital go-to-market eller distributionsfördel.",
+      "key_characteristics": [
+        "Digital kundresa eller e-handelsdriven försäljning",
+        "Disintermediation (tar bort återförsäljare)",
+        "Hög tillväxt initialt",
+        "Lägre marginaler i nuvarande fas",
+        "Skalbar marknadsföringsmodell (CAC/LTV-logik)"
+      ],
+      "why_attractive": "Potential för kraftig skalning och marginalexpansion när CAC optimeras och volym ökar."
+    },
+    {
+      "name": "Kontraktsdriven specialistleverantör",
+      "description": "Bolag som säljer till institutionella kunder via större kontrakt eller upphandlingar.",
+      "key_characteristics": [
+        "Stora enskilda affärer (lumpy revenue)",
+        "Hög teknisk eller regulatorisk tröskel",
+        "Högre marginaler än genomsnittet",
+        "Kundkoncentration",
+        "Exponering mot makro/politiska beslut"
+      ],
+      "why_attractive": "Kan generera mycket hög tillväxt och marginal vid rätt kontraktstilldelning."
+    }
+  ],
+  "hidden_signals": [
+    "Nästan alla bolag säljer 'enkla produkter' men vinner på execution (distribution, varumärke, logistik)",
+    "Återkommande intäkter är indirekta (repeat purchase) snarare än kontraktsbundna",
+    "Working capital är en central värdedrivare – ofta underskattad i analys",
+    "Bolagen är ofta 'för små för strategiska köpare idag' men attraktiva som plattformar",
+    "Många bolag har redan digital närvaro men inte fullt optimerad (=> latent upside)",
+    "Produktbredd används ofta som defensiv strategi (SKU-expansion)",
+    "Geografisk expansion är nästan alltid outnyttjad potential"
+  ],
+  "acceptable_weaknesses": [
+    "Låg nuvarande lönsamhet (så länge det finns tydliga förbättringshävarmar)",
+    "Hög lagerbindning och svag cash conversion",
+    "Begränsad skalbarhet i nuvarande struktur",
+    "Beroende av nyckelpersoner (founders/familj)",
+    "Cyklikalitet i efterfrågan",
+    "Avsaknad av 'äkta recurring revenue'"
+  ],
+  "investment_playbook": {
+    "must_have_traits": [
+      "Tydlig nisch och differentierad produkt",
+      "Bevisad efterfrågan (historisk omsättning >50–100 MSEK)",
+      "Fragmenterad marknad",
+      "Möjlighet att förbättra marginaler operativt",
+      "Repeat purchase-beteende hos kunder"
+    ],
+    "nice_to_have_traits": [
+      "Starkt varumärke eller tydlig positionering",
+      "Digital försäljningskanal med skalbar potential",
+      "Intern produktion eller supply chain-kontroll",
+      "Exportpotential",
+      "B2B + B2C mix"
+    ],
+    "avoid": [
+      "Ren commoditized produkt utan differentiering",
+      "Extrem kundkoncentration utan kontrakt",
+      "Strukturellt fallande marknad",
+      "Ingen tydlig väg till marginalexpansion",
+      "För komplex operation utan standardisering"
+    ],
+    "screening_implications": [
+      "If EBIT <5% AND gross margin is stable/high → prioritize (turnaround case)",
+      "If high inventory but strong SKU breadth → potential working capital optimization",
+      "If founder-led + niche → high likelihood of proprietary deal",
+      "If repeat orders but no contracts → treat as quasi-recurring revenue",
+      "If digital channel exists but under-optimized → prioritize for value creation"
+    ]
+  },
+  "_meta": {
+    "version": "1.0.0",
+    "source": "exemplar_synthesis",
+    "updated": "2025-03-23",
+    "description": "Derived from Deep Research exemplar reports; bump version when editing."
+  }
+}

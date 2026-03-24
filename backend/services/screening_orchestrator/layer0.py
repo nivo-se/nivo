@@ -38,6 +38,9 @@ def run_layer0_for_campaign(db: Any, campaign: Dict[str, Any]) -> Tuple[List[Dic
         params = json.loads(params)
 
     layer0_limit = int(params.get("layer0Limit", 20))
+    cohort_max = int(params.get("maxUniverseCandidates", params.get("max_universe_candidates", 500)))
+    if cohort_max < layer0_limit:
+        cohort_max = layer0_limit
 
     raw_filters = params.get("filters") or []
     raw_excl = params.get("excludeFilters") or []
@@ -76,13 +79,16 @@ def run_layer0_for_campaign(db: Any, campaign: Dict[str, Any]) -> Tuple[List[Dic
     )
 
     ranked = sorted(rows, key=_sort_key_profile_score, reverse=True)
+    ranked = ranked[:cohort_max]
     top = ranked[:layer0_limit]
 
     stats = {
         "total_matched": total,
         "layer0_limit": layer0_limit,
+        "max_universe_candidates": cohort_max,
         "kept": len(top),
         "scanned_rows": len(rows),
+        "ranked_after_cohort_cap": len(ranked),
     }
     logger.info(
         "Layer0 campaign=%s total=%s scanned=%s kept=%s",

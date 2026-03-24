@@ -1,0 +1,94 @@
+# Screening v1 — aggressive trade exclusions + group penalties + service heuristic.
+# Low Noise Factory + Snigel not in universe yet.
+
+constraints:
+  min_revenue_sek: 50000000
+  nace_deny_prefixes: []
+  min_calendar_year: null
+  max_latest_year_age: null
+
+name_exclusion_keywords:
+  # Trades / local services (substring; "el" uses whole-token match in code)
+  - bygg
+  - mark
+  - entreprenad
+  - anläggning
+  - anlaggning
+  - vvs
+  - rör
+  - varme
+  - värme
+  - kyla
+  - el
+  - elservice
+  - installation
+  - installations
+  - kylservice
+  - golvservice
+  - verkstad
+  - åkeri
+  - transport
+  - grossist
+  - grossisten
+  # Manual blacklist (subsidiaries / obvious non-targets)
+  - intertek
+  - citrix
+  - xilinx
+  - grundfos
+  # prior list
+  - plåt
+  - smide
+  - bilverkstad
+  - konsult
+  - consulting
+  - osteria
+  - hotel
+
+name_penalty_keywords:
+  group_like:
+    penalty: 0.5
+    keywords:
+      - group
+      - sverige ab
+      - sweden ab
+      - scandinavia
+      - international
+      - systems ab
+      - notified body
+  service_like:
+    penalty: 0.25
+    keywords:
+      - service
+      - tjänst
+      - teknik
+      - management
+
+scoring:
+  alpha: 2.5
+  min_non_null_per_company: 5
+  min_population_coverage: 0.8
+  max_combined_penalty: 0.85
+
+winsor:
+  p_low: 0.02
+  p_high: 0.98
+
+liked_orgnrs:
+  - "5562146018" # Fladen Fishing Aktiebolag
+  - "5564968039" # Formenta AB
+  - "5564169786" # KRYDDHUSET I LJUNG Aktiebolag
+  - "5564282738" # Mille Notti AB
+  - "5591098214" # Nordiska Kök AB
+  - "5565636353" # AB Poly-Produkter (PolyRopes)
+  - "5566816632" # Quadpak AB
+  - "5564551900" # Texstar AB
+
+archetypes: []
+
+negative_orgnrs: []
+
+calibration:
+  assertions:
+    max_median_rank_liked: 800
+    min_median_rank_negative: 500
+    all_liked_in_top: 2000

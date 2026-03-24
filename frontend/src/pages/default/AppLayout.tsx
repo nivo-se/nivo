@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search, Building2, LayoutList, Briefcase } from "lucide-react";
+import { Home, Globe, List, Target, Cpu, Settings, Shield, LogOut, Search, Building2, LayoutList, Briefcase, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,15 @@ interface NavItem {
   icon: typeof Home;
   indent?: boolean;
   adminOnly?: boolean;
+  /** Match this path only (no sub-routes). Use for parent items with nested pages. */
+  exact?: boolean;
 }
 
 const navItems: NavItem[] = [
   { path: "/", label: "Dashboard", icon: Home },
   { path: "/universe", label: "Universe", icon: Globe },
-  { path: "/screening-campaigns", label: "Screening campaigns", icon: Building2 },
+  { path: "/screening-campaigns", label: "Screening campaigns", icon: Building2, exact: true },
+  { path: "/screening-campaigns/exemplars", label: "Playbook & examples", icon: BookOpen, indent: true },
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/ai", label: "AI Lab", icon: Cpu },
@@ -38,8 +41,10 @@ export default function AppLayout() {
     }
   };
 
-  const isActive = (path: string) => {
+  const isActive = (path: string, exact?: boolean) => {
     if (path === "/") return location.pathname === "/" || location.pathname === "";
+    const norm = (s: string) => s.replace(/\/$/, "") || "/";
+    if (exact) return norm(location.pathname) === norm(path);
     return path !== "/" && location.pathname.startsWith(path);
   };
 
@@ -64,7 +69,7 @@ export default function AppLayout() {
           {navItems.map((item) => {
             if (item.adminOnly && !isAdmin) return null;
             const Icon = item.icon;
-            const active = isActive(item.path);
+            const active = isActive(item.path, item.exact);
             return (
               <Link
                 key={`${item.path}-${item.label}`}

@@ -178,4 +178,5 @@ This index is intended to be used together with:
 - `SCREENING_DATA_AND_ENRICHMENT.md` — head offices vs subsidiaries, SNI limits, Tavily / enrichment discipline
 - `SCREENING_PROFILES_AND_ENRICHMENT.md` — where profile JSON lives vs campaigns vs `company_enrichment`; `POST /api/enrichment/run` with `campaignId`
 - `SCREENING_UX_WORKFLOW.md` — full UX workflow (profile → Layer 0 → triage → enrich) + improvement backlog
+- `SCREENING_LAYER2_CLASSIFIER.md` — minimal Layer 2 LLM classifier on Stage 1 CSV (web evidence pack, strict JSON, blend score; `scripts/screening_layer2_run.py`)
 
