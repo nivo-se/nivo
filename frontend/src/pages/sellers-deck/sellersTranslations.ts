@@ -1,7 +1,6 @@
 /**
  * Sellers page (target company owners) — Swedish only.
- * Investor perspective: tydlig ägarposition, inte rådgivare/partner.
- * Calm, confident, professional.
+ * Partnerskap och delägarskap med entreprenörer som vill bygga vidare — tillsammans.
  */
 
 export const sellersTranslations = {
@@ -20,67 +19,111 @@ export const sellersTranslations = {
   navHurViArbetar: "Hur vi arbetar",
   navVadViLetarEfter: "Vad vi letar efter",
   navVarförAnnorlunda: "Varför vi är annorlunda",
+  navVarProcess: "Vår process",
+  navEfterAffaren: "Efter affären",
   navVemBakomOss: "Vem som står bakom oss",
   navTeam: "Team",
   navKontakt: "Kontakt",
 
   // Hero
-  heroOneLiner:
-    "Att sälja det man byggt är mer än en affär. Vi vill vara det rätta hemmet för bolaget — en långsiktig ägare som utvecklar bolaget vidare.",
+  heroTitle:
+    "Det du har byggt förtjänar en partner som kan ta det vidare — tillsammans med dig",
+  heroSubtitle:
+    "Att sälja sitt bolag är mer än en affär. Vi går in som delägare tillsammans med entreprenörer som vill fortsätta utveckla det de byggt — med rätt stöd, rätt tempo och ett långsiktigt perspektiv.",
 
   // Sammanfattning
   sammanfattningTitle: "Sammanfattning",
   sammanfattningIntro:
-    "Du har byggt något under många år. Att sälja är att välja vem som ska ta ansvar för bolagets fortsatta utveckling.",
+    "Du har byggt något under många år. Att sälja är inte bara att göra en affär, utan att välja vem du ska bygga vidare med.",
   sammanfattningText:
-    "Nivo är ett investeringsbolag med långsiktigt ägande av nordiska små och medelstora företag. Vi riktar in oss på ambitiösa bolag som ert — omsättning 50–200 mkr, starka produkter, lojala kunder — med förutsättningar för uthållig affärsutveckling. Vi köper för att utveckla, inte för att sälja vidare. Stabilitet och långsiktighet, kombinerat med aktivt ägararbete och fokus på operativ utveckling.",
-  sammanfattningBullet1:
-    "Kapital till bolaget för tillväxt och utveckling — vi investerar i verksamheten, inte bara i affären",
-  sammanfattningBullet2:
-    "Möjlighet att återinvestera och kvarstå som minoritetsägare",
-  sammanfattningBullet3:
-    "En långsiktig ägare som utvecklar bolaget vidare",
+    "Nivo är ett investeringsbolag som förvärvar och utvecklar nordiska små och medelstora företag. Vi går in som delägare tillsammans med entreprenörer som vill fortsätta utveckla sina bolag i nästa fas.",
+  sammanfattningText2:
+    "Vi köper för att bygga vidare — inte för att sälja vidare. Som ägare arbetar vi nära entreprenören och ledningen, med fokus på långsiktig utveckling av bolaget.",
+  sammanfattningBullet1: "Kapital till fortsatt utveckling",
+  sammanfattningBullet2: "Möjlighet att kvarstå som delägare",
+  sammanfattningBullet3: "En aktiv partner i nästa fas",
 
   // Hur vi arbetar som ägare
   samarbeteTitle: "Hur vi arbetar som ägare",
-  samarbeteIntro:
-    "Vi är aktiva i styrning och utveckling — inte i daglig drift.",
+  samarbetePartnerskapTitle: "Partnerskap",
+  samarbetePartnerskapText:
+    "Vi arbetar tillsammans med entreprenören — som ett gemensamt lag. Du fortsätter driva bolaget, och vi bidrar med struktur, resurser och stöd där det gör skillnad. Beslut tas gemensamt, med bolagets bästa i fokus.",
   samarbeteSnabbBeslut: "Beslutsprocess",
   samarbeteSnabbBeslutText:
-    "Vi är ett litet team. Inga långa investerarkommittéer. När något behöver avgöras tar vi det. Du får svar, inte väntan.",
+    "Vi är ett litet team. Inga långa processer. När något behöver avgöras gör vi det. Du får tydliga svar, snabbt.",
   samarbeteNärvarandeMenIntePåträngande: "Ägarroll",
   samarbeteNärvarandeMenIntePåträngandeText:
-    "Som ägare arbetar vi nära bolaget i strategiska frågor. Vi ansvarar inte för den dagliga driften. Vi driver strategiska initiativ och tillför resurser där det behövs.",
-  samarbeteByggaInteRapportera: "Operativt arbete",
+    "Vi är aktiva i strategi, styrning och utveckling — inte i daglig drift. Vår roll är att hjälpa bolaget framåt, inte att ta över det.",
+  samarbeteByggaInteRapportera: "Operativ utveckling",
   samarbeteByggaInteRapporteraText:
-    "Vi vill ha tydlig rapportering så vi förstår läget. Målet är att bolaget ska kunna styra verksamheten bättre. Vi prioriterar det som driver värde.",
+    "Vi fokuserar på det som faktiskt skapar värde:",
+  samarbeteOperativBullet1: "bättre styrning",
+  samarbeteOperativBullet2: "tydligare prioriteringar",
+  samarbeteOperativBullet3: "starkare marginaler",
+  samarbeteOperativBullet4: "bättre prissättning",
+  samarbeteDigitalTitle: "Digitalisering och AI",
+  samarbeteDigitalText:
+    "Vi ser digitalisering och AI som en naturlig del av hur bolag utvecklas framåt. I vissa fall handlar det om större initiativ, i andra om mindre förbättringar med stor effekt. Fokus är alltid detsamma: att använda teknik där den stärker affären och gör bolaget bättre över tid.",
+  samarbeteNatverkTitle: "Nätverk",
+  samarbeteNatverkText:
+    "Vi har byggt relationer inom företagande, industri, kapital och digital utveckling. När det behövs tar vi in rätt personer för att hjälpa bolaget framåt.",
 
   // Vad vi letar efter
   vadViLetarEfter: "Vad vi letar efter",
   vadViLetarEfterIntro:
-    "Vi är selektiva — endast ett fåtal bolag uppfyller våra kriterier. Det hjälper dig att veta om vi är rätt match:",
+    "Vi investerar i ett fåtal bolag där vi tror att vi kan vara rätt partner i nästa fas.",
   vadViLetarEfterItem1:
-    "Företag med stark grund och uthålliga konkurrensfördelar — etablerade produkter, lojala kunder och förutsättningar att skapa växande kassaflöden över tid.",
-  vadViLetarEfterItem2:
-    "Beprövade affärsmodeller — verksamhet som visat sig fungera över tid.",
-  vadViLetarEfterItem3:
-    "Operativ förbättringspotential — vi bygger värde genom bättre marginaler, prissättning och kostnadskontroll, inte genom hävstång.",
-  vadViLetarEfterItem4:
-    "Långsiktigt ägande — vi kan hålla 5–10+ år. Evergreen-struktur utan tvingat ägarskifte.",
+    "Företag med stark grund, lojala kunder och stabila kassaflöden",
+  vadViLetarEfterItem2: "Beprövade affärsmodeller",
+  vadViLetarEfterItem3: "Tydlig potential att utveckla verksamheten vidare",
+  vadViLetarEfterItem4: "Evergreen-ägande utan fondcykel eller tvingat ägarskifte",
   vadViLetarEfterItem5:
-    "Skickliga och drivna företagare som kan tänka sig arbeta kvar — vi är rätt ägare om du vill fortsätta vara verksam och kvarstå som minoritetsägare under en period.",
+    "Entreprenörer som vill vara kvar som delägare och fortsätta utveckla bolaget tillsammans med oss",
   vadViLetarEfterAvslutning:
-    "När vi ser det vi letar efter, engagerar vi oss fullt. Vi tar inte för många affärer samtidigt — de vi investerar i får vår fulla uppmärksamhet.",
+    "När vi ser det vi letar efter engagerar vi oss fullt ut. Vi gör få investeringar och arbetar nära de bolag vi äger.",
 
   // Varför Nivo är annorlunda
   varforAnnorlundaTitle: "Varför Nivo är annorlunda",
-  varforAnnorlundaRubrik: "Investeringsbolag — inte riskkapital",
+  varforAnnorlundaRubrik: "Investeringsbolag — inte traditionellt riskkapital",
   varforAnnorlundaText:
-    "När vi blir ägare till ett företag har vi ingen avsikt att sälja. Det möjliggör långsiktighet i alla beslut, planer och relationer. Nivo är ett svenskt aktiebolag med evergreen-struktur — ingen fondcykel. Vi kan hålla 5–10+ år. Med en långsiktig horisont tar man inga genvägar. Vi skapar verkligt ekonomisk affärsvärde och fokuserar på lönsam tillväxt och starka kassaflöden.",
-  varforAnnorlundaBullet1: "Evergreen svenskt aktiebolag",
-  varforAnnorlundaBullet2: "Ingen fondcykel — inget tvingat ägarskifte",
-  varforAnnorlundaBullet3: "Lång investeringshorisont",
-  varforAnnorlundaBullet4: "Kapital återinvesteras i bolaget",
+    "Vi investerar med eget kapital i en evergreen-struktur. Det innebär att vi inte har någon fondcykel och ingen förutbestämd exit.",
+  varforAnnorlundaText2: "Vi bygger bolag tillsammans med entreprenörer — inte för att sälja vidare.",
+  varforAnnorlundaViIntro: "Vi:",
+  varforAnnorlundaVi1: "bygger inte värde genom hög belåning",
+  varforAnnorlundaVi2: "driver inte kortsiktiga planer",
+  varforAnnorlundaVi3: "fattar beslut med bolagets långsiktiga utveckling i fokus",
+  varforAnnorlundaBullet1: "Evergreen-struktur",
+  varforAnnorlundaBullet2: "Ingen fondcykel",
+  varforAnnorlundaBullet3: "Ingen förutbestämd exit",
+  varforAnnorlundaBullet4: "Kapital som kan återinvesteras",
+  varforAnnorlundaBullet5: "Fokus på långsiktigt värdeskapande",
+
+  vadViInteGorText:
+    "Vi bygger inte värde genom aggressiv belåning. Vi driver inte bolag mot en snabb exit. Vi investerar för att utveckla bolag över tid.",
+
+  // Vår process
+  varProcessTitle: "Vår process",
+  varProcessIntro:
+    "Att sälja sitt bolag är ett stort beslut. Vi håller processen enkel, tydlig och konfidentiell.",
+  varProcessStep1Title: "Första kontakt",
+  varProcessStep1Text: "Ett inledande samtal — helt konfidentiellt och utan förpliktelser.",
+  varProcessStep2Title: "Fördjupning",
+  varProcessStep2Text: "Vi tittar närmare på bolaget tillsammans. Fokus på verksamheten, inte bara siffror.",
+  varProcessStep3Title: "Förslag",
+  varProcessStep3Text: "Vi presenterar ett tydligt upplägg om vi ser en bra match.",
+  varProcessStep4Title: "Genomförande",
+  varProcessStep4Text: "Vi driver processen strukturerat tillsammans med dig hela vägen.",
+  varProcessAvslut: "Vi är raka i vår återkoppling och snabba i våra beslut.",
+
+  // Efter affären
+  efterAffarenTitle: "Efter affären",
+  efterAffarenP1:
+    "Vi är rätt partner för entreprenörer som vill fortsätta.",
+  efterAffarenP2:
+    "Du kan vara kvar som delägare och aktiv i bolaget — ofta som vd eller i ledningen.",
+  efterAffarenP3:
+    "Vi tar ansvar för strategi, struktur och utveckling. Du fortsätter bygga bolaget.",
+  efterAffarenP4: "Det är i samarbetet mellan oss som värdet skapas.",
 
   // Vem som står bakom oss
   vemBakomOssTitle: "Vem som står bakom oss",
@@ -159,14 +202,11 @@ export const sellersTranslations = {
   teamPunchLine:
     "Vi driver utveckling i bolag vi äger. Genom erfarenhet, nätverk och finansiella resurser. Det är den typen av ägare vi är.",
 
-  // Varför det här spelar roll
-  varforSpelarRollTitle: "Varför det här spelar roll för dig",
-  varforSpelarRollText:
-    "Ett bolag byggt av dig behöver en köpare som förstår den operativa verkligheten och har tålamod att bygga värde över tid. Långsiktighet är en förutsättning för att skapa en miljö där medarbetare är trygga och kan fatta rätt affärsmässiga beslut.",
-  varforSpelarRollCta:
-    "Vill du diskutera en möjlig transaktion? Vi ser fram emot att höra från dig.",
-
-  // Kontakt
-  kontaktText: "Tveka inte att höra av dig — oavsett var du är i processen.",
-  kontaktCtaButton: "Kontakta oss",
+  // Kontakt / CTA
+  kontaktSectionTitle: "Vill du ta ett första samtal?",
+  kontaktBody:
+    "Att sälja sitt bolag är inget man bestämmer över en dag. Vi tar gärna ett första samtal — helt konfidentiellt och utan förpliktelser.",
+  kontaktDuKan: "Du kan kontakta oss direkt:",
+  kontaktFooter:
+    "Du är välkommen att höra av dig oavsett var du befinner dig i processen.",
 } as const;
