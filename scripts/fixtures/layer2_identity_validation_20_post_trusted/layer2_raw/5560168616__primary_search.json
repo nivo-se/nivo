@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560168616",
+  "company_name": "Elekta AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Elekta\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Elekta what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.jetro.go.jp/en/invest/newsroom/2023/1ed94c660d13c0d5.html",
+        "title": "Elekta, a Swedish company that leads precision radiotherapy ...",
+        "content": "* Invest Japan Business Support Center (IBSC). Founded in Stockholm in 1972 and listed on the Nasdaq Stockholm, ElektaExternal site: a new window will open.is a Swedish global company that specializes in the development of radio therapy equipment, including stereotactic radiosurgery using Leksell Gamma Knife1, Adaptive Radiotherapy with Linac2/MR Linac, and brachytherapy, as an integrated radiotherapy vender. In the area of treatment information systems, the company collaborated with JETRO to research cloud computing and develop networking environment, and has received an order for the first cloud-based cancer treatment system (Elekta Axis) in Japan. To help raise awareness of Elekta K.K. in Japan, JETRO Invest Japan Business Support Center (IBSC) provided PR support (Success Stories). ## JETRO supports your business in Japan. JETRO IBSCs are located in Japan's major business hubs and provide one-stop support and service to foreign firms seeking to set up or expand business in Japan. * Investment Japan Business Support Centers (IBSCs). We will do our very best to support your business expansion into and within Japan as well as business collaboration with Japanese companies.",
+        "score": 0.6737291,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.elekta.com/products/",
+        "title": "Products | Innovative Cancer Care & Treatment - Elekta",
+        "content": "# Products. Experience true freedom of choice. ## Radiation Therapy. Precision radiation therapy for everyone, everywhere. ## Stereotactic Radiosurgery. Noninvasive, precision technology for personalized care. ## Oncology Software. Technology smart enough to create hope. ## Brachytherapy. An indispensable part of radiation therapy. ## Neurosurgery. Gentler approach to invasive neurosurgery/stereotactic neurosurgery. An asterisk (\\*) indicates a required entry.",
+        "score": 0.59061456,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/elekta-ab/",
+        "title": "Elekta AB Company Profile - GlobalData",
+        "content": "# Elekta AB - Company Profile. All the sales intelligence you need on Elekta AB in one solution. when and how to engage with Elekta AB. # Elekta AB: Overview. Elekta AB (Elekta) specializes in the development and provision of advanced cancer care solutions. Gain a 360-degree view of Elekta AB and make more informed decisions for your business. Gain a 360-degree view of Elekta AB and make more informed decisions for your business. ## Elekta AB premium industry data and analytics. Improve competitive bidding with insights into all publicly disclosed IT services contracts for Elekta AB (including IT outsourcing, business process outsourcing, systems integration & consulting and more). | 2025 | Contracts/Agreements | In July, the company partnered with Gray Oncology Solutions to integrate the GrayOS Care Orchestration Platform for Elekta ONE OIS customers. Gain insight into Elekta AB key executives to enhance your sales strategy. Gain insight into Elekta AB key executives to enhance your sales strategy.",
+        "score": 0.5749443,
+        "raw_content": null
+      },
+      {
+        "url": "https://matrixbcg.com/blogs/how-it-works/elekta",
+        "title": "How Does Elekta Company Work? – MatrixBCG.com",
+        "content": "It integrates precision devices, clinical software, and service contracts to deliver stereotactic radiosurgery and comprehensive radiotherapy workflows; see Elekta Porter's Five Forces Analysis for strategic context. Elekta’s revenue mix balances high-ticket capital equipment with resilient recurring services; in 2024/2025 Solutions (hardware and software licenses) were ~**58%** of net sales and Services ~**42%**, supported by long-term service contracts and growing SaaS subscriptions. Elekta’s Key Milestones, Strategic Moves, and Competitive Edge trace a focused push under 'Access 2025' to expand precision radiation therapy to underserved markets, driven by product launches, AI integration, and localized manufacturing to strengthen global reach and clinical efficiency. How Elekta works in market terms: recurring service, software subscriptions, and capital sales drive revenue. Elekta business model adjustments include sourcing diversification, localized service hubs, and shifting toward higher-margin software and AI-enabled offerings to mitigate hardware cycle exposure and input-cost fluctuations. Elekta’s roadmap emphasizes AI-driven workflows and higher recurring revenue from software and services, aiming for operational leverage and improved margins.",
+        "score": 0.56690645,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.elekta.com/products/radiation-therapy/",
+        "title": "Radiation Therapy | Linac Machines | Products - Elekta",
+        "content": "An Elekta linac is more than a machine—it's a treatment solution—and our gold standard radiation treatment planning and review software, comprehensive quality assurance tools and extensive service options will support you in getting the most out of your linac. Increasing demand for radiation therapy around the world creates a need for more workflow oriented, better integrated, and automated solutions for treatment planning and management. ### Automated and integrated quality assurance in radiation therapy. To help you deliver safe and efficient treatments while reducing admin and non-treatment machine time in your clinic, we offer a suite of easy-to-use, web-based quality assurance tools for Machine and Patient QA. The future of radiation oncology, our hardware and software motion management technology innovations enable clinicians to reliably compensate for patient breathing during both internal and external beam radiation therapy, increasing treatment delivery accuracy and clinical confidence. Elekta Symmetry captures image data during the breathing phase and performs sophisticated computations to provide 4D data.",
+        "score": 0.459295,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.87,
+    "request_id": "c4ad57b3-dcac-4979-8f74-12410b38b56b"
+  }
+}

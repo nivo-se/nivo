@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560069463",
+  "company_name": "Alfa Laval Corporate AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Alfa Laval Corporate\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Alfa Laval Corporate what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.alfalaval.com/about-us/our-company/",
+        "title": "What we do - Alfa Laval",
+        "content": "Alfa Laval is a leading global provider of first-rate products in the areas of heat transfer, separation and fluid handling.",
+        "score": 0.72977066,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/alfa-laval-ab/",
+        "title": "Alfa Laval AB Company Profile - GlobalData",
+        "content": "# Alfa Laval AB - Company Profile. All the sales intelligence you need on Alfa Laval AB in one solution. Alfa Laval AB (Alfa Laval) is a global provider of specialized products and solutions in heat transfer, separation, and fluid handling technologies. Alfa Laval's technologies are utilized by customers in industries such as energy, food, water, and marine, enhancing productivity and competitiveness. Gain a 360-degree view of Alfa Laval AB and make more informed decisions for your business. Gain a 360-degree view of Alfa Laval AB and make more informed decisions for your business. View Alfa Laval AB financials. ## Alfa Laval AB premium industry data and analytics. Improve competitive bidding with insights into all publicly disclosed IT services contracts for Alfa Laval AB (including IT outsourcing, business process outsourcing, systems integration & consulting and more). Gain insight into Alfa Laval AB key executives to enhance your sales strategy. Gain insight into Alfa Laval AB key executives to enhance your sales strategy.",
+        "score": 0.6557114,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.alfalaval.com/about-us/",
+        "title": "About us | Alfa Laval",
+        "content": "Meeting these challenges will require significant change – and Alfa Laval is uniquely positioned to help. Alfa Laval products and solutions can enable us, our customers and societies to meet sustainability goals, boost circular business, and develop sustainable value chains. That comes with great responsibility. Our purpose of pioneering positive impact serves as the motivational force in our daily activities to deliver outstanding customer service, technology leadership and an inspiring and embracing workplace. Alfa Laval is a leading global provider of first-rate products in the areas of heat transfer, separation and fluid handling. At Alfa Laval we aim to realise our purpose, while at the same time meet the financial targets established with regard to growth, profitability and ... Our innovative and entrepreneurial spirit dates back to 1878, when Gustaf de Laval and his business partner patented a revolutionary new milk separator... #### Where we come from. Alfa Laval’s success is founded on being a company that holds true to its values.",
+        "score": 0.64047897,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bigsciencesweden.se/suppliers-partners/alfa-laval-technologies-ab/",
+        "title": "Alfa Laval Technologies AB - Big Science Sweden",
+        "content": "# Connecting Swedish industry, universities and research institutes with Big Science. Connecting Swedish industry, universities and research institutes with Big Science. ### News & Media. ### Calendar. ### The Swedish Guide. ### Business opportunities. ### Careers. ### Membership. ### Contact. ### Social media. # Alfa Laval Technologies AB. ### Core Competencies. ### Industry Sectors. ### References. ### Company size. ### Procurement code(s). ### NEWS. ### NEWSLETTERS. ### PROCUREMENTS. ### NEWS AND INVITATIONS. ### Big Science Sweden. We are Sweden’s Industrial Liaison Office (ILO), connecting Swedish industry, universities, and research institutes with the Big Science research organisations where Sweden is a member state.",
+        "score": 0.5515985,
+        "raw_content": null
+      },
+      {
+        "url": "https://portersfiveforce.com/blogs/brief-history/alfalaval",
+        "title": "What is Brief History of Alfa Laval Company? – PortersFiveForce.com",
+        "content": "From dairy centrifuges to plate heat exchangers and ballast-water systems, Alfa Laval grew through engineering-driven product expansion and global sales, employing over 20,000 people and reporting 2024 net sales near **SEK 67–70 billion**. Under Tetra Laval ownership and later relisting, Alfa Laval accelerated mergers and acquisitions, strengthened plate heat exchanger market share, and invested in R&D centers in Europe and Asia to capture rising energy-efficiency demand. Milestones, Innovations and Challenges trace Alfa Laval history from Gustaf de Laval’s separator to a global heat-transfer and separation leader, highlighting product leaps, strategic acquisitions and responses to cyclic marine and energy markets. Alfa Laval innovations include continuous centrifugal separators and progressive plate heat exchanger designs that delivered measurable efficiency gains across food, marine and energy sectors. Timeline and Future Outlook traces Alfa Laval history from its 1877 founding through key innovations in separation, heat transfer and fluid handling, highlights recent growth—group sales ~**SEK 67–70 billion** in 2024—and outlines a roadmap into energy-efficiency markets, hydrogen pilots and marine decarbonization.",
+        "score": 0.4893821,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.47,
+    "request_id": "36b42944-e4c5-4cf5-b0ef-7e6de39c238c"
+  }
+}

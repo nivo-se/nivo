@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560337136",
+  "company_name": "Cramo AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Cramo\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Cramo what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.cramo.se/en",
+        "title": "renting just got smarter - Cramo",
+        "content": "Welcome to Cramo · Access equipment · Construction · Tools · Lifting · Scaffolding and ladders · Site huts, toilets & trailers · Support equipment, railings and fences.",
+        "score": 0.98558,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.youtube.com/c/CramoGroup/about",
+        "title": "Cramo - YouTube",
+        "content": "At Cramo you will find the widest assortment of tools on the market, from circular saws and pumps to special equipment such as heat cameras and dehumidifiers.",
+        "score": 0.98438,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.innofactor.com/customers/cramo-tabella/",
+        "title": "A software solution for Cramo's diverse financial planning needs",
+        "content": "# A software solution for Cramo’s diverse financial planning needs. Tabella Business Tools enabled a construction machinery rental company to solve many challenges in one go. The history of co-operation between Cramo and Invenco (now part of Innofactor) concerning Tabella Business Tools software can be traced back to 2015, when the companies started to use Tabella to implement a financial planning project between Cramo's different operating countries. The aim of the development project was to avoid having to circulate data through the entire group's common consolidation system between rounds of planning, which presents challenges in terms of making efficient use of time. The inadequate functionality provided by Excel became a problem for Cramo, so the group decided to incorporate the financial planning, reporting and consolidation activities of the companies that produce group services into the same Tabella software solution that was used for the operational companies. Finferries uses Tabella Business Tools for financial planning and internal reporting, as well as for drawing up the consolidated financial statements.",
+        "score": 0.97817,
+        "raw_content": null
+      },
+      {
+        "url": "https://noordigital.com/case-studies/cramo/",
+        "title": "Showcase – Cramo | Noor Digital",
+        "content": "Cramo is a leading provider of equipment rental services, offering a wide range of products and solutions to businesses across various industries. From construction equipment to tools and machinery, Cramo provides essential rental services that help companies in need of temporary equipment solutions. Since the beginning of our collaboration in 2021, Noor Digital has had the privilege of partnering with Cramo to develop a long-term, data-driven SEO strategy. A significant boost in visibility and new all-time highs in organic traffic year after year, supporting a digital presence that reflects Cramo’s position as a market leader. By equipping their team with a deeper understanding of SEO, Cramo can now disseminate this expertise across different regions, ensuring consistent digital strategies across their international locations. Our agile, hands-on approach has been key in ensuring that the SEO strategy remains relevant as market conditions and Google algorithms evolve, helping Cramo maintain a unified, effective SEO presence across all markets.",
+        "score": 0.97506,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.cramo.com/",
+        "title": "Cramo Group",
+        "content": "CRAMO - Equipment rental services in 11 countries.",
+        "score": 0.96975,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.18,
+    "request_id": "5bee5809-03f5-48de-a227-5b3902e9227e"
+  }
+}

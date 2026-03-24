@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5565636353",
+  "company_name": "AB Poly-Produkter",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"AB Poly-Produkter\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "AB Poly-Produkter official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.polyprodukter.se/",
+        "title": "AB Poly-Produkter: Innovation och tradition sedan 1967",
+        "content": "AB Poly-Produkter är ett familjeföretag som grundades i Göteborg 1967 av Gunvor och Börje Nilsson. AB Poly-Produkter driver idag två varumärken: PolyRopes och PolyAgri. AB Poly-Produkter är ett familjeföretag som grundades i Göteborg 1967 av Gunvor och Börje Nilsson. AB Poly-Produkter driver idag två varumärken: PolyRopes och PolyAgri. Med vårt varumärke PolyRopes fokuserar vi på högkvalitativa rep och snören. Vi tillverkar ett brett utbud av produkter för båtlivet, såsom förtöjningstampar, fenderlinor, skot, fall och mycket mer. Utöver vårt båtsortiment erbjuder vi även ett brett utbud av rep och snören i olika längder och dimensioner, anpassade för en mängd olika ändamål. Vi är specialiserade på produkter för höhantering och erbjuder bland annat balplast, balnät och plansilofolie. Plast spelar en stor roll även här, och med innovativa lösningar har vi arbetat för att förbättra plastens hållbarhet samtidigt som vi minskar dess volymbehov. Vi tillverkar pressgarn och utgödslingslinor av hög kvalitet med enastående slitstyrka – produkter du kan lita på i alla lägen.",
+        "score": 0.82560414,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.polyprodukter.se/?lang=en",
+        "title": "Innovation and tradition since 1967 - AB Poly-Produkter",
+        "content": "AB Poly-Produkter currently operates two brands: PolyRopes and PolyAgri. AB Poly-Produkter currently operates two brands: PolyRopes and PolyAgri. With our PolyRopes brand, we focus on high-quality ropes and cords. We manufacture a wide range of products for boating, such as mooring lines, fender lines, sheets, halyards and much more. In addition to our boat range, we also offer a wide range of ropes and cords in different lengths and dimensions, adapted for a variety of purposes. Products from the PolyRope range. #### PolyAgri. PolyAgri is our brand dedicated to agriculture and farming. Ropes are also an important part of our agricultural range. We produce high-quality baler twine and fertiliser lines with outstanding durability – products you can rely on in all situations. Products from the PolyAgri range. We use cookies to improve your experience on our website. By browsing this website, you agree to our use of cookies.",
+        "score": 0.8088086,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.polyprodukter.se/contact-us/?lang=en",
+        "title": "Contact us - AB Poly-Produkter",
+        "content": "Innovation and tradition since 1967. Innovation and tradition since 1967. Hero Lagerbild AB Poly-Produkter. #### We work here. Redegatan 9, 426 77 Västra Frölunda, Sweden. #### Benny W Nilsson. #### Kristoffer Nilsson. #### Åsa Silvede. #### Fredrik Olsson. #### Alice Robertsson. #### Mikael Hansson. #### Gustaf Henriksson. #### Johnny Brandt. #### Jonathan Schultz. #### Caroline Anjemark. #### Malte. #### We work here. Hobergsvägen 2, 447 37 Vårgårda, Sweden. #### Karl Birgander. #### Fredrik Särnqvist. #### Jakob Gustafsson. #### Erik Lundevall. #### Houda Hadid. #### Hser Gay Theimya. #### Daniel Mjörnemyr. #### BenBow Maypaw. #### Hassan Aftab. #### Felix Fahlgren. #### Hanna Ström. We use cookies to improve your experience on our website. By browsing this website, you agree to our use of cookies.",
+        "score": 0.74541736,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.polyropes.eu/about-us/",
+        "title": "About us - PolyRopes",
+        "content": "rope experts since 1967 mobil. At first glance, PolyRopes is just a rope company. Meet us who work here and get an insight into how we view rope manufacturing, entrepreneurship, and customer care. Börje is in a hurry to catch the flight that will take him to Portugal for a meeting with a major rope manufacturer. Börje and Gunvor Nilsson founded the company AB Poly-Produkter in 1967, and since then, we have been somewhat of a newcomer in Swedish rope manufacturing. A rope is so much more than just a rope; it’s what you do with it, a solution to thousands of problems. With our own manufacturing and sales, we can offer short lead times, customized production, and fast deliveries. **2022** – The number of brands is reduced from five to two, one for rope and boating; and one for agriculture. ### What you get when you choose ropes from us. * A warehouse with over 4000 ropes. - Rope for cat scratching post.",
+        "score": 0.6932451,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/polyprodukter/",
+        "title": "AB Poly-Produkter (@polyprodukter) - Facebook",
+        "content": "AB Poly-Produkter, Västra Frölunda. 1541 likes. Skandinaviens ledande tågvirkesföretag grundat år 1967. Stort sortiment med innovativa produkter.",
+        "score": 0.68420124,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.96,
+    "request_id": "4251917d-ef98-4a17-af5c-3f2b65f5571c"
+  }
+}

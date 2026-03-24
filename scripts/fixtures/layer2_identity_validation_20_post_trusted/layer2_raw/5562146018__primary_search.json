@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5562146018",
+  "company_name": "Fladen Fishing Aktiebolag",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Fladen Fishing\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Fladen Fishing what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.crunchbase.com/organization/fladen-fishing",
+        "title": "Fladen Fishing - Crunchbase Company Profile & Funding",
+        "content": "Fladen Fishing is a company that specializes in the design and development of fishing tackle, outdoor clothing, and boat accessories. Their product range is",
+        "score": 0.8783249,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bloomberg.com/profile/company/8680442Z:SS",
+        "title": "Fladen Fishing AB - Company Profile and News",
+        "content": "Fladen Fishing AB provides the wholesale distribution of sporting and recreation goods. The Company offers a variety of fishing gear including rods, lures,",
+        "score": 0.83710164,
+        "raw_content": null
+      },
+      {
+        "url": "https://fladenfishing.se/en/pages/om-oss?srsltid=AfmBOooOCGRI5xkPMOF0RAQWZunboI_jlrEjOriL_ND6vxQVtvxGilOj",
+        "title": "About us – Fladen Fishing AB",
+        "content": "Therefore, we ensure that our production lives up to high standards and that it takes place under good working conditions. Fladen Fishing are members of the Business Social Compliance Initiative - BSCI and through this we have a greater opportunity to influence suppliers and factories in a positive direction. Together with experienced anglers, Fladen Fishing is careful to follow new trends, develop and improve our range continuously. Manufacturing takes place without intermediaries at leading manufacturers around the world and we work actively to find the best manufacturer for each product, all in order to be able to offer the best quality at the best price. Fladen Fishing works actively to ensure that the working environment at our manufacturers is the best possible. Today, you can find products from us at the vast majority of specialist retailers in sport fishing. We have fishing equipment for a small amount of money for those who want to start fishing, but we also have more advanced products for those who want the very best.",
+        "score": 0.7578844,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sportfishtackle.com/en/varumarken/fladen.html",
+        "title": "Fladen",
+        "content": "# Fladen. Fladen Fishing's ambition is to give you, the angler, a good experience. Fladen Maxximus Predator Tail 50g. Fladen Maxximus Predator Tail 50g. Fladen Maxximus Predator Tail-or XL. Fladen Maxximus Predator Tail-or XL. Fladen Maxximus Cable Braid Multicolor 300m. Fladen Predator Jerk 9cm, 25g. Fladen Predator Jerk 9cm, 25g. Fladen Predator Jerk 50g, 12cm. Fladen Predator Jerk 50g, 12cm. Fladen Maxximus Cable Braid Red 150m. Fladen Maxximus Cable Braid Red 150m. Söder Sportfiske AB uses cookies and similar storage technologies to provide you with tailored content, relevant marketing and a better experience with our e-commerce and website.You acknowledge that you have read our Cookie Policy and agree to our use of cookies by clicking \"Accept\". Söder Sportfiske AB uses cookies and similar storage technologies to provide you with tailored content, relevant marketing and a better experience with our e-commerce and website. You acknowledge that you have read our Cookie Policy and agree to our use of cookies by clicking \"Accept\".",
+        "score": 0.7325349,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.instagram.com/fladenfishing_official/",
+        "title": "Fladen Fishing AB (@fladenfishing_official) · Varberg",
+        "content": "Everything in sportfishing - quick delivery. Our wide range of products contains over 5000 items for all types of fishing.",
+        "score": 0.599087,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.84,
+    "request_id": "b9273aa6-625a-4817-a8bb-82ff57065e15"
+  }
+}

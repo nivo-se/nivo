@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564169786",
+  "company_name": "KRYDDHUSET I LJUNG Aktiebolag",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"KRYDDHUSET I LJUNG\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "KRYDDHUSET I LJUNG official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.facebook.com/100057040315483/?locale=hy_AM",
+        "title": "Kryddhuset | Ljung - Facebook",
+        "content": "Details. 󰡍. 98% խորհուրդ է տրվում (13 Կարծիքներ). 󰘛. Industrivägen 3, Ljung, Sweden, 52441 ; Links. 󰤂. kryddhuset.se ; Կոնտակտային տվյալներ. 󰛪. +46 513 509 56. 󰘢.",
+        "score": 0.7539928,
+        "raw_content": null
+      },
+      {
+        "url": "https://kryddhuset.se/menu/",
+        "title": "Menu - Kryddhuset i Ljung AB",
+        "content": "Our company facebook page · Our company Instagram. Kryddhuset i Ljung AB. Industrivägen 3. 524 41 Ljung. Telefon: 0513-509 56. E-post: info@kryddhuset.se",
+        "score": 0.7522497,
+        "raw_content": null
+      },
+      {
+        "url": "https://kryddhusetiljung.se/",
+        "title": "Kryddhuset i Ljung AB",
+        "content": "Ingredienser: Salt (59%), paprika, lök, chili chipotle (5%), svartpeppar, vitlök, spiskummin, kryddpeppar, koriander, ingefära, rapsolja, chili, oregano. Ingredienser: Salt (59%), paprika, lök, svartpeppar, vitlök, spiskummin, kryddpeppar, koriander, ingefära, rapsolja, chili, oregano. Ingredienser: Salt (53,2%), paprika, lök, svartpeppar, socker, ingefära, vitlök, spiskummin, kryddpeppar, koriander, rapsolja, aromer (honung, lime), chili, oregano, vitlök. Ingredienser: Salt (59%), paprika, lök, svartpeppar, vitlök, spiskummin, kryddpeppar, koriander, ingefära, rapsolja, chili, oregano.. Ingredienser: Salt (69%), paprika, svartpeppar, lök, vitlök, spiskummin, selleri, rapsolja, koriander, ingefära, chili. Ingredienser: Salt (59%), lök, svartpeppar, vitlök, paprika, koriander, kokosmjölkspulver (kokosmjölk, maltodextrin, natriumkaseinat), persilja, ingefära, korianderblad, sojasås (vatten, sojabönor, majsmjöl, salt, färgämne (150a), konserveringsmedel (E202)), chili chipotle, rapsolja, paprikaextrakt. Ingredienser: Salt (51,5%), lök, paprika, svartpeppar, ingefära, spiskummin, socker, vitlök, arom (bacon, rök), chili, rapsolja, paprikaextrakt. Ingredienser: Havssalt (37%), lökpulver, paprika, ingefära, svartpeppar, vitlök, chilipulver [chili, salt, spiskummin, vitlök, oregano], socker (5%), koriander, rapsolja, naturlig honungs- och ingefäraarom, paprikaextrakt.](https://impro.usercontent.one/appid/oneComWsb/domain/kryddhusetiljung.se/media/kryddhusetiljung.se/onewebmedia/Katalog/SPICE%20RUBS/spicerub_pet180_honey_and_ginger_6334.jpg? Ingredienser: Havssalt (39%), lökpulver, chilipulver [chili, salt, spiskummin, vitlök, oregano], vitlök, svartpeppar, rosmarin, timjan, spiskummin, rosèpeppar, paprikaflakes, oregano, mejram och rapsolja.](https://impro.usercontent.one/appid/oneComWsb/domain/kryddhusetiljung.se/media/kryddhusetiljung.se/onewebmedia/Katalog/SPICE%20RUBS/spicerub_pet180_herbs_and_spicy_6336.jpg?",
+        "score": 0.7318455,
+        "raw_content": null
+      },
+      {
+        "url": "https://kryddhuset.se/om/",
+        "title": "När smaken kommer till sin rätt - Kryddhuset",
+        "content": "När smaken kommer till sin rätt. Historik & ägarbild. Kryddhuset i Ljung AB är ett entreprenörsorienterat familjeföretag med rötter i Sverige och Italien",
+        "score": 0.72698855,
+        "raw_content": null
+      },
+      {
+        "url": "https://kryddhuset.se/",
+        "title": "Kryddhuset i Ljung AB: Startpage",
+        "content": "##### Favorite saved! ##### LADE TILL I VARUKORG! ##### You have no favorites yet. ##### DIN VARUKORG ÄR TOM! ##### Kryddhuset i Ljung AB. E-post: info@kryddhuset.se Org nr.",
+        "score": 0.6844544,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.99,
+    "request_id": "88a65849-cce1-4842-a562-c464e5ca6f44"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564968039",
+  "company_name": "Formenta AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Formenta\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Formenta what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.linkedin.com/company/formenta",
+        "title": "Formenta - Designed to last.",
+        "content": "Overview:\nFormenta design and produce premium products for outdoor environments; flagpoles, lighting columns, planters, sand containers, bikestands, park furnitures and waste bins. Our clients is globally based in more than 30 countries. Formenta is located with production and HQ in Värnamo, Sweden and sales office in Netherlands.\n\nWebsite: https://www.formenta.se/\nCrunchbase Url: N/A\nLinkedin Url: https://www.linkedin.com/company/formenta\n\nIndustry:\nManufacturing\n\nCompany size:\n11-50 employees\n12 associated members (LinkedIn members who’ve listed Formenta as their current workplace on their profile)\n\nFounded:\n1972\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.83549726,
+        "raw_content": null,
+        "domain": "linkedin.com",
+        "popularity_score": 13.152422852562271,
+        "main_topic": "business"
+      },
+      {
+        "url": "https://www.formenta.se/projects/lilla-bantorget-stockholm-sweden",
+        "title": "Lilla Bantorget: Stockholm Sweden | Formenta",
+        "content": "Sätra Playground, Västerås, SwedenProject Tuna, Tumba, SwedenBergsäter Park, Ulricehamns, SwedenLagerlunda Park, Norrköping, SwedenPreschool i Espoo, Finland24 Torkel Knutssonsgatan, Stockholm, SwedenPop-Up Playground, Järfälla, SwedenLaholmsudden, Strömstad, SwedenPumpan Kindergarten, Solna, SwedenNyhed School, Rättvik, SwedenLilla Bantorget, Stockholm SwedenPlayground Circus, Solvesborg, SwedenPlayground Rainbow, Angelholm, SwedenHatten Pre-School, Norrköping, SwedenBrinken Playground, Motala, SwedenKlockgjutarparken, Gävle, SwedenRoundabout, Lerum, SwedenWalk / Bike path, Järfälla, SwedenPlayground Flowers for bees, Köping, SwedenKarlaparken, Örebro, SwedenLundagården Pre-school, Götene, SwedenPedestrian Crossing, Tranås, SwedenPlayground, Bergsjön, SwedenPlayground Zebra, Angelholm, SwedenThe Traffic Office, Stockholm, SwedenWalk / Bike Path, Växjö, SwedenWalk / Bike Path, Forsheda, SwedenTallörtsbacken, Jönköping, SwedenHögstorp Church, Växjö, SwedenWalk / Bike Path, Knivsta, SwedenPedestrian Crossing, Växjö, SwedenÖjaby School, Växjö, SwedenWalk / Bike Path, Mölndal, SwedenRavema, Värnamo, SwedenResidential Area, Farsta, SwedenLights in Alingsås, Alingsås, SwedenHånger Church, Hånger, SwedenMain Square, Svedala, SwedenStationsparken, Halmstad, SwedenMickedalsparken, Halmstad, SwedenApladalen, Värnamo, SwedenResidential Area, Värnamo, Sweden. # Lilla Bantorget. ## Stockholm Sweden. ## Products. Receive information on new products, development and news. Select at least one of our product segments.",
+        "score": 0.6016175,
+        "raw_content": null,
+        "domain": "formenta.se",
+        "popularity_score": 0.0,
+        "main_topic": "business"
+      },
+      {
+        "url": "https://www.formenta.se/projects/gummifabriken",
+        "title": "Project – Flagpole – Värnamo Gummifabrik | Formenta",
+        "content": "Residential, Värnamo, SwedenTele 2 Arena, Stockholm, SwedenFriends Arena, Stockholm, SwedenJureskogs, Värnamo, SwedenGummifabriken, Värnamo, SwedenFrancophonie Summit 2018, Yerevan, ArmeniaTemple of Solomon, Sao Paolo, BrazilResidential Building, Eslöv, SwedenFIS Nordic World Ski Championships, Oslo, NorwayGuldfågeln Arena, Kalmar, SwedenAlléskolan, Hallsberg, SwedenIkea, Umeå, SwedenHarmsen, Hengelo, The NetherlandsAvion Shopping, Umeå, SwedenMinistry of Foreign Affairs of Yerevan, ArmeniaPlayground, Skummeslövstrand, SwedenHotel Riviera, Båstad, SwedenKFC, Malmö, SwedenMediamarkt, Gothenburg, SwedenUnited Nations, Vienna, AustriaPan American Games, TorontoAsian Games, Doha, QatarSAAB Arena, Linköping, Sweden. # Gummifabriken. ## Värnamo, Sweden. ## Products. | Flagpole ISS Exclusive with lock 12 m |. Receive information on new products, development and news. Select at least one of our product segments. Copyright © Formenta AB 1997–2026.",
+        "score": 0.5931622,
+        "raw_content": null,
+        "domain": "formenta.se",
+        "popularity_score": 0.0,
+        "main_topic": "business"
+      },
+      {
+        "url": "https://www.formenta.se/projects/tele-2-arena-stockholm-sweden",
+        "title": "Tele 2 Arena: Stockholm, Sweden | Formenta",
+        "content": "Residential, Värnamo, SwedenTele 2 Arena, Stockholm, SwedenFriends Arena, Stockholm, SwedenJureskogs, Värnamo, SwedenGummifabriken, Värnamo, SwedenFrancophonie Summit 2018, Yerevan, ArmeniaTemple of Solomon, Sao Paolo, BrazilResidential Building, Eslöv, SwedenFIS Nordic World Ski Championships, Oslo, NorwayGuldfågeln Arena, Kalmar, SwedenAlléskolan, Hallsberg, SwedenIkea, Umeå, SwedenHarmsen, Hengelo, The NetherlandsAvion Shopping, Umeå, SwedenMinistry of Foreign Affairs of Yerevan, ArmeniaPlayground, Skummeslövstrand, SwedenHotel Riviera, Båstad, SwedenKFC, Malmö, SwedenMediamarkt, Gothenburg, SwedenUnited Nations, Vienna, AustriaPan American Games, TorontoAsian Games, Doha, QatarSAAB Arena, Linköping, Sweden. # Tele 2 Arena. Tele2 Arena is since 2013 a sports and event area in the south of Stockholm. The arena, which is the home ground for Swedish top flight teams Hammarby and Djurgården, has a capacity of 40 000 spectators. When construction company PEAB was tasked by Tele2 Arena to source flagpoles, they chose Formenta and Flagpole ISS Exclusive with lock 16 m, a flagpole especially suited for challenging outdoor environments. ## Products. | Flagpole ISS Exclusive with lock 16 m |. Receive information on new products, development and news. Select at least one of our product segments.",
+        "score": 0.5914643,
+        "raw_content": null,
+        "domain": "formenta.se",
+        "popularity_score": 0.0,
+        "main_topic": "business"
+      },
+      {
+        "url": "https://www.formenta.se/lighting-columns/lighting-column-anthracite-3-6-m",
+        "title": "Lighting Column Anthracite Grey 3–6 m | Formenta",
+        "content": "Lighting Column Anthracite 3–6 m. Lighting Column Anthracite 3–6 m. # Lighting Column Anthracite 3–6 m. Our lighting columns are made from fibreglass composite materials, which means they are maintenance-free while combining low weight and extreme strength. | Rec. base 108/900 | Saferoad 7778234 Cetong 7778676 Formenta 7771497 |. | Rec. base 108/900 | Saferoad 7778234 Cetong 7778676 Formenta 7771497 |. | Rec. base 108/900 | Saferoad 7778234 Cetong 7778676 Formenta 7771497 |. Formenta lighting columns come in eight different lengths of 3, 4, 5 or 6 m and 7, 8, 9 and 10 m. All lighting columns are of conical shape and can be shipped in any colour from the RAL scale. With our Swedish-made composite lighting columns, weight can be reduced by 70% compared to traditional steel columns. The manufacturing process of Formenta lighting columns does not include emissions in nearby waters. This is a very important difference from the production of the traditional lighting columns in aluminium or steel.",
+        "score": 0.44941738,
+        "raw_content": null,
+        "domain": "formenta.se",
+        "popularity_score": 0.0,
+        "main_topic": "business"
+      }
+    ],
+    "response_time": 4.27,
+    "request_id": "b90fa307-2851-42e0-9273-c7c5bcf9359c"
+  }
+}
