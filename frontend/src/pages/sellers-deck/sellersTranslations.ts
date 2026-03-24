@@ -14,198 +14,150 @@ export const sellersTranslations = {
   gateError: "Fel lösenord. Försök igen.",
   lockPage: "Lås sidan",
 
-  // Nav
-  navSammanfattning: "Sammanfattning",
+  // Nav (exakt 6)
   navHurViArbetar: "Hur vi arbetar",
   navVadViLetarEfter: "Vad vi letar efter",
   navVarförAnnorlunda: "Varför vi är annorlunda",
   navVarProcess: "Vår process",
   navEfterAffaren: "Efter affären",
-  navVemBakomOss: "Vem som står bakom oss",
-  navTeam: "Team",
   navKontakt: "Kontakt",
 
   // Hero
   heroTitle:
     "Det du har byggt förtjänar en partner som kan ta det vidare — tillsammans med dig",
-  heroSubtitle:
-    "Att sälja sitt bolag är mer än en affär. Vi går in som delägare tillsammans med entreprenörer som vill fortsätta utveckla det de byggt — med rätt stöd, rätt tempo och ett långsiktigt perspektiv.",
+  heroLead1: "Att sälja sitt bolag är mer än en affär.",
+  heroLead2: "Det handlar om vem du väljer att bygga vidare med.",
+  heroLead3:
+    "Nivo går in som delägare tillsammans med entreprenörer som vill fortsätta utveckla det de byggt — med struktur, rätt prioriteringar och ett långsiktigt perspektiv.",
 
-  // Sammanfattning
-  sammanfattningTitle: "Sammanfattning",
-  sammanfattningIntro:
-    "Du har byggt något under många år. Att sälja är inte bara att göra en affär, utan att välja vem du ska bygga vidare med.",
-  sammanfattningText:
-    "Nivo är ett investeringsbolag som förvärvar och utvecklar nordiska små och medelstora företag. Vi går in som delägare tillsammans med entreprenörer som vill fortsätta utveckla sina bolag i nästa fas.",
-  sammanfattningText2:
-    "Vi köper för att bygga vidare — inte för att sälja vidare. Som ägare arbetar vi nära entreprenören och ledningen, med fokus på långsiktig utveckling av bolaget.",
-  sammanfattningBullet1: "Kapital till fortsatt utveckling",
-  sammanfattningBullet2: "Möjlighet att kvarstå som delägare",
-  sammanfattningBullet3: "En aktiv partner i nästa fas",
+  // Citat (egen sektion)
+  quoteMain: "Tillsammans tar vi det som fungerar — och bygger vidare mot nästa kapitel.",
+  quoteSub: "Med ambitionen att utveckla och stärka verksamheten vidare.",
 
-  // Hur vi arbetar som ägare
-  samarbeteTitle: "Hur vi arbetar som ägare",
-  samarbetePartnerskapTitle: "Partnerskap",
-  samarbetePartnerskapText:
-    "Vi arbetar tillsammans med entreprenören — som ett gemensamt lag. Du fortsätter driva bolaget, och vi bidrar med struktur, resurser och stöd där det gör skillnad. Beslut tas gemensamt, med bolagets bästa i fokus.",
-  samarbeteSnabbBeslut: "Beslutsprocess",
-  samarbeteSnabbBeslutText:
-    "Vi är ett litet team. Inga långa processer. När något behöver avgöras gör vi det. Du får tydliga svar, snabbt.",
-  samarbeteNärvarandeMenIntePåträngande: "Ägarroll",
-  samarbeteNärvarandeMenIntePåträngandeText:
-    "Vi är aktiva i strategi, styrning och utveckling — inte i daglig drift. Vår roll är att hjälpa bolaget framåt, inte att ta över det.",
-  samarbeteByggaInteRapportera: "Operativ utveckling",
-  samarbeteByggaInteRapporteraText:
-    "Vi fokuserar på det som faktiskt skapar värde:",
-  samarbeteOperativBullet1: "bättre styrning",
-  samarbeteOperativBullet2: "tydligare prioriteringar",
-  samarbeteOperativBullet3: "starkare marginaler",
-  samarbeteOperativBullet4: "bättre prissättning",
-  samarbeteDigitalTitle: "Digitalisering och AI",
-  samarbeteDigitalText:
-    "Vi ser digitalisering och AI som en naturlig del av hur bolag utvecklas framåt. I vissa fall handlar det om större initiativ, i andra om mindre förbättringar med stor effekt. Fokus är alltid detsamma: att använda teknik där den stärker affären och gör bolaget bättre över tid.",
-  samarbeteNatverkTitle: "Nätverk",
-  samarbeteNatverkText:
-    "Vi har byggt relationer inom företagande, industri, kapital och digital utveckling. När det behövs tar vi in rätt personer för att hjälpa bolaget framåt.",
+  // Intro (under citat)
+  introP1:
+    "Du har byggt något över många år. Att ta in en partner handlar inte bara om pris — utan om riktning, arbetssätt och förtroende.",
+  introP2:
+    "Nivo är ett investeringsbolag som går in som delägare i nordiska små och medelstora bolag.",
+  introP3:
+    "Nivo arbetar nära entreprenörer och ledning för att utveckla verksamheten vidare — i praktiken, inte i teori.",
 
-  // Vad vi letar efter
-  vadViLetarEfter: "Vad vi letar efter",
-  vadViLetarEfterIntro:
-    "Vi investerar i ett fåtal bolag där vi tror att vi kan vara rätt partner i nästa fas.",
-  vadViLetarEfterItem1:
-    "Företag med stark grund, lojala kunder och stabila kassaflöden",
-  vadViLetarEfterItem2: "Beprövade affärsmodeller",
-  vadViLetarEfterItem3: "Tydlig potential att utveckla verksamheten vidare",
-  vadViLetarEfterItem4: "Evergreen-ägande utan fondcykel eller tvingat ägarskifte",
-  vadViLetarEfterItem5:
-    "Entreprenörer som vill vara kvar som delägare och fortsätta utveckla bolaget tillsammans med oss",
-  vadViLetarEfterAvslutning:
-    "När vi ser det vi letar efter engagerar vi oss fullt ut. Vi gör få investeringar och arbetar nära de bolag vi äger.",
+  // 1. Hur vi arbetar
+  hurViArbetarTitle: "Hur vi arbetar",
 
-  // Varför Nivo är annorlunda
-  varforAnnorlundaTitle: "Varför Nivo är annorlunda",
-  varforAnnorlundaRubrik: "Investeringsbolag — inte traditionellt riskkapital",
-  varforAnnorlundaText:
-    "Vi investerar med eget kapital i en evergreen-struktur. Det innebär att vi inte har någon fondcykel och ingen förutbestämd exit.",
-  varforAnnorlundaText2: "Vi bygger bolag tillsammans med entreprenörer — inte för att sälja vidare.",
-  varforAnnorlundaViIntro: "Vi:",
-  varforAnnorlundaVi1: "bygger inte värde genom hög belåning",
-  varforAnnorlundaVi2: "driver inte kortsiktiga planer",
-  varforAnnorlundaVi3: "fattar beslut med bolagets långsiktiga utveckling i fokus",
-  varforAnnorlundaBullet1: "Evergreen-struktur",
-  varforAnnorlundaBullet2: "Ingen fondcykel",
-  varforAnnorlundaBullet3: "Ingen förutbestämd exit",
-  varforAnnorlundaBullet4: "Kapital som kan återinvesteras",
-  varforAnnorlundaBullet5: "Fokus på långsiktigt värdeskapande",
+  hvPartnerskapTitle: "Partnerskap",
+  hvPartnerskapB1: "Nivo bygger bolaget tillsammans med entreprenören",
+  hvPartnerskapB2: "Tydlig rollfördelning mellan ägare och ledning",
+  hvPartnerskapB3: "Beslut tas gemensamt, med bolagets bästa i fokus",
 
-  vadViInteGorText:
-    "Vi bygger inte värde genom aggressiv belåning. Vi driver inte bolag mot en snabb exit. Vi investerar för att utveckla bolag över tid.",
+  hvBeslutTitle: "Beslut",
+  hvBeslutB1: "Korta beslutsvägar och tydliga svar",
+  hvBeslutB2: "Fokus på det som faktiskt spelar roll",
+  hvBeslutB3: "Prioriteringar sätts och följs upp",
 
-  // Vår process
+  hvAgarrollTitle: "Ägarroll",
+  hvAgarrollB1: "Aktiv i strategi och utveckling",
+  hvAgarrollB2: "Inte inne och stör i vardagen",
+  hvAgarrollB3: "Fokus på att stärka, inte ta över",
+
+  hvOperativTitle: "Operativ utveckling",
+  hvOperativB1: "Förbättra marginaler, prissättning och struktur",
+  hvOperativB2: "Tydliggöra fokus och riktning i bolaget",
+  hvOperativB3: "Arbeta med kontinuerliga förbättringar över tid",
+
+  hvDigitalTitle: "Digitalisering och AI",
+  hvDigitalB1: "Identifiera var teknik faktiskt gör skillnad",
+  hvDigitalB2: "Automatisera där det förenklar och sparar tid",
+  hvDigitalB3: "Använda AI som ett verktyg – inte ett buzzword",
+
+  hvNatverkTitle: "Nätverk",
+  hvNatverkB1: "Tillgång till operativ och industriell erfarenhet",
+  hvNatverkB2: "Stöd vid rekrytering och nyckelroller",
+  hvNatverkB3: "Rätt kompetens in när det behövs",
+
+  subgridTitle: "Så utvecklar Nivo bolag i praktiken",
+
+  sgGrowthTitle: "Tillväxt och riktning",
+  sgGrowthB1: "Tydlig plan för hur bolaget ska utvecklas",
+  sgGrowthB2: "Säkerställa rätt kapabiliteter",
+  sgGrowthB3: "Driva initiativ som faktiskt gör skillnad",
+
+  sgOrgTitle: "Organisation",
+  sgOrgB1: "Klargöra roller och ansvar",
+  sgOrgB2: "Stärka team där det behövs",
+  sgOrgB3: "Skapa en struktur som håller över tid",
+
+  sgDecisionTitle: "Nyckeltal och beslut",
+  sgDecisionB1: "Ett fåtal tydliga nyckeltal",
+  sgDecisionB2: "Beslut baserade på fakta och erfarenhet",
+  sgDecisionB3: "Löpande uppföljning utan onödig komplexitet",
+
+  sgSystemsTitle: "System och verktyg",
+  sgSystemsB1: "Uppgradera det som är affärskritiskt",
+  sgSystemsB2: "Införa verktyg som förenklar arbetet",
+  sgSystemsB3: "Använda AI där det ger konkret effekt",
+
+  sgExecutionTitle: "Genomförande",
+  sgExecutionB1: "Förbättra sälj, prissättning och leverans",
+  sgExecutionB2: "Få saker gjorda – inte bara planerade",
+  sgExecutionB3: "Små förbättringar som bygger värde över tid",
+
+  sgCultureTitle: "Kultur",
+  sgCultureB1: "Tydliga mål och riktning",
+  sgCultureB2: "Synlig progression i arbetet",
+  sgCultureB3: "En arbetstakt som är hållbar",
+
+  hurViArbetarClosing:
+    "Nivo arbetar pragmatiskt och fokuserar på det som faktiskt driver resultat i varje bolag.",
+
+  // 2. Vad vi letar efter (2×3 i kort)
+  vadViLetarEfterTitle: "Vad vi letar efter",
+  vadBlock1Title: "Bolag och affär",
+  vadB1: "Bolag med stabil verksamhet och lojala kunder",
+  vadB2: "Beprövade affärsmodeller med god lönsamhet",
+  vadB3: "Tydlig potential att utveckla vidare",
+  vadBlock2Title: "Entreprenör och matchning",
+  vadB4: "Entreprenörer som vill vara kvar och fortsätta bygga",
+  vadB5: "Bolag där Nivo kan vara en relevant partner",
+  vadB6: "Verksamheter där förbättringar gör verklig skillnad",
+
+  // 3. Varför vi är annorlunda
+  varforAnnorlundaTitle: "Varför vi är annorlunda",
+
+  vaStrukturTitle: "Struktur",
+  vaStrukturB1: "Nivo investerar med eget kapital",
+  vaStrukturB2: "Ingen fondcykel",
+  vaStrukturB3: "Ingen förutbestämd exit",
+
+  vaPerspektivTitle: "Perspektiv",
+  vaPerspektivB1: "Nivo bygger bolag över tid",
+  vaPerspektivB2: "Fokus på utveckling, inte försäljning",
+  vaPerspektivB3: "Beslut tas långsiktigt",
+
+  vaArbetssattTitle: "Arbetssätt",
+  vaArbetssattB1: "Inga standardmodeller som trycks på alla",
+  vaArbetssattB2: "Nivo anpassar sig efter bolaget",
+  vaArbetssattB3: "Det som fungerar i praktiken",
+
+  // 4. Vår process
   varProcessTitle: "Vår process",
-  varProcessIntro:
-    "Att sälja sitt bolag är ett stort beslut. Vi håller processen enkel, tydlig och konfidentiell.",
-  varProcessStep1Title: "Första kontakt",
-  varProcessStep1Text: "Ett inledande samtal — helt konfidentiellt och utan förpliktelser.",
-  varProcessStep2Title: "Fördjupning",
-  varProcessStep2Text: "Vi tittar närmare på bolaget tillsammans. Fokus på verksamheten, inte bara siffror.",
-  varProcessStep3Title: "Förslag",
-  varProcessStep3Text: "Vi presenterar ett tydligt upplägg om vi ser en bra match.",
-  varProcessStep4Title: "Genomförande",
-  varProcessStep4Text: "Vi driver processen strukturerat tillsammans med dig hela vägen.",
-  varProcessAvslut: "Vi är raka i vår återkoppling och snabba i våra beslut.",
+  vp1: "Första kontakt – ett konfidentiellt samtal utan förpliktelser",
+  vp2: "Fördjupning – Nivo lär känna bolaget tillsammans med er",
+  vp3: "Förslag – ett tydligt och konkret upplägg",
+  vp4: "Genomförande – strukturerat hela vägen",
+  varProcessClosing: "Nivo är raka i återkopplingen och snabba i besluten.",
 
-  // Efter affären
+  // 5. Efter affären
   efterAffarenTitle: "Efter affären",
-  efterAffarenP1:
-    "Vi är rätt partner för entreprenörer som vill fortsätta.",
-  efterAffarenP2:
-    "Du kan vara kvar som delägare och aktiv i bolaget — ofta som vd eller i ledningen.",
-  efterAffarenP3:
-    "Vi tar ansvar för strategi, struktur och utveckling. Du fortsätter bygga bolaget.",
-  efterAffarenP4: "Det är i samarbetet mellan oss som värdet skapas.",
+  eaB1: "Du kan vara kvar som delägare och fortsätta driva bolaget",
+  eaB2: "Nivo tar ansvar för struktur, riktning och utveckling",
+  eaB3: "Nivo bygger vidare tillsammans med dig, steg för steg",
+  efterAffarenClosing: "Det är i samarbetet mellan oss som värdet skapas.",
 
-  // Vem som står bakom oss
-  vemBakomOssTitle: "Vem som står bakom oss",
-  vemBakomOssRubrik: "Ägd av family offices och privata investerare",
-  vemBakomOssText:
-    "Vårt kapital kommer främst från family offices och privata investerare. De har samma investeringsfilosofi som entreprenörer som byggt företag under ett liv — tålamodigt kapital, långsiktigt värde, operativt fokus. Ingen institutionell press för snabba omsättningar eller aggressiv hävstång.",
-  vemBakomOssAlignment:
-    "Du kommer att känna igen dig i deras sätt att tänka. Våra ägare förstår vad det innebär att bygga något över decennier.",
-
-  // Team
-  teamTitle: "Team",
-  teamSubtitle: "Operativ erfarenhet möter disciplinerat kapital",
-  teamCoreTitle: "Kärnteam",
-  foundingPartner: "Grundande partner",
-  readMore: "Läs mer →",
-  teamJesperBio:
-    "15+ års erfarenhet inom venture capital, kapitalanskaffning och företagsbyggande. Har lett investeringar och skalning av nordiska bolag i både tidiga och senare tillväxtfaser.",
-  teamHenrikBio:
-    "15+ års kommersiell ledarskap över startups och globala företag. Har byggt bolag från noll till över €60m i omsättning och ledde tillväxt över flera marknader.",
-  teamSebastianBio:
-    "15+ års erfarenhet inom CFO och företagsfinansiering med erfarenhet av förvärv, kapitalmarknader och IPO-förberedelser inom både teknik- och industrisektorer.",
-
-  // Advisory board
-  advisoryTitle: "Rådgivare",
-  advisorySenior: "Senior Advisor",
-  advisorySeniorDesc: "Ex-CEO industri SEK 400m. 25+ års operativ erfarenhet.",
-  advisoryFinancial: "Financial Advisor",
-  advisoryFinancialDesc: "Ex-CFO noterat nordiskt bolag. Finansiella system.",
-  advisoryAdvisor: "Advisor",
-  advisoryAdvisorDesc: "Strategisk och operativ rådgivning.",
-
-  // Track record
-  trackRecordTitle: "Varför vi kan genomföra",
-  trackRecordText:
-    "Teamet har genomfört denna typ av strategi i praktiken: 80+ ECM-transaktioner och 20+ IPO:er; €60m+ D2C-företag byggt inom Electrolux; €50m+ venture investerat inklusive iZettle (PayPal-exit). Vi kombinerar kapitalmarknadsdisciplin med operativ skalning — det som krävs för att utveckla ett bolag som ert.",
-  statEcm: "ECM-transaktioner genomförda",
-  statIpos: "IPO:er över nordiska marknader",
-  statVenture: "Venturekapital investerat",
-  statIzettle: "PayPal-exit; IPO-notering",
-  statD2c: "D2C-företag byggt vid Electrolux",
-  statEcommerce: "E-handelskanal från noll",
-
-  // Capability matrix
-  capabilityExpandTitle: "Fullständig översikt",
-  capabilityExpandHint: "Klicka för att expandera",
-  capabilityDealSourcing: "Deal sourcing och transaktioner",
-  capabilityDealSourcingExp:
-    "Teamet har omfattande erfarenhet inom företagsfinansiering och venture: 80+ ECM-transaktioner och 20+ IPO:er, plus €50m+ venture-investeringar inklusive tidigt engagemang i iZettle och Readly — iZettle senare förvärvat av PayPal. Stark expertis inom värdering, kapitalanskaffning, transaktionsstrukturering och exit-strategi.",
-  capabilityOperational: "Operativ värdeskapande",
-  capabilityOperationalExp:
-    "Hands-on operativt ledarskap: €60m+ direkt-till-konsument-företag byggt inom Electrolux, växt den nordiska e-handelskanalen från noll till €30m omsättning. Direkt erfarenhet av digitalisering, e-handelsstrategi, internationell expansion och intäktsutveckling — högst relevant för företag som ert.",
-  capabilityFinancial: "Finansiellt ledarskap och styrning",
-  capabilityFinancialExp:
-    "Stark finansiell ledarskapserfarenhet från noterade bolag och internationella organisationer: bygga finansfunktioner, hantera rapportering, ansvara för kapitalallokering. Nivo kan implementera institutionell finansiell disciplin, styrning och rapportering i portföljbolag från dag ett.",
-  capabilityFounder: "Entreprenöriellt och grundarperspektiv",
-  capabilityFounderExp:
-    "Institutionell erfarenhet kombinerad med entreprenörskap — grundat och investerat i flera företag, inklusive fintech och digital infrastruktur. Stark förståelse för grundarledda företag som ert och de operativa realiteterna ni möter.",
-  capabilityMatrixTitle: "Capability matrix",
-  capabilityMatrixSubtitle: "Investeringslivscykel → teamerfarenhet",
-  phaseDealSourcing: "Deal sourcing",
-  phaseDealSourcingExp: "Investment banking, venture capital och privata investeringsnätverk",
-  phaseTransaction: "Transaktioner",
-  phaseTransactionExp: "80+ ECM-transaktioner och 20+ IPO:er",
-  phaseCapital: "Kapitalmarknader",
-  phaseCapitalExp: "Värdering, kapitalanskaffning och investerarpositionering",
-  phaseScaling: "Operativ skalning",
-  phaseScalingExp: "€60m D2C-företag byggt inom Electrolux",
-  phaseDigital: "Digital transformation",
-  phaseDigitalExp: "E-handelsplattformar, internationell expansion och intäktsutveckling",
-  phaseGovernance: "Finansiell styrning",
-  phaseGovernanceExp: "CFO-ledarskap i noterade bolag och internationella organisationer",
-  phaseExit: "Exit-strategi",
-  phaseExitExp: "IPO:er, M&A-transaktioner och venture-exits",
-
-  // Punch line
-  teamPunchLine:
-    "Vi driver utveckling i bolag vi äger. Genom erfarenhet, nätverk och finansiella resurser. Det är den typen av ägare vi är.",
-
-  // Kontakt / CTA
-  kontaktSectionTitle: "Vill du ta ett första samtal?",
+  // 6. Kontakt
+  kontaktSectionTitle: "Kontakt",
   kontaktBody:
-    "Att sälja sitt bolag är inget man bestämmer över en dag. Vi tar gärna ett första samtal — helt konfidentiellt och utan förpliktelser.",
+    "Att sälja sitt bolag är inget man bestämmer över en dag. Nivo tar gärna ett första samtal — konfidentiellt och utan förpliktelser.",
   kontaktDuKan: "Du kan kontakta oss direkt:",
   kontaktFooter:
     "Du är välkommen att höra av dig oavsett var du befinner dig i processen.",

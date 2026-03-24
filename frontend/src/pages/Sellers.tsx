@@ -1,7 +1,7 @@
 /**
  * Sellers page (target company owners). Route: /intro.
  * Password-gated page for potential acquisition targets.
- * Swedish only. Partnerskap, delägarskap, långsiktig utveckling — inte klassisk PE.
+ * Swedish only.
  */
 
 "use client";
@@ -9,57 +9,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import {
-  Lock,
-  User,
-  ChevronDown,
-  Shield,
-  Clock,
-  Building2,
-  Handshake,
-  FileCheck,
-  BarChart3,
-  TrendingUp,
-  Workflow,
-  ArrowRight,
-  RefreshCw,
-  Zap,
-  UserCheck,
-  Hammer,
-  Network,
-} from "lucide-react";
+import { Lock } from "lucide-react";
 import { tokens, SECTION_CLASS } from "@/lib/designProfileTokens";
 import { sellersTranslations } from "./sellers-deck/sellersTranslations";
 
 const SELLERS_STORAGE_KEY = "nivo_sellers_unlocked";
 const SELLERS_PASSWORD = "nivo2020";
-
-const TEAM = [
-  {
-    name: "Jesper Kreuger",
-    bioKey: "teamJesperBio" as const,
-    linkedin: "https://www.linkedin.com/in/jesper-kreuger-91b14/",
-  },
-  {
-    name: "Henrik Cavalli",
-    bioKey: "teamHenrikBio" as const,
-    linkedin: "https://www.linkedin.com/in/henrikc1/",
-  },
-  {
-    name: "Sebastian Robson",
-    bioKey: "teamSebastianBio" as const,
-    linkedin: "https://www.linkedin.com/in/sebastian-robson-7418b82b2/",
-  },
-];
-
-const TRACK_RECORD = [
-  { stat: "80+", labelKey: "statEcm" as const },
-  { stat: "20+", labelKey: "statIpos" as const },
-  { stat: "€50m+", labelKey: "statVenture" as const },
-  { stat: "iZettle & Readly", labelKey: "statIzettle" as const },
-  { stat: "€60m+", labelKey: "statD2c" as const },
-  { stat: "€30m", labelKey: "statEcommerce" as const },
-];
 
 const CONTACT_CTA = [
   { name: "Jesper Kreuger", email: "jesper@nivogroup.se", phone: "070-855 53 35" },
@@ -67,17 +22,28 @@ const CONTACT_CTA = [
   { name: "Sebastian Robson", email: "sebastian@nivogroup.se", phone: "070-441 84 48" },
 ] as const;
 
-const CAPABILITY_MATRIX = [
-  { phaseKey: "phaseDealSourcing" as const, expKey: "phaseDealSourcingExp" as const, icon: Handshake },
-  { phaseKey: "phaseTransaction" as const, expKey: "phaseTransactionExp" as const, icon: FileCheck },
-  { phaseKey: "phaseCapital" as const, expKey: "phaseCapitalExp" as const, icon: BarChart3 },
-  { phaseKey: "phaseScaling" as const, expKey: "phaseScalingExp" as const, icon: TrendingUp },
-  { phaseKey: "phaseDigital" as const, expKey: "phaseDigitalExp" as const, icon: Workflow },
-  { phaseKey: "phaseGovernance" as const, expKey: "phaseGovernanceExp" as const, icon: Shield },
-  { phaseKey: "phaseExit" as const, expKey: "phaseExitExp" as const, icon: ArrowRight },
+const SELLERS_HEADER_HEIGHT = 68;
+
+const ANCHOR_LINKS = [
+  { href: "#hur-vi-arbetar", labelKey: "navHurViArbetar" as const },
+  { href: "#vad-vi-letar-efter", labelKey: "navVadViLetarEfter" as const },
+  { href: "#varfor-annorlunda", labelKey: "navVarförAnnorlunda" as const },
+  { href: "#var-process", labelKey: "navVarProcess" as const },
+  { href: "#efter-affaren", labelKey: "navEfterAffaren" as const },
+  { href: "#kontakt", labelKey: "navKontakt" as const },
 ];
 
-function Section({
+const TRACKABLE_SECTION_IDS = [
+  "overview",
+  "hur-vi-arbetar",
+  "vad-vi-letar-efter",
+  "varfor-annorlunda",
+  "var-process",
+  "efter-affaren",
+  "kontakt",
+];
+
+function SectionShell({
   title,
   bg = "bg",
   id,
@@ -95,12 +61,67 @@ function Section({
       style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}
     >
       <div className={SECTION_CLASS}>
-        <h2 className="text-2xl font-semibold mb-4" style={{ color: tokens.text }}>
+        <h2 className="text-2xl font-semibold mb-8" style={{ color: tokens.text }}>
           {title}
         </h2>
         {children}
       </div>
     </section>
+  );
+}
+
+function BulletCard({
+  title,
+  intro,
+  bullets,
+}: {
+  title: string;
+  intro?: string;
+  bullets: readonly [string, string, string];
+}) {
+  return (
+    <div
+      className="rounded-xl p-5 sm:p-6 border h-full flex flex-col"
+      style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
+    >
+      <h3 className="font-semibold text-base mb-2" style={{ color: tokens.text }}>
+        {title}
+      </h3>
+      {intro ? (
+        <p className="text-[14px] leading-relaxed mb-3" style={{ color: tokens.text }}>
+          {intro}
+        </p>
+      ) : null}
+      <ul className="space-y-2 mt-auto">
+        {bullets.map((line) => (
+          <li key={line} className="flex items-start gap-3 text-[14px] leading-relaxed" style={{ color: tokens.text }}>
+            <span
+              className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: tokens.accent }}
+              aria-hidden
+            />
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function BulletList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="space-y-2">
+      {items.map((line) => (
+        <li key={line} className="flex items-start gap-3 text-[15px] leading-relaxed" style={{ color: tokens.text }}>
+          <span
+            className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: tokens.accent }}
+            aria-hidden
+          />
+          <span>{line}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -180,20 +201,6 @@ function SellersGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-const SELLERS_HEADER_HEIGHT = 68;
-
-const ANCHOR_LINKS = [
-  { href: "#sammanfattning", labelKey: "navSammanfattning" as const },
-  { href: "#samarbete", labelKey: "navHurViArbetar" as const },
-  { href: "#vad-vi-letar-efter", labelKey: "navVadViLetarEfter" as const },
-  { href: "#varfor-annorlunda", labelKey: "navVarförAnnorlunda" as const },
-  { href: "#var-process", labelKey: "navVarProcess" as const },
-  { href: "#efter-affaren", labelKey: "navEfterAffaren" as const },
-  { href: "#vem-bakom-oss", labelKey: "navVemBakomOss" as const },
-  { href: "#team", labelKey: "navTeam" as const },
-  { href: "#kontakt", labelKey: "navKontakt" as const },
-];
-
 function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
   const t = sellersTranslations;
   return (
@@ -229,19 +236,6 @@ function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
-const TRACKABLE_SECTION_IDS = [
-  "overview",
-  "sammanfattning",
-  "samarbete",
-  "vad-vi-letar-efter",
-  "varfor-annorlunda",
-  "var-process",
-  "efter-affaren",
-  "vem-bakom-oss",
-  "team",
-  "kontakt",
-];
-
 function SellersContent({ onSignOut }: { onSignOut: () => void }) {
   const t = sellersTranslations;
   const [searchParams] = useSearchParams();
@@ -250,7 +244,6 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
 
   useEffect(() => {
     if (!tid) return;
-    // Page view: fire once when content is shown
     fetch(`/track/page/${tid}`, { credentials: "omit" }).catch(() => {});
   }, [tid]);
 
@@ -278,7 +271,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: tokens.bg }} data-design-profile="nivo">
       <SellersHeader onSignOut={onSignOut} />
       <div style={{ paddingTop: SELLERS_HEADER_HEIGHT }}>
-        {/* Hero — video background, white text */}
+        {/* Hero */}
         <section className="relative flex min-h-[75vh] w-full overflow-hidden" id="overview">
           <div className="pointer-events-none absolute inset-0">
             <video
@@ -296,226 +289,111 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
             <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent" />
           </div>
-          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-24 min-h-[75vh] overflow-visible w-full">
-            <div className="max-w-3xl mx-auto text-center overflow-visible text-white">
+          <div className="relative z-10 flex flex-col justify-center px-5 sm:px-6 pt-10 sm:pt-12 pb-16 min-h-[75vh] overflow-visible w-full">
+            <div className="max-w-4xl mx-auto px-5 sm:px-6 text-center overflow-visible text-white">
               <div className="w-full py-5 px-8 sm:py-6 sm:px-10 mb-4 overflow-visible min-h-[100px] sm:min-h-[120px] flex items-center justify-center">
-                <img
-                  src="/nivo-logo-white.svg"
-                  alt="Nivo"
-                  className="h-20 sm:h-24 w-auto object-contain"
-                />
+                <img src="/nivo-logo-white.svg" alt="Nivo" className="h-20 sm:h-24 w-auto object-contain" />
               </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold max-w-3xl mx-auto leading-snug text-white mb-5">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold max-w-3xl mx-auto leading-snug text-white mb-6">
                 {t.heroTitle}
               </h1>
-              <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-white/95">
-                {t.heroSubtitle}
-              </p>
+              <div className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-white/95 space-y-3">
+                <p>{t.heroLead1}</p>
+                <p>{t.heroLead2}</p>
+                <p>{t.heroLead3}</p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Sammanfattning */}
-        <Section title={t.sammanfattningTitle} id="sammanfattning">
-          <div className="rounded-lg p-5 border mb-6" style={{ backgroundColor: tokens.bgAlt, borderColor: tokens.border }}>
-            <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
-              {t.sammanfattningIntro}
-            </p>
-            <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
-              {t.sammanfattningText}
-            </p>
-            <p className="text-[15px] leading-relaxed mb-4" style={{ color: tokens.text }}>
-              {t.sammanfattningText2}
-            </p>
-            <ul className="space-y-1.5 text-sm mb-4 pl-6" style={{ color: tokens.text }}>
-              <li className="flex items-start gap-3">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                <span className="flex-1">{t.sammanfattningBullet1}</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                <span className="flex-1">{t.sammanfattningBullet2}</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                <span className="flex-1">{t.sammanfattningBullet3}</span>
-              </li>
-            </ul>
-          </div>
-        </Section>
-
-        {/* Hur vi arbetar som ägare */}
-        <Section title={t.samarbeteTitle} bg="bgAlt" id="samarbete">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { icon: Handshake, titleKey: "samarbetePartnerskapTitle" as const, textKey: "samarbetePartnerskapText" as const },
-              { icon: Zap, titleKey: "samarbeteSnabbBeslut" as const, textKey: "samarbeteSnabbBeslutText" as const },
-              { icon: UserCheck, titleKey: "samarbeteNärvarandeMenIntePåträngande" as const, textKey: "samarbeteNärvarandeMenIntePåträngandeText" as const },
-            ].map(({ icon: Icon, titleKey, textKey }) => (
-              <div
-                key={titleKey}
-                className="rounded-lg p-5 border"
-                style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                  style={{ backgroundColor: tokens.washSage, borderColor: tokens.accent, borderWidth: 1 }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
-                </div>
-                <h3 className="font-semibold mb-2 text-base" style={{ color: tokens.text }}>
-                  {t[titleKey]}
-                </h3>
-                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t[textKey]}
-                </p>
-              </div>
-            ))}
-            <div
-              className="rounded-lg p-5 border md:col-span-2"
-              style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
+        {/* Citat */}
+        <section className="w-full" style={{ backgroundColor: tokens.bgAlt }}>
+          <div className={SECTION_CLASS}>
+            <figure
+              className="rounded-2xl border px-6 py-10 sm:px-10 sm:py-12 text-center"
+              style={{
+                backgroundColor: tokens.bg,
+                borderColor: tokens.border,
+                boxShadow: "var(--profile-shadow-soft, 0 2px 12px rgba(0,0,0,0.06))",
+              }}
             >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{ backgroundColor: tokens.washSage, borderColor: tokens.accent, borderWidth: 1 }}
+              <blockquote
+                className="text-lg sm:text-xl md:text-2xl font-semibold leading-snug max-w-3xl mx-auto"
+                style={{ color: tokens.text }}
               >
-                <Hammer className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
-              </div>
-              <h3 className="font-semibold mb-2 text-base" style={{ color: tokens.text }}>
-                {t.samarbeteByggaInteRapportera}
-              </h3>
-              <p className="text-[14px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-                {t.samarbeteByggaInteRapporteraText}
-              </p>
-              <ul className="space-y-1 pl-5 list-disc text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-                <li>{t.samarbeteOperativBullet1}</li>
-                <li>{t.samarbeteOperativBullet2}</li>
-                <li>{t.samarbeteOperativBullet3}</li>
-                <li>{t.samarbeteOperativBullet4}</li>
-              </ul>
+                {t.quoteMain}
+              </blockquote>
+              <figcaption className="mt-4 text-sm sm:text-base max-w-2xl mx-auto" style={{ color: tokens.text, opacity: 0.85 }}>
+                {t.quoteSub}
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        {/* Intro */}
+        <section className="w-full" style={{ backgroundColor: tokens.bg }}>
+          <div className={SECTION_CLASS}>
+            <div className="max-w-2xl mx-auto text-[15px] sm:text-base leading-relaxed space-y-4" style={{ color: tokens.text }}>
+              <p>{t.introP1}</p>
+              <p>{t.introP2}</p>
+              <p>{t.introP3}</p>
             </div>
-            {[
-              { icon: Workflow, titleKey: "samarbeteDigitalTitle" as const, textKey: "samarbeteDigitalText" as const },
-              { icon: Network, titleKey: "samarbeteNatverkTitle" as const, textKey: "samarbeteNatverkText" as const },
-            ].map(({ icon: Icon, titleKey, textKey }) => (
-              <div
-                key={titleKey}
-                className="rounded-lg p-5 border"
-                style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                  style={{ backgroundColor: tokens.washSage, borderColor: tokens.accent, borderWidth: 1 }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
-                </div>
-                <h3 className="font-semibold mb-2 text-base" style={{ color: tokens.text }}>
-                  {t[titleKey]}
-                </h3>
-                <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t[textKey]}
-                </p>
-              </div>
-            ))}
           </div>
-        </Section>
+        </section>
 
-        {/* Vad vi letar efter */}
-        <Section title={t.vadViLetarEfter} id="vad-vi-letar-efter">
-          <p className="text-[15px] leading-relaxed mb-6" style={{ color: tokens.text }}>
-            {t.vadViLetarEfterIntro}
-          </p>
-          <ul className="space-y-3 mb-6 pl-6" style={{ color: tokens.text }}>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem1}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem2}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem3}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem4}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span className="flex-1 text-[15px] leading-relaxed">{t.vadViLetarEfterItem5}</span>
-            </li>
-          </ul>
-          <div
-            className="rounded-lg p-5 border-l-4"
-            style={{ backgroundColor: tokens.washSage, borderLeftColor: tokens.accent }}
-          >
-            <p className="text-[15px] font-medium leading-relaxed" style={{ color: tokens.text }}>
-              {t.vadViLetarEfterAvslutning}
-            </p>
+        {/* 1. Hur vi arbetar */}
+        <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+            <BulletCard
+              title={t.hvPartnerskapTitle}
+              bullets={[t.hvPartnerskapB1, t.hvPartnerskapB2, t.hvPartnerskapB3]}
+            />
+            <BulletCard title={t.hvBeslutTitle} bullets={[t.hvBeslutB1, t.hvBeslutB2, t.hvBeslutB3]} />
+            <BulletCard title={t.hvAgarrollTitle} bullets={[t.hvAgarrollB1, t.hvAgarrollB2, t.hvAgarrollB3]} />
+            <BulletCard title={t.hvOperativTitle} bullets={[t.hvOperativB1, t.hvOperativB2, t.hvOperativB3]} />
+            <BulletCard title={t.hvDigitalTitle} bullets={[t.hvDigitalB1, t.hvDigitalB2, t.hvDigitalB3]} />
+            <BulletCard title={t.hvNatverkTitle} bullets={[t.hvNatverkB1, t.hvNatverkB2, t.hvNatverkB3]} />
           </div>
-        </Section>
 
-        {/* Varför Nivo är annorlunda */}
-        <Section title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda">
-          <h3 className="text-lg font-semibold mb-3" style={{ color: tokens.text }}>
-            {t.varforAnnorlundaRubrik}
+          <h3 className="text-lg font-semibold mt-12 mb-6" style={{ color: tokens.text }}>
+            {t.subgridTitle}
           </h3>
-          <p className="leading-relaxed mb-3 text-[15px]" style={{ color: tokens.text }}>
-            {t.varforAnnorlundaText}
-          </p>
-          <p className="leading-relaxed mb-4 text-[15px]" style={{ color: tokens.text }}>
-            {t.varforAnnorlundaText2}
-          </p>
-          <p className="font-semibold mb-2 text-[15px]" style={{ color: tokens.text }}>
-            {t.varforAnnorlundaViIntro}
-          </p>
-          <ul className="space-y-1.5 mb-8 pl-6 list-disc text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-            <li>{t.varforAnnorlundaVi1}</li>
-            <li>{t.varforAnnorlundaVi2}</li>
-            <li>{t.varforAnnorlundaVi3}</li>
-          </ul>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
-            {[
-              { icon: Building2, text: t.varforAnnorlundaBullet1 },
-              { icon: Shield, text: t.varforAnnorlundaBullet2 },
-              { icon: Clock, text: t.varforAnnorlundaBullet3 },
-              { icon: RefreshCw, text: t.varforAnnorlundaBullet4 },
-              { icon: TrendingUp, text: t.varforAnnorlundaBullet5 },
-            ].map(({ icon: Icon, text }) => (
-              <div
-                key={text}
-                className="flex items-center gap-3 px-5 py-4 sm:px-6 sm:py-5 rounded-xl text-sm sm:text-base font-medium border"
-                style={{ backgroundColor: tokens.bg, borderColor: tokens.border, color: tokens.text }}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-                {text}
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <BulletCard title={t.sgGrowthTitle} bullets={[t.sgGrowthB1, t.sgGrowthB2, t.sgGrowthB3]} />
+            <BulletCard title={t.sgOrgTitle} bullets={[t.sgOrgB1, t.sgOrgB2, t.sgOrgB3]} />
+            <BulletCard title={t.sgDecisionTitle} bullets={[t.sgDecisionB1, t.sgDecisionB2, t.sgDecisionB3]} />
+            <BulletCard title={t.sgSystemsTitle} bullets={[t.sgSystemsB1, t.sgSystemsB2, t.sgSystemsB3]} />
+            <BulletCard title={t.sgExecutionTitle} bullets={[t.sgExecutionB1, t.sgExecutionB2, t.sgExecutionB3]} />
+            <BulletCard title={t.sgCultureTitle} bullets={[t.sgCultureB1, t.sgCultureB2, t.sgCultureB3]} />
           </div>
-          <div
-            className="rounded-lg p-5 border-l-4 text-[15px] leading-relaxed"
-            style={{ backgroundColor: tokens.washSage, borderLeftColor: tokens.accent, color: tokens.text }}
-          >
-            {t.vadViInteGorText}
-          </div>
-        </Section>
+          <p className="mt-10 text-[15px] leading-relaxed max-w-2xl" style={{ color: tokens.text }}>
+            {t.hurViArbetarClosing}
+          </p>
+        </SectionShell>
 
-        {/* Vår process */}
-        <Section title={t.varProcessTitle} id="var-process">
-          <p className="text-[15px] leading-relaxed mb-8" style={{ color: tokens.text }}>
-            {t.varProcessIntro}
-          </p>
-          <div className="space-y-6 mb-8">
-            {[
-              { titleKey: "varProcessStep1Title" as const, textKey: "varProcessStep1Text" as const },
-              { titleKey: "varProcessStep2Title" as const, textKey: "varProcessStep2Text" as const },
-              { titleKey: "varProcessStep3Title" as const, textKey: "varProcessStep3Text" as const },
-              { titleKey: "varProcessStep4Title" as const, textKey: "varProcessStep4Text" as const },
-            ].map(({ titleKey, textKey }, i) => (
-              <div
-                key={titleKey}
+        {/* 2. Vad vi letar efter */}
+        <SectionShell title={t.vadViLetarEfterTitle} id="vad-vi-letar-efter">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+            <BulletCard title={t.vadBlock1Title} bullets={[t.vadB1, t.vadB2, t.vadB3]} />
+            <BulletCard title={t.vadBlock2Title} bullets={[t.vadB4, t.vadB5, t.vadB6]} />
+          </div>
+        </SectionShell>
+
+        {/* 3. Varför vi är annorlunda */}
+        <SectionShell title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            <BulletCard title={t.vaStrukturTitle} bullets={[t.vaStrukturB1, t.vaStrukturB2, t.vaStrukturB3]} />
+            <BulletCard title={t.vaPerspektivTitle} bullets={[t.vaPerspektivB1, t.vaPerspektivB2, t.vaPerspektivB3]} />
+            <BulletCard title={t.vaArbetssattTitle} bullets={[t.vaArbetssattB1, t.vaArbetssattB2, t.vaArbetssattB3]} />
+          </div>
+        </SectionShell>
+
+        {/* 4. Vår process */}
+        <SectionShell title={t.varProcessTitle} id="var-process">
+          <ol className="space-y-5 mb-8">
+            {[t.vp1, t.vp2, t.vp3, t.vp4].map((step, i) => (
+              <li
+                key={step}
                 className="flex gap-4 pl-1 border-l-4 rounded-r-lg py-1"
                 style={{ borderLeftColor: tokens.accent }}
               >
@@ -526,253 +404,29 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
                 >
                   {i + 1}
                 </span>
-                <div>
-                  <h3 className="font-semibold mb-1" style={{ color: tokens.text }}>
-                    {t[titleKey]}
-                  </h3>
-                  <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                    {t[textKey]}
-                  </p>
-                </div>
-              </div>
+                <span className="text-[15px] leading-relaxed pt-1" style={{ color: tokens.text }}>
+                  {step}
+                </span>
+              </li>
             ))}
-          </div>
-          <p className="text-[15px] font-medium leading-relaxed" style={{ color: tokens.text }}>
-            {t.varProcessAvslut}
-          </p>
-        </Section>
-
-        {/* Efter affären */}
-        <Section title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren">
-          <p className="text-[15px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-            {t.efterAffarenP1}
-          </p>
-          <p className="text-[15px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-            {t.efterAffarenP2}
-          </p>
-          <p className="text-[15px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-            {t.efterAffarenP3}
-          </p>
+          </ol>
           <p className="text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
-            {t.efterAffarenP4}
+            {t.varProcessClosing}
           </p>
-        </Section>
+        </SectionShell>
 
-        {/* Vem som står bakom oss */}
-        <Section title={t.vemBakomOssTitle} id="vem-bakom-oss">
-          <h3 className="text-lg font-semibold mb-3" style={{ color: tokens.text }}>
-            {t.vemBakomOssRubrik}
-          </h3>
-          <p className="leading-relaxed mb-4" style={{ color: tokens.text }}>
-            {t.vemBakomOssText}
-          </p>
-          <div
-            className="rounded-lg p-5 border-l-4"
-            style={{ backgroundColor: tokens.washSage, borderLeftColor: tokens.accent }}
-          >
-            <p className="text-[15px] sm:text-base font-medium leading-relaxed" style={{ color: tokens.text }}>
-              {t.vemBakomOssAlignment}
+        {/* 5. Efter affären */}
+        <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren">
+          <div className="max-w-2xl">
+            <BulletList items={[t.eaB1, t.eaB2, t.eaB3]} />
+            <p className="mt-8 text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
+              {t.efterAffarenClosing}
             </p>
           </div>
-        </Section>
+        </SectionShell>
 
-        {/* Team */}
-        <Section title={t.teamTitle} bg="bgAlt" id="team">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>
-            {t.teamSubtitle}
-          </p>
-
-          <h3 className="text-lg font-semibold mb-4" style={{ color: tokens.text }}>
-            {t.teamCoreTitle}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-            {TEAM.map((member) => (
-              <div key={member.name} className="flex flex-col items-center text-center">
-                <div
-                  className="w-full max-w-[200px] aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden border-2"
-                  style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
-                >
-                  <User className="w-14 h-14" style={{ color: tokens.text }} />
-                </div>
-                <p className="font-semibold mt-4" style={{ color: tokens.text }}>
-                  {member.name}
-                </p>
-                <p className="text-sm font-medium mt-1" style={{ color: tokens.accent }}>
-                  {t.foundingPartner}
-                </p>
-                <p className="text-sm mt-2 leading-relaxed" style={{ color: tokens.text }}>
-                  {t[member.bioKey]}
-                </p>
-                {member.linkedin && (
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-profile-accent font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded mt-2 inline-block"
-                  >
-                    {t.readMore}
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <h3 className="text-lg font-semibold mb-4" style={{ color: tokens.text }}>
-            {t.advisoryTitle}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-            <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>
-                {t.advisorySenior}
-              </p>
-              <p className="text-[15px] mt-1" style={{ color: tokens.text }}>
-                {t.advisorySeniorDesc}
-              </p>
-            </div>
-            <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>
-                {t.advisoryFinancial}
-              </p>
-              <p className="text-[15px] mt-1" style={{ color: tokens.text }}>
-                {t.advisoryFinancialDesc}
-              </p>
-            </div>
-            <div className="rounded-lg p-4 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>
-                {t.advisoryAdvisor}
-              </p>
-              <p className="text-[15px] mt-1" style={{ color: tokens.text }}>
-                {t.advisoryAdvisorDesc}
-              </p>
-            </div>
-          </div>
-
-          <h3 className="text-lg font-semibold mb-3" style={{ color: tokens.text }}>
-            {t.trackRecordTitle}
-          </h3>
-          <p className="text-[15px] leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
-            {t.trackRecordText}
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-            {TRACK_RECORD.map((item) => (
-              <div
-                key={item.labelKey}
-                className="rounded-lg p-4 border text-center"
-                style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}
-              >
-                <p className="text-xl font-semibold" style={{ color: tokens.accent }}>
-                  {item.stat}
-                </p>
-                <p className="text-sm mt-1" style={{ color: tokens.text }}>
-                  {t[item.labelKey]}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div
-            className="rounded-lg p-5 sm:p-6 mb-8"
-            style={{ backgroundColor: tokens.washSage, borderLeft: `4px solid ${tokens.accent}` }}
-          >
-            <p className="text-[17px] sm:text-[19px] font-semibold leading-relaxed" style={{ color: tokens.text }}>
-              {t.teamPunchLine}
-            </p>
-          </div>
-
-          <details
-            className="group rounded-lg border"
-            style={{ borderColor: tokens.border, backgroundColor: tokens.bg }}
-          >
-            <summary
-              className="flex items-center justify-between gap-3 cursor-pointer list-none px-5 py-4 font-bold transition-all rounded-lg group-open:rounded-b-none group-open:rounded-t-lg hover:bg-black/5 [&::-webkit-details-marker]:hidden"
-              style={{
-                color: tokens.text,
-                backgroundColor: tokens.bg,
-                border: `2px solid ${tokens.border}`,
-                borderLeft: `4px solid ${tokens.accent}`,
-              }}
-            >
-              <span className="flex items-center gap-3">
-                <ChevronDown
-                  className="w-5 h-5 flex-shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: tokens.accent }}
-                  aria-hidden
-                />
-                <span>{t.capabilityExpandTitle}</span>
-              </span>
-              <span className="text-sm font-normal opacity-75">{t.capabilityExpandHint}</span>
-            </summary>
-            <div className="px-5 pb-6 pt-2 space-y-6 border-t" style={{ borderColor: tokens.border }}>
-              <div>
-                <p className="text-sm font-semibold mb-2" style={{ color: tokens.text }}>
-                  {t.capabilityDealSourcing}
-                </p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.capabilityDealSourcingExp}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold mb-2" style={{ color: tokens.text }}>
-                  {t.capabilityOperational}
-                </p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.capabilityOperationalExp}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold mb-2" style={{ color: tokens.text }}>
-                  {t.capabilityFinancial}
-                </p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.capabilityFinancialExp}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold mb-2" style={{ color: tokens.text }}>
-                  {t.capabilityFounder}
-                </p>
-                <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-                  {t.capabilityFounderExp}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold mb-4" style={{ color: tokens.text }}>
-                  {t.capabilityMatrixTitle}
-                </p>
-                <p className="text-[14px] mb-4" style={{ color: tokens.text }}>
-                  {t.capabilityMatrixSubtitle}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {CAPABILITY_MATRIX.map(({ phaseKey, expKey, icon: Icon }) => (
-                    <div
-                      key={phaseKey}
-                      className="flex gap-4 p-4 rounded-lg border"
-                      style={{ backgroundColor: tokens.washSage, borderColor: tokens.border }}
-                    >
-                      <div
-                        className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: tokens.bg, borderColor: tokens.accent, borderWidth: 1 }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: tokens.accent }} aria-hidden />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-[15px] mb-1" style={{ color: tokens.text }}>
-                          {t[phaseKey]}
-                        </p>
-                        <p className="text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-                          {t[expKey]}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </details>
-        </Section>
-
-        {/* Kontakt */}
-        <Section title={t.kontaktSectionTitle} id="kontakt">
+        {/* 6. Kontakt */}
+        <SectionShell title={t.kontaktSectionTitle} id="kontakt">
           <p className="text-[15px] leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
             {t.kontaktBody}
           </p>
@@ -783,7 +437,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
             {CONTACT_CTA.map((c) => (
               <div
                 key={c.email}
-                className="rounded-lg p-5 border"
+                className="rounded-xl p-5 sm:p-6 border"
                 style={{ backgroundColor: tokens.bgAlt, borderColor: tokens.border }}
               >
                 <p className="font-semibold mb-3" style={{ color: tokens.text }}>
@@ -807,7 +461,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           <p className="text-[15px] leading-relaxed" style={{ color: tokens.text }}>
             {t.kontaktFooter}
           </p>
-        </Section>
+        </SectionShell>
       </div>
     </div>
   );
