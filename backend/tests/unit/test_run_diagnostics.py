@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import MagicMock
 
-import pytest
 
 from backend.orchestrator.run_diagnostics import build_run_diagnostics
 

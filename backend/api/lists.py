@@ -4,7 +4,7 @@ Scope: private | team | public. Items stored in saved_list_items.
 """
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -12,7 +12,6 @@ from pydantic import BaseModel
 from ..services.db_factory import get_database_service
 from .dependencies import get_current_user_id
 from .universe import (
-    FilterItem,
     UniverseQueryPayload,
     _build_order,
     _build_universe_source_subquery,

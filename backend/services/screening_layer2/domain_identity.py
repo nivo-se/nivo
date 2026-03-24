@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import re
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
@@ -61,6 +61,26 @@ _STOP_NAME_PARTS = frozenset(
     {"aktiebolag", "bolag", "ab", "holding", "group", "sverige", "sweden", "the", "inc", "ltd"}
 )
 
+# ALL-CAPS words that look like tickers / brands (exclude common non-brand abbreviations).
+_UPPER_BRAND_FALSE_POSITIVE = frozenset(
+    {
+        "CEO",
+        "USA",
+        "EU",
+        "AB",
+        "AS",
+        "AG",
+        "SA",
+        "NV",
+        "BV",
+        "OY",
+        "PLC",
+        "LLC",
+    }
+)
+
+_UPPER_BRAND_TOKEN_RE = re.compile(r"\b[A-ZÅÄÖ]{3,5}\b")
+
 
 @dataclass
 class TavilyHit:
@@ -77,6 +97,98 @@ def _name_tokens(company_name: str) -> List[str]:
         for p in parts
         if len(p) >= 3 and p.lower() not in _STOP_NAME_PARTS
     ]
+
+
+def _uppercase_brand_tokens(name: str) -> List[str]:
+    """3–5 letter ALL-CAPS tokens (e.g. SCA, ICA, ABB) from the raw legal name."""
+    out: List[str] = []
+    for m in _UPPER_BRAND_TOKEN_RE.finditer(name or ""):
+        w = m.group()
+        if w in _UPPER_BRAND_FALSE_POSITIVE:
+            continue
+        out.append(w.lower())
+    return out
+
+
+def is_short_name_company(company_name: str) -> bool:
+    """
+    Short legal / ticker-style names where ≥4-char token rules fail (SCA, ABB, ICA, …).
+
+    True when stripped core is very short, or when the name contains a 3–5 letter ALL-CAPS brand token.
+    """
+    core = company_name_core(company_name).strip()
+    if not core:
+        return False
+    alnum = re.sub(r"[^\wåäöÅÄÖ]", "", core, flags=re.I)
+    if 2 <= len(alnum) <= 4:
+        return True
+    return bool(_uppercase_brand_tokens(company_name))
+
+
+def _short_name_brand_tokens(company_name: str) -> List[str]:
+    """
+    Lowercase brand tokens for domain alignment (only meaningful when is_short_name_company).
+    Includes short core and ALL-CAPS tickers; deduped, min length 2.
+    """
+    if not is_short_name_company(company_name):
+        return []
+    seen: set[str] = set()
+    out: List[str] = []
+    core = company_name_core(company_name).strip()
+    alnum = re.sub(r"[^\wåäöÅÄÖ]", "", core, flags=re.I).lower()
+    if 2 <= len(alnum) <= 5:
+        if alnum not in seen:
+            seen.add(alnum)
+            out.append(alnum)
+    for t in _uppercase_brand_tokens(company_name):
+        if t not in seen and len(t) >= 2:
+            seen.add(t)
+            out.append(t)
+    return out
+
+
+def brand_match_tokens_for_scoring(company_name: str) -> List[str]:
+    """Name tokens used in score_domain_cluster (short-name path includes 2–5 char brands)."""
+    if is_short_name_company(company_name):
+        long = [t for t in _name_tokens(company_name) if len(t) >= 4]
+        merged = list(dict.fromkeys(_short_name_brand_tokens(company_name) + long))
+        return [t for t in merged if len(t) >= 2]
+    return [t for t in _name_tokens(company_name) if len(t) >= 4]
+
+
+def official_pick_tokens(company_name: str) -> List[str]:
+    """Tokens for picking an official URL from Tavily rows (includes short tickers when applicable)."""
+    return brand_match_tokens_for_scoring(company_name)
+
+
+def _domain_name_labels(d: str) -> List[str]:
+    """Split host-ish string into dot/hyphen labels (lowercase)."""
+    s = (d or "").lower().strip()
+    if not s:
+        return []
+    return [x for x in re.split(r"[.\-]", s) if x]
+
+
+def _short_brand_matches_domain_stem(t: str, stem: str, d: str, blob: str) -> bool:
+    """
+    Strict alignment for 2–5 char brands: avoid substring false positives (e.g. sca in scandinavian).
+
+    Uses registrable stem equality, label equality, or bounded prefix on a single label (icagruppen).
+    """
+    tl = (t or "").lower()
+    sl = (stem or "").lower()
+    if len(tl) < 2:
+        return False
+    if tl == sl:
+        return True
+    if len(tl) >= 4 and (tl in (d or "").lower() or tl in (blob or "").lower()):
+        return True
+    for lab in _domain_name_labels(d) + _domain_name_labels(blob):
+        if lab == tl:
+            return True
+        if len(tl) >= 3 and lab.startswith(tl) and len(lab) <= len(tl) + 7:
+            return True
+    return False
 
 
 def registrable_domain(netloc: str) -> str:
@@ -154,6 +266,97 @@ def group_hits_by_domain(hits: Sequence[TavilyHit]) -> Dict[str, List[TavilyHit]
     return dict(g)
 
 
+def _target_tokens_for_entity_match(company_name: str) -> List[str]:
+    """Distinct name tokens (≥3 chars) from legal-stripped core; used for entity mismatch checks."""
+    core = company_name_core(company_name)
+    seen: set[str] = set()
+    out: List[str] = []
+    for t in _name_tokens(core):
+        if len(t) < 3:
+            continue
+        if t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
+
+def _token_as_word_in_text(token: str, text_lower: str) -> bool:
+    """True if `token` appears as a whole word in text (avoids substring false positives)."""
+    if len(token) < 3 or not text_lower:
+        return False
+    try:
+        return bool(
+            re.search(r"(?<!\w)" + re.escape(token) + r"(?!\w)", text_lower, flags=re.IGNORECASE)
+        )
+    except re.error:
+        return token.lower() in text_lower
+
+
+def _target_token_matches_domain(token: str, domain_lower: str) -> bool:
+    """Substring match on registrable domain (labels are short; substring is intentional)."""
+    return bool(token and token in domain_lower)
+
+
+def should_remove_entity_mismatch_domain(
+    domain: str,
+    hits: Sequence[TavilyHit],
+    company_name: str,
+) -> bool:
+    """
+    Hard-remove a domain cluster when Tavily title/snippet describe a *different* brand than the
+    target company: no target tokens in domain or text, but the domain's brand stem clearly
+    appears in titles/snippets (e.g. Innofactor winning for Cramo). Not a score penalty — drop entirely.
+    """
+    tokens = _target_tokens_for_entity_match(company_name)
+    if not tokens:
+        return False
+
+    d_lower = (domain or "").lower().strip()
+    if not d_lower:
+        return False
+
+    blob = " ".join(f"{h.title} {h.content}" for h in hits).lower()
+    blob = blob[:8000]
+    titles = " ".join((h.title or "").lower() for h in hits)
+
+    for t in tokens:
+        if _target_token_matches_domain(t, d_lower):
+            return False
+        if _token_as_word_in_text(t, blob):
+            return False
+
+    dom_stem = _brand_stem_loose(domain)
+    if len(dom_stem) < 5:
+        return False
+
+    for t in tokens:
+        if len(t) >= 3 and (t in dom_stem or dom_stem in t):
+            return False
+
+    if dom_stem not in titles and dom_stem not in blob:
+        return False
+
+    return True
+
+
+def filter_grouped_domains_entity_mismatch(
+    grouped: Dict[str, List[TavilyHit]],
+    company_name: str,
+) -> Dict[str, List[TavilyHit]]:
+    """Drop domain clusters that are clearly about another company (hard filter, not scoring)."""
+    out: Dict[str, List[TavilyHit]] = {}
+    for dom, hits in (grouped or {}).items():
+        if should_remove_entity_mismatch_domain(dom, hits, company_name):
+            logger.info(
+                "layer2_entity_mismatch_drop domain=%s company=%s",
+                dom,
+                (company_name or "")[:100],
+            )
+            continue
+        out[dom] = hits
+    return out
+
+
 def _blocked_first_party_domain(domain: str, blocked_substrings: Tuple[str, ...]) -> bool:
     d = domain.lower()
     return any(b in d for b in blocked_substrings)
@@ -176,11 +379,22 @@ def score_domain_cluster(
     if n == 0:
         return -1e9
     freq = min(1.0, n / 5.0)
-    tokens = [t for t in _name_tokens(company_name) if len(t) >= 4]
+    tokens = brand_match_tokens_for_scoring(company_name)
     blob = " ".join(
         f"{h.title} {h.content}".lower() for h in hits
     )
-    name_hits = sum(1 for t in tokens if t in blob)
+    name_hits = 0
+    for t in tokens:
+        if not t:
+            continue
+        if len(t) <= 4:
+            if len(t) >= 3 and _token_as_word_in_text(t, blob):
+                name_hits += 1
+            elif len(t) == 2 and t in blob:
+                name_hits += 1
+        else:
+            if t in blob:
+                name_hits += 1
     name_score = min(1.0, name_hits / max(len(tokens), 1)) if tokens else 0.2
     prod_bonus = 0.35 if _PRODUCT_INDUSTRY_RE.search(blob) else 0.0
     avg_tav = sum(h.score for h in hits) / max(n, 1)
@@ -237,6 +451,16 @@ def pick_linkedin_snippets(all_hits: Sequence[TavilyHit], max_snips: int = 2) ->
 # Stricter than raw clustering strength: only "clear" first-party signal counts for canonical homepage.
 STRONG_DOMAIN_SCORE = 4.15
 MIN_TOP2_GAP = 0.45
+
+# Trusted identity: relax *only* when explicitly allowed (Layer 1 / CSV / strong cluster), not globally.
+STAGE1_TRUSTED_MIN_SCORE = 82.0
+TRUSTED_STRONG_DELTA = 0.35
+TRUSTED_GAP_DELTA = 0.12
+# Among first-party clusters, top must clearly beat #2 to ignore a different-brand runner-up.
+TRUSTED_FP_DOMINANCE_GAP = 0.35
+# "Very strong cluster" — high score + repeated Tavily hits (not a global threshold cut).
+TRUSTED_CLUSTER_MIN_HITS = 3
+TRUSTED_CLUSTER_SCORE_BONUS = 0.85
 
 
 def best_url_for_domain(hits: Sequence[TavilyHit]) -> Optional[str]:
@@ -296,6 +520,14 @@ def same_brand_family(primary: str, other: str, company_name: str) -> bool:
         return True
     if len(sp) >= 3 and sp in so:
         return True
+    if is_short_name_company(company_name):
+        for t in _short_name_brand_tokens(company_name):
+            if len(t) < 2:
+                continue
+            pin = _short_brand_matches_domain_stem(t, sp, p, p.replace(".", ""))
+            oin = _short_brand_matches_domain_stem(t, so, o, o.replace(".", ""))
+            if pin and oin:
+                return True
     tokens = [t for t in _name_tokens(company_name) if len(t) >= 4]
     for t in tokens:
         if t in sp and t in so:
@@ -311,16 +543,109 @@ def domain_has_brand_keyword_match(domain: str, company_name: str) -> bool:
     d = (domain or "").lower().strip()
     if not d:
         return False
+    stem = _brand_stem_loose(domain)
+    blob = d.replace("-", "")
+
+    if is_short_name_company(company_name):
+        for t in _short_name_brand_tokens(company_name):
+            if _short_brand_matches_domain_stem(t, stem, d, blob):
+                return True
+        for t in [x for x in _name_tokens(company_name) if len(x) >= 4]:
+            if t in d or t in blob:
+                return True
+            if len(stem) >= 4 and (t in stem or stem in t):
+                return True
+        return False
+
     tokens = [t for t in _name_tokens(company_name) if len(t) >= 4]
     if not tokens:
         return True
-    stem = _brand_stem_loose(domain)
-    blob = d.replace("-", "")
     for t in tokens:
         if t in d or t in blob:
             return True
         if len(stem) >= 4 and (t in stem or stem in t):
             return True
+    return False
+
+
+def homepage_hint_matches_top_cluster(
+    homepage_hint: Optional[str],
+    top_domain: str,
+    company_name: str,
+) -> bool:
+    """True when CSV/homepage URL registrable domain aligns with the top clustered first-party domain."""
+    if not homepage_hint or not top_domain:
+        return False
+    raw = (homepage_hint or "").strip()
+    if not raw.startswith(("http://", "https://")):
+        raw = "https://" + raw
+    try:
+        p = urlparse(raw)
+    except Exception:
+        return False
+    if not p.netloc:
+        return False
+    hdom = registrable_domain(p.netloc)
+    td = top_domain.lower().strip()
+    if hdom == td:
+        return True
+    return same_brand_family(hdom, top_domain, company_name)
+
+
+def competing_entity_detected(
+    ranked_fp_only: Sequence[Tuple[str, float, List[TavilyHit]]],
+    company_name: str,
+) -> bool:
+    """
+    True when two first-party clusters are score-near and clearly different brands (ambiguous winner).
+    Disables trusted-identity relaxation — never overrides entity-mismatch removal.
+    """
+    if len(ranked_fp_only) < 2:
+        return False
+    gap = ranked_fp_only[0][1] - ranked_fp_only[1][1]
+    if gap > TRUSTED_FP_DOMINANCE_GAP:
+        return False
+    return not same_brand_family(ranked_fp_only[0][0], ranked_fp_only[1][0], company_name)
+
+
+def very_strong_cluster_signal(score: float, hits: Sequence[TavilyHit]) -> bool:
+    """High aggregate score plus multiple Tavily hits on the same domain (coherent cluster)."""
+    n = len(hits)
+    if n >= TRUSTED_CLUSTER_MIN_HITS and score >= STRONG_DOMAIN_SCORE + TRUSTED_CLUSTER_SCORE_BONUS:
+        return True
+    if n >= 4 and score >= STRONG_DOMAIN_SCORE + 0.55:
+        return True
+    return False
+
+
+def compute_trusted_identity(
+    company_name: str,
+    *,
+    homepage_hint: Optional[str],
+    stage1_total_score: Optional[float],
+    ranked_fp_only: Sequence[Tuple[str, float, List[TavilyHit]]],
+    ranked_no_block: Sequence[Tuple[str, float, List[TavilyHit]]],
+) -> bool:
+    """
+    Narrow path to relax strict identity checks for large caps / CSV hints / very strong clusters.
+    Never true for blocked/supporting tops, brand mismatch, or competing-entity ambiguity.
+    """
+    if not ranked_fp_only:
+        return False
+    if competing_entity_detected(ranked_fp_only, company_name):
+        return False
+    top_dom, top_sc, top_hits = ranked_fp_only[0]
+    if post_cluster_domain_blocked(top_dom) or is_supporting_domain(top_dom):
+        return False
+    if not domain_has_brand_keyword_match(top_dom, company_name):
+        return False
+
+    if stage1_total_score is not None and float(stage1_total_score) >= STAGE1_TRUSTED_MIN_SCORE:
+        return True
+    if homepage_hint_matches_top_cluster(homepage_hint, top_dom, company_name):
+        return True
+    if very_strong_cluster_signal(top_sc, top_hits):
+        return True
     return False
 
 
@@ -331,9 +656,11 @@ def compute_layer2_identity_low(
     *,
     homepage_verified: bool,
     had_top_fp_candidate: bool,
+    trusted_identity: bool = False,
 ) -> bool:
     """
     Low confidence when clusters are weak, top-two disagree, or we could not verify a homepage on-cluster.
+    ``trusted_identity`` slightly relaxes cuts only when compute_trusted_identity was true (no competing entity).
     """
     if not ranked_fp_only:
         return True
@@ -341,15 +668,29 @@ def compute_layer2_identity_low(
     if not domain_has_brand_keyword_match(top_dom, company_name):
         return True
     top_score = ranked_fp_only[0][1]
-    if top_score < STRONG_DOMAIN_SCORE:
+    strong_cut = STRONG_DOMAIN_SCORE - (TRUSTED_STRONG_DELTA if trusted_identity else 0.0)
+    gap_cut = MIN_TOP2_GAP - (TRUSTED_GAP_DELTA if trusted_identity else 0.0)
+    if top_score < strong_cut:
         return True
     if len(ranked_fp_only) >= 2:
-        if ranked_fp_only[0][1] - ranked_fp_only[1][1] < MIN_TOP2_GAP:
+        if ranked_fp_only[0][1] - ranked_fp_only[1][1] < gap_cut:
             return True
     if len(ranked_no_block) >= 2:
         if not same_brand_family(ranked_no_block[0][0], ranked_no_block[1][0], company_name):
-            return True
+            if trusted_identity:
+                if len(ranked_fp_only) <= 1:
+                    pass
+                else:
+                    fp_gap = ranked_fp_only[0][1] - ranked_fp_only[1][1]
+                    if fp_gap < TRUSTED_FP_DOMINANCE_GAP:
+                        return True
+            else:
+                return True
     if had_top_fp_candidate and not homepage_verified:
+        if trusted_identity:
+            if top_score >= STRONG_DOMAIN_SCORE:
+                return False
+            return True
         return True
     return False
 
@@ -377,6 +718,7 @@ def secondary_identity_tavily_recommended(
     company_name: str,
     *,
     homepage_verified: bool,
+    trusted_identity: bool = False,
 ) -> bool:
     """
     Second Tavily (official-website) query when primary-only identity is ambiguous or borderline-strong.
@@ -388,6 +730,7 @@ def secondary_identity_tavily_recommended(
         company_name,
         homepage_verified=homepage_verified,
         had_top_fp_candidate=bool(ranked_fp_only),
+        trusted_identity=trusted_identity,
     ):
         return True
     if ranked_fp_only:

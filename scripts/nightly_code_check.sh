@@ -44,7 +44,13 @@ run_warn_check() {
   fi
 }
 
-PY_BIN="backend/.venv/bin/python"
+PY_BIN=".venv/bin/python"
+if [[ ! -x "$PY_BIN" ]]; then
+  PY_BIN="backend/venv/bin/python"
+fi
+if [[ ! -x "$PY_BIN" ]]; then
+  PY_BIN="backend/.venv/bin/python"
+fi
 if [[ ! -x "$PY_BIN" ]]; then
   PY_BIN="python3"
 fi
@@ -58,8 +64,8 @@ run_check "API smoke endpoints" "./scripts/smoke_api_endpoints.sh"
 run_check "Frontend service smoke" "$PY_BIN scripts/smoke_frontend_services.py"
 run_check "Financials endpoint smoke" "./scripts/smoke_financials_endpoint.sh"
 
-run_warn_check "AppleDouble artifact scan (tracked files)" "! git ls-files | rg -n '(^|/)\\._[^/]+$'"
-run_warn_check "Legacy localhost:3000 endpoint scan" "! rg -n 'localhost:3000/api' frontend/src --glob '!**/node_modules/**'"
+run_warn_check "AppleDouble artifact scan (tracked files)" "git ls-files | python3 -c \"import sys; hits=[line.strip() for line in sys.stdin if '/._' in line or line.strip().startswith('._')]; [print(hit) for hit in hits]; raise SystemExit(1 if hits else 0)\""
+run_warn_check "Legacy localhost:3000 endpoint scan" "python3 -c \"from pathlib import Path; hits=[]; [hits.append(str(path)) for path in Path('frontend/src').rglob('*') if path.is_file() and 'localhost:3000/api' in path.read_text(encoding='utf-8', errors='ignore')]; [print(hit) for hit in hits]; raise SystemExit(1 if hits else 0)\""
 
 echo ""
 echo "===== Nightly Check Summary ====="

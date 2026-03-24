@@ -8,11 +8,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 import ssl
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 import aiohttp
 import certifi

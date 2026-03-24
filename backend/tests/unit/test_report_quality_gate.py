@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
 
 from backend.services.deep_research.report_quality_gate import (
     evaluate_report_quality,
-    ReportQualityResult,
 )
 
 

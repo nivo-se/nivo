@@ -13,6 +13,8 @@ Stage 1 → Layer 2 (production shortlist)
   Example:
     PYTHONPATH=. python3 scripts/screening_rank_v1.py --out shortlist_200.csv --top 200
 
+  With `--out`, also writes `shortlist_200_manifest.json` (same stem + `_manifest.json`) for reproducibility.
+
   After changing Layer 1 rules, re-export shortlist_200.csv and **manually review the top ~50**
   rows (names + orgnr) before running Layer 2.
 
@@ -54,6 +56,13 @@ except ImportError as e:
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from screening_manifest_utils import git_commit_hash, sha256_file, utc_timestamp_iso, write_json  # noqa: E402
+
+SCREENING_RANK_V1_VERSION = "1.0.0"
 
 # --- Layer 1 hard name exclusions (always on; YAML may add more via name_exclusion_keywords) ---
 _L1_HARD_OPERATING_KEYWORDS: Tuple[str, ...] = (
@@ -65,8 +74,6 @@ _L1_HARD_OPERATING_KEYWORDS: Tuple[str, ...] = (
     "finance",
     "finans",
     "family",
-    "group",
-    "grupp",
 )
 
 _L1_HARD_SERVICE_KEYWORDS: Tuple[str, ...] = (
@@ -916,6 +923,100 @@ def run_pipeline(
     return ranked, excluded_df
 
 
+def _effective_product_signal_keywords(cfg: Dict[str, Any]) -> List[str]:
+    extra = cfg.get("product_signal_keywords") or []
+    return list(_L1_DEFAULT_PRODUCT_SIGNAL_KEYWORDS) + [str(x).strip() for x in extra if str(x).strip()]
+
+
+def _layer1_manifest(
+    *,
+    cfg: Dict[str, Any],
+    cfg_path: Path,
+    args: argparse.Namespace,
+    eff_alpha: float,
+    output_row_count: int,
+    excluded_row_count: int,
+    cohort_row_count: int,
+) -> Dict[str, Any]:
+    """Snapshot for reproducibility + DB ingestion (see docs/screening_runs_db_proposal.md)."""
+    constraints = cfg.get("constraints") or {}
+    scoring_cfg = cfg.get("scoring") or {}
+    winsor_cfg = cfg.get("winsor") or {}
+    fr = cfg.get("feature_rules") or {}
+    min_cov = float(scoring_cfg.get("min_population_coverage", fr.get("min_population_coverage", 0.55)))
+    min_non_null = int(scoring_cfg.get("min_non_null_per_company", fr.get("min_non_null_per_company", 4)))
+    max_combined = float(scoring_cfg.get("max_combined_penalty", DEFAULT_MAX_COMBINED_PENALTY))
+
+    cfg_resolved = cfg_path.resolve() if cfg_path.exists() else cfg_path
+    config_hash = sha256_file(cfg_path) if cfg_path.is_file() else None
+
+    return {
+        "run_kind": "layer1_screening_rank_v1",
+        "created_at_utc": utc_timestamp_iso(),
+        "git_commit": git_commit_hash(REPO_ROOT),
+        "script": "screening_rank_v1.py",
+        "script_version": SCREENING_RANK_V1_VERSION,
+        "config_path": str(cfg_resolved),
+        "config_hash_sha256": config_hash,
+        "cli": {
+            "out": str(args.out.resolve()) if args.out else None,
+            "top": args.top,
+            "legacy_scores": bool(args.legacy_scores),
+            "alpha_override": args.alpha,
+            "config": str(Path(args.config).resolve()),
+        },
+        "top_n": args.top,
+        "row_counts": {
+            "ranked_output": output_row_count,
+            "excluded_pre_score": excluded_row_count,
+            "cohort_after_hard_exclusions": cohort_row_count,
+        },
+        "settings": {
+            "alpha_effective": eff_alpha,
+            "scoring": {
+                "alpha_config": scoring_cfg.get("alpha"),
+                "max_combined_penalty": max_combined,
+                "min_population_coverage": min_cov,
+                "min_non_null_per_company": min_non_null,
+            },
+            "winsor": {
+                "p_low": float(winsor_cfg.get("p_low", 0.05)),
+                "p_high": float(winsor_cfg.get("p_high", 0.95)),
+            },
+            "legacy_scores_mode_b": bool(args.legacy_scores),
+            "hard_exclusion_keywords": {
+                "layer1_operating_keywords": list(_L1_HARD_OPERATING_KEYWORDS),
+                "layer1_service_keywords": list(_L1_HARD_SERVICE_KEYWORDS),
+                "shell_name_suffixes": list(_L1_SHELL_NAME_SUFFIXES),
+                "yaml_name_exclusion_keywords": list(cfg.get("name_exclusion_keywords") or []),
+                "yaml_layer1_extra_operating_exclusion_keywords": list(
+                    cfg.get("layer1_extra_operating_exclusion_keywords") or []
+                ),
+                "yaml_layer1_extra_service_exclusion_keywords": list(
+                    cfg.get("layer1_extra_service_exclusion_keywords") or []
+                ),
+            },
+            "orgnr_denylist_count": len(_merged_hard_orgnr_denyset(cfg)),
+            "product_signal_keywords_effective": _effective_product_signal_keywords(cfg),
+            "product_similarity_boost": float(constraints.get("product_similarity_boost", 0.0) or 0.0),
+            "require_product_signal": bool(constraints.get("require_product_signal", False)),
+            "max_revenue_sek": constraints.get("max_revenue_sek"),
+            "max_employees": constraints.get("max_employees"),
+            "min_revenue_sek": constraints.get("min_revenue_sek", 50_000_000),
+            "nace_deny_prefixes": _nace_deny_prefixes(cfg),
+            "apply_global_shell_suffixes": bool(constraints.get("apply_global_shell_suffixes", True)),
+            "max_latest_year_age": constraints.get("max_latest_year_age"),
+            "min_calendar_year": constraints.get("min_calendar_year"),
+            "constraints_snapshot": dict(constraints),
+        },
+        "artifacts": {
+            "shortlist_csv": str(args.out.resolve()) if args.out else None,
+            "excluded_csv": str(args.out.with_suffix(".excluded.csv").resolve()) if args.out else None,
+            "manifest_json": str(args.out.with_name(args.out.stem + "_manifest.json").resolve()) if args.out else None,
+        },
+    }
+
+
 def write_csv(df: pd.DataFrame, path: Optional[Path], top: Optional[int]) -> None:
     out = df if top is None else df.head(int(top))
     columns = [
@@ -1049,9 +1150,28 @@ def main() -> None:
         print("No ranked rows.", file=sys.stderr)
         sys.exit(2)
     write_csv(ranked, args.out, args.top)
+
+    scoring_cfg = cfg.get("scoring") or {}
+    eff_alpha = float(args.alpha if args.alpha is not None else scoring_cfg.get("alpha", DEFAULT_ALPHA))
+    cohort_n = len(ranked)
+    out_df = ranked if args.top is None else ranked.head(int(args.top))
+    output_row_count = len(out_df)
+
     if args.out:
         ex_path = args.out.with_suffix(".excluded.csv")
         excluded.to_csv(ex_path, index=False)
+        man = _layer1_manifest(
+            cfg=cfg,
+            cfg_path=args.config,
+            args=args,
+            eff_alpha=eff_alpha,
+            output_row_count=output_row_count,
+            excluded_row_count=len(excluded),
+            cohort_row_count=cohort_n,
+        )
+        man_path = args.out.with_name(args.out.stem + "_manifest.json")
+        write_json(man_path, man)
+        print(f"Wrote {man_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

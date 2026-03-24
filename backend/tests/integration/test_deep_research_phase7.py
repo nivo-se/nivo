@@ -9,12 +9,10 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-import pytest
 
 from backend.orchestrator.run_diagnostics import build_run_diagnostics
 from backend.services.deep_research.report_quality_gate import (
     evaluate_report_quality,
-    REPORT_QUALITY_CODES,
 )
 
 
@@ -115,7 +113,7 @@ class TestReportQualityGate:
         assert "degraded" in result.reason_codes
         assert "valuation_skipped" in result.reason_codes
         assert "Report generated with incomplete data" in str(result.limitation_summary) or any(
-            "Valuation" in l for l in result.limitation_summary
+            "Valuation" in limitation for limitation in result.limitation_summary
         )
 
     def test_weak_evidence_insufficient(self) -> None:

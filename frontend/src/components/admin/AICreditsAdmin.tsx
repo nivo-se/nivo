@@ -44,11 +44,13 @@ export default function AICreditsAdmin() {
 
   useEffect(() => {
     load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
 
   useEffect(() => {
     if (config == null) return;
     getAiCreditsUsage(period).then(setUsage).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- usage refresh depends on selected period only
   }, [period]);
 
   const handleSaveLimits = async () => {

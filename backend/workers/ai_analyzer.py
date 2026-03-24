@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from openai import OpenAI
 
 from .prompt_config import PromptConfig, PromptConfigError
-from .strategic_fit_analyzer import StrategicFitAnalyzer, StrategicFitResult
+from .strategic_fit_analyzer import StrategicFitAnalyzer
 
 logger = logging.getLogger(__name__)
 

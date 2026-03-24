@@ -8,12 +8,11 @@ import logging
 from calendar import monthrange
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from .dependencies import get_current_user_id
 from .rbac import require_role
 
 logger = logging.getLogger(__name__)

@@ -535,6 +535,7 @@ export default function RunStatusPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- polling lifecycle is keyed off run status and stable fetch callback
   }, [run?.status, fetchStatus])
 
   useEffect(() => {

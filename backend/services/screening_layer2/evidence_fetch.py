@@ -23,9 +23,12 @@ from backend.services.screening_layer2.domain_identity import (
     TavilyHit,
     collect_supporting_domains_from_hits,
     compute_layer2_identity_low,
+    compute_trusted_identity,
+    filter_grouped_domains_entity_mismatch,
     group_hits_by_domain,
     is_supporting_domain,
     merge_tavily_result_hits,
+    official_pick_tokens,
     pick_linkedin_snippets,
     post_cluster_domain_blocked,
     rank_domains,
@@ -206,6 +209,7 @@ class RetrievalMeta:
     likely_first_party_domains: List[str] = field(default_factory=list)
     supporting_domains: List[str] = field(default_factory=list)
     layer2_identity_confidence_low: bool = False
+    layer2_trusted_identity: bool = False
     tavily_queries_run: int = 0
     domain_cluster_ranking: List[str] = field(default_factory=list)
     tavily_raw_artifacts: Dict[str, str] = field(default_factory=dict)
@@ -228,6 +232,7 @@ class RetrievalMeta:
             "likely_first_party_domains": list(self.likely_first_party_domains),
             "supporting_domains": list(self.supporting_domains),
             "layer2_identity_confidence_low": self.layer2_identity_confidence_low,
+            "layer2_trusted_identity": self.layer2_trusted_identity,
             "tavily_queries_run": self.tavily_queries_run,
             "domain_cluster_ranking": list(self.domain_cluster_ranking),
             "tavily_raw_artifacts": dict(self.tavily_raw_artifacts),
@@ -447,11 +452,6 @@ def _pick_best(
     return best if best_score > 0 else None
 
 
-def _name_tokens(company_name: str) -> List[str]:
-    parts = re.split(r"[^\wåäöÅÄÖ]+", company_name, flags=re.I)
-    return [p.lower() for p in parts if len(p) >= 4]
-
-
 def _blocked_host(host: str) -> bool:
     h = host.lower()
     return any(b in h for b in _BLOCKED_TAVILY_HOST_SUBSTR)
@@ -518,6 +518,7 @@ def _build_evidence_pack_multi_source(
     homepage: Optional[str],
     meta: RetrievalMeta,
     *,
+    stage1_total_score: Optional[float] = None,
     raw_tavily_dir: Optional[Path] = None,
     tavily_raw_cache_dir: Optional[Path] = None,
     tavily_debug_output_dir: Optional[Path] = None,
@@ -539,6 +540,7 @@ def _build_evidence_pack_multi_source(
     chunks: List[str] = [intro]
     hint = normalize_homepage(homepage)
     meta.homepage_present = bool(hint)
+    hint_for_trust = hint or (homepage.strip() if isinstance(homepage, str) and homepage.strip() else None)
 
     raw_lists: list = []
     identity_raw: Optional[dict[str, Any]] = None
@@ -619,7 +621,10 @@ def _build_evidence_pack_multi_source(
         raw_lists = [r1 or []]
 
         merged_primary = merge_tavily_result_hits([r1 or []], max_hits=15)
-        grouped_p = group_hits_by_domain(merged_primary)
+        grouped_p = filter_grouped_domains_entity_mismatch(
+            group_hits_by_domain(merged_primary),
+            company_name,
+        )
         ranked_p = rank_domains(
             grouped_p,
             company_name,
@@ -628,6 +633,14 @@ def _build_evidence_pack_multi_source(
         )
         ranked_no_block_p = [r for r in ranked_p if not post_cluster_domain_blocked(r[0])]
         ranked_fp_only_p = [r for r in ranked_no_block_p if not is_supporting_domain(r[0])]
+
+        trusted_primary = compute_trusted_identity(
+            company_name,
+            homepage_hint=hint_for_trust,
+            stage1_total_score=stage1_total_score,
+            ranked_fp_only=ranked_fp_only_p,
+            ranked_no_block=ranked_no_block_p,
+        )
 
         primary_fp = ranked_fp_only_p[0][0] if ranked_fp_only_p else None
         http_ms_verify = 0.0
@@ -654,6 +667,7 @@ def _build_evidence_pack_multi_source(
                 ranked_no_block_p,
                 company_name,
                 homepage_verified=home_verified_p,
+                trusted_identity=trusted_primary,
             ):
                 r2, identity_raw = _one_search(q_secondary, "identity_search", TAVILY_QUERY_INDEX_IDENTITY)
                 queries_executed.append(q_secondary)
@@ -676,7 +690,16 @@ def _build_evidence_pack_multi_source(
         )
 
     merged = merge_tavily_result_hits(raw_lists, max_hits=15)
-    grouped = group_hits_by_domain(merged)
+    grouped = filter_grouped_domains_entity_mismatch(
+        group_hits_by_domain(merged),
+        company_name,
+    )
+    allowed_domains = set(grouped.keys())
+    merged = [
+        h
+        for h in merged
+        if registrable_domain(urlparse(h.url).netloc) in allowed_domains
+    ]
     ranked = rank_domains(
         grouped,
         company_name,
@@ -685,6 +708,15 @@ def _build_evidence_pack_multi_source(
     )
     ranked_no_block = [r for r in ranked if not post_cluster_domain_blocked(r[0])]
     ranked_fp_only = [r for r in ranked_no_block if not is_supporting_domain(r[0])]
+
+    trusted_identity = compute_trusted_identity(
+        company_name,
+        homepage_hint=hint_for_trust,
+        stage1_total_score=stage1_total_score,
+        ranked_fp_only=ranked_fp_only,
+        ranked_no_block=ranked_no_block,
+    )
+    meta.layer2_trusted_identity = trusted_identity
 
     likely_domains: List[str] = []
     if ranked_fp_only:
@@ -706,6 +738,14 @@ def _build_evidence_pack_multi_source(
     if meta.supporting_domains:
         chunks.append(
             "=== SUPPORTING_DOMAINS (non-homepage) ===\n" + ", ".join(meta.supporting_domains)
+        )
+
+    if trusted_identity:
+        chunks.append(
+            "=== TRUSTED_IDENTITY ===\n"
+            "Layer 1 score, CSV homepage alignment, or a very strong single-domain cluster — "
+            "identity checks are slightly relaxed for this row only; competing-entity ambiguity "
+            "and entity-mismatch removals still apply.\n"
         )
 
     for h in merged[:12]:
@@ -769,6 +809,7 @@ def _build_evidence_pack_multi_source(
             company_name,
             homepage_verified=homepage_verified,
             had_top_fp_candidate=bool(ranked_fp_only),
+            trusted_identity=trusted_identity,
         )
         # Never treat a weak or ambiguous cluster as canonical homepage_used — prefer unresolved over wrong.
         use_canonical_homepage = bool(
@@ -839,6 +880,7 @@ def build_evidence_pack(
     homepage: Optional[str],
     *,
     retrieval_mode: Literal["auto", "homepage_known", "homepage_missing", "multi_source"] = "auto",
+    stage1_total_score: Optional[float] = None,
     raw_tavily_dir: Optional[Path] = None,
     tavily_raw_cache_dir: Optional[Path] = None,
     tavily_debug_output_dir: Optional[Path] = None,
@@ -860,6 +902,7 @@ def build_evidence_pack(
             company_name,
             homepage,
             meta,
+            stage1_total_score=stage1_total_score,
             raw_tavily_dir=raw_tavily_dir,
             tavily_raw_cache_dir=tavily_raw_cache_dir,
             tavily_debug_output_dir=tavily_debug_output_dir,
@@ -1007,7 +1050,7 @@ def build_evidence_pack(
                 )
 
             if results:
-                tokens = _name_tokens(company_name)
+                tokens = official_pick_tokens(company_name)
                 official_url = _pick_official_from_tavily(results, company_name, tokens)
 
                 # Snippets from top results (not counted as page fetches)

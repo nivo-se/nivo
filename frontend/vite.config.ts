@@ -9,8 +9,10 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     proxy: {
+      // Never use VITE_API_BASE_URL here — that is where the *browser* sends API calls in prod.
+      // Dev proxy must target your local FastAPI only (override if API runs elsewhere).
       "/api": {
-        target: process.env.VITE_API_BASE_URL || "http://localhost:8000",
+        target: process.env.VITE_DEV_API_PROXY_TARGET || "http://127.0.0.1:8000",
         changeOrigin: true,
         secure: false,
       },

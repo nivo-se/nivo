@@ -3,9 +3,7 @@ Universe query API: structured filter stack for Universe page.
 Builds a schema-compatible source from base tables and supports filters + sort + pagination.
 """
 import asyncio
-import json
 import logging
-import os
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from fastapi import APIRouter, Request

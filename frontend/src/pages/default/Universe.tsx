@@ -282,6 +282,7 @@ export default function Universe() {
       result = result.filter((c) => !evaluateFilterGroup(c, activeFilters.exclude));
     }
     return result;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- exclude filtering only depends on the active rule set size here
   }, [companies, activeFilters.exclude.rules, backendExcludeFilters.length]);
 
   const toggleSort = (field: string) => {

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -74,7 +73,6 @@ class EvidenceVerifier:
         if not above_threshold:
             return
 
-        values = [i.value for i in above_threshold if i.value]
         conflicts = 0
         for i, a in enumerate(above_threshold):
             for b in above_threshold[i + 1 :]:

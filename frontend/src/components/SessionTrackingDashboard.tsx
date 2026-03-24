@@ -227,12 +227,14 @@ const SessionTrackingDashboard: React.FC<SessionTrackingDashboardProps> = ({
       }, refreshInterval);
       return () => clearInterval(interval);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-refresh is keyed to selected session and timer settings
   }, [enableAutoRefresh, refreshInterval, selectedSession]);
 
   useEffect(() => {
     if (selectedSession) {
       fetchSessionDetails(selectedSession);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh details only when the selected session changes
   }, [selectedSession]);
 
   const getStatusIcon = (status: string) => {

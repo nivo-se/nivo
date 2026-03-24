@@ -80,8 +80,8 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
       try {
         const lists = JSON.parse(saved)
         setSavedLists(lists)
-        if (lists.length > 0 && !selectedList) {
-          setSelectedList(lists[0])
+        if (lists.length > 0) {
+          setSelectedList((current) => current ?? lists[0])
         }
       } catch (error) {
         console.error('Error loading saved lists:', error)
@@ -94,6 +94,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
     if (selectedList) {
       calculateAnalytics(selectedList.companies)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- analytics rerun only when selected list changes
   }, [selectedList])
 
   const calculateAnalytics = (companies: CompanyRecord[]) => {

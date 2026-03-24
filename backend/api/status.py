@@ -75,7 +75,6 @@ async def get_status():
     except Exception as e:
         status["redis"] = f"error: {str(e)}"
 
-    required = ["api", "db_ok"]
     all_healthy = db_ok and all(status.get(key) in ("healthy", True) for key in ("api", "db_ok"))
 
     return {

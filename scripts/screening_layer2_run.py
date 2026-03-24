@@ -38,11 +38,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 # Repo root: TavilyClient + settings (`backend.*`). Backend tree: `services.*` imports.
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(REPO_ROOT / "backend") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "backend"))
+
+from screening_manifest_utils import git_commit_hash, utc_timestamp_iso, write_json
+
+SCREENING_LAYER2_RUN_VERSION = "1.0.0"
 
 try:
     from dotenv import load_dotenv
@@ -324,6 +331,7 @@ def main() -> None:
                 name,
                 hp,
                 retrieval_mode=rmode,
+                stage1_total_score=s1,
                 raw_tavily_dir=raw_capture_dir,
                 tavily_raw_cache_dir=raw_capture_dir,
                 tavily_debug_output_dir=tavily_debug_output_dir,
@@ -404,11 +412,28 @@ def main() -> None:
                         row[k] = "|".join(str(x) for x in v)
                 w.writerow(row)
 
+    def _cli_snapshot() -> Dict[str, Any]:
+        snap: Dict[str, Any] = {}
+        for k, v in vars(args).items():
+            if isinstance(v, Path):
+                snap[k] = str(v.resolve())
+            else:
+                snap[k] = v
+        return snap
+
     manifest = {
-        "created_at_utc": ts,
+        "run_kind": "layer2_screening_layer2_run",
+        "created_at_utc": utc_timestamp_iso(),
+        "run_timestamp_id": ts,
+        "git_commit": git_commit_hash(REPO_ROOT),
+        "script": "screening_layer2_run.py",
+        "script_version": SCREENING_LAYER2_RUN_VERSION,
+        "cli": _cli_snapshot(),
         "input_csv": str(args.input.resolve()),
+        "out_dir": str(args.out_dir.resolve()),
         "model": args.model,
-        "rows": len(df),
+        "temperature": args.temperature,
+        "rows_input_slice": len(df),
         "blend": {
             "formula": "100 * (w1 * stage1/100 + w2 * fit_confidence * (1 if is_fit else 0.15)) / (w1+w2)",
             "w_stage1": args.w_stage1,
@@ -422,6 +447,7 @@ def main() -> None:
         "tavily_raw": {
             "enabled": not args.no_tavily_raw,
             "directory_relative": LAYER2_RAW_SUBDIR,
+            "directory_absolute": str((args.out_dir / LAYER2_RAW_SUBDIR).resolve()) if not args.no_tavily_raw else None,
             "rows": tavily_raw_index,
         },
         "tavily_low_credit": {
@@ -430,8 +456,14 @@ def main() -> None:
             "max_rows_cap": min(max(1, args.tavily_low_credit_max_rows), 50) if args.tavily_low_credit else None,
             "priority_max_rank_deprecated": args.tavily_priority_max_rank,
         },
+        "artifacts": {
+            "jsonl": str(jsonl_path.resolve()),
+            "csv": str(csv_path.resolve()),
+            "manifest": str(manifest_path.resolve()),
+            "layer2_raw_dir": str((args.out_dir / LAYER2_RAW_SUBDIR).resolve()) if not args.no_tavily_raw else None,
+        },
     }
-    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    write_json(manifest_path, manifest)
 
     print(f"Wrote {jsonl_path}")
     print(f"Wrote {csv_path}")

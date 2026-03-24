@@ -3,7 +3,7 @@ Financial filter endpoints for Stage 1 shortlist generation
 """
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict
 import json
 import numpy as np
 import pandas as pd
@@ -13,8 +13,7 @@ from pathlib import Path
 # Add backend directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agentic_pipeline.config import PipelineConfig, SegmentWeighting
-from agentic_pipeline.staged_workflow import StagedTargetingWorkflow, StagePlan
+from agentic_pipeline.config import SegmentWeighting
 from ..services.db_factory import get_database_service
 
 logger = logging.getLogger(__name__)
@@ -85,15 +84,10 @@ async def get_filter_analytics(
     Returns data for scatter plots, density maps, and percentile distributions.
     """
     try:
-        # Parse weights or use defaults
+        # Parse weights for validation even though visualizations use raw KPI distributions.
         if weights:
             weight_dict = json.loads(weights)
-            filter_weights = FilterWeights(**weight_dict)
-        else:
-            filter_weights = FilterWeights()
-        
-        # Map to backend weights
-        segment_weights = map_frontend_weights_to_segment_weighting(filter_weights)
+            FilterWeights(**weight_dict)
         
         db = get_database_service()
         if not getattr(db, "table_exists", lambda t: False)("company_kpis"):

@@ -62,6 +62,7 @@ const CompanyListManager: React.FC<CompanyListManagerProps> = ({
       }
     }
     loadLists()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- parent callback churn should not trigger list reloads
   }, []) // Remove onListUpdate from dependency array to prevent infinite loop
 
   // No need to save to localStorage automatically - database handles persistence

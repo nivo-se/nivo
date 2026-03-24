@@ -4,13 +4,12 @@ Gathers public information from company websites, news, and industry sources.
 """
 
 import asyncio
-import json
 import logging
 import re
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -141,11 +140,13 @@ class WebEnrichmentService:
             
             if not website_data.about_text:
                 about_link = self._find_link(soup, base_url, ['about', 'om-oss', 'om oss', 'vilka vi är'])
-                if about_link: links_to_visit['about'] = about_link
+                if about_link:
+                    links_to_visit['about'] = about_link
                 
             if not website_data.contact_info:
                 contact_link = self._find_link(soup, base_url, ['contact', 'kontakt', 'kontakta'])
-                if contact_link: links_to_visit['contact'] = contact_link
+                if contact_link:
+                    links_to_visit['contact'] = contact_link
 
             # Visit sub-pages concurrently
             if links_to_visit:
@@ -210,7 +211,8 @@ class WebEnrichmentService:
                         p.get_text(strip=True) for p in items[:10]
                         if p.get_text(strip=True) and len(p.get_text(strip=True)) > 5
                     ]
-                    if data.products_services: break
+                    if data.products_services:
+                        break
 
         # Extract contact info
         contact_patterns = {
@@ -227,10 +229,14 @@ class WebEnrichmentService:
         # Social media
         for link in soup.find_all('a', href=True):
             href = link['href']
-            if 'linkedin.com' in href: data.social_media['linkedin'] = href
-            elif 'facebook.com' in href: data.social_media['facebook'] = href
-            elif 'twitter.com' in href or 'x.com' in href: data.social_media['twitter'] = href
-            elif 'instagram.com' in href: data.social_media['instagram'] = href
+            if 'linkedin.com' in href:
+                data.social_media['linkedin'] = href
+            elif 'facebook.com' in href:
+                data.social_media['facebook'] = href
+            elif 'twitter.com' in href or 'x.com' in href:
+                data.social_media['twitter'] = href
+            elif 'instagram.com' in href:
+                data.social_media['instagram'] = href
     
     async def _search_news(self, company_name: str, orgnr: str) -> List[NewsArticle]:
         """Search for recent news articles about the company."""

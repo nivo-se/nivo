@@ -58,6 +58,7 @@ const AnalyzedCompanies: React.FC = () => {
 
   useEffect(() => {
     loadAnalysisRuns()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh list when filter and paging inputs change
   }, [currentPage, searchTerm, analysisMode, templateFilter, dateFrom, dateTo, statusFilter, sortBy, sortOrder])
 
   const loadAnalysisRuns = async () => {

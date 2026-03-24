@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 from .competitor_market_schemas import (
     CompetitorCandidateW3,
-    EvidenceRef,
     VerificationStatus,
     VerifiedCompetitor,
 )
@@ -25,7 +24,6 @@ def _score_overlap(
         "geography": 0.0,
         "business_model": 0.0,
     }
-    name_lower = candidate.name.lower()
     target_products = [str(p).lower() for p in (company_profile.get("products_services") or [])]
     target_customers = [str(c).lower() for c in (company_profile.get("customer_segments") or company_profile.get("customer_segments_profile") or [])]
     target_geos = [str(g).lower() for g in (company_profile.get("geographies") or [])]

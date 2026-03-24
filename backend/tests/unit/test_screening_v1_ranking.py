@@ -232,7 +232,7 @@ class ScreeningV1RankingTest(unittest.TestCase):
                 "group_like": {"penalty": 0.35, "keywords": ["group"]},
             },
         }
-        df.loc[10, "company_name"] = "Test Group Sverige AB"
+        df.loc[10, "company_name"] = "Test Group Nordic AB"
         ranked, _ = srv1.run_pipeline(df, cfg, use_legacy=False, alpha=0.45)
         row = ranked[ranked["orgnr"].astype(str) == df.loc[10, "orgnr"]]
         self.assertFalse(row.empty)

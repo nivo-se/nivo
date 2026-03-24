@@ -6,11 +6,8 @@ and contradictions. Persists report_quality_status and reason codes.
 
 from __future__ import annotations
 
-import uuid
 from dataclasses import dataclass, field
 from typing import Any
-
-from sqlalchemy.orm import Session
 
 
 # Machine-readable reason codes for quality gate
@@ -114,6 +111,20 @@ def _check_assumption_coverage(node_results: dict[str, Any]) -> tuple[list[str],
     return codes, limits
 
 
+def _has_accepted_evidence(node_results: dict[str, Any]) -> bool:
+    """Return True when the run has at least one accepted evidence item."""
+    ev_out = node_results.get("evidence_validation", {})
+    if not isinstance(ev_out, dict):
+        return False
+    accepted = ev_out.get("accepted_count")
+    if accepted is None:
+        accepted = ev_out.get("items_count")
+    try:
+        return int(accepted or 0) > 0
+    except (TypeError, ValueError):
+        return False
+
+
 def evaluate_report_quality(
     *,
     sections: list[dict[str, Any]],
@@ -151,7 +162,10 @@ def evaluate_report_quality(
     all_codes = list(dict.fromkeys(all_codes))
     all_limits = list(dict.fromkeys(all_limits))
 
-    if "blocked_assumption_registry" in all_codes or "empty_sections" in all_codes:
+    assumption_blocked = "blocked_assumption_registry" in all_codes
+    graceful_valuation_skip = valuation_skipped and _has_accepted_evidence(node_results)
+
+    if "empty_sections" in all_codes or (assumption_blocked and not graceful_valuation_skip):
         status = "blocked"
         passed = False
     elif all_codes or all_limits:

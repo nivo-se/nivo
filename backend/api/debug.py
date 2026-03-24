@@ -1,6 +1,7 @@
 """
 Debug endpoints for system configuration visibility.
 """
+from datetime import datetime
 import os
 import subprocess
 from pathlib import Path
@@ -9,7 +10,6 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/debug", tags=["debug"])
 
-from datetime import datetime
 _STARTED_AT = datetime.utcnow().isoformat() + "Z"
 
 

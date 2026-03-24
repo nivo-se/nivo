@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service

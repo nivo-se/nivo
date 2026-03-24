@@ -3,11 +3,9 @@ import os
 import hashlib
 import logging
 from pathlib import Path
-from typing import List, Optional
 
 import chromadb
 from chromadb.utils import embedding_functions
-from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 

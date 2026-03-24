@@ -97,7 +97,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # JWT auth when REQUIRE_AUTH=true (prod)
-from .auth import JWTAuthMiddleware
+from .auth import JWTAuthMiddleware  # noqa: E402
 app.add_middleware(JWTAuthMiddleware)
 
 
@@ -127,10 +127,10 @@ async def health_check():
     return {"status": "healthy", "service": "nivo-intelligence-api"}
 
 # Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
-from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, enrichment, export, filters, home, jobs, labels, lists, me, prospects, report_settings, screening, screening_campaigns, shortlists, status, analysis, saved_lists, universe, views
-from .chat import router as chat_router
-from .deep_research import router as deep_research_router
-from .enrichment import router as enrichment_router
+from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, export, filters, home, jobs, labels, lists, me, prospects, report_settings, screening, screening_campaigns, screening_run_shortlist, shortlists, status, analysis, saved_lists, universe, views  # noqa: E402
+from .chat import router as chat_router  # noqa: E402
+from .deep_research import router as deep_research_router  # noqa: E402
+from .enrichment import router as enrichment_router  # noqa: E402
 
 app.include_router(me.router)
 app.include_router(bootstrap.router)
@@ -147,6 +147,7 @@ app.include_router(labels.router)
 app.include_router(universe.router)
 app.include_router(screening.router)
 app.include_router(screening_campaigns.router)
+app.include_router(screening_run_shortlist.router)
 app.include_router(db.router)
 app.include_router(debug.router)
 app.include_router(filters.router)

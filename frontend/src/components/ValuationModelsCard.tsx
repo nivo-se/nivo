@@ -66,6 +66,7 @@ const ValuationModelsCard: React.FC<ValuationModelsCardProps> = ({
 
   useEffect(() => {
     loadValuations()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- valuation fetch is driven by route identifiers
   }, [runId, orgnr])
 
   const loadValuations = async () => {

@@ -169,8 +169,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
         if (!isMounted) return
 
         setSavedLists(lists)
-        if (lists.length > 0 && !selectedList) {
-          setSelectedList(lists[0])
+        if (lists.length > 0) {
+          setSelectedList((current) => current ?? lists[0])
         }
       } catch (error) {
         console.error('Error loading saved lists:', error)
@@ -205,6 +205,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     if (selectedList && !savedLists.some((list) => list.id === selectedList.id)) {
       setSelectedList(savedLists[0] ?? null)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- keep selected list synchronized from storage refreshes
   }, [savedLists, selectedList])
 
   const refreshSavedLists = async () => {
@@ -227,6 +228,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     if (selectedList) {
       runAIAnalysis(selectedList.companies)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- rerun analysis only when the selected list changes
   }, [selectedList])
 
   const runAIAnalysis = async (companies: CompanyRecord[]) => {

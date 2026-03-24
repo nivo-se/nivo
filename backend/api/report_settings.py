@@ -6,12 +6,11 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from backend.db import SessionLocal
-from .dependencies import get_current_user_id
 from .rbac import require_role
 
 router = APIRouter(prefix="/api/admin/report-settings", tags=["admin", "report-settings"])

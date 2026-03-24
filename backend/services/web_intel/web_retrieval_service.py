@@ -67,8 +67,6 @@ def _compute_evidence_quality(
 
     market_score = _avg_score(market_items) if market_items else 0.0
     comp_score = _avg_score(comp_items) if comp_items else 0.0
-    company_score = _avg_score(company_items) if company_items else 0.0
-
     missing: list[str] = []
     if market_score < market_threshold and not market_items:
         missing.append("market")
