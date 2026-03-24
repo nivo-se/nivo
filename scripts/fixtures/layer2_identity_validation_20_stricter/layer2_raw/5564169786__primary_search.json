@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564169786",
+  "company_name": "KRYDDHUSET I LJUNG Aktiebolag",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"KRYDDHUSET I LJUNG\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "KRYDDHUSET I LJUNG what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.cbinsights.com/company/kryddhuset",
+        "title": "Kryddhuset - Products, Competitors, Financials, Employees ...",
+        "content": "Kryddhuset is a manufacture of spices and condiments. Headquarters Location. Industrivägen 3. Ljung, 524 41,. Sweden. 0513-509 56.",
+        "score": 0.8497846,
+        "raw_content": null
+      },
+      {
+        "url": "https://usetorg.com/suppliers/8Tu35IPK/kryddhuset-i-ljung-ab",
+        "title": "kryddhuset i ljung ab: Company Profile, Contacts, Products - Torg",
+        "content": "kryddhuset i ljung ab supplier profile banner. kryddhuset i ljung ab company logo. # kryddhuset i ljung ab. 5 Spices Grinders Great Spice Mix. Grinder Spice Set Himalaya Salt and Pepper Mix. 5 Spices Grinders Great Spice Mix. Grinder Spice Set Himalaya Salt and Pepper Mix. No. ## kryddhuset i ljung ab. ### Supplier Overview. Kryddhuset is a family-owned company with over 25 years of experience in providing high-quality spices and seasonings. We are committed to delivering creative flavor experiences for all types of cooking, utilizing sustainable practices in our production. Our diverse product range includes gourmet spices, marinades, and specialty products catering to both home cooks and culinary professionals. ## Products (13). 1 Honey & Ginger Grill & BBQ Spice Rub. No. 2 Bourbon Chipotle & Apple Grill & BBQ Spice Rub. No. 3 Pineapple Habanero & Rum Grill & BBQ Spice Rub. No. 4 Herbs & Spicy Grill & BBQ Spice Rub. Streetfood Spice New York BBQ.",
+        "score": 0.8036831,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.largestcompanies.com/company/Kryddhuset-i-Ljung-AB-234092",
+        "title": "Kryddhuset i Ljung AB - Detailed information - Largestcompanies",
+        "content": "Kryddhuset i Ljung AB - Manufacture of condiments and seasonings.",
+        "score": 0.7978881,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.amazon.se/-/en/Kryddhuset-Mill-Ceramic-Grinder-Stainless/dp/B0B1PG5T8B",
+        "title": "Kryddhuset Mill - Ceramic Grinder with Spices & Salt - Amazon.se",
+        "content": "The spice house in Ljung AB is an entrepreneur-oriented family company with roots in Sweden and Italy that started just over 25 years ago. Brief content",
+        "score": 0.71687365,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.kompass.com/z/se/c/kryddhuset-i-ljung-aktiebolag/se365300/",
+        "title": "KRYDDHUSET I LJUNG Aktiebolag - Kompass",
+        "content": "Manufacture of condiments and seasonings (10840). See the Kompass classification · Information available as an option · Information available as an option.",
+        "score": 0.7077487,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.84,
+    "request_id": "c91e78a2-bfda-4316-84c1-f4683184ef00"
+  }
+}

@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { Pool } from 'pg'
 
 export const CRM_SCHEMA = 'deep_research'
 
@@ -30,7 +30,7 @@ export type InteractionType =
   | 'status_changed'
 
 export interface CRMDependencies {
-  supabase: SupabaseClient
+  pool: Pool
 }
 
 export interface OutreachDraft {

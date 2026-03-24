@@ -6,8 +6,21 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 import OpenAI from 'openai'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import type { Pool } from 'pg'
 import { randomUUID } from 'crypto'
+import { getAppPool } from './app-db.js'
+import { getAuth0SubFromBearer } from './auth0-verify.js'
+import {
+  checkAiCreditsLimit,
+  recordAiCreditsUsage,
+  insertRunRecord,
+  updateRunRecord,
+  fetchRunHistory,
+  fetchAnalysisRuns,
+  fetchRunDetail,
+  fetchCompanyDataFromNewSchema,
+  persistValuationSession,
+} from './pg-ai-helpers.js'
 import Database from 'better-sqlite3'
 import { getLocalDB, localDBExists } from './local-db.js'
 import { fetchComprehensiveCompanyData } from './data-enrichment.js'
@@ -53,7 +66,7 @@ config({ path: path.resolve(__dirname, '../.env.local') })
 
 // Environment check (only when DEBUG=true to avoid leaking operational hints)
 if (process.env.DEBUG === 'true' || process.env.DEBUG === '1') {
-  console.log('Supabase URL:', process.env.VITE_SUPABASE_URL ? 'Loaded' : 'Missing')
+  console.log('DATABASE_URL / Postgres:', process.env.DATABASE_URL || process.env.POSTGRES_HOST ? 'Loaded' : 'Missing')
   console.log('OpenAI API Key:', process.env.OPENAI_API_KEY ? 'Loaded' : 'Missing')
 }
 
@@ -288,76 +301,8 @@ const COMPLETION_COST_PER_1K = 0.0006
 const SCREENING_PROMPT_COST_PER_1K = 0.00015  // Same as deep analysis for consistency
 const SCREENING_COMPLETION_COST_PER_1K = 0.0006
 
-// Supabase client
-function getSupabase(): SupabaseClient | null {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SERVICE_KEY ||
-    process.env.VITE_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials')
-    return null
-  }
-
-  return createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
-}
-
-// AI credits: check spend limit before running (best-effort; ignores if tables missing)
-async function checkAiCreditsLimit(supabase: SupabaseClient, userId: string, estimatedCostUsd: number): Promise<{ allowed: boolean; message: string }> {
-  try {
-    const { data: configRows } = await supabase.from('ai_credits_config').select('global_monthly_limit_usd, per_user_monthly_limit_usd').eq('id', 1)
-    const config = Array.isArray(configRows) && configRows.length > 0 ? configRows[0] : null
-    if (!config) return { allowed: true, message: '' }
-    const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-    const { data: usageRows } = await supabase
-      .from('ai_credits_usage')
-      .select('user_id, amount_usd')
-      .gte('created_at', startOfMonth)
-    const rows = usageRows || []
-    let userTotal = 0
-    let globalTotal = 0
-    for (const row of rows) {
-      const amt = Number(row?.amount_usd ?? 0)
-      globalTotal += amt
-      if (row?.user_id === userId) userTotal += amt
-    }
-    const globalLimit = Number(config.global_monthly_limit_usd ?? 999999)
-    const perUserLimit = config.per_user_monthly_limit_usd != null ? Number(config.per_user_monthly_limit_usd) : null
-    if (perUserLimit != null && userTotal + estimatedCostUsd > perUserLimit) {
-      return { allowed: false, message: `Per-user AI spend limit reached ($${userTotal.toFixed(2)} / $${perUserLimit.toFixed(2)} this month).` }
-    }
-    if (globalTotal + estimatedCostUsd > globalLimit) {
-      return { allowed: false, message: `Global AI spend limit reached ($${globalTotal.toFixed(2)} / $${globalLimit.toFixed(2)} this month).` }
-    }
-    return { allowed: true, message: '' }
-  } catch {
-    return { allowed: true, message: '' }
-  }
-}
-
-// Record AI credits usage after a run (best-effort)
-async function recordAiCreditsUsage(
-  supabase: SupabaseClient,
-  userId: string,
-  amountUsd: number,
-  operationType: 'screening' | 'deep_analysis',
-  runId: string
-): Promise<void> {
-  try {
-    await supabase.from('ai_credits_usage').insert({
-      user_id: userId,
-      amount_usd: amountUsd,
-      operation_type: operationType,
-      run_id: runId
-    })
-  } catch (e) {
-    console.warn('Failed to record AI credits usage:', e)
-  }
+function getDbPool(): Pool | null {
+  return getAppPool()
 }
 
 // Main AI Analysis endpoint
@@ -377,9 +322,9 @@ app.post('/api/ai-analysis', async (req, res) => {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     const uniqueSelections: CompanySelection[] = []
@@ -399,7 +344,7 @@ app.post('/api/ai-analysis', async (req, res) => {
     const estimatedCostUsd = analysisType === 'screening'
       ? uniqueSelections.length * 0.002
       : uniqueSelections.length * 0.05
-    const creditsCheck = await checkAiCreditsLimit(supabase, userId, estimatedCostUsd)
+    const creditsCheck = await checkAiCreditsLimit(pool, userId, estimatedCostUsd)
     if (!creditsCheck.allowed) {
       return res.status(402).json({ success: false, error: creditsCheck.message })
     }
@@ -411,7 +356,7 @@ app.post('/api/ai-analysis', async (req, res) => {
     const modelVersion = analysisType === 'screening' ? MODEL_SCREENING : MODEL_DEFAULT
     
     try {
-      await insertRunRecord(supabase, {
+      await insertRunRecord(pool, {
         id: runId,
         status: 'running',
         modelVersion,
@@ -442,7 +387,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       for (let i = 0; i < uniqueSelections.length; i += batchSize) {
         const batch = uniqueSelections.slice(i, i + batchSize)
         try {
-          const batchResult = await processScreeningBatch(supabase, openai, runId, batch, instructions)
+          const batchResult = await processScreeningBatch(pool, openai, runId, batch, instructions)
           screeningResults.push(...batchResult.results)
           
           // Log quality issues for monitoring
@@ -458,7 +403,7 @@ app.post('/api/ai-analysis', async (req, res) => {
       // Process deep analysis individually
       for (const selection of uniqueSelections) {
         try {
-          const result = await processDeepAnalysis(supabase, openai, runId, selection, instructions)
+          const result = await processDeepAnalysis(pool, openai, runId, selection, instructions)
           if (result) {
             companiesResults.push(result)
           }
@@ -474,7 +419,7 @@ app.post('/api/ai-analysis', async (req, res) => {
     
     // Update the run record with completion status
     try {
-      await updateRunRecord(supabase, {
+      await updateRunRecord(pool, {
         id: runId,
         status: finalStatus,
         completedAt,
@@ -490,7 +435,7 @@ app.post('/api/ai-analysis', async (req, res) => {
     const totalCostUsd = screeningCost + deepCost
     if (totalCostUsd > 0) {
       await recordAiCreditsUsage(
-        supabase,
+        pool,
         userId,
         Math.round(totalCostUsd * 1e6) / 1e6,
         analysisType === 'screening' ? 'screening' : 'deep_analysis',
@@ -525,9 +470,9 @@ app.post('/api/ai-analysis', async (req, res) => {
 // Get analysis history or specific run
 app.get('/api/ai-analysis', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     const runIdParam = req.query.runId
@@ -535,7 +480,7 @@ app.get('/api/ai-analysis', async (req, res) => {
 
     if (runIdParam) {
       const runId = Array.isArray(runIdParam) ? runIdParam[0] : runIdParam
-      const payload = await fetchRunDetail(supabase, runId)
+      const payload = await fetchRunDetail(pool, runId)
       if (!payload) {
         return res.status(404).json({ success: false, error: 'Run not found' })
       }
@@ -545,7 +490,7 @@ app.get('/api/ai-analysis', async (req, res) => {
     if (historyParam !== undefined) {
       const limitRaw = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit
       const limit = Math.min(Math.max(parseInt(limitRaw || '5', 10) || 5, 1), 25)
-      const history = await fetchRunHistory(supabase, limit)
+      const history = await fetchRunHistory(pool, limit)
       return res.status(200).json({ success: true, data: history })
     }
 
@@ -559,9 +504,9 @@ app.get('/api/ai-analysis', async (req, res) => {
 // Standardized API endpoints
 app.get('/api/analysis-runs', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     // Extract query parameters
@@ -589,7 +534,7 @@ app.get('/api/analysis-runs', async (req, res) => {
       limit
     }
 
-    const result = await fetchAnalysisRuns(supabase, filters)
+    const result = await fetchAnalysisRuns(pool, filters)
     
     res.status(200).json({ 
       success: true, 
@@ -607,67 +552,32 @@ app.get('/api/analysis-runs', async (req, res) => {
 // Delete analysis run endpoint
 app.delete('/api/analysis-runs/:runId', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     const { runId } = req.params
 
     // Delete related records first (due to foreign key constraints)
-    const { error: auditError } = await supabase
-      .from('ai_analysis_audit')
-      .delete()
-      .eq('run_id', runId)
+    await pool.query(`DELETE FROM ai_analysis_audit WHERE run_id = $1`, [runId]).catch((e) =>
+      console.error('Error deleting audit records:', e)
+    )
+    await pool.query(`DELETE FROM ai_analysis_metrics WHERE run_id = $1`, [runId]).catch((e) =>
+      console.error('Error deleting metrics records:', e)
+    )
+    await pool.query(`DELETE FROM ai_analysis_sections WHERE run_id = $1`, [runId]).catch((e) =>
+      console.error('Error deleting sections records:', e)
+    )
+    await pool.query(`DELETE FROM ai_company_analysis WHERE run_id = $1`, [runId]).catch((e) =>
+      console.error('Error deleting company analysis records:', e)
+    )
+    await pool.query(`DELETE FROM ai_screening_results WHERE run_id = $1`, [runId]).catch((e) =>
+      console.error('Error deleting screening results:', e)
+    )
 
-    if (auditError) {
-      console.error('Error deleting audit records:', auditError)
-    }
-
-    const { error: metricsError } = await supabase
-      .from('ai_analysis_metrics')
-      .delete()
-      .eq('run_id', runId)
-
-    if (metricsError) {
-      console.error('Error deleting metrics records:', metricsError)
-    }
-
-    const { error: sectionsError } = await supabase
-      .from('ai_analysis_sections')
-      .delete()
-      .eq('run_id', runId)
-
-    if (sectionsError) {
-      console.error('Error deleting sections records:', sectionsError)
-    }
-
-    const { error: companyError } = await supabase
-      .from('ai_company_analysis')
-      .delete()
-      .eq('run_id', runId)
-
-    if (companyError) {
-      console.error('Error deleting company analysis records:', companyError)
-    }
-
-    const { error: screeningError } = await supabase
-      .from('ai_screening_results')
-      .delete()
-      .eq('run_id', runId)
-
-    if (screeningError) {
-      console.error('Error deleting screening results:', screeningError)
-    }
-
-    // Finally delete the main run record
-    const { error: runError } = await supabase
-      .from('ai_analysis_runs')
-      .delete()
-      .eq('id', runId)
-
-    if (runError) {
-      console.error('Error deleting run record:', runError)
+    const delRun = await pool.query(`DELETE FROM ai_analysis_runs WHERE id = $1`, [runId])
+    if (delRun.rowCount === 0) {
       return res.status(500).json({ success: false, error: 'Failed to delete analysis run' })
     }
 
@@ -680,13 +590,13 @@ app.delete('/api/analysis-runs/:runId', async (req, res) => {
 
 app.get('/api/analysis-runs/:runId', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     const { runId } = req.params
-    const payload = await fetchRunDetail(supabase, runId)
+    const payload = await fetchRunDetail(pool, runId)
     
     if (!payload) {
       return res.status(404).json({ success: false, error: 'Run not found' })
@@ -701,50 +611,25 @@ app.get('/api/analysis-runs/:runId', async (req, res) => {
 
 app.get('/api/analysis-companies', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     const limit = Math.min(Math.max(parseInt(req.query.limit as string || '20', 10) || 20, 1), 100)
     const offset = Math.max(parseInt(req.query.offset as string || '0', 10) || 0, 0)
-    
-    const { data: analysisData, error } = await supabase
-      .from('ai_company_analysis')
-      .select(`
-        id,
-        run_id,
-        orgnr,
-        company_name,
-        summary,
-        recommendation,
-        confidence,
-        risk_score,
-        financial_grade,
-        commercial_grade,
-        operational_grade,
-        next_steps,
-        created_at,
-        executive_summary,
-        key_findings,
-        narrative,
-        strengths,
-        weaknesses,
-        opportunities,
-        risks,
-        acquisition_interest,
-        financial_health_score,
-        growth_outlook,
-        market_position,
-        target_price_msek
-      `)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
 
-    if (error) {
-      console.error('Database error:', error)
-      return res.status(500).json({ success: false, error: 'Database error' })
-    }
+    const { rows: analysisData } = await pool.query(
+      `SELECT
+        id, run_id, orgnr, company_name, summary, recommendation, confidence, risk_score,
+        financial_grade, commercial_grade, operational_grade, next_steps, created_at,
+        executive_summary, key_findings, narrative, strengths, weaknesses, opportunities, risks,
+        acquisition_interest, financial_health_score, growth_outlook, market_position, target_price_msek
+       FROM ai_company_analysis
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    )
 
     // Transform data for frontend (snake_case to camelCase)
     const transformedData = (analysisData || []).map(item => ({
@@ -1263,51 +1148,8 @@ app.get('/api/companies/orgnrs', async (req, res) => {
 })
 
 // Helper functions
-async function insertRunRecord(supabase: SupabaseClient, run: any) {
-  // Ensure initiated_by is never null
-  const initiatedBy = run.initiatedBy || 'unknown-user'
-  
-  const { error } = await supabase
-    .from('ai_analysis_runs')
-    .insert([{
-      id: run.id,
-      initiated_by: initiatedBy,
-      model_version: run.modelVersion,
-      analysis_mode: run.analysisMode,
-      status: run.status,
-      started_at: run.startedAt,
-      completed_at: run.completedAt,
-      error_message: run.errorMessage,
-      analysis_template_id: run.templateId,
-      analysis_template_name: run.templateName,
-      custom_instructions: run.customInstructions,
-      company_count: run.companyCount
-    }])
-  
-  if (error) {
-    console.error('Error inserting run record:', error)
-    throw new Error(`Failed to create analysis run: ${error.message}`)
-  }
-}
-
-async function updateRunRecord(supabase: SupabaseClient, run: any) {
-  const { error } = await supabase
-    .from('ai_analysis_runs')
-    .update({
-      status: run.status,
-      completed_at: run.completedAt,
-      error_message: run.errorMessage
-    })
-    .eq('id', run.id)
-  
-  if (error) {
-    console.error('Error updating run record:', error)
-    throw new Error(`Failed to update analysis run: ${error.message}`)
-  }
-}
-
 async function processScreeningBatch(
-  supabase: SupabaseClient,
+  pool: Pool,
   openai: OpenAI,
   runId: string,
   batch: CompanySelection[],
@@ -1329,7 +1171,7 @@ async function processScreeningBatch(
     
     try {
       // Use enhanced data fetching with quality tracking
-      const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+      const dataResult = await fetchComprehensiveCompanyData(pool, orgnr)
       allIssues.push(...dataResult.issues)
       
       if (!dataResult.success || !dataResult.data) {
@@ -1409,23 +1251,26 @@ async function processScreeningBatch(
       
       results.push(result)
       
-      // Save to database
-      await supabase
-        .from('ai_screening_results')
-        .insert([{
-          run_id: runId,
+      await pool.query(
+        `INSERT INTO ai_screening_results (
+          run_id, orgnr, company_name, screening_score, risk_flag, brief_summary,
+          audit_prompt, audit_response, audit_latency_ms, audit_prompt_tokens, audit_completion_tokens, audit_cost_usd
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [
+          runId,
           orgnr,
-          company_name: companyData.masterData.name,
-          screening_score: result.screeningScore,
-          risk_flag: result.riskFlag,
-          brief_summary: result.briefSummary,
-          audit_prompt: result.audit.prompt,
-          audit_response: result.audit.response,
-          audit_latency_ms: result.audit.latency_ms,
-          audit_prompt_tokens: result.audit.prompt_tokens,
-          audit_completion_tokens: result.audit.completion_tokens,
-          audit_cost_usd: result.audit.cost_usd
-        }])
+          companyData.masterData.name,
+          result.screeningScore,
+          result.riskFlag,
+          result.briefSummary,
+          result.audit.prompt,
+          result.audit.response,
+          result.audit.latency_ms,
+          result.audit.prompt_tokens,
+          result.audit.completion_tokens,
+          result.audit.cost_usd,
+        ]
+      )
       
     } catch (error: any) {
       console.error(`Error processing screening for ${orgnr}:`, error)
@@ -1640,7 +1485,7 @@ VIKTIGT: Svara ENDAST med JSON-objektet ovan, utan ytterligare text eller markdo
 }
 
 async function processDeepAnalysis(
-  supabase: SupabaseClient,
+  pool: Pool,
   openai: OpenAI,
   runId: string,
   selection: CompanySelection,
@@ -1651,7 +1496,7 @@ async function processDeepAnalysis(
   
   try {
     // Use enhanced data fetching with quality tracking
-    const dataResult = await fetchComprehensiveCompanyData(supabase, orgnr)
+    const dataResult = await fetchComprehensiveCompanyData(pool, orgnr)
     
     if (!dataResult.success || !dataResult.data) {
       console.error(`Failed to load comprehensive data for ${orgnr}:`, dataResult.issues)
@@ -1762,87 +1607,88 @@ async function processDeepAnalysis(
       targetPrice: parsedResult.targetPrice
     }
     
-    // Save to database
-    await supabase
-      .from('ai_company_analysis')
-      .insert([{
-        run_id: runId,
+    await pool.query(
+      `INSERT INTO ai_company_analysis (
+        run_id, orgnr, company_name, summary, recommendation, confidence, risk_score,
+        financial_grade, commercial_grade, operational_grade, next_steps,
+        executive_summary, key_findings, narrative, strengths, weaknesses, opportunities, risks,
+        acquisition_interest, financial_health_score, growth_outlook, market_position, target_price_msek
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
+      )`,
+      [
+        runId,
         orgnr,
-        company_name: companyData.masterData.name,
-        summary: result.summary,
-        recommendation: result.recommendation,
-        confidence: Math.round((result.confidence || 0) * 100), // Convert to integer
-        risk_score: Math.round((result.riskScore || 0) * 10), // Convert to integer
-        financial_grade: result.financialGrade,
-        commercial_grade: result.commercialGrade,
-        operational_grade: result.operationalGrade,
-        // financial_metrics: not stored in ai_company_analysis table
-        next_steps: result.nextSteps,
-        executive_summary: result.executiveSummary,
-        key_findings: result.keyFindings,
-        narrative: result.narrative,
-        strengths: result.strengths,
-        weaknesses: result.weaknesses,
-        opportunities: result.opportunities,
-        risks: result.risks,
-        acquisition_interest: result.acquisitionInterest,
-        financial_health_score: Math.round((result.financialHealth || 0) * 10), // Convert to integer
-        growth_outlook: result.growthPotential,
-        market_position: result.marketPosition,
-        target_price_msek: result.targetPrice
-      }])
+        companyData.masterData.name,
+        result.summary,
+        result.recommendation,
+        Math.round((result.confidence || 0) * 100),
+        Math.round((result.riskScore || 0) * 10),
+        result.financialGrade,
+        result.commercialGrade,
+        result.operationalGrade,
+        JSON.stringify(result.nextSteps ?? []),
+        result.executiveSummary,
+        result.keyFindings,
+        result.narrative,
+        result.strengths,
+        result.weaknesses,
+        result.opportunities,
+        result.risks,
+        result.acquisitionInterest,
+        Math.round((result.financialHealth || 0) * 10),
+        result.growthPotential,
+        result.marketPosition,
+        result.targetPrice,
+      ]
+    )
 
     // Compute and save valuations
     try {
       const profile = createCompanyProfile(companyData.masterData)
       const assumptions = await loadAllAssumptions(
-        supabase, 
-        profile.industry, 
-        profile.sizeBucket, 
+        pool,
+        profile.industry,
+        profile.sizeBucket,
         profile.growthBucket
       )
-      
+
       const valuations = runValuations(profile, assumptions)
-      
-      // Create valuation run
-      const { data: valuationRun, error: runError } = await supabase
-        .from('valuation_runs')
-        .insert({
-          analysis_run_id: runId,
-          company_orgnr: orgnr,
-          selected_model_key: 'hybrid_score', // Default to hybrid model
-          value_type: 'equity'
-        })
-        .select()
-        .single()
 
-      if (!runError && valuationRun) {
-        // Insert valuation results
-        const resultsToInsert = valuations.map(valuation => ({
-          valuation_run_id: valuationRun.id,
-          model_key: valuation.modelKey,
-          value_ev: valuation.valueEv,
-          value_equity: valuation.valueEquity,
-          basis: valuation.basis,
-          multiple_used: valuation.multipleUsed,
-          confidence: valuation.confidence,
-          inputs: valuation.inputs,
-          notes: valuation.inputs.reason
-        }))
+      const vr = await pool.query(
+        `INSERT INTO valuation_runs (analysis_run_id, company_orgnr, selected_model_key, value_type)
+         VALUES ($1, $2, $3, $4) RETURNING id`,
+        [runId, orgnr, 'hybrid_score', 'equity']
+      )
+      const valuationRunId = vr.rows[0]?.id
 
-        await supabase
-          .from('valuation_results')
-          .insert(resultsToInsert)
+      if (valuationRunId) {
+        for (const valuation of valuations) {
+          await pool.query(
+            `INSERT INTO valuation_results (
+              valuation_run_id, model_key, value_ev, value_equity, basis, multiple_used, confidence, inputs, notes
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9)`,
+            [
+              valuationRunId,
+              valuation.modelKey,
+              valuation.valueEv,
+              valuation.valueEquity,
+              valuation.basis,
+              valuation.multipleUsed,
+              valuation.confidence,
+              JSON.stringify(valuation.inputs),
+              valuation.inputs.reason,
+            ]
+          )
+        }
 
-        // Update target price with selected model's equity value
-        const selectedValuation = valuations.find(v => v.modelKey === 'hybrid_score')
+        const selectedValuation = valuations.find((v) => v.modelKey === 'hybrid_score')
         if (selectedValuation && selectedValuation.valueEquity) {
-          result.targetPrice = Math.round(selectedValuation.valueEquity / 1000) // Database stores in thousands, convert to MSEK
+          result.targetPrice = Math.round(selectedValuation.valueEquity / 1000)
         }
       }
     } catch (valuationError) {
       console.error('Valuation computation failed:', valuationError)
-      // Continue without valuations - don't fail the entire analysis
     }
     
     return result
@@ -1853,339 +1699,30 @@ async function processDeepAnalysis(
   }
 }
 
-async function fetchRunHistory(supabase: SupabaseClient, limit: number) {
-  const { data, error } = await supabase
-    .from('ai_analysis_runs')
-    .select('*')
-    .order('started_at', { ascending: false })
-    .limit(limit)
-
-  if (error) {
-    console.error('Error fetching run history:', error)
-    return []
-  }
-
-  return data || []
-}
-
-async function fetchAnalysisRuns(supabase: SupabaseClient, filters: any) {
-  const { page, limit, search, analysisMode, templateId, dateFrom, dateTo, status, sortBy, sortOrder } = filters
-  
-  // Build the query
-  let query = supabase
-    .from('ai_analysis_runs')
-    .select(`
-      *,
-      ai_company_analysis(orgnr, company_name),
-      ai_screening_results(orgnr, company_name)
-    `, { count: 'exact' })
-
-  // Apply filters
-  if (search) {
-    query = query.or(`analysis_template_name.ilike.%${search}%,custom_instructions.ilike.%${search}%,id.ilike.%${search}%`)
-  }
-  
-  if (analysisMode && analysisMode !== 'all') {
-    query = query.eq('analysis_mode', analysisMode)
-  }
-  
-  if (templateId && templateId !== 'all') {
-    if (templateId === 'custom') {
-      query = query.is('analysis_template_id', null)
-    } else {
-      query = query.eq('analysis_template_id', templateId)
-    }
-  }
-  
-  if (dateFrom) {
-    query = query.gte('started_at', dateFrom)
-  }
-  
-  if (dateTo) {
-    query = query.lte('started_at', dateTo)
-  }
-  
-  if (status && status !== 'all') {
-    query = query.eq('status', status)
-  }
-
-  // Apply sorting
-  const ascending = sortOrder === 'asc'
-  switch (sortBy) {
-    case 'date':
-      query = query.order('started_at', { ascending })
-      break
-    case 'companies':
-      query = query.order('company_count', { ascending })
-      break
-    case 'template':
-      query = query.order('analysis_template_name', { ascending })
-      break
-    default:
-      query = query.order('started_at', { ascending: false })
-  }
-
-  // Apply pagination
-  const offset = (page - 1) * limit
-  query = query.range(offset, offset + limit - 1)
-
-  const { data, error, count } = await query
-
-  if (error) {
-    console.error('Error fetching analysis runs:', error)
-    return { runs: [], total: 0, page, totalPages: 0 }
-  }
-
-  // Transform the data to include company information
-  const runs = (data || []).map(run => {
-    // Get unique companies from both tables
-    const companies = new Map()
-    
-    // Add companies from ai_company_analysis
-    if (run.ai_company_analysis) {
-      run.ai_company_analysis.forEach((company: any) => {
-        companies.set(company.orgnr, {
-          orgnr: company.orgnr,
-          name: company.company_name
-        })
-      })
-    }
-    
-    // Add companies from ai_screening_results
-    if (run.ai_screening_results) {
-      run.ai_screening_results.forEach((company: any) => {
-        companies.set(company.orgnr, {
-          orgnr: company.orgnr,
-          name: company.company_name
-        })
-      })
-    }
-
-    return {
-      id: run.id,
-      startedAt: run.started_at,
-      completedAt: run.completed_at,
-      analysisMode: run.analysis_mode,
-      templateName: run.analysis_template_name,
-      customInstructions: run.custom_instructions,
-      companyCount: run.company_count || 0,
-      companies: Array.from(companies.values()),
-      status: run.status,
-      modelVersion: run.model_version,
-      initiatedBy: run.initiated_by
-    }
-  })
-
-  const totalPages = Math.ceil((count || 0) / limit)
-
-  return {
-    runs,
-    total: count || 0,
-    page,
-    totalPages
-  }
-}
-
-async function fetchRunDetail(supabase: SupabaseClient, runId: string) {
-  // Fetch run details and associated analysis data
-  const { data: runData, error: runError } = await supabase
-    .from('ai_analysis_runs')
-    .select('*')
-    .eq('id', runId)
-    .single()
-
-  if (runError || !runData) {
-    return null
-  }
-
-  // Fetch analysis data based on run mode
-  if (runData.analysis_mode === 'screening') {
-    const { data: screeningData } = await supabase
-      .from('ai_screening_results')
-      .select('*')
-      .eq('run_id', runId)
-
-    return {
-      run: {
-        id: runData.id,
-        status: runData.status,
-        modelVersion: runData.model_version,
-        analysisMode: runData.analysis_mode,
-        startedAt: runData.started_at,
-        completedAt: runData.completed_at,
-        errorMessage: runData.error_message
-      },
-      results: screeningData || []
-    }
-  } else {
-    const { data: analysisData } = await supabase
-      .from('ai_company_analysis')
-      .select(`
-        id,
-        run_id,
-        orgnr,
-        company_name,
-        summary,
-        recommendation,
-        confidence,
-        risk_score,
-        financial_grade,
-        commercial_grade,
-        operational_grade,
-        next_steps,
-        created_at,
-        executive_summary,
-        key_findings,
-        narrative,
-        strengths,
-        weaknesses,
-        opportunities,
-        risks,
-        acquisition_interest,
-        financial_health_score,
-        growth_outlook,
-        market_position,
-        target_price_msek
-      `)
-      .eq('run_id', runId)
-
-    // Transform data for frontend (snake_case to camelCase)
-    const transformedCompanies = (analysisData || []).map(item => ({
-      id: item.id,
-      runId: item.run_id,
-      orgnr: item.orgnr,
-      companyName: item.company_name,
-      summary: item.summary,
-      recommendation: item.recommendation,
-      confidence: item.confidence,
-      riskScore: item.risk_score,
-      financialGrade: item.financial_grade,
-      commercialGrade: item.commercial_grade,
-      operationalGrade: item.operational_grade,
-      // financialMetrics: stored in ai_analysis_metrics table, not in ai_company_analysis
-      nextSteps: item.next_steps || [],
-      createdAt: item.created_at,
-      // Enhanced Codex fields
-      executiveSummary: item.executive_summary,
-      keyFindings: item.key_findings,
-      narrative: item.narrative,
-      strengths: item.strengths,
-      weaknesses: item.weaknesses,
-      opportunities: item.opportunities,
-      risks: item.risks,
-      acquisitionInterest: item.acquisition_interest,
-      financialHealth: item.financial_health_score,
-      growthPotential: item.growth_outlook,
-      marketPosition: item.market_position,
-      targetPrice: item.target_price_msek
-    }))
-
-    return {
-      run: {
-        id: runData.id,
-        status: runData.status,
-        modelVersion: runData.model_version,
-        analysisMode: runData.analysis_mode,
-        startedAt: runData.started_at,
-        completedAt: runData.completed_at,
-        errorMessage: runData.error_message
-      },
-      companies: transformedCompanies
-    }
-  }
-}
-
 // ============================================================================
 // SAVED COMPANY LISTS API
 // ============================================================================
 
-// Helper function to get authenticated user from request
 async function getAuthenticatedUser(req: any): Promise<{ id: string } | null> {
-  try {
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null
-    }
-
-    const token = authHeader.substring(7)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return null
-    }
-
-    // Create a client with the user's token
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-
-    const { data: { user }, error } = await userClient.auth.getUser()
-    if (error || !user) {
-      return null
-    }
-
-    return { id: user.id }
-  } catch (error) {
-    console.error('Error getting authenticated user:', error)
-    return null
-  }
+  const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+  return sub ? { id: sub } : null
 }
 
-// Get all saved lists for the current user
 app.get('/api/saved-lists', async (req, res) => {
   try {
-    // Get authenticated user from request
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
+    }
     const user = await getAuthenticatedUser(req)
     if (!user) {
-      // If no authenticated user, return empty array (or you could return 401)
-      return res.status(200).json({
-        success: true,
-        data: []
-      })
+      return res.status(200).json({ success: true, data: [] })
     }
-
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(200).json({
-        success: true,
-        data: []
-      })
-    }
-
-    const token = authHeader.substring(7)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
-    }
-
-    // Create authenticated client with user's token
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-
-    const { data, error } = await userClient
-      .from('saved_company_lists')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching saved lists:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Database error: ' + error.message 
-      })
-    }
-
-    res.status(200).json({
-      success: true,
-      data: data || []
-    })
+    const { rows } = await pool.query(
+      `SELECT * FROM saved_company_lists WHERE user_id = $1 ORDER BY created_at DESC`,
+      [user.id]
+    )
+    res.status(200).json({ success: true, data: rows || [] })
   } catch (error: any) {
     console.error('Get saved lists error:', error)
     res.status(500).json({ success: false, error: error?.message || 'Internal server error' })
@@ -2213,49 +1750,21 @@ app.post('/api/saved-lists', async (req, res) => {
       })
     }
 
-    // Get auth token to create authenticated client
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication token required' 
-      })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const token = authHeader.substring(7)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
-    }
-
-    // Create authenticated client with user's token
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-
-    const { data, error } = await userClient
-      .from('saved_company_lists')
-      .insert({
-        user_id: user.id,
-        name,
-        description: description || '',
-        companies: companies,
-        filters: filters || {},
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error creating saved list:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Database error: ' + error.message 
-      })
+    const now = new Date().toISOString()
+    const ins = await pool.query(
+      `INSERT INTO saved_company_lists (user_id, name, description, companies, filters, created_at, updated_at)
+       VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6, $7)
+       RETURNING *`,
+      [user.id, name, description || '', JSON.stringify(companies), JSON.stringify(filters || {}), now, now]
+    )
+    const data = ins.rows[0]
+    if (!data) {
+      return res.status(500).json({ success: false, error: 'Failed to create saved list' })
     }
 
     res.status(201).json({
@@ -2287,47 +1796,29 @@ app.put('/api/saved-lists/:id', async (req, res) => {
       })
     }
 
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication token required' 
-      })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const token = authHeader.substring(7)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
-    }
-
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-
-    const { data, error } = await userClient
-      .from('saved_company_lists')
-      .update({
+    const upd = await pool.query(
+      `UPDATE saved_company_lists
+       SET name = $1, description = $2, companies = $3::jsonb, filters = $4::jsonb, updated_at = $5
+       WHERE id = $6 AND user_id = $7
+       RETURNING *`,
+      [
         name,
         description,
-        companies,
-        filters,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error updating saved list:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Database error: ' + error.message 
-      })
+        JSON.stringify(companies ?? []),
+        JSON.stringify(filters ?? {}),
+        new Date().toISOString(),
+        id,
+        user.id,
+      ]
+    )
+    const data = upd.rows[0]
+    if (!data) {
+      return res.status(404).json({ success: false, error: 'List not found or not owned by user' })
     }
 
     res.status(200).json({
@@ -2358,39 +1849,17 @@ app.delete('/api/saved-lists/:id', async (req, res) => {
       })
     }
 
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication token required' 
-      })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const token = authHeader.substring(7)
-    const supabaseUrl = process.env.VITE_SUPABASE_URL
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
-    }
-
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-
-    const { error } = await userClient
-      .from('saved_company_lists')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id)
-
-    if (error) {
-      console.error('Error deleting saved list:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Database error: ' + error.message 
-      })
+    const del = await pool.query(`DELETE FROM saved_company_lists WHERE id = $1 AND user_id = $2`, [
+      id,
+      user.id,
+    ])
+    if (del.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'List not found or not owned by user' })
     }
 
     res.status(200).json({
@@ -2410,31 +1879,16 @@ app.delete('/api/saved-lists/:id', async (req, res) => {
 // Test saved_company_lists table access
 app.get('/api/test-saved-lists', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Test if table exists and is accessible
-    const { data, error } = await supabase
-      .from('saved_company_lists')
-      .select('*')
-      .limit(1)
-
-    if (error) {
-      console.error('Error accessing saved_company_lists table:', error)
-      return res.status(500).json({ 
-        success: false, 
-        error: error.message,
-        code: error.code,
-        details: error.details
-      })
-    }
-
+    const { rows } = await pool.query(`SELECT * FROM saved_company_lists LIMIT 1`)
     res.status(200).json({
       success: true,
       message: 'saved_company_lists table is accessible',
-      count: data?.length || 0
+      count: rows?.length || 0,
     })
   } catch (error: any) {
     console.error('Test saved lists error:', error)
@@ -2442,56 +1896,33 @@ app.get('/api/test-saved-lists', async (req, res) => {
   }
 })
 
-// Test authentication and saved lists
 app.get('/api/test-auth-lists', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Test authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError) {
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Auth error: ' + authError.message 
-      })
-    }
-
-    if (!user) {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
       return res.status(200).json({
         success: true,
         message: 'No authenticated user',
         user: null,
-        lists: []
+        lists: [],
       })
     }
 
-    // Test fetching lists for this user
-    const { data, error } = await supabase
-      .from('saved_company_lists')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Database error: ' + error.message,
-        code: error.code
-      })
-    }
+    const { rows } = await pool.query(
+      `SELECT * FROM saved_company_lists WHERE user_id = $1 ORDER BY created_at DESC`,
+      [sub]
+    )
 
     res.status(200).json({
       success: true,
       message: 'Authentication and database access working',
-      user: {
-        id: user.id,
-        email: user.email
-      },
-      lists: data || []
+      user: { id: sub },
+      lists: rows || [],
     })
   } catch (error: any) {
     console.error('Test auth lists error:', error)
@@ -2527,209 +1958,6 @@ function buildChartSeries(history: NormalizedFinancialHistory) {
         evToEbitda: singleYearMetrics.evToEbitda,
       }
     })
-}
-
-interface FetchedValuationData {
-  companies: Array<{
-    orgnr: string
-    name: string
-    industry: string | null
-    employees: number | null
-    records: Array<Record<string, any>>
-  }>
-}
-
-/**
- * Helper function to fetch company data from new schema and transform to old format
- * for compatibility with createCompanyProfile and other functions
- */
-async function fetchCompanyDataFromNewSchema(
-  supabase: SupabaseClient,
-  orgnr: string
-): Promise<any | null> {
-  // Fetch from companies table
-  const { data: companyData, error: companyError } = await supabase
-    .from('companies')
-    .select(`
-      orgnr,
-      company_name,
-      segment_names,
-      address,
-      homepage,
-      email,
-      foundation_year,
-      employees_latest
-    `)
-    .eq('orgnr', orgnr)
-    .single()
-
-  if (companyError || !companyData) {
-    console.error(`[valuation] Failed to fetch company row for ${orgnr}`, companyError?.message || 'No data returned')
-    return null
-  }
-
-  // Fetch from company_metrics table
-  const { data: metricsData, error: metricsError } = await supabase
-    .from('company_metrics')
-    .select(`
-      orgnr,
-      latest_revenue_sek,
-      latest_profit_sek,
-      latest_ebitda_sek,
-      revenue_cagr_3y,
-      avg_ebitda_margin,
-      avg_net_margin,
-      digital_presence
-    `)
-    .eq('orgnr', orgnr)
-    .single()
-  if (metricsError) {
-    console.warn(`[valuation] Metrics fetch warning for ${orgnr}`, metricsError.message)
-  }
-
-  // Transform to old format
-  const segmentNames = Array.isArray(companyData.segment_names)
-    ? companyData.segment_names
-    : (companyData.segment_names ? [companyData.segment_names] : [])
-  
-  // Extract city from address JSONB
-  let city: string | null = null
-  if (companyData.address) {
-    if (typeof companyData.address === 'object') {
-      city = companyData.address.postPlace || companyData.address.visitorAddress?.postPlace || null
-    }
-  }
-
-  // Transform revenue/profit from thousands to SEK (if needed)
-  // Database stores in thousands, but createCompanyProfile expects SEK
-  const revenue = metricsData?.latest_revenue_sek ? metricsData.latest_revenue_sek * 1000 : null
-  const profit = metricsData?.latest_profit_sek ? metricsData.latest_profit_sek * 1000 : null
-
-  return {
-    OrgNr: companyData.orgnr,
-    name: companyData.company_name,
-    segment_name: segmentNames[0] || null,
-    city: city,
-    employees: companyData.employees_latest,
-    revenue: revenue,
-    profit: profit,
-    SDI: metricsData?.latest_revenue_sek || null, // In thousands
-    DR: metricsData?.latest_profit_sek || null, // In thousands
-    ORS: metricsData?.latest_ebitda_sek || null, // In thousands
-    Revenue_growth: metricsData?.revenue_cagr_3y || null,
-    EBIT_margin: metricsData?.avg_ebitda_margin || null,
-    NetProfit_margin: metricsData?.avg_net_margin || null,
-    digital_presence: metricsData?.digital_presence || false,
-    incorporation_date: companyData.foundation_year ? `${companyData.foundation_year}-01-01` : null,
-    email: companyData.email,
-    homepage: companyData.homepage,
-    address: companyData.address
-  }
-}
-
-async function fetchValuationSourceData(
-  supabase: SupabaseClient,
-  companyIds: string[]
-): Promise<FetchedValuationData> {
-  // Fetch from new schema: companies + company_metrics
-  const { data: companyRows, error: companyError } = await supabase
-    .from('companies')
-    .select(`
-      orgnr,
-      company_name,
-      segment_names,
-      employees_latest
-    `)
-    .in('orgnr', companyIds)
-
-  if (companyError) {
-    throw new Error(`Failed to fetch company data: ${companyError.message}`)
-  }
-
-  const { data: metricsRows, error: metricsError } = await supabase
-    .from('company_metrics')
-    .select(`
-      orgnr,
-      latest_revenue_sek,
-      latest_profit_sek,
-      latest_ebitda_sek,
-      revenue_cagr_3y,
-      avg_ebitda_margin,
-      avg_net_margin
-    `)
-    .in('orgnr', companyIds)
-
-  if (metricsError) {
-    throw new Error(`Failed to fetch metrics data: ${metricsError.message}`)
-  }
-
-  // Fetch historical financial accounts from new schema
-  const { data: accountRows, error: accountsError } = await supabase
-    .from('financial_accounts')
-    .select('orgnr, year, account_code, amount_sek')
-    .in('orgnr', companyIds)
-    .eq('period', '12')
-    .order('year', { ascending: false })
-
-  if (accountsError) {
-    throw new Error(`Failed to fetch financial accounts: ${accountsError.message}`)
-  }
-
-  // Build accounts map by orgnr and year
-  const accountsMap = new Map<string, Map<number, any>>()
-  for (const row of accountRows || []) {
-    const orgnr = row.orgnr
-    if (!orgnr) continue
-    if (!accountsMap.has(orgnr)) {
-      accountsMap.set(orgnr, new Map())
-    }
-    const yearMap = accountsMap.get(orgnr)!
-    const year = row.year
-    if (!yearMap.has(year)) {
-      yearMap.set(year, { year })
-    }
-    const record = yearMap.get(year)!
-    // Map account codes
-    if (row.account_code === 'SDI') record.SDI = row.amount_sek
-    else if (row.account_code === 'RG') record.RG = row.amount_sek
-    else if (row.account_code === 'DR') record.DR = row.amount_sek
-    else if (row.account_code === 'EBITDA') record.EBITDA = row.amount_sek
-  }
-
-  // Build companies array
-  const companiesMap = new Map<string, any>()
-  for (const companyRow of companyRows || []) {
-    const orgnr = companyRow.orgnr
-    const metricsRow = metricsRows?.find(m => m.orgnr === orgnr)
-    const segmentNames = Array.isArray(companyRow.segment_names) 
-      ? companyRow.segment_names 
-      : (companyRow.segment_names ? [companyRow.segment_names] : [])
-    
-    const fallbackYear = new Date().getFullYear()
-    const fallbackRecord = {
-      year: fallbackYear,
-      SDI: metricsRow?.latest_revenue_sek || null,
-      RG: metricsRow?.latest_revenue_sek || null,
-      EBIT: metricsRow?.latest_ebitda_sek || null,
-      EBITDA: metricsRow?.latest_ebitda_sek || null,
-      DR: metricsRow?.latest_profit_sek || null,
-    }
-    
-    const yearRecords = accountsMap.get(orgnr) || new Map()
-    const records = Array.from(yearRecords.values()).length > 0 
-      ? Array.from(yearRecords.values())
-      : [fallbackRecord]
-
-    companiesMap.set(orgnr, {
-      orgnr: orgnr,
-      name: companyRow.company_name || 'Okänt bolag',
-      industry: segmentNames[0] || null,
-      employees: companyRow.employees_latest || null,
-      records,
-  })
-  }
-
-  return { companies: Array.from(companiesMap.values()) }
 }
 
 interface AiInsightResult {
@@ -2954,45 +2182,6 @@ Data: ${JSON.stringify(deepPrompt)}`,
   }
 }
 
-async function persistValuationSession(
-  supabase: SupabaseClient,
-  payload: {
-    companyIds: string[]
-    mode: 'default' | 'deep'
-    companies: ValuationCompanyResponse[]
-    insights: AiInsightResult
-    exportDataset: ReturnType<typeof buildValuationExportDataset>
-  }
-): Promise<string | null> {
-  const { data, error } = await supabase
-    .from('valuation_sessions')
-    .insert({
-      company_ids: payload.companyIds,
-      mode: payload.mode,
-      valuation_payload: payload.companies.map((company) => ({
-        orgnr: company.orgnr,
-        name: company.name,
-        industry: company.industry,
-        employees: company.employees,
-        metrics: company.metrics,
-        history: company.history,
-        aiInsights: payload.insights.companyInsights[company.orgnr] ?? null,
-      })),
-      overall_summary: payload.insights.overallSummary,
-      export_dataset: payload.exportDataset,
-      generated_at: new Date().toISOString(),
-    })
-    .select('id')
-    .single()
-
-  if (error) {
-    console.error('Failed to persist valuation session:', error)
-    throw new Error('Could not save valuation session to database')
-  }
-
-  return data?.id || null
-}
-
 app.post('/api/valuation', async (req, res) => {
   try {
     const { companyIds, mode: modeInput } = req.body || {}
@@ -3006,16 +2195,16 @@ app.post('/api/valuation', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Max 15 företag kan värderas samtidigt' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
     // Fetch company data from new schema for each company
     const companies: ValuationCompanyResponse[] = []
     
     for (const companyId of companyIds) {
-      const companyData = await fetchCompanyDataFromNewSchema(supabase, companyId)
+      const companyData = await fetchCompanyDataFromNewSchema(pool, companyId)
 
       if (!companyData) {
         console.error(`Failed to fetch data for company ${companyId}`)
@@ -3025,7 +2214,7 @@ app.post('/api/valuation', async (req, res) => {
       // Create company profile and run valuations
       const profile = createCompanyProfile(companyData)
       const assumptions = await loadAllAssumptions(
-        supabase, 
+        pool, 
         profile.industry, 
         profile.sizeBucket, 
         profile.growthBucket
@@ -3086,7 +2275,7 @@ app.post('/api/valuation', async (req, res) => {
       }))
     )
 
-    const valuationSessionId = await persistValuationSession(supabase, {
+    const valuationSessionId = await persistValuationSession(pool, {
       companyIds: companyIds.map(String),
       mode,
       companies,
@@ -3122,31 +2311,27 @@ app.post('/api/valuation/preview', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Organization number required' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Fetch company data from new schema
-    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
+    const companyData = await fetchCompanyDataFromNewSchema(pool, orgnr)
 
     if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
-    // Create company profile
     const profile = createCompanyProfile(companyData)
-    
-    // Load assumptions
+
     const assumptions = await loadAllAssumptions(
-      supabase, 
-      profile.industry, 
-      profile.sizeBucket, 
+      pool,
+      profile.industry,
+      profile.sizeBucket,
       profile.growthBucket,
       overrides
     )
 
-    // Run valuations
     const results = runValuations(profile, assumptions)
 
     res.status(200).json({
@@ -3172,76 +2357,67 @@ app.post('/api/valuation/commit', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Analysis run ID and organization number required' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Fetch company data from new schema
-    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
+    const companyData = await fetchCompanyDataFromNewSchema(pool, orgnr)
 
     if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
-    // Create company profile
     const profile = createCompanyProfile(companyData)
-    
-    // Load assumptions
+
     const assumptions = await loadAllAssumptions(
-      supabase, 
-      profile.industry, 
-      profile.sizeBucket, 
+      pool,
+      profile.industry,
+      profile.sizeBucket,
       profile.growthBucket,
       overrides
     )
 
-    // Run valuations
     const results = runValuations(profile, assumptions)
 
-    // Create valuation run
-    const { data: valuationRun, error: runError } = await supabase
-      .from('valuation_runs')
-      .insert({
-        analysis_run_id: analysisRunId,
-        company_orgnr: orgnr,
-        selected_model_key: selectedModelKey,
-        value_type: valueType
-      })
-      .select()
-      .single()
-
-    if (runError) {
-      console.error('Error creating valuation run:', runError)
+    const vr = await pool.query(
+      `INSERT INTO valuation_runs (analysis_run_id, company_orgnr, selected_model_key, value_type)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [analysisRunId, orgnr, selectedModelKey, valueType]
+    )
+    const valuationRunId = vr.rows[0]?.id
+    if (!valuationRunId) {
       return res.status(500).json({ success: false, error: 'Failed to create valuation run' })
     }
 
-    // Insert valuation results
-    const resultsToInsert = results.map(result => ({
-      valuation_run_id: valuationRun.id,
-      model_key: result.modelKey,
-      value_ev: result.valueEv,
-      value_equity: result.valueEquity,
-      basis: result.basis,
-      multiple_used: result.multipleUsed,
-      confidence: result.confidence,
-      inputs: result.inputs,
-      notes: result.inputs.reason
-    }))
-
-    const { error: resultsError } = await supabase
-      .from('valuation_results')
-      .insert(resultsToInsert)
-
-    if (resultsError) {
-      console.error('Error inserting valuation results:', resultsError)
-      return res.status(500).json({ success: false, error: 'Failed to save valuation results' })
+    for (const result of results) {
+      try {
+        await pool.query(
+          `INSERT INTO valuation_results (
+            valuation_run_id, model_key, value_ev, value_equity, basis, multiple_used, confidence, inputs, notes
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9)`,
+          [
+            valuationRunId,
+            result.modelKey,
+            result.valueEv,
+            result.valueEquity,
+            result.basis,
+            result.multipleUsed,
+            result.confidence,
+            JSON.stringify(result.inputs),
+            result.inputs.reason,
+          ]
+        )
+      } catch (resultsError) {
+        console.error('Error inserting valuation results:', resultsError)
+        return res.status(500).json({ success: false, error: 'Failed to save valuation results' })
+      }
     }
 
     res.status(200).json({
       success: true,
       data: {
-        valuationRunId: valuationRun.id,
+        valuationRunId: valuationRunId,
         company: profile,
         valuations: results,
         selectedModelKey,
@@ -3259,40 +2435,30 @@ app.get('/api/valuation/:runId/:orgnr', async (req, res) => {
   try {
     const { runId, orgnr } = req.params
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Get valuation run
-    const { data: valuationRun, error: runError } = await supabase
-      .from('valuation_runs')
-      .select('*')
-      .eq('analysis_run_id', runId)
-      .eq('company_orgnr', orgnr)
-      .single()
-
-    if (runError || !valuationRun) {
+    const runQ = await pool.query(
+      `SELECT * FROM valuation_runs WHERE analysis_run_id = $1 AND company_orgnr = $2 LIMIT 1`,
+      [runId, orgnr]
+    )
+    const valuationRun = runQ.rows[0]
+    if (!valuationRun) {
       return res.status(404).json({ success: false, error: 'Valuation run not found' })
     }
 
-    // Get valuation results
-    const { data: results, error: resultsError } = await supabase
-      .from('valuation_results')
-      .select('*')
-      .eq('valuation_run_id', valuationRun.id)
-      .order('model_key')
-
-    if (resultsError) {
-      console.error('Error fetching valuation results:', resultsError)
-      return res.status(500).json({ success: false, error: 'Failed to fetch valuation results' })
-    }
+    const resQ = await pool.query(
+      `SELECT * FROM valuation_results WHERE valuation_run_id = $1 ORDER BY model_key`,
+      [valuationRun.id]
+    )
 
     res.status(200).json({
       success: true,
       data: {
         valuationRun,
-        valuations: results || []
+        valuations: resQ.rows || []
       }
     })
   } catch (error: any) {
@@ -3311,21 +2477,17 @@ app.patch('/api/valuation/:valuationRunId/select', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Model key required' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const { error } = await supabase
-      .from('valuation_runs')
-      .update({
-        selected_model_key: modelKey,
-        value_type: valueType
-      })
-      .eq('id', valuationRunId)
-
-    if (error) {
-      console.error('Error updating valuation run:', error)
+    const upd = await pool.query(
+      `UPDATE valuation_runs SET selected_model_key = $1, value_type = $2 WHERE id = $3`,
+      [modelKey, valueType, valuationRunId]
+    )
+    if (upd.rowCount === 0) {
+      console.error('Error updating valuation run: no row matched')
       return res.status(500).json({ success: false, error: 'Failed to update valuation run' })
     }
 
@@ -3352,21 +2514,19 @@ app.post('/api/valuation/advice', async (req, res) => {
       return res.status(500).json({ success: false, error: 'OpenAI API key not configured' })
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    // Fetch company data from new schema
-    const companyData = await fetchCompanyDataFromNewSchema(supabase, orgnr)
+    const companyData = await fetchCompanyDataFromNewSchema(pool, orgnr)
 
     if (!companyData) {
       return res.status(404).json({ success: false, error: 'Company data not found' })
     }
 
-    // Create company profile
     const profile = createCompanyProfile(companyData)
-    
+
     // Create company context for LLM
     const context: CompanyContext = {
       name: profile.name,
@@ -3404,12 +2564,12 @@ app.post('/api/valuation/advice', async (req, res) => {
 // Admin endpoints for managing valuation assumptions
 app.get('/api/valuation/assumptions', async (req, res) => {
   try {
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const assumptions = await getAllAssumptions(supabase)
+    const assumptions = await getAllAssumptions(pool)
 
     res.status(200).json({
       success: true,
@@ -3426,12 +2586,12 @@ app.patch('/api/valuation/assumptions/:id', async (req, res) => {
     const { id } = req.params
     const updates = req.body
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const success = await updateAssumptions(supabase, id, updates)
+    const success = await updateAssumptions(pool, id, updates)
 
     if (!success) {
       return res.status(500).json({ success: false, error: 'Failed to update assumptions' })
@@ -3451,12 +2611,12 @@ app.post('/api/valuation/assumptions', async (req, res) => {
   try {
     const assumptions = req.body
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const createdRecord = await createAssumptions(supabase, assumptions)
+    const createdRecord = await createAssumptions(pool, assumptions)
 
     if (!createdRecord) {
       return res.status(500).json({ success: false, error: 'Failed to create assumptions' })
@@ -3477,12 +2637,12 @@ app.delete('/api/valuation/assumptions/:id', async (req, res) => {
   try {
     const { id } = req.params
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      return res.status(500).json({ success: false, error: 'Supabase credentials not configured' })
+    const pool = getDbPool()
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Postgres database not configured' })
     }
 
-    const success = await deleteAssumptions(supabase, id)
+    const success = await deleteAssumptions(pool, id)
 
     if (!success) {
       return res.status(500).json({ success: false, error: 'Failed to delete assumptions' })
@@ -4036,14 +3196,14 @@ app.get('/api/analytics', async (req, res) => {
 // Start server
 app.listen(port, () => {
   const openaiOk = Boolean(process.env.OPENAI_API_KEY)
-  const supabaseOk = Boolean(
-    process.env.VITE_SUPABASE_URL &&
-    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY)
+  const pgOk = Boolean(
+    process.env.DATABASE_URL ||
+    (process.env.POSTGRES_HOST && process.env.POSTGRES_DB)
   )
   console.log(`🚀 Enhanced AI Analysis Server running on http://localhost:${port}`)
   console.log('✨ Features: Enhanced Codex AI analysis with Swedish localization')
   console.log('📊 Features: Multi-model valuation engine with EV vs Equity handling')
   console.log(`🔑 AI (OpenAI): ${openaiOk ? 'configured' : 'NOT CONFIGURED — set OPENAI_API_KEY in .env or frontend/.env.local'}`)
-  console.log(`🔑 Supabase: ${supabaseOk ? 'configured' : 'NOT CONFIGURED — set VITE_SUPABASE_URL and service/anon key'}`)
+  console.log(`🔑 Postgres: ${pgOk ? 'configured' : 'NOT CONFIGURED — set DATABASE_URL or POSTGRES_*'}`)
   console.log(`   Debug: GET http://localhost:${port}/api/ai-status`)
 })

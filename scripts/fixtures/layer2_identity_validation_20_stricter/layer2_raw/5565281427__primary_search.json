@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5565281427",
+  "company_name": "Thule Sweden AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Thule Sweden\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Thule Sweden what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.red-dot.org/project/thule-40602",
+        "title": "Thule - Red Dot Design Award",
+        "content": "Present in more than 140 markets around the world today, Thule is a specialised provider of transportation solutions for cars and bicycles, ranging from luggage",
+        "score": 0.5513086,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.thulegroup.com/en/history-of-thule-group",
+        "title": "History of Thule Group",
+        "content": "# History of Thule Group. Today Thule Group is a publicly listed company and a world leader in products that make it easy for people to bring everything they care about – securely, safely, and in style. In September, Thule broadens the product category Active with Kids with the new stroller Thule Shine and the updated version of the child carrier backpack Thule Sapling. Thule Group enters the Recreational Vehicle Product category by acquiring **Omnistor**, Europe's leading provider of bike carriers and awnings for RVs. BlankTag Click to view larger version. Thule Group opens a new production site in the Polish city of Pila. Thule Group acquires Tepui Tents, a leading North American Roof Top Tent company. Thule Group acquired the Dutch company GMG B.V. with a focus on child bike seats under the brand **Yepp.**. Thule Group acquires **Case Logic**, a leading company in Bags for Electronic Devices. Thule Group acquires sport&cargo carrier brand **Sportrack**and towbar businesses in Europe and North America.",
+        "score": 0.4600226,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/thule-group-ab/",
+        "title": "Thule Group AB Company Profile - Overview - GlobalData",
+        "content": "# Thule Group AB - Company Profile. All the sales intelligence you need on Thule Group AB in one solution. when and how to engage with Thule Group AB. # Thule Group AB: Overview. Thule Group AB (Thule Group) is a manufacturer of roof racks, bikes and water sport carriers. Gain a 360-degree view of Thule Group AB and make more informed decisions for your business. Gain a 360-degree view of Thule Group AB and make more informed decisions for your business. View Thule Group AB financials. ## Signals available in Thule Group AB report. ## Thule Group AB premium industry data and analytics. Improve competitive bidding with insights into all publicly disclosed IT services contracts for Thule Group AB (including IT outsourcing, business process outsourcing, systems integration & consulting and more). Gain insight into Thule Group AB key executives to enhance your sales strategy. Gain insight into Thule Group AB key executives to enhance your sales strategy.",
+        "score": 0.4543517,
+        "raw_content": null
+      },
+      {
+        "url": "https://swottemplate.com/blogs/brief-history/thulegroup-brief-history",
+        "title": "What is Brief History of Thule Group Company? - SWOT Template",
+        "content": "Erik Thulin founded Thule in Hillerstorp, Sweden, initially producing a pike fishing trap. 1962, Thule introduced its first ski rack, marking a",
+        "score": 0.45217365,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.thule.com/en-us/about-thule/history",
+        "title": "Once upon a time in Hillerstorp - Thule",
+        "content": "Thule has been making roof racks since 1962. With the launch of our next generation of roof racks, watch our heritage video to see how our roof racks have",
+        "score": 0.41663104,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.86,
+    "request_id": "04ea0fac-614f-4486-acc9-acd90a35ce93"
+  }
+}

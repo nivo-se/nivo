@@ -43,17 +43,60 @@ const TRACKABLE_SECTION_IDS = [
   "kontakt",
 ];
 
+/** Scroll reveal for section H2 + eyebrow; IO only when motion is OK; CSS motion-reduce: also forces visible state. */
+function useSectionTitleReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncReduced = () => {
+      if (mq.matches) setVisible(true);
+    };
+    syncReduced();
+    mq.addEventListener("change", syncReduced);
+
+    if (mq.matches) {
+      return () => mq.removeEventListener("change", syncReduced);
+    }
+
+    const el = ref.current;
+    if (!el) {
+      return () => mq.removeEventListener("change", syncReduced);
+    }
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+    );
+    obs.observe(el);
+    return () => {
+      mq.removeEventListener("change", syncReduced);
+      obs.disconnect();
+    };
+  }, []);
+
+  return { ref, visible };
+}
+
 function SectionShell({
   title,
   bg = "bg",
   id,
+  sectionIndex,
   children,
 }: {
   title: string;
   bg?: "bg" | "bgAlt";
   id?: string;
+  /** 1–6 = shows “01”…“06” eyebrow above the H2 for scan rhythm. */
+  sectionIndex?: number;
   children: React.ReactNode;
 }) {
+  const label = sectionIndex != null ? String(sectionIndex).padStart(2, "0") : null;
+  const { ref: titleBlockRef, visible: titleVisible } = useSectionTitleReveal();
+
   return (
     <section
       className={"w-full" + (id ? " scroll-mt-[100px]" : "")}
@@ -61,15 +104,60 @@ function SectionShell({
       style={{ backgroundColor: bg === "bgAlt" ? tokens.bgAlt : tokens.bg }}
     >
       <div className={SECTION_CLASS}>
-        <h2 className="text-2xl font-semibold mb-8" style={{ color: tokens.text }}>
-          {title}
-        </h2>
+        <div
+          ref={titleBlockRef}
+          className={
+            "mb-8 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none " +
+            (titleVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2") +
+            " motion-reduce:opacity-100 motion-reduce:translate-y-0"
+          }
+        >
+          {label ? (
+            <p
+              className="text-xs font-semibold tracking-[0.28em] tabular-nums mb-3"
+              style={{ color: tokens.accent }}
+              aria-hidden
+            >
+              {label}
+            </p>
+          ) : null}
+          <h2
+            className="text-2xl sm:text-3xl font-semibold tracking-tight leading-snug"
+            style={{ color: tokens.text }}
+          >
+            {title}
+          </h2>
+        </div>
         {children}
       </div>
     </section>
   );
 }
 
+/** Bullet vertically centered on the first text line when wrapping (`1lh` box). */
+function BulletTextRows({
+  lines,
+  size = "14",
+}: {
+  lines: readonly string[];
+  size?: "14" | "15";
+}) {
+  const cls = size === "14" ? "text-[14px] leading-relaxed" : "text-[15px] leading-relaxed";
+  return (
+    <ul className="space-y-2">
+      {lines.map((line) => (
+        <li key={line} className={`flex gap-3 ${cls}`} style={{ color: tokens.text }}>
+          <span className={`flex h-[1lh] w-1.5 flex-shrink-0 items-center justify-center ${cls}`} aria-hidden>
+            <span className="block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: tokens.accent }} />
+          </span>
+          <span className="min-w-0 flex-1">{line}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Full bordered card (subgrid under Hur vi arbetar). */
 function BulletCard({
   title,
   intro,
@@ -81,10 +169,10 @@ function BulletCard({
 }) {
   return (
     <div
-      className="rounded-xl p-5 sm:p-6 border h-full flex flex-col"
+      className="rounded-xl p-5 sm:p-6 border h-full flex flex-col justify-start"
       style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
     >
-      <h3 className="font-semibold text-base mb-2" style={{ color: tokens.text }}>
+      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-2" style={{ color: tokens.text }}>
         {title}
       </h3>
       {intro ? (
@@ -92,37 +180,31 @@ function BulletCard({
           {intro}
         </p>
       ) : null}
-      <ul className="space-y-2 mt-auto">
-        {bullets.map((line) => (
-          <li key={line} className="flex items-start gap-3 text-[14px] leading-relaxed" style={{ color: tokens.text }}>
-            <span
-              className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: tokens.accent }}
-              aria-hidden
-            />
-            <span>{line}</span>
-          </li>
-        ))}
-      </ul>
+      <BulletTextRows lines={bullets} size="14" />
+    </div>
+  );
+}
+
+/** Left accent rail, no card chrome. */
+function BulletRailSection({
+  title,
+  bullets,
+}: {
+  title: string;
+  bullets: readonly [string, string, string];
+}) {
+  return (
+    <div className="h-full border-l-4 pl-4 sm:pl-5 py-1 pr-1" style={{ borderLeftColor: tokens.accent }}>
+      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-2" style={{ color: tokens.text }}>
+        {title}
+      </h3>
+      <BulletTextRows lines={bullets} size="14" />
     </div>
   );
 }
 
 function BulletList({ items }: { items: readonly string[] }) {
-  return (
-    <ul className="space-y-2">
-      {items.map((line) => (
-        <li key={line} className="flex items-start gap-3 text-[15px] leading-relaxed" style={{ color: tokens.text }}>
-          <span
-            className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: tokens.accent }}
-            aria-hidden
-          />
-          <span>{line}</span>
-        </li>
-      ))}
-    </ul>
-  );
+  return <BulletTextRows lines={items} size="15" />;
 }
 
 function SellersGate({ onUnlock }: { onUnlock: () => void }) {
@@ -306,24 +388,20 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </section>
 
-        {/* Citat */}
-        <section className="w-full" style={{ backgroundColor: tokens.bgAlt }}>
+        {/* Citat — P3: full-bleed sage gradient band; typographic pull quote (no card chrome) */}
+        <section className="w-full" style={{ background: tokens.gradients.soft }}>
           <div className={SECTION_CLASS}>
-            <figure
-              className="rounded-2xl border px-6 py-10 sm:px-10 sm:py-12 text-center"
-              style={{
-                backgroundColor: tokens.bg,
-                borderColor: tokens.border,
-                boxShadow: "var(--profile-shadow-soft, 0 2px 12px rgba(0,0,0,0.06))",
-              }}
-            >
+            <figure className="max-w-3xl mx-auto py-2 sm:py-4">
               <blockquote
-                className="text-lg sm:text-xl md:text-2xl font-semibold leading-snug max-w-3xl mx-auto"
-                style={{ color: tokens.text }}
+                className="border-l-[3px] pl-6 sm:pl-8 text-left text-lg sm:text-xl md:text-[1.65rem] font-medium leading-snug tracking-tight"
+                style={{ borderLeftColor: tokens.accent, color: tokens.text }}
               >
                 {t.quoteMain}
               </blockquote>
-              <figcaption className="mt-4 text-sm sm:text-base max-w-2xl mx-auto" style={{ color: tokens.text, opacity: 0.85 }}>
+              <figcaption
+                className="mt-5 pl-6 sm:pl-8 text-left text-sm sm:text-[15px] leading-relaxed"
+                style={{ color: tokens.textMuted }}
+              >
                 {t.quoteSub}
               </figcaption>
             </figure>
@@ -342,20 +420,23 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         </section>
 
         {/* 1. Hur vi arbetar */}
-        <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-            <BulletCard
+        <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar" sectionIndex={1}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+            <BulletRailSection
               title={t.hvPartnerskapTitle}
               bullets={[t.hvPartnerskapB1, t.hvPartnerskapB2, t.hvPartnerskapB3]}
             />
-            <BulletCard title={t.hvBeslutTitle} bullets={[t.hvBeslutB1, t.hvBeslutB2, t.hvBeslutB3]} />
-            <BulletCard title={t.hvAgarrollTitle} bullets={[t.hvAgarrollB1, t.hvAgarrollB2, t.hvAgarrollB3]} />
-            <BulletCard title={t.hvOperativTitle} bullets={[t.hvOperativB1, t.hvOperativB2, t.hvOperativB3]} />
-            <BulletCard title={t.hvDigitalTitle} bullets={[t.hvDigitalB1, t.hvDigitalB2, t.hvDigitalB3]} />
-            <BulletCard title={t.hvNatverkTitle} bullets={[t.hvNatverkB1, t.hvNatverkB2, t.hvNatverkB3]} />
+            <BulletRailSection title={t.hvBeslutTitle} bullets={[t.hvBeslutB1, t.hvBeslutB2, t.hvBeslutB3]} />
+            <BulletRailSection title={t.hvAgarrollTitle} bullets={[t.hvAgarrollB1, t.hvAgarrollB2, t.hvAgarrollB3]} />
+            <BulletRailSection title={t.hvOperativTitle} bullets={[t.hvOperativB1, t.hvOperativB2, t.hvOperativB3]} />
+            <BulletRailSection title={t.hvDigitalTitle} bullets={[t.hvDigitalB1, t.hvDigitalB2, t.hvDigitalB3]} />
+            <BulletRailSection title={t.hvNatverkTitle} bullets={[t.hvNatverkB1, t.hvNatverkB2, t.hvNatverkB3]} />
           </div>
 
-          <h3 className="text-lg font-semibold mt-12 mb-6" style={{ color: tokens.text }}>
+          <h3
+            className="text-lg sm:text-xl font-semibold tracking-tight mt-12 mb-6 leading-snug"
+            style={{ color: tokens.text }}
+          >
             {t.subgridTitle}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
@@ -372,24 +453,24 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         </SectionShell>
 
         {/* 2. Vad vi letar efter */}
-        <SectionShell title={t.vadViLetarEfterTitle} id="vad-vi-letar-efter">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-            <BulletCard title={t.vadBlock1Title} bullets={[t.vadB1, t.vadB2, t.vadB3]} />
-            <BulletCard title={t.vadBlock2Title} bullets={[t.vadB4, t.vadB5, t.vadB6]} />
+        <SectionShell title={t.vadViLetarEfterTitle} id="vad-vi-letar-efter" sectionIndex={2}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+            <BulletRailSection title={t.vadBlock1Title} bullets={[t.vadB1, t.vadB2, t.vadB3]} />
+            <BulletRailSection title={t.vadBlock2Title} bullets={[t.vadB4, t.vadB5, t.vadB6]} />
           </div>
         </SectionShell>
 
         {/* 3. Varför vi är annorlunda */}
-        <SectionShell title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-            <BulletCard title={t.vaStrukturTitle} bullets={[t.vaStrukturB1, t.vaStrukturB2, t.vaStrukturB3]} />
-            <BulletCard title={t.vaPerspektivTitle} bullets={[t.vaPerspektivB1, t.vaPerspektivB2, t.vaPerspektivB3]} />
-            <BulletCard title={t.vaArbetssattTitle} bullets={[t.vaArbetssattB1, t.vaArbetssattB2, t.vaArbetssattB3]} />
+        <SectionShell title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda" sectionIndex={3}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+            <BulletRailSection title={t.vaStrukturTitle} bullets={[t.vaStrukturB1, t.vaStrukturB2, t.vaStrukturB3]} />
+            <BulletRailSection title={t.vaPerspektivTitle} bullets={[t.vaPerspektivB1, t.vaPerspektivB2, t.vaPerspektivB3]} />
+            <BulletRailSection title={t.vaArbetssattTitle} bullets={[t.vaArbetssattB1, t.vaArbetssattB2, t.vaArbetssattB3]} />
           </div>
         </SectionShell>
 
         {/* 4. Vår process */}
-        <SectionShell title={t.varProcessTitle} id="var-process">
+        <SectionShell title={t.varProcessTitle} id="var-process" sectionIndex={4}>
           <ol className="space-y-5 mb-8">
             {[t.vp1, t.vp2, t.vp3, t.vp4].map((step, i) => (
               <li
@@ -404,7 +485,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
                 >
                   {i + 1}
                 </span>
-                <span className="text-[15px] leading-relaxed pt-1" style={{ color: tokens.text }}>
+                <span className="text-[15px] sm:text-base leading-relaxed pt-0.5" style={{ color: tokens.text }}>
                   {step}
                 </span>
               </li>
@@ -416,7 +497,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         </SectionShell>
 
         {/* 5. Efter affären */}
-        <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren">
+        <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren" sectionIndex={5}>
           <div className="max-w-2xl">
             <BulletList items={[t.eaB1, t.eaB2, t.eaB3]} />
             <p className="mt-8 text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
@@ -426,35 +507,40 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         </SectionShell>
 
         {/* 6. Kontakt */}
-        <SectionShell title={t.kontaktSectionTitle} id="kontakt">
+        <SectionShell title={t.kontaktSectionTitle} id="kontakt" sectionIndex={6}>
           <p className="text-[15px] leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
             {t.kontaktBody}
           </p>
           <p className="text-sm font-semibold mb-4" style={{ color: tokens.text }}>
             {t.kontaktDuKan}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          <div
+            className="mb-8 flex flex-col md:grid md:grid-cols-3 md:gap-6"
+            style={{ ["--kontakt-card-bg"]: tokens.bgAlt } as React.CSSProperties}
+          >
             {CONTACT_CTA.map((c) => (
               <div
                 key={c.email}
-                className="rounded-xl p-5 sm:p-6 border"
-                style={{ backgroundColor: tokens.bgAlt, borderColor: tokens.border }}
+                className="py-5 max-md:border-b max-md:last:border-b-0 md:border md:rounded-xl md:p-6 md:[background-color:var(--kontakt-card-bg)]"
+                style={{ borderColor: tokens.border }}
               >
-                <p className="font-semibold mb-3" style={{ color: tokens.text }}>
+                <p className="font-semibold mb-2 md:mb-3 text-[15px]" style={{ color: tokens.text }}>
                   {c.name}
                 </p>
-                <a
-                  href={`mailto:${c.email}`}
-                  className="text-[15px] block text-profile-accent hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded"
-                >
-                  {c.email}
-                </a>
-                <a
-                  href={`tel:${c.phone.replace(/\s|-/g, "")}`}
-                  className="text-[15px] block mt-2 text-profile-accent hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded"
-                >
-                  {c.phone}
-                </a>
+                <div className="flex flex-col gap-1.5 text-[15px] leading-relaxed">
+                  <a
+                    href={`mailto:${c.email}`}
+                    className="text-profile-accent hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded w-fit"
+                  >
+                    {c.email}
+                  </a>
+                  <a
+                    href={`tel:${c.phone.replace(/\s|-/g, "")}`}
+                    className="text-profile-accent hover:underline focus:outline-none focus:ring-2 focus:ring-profile-accent/30 rounded w-fit"
+                  >
+                    {c.phone}
+                  </a>
+                </div>
               </div>
             ))}
           </div>

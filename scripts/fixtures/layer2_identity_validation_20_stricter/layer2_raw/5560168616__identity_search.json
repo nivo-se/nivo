@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560168616",
+  "company_name": "Elekta AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Elekta\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Elekta official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://ca.linkedin.com/company/elekta",
+        "title": "Elekta - LinkedIn",
+        "content": "Overview:\nEach year, millions of people hear the words no one wants to hear: \"You have cancer.\" And behind each diagnosis lies a unique story, a family that deserves hope, a future that's worth fighting for. We know that no two treatment journeys are the same and delivering care is far from simple. It's complex, urgent, and deeply human. That’s why we don’t back down from challenges—we rise to them. From the smallest tumor change to the toughest clinical decisions, we see every obstacle as an opportunity to progress. That is what drives us. The people undergoing treatment. The clinicians providing the care. We are united in purpose. Together, we can create a world where every patient has access to the highest standard of care. This is our commitment because for everyone, it's personal. We are leading the innovation in personalized radiation therapy solutions. We are Elekta. Elekta reserves the right to remove any comment and to restrict access to its page at its sole discretion, without prior notice. The presence of user comments does not imply endorsement by Elekta, and Elekta makes no representations regarding the accuracy of such comments. User-generated content does not necessarily reflect the views, values, or positions of Elekta.\n\nWebsite: https://www.elekta.com/\nCrunchbase Url: N/A\nLinkedin Url: https://www.linkedin.com/company/elekta\n\nIndustry:\nMedical Equipment Manufacturing\n\nCompany size:\n1,001-5,000 employees\n4825 associated members (LinkedIn members who’ve listed Elekta as their current workplace on their profile)\n\nFounded:\n1972\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.8021998,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Elekta",
+        "title": "Elekta - Wikipedia",
+        "content": "# Elekta. | Products | Elekta Unity MR-Linac, Leksell Gamma Knife, Versa HD linear accelerator, Evo linear accelerator, Harmony linear accelerator, Brachytherapy products; as well as Oncology Information System (MOSAIQ), Treatment Planning Software (Monaco) |. **Elekta** is a global Swedish company that develops and produces radiation therapy and radiosurgery-related equipment and clinical management for the treatment of cancer and brain disorders. Elekta was jointly founded in 1972 by the late Lars Leksell, Professor of Neurosurgery at the Karolinska Institute in Stockholm, Sweden, and his son Laurent (Larry) Leksell, in order to commercialize the development of the Leksell Stereotactic System, and Gamma Knife, which he had been researching since the late 1940s. Since 1994, the company has been listed on the Nordic Exchange \"Exchange (organized market)\") (Nasdaq Stockholm) under the ticker EKTAb. Larry Leksell became Chief Executive Officer of Elekta until 2005, and under his leadership the company expanded into a public medical technology group with more than 3,400 employees worldwide.",
+        "score": 0.740494,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.youtube.com/@ElektaOfficial",
+        "title": "Elekta - YouTube",
+        "content": "As a leader in precision radiation therapy, Elekta is committed to ensuring every patient has access to the best cancer care possible.",
+        "score": 0.6238588,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.arthealth.com/elekta/",
+        "title": "Elekta - Advanced Radiotherapy Technologies",
+        "content": "It is our goal to help you deliver the best possible radiotherapy, for every patient, every time. Designed in collaboration with industry-leading experts",
+        "score": 0.60610276,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.hospitals-management.com/suppliers/elekta-ab",
+        "title": "Elekta AB - - Company Profile, Product Range, Locations & Major ...",
+        "content": "Elekta is a human care company pioneering significant innovations and clinical solutions for treating cancer and brain disorders.",
+        "score": 0.59824234,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.69,
+    "request_id": "fd23ab1a-00bd-4ddb-a764-ed88ef11c8a3"
+  }
+}

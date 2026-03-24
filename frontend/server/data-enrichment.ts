@@ -1,172 +1,115 @@
 /**
- * Comprehensive Data Enrichment Service
- * Fetches and aggregates multi-source company data for AI analysis
+ * Data enrichment for AI analysis — uses Postgres via pg Pool.
  */
 
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { Pool } from 'pg'
 import {
   DataLoadResult,
   QualityIssue,
   ComprehensiveCompanyData,
   createQualityIssue,
-  calculateFinancialTrends
+  calculateFinancialTrends,
 } from './data-quality.js'
 import { getIndustryBenchmarks } from './industry-benchmarks.js'
 
-/**
- * Fetch comprehensive company data from available sources
- * Note: Uses the new companies + company_metrics schema and company_financials for history
- */
 export async function fetchComprehensiveCompanyData(
-  supabase: SupabaseClient,
+  pool: Pool,
   orgnr: string
 ): Promise<DataLoadResult<ComprehensiveCompanyData>> {
   const issues: QualityIssue[] = []
-  
+
   try {
-    // 1. Validate that core tables are accessible
-    const { error: tableError } = await supabase
-      .from('companies')
-      .select('orgnr')
-      .limit(1)
-    
-    if (tableError) {
-      issues.push(createQualityIssue(
-        'critical',
-        `Cannot access companies table: ${tableError.message}`,
-        { error: tableError?.message }
-      ))
+    const probe = await pool.query('SELECT orgnr FROM companies LIMIT 1')
+    if (!probe.rows?.length) {
+      issues.push(createQualityIssue('critical', 'Cannot access companies table', {}))
       return { data: null, issues, success: false }
     }
 
-    // 2. Fetch primary company snapshot (companies + company_metrics)
-    const masterResult = await fetchCompanySnapshot(supabase, orgnr)
+    const masterResult = await fetchCompanySnapshot(pool, orgnr)
     issues.push(...masterResult.issues)
 
-    // 3. Check for critical data availability
     if (!masterResult.data) {
-      issues.push(createQualityIssue(
-        'critical',
-        'No master analytics data found',
-        { orgnr }
-      ))
+      issues.push(createQualityIssue('critical', 'No master analytics data found', { orgnr }))
       return { data: null, issues, success: false }
     }
-    
-    // 4. Try to fetch historical data (may be empty)
-    const historicalResult = await fetchHistoricalAccounts(supabase, orgnr)
-    const kpiResult = await fetchDetailedKPIs(supabase, orgnr)
-    
-    // Add historical data issues as warnings (not critical)
+
+    const historicalResult = await fetchHistoricalAccounts(pool, orgnr)
+    const kpiResult = await fetchDetailedKPIs(pool, orgnr)
+
     if (historicalResult.issues.length > 0) {
-      issues.push(...historicalResult.issues.map(issue => ({
-        ...issue,
-        level: 'warning' as const // Downgrade to warning since historical data is optional
-      })))
+      issues.push(
+        ...historicalResult.issues.map((issue) => ({
+          ...issue,
+          level: 'warning' as const,
+        }))
+      )
     }
-    
+
     if (kpiResult.issues.length > 0) {
-      issues.push(...kpiResult.issues.map(issue => ({
-        ...issue,
-        level: 'warning' as const // Downgrade to warning since KPI data is optional
-      })))
+      issues.push(
+        ...kpiResult.issues.map((issue) => ({
+          ...issue,
+          level: 'warning' as const,
+        }))
+      )
     }
-    
-    // 5. Calculate trends and benchmarks
+
     const trends = calculateFinancialTrends(historicalResult.data || [])
-    const benchmarks = await getIndustryBenchmarks(supabase, masterResult.data.segment_name)
-    
-    // 6. Assemble comprehensive data
+    const benchmarks = await getIndustryBenchmarks(pool, masterResult.data.segment_name)
+
     const comprehensiveData: ComprehensiveCompanyData = {
       masterData: masterResult.data,
       historicalData: historicalResult.data || [],
       kpiData: kpiResult.data || [],
       trends,
-      benchmarks
+      benchmarks,
     }
-    
+
     return { data: comprehensiveData, issues, success: true }
-    
-  } catch (error) {
-    issues.push(createQualityIssue(
-      'critical',
-      `Data enrichment failed: ${error.message}`,
-      { orgnr, error: error.message }
-    ))
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    issues.push(createQualityIssue('critical', `Data enrichment failed: ${msg}`, { orgnr, error: msg }))
     return { data: null, issues, success: false }
   }
 }
 
-/**
- * Fetch master analytics data (current year snapshot)
- */
-async function fetchCompanySnapshot(
-  supabase: SupabaseClient,
-  orgnr: string
-): Promise<DataLoadResult<any>> {
+async function fetchCompanySnapshot(pool: Pool, orgnr: string): Promise<DataLoadResult<any>> {
   const issues: QualityIssue[] = []
 
   try {
-    const { data, error } = await supabase
-      .from('companies')
-      .select(`
-        orgnr,
-        company_id,
-        company_name,
-        address,
-        homepage,
-        email,
-        segment_names,
-        foundation_year,
-        employees_latest,
-        company_metrics (
-          latest_revenue_sek,
-          latest_profit_sek,
-          latest_ebitda_sek,
-          revenue_cagr_3y,
-          avg_ebitda_margin,
-          avg_net_margin,
-          company_size_bucket,
-          profitability_bucket,
-          growth_bucket,
-          digital_presence
-        )
-      `)
-      .eq('orgnr', orgnr)
-      .single()
-    
-    if (error) {
-      issues.push(createQualityIssue(
-        'critical',
-        `Failed to fetch company snapshot: ${error.message}`,
-        { orgnr, error: error.message }
-      ))
-      return { data: null, issues, success: false }
-    }
+    const { rows } = await pool.query(
+      `SELECT c.orgnr, c.company_id, c.company_name, c.address, c.homepage, c.email,
+              c.segment_names, c.foundation_year, c.employees_latest,
+              m.latest_revenue_sek, m.latest_profit_sek, m.latest_ebitda_sek, m.revenue_cagr_3y,
+              m.avg_ebitda_margin, m.avg_net_margin, m.company_size_bucket, m.profitability_bucket,
+              m.growth_bucket, m.digital_presence
+       FROM companies c
+       LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
+       WHERE c.orgnr = $1
+       LIMIT 1`,
+      [orgnr]
+    )
 
+    const data = rows[0]
     if (!data) {
-      issues.push(createQualityIssue(
-        'critical',
-        'No company data found',
-        { orgnr }
-      ))
+      issues.push(createQualityIssue('critical', 'No company data found', { orgnr }))
       return { data: null, issues, success: false }
     }
 
-    // Check data completeness
-    const missingFields = []
-    if (!data.company_metrics?.latest_revenue_sek) missingFields.push('latest_revenue_sek (revenue)')
-    if (!data.company_metrics?.latest_profit_sek) missingFields.push('latest_profit_sek (net profit)')
-    if (!data.company_metrics?.avg_ebitda_margin) missingFields.push('avg_ebitda_margin')
-    
+    const missingFields: string[] = []
+    if (!data.latest_revenue_sek) missingFields.push('latest_revenue_sek (revenue)')
+    if (!data.latest_profit_sek) missingFields.push('latest_profit_sek (net profit)')
+    if (!data.avg_ebitda_margin) missingFields.push('avg_ebitda_margin')
+
     if (missingFields.length > 0) {
-      issues.push(createQualityIssue(
-        'warning',
-        `Missing key financial fields: ${missingFields.join(', ')}`,
-        { orgnr, missingFields }
-      ))
+      issues.push(
+        createQualityIssue('warning', `Missing key financial fields: ${missingFields.join(', ')}`, {
+          orgnr,
+          missingFields,
+        })
+      )
     }
-    
+
     const mapped = {
       OrgNr: data.orgnr,
       company_id: data.company_id,
@@ -177,147 +120,84 @@ async function fetchCompanySnapshot(
       segment_name: Array.isArray(data.segment_names) ? data.segment_names[0] : data.segment_names,
       foundation_year: data.foundation_year,
       employees: data.employees_latest,
-      SDI: data.company_metrics?.latest_revenue_sek,
-      DR: data.company_metrics?.latest_profit_sek,
-      ORS: data.company_metrics?.latest_ebitda_sek,
-      Revenue_growth: data.company_metrics?.revenue_cagr_3y,
-      EBIT_margin: data.company_metrics?.avg_ebitda_margin,
-      NetProfit_margin: data.company_metrics?.avg_net_margin,
-      company_size_category: data.company_metrics?.company_size_bucket,
-      profitability_category: data.company_metrics?.profitability_bucket,
-      growth_category: data.company_metrics?.growth_bucket,
-      digital_presence: data.company_metrics?.digital_presence
+      SDI: data.latest_revenue_sek,
+      DR: data.latest_profit_sek,
+      ORS: data.latest_ebitda_sek,
+      Revenue_growth: data.revenue_cagr_3y,
+      EBIT_margin: data.avg_ebitda_margin,
+      NetProfit_margin: data.avg_net_margin,
+      company_size_category: data.company_size_bucket,
+      profitability_category: data.profitability_bucket,
+      growth_category: data.growth_bucket,
+      digital_presence: data.digital_presence,
     }
 
     return { data: mapped, issues, success: true }
-
-  } catch (error) {
-    issues.push(createQualityIssue(
-      'critical',
-      `Company snapshot fetch error: ${error.message}`,
-      { orgnr, error: error.message }
-    ))
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    issues.push(
+      createQualityIssue('critical', `Company snapshot fetch error: ${msg}`, { orgnr, error: msg })
+    )
     return { data: null, issues, success: false }
   }
 }
 
-/**
- * Fetch historical financial accounts (4+ years)
- */
-async function fetchHistoricalAccounts(
-  supabase: SupabaseClient,
-  orgnr: string
-): Promise<DataLoadResult<any[]>> {
+async function fetchHistoricalAccounts(pool: Pool, orgnr: string): Promise<DataLoadResult<any[]>> {
   const issues: QualityIssue[] = []
 
   try {
-    const { data, error } = await supabase
-      .from('company_financials')
-      .select('year, revenue_sek, profit_sek, ebitda_sek, employees')
-      .eq('orgnr', orgnr)
-      .order('year', { ascending: false })
-      .limit(4) // Last 4 years
-    
-    if (error) {
-      issues.push(createQualityIssue(
-        'warning',
-        `Failed to fetch historical accounts: ${error.message}`,
-        { orgnr, error: error.message }
-      ))
-      return { data: [], issues, success: false }
-    }
-    
+    const { rows: data } = await pool.query(
+      `SELECT year, revenue_sek, profit_sek, ebitda_sek, employees
+       FROM company_financials
+       WHERE orgnr = $1
+       ORDER BY year DESC
+       LIMIT 4`,
+      [orgnr]
+    )
+
     if (!data || data.length === 0) {
-      issues.push(createQualityIssue(
-        'warning',
-        'No historical accounts data found',
-        { orgnr }
-      ))
+      issues.push(createQualityIssue('warning', 'No historical accounts data found', { orgnr }))
       return { data: [], issues, success: false }
     }
 
-    // Check data quality
-    const validYears = data.filter(d => d.year && (d.revenue_sek || 0) > 0)
+    const validYears = data.filter((d) => d.year && (d.revenue_sek || 0) > 0)
     if (validYears.length < 2) {
-      issues.push(createQualityIssue(
-        'warning',
-        `Limited valid historical data: ${validYears.length} years`,
-        { orgnr, totalYears: data.length, validYears: validYears.length }
-      ))
+      issues.push(
+        createQualityIssue(
+          'warning',
+          `Limited valid historical data: ${validYears.length} years`,
+          { orgnr, totalYears: data.length, validYears: validYears.length }
+        )
+      )
     }
-    
+
     return { data: validYears, issues, success: true }
-    
-  } catch (error) {
-    issues.push(createQualityIssue(
-      'warning',
-      `Historical accounts fetch error: ${error.message}`,
-      { orgnr, error: error.message }
-    ))
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    issues.push(
+      createQualityIssue('warning', `Historical accounts fetch error: ${msg}`, { orgnr, error: msg })
+    )
     return { data: [], issues, success: false }
   }
 }
 
-/**
- * Fetch detailed KPIs
- */
-async function fetchDetailedKPIs(
-  supabase: SupabaseClient,
-  orgnr: string
-): Promise<DataLoadResult<any[]>> {
+async function fetchDetailedKPIs(pool: Pool, orgnr: string): Promise<DataLoadResult<any[]>> {
   const issues: QualityIssue[] = []
 
   try {
-    const { data, error } = await supabase
-      .from('company_metrics')
-      .select('revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, equity_ratio_latest, debt_to_equity_latest')
-      .eq('orgnr', orgnr)
-      .maybeSingle()
+    const { rows } = await pool.query(
+      `SELECT revenue_cagr_3y, avg_ebitda_margin, avg_net_margin, equity_ratio_latest, debt_to_equity_latest
+       FROM company_metrics
+       WHERE orgnr = $1
+       LIMIT 1`,
+      [orgnr]
+    )
 
-    if (error) {
-      issues.push(createQualityIssue(
-        'info',
-        `Failed to fetch KPI data: ${error.message}`,
-        { orgnr, error: error.message }
-      ))
-      return { data: [], issues, success: false }
-    }
-
+    const data = rows[0]
     return { data: data ? [data] : [], issues, success: true }
-    
-  } catch (error) {
-    issues.push(createQualityIssue(
-      'info',
-      `KPI data fetch error: ${error.message}`,
-      { orgnr, error: error.message }
-    ))
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    issues.push(createQualityIssue('info', `KPI data fetch error: ${msg}`, { orgnr, error: msg }))
     return { data: [], issues, success: false }
   }
-}
-
-/**
- * Validate that tables exist (helper function)
- */
-async function validateTablesExist(
-  supabase: SupabaseClient,
-  requiredTables: string[]
-): Promise<string[]> {
-  const missingTables: string[] = []
-  
-  for (const table of requiredTables) {
-    try {
-      const { error } = await supabase
-        .from(table)
-        .select('*')
-        .limit(1)
-      
-      if (error) {
-        missingTables.push(table)
-      }
-    } catch (err) {
-      missingTables.push(table)
-    }
-  }
-  
-  return missingTables
 }

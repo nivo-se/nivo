@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560168616",
+  "company_name": "Elekta AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Elekta\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Elekta what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/sourceId/12164132",
+        "title": "Sweden-Based Medical Equipment Manufacturer Elekta AB ...",
+        "content": "Elekta AB is a global leader in radiotherapy solutions for cancer and neurological diseases treatment and generated revenue of about Swedish",
+        "score": 0.75464433,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.jetro.go.jp/en/invest/newsroom/2023/1ed94c660d13c0d5.html",
+        "title": "Elekta, a Swedish company that leads precision radiotherapy ...",
+        "content": "* Invest Japan Business Support Center (IBSC). Founded in Stockholm in 1972 and listed on the Nasdaq Stockholm, ElektaExternal site: a new window will open.is a Swedish global company that specializes in the development of radio therapy equipment, including stereotactic radiosurgery using Leksell Gamma Knife1, Adaptive Radiotherapy with Linac2/MR Linac, and brachytherapy, as an integrated radiotherapy vender. In the area of treatment information systems, the company collaborated with JETRO to research cloud computing and develop networking environment, and has received an order for the first cloud-based cancer treatment system (Elekta Axis) in Japan. To help raise awareness of Elekta K.K. in Japan, JETRO Invest Japan Business Support Center (IBSC) provided PR support (Success Stories). ## JETRO supports your business in Japan. JETRO IBSCs are located in Japan's major business hubs and provide one-stop support and service to foreign firms seeking to set up or expand business in Japan. * Investment Japan Business Support Centers (IBSCs). We will do our very best to support your business expansion into and within Japan as well as business collaboration with Japanese companies.",
+        "score": 0.67347145,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.elekta.com/products/",
+        "title": "Products | Innovative Cancer Care & Treatment - Elekta",
+        "content": "# Products. Experience true freedom of choice. ## Radiation Therapy. Precision radiation therapy for everyone, everywhere. ## Stereotactic Radiosurgery. Noninvasive, precision technology for personalized care. ## Oncology Software. Technology smart enough to create hope. ## Brachytherapy. An indispensable part of radiation therapy. ## Neurosurgery. Gentler approach to invasive neurosurgery/stereotactic neurosurgery. An asterisk (\\*) indicates a required entry.",
+        "score": 0.59061456,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/elekta-ab/",
+        "title": "Elekta AB Company Profile - GlobalData",
+        "content": "# Elekta AB - Company Profile. All the sales intelligence you need on Elekta AB in one solution. when and how to engage with Elekta AB. # Elekta AB: Overview. Elekta AB (Elekta) specializes in the development and provision of advanced cancer care solutions. Gain a 360-degree view of Elekta AB and make more informed decisions for your business. Gain a 360-degree view of Elekta AB and make more informed decisions for your business. ## Elekta AB premium industry data and analytics. Improve competitive bidding with insights into all publicly disclosed IT services contracts for Elekta AB (including IT outsourcing, business process outsourcing, systems integration & consulting and more). | 2025 | Contracts/Agreements | In July, the company partnered with Gray Oncology Solutions to integrate the GrayOS Care Orchestration Platform for Elekta ONE OIS customers. Gain insight into Elekta AB key executives to enhance your sales strategy. Gain insight into Elekta AB key executives to enhance your sales strategy.",
+        "score": 0.5746579,
+        "raw_content": null
+      },
+      {
+        "url": "https://matrixbcg.com/blogs/how-it-works/elekta",
+        "title": "How Does Elekta Company Work? – MatrixBCG.com",
+        "content": "It integrates precision devices, clinical software, and service contracts to deliver stereotactic radiosurgery and comprehensive radiotherapy workflows; see Elekta Porter's Five Forces Analysis for strategic context. Elekta’s revenue mix balances high-ticket capital equipment with resilient recurring services; in 2024/2025 Solutions (hardware and software licenses) were ~**58%** of net sales and Services ~**42%**, supported by long-term service contracts and growing SaaS subscriptions. Elekta’s Key Milestones, Strategic Moves, and Competitive Edge trace a focused push under 'Access 2025' to expand precision radiation therapy to underserved markets, driven by product launches, AI integration, and localized manufacturing to strengthen global reach and clinical efficiency. How Elekta works in market terms: recurring service, software subscriptions, and capital sales drive revenue. Elekta business model adjustments include sourcing diversification, localized service hubs, and shifting toward higher-margin software and AI-enabled offerings to mitigate hardware cycle exposure and input-cost fluctuations. Elekta’s roadmap emphasizes AI-driven workflows and higher recurring revenue from software and services, aiming for operational leverage and improved margins.",
+        "score": 0.56719416,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.06,
+    "request_id": "a637b200-8057-4686-9bfd-e3df17dd9dad"
+  }
+}

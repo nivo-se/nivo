@@ -21,7 +21,7 @@ import {
 import { ScrollArea } from './ui/scroll-area'
 import { Checkbox } from './ui/checkbox'
 import { Loader2, RefreshCw, ShieldAlert, ShieldCheck, Sparkles, Undo2, List, FileText } from 'lucide-react'
-import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
+import { companyDataService, type CompanyRecord } from '../lib/companyDataService'
 import { AIAnalysisService } from '../lib/aiAnalysisService'
 import { API_BASE } from '../lib/apiClient'
 import { fetchWithAuth } from '../lib/backendFetch'
@@ -163,7 +163,7 @@ const metricUnitLabel = (metric: MetricResult) => {
 }
 
 const CompanySelectionList: React.FC<{
-  companies: SupabaseCompany[]
+  companies: CompanyRecord[]
   selected: Set<string>
   onToggle: (orgnr: string) => void
   loading: boolean
@@ -410,7 +410,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
   // Saved lists state
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedListId, setSelectedListId] = useState<string>('')
-  const [availableCompanies, setAvailableCompanies] = useState<SupabaseCompany[]>([])
+  const [availableCompanies, setAvailableCompanies] = useState<CompanyRecord[]>([])
   
   // Analysis mode and selection state
   const [analysisMode, setAnalysisMode] = useState<'screening' | 'deep'>('screening')
@@ -515,7 +515,7 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
     setErrorMessage(null)
     setRunningAnalysis(true)
     try {
-      let companiesToAnalyze: SupabaseCompany[] = []
+      let companiesToAnalyze: CompanyRecord[] = []
       
       if (analysisMode === 'screening') {
         companiesToAnalyze = availableCompanies.filter((company) => selectedCompanies.has(company.OrgNr))

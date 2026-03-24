@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560000841",
+  "company_name": "Atlas Copco AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Atlas Copco\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Atlas Copco what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.emeoutlookmag.com/company-profiles/23-atlas-copco-sweden",
+        "title": "Atlas Copco Sweden : Sustainable Productivity on a Global Scale",
+        "content": "**Innovation is the guiding principle at Atlas Copco, which drives engineers and designers to develop new technology and revolutionise productivity in drilling, manufacturing and other industrial processes.**. Atlas Copco Sweden has been a world leading provider of sustainable industrial productivity solutions for over 140 years. Atlas Copco’s history of product development in its four main technological areas dates back to the turn of the last century, when the company’s first compressors, pneumatic tools, rock drills and breakers were launched. To this end, Atlas Copco, as a world leader in the mining and construction industry, is deeply committed to improved safety and environmentally responsible initiatives as the website emphasises: “Safety and the environment are the two most important considerations in every decision we make, today and in the future. Atlas Copco’s energy-efficient products are continuously developed and improved to reduce emissions. “There is always a better way” – For more than a century this guiding principle has driven Atlas Copco’s engineers and designers to develop new technology and revolutionise productivity in drilling, manufacturing and other industrial processes.",
+        "score": 0.99984527,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopco.com/en-us/about-atlas-copco/our-history",
+        "title": "Our history - Atlas Copco USA",
+        "content": "Learn more what it's like to work for Atlas Copco! Learn more what it's like to work for Atlas Copco! The merged company was named Atlas Diesel and during the 1920s, all operations were moved to Sickla, just outside Stockholm, where we are still headquartered today. ## Atlas Diesel becomes Atlas Copco. ## Atlas Copco today. Today Atlas Copco is a company with expertise and services divided into four business areas – Compressor Technique, Vacuum Technique, Industrial Technique and Power Technique – to support customers in some 180 countries. As we in 2023 look back on 150 fantastic years, we recognize that we wouldn’t be here without the work of our passionate people – employees who never cease to be curious and strive to learn, who come up with ideas for new technologies and services. * Explore the milestones and developments over the years by visiting the Atlas Copco Group history website in English.",
+        "score": 0.999566,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.airbestpractices.com/industry-news/atlas-copco-group-acquires-swedish-automation-company",
+        "title": "Atlas Copco Group Acquires Swedish Automation Company",
+        "content": "Its four business areas offer compressed air and vacuum solutions, energy solutions, dewatering and industrial pumps, industrial power tools and",
+        "score": 0.99954873,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Atlas_Copco",
+        "title": "Atlas Copco - Wikipedia",
+        "content": "In 2017, Atlas Copco announced that it planned to move its production of rock excavation, drilling and demolition equipment for the mining and infrastructure sectors into a separate listed company, the shares of which would be distributed to Atlas Copco shareholders. In November the same year, the identity of the business group was separated from the appearance of products sold under the Atlas Copco brand, by introducing a new and visually distinct logotype that includes the word *Group*. Since the split-off in 2018 of parts of the business into an independent company, Atlas Copco has been organized around four main business areas: Compressor technique, Vacuum technique, Industrial technique and Power technique. The Atlas Copco Group has around 90 brands, including Atlas Copco and Chicago Pneumatic for compressors and tools, Edwards and Leybold for vacuum systems, BeaconMedaes for medical gas and Desoutter for assembly equipment.",
+        "score": 0.99944717,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopco.com/en-us/about-atlas-copco",
+        "title": "About Atlas Copco - Atlas Copco USA",
+        "content": "Atlas Copco is the Home of Industrial Ideas. Our innovative products, solutions, and services are demanded by every type of industry. Atlas Copco is a brand within the Atlas Copco Group, where technology transforms the future. At Atlas Copco Group, we have a long tradition of doing business in a sustainable way. We provide safe, reliable and energy efficient solutions to customers in a wide range of industries including manufacturing, construction, pharmaceutical, automotive and electronics. We provide safe, reliable and energy efficient solutions to customers in a wide range of industries including manufacturing, construction, pharmaceutical, automotive and electronics. ### Atlas Copco is The Home of Industrial Ideas. At Atlas Copco, we have been turning great ideas into business-critical benefits since 1873. Atlas Copco focuses on keeping you connected to your products - no matter where they are and no matter when you need them! ## Atlas Copco Group. ### Atlas Copco Group. Learn more about Atlas Copco Group. **Learn more about Atlas Copco Group**.",
+        "score": 0.99909604,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.88,
+    "request_id": "ac712ad1-12cb-4da5-96ba-fcca55b957dd"
+  }
+}

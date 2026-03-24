@@ -23,14 +23,14 @@ import {
   X,
   Check
 } from 'lucide-react'
-import { supabaseCompanyService, SupabaseCompany, CompanyFilter } from '../lib/supabaseCompanyService'
+import { companyDataService, type CompanyRecord, type CompanyFilter } from '../lib/companyDataService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import CompanyListManager from './CompanyListManager'
 import AddToListsDialog from './AddToListsDialog'
 import { AIDeepDivePanel } from './AIDeepDivePanel'
 
 interface SearchResults {
-  companies: SupabaseCompany[]
+  companies: CompanyRecord[]
   total: number
   summary: {
     avgRevenue: number
@@ -50,7 +50,7 @@ const EnhancedCompanySearch: React.FC = () => {
   const [filters, setFilters] = useState<CompanyFilter>({})
   const [currentPage, setCurrentPage] = useState(1)
   const [viewMode, setViewMode] = useState<'list' | 'analysis'>('list')
-  const [selectedCompany, setSelectedCompany] = useState<SupabaseCompany | null>(null)
+  const [selectedCompany, setSelectedCompany] = useState<CompanyRecord | null>(null)
   const [showCompanyDetail, setShowCompanyDetail] = useState(false)
   const [savedLists, setSavedLists] = useState<SavedCompanyList[]>([])
   const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())
@@ -98,14 +98,14 @@ const EnhancedCompanySearch: React.FC = () => {
   }
 
   // Get selected companies as array - fetches all selected companies from database
-  const [selectedCompaniesArray, setSelectedCompaniesArray] = useState<SupabaseCompany[]>([])
+  const [selectedCompaniesArray, setSelectedCompaniesArray] = useState<CompanyRecord[]>([])
   
   // Update selected companies array when selection changes
   useEffect(() => {
     const fetchSelectedCompanies = async () => {
       if (selectedCompanies.size > 0) {
         try {
-          const companies = await supabaseCompanyService.getCompaniesByOrgNrs(Array.from(selectedCompanies))
+          const companies = await companyDataService.getCompaniesByOrgNrs(Array.from(selectedCompanies))
           setSelectedCompaniesArray(companies)
         } catch (error) {
           console.error('Error fetching selected companies:', error)
@@ -119,7 +119,7 @@ const EnhancedCompanySearch: React.FC = () => {
     fetchSelectedCompanies()
   }, [selectedCompanies])
 
-  const getSelectedCompaniesArray = (): SupabaseCompany[] => {
+  const getSelectedCompaniesArray = (): CompanyRecord[] => {
     return selectedCompaniesArray
   }
 
@@ -163,8 +163,8 @@ const EnhancedCompanySearch: React.FC = () => {
 
       // Get paginated results and all matching company OrgNrs in parallel
       const [result, allMatchingOrgNrs] = await Promise.all([
-        supabaseCompanyService.getCompanies(currentPage, itemsPerPage, searchFilters),
-        supabaseCompanyService.getAllMatchingCompanyOrgNrs(searchFilters)
+        companyDataService.getCompanies(currentPage, itemsPerPage, searchFilters),
+        companyDataService.getAllMatchingCompanyOrgNrs(searchFilters)
       ])
       
       // Calculate summary from the companies data
@@ -188,7 +188,7 @@ const EnhancedCompanySearch: React.FC = () => {
     }
   }
 
-  const calculateSummary = (companies: SupabaseCompany[]) => {
+  const calculateSummary = (companies: CompanyRecord[]) => {
     if (companies.length === 0) {
       return {
         avgRevenue: 0,
@@ -620,7 +620,7 @@ const EnhancedCompanySearch: React.FC = () => {
                               onClick={async () => {
                                 // Fetch full company data with historicalData
                                 try {
-                                  const fullCompany = await supabaseCompanyService.getCompany(company.OrgNr)
+                                  const fullCompany = await companyDataService.getCompany(company.OrgNr)
                                   if (fullCompany) {
                                     setSelectedCompany(fullCompany)
                                     setShowCompanyDetail(true)

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560296968",
+  "company_name": "Getinge AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Getinge\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Getinge what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.globaldata.com/company-profile/getinge-ab/",
+        "title": "Getinge AB Company Profile - GlobalData",
+        "content": "# Getinge AB - Company Profile. All the sales intelligence you need on Getinge AB in one solution. when and how to engage with Getinge AB. # Getinge AB: Overview. * Top 10 Medical Companies in the World in 2021 by Number of Marketed Products. Getinge AB (Getinge) is a medical device company. The company's main activities include offering solutions for intensive care, cardiovascular procedures, operating room, sterile reprocessing, digital health, pharmaceutical production, and research laboratories. Gain a 360-degree view of Getinge AB and make more informed decisions for your business. Gain a 360-degree view of Getinge AB and make more informed decisions for your business. ## Getinge AB premium industry data and analytics. IT Client Prospector provides intelligence on Getinge AB’s likely spend across technology areas enabling you to understand the digital strategy. Gain insight into Getinge AB key executives to enhance your sales strategy. Gain insight into Getinge AB key executives to enhance your sales strategy.",
+        "score": 0.72465646,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/company/history/",
+        "title": "Getinge History - A Legacy of Innovation and Excellence",
+        "content": "This is the story of a company from a small rural town in southern Sweden that grew into a global medical technology leader. In 1904, the Swedish entrepreneur Olander Larsson started manufacturing agricultural equipment in the community of Getinge. In 1932, Getinge made its first move into medical technology by starting to produce sterilizers for medical equipment. In the 1960s, Electrolux acquired Getinge. In the decades to come, Getinge acquired over 15 different infection control and sterilization companies across Europe and the United States. These acquisitions enabled Getinge to become a global leader in the field of Surgical Workflows. Growing a financially strong and prosperous company is a core part of the Getinge story. In 2000, the acquisition of Maquet enabled the Getinge Group to start provisioning operating theatres. Since its listing in 1993, Getinge sales have grown continuously, achieved through a combination of organic growth and acquisitions. Getinge is a leader in its chosen business segments, which focus on Acute Care Therapies, Life Science and Surgical Workflows.",
+        "score": 0.70580584,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/company/",
+        "title": "Getinge – Advancing Healthcare & Life Sciences Solutions",
+        "content": "* Founded in 1904 in the small town of Getinge, Sweden. At Getinge, we are committed to continuous growth and innovation. Our recent acquisitions reflect our dedication to expanding our capabilities of making life-saving technology accessible to more people. At Getinge, our passion for life extends to all dimensions of life, from the well-being of patients to the health of our planet. ## ”Darkness and light” Getinge company video 2024. Join our purpose to make life-saving technologies accessible for more people. Getinge is committed to the principles of corporate governance, all in order to promote business competitiveness as well as investor confidence. Read more about our Corporate Governance. We are looking for you who share our passion for providing innovative healthcare solutions. We believe that our passion for improving patient outcome through leading technology and integrated medtech solutions, adds value to both healthcare and investors. You might access content  not managed by Getinge team, in that case Getinge can not be hold responsible of the content.",
+        "score": 0.6334335,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/",
+        "title": "Welcome to Getinge - Getinge",
+        "content": "For every life saved and every breakthrough made — Getinge stands behind the moments that matter. Explore our products  Discover the Getinge story. Getinge’s sustainability work is an integral part of our passion for life. And our heritage proves that passion for improving patient outcome, through leading technology and integrated medtech solutions, adds value to both healthcare and investors. ### NOTICE OF ANNUAL GENERAL MEETING IN GETINGE AB (PUBL). ### Getinge transforms sterile reprocessing with Automatiq - a full range of logistic automation modules. ### Getinge introduces new version of Solsus 66 to meet CSSD efficiency needs. The Annual General Meeting in Getinge AB (publ), corporate ID No. 556408-5032, will be held on Tuesday, April 21, 2026 at 3.00 p.m. CEST, in Kongresshallen, Hotel Tylösand, Halmstad, Sweden. ## Getinge Automatiq - Automated Solutions empowering CSSDs through automation. ## Getinge Academy. ### Getinge Automatiq - Automated Solutions empowering CSSDs through automation. ### Getinge Academy. You are now leaving Getinge.com.",
+        "score": 0.63288915,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/products-and-solutions/sterile-reprocessing/",
+        "title": "Getinge Advanced Sterile Reprocessing Solutions",
+        "content": "Getinge is the expert in creating a seamless workflow of instrument reprocessing. Getinge Sterile Reprocessing solutions for enhanced workflow and patient safety. Instruments can also be manually cleaned by soaking, spray-gun rinsing and/or ultrasonic cleaning, before being loaded into the washer-disinfector. ## Cleaning and disinfection to inspection and packing. The clean and disinfected goods enter the area for sorting, inspection and packing. Once sorted, inspected and packaged, the goods are ready for sterile processing. Once sterile, the goods can either be stored in a dedicated storage area, where they are kept until they are needed again, or transported directly to the next surgery waiting for them to arrive in time. That’s why Getinge has built a team of experienced project specialists who can help you design an efficient facility using high-quality medical products. A versatile Pre-Cleaning Ultrasonic (PCU). ### Getinge Clean Pre-treatment Foam. ### Getinge Elmasonic Med Ultrasonic Cleaning Units. ### Getinge EDS8 Drying and Storage Cabinet.",
+        "score": 0.5271467,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.93,
+    "request_id": "e5cb5f8f-b0a3-41d4-9a65-42bef7cea6f0"
+  }
+}

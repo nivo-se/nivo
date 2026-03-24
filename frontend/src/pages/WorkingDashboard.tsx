@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { BarChart3, Building2, Search, Brain, FileText, Download, Shield, Menu, X, LogOut, User, Loader2, Target, TrendingUp, DollarSign, Users } from 'lucide-react'
-import { supabaseDataService, DashboardAnalytics } from '../lib/supabaseDataService'
+import { companyDataService, type DashboardAnalytics } from '../lib/companyDataService'
 import { isAuth0Configured } from '../lib/authToken'
 import { isAdminLinkVisible } from '../lib/isAdmin'
 import EnhancedCompanySearch from '../components/EnhancedCompanySearch'
@@ -36,7 +36,7 @@ const WorkingDashboard: React.FC = () => {
     const loadAnalytics = async () => {
       try {
         setLoading(true)
-        const data = await supabaseDataService.getDashboardAnalytics()
+        const data = await companyDataService.getDashboardAnalytics()
         setAnalytics(data)
         // Log card values for verification
         const cardValues = {
@@ -200,7 +200,7 @@ const WorkingDashboard: React.FC = () => {
             {!authEnabled && (
               <Alert>
                 <AlertDescription>
-                  Supabase-integration är inte konfigurerad i denna miljö. Instrumentpanelen använder det incheckade demo-
+                  Inloggning är inte aktiverad i denna miljö. Instrumentpanelen använder det incheckade demo-
                   datasetet för att visa funktionaliteten.
                 </AlertDescription>
               </Alert>

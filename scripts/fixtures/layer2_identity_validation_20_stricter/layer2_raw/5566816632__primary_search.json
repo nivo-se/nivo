@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5566816632",
+  "company_name": "Quadpak AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Quadpak\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Quadpak what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.zoominfo.com/c/quadpak-ab/472403694",
+        "title": "Quadpak - Overview, News & Similar companies | ZoomInfo.com",
+        "content": "Quadpak is a Swedish-based flexible packaging manufacturer specializing in high-quality bags tailored for various liquid product applications. The company",
+        "score": 0.8497846,
+        "raw_content": null
+      },
+      {
+        "url": "https://quadpak.se/about-us/",
+        "title": "About us - Quadpak",
+        "content": "## Think inside the box. ## Think inside the box. # **QUADPAK – FOR A INNOVATIVE AND SUSTAINABLE PACKAGING**. Quadpak’s business is based on technical development and innovations that results in sustainable, high quality, bag in box solutions that can be used in a wide range of different applications within food and non-food products. Our vision is to be leading in reducing our customer´s environmental impact in regard to flexible packaging. **Quadpak quality and environmental policy PDF.** Quadpak is certified according to **ISO 9001:2015, ISO 14001:2015**, and QSA level 1. All raw materials and incoming components in our production are food stuff approved and our suppliers are BRC, SQF and ISO certified. Quadpak is located in Värnamo, the heart of Sweden’s manufacturing sector and is the European partner to CDF Corporation. **Sustainable Flexible Packaging | CDF Corporation (cdf1.com)**.",
+        "score": 0.8156003,
+        "raw_content": null
+      },
+      {
+        "url": "https://quadpak.se/",
+        "title": "Quadpak: Home",
+        "content": "## Think inside the box. ## Think inside the box. # **BAG IN BOX - SMART AND FLEXIBLE PACKAGING**. Quadpak is a Swedish-based flexible packaging manufacturer with an extensive experience and capability in manufacturing high-quality bags, tailored to meet its customer’s needs. We has a proven track record of success focusing on innovative, smart sustainable packaging for a variety liquid product applications. Quadpak capabilities range from bag in box solutions specializing in the Cheertainer™ design and stand-up pouches, traditional pillow bags and customized bag solutions. Join us for an exciting journey from traditional packaging into new flexible packaging solutions! ### CHEMICALS / DETERGENTS. As a result of high demand, we are doubling our capacity with a new machine producing Cheertainers. The machine will be at place and manufacturing bags during early 2024. ## NEW WEBSITE – THINK INSIDE THE BOX. We are now launching our new website that highlights a multitude of possibilities and benefits with Quadpak's high-quality bags and bag-in-box solutions.",
+        "score": 0.7859175,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.crunchbase.com/organization/quad-pack",
+        "title": "Quad Pack - Crunchbase Company Profile & Funding",
+        "content": "Quad Pack is a manufacturer of pillow bag-in-box, stand-up pouches, and packaging products.",
+        "score": 0.7316155,
+        "raw_content": null
+      },
+      {
+        "url": "https://cosmeticsbusiness.com/quadpack-presents-scandinavia-s-largest-packaging-fair-scan-pack-in-gothenburg-sweden-81402",
+        "title": "Quadpack presents Scandinavia's largest packaging fair, Scan Pack ...",
+        "content": "Quadpack Quadpack is a global manufacturer and provider of cosmetics packaging solutions for beauty brands. Established in 2003, it has offices",
+        "score": 0.6778372,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.94,
+    "request_id": "872dc6e0-1555-436f-828d-678d759cd431"
+  }
+}

@@ -17,13 +17,13 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 
 // SavedCompanyList interface is now imported from savedListsService
 
 interface CompanyListManagerProps {
-  currentCompanies: SupabaseCompany[]
+  currentCompanies: CompanyRecord[]
   currentFilters: any
   onListSelect: (list: SavedCompanyList) => void
   onListUpdate: (lists: SavedCompanyList[]) => void

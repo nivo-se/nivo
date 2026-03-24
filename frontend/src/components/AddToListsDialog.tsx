@@ -17,13 +17,13 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { SavedCompanyList, SavedListsService } from '../lib/savedListsService'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { toast } from './ui/use-toast'
 
 interface AddToListsDialogProps {
   isOpen: boolean
   onClose: () => void
-  companies: SupabaseCompany[]
+  companies: CompanyRecord[]
   onSuccess?: (list: SavedCompanyList) => void
 }
 

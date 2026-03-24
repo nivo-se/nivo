@@ -40,7 +40,7 @@ import {
 } from 'recharts'
 import { ValuationMetrics, ValuationDatasetForExport, toCsv } from '../lib/valuation'
 import { SavedCompanyList, SavedListsService } from '../lib/savedListsService'
-import { supabaseDataService, SupabaseCompany } from '../lib/supabaseDataService'
+import { companyDataService, type CompanyRecord } from '../lib/companyDataService'
 
 const MIN_COMPANIES = 3
 
@@ -136,7 +136,7 @@ const parseInteger = (value: unknown): number | null => {
   return null
 }
 
-const mapSupabaseCompanyToOption = (company: SupabaseCompany): CompanyOption => ({
+const mapCompanyRecordToOption = (company: CompanyRecord): CompanyOption => ({
   OrgNr: company.OrgNr,
   name: company.name ?? 'Okänt bolag',
   segment_name: company.segment_name ?? company.industry_name ?? null,
@@ -313,12 +313,12 @@ const useDebounce = <T,>(value: T, delay = 400) => {
 
 const fetchCompanies = async (searchTerm: string): Promise<CompanyOption[]> => {
   try {
-    const supabaseResults = await supabaseDataService.searchCompanies(searchTerm, 20)
-    if (supabaseResults.length > 0) {
-      return uniqueCompanies(supabaseResults.map(mapSupabaseCompanyToOption))
+    const searchResults = await companyDataService.searchCompanies(searchTerm, 20)
+    if (searchResults.length > 0) {
+      return uniqueCompanies(searchResults.map(mapCompanyRecordToOption))
     }
   } catch (error) {
-    console.error('Supabase valuation search failed:', error)
+      console.error('Valuation company search failed:', error)
   }
 
   const params = new URLSearchParams({ limit: '20' })
@@ -451,7 +451,7 @@ const ValuationPage: React.FC = () => {
     }
 
     const mappedCompanies = uniqueCompanies(
-      (activeSavedListData.companies || []).map(mapSupabaseCompanyToOption)
+      (activeSavedListData.companies || []).map(mapCompanyRecordToOption)
     )
 
     if (mappedCompanies.length === 0) {

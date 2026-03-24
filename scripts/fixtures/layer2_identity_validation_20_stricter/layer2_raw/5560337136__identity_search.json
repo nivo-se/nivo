@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560337136",
+  "company_name": "Cramo AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Cramo\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Cramo official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.cramo.lt/en",
+        "title": "Welcome to Cramo",
+        "content": "Cramo rents out machinery and equipment for large and small projects in the building and construction, industrial and public sectors.",
+        "score": 0.73322314,
+        "raw_content": null
+      },
+      {
+        "url": "https://cramoservices.com/index.php/home/",
+        "title": "Home – Cramo",
+        "content": "Elevate your adventures to new heights Get in touch with Cramo Services today and let's create magical memories together! ... Copyright @ Cramo Services Website",
+        "score": 0.7237202,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.cramo.com/",
+        "title": "CRAMO - Full service renting partner",
+        "content": "CRAMO - Equipment rental services in 11 countries.",
+        "score": 0.66777676,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/CramoGroup/",
+        "title": "CRAMO (@CramoGroup) - Facebook",
+        "content": "CRAMO. 37130 likes · 1 talking about this. Cramo provides equipment rental services, a full range of machinery equipment and related services.",
+        "score": 0.6139086,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.youtube.com/cramogroup",
+        "title": "Cramo - YouTube",
+        "content": "Cramo is a full assortment supplier in access equipment. We offer a full range of machinery from 4 to 50 metres in working height.",
+        "score": 0.61112726,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.77,
+    "request_id": "509f3e73-27a0-435a-a395-0b79e291496e"
+  }
+}

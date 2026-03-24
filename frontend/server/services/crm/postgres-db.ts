@@ -1,7 +1,7 @@
 /**
  * Postgres-backed CRM database client.
  * Implements CrmDb for use with local Postgres (Mac mini / docker).
- * Uses local Postgres (Mac mini / docker) instead of Supabase.
+ * Uses local Postgres (Mac mini / docker).
  * Configure via POSTGRES_* or DATABASE_URL in .env.
  */
 
@@ -41,7 +41,7 @@ export function isCrmPostgresConfigured(): boolean {
 
 import type { CrmDb } from './db-interface.js'
 
-/** Postgres-backed CRM DB – replaces Supabase for CRM operations. */
+/** Postgres-backed CRM DB. */
 export class PostgresCrmDb implements CrmDb {
   constructor(private readonly pool: pg.Pool) {}
 

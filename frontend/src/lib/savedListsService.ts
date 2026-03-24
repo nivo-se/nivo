@@ -1,5 +1,5 @@
 import { getAccessToken } from './authToken'
-import { SupabaseCompany } from './supabaseDataService'
+import type { CompanyRecord } from './companyDataService'
 
 async function authHeaders(extra: HeadersInit = {}): Promise<HeadersInit> {
   const token = await getAccessToken()
@@ -13,7 +13,7 @@ export interface SavedCompanyList {
   id: string
   name: string
   description?: string
-  companies: SupabaseCompany[]
+  companies: CompanyRecord[]
   filters: any
   createdAt: string
   updatedAt: string

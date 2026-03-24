@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5562146018",
+  "company_name": "Fladen Fishing Aktiebolag",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Fladen Fishing\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Fladen Fishing what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.crunchbase.com/organization/fladen-fishing",
+        "title": "Fladen Fishing - Crunchbase Company Profile & Funding",
+        "content": "Fladen Fishing is a company that specializes in the design and development of fishing tackle, outdoor clothing, and boat accessories. Their product range is",
+        "score": 0.8783249,
+        "raw_content": null
+      },
+      {
+        "url": "https://fladenfishing.se/en/pages/om-oss?srsltid=AfmBOoq53m4s_1QvGMJrxUxHC-HvsNcDXe0mW9InuYw32LBR7K65k5C_",
+        "title": "About us – Fladen Fishing AB",
+        "content": "Therefore, we ensure that our production lives up to high standards and that it takes place under good working conditions. Fladen Fishing are members of the Business Social Compliance Initiative - BSCI and through this we have a greater opportunity to influence suppliers and factories in a positive direction. Together with experienced anglers, Fladen Fishing is careful to follow new trends, develop and improve our range continuously. Manufacturing takes place without intermediaries at leading manufacturers around the world and we work actively to find the best manufacturer for each product, all in order to be able to offer the best quality at the best price. Fladen Fishing works actively to ensure that the working environment at our manufacturers is the best possible. Today, you can find products from us at the vast majority of specialist retailers in sport fishing. We have fishing equipment for a small amount of money for those who want to start fishing, but we also have more advanced products for those who want the very best.",
+        "score": 0.7593865,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.mokkimies.com/fladen_fishing",
+        "title": "Fladen Fishing - Mökkimies.com",
+        "content": "We know you will find yours from Fladen products. Fladen has fishing tackle for everyone, and anyone can fish.",
+        "score": 0.60049355,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.instagram.com/fladenfishing_official/",
+        "title": "Fladen Fishing AB (@fladenfishing_official) · Varberg - Instagram",
+        "content": "Everything in sportfishing - quick delivery. Our wide range of products contains over 5000 items for all types of fishing.",
+        "score": 0.586926,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/fladenfishing/posts/everything-for-ice-fishing-visit-our-resellers-or-fladen-stores-in-sweden-for-ev/775040474660169/",
+        "title": "Everything for ice fishing! Visit our resellers or Fladen Stores in ...",
+        "content": "Everything for ice fishing! ❄ Visit our resellers or Fladen Stores in Sweden for everything you need for safe and comfortable ice fishing.",
+        "score": 0.47139415,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.17,
+    "request_id": "7ec02a45-2fae-42a6-a3a5-4d52e7df277c"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560069463",
+  "company_name": "Alfa Laval Corporate AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Alfa Laval Corporate\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Alfa Laval Corporate official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://corporate.alfalaval.com/",
+        "title": "Alfa Laval - Corporate",
+        "content": "Alfa Laval - Corporate. Menu. Live; Categories; DEC · About Alfa Laval · Alfa Laval Mexico · América Cono Sur · Australia · Benelux · Canadian · China · French",
+        "score": 0.77589405,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.alfalaval.com/en-fr/",
+        "title": "Alfa Laval: Corporate",
+        "content": "We create better everyday conditions for people. We do this by contributing to a more sustainable future through engineering innovation.",
+        "score": 0.7251239,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.alfalaval.com/about-us/our-company/",
+        "title": "What we do - Alfa Laval",
+        "content": "Alfa Laval is a leading global provider of first-rate products in the areas of heat transfer, separation and fluid handling.",
+        "score": 0.6862234,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.alfalaval.us/",
+        "title": "Alfa Laval: Heat transfer, separation and fluid handling",
+        "content": "Alfa Laval is a global leader in the design and manufacture of fluid handling equipment, epitomizing innovation, efficiency and reliability.",
+        "score": 0.67758125,
+        "raw_content": null
+      },
+      {
+        "url": "https://corporate.alfalaval.com/alfa-laval-creating-better",
+        "title": "Alfa Laval - Creating better everyday conditions for people",
+        "content": "Alfa Laval has a broad range of products and systems for purifying waste water and for removing the salt from seawater to make it drinkable.",
+        "score": 0.57322514,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.58,
+    "request_id": "aac3f4f1-caca-4683-939b-d52c9635fbd4"
+  }
+}

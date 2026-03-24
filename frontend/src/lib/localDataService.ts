@@ -1,5 +1,4 @@
-// Local Data Service for SQLite Database Connection
-// This service provides local database access instead of Supabase
+// Local Data Service — company list/analytics via Node enhanced-server (SQLite) or FastAPI-backed routes.
 
 export interface LocalCompany {
   OrgNr: string
@@ -66,9 +65,15 @@ export interface CompanyFilter {
 }
 
 class LocalDataService {
-  // Use configured API base; in dev, empty base routes through Vite proxy.
   private getBaseUrl(): string {
     return API_BASE
+  }
+
+  /** Node enhanced-server (port 3001 by default). Company list lives here, not on FastAPI. */
+  private getNodeApiUrl(): string {
+    const raw = (import.meta.env.VITE_NODE_API_URL as string | undefined)?.trim()
+    if (raw) return raw.replace(/\/$/, '')
+    return 'http://localhost:3001'
   }
 
   // Get all companies with pagination and filtering
@@ -78,25 +83,45 @@ class LocalDataService {
     filters: CompanyFilter = {}
   ): Promise<SearchResults> {
     try {
+      const offset = Math.max(0, (page - 1) * limit)
       const params = new URLSearchParams({
-        page: page.toString(),
         limit: limit.toString(),
-        ...Object.fromEntries(
-          Object.entries(filters).filter(([_, value]) => value !== undefined)
-        )
+        offset: offset.toString(),
       })
+      const f = filters as Record<string, unknown>
+      if (f.name && typeof f.name === "string") params.set("search", f.name)
+      if (f.industry && typeof f.industry === "string") params.set("industry", f.industry)
+      if (f.city && typeof f.city === "string") params.set("city", f.city)
+      const num = (k: string) => {
+        const v = f[k]
+        if (typeof v === "number" && Number.isFinite(v)) params.set(k, String(v))
+      }
+      num("minRevenue")
+      num("maxRevenue")
+      num("minProfit")
+      num("maxProfit")
+      num("minRevenueGrowth")
+      num("maxRevenueGrowth")
+      num("minEBITAmount")
+      num("maxEBITAmount")
+      num("minEmployees")
+      num("maxEmployees")
+      if (f.profitability && typeof f.profitability === "string") params.set("profitability", f.profitability)
+      if (f.size && typeof f.size === "string") params.set("size", f.size)
+      if (f.growth && typeof f.growth === "string") params.set("growth", f.growth)
 
-      const response = await fetch(`${this.getBaseUrl()}/companies?${params}`)
+      const response = await fetch(`${this.getNodeApiUrl()}/api/companies?${params}`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const data = await response.json()
+      const total = data.pagination?.total ?? data.total ?? 0
       
       return {
         companies: data.companies || [],
-        total: data.total || 0,
+        total,
         summary: {
           avgRevenue: data.summary?.avgRevenue || 0,
           avgGrowth: data.summary?.avgGrowth || 0,
@@ -213,14 +238,18 @@ class LocalDataService {
   // Get company by OrgNr
   async getCompany(orgNr: string): Promise<LocalCompany | null> {
     try {
-      const response = await fetch(`${this.getBaseUrl()}/companies/${orgNr}`)
+      const response = await fetch(`${this.getNodeApiUrl()}/api/companies?orgnr=${encodeURIComponent(orgNr)}`)
       
       if (!response.ok) {
         if (response.status === 404) return null
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      return await response.json()
+      const data = await response.json()
+      if (data && typeof data === "object" && "company" in data) {
+        return (data as { company: LocalCompany }).company
+      }
+      return data as LocalCompany
     } catch (error) {
       console.error('Error fetching company:', error)
       return null
@@ -230,13 +259,17 @@ class LocalDataService {
   // Get dashboard analytics
   async getDashboardAnalytics() {
     try {
-      const response = await fetch(`${this.getBaseUrl()}/analytics/dashboard`)
+      const response = await fetch(`${this.getNodeApiUrl()}/api/analytics`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      return await response.json()
+      const body = await response.json()
+      if (body && typeof body === "object" && "data" in body) {
+        return (body as { data: Record<string, unknown> }).data
+      }
+      return body
     } catch (error) {
       console.error('Error fetching dashboard analytics:', error)
       // Return mock data when API is not available
@@ -255,18 +288,18 @@ class LocalDataService {
   async searchCompanies(query: string, limit: number = 20): Promise<LocalCompany[]> {
     try {
       const params = new URLSearchParams({
-        q: query,
-        limit: limit.toString()
+        search: query,
+        limit: limit.toString(),
       })
 
-      const response = await fetch(`${this.getBaseUrl()}/companies/search?${params}`)
+      const response = await fetch(`${this.getNodeApiUrl()}/api/companies?${params}`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const data = await response.json()
-      return data.companies || []
+      return (data.companies || data.data?.companies || []) as LocalCompany[]
     } catch (error) {
       console.error('Error searching companies:', error)
       return []

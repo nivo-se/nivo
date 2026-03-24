@@ -10,7 +10,7 @@ This module adds a CRM layer on top of `deep_research` company intelligence data
 - `GOOGLE_WORKSPACE_SENDER`
 - `OPENAI_API_KEY`
 - `APP_BASE_URL`
-- existing Supabase env vars (`VITE_SUPABASE_URL` and service key)
+- `DATABASE_URL` or `POSTGRES_HOST` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` (same Postgres as the rest of the stack)
 
 ## Flow
 

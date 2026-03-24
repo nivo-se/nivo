@@ -46,7 +46,6 @@ export default defineConfig(({ mode }) => ({
           'react-vendor': ['react', 'react-dom'],
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-tabs', '@radix-ui/react-select'],
           'chart-vendor': ['recharts'],
-          'supabase-vendor': ['@supabase/supabase-js'],
           // Split large components
           'ai-components': [
             './src/components/AIAnalytics.tsx',

@@ -21,7 +21,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { AnalyticsService, CompanyFilter } from '../lib/analyticsService'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 
 // SavedCompanyList interface is now imported from savedListsService

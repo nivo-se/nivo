@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564968039",
+  "company_name": "Formenta AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Formenta\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Formenta official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.formentera.es/en/",
+        "title": "Turismo de Formentera » Web oficial de Turismo de Formentera",
+        "content": "Welcome to paradise Formentera beaches     Formentera Starlight destination More info      Explore Formentera Interactive map     The Lighthouse Route View route     Amazing Mediterranean landscapes Flora and fauna     Tour Formentera 32 Routes. Technical storage or access is strictly necessary for the legitimate purpose of enabling the use of a specific service explicitly requested by the subscriber or user, or for the sole purpose of carrying out the transmission of a communication over an electronic communications network. El almacenamiento o acceso técnico es necesario para la finalidad legítima de almacenar preferencias no solicitadas por el abonado o usuario. Storage or technical access that is used exclusively for statistical purposes. Sin un requerimiento, el cumplimiento voluntario por parte de tu proveedor de servicios de Internet, o los registros adicionales de un tercero, la información almacenada o recuperada sólo para este propósito no se puede utilizar para identificarte. Technical storage or access is necessary to create user profiles for the purpose of targeting advertising, or to track the user across a website or multiple websites for similar marketing purposes.",
+        "score": 0.6994397,
+        "raw_content": null
+      },
+      {
+        "url": "https://formenta.art/en/home-page-english/",
+        "title": "Handicraft workshop - Formenta",
+        "content": "Nasze meble wytwarzamy głównie z drewna orzecha włoskiego i dębu, ale i z pozostałych gatunków, zależnie od preferencji i zapotrzebowania.",
+        "score": 0.66229486,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.formenterahotelsguide.com/en",
+        "title": "Official website of on-line reservations of ... - Formentera Hotels Guide",
+        "content": "With Formentera Hotels Guide you can make direct online bookings with hotels in Ibiza and Formentera. We undertake to do our utmost to make your stay on Ibiza",
+        "score": 0.6546525,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.formenta.ca/en/story-of-formenta",
+        "title": "Story of Formenta | A family business of three generations",
+        "content": "Formenta is the original trademark of Nyholm Group, which holds several companies focusing on products for the urban outdoors.",
+        "score": 0.63397753,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.hotelcaformenta.it/",
+        "title": "Hotel Ca' Formenta Venice Official Site | Hotels near the Venice ...",
+        "content": "Venetian style, Italian hospitality, services in line with international standards. Hotel Ca' Formenta offers you a no-worries stay in Venice! Revolution Slider",
+        "score": 0.63179934,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.86,
+    "request_id": "00b0fb6e-b365-4304-a042-84816e4f7ff2"
+  }
+}

@@ -18,6 +18,8 @@ Usage:
     --input /tmp/shortlist_resolved.csv --out-dir /tmp/layer2_run
 
 Requires: TAVILY_API_KEY in environment (for rows that need resolution), httpx, bs4.
+
+Exit codes: 0 success, 2 bad input. (Tavily unavailable rows remain unresolved; Layer 2 can still run in homepage-missing mode.)
 """
 
 from __future__ import annotations
@@ -44,8 +46,11 @@ except ImportError:
 from backend.services.shortlist_homepage_resolver import (
     DEFAULT_MAJOR_NAME_KEYWORDS,
     DEFAULT_MAJOR_ORGNR_DENYLIST,
+    collect_tavily_startup_diagnostics,
     resolve_shortlist_rows,
+    row_needs_homepage_tavily_lookup,
 )
+from backend.services.shortlist_homepage_resolver.resolver import classify_exclusion
 
 logger = logging.getLogger(__name__)
 
@@ -192,6 +197,61 @@ def main() -> None:
         len(extra_org),
     )
 
+    startup = collect_tavily_startup_diagnostics()
+    homepage_in_csv = "homepage" in base_fields
+    logger.info("Input columns (%d): %s", len(base_fields), ", ".join(base_fields))
+    logger.info("homepage column present: %s", homepage_in_csv)
+    if rows:
+        r0 = rows[0]
+        logger.info(
+            "Sample row[0]: orgnr=%r company_name=%r homepage=%r",
+            str(r0.get("orgnr", ""))[:32],
+            str(r0.get("company_name", ""))[:80],
+            r0.get("homepage"),
+        )
+
+    eligible_need_tavily = 0
+    for r in rows:
+        orgnr = str(r.get("orgnr", "")).strip()
+        name = str(r.get("company_name", "")).strip()
+        if not orgnr or not name:
+            continue
+        if classify_exclusion(
+            orgnr,
+            name,
+            r,
+            manual_orgnrs=manual,
+            name_keywords=keywords,
+            min_revenue_column=args.min_revenue_column,
+            min_revenue_threshold=args.min_revenue_threshold,
+        ):
+            continue
+        if row_needs_homepage_tavily_lookup(r):
+            eligible_need_tavily += 1
+
+    logger.info(
+        "Tavily startup: import_ok=%s api_key_env=%s api_key_configured=%s available=%s",
+        startup.get("tavily_import_ok"),
+        startup.get("tavily_api_key_env_present"),
+        startup.get("tavily_api_key_configured"),
+        startup.get("tavily_available"),
+    )
+    if not startup.get("tavily_available") and eligible_need_tavily > 0:
+        if not startup.get("tavily_import_ok"):
+            hint = (
+                "Tavily client could not import (often missing `requests` in this Python). "
+                "Use the project venv, e.g. backend/venv/bin/python with PYTHONPATH=., or install backend deps."
+            )
+        elif not startup.get("tavily_api_key_configured"):
+            hint = "Set TAVILY_API_KEY in .env or environment, or configure it in backend settings."
+        else:
+            hint = "See tavily_startup in this JSON."
+        logger.warning(
+            "Tavily unavailable but %d rows have no manual homepage; they will stay unresolved. %s",
+            eligible_need_tavily,
+            hint,
+        )
+
     resolved, excluded, stats = resolve_shortlist_rows(
         rows,
         manual_orgnrs=manual,
@@ -199,6 +259,7 @@ def main() -> None:
         min_revenue_column=args.min_revenue_column,
         min_revenue_threshold=args.min_revenue_threshold,
         pause_seconds=args.sleep,
+        tavily_startup=startup,
     )
 
     # Ensure resolution columns exist in field order
@@ -218,10 +279,13 @@ def main() -> None:
 
     summary = {
         "input_csv": str(args.input.resolve()),
+        "input_columns": list(base_fields),
+        "homepage_column_in_csv": homepage_in_csv,
         "input_rows": len(rows),
         "resolved_rows": len(resolved),
         "excluded_rows": len(excluded),
         "homepage_status_counts": {
+            "manual_curated": stats.get("manual_curated", 0),
             "verified_existing": stats["verified_existing"],
             "resolved_tavily": stats["resolved_tavily"],
             "unresolved": stats["unresolved"],
@@ -229,7 +293,22 @@ def main() -> None:
             "dead_original": stats["dead_original"],
         },
         "excluded_count": stats["excluded"],
+        "rejected_directory_candidates": stats.get("rejected_directory_candidates", 0),
+        "accepted_first_party_domains": stats.get("accepted_first_party_domains", 0),
+        "unresolved_rows": stats.get("unresolved_rows", stats.get("unresolved", 0)),
+        "tavily_attempted_rows": stats.get("tavily_attempted_rows", 0),
+        "tavily_startup": stats.get("tavily_startup", startup),
+        "tavily_runtime_counts": stats.get("tavily_runtime_counts", {}),
     }
+    rtc = summary["tavily_runtime_counts"]
+    if (
+        rtc.get("tavily_search_calls", 0) > 0
+        and rtc.get("tavily_search_calls_with_results", 0) == 0
+        and summary["homepage_status_counts"].get("unresolved", 0) > 0
+    ):
+        summary["resolver_warning"] = (
+            "tavily_search_returned_empty_for_every_call; check API key, network, and quotas."
+        )
     print(json.dumps(summary, indent=2))
     if args.out_summary:
         args.out_summary.write_text(json.dumps(summary, indent=2), encoding="utf-8")

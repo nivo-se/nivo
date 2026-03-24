@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560444153",
+  "company_name": "Bring Sverige AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Bring Sverige\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Bring Sverige official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.bring.se/en",
+        "title": "bring.se/en",
+        "content": "##### Business. ##### Private. ##### Bring. ##### Business logins. Illustration of hand, holding a parcel. # Sustainable deliveries. ### Receive parcels. Everything you need to know about delivery, pickup, and handling of your parcels. ### Services. Read about our services and book directly or request a quote. ### Customer service. For customers who have questions or want to contact us. ## Price enquiry. Request a quote for your business. ## Business. ## Private. ## Bring.",
+        "score": 0.6501347,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bring.se/en/about-bring",
+        "title": "About Bring - bring.se/en",
+        "content": "# About Bring. Bring solves everyday logistics for small and large companies in the Nordic region. The Nordic region is Bring's home. From our Nordic base, we can help you with your logistics to and from the wider world, regardless of type of transport. At Bring we are about 6000 employees working to provide good service for your company, based on these clear values; honesty, courage, openness, cooperation and respect. ## Environment & Sustainability. Bring strives to be a leader in environmental solutions in our industry. Large parts of our company is certified within environment and quality according to the standards ISO 14001 and ISO 9,001th. ## Ethical guidelines. Our ethical guidelines are based on the group's values, and form a norm for what is considered good and responsible conduct. Our ethical guidelines form a norm for good and responsible conduct, and apply to all employees in the group. The group must be characterized by a high ethical standard and an open corporate culture.",
+        "score": 0.62934244,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bring.se/",
+        "title": "Bring | Vad kan vi hjälpa dig med?",
+        "content": "# Snabba och flexibla leveranser i hela Sverige. ### Ta emot och returnera dina paket. Så får du det du beställt levererat till dörren, ombudet och paketboxen. ### Sök paketbox och ombud. Till våra företagstjänster och inspiration. Här hittar du kontaktvägar och svar på de vanligaste frågorna. ## Så packar och skickar du med Bring. Har du sålt något via en köp- och säljplattform? Med Bring blir det enkelt att packa, märka och lämna in paketet. Här får du en tydlig guide för hur du gör, så att ditt paket kommer fram tryggt och smidigt. ## Du beställer Bring levererar. Eller utanför din dörr om du hellre vill det. Och om du inte är hemma levererar vi till ditt närmsta paketombud. Eller till en paketbox om du föredrar det. Det ska vara lätt att välja rätt. Därför är våra paketleveranser till paketboxar och ombud Svanenmärkta i hela landet. Ja, så att det ska vara enkelt för dig att göra smarta val.",
+        "score": 0.59033114,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bring.se/en/services",
+        "title": "Services - bring.se/en",
+        "content": "Services · What do you need? · Parcels and cargo · Courier and express · International cargo · Warehousing · Mail within the Nordics · Customs · Business.",
+        "score": 0.5803764,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bring.se/en/private/customer-service/contact-us",
+        "title": "Contact us - bring.se/en",
+        "content": "Outside opening hours, the AI assistant will help you. Courier & express: +46771-269 269. Weekdays: 08:00–17:00",
+        "score": 0.53648347,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.75,
+    "request_id": "34278f08-d372-4fb2-bb8a-232ae7448ac4"
+  }
+}

@@ -1,6 +1,5 @@
 /**
  * CRM database interface – implemented by PostgresCrmDb.
- * Allows CRM services to work with Postgres instead of Supabase.
  */
 
 export interface CrmCompanyListItem {

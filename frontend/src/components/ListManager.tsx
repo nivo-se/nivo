@@ -24,12 +24,12 @@ import {
   EyeOff
 } from 'lucide-react'
 import { SavedCompanyList, SavedListsService } from '../lib/savedListsService'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { toast } from './ui/use-toast'
 
 interface ListManagerProps {
   onListSelect?: (list: SavedCompanyList) => void
-  onCompanySelect?: (company: SupabaseCompany) => void
+  onCompanySelect?: (company: CompanyRecord) => void
   showActions?: boolean
   allowEditing?: boolean
   allowSelection?: boolean

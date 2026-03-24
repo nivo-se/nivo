@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5561210560",
+  "company_name": "Loomis Sverige AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Loomis Sverige\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Loomis Sverige official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.zoominfo.com/c/loomis-sverige-ab/483532671",
+        "title": "Loomis Sverige - Overview, News & Similar companies - ZoomInfo",
+        "content": "What is Loomis Sverige's official website? Loomis Sverige's official website is www.loomis.se. Sign Up for FreeTo access detailed company insights.",
+        "score": 0.939919,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/sv-se/",
+        "title": "Loomis Sverige - Betalningslösningar och Säker Transport",
+        "content": "Loomis är specialister på transport, hantering och förvaring av skyddsvärt gods. Med stöd av den senaste tekniken levererar Loomis effektiva lösningar för att spara din tid. Loomis hjälper dig med en säker hantering av kontanter. Loomis hjälper dig med det så att du kan fokusera på att utveckla din verksamhet för en framgångsrik framtid! Vår planet står inför stora utmaningar på grund av klimatförändringar och miljöföroreningar, men det är inte försent att göra saker bättre. Efter en grundlig analys av Loomis miljöpåverkan bestämde vi oss för att sätta ett tydligt mål: att minska våra CO2-utsläpp med 15 % 2024 och med 20 % 2025. Säkra, effektiva och spårbara transporter är en nyckelkompontent för våra kunder och det finns i Loomis DNA. > \"Vi handlar med särskilt värdefulla och eftertraktade produkter; guld och silver som investering, det ställer höga krav på alla delar av processen. Ta reda på hur Loomis kan hjälpa dig att minska kostnaderna samtidigt som säkerheten och precisionen förbättras.",
+        "score": 0.75831425,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.loomis.com/sv-se/",
+        "title": "Hem | Loomis Corporate",
+        "content": "Loomis tjänster är samhällskritiska och stödjer centralbankernas arbete för att säkerställa välfungerande  betalningsflöden på våra marknader. Genom att hantera alla typer av betalningsmedel och möjliggöra tillgången till finansiella tjänster, bidrar Loomis till att bygga ett inkluderande och motståndskraftigt samhälle. Med stark tonvikt på säkerhet och effektiv logistik säkerställer vi att kontanter är lättillgängliga i samhället genom att transportera kontanter till och från centralbanker, finansiella institutioner och privatkunder. Våra automationslösningar för kontanthantering är utvecklade för att minska den tid, arbetskraft och kostnad det tar att säkert hantera kontanttransaktioner för detaljhandelsföretag. Loomis investerarrelationer syftar till att kontinuerligt hålla kapitalmarknaderna informerade om bolagets verksamhet och utveckling. På Loomis tror vi att det är avgörande att ha rätt personer i rätt roller för att förverkliga vår vision om att skapa ett inkluderande samhälle med lika tillgång till betalning för alla. Loomis höll en kapitalmarknadsdag för institutionella investerare och analytiker den 13 november 2024 i London. Loomis meddelar nedskrivning av goodwill och avsättning för det fjärde kvartalet 2025.",
+        "score": 0.73981786,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/en-se/about-us",
+        "title": "About us | Loomis",
+        "content": "## Contact us. ## How can we help? ### New Business Enquiries. Let us help you reduce costs and improve security when handling payments, cash and valuables. ### Support. Contact our customer service by calling 010-163 63 00 or by filling in the form via the link below. Our opening hours are 08:00-17:00 Monday - Friday. Enter your phone number and one of our agents will call you when available. ## Legal. LOOMIS SVERIGE AB | STAFFANS VÄG 1, 192 78 SOLLENTUNA | ORG: 556191-0679. ### We are here to help. Find out how Loomis can help you cut costs while improving security and accuracy.",
+        "score": 0.7382357,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/pages/Loomis-Sverige-AB/443545189097802",
+        "title": "Loomis Sverige AB - Home | Facebook",
+        "content": "Loomis Sverige AB, Stockholm, Sweden. 11 likes. Local business.",
+        "score": 0.71758664,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.74,
+    "request_id": "aa90afd3-fd49-4e56-bf6f-9b5815080db5"
+  }
+}

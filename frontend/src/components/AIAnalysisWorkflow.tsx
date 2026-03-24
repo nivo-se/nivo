@@ -19,7 +19,7 @@ import {
   ArrowRight,
   Info
 } from 'lucide-react'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { SavedCompanyList } from '../lib/savedListsService'
 
 interface AIAnalysisResult {

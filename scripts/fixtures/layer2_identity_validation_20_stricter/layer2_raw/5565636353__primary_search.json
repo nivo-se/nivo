@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5565636353",
+  "company_name": "AB Poly-Produkter",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"AB Poly-Produkter\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "AB Poly-Produkter what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.polyprodukter.se/",
+        "title": "AB Poly-Produkter: Innovation och tradition sedan 1967",
+        "content": "AB Poly-Produkter är ett familjeföretag som grundades i Göteborg 1967 av Gunvor och Börje Nilsson. AB Poly-Produkter driver idag två varumärken: PolyRopes och PolyAgri. AB Poly-Produkter är ett familjeföretag som grundades i Göteborg 1967 av Gunvor och Börje Nilsson. AB Poly-Produkter driver idag två varumärken: PolyRopes och PolyAgri. Med vårt varumärke PolyRopes fokuserar vi på högkvalitativa rep och snören. Vi tillverkar ett brett utbud av produkter för båtlivet, såsom förtöjningstampar, fenderlinor, skot, fall och mycket mer. Utöver vårt båtsortiment erbjuder vi även ett brett utbud av rep och snören i olika längder och dimensioner, anpassade för en mängd olika ändamål. Vi är specialiserade på produkter för höhantering och erbjuder bland annat balplast, balnät och plansilofolie. Plast spelar en stor roll även här, och med innovativa lösningar har vi arbetat för att förbättra plastens hållbarhet samtidigt som vi minskar dess volymbehov. Vi tillverkar pressgarn och utgödslingslinor av hög kvalitet med enastående slitstyrka – produkter du kan lita på i alla lägen.",
+        "score": 0.81418616,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.polyropes.eu/about-us/",
+        "title": "About us - PolyRopes",
+        "content": "rope experts since 1967 mobil. At first glance, PolyRopes is just a rope company. Meet us who work here and get an insight into how we view rope manufacturing, entrepreneurship, and customer care. Börje is in a hurry to catch the flight that will take him to Portugal for a meeting with a major rope manufacturer. Börje and Gunvor Nilsson founded the company AB Poly-Produkter in 1967, and since then, we have been somewhat of a newcomer in Swedish rope manufacturing. A rope is so much more than just a rope; it’s what you do with it, a solution to thousands of problems. With our own manufacturing and sales, we can offer short lead times, customized production, and fast deliveries. **2022** – The number of brands is reduced from five to two, one for rope and boating; and one for agriculture. ### What you get when you choose ropes from us. * A warehouse with over 4000 ropes. - Rope for cat scratching post.",
+        "score": 0.7568076,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.trademo.com/companies/poly-produkter-ab/46691089",
+        "title": "Supply Chain Data Of Poly Produkter Ab Company Profile | Trademo",
+        "content": "Based on recent shipment records, Poly Produkter Ab mainly imports windows and windows doors. This data is aggregated from verified global customs and trade",
+        "score": 0.7101667,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/polyprodukter/",
+        "title": "AB Poly-Produkter (@polyprodukter) - Facebook",
+        "content": "AB Poly-Produkter, Västra Frölunda. 1541 likes. Skandinaviens ledande tågvirkesföretag grundat år 1967. Stort sortiment med innovativa produkter.",
+        "score": 0.6342494,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/polyprodukter/mentions/",
+        "title": "AB Poly-Produkter (@polyprodukter) - Facebook",
+        "content": "AB Poly-Produkter, Västra Frölunda. 1544 likes. Skandinaviens ledande tågvirkesföretag grundat år 1967. Stort sortiment med innovativa produkter.",
+        "score": 0.62000114,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.82,
+    "request_id": "00716901-7d55-4bf8-8d7f-99a07c452d9f"
+  }
+}

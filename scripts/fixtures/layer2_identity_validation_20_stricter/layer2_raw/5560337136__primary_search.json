@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560337136",
+  "company_name": "Cramo AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Cramo\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Cramo what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://vertikal.net/en/news/story/12638/cramo-expands-in-sweden",
+        "title": "Cramo expands in Sweden - Vertikal.net",
+        "content": "They have four locations in Gothenburg and one depot in nearby Falkenberg. Products include tools, construction and access equipment. The",
+        "score": 0.7309246,
+        "raw_content": null
+      },
+      {
+        "url": "https://pitchbook.com/profiles/company/61376-50",
+        "title": "Cramo 2026 Company Profile: Valuation, Funding & Investors",
+        "content": "Cramo Oyj is a provider of construction equipment rentals. The company rents transporting equipment, concrete equipment and treatment tools.",
+        "score": 0.71687365,
+        "raw_content": null
+      },
+      {
+        "url": "https://leadiq.com/c/cramo/5a1d964c2300005a0084f41e",
+        "title": "Cramo Company Overview, Contact Details & Competitors | LeadIQ",
+        "content": "Cramo is a leading European equipment rental services company serving approximately 150,000 customers through around 200 depots across 6 markets with a full",
+        "score": 0.6688159,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.innofactor.com/customers/cramo-tabella/",
+        "title": "A software solution for Cramo's diverse financial planning needs",
+        "content": "Customer story: Cramo. Cramo is a full-service construction machinery rental company that also provides services to support construction, renovation and",
+        "score": 0.657561,
+        "raw_content": null
+      },
+      {
+        "url": "https://noordigital.com/case-studies/cramo/",
+        "title": "Showcase – Cramo | Noor Digital",
+        "content": "Cramo is a leading provider of equipment rental services, offering a wide range of products and solutions to businesses across various industries. From construction equipment to tools and machinery, Cramo provides essential rental services that help companies in need of temporary equipment solutions. Since the beginning of our collaboration in 2021, Noor Digital has had the privilege of partnering with Cramo to develop a long-term, data-driven SEO strategy. A significant boost in visibility and new all-time highs in organic traffic year after year, supporting a digital presence that reflects Cramo’s position as a market leader. By equipping their team with a deeper understanding of SEO, Cramo can now disseminate this expertise across different regions, ensuring consistent digital strategies across their international locations. Our agile, hands-on approach has been key in ensuring that the SEO strategy remains relevant as market conditions and Google algorithms evolve, helping Cramo maintain a unified, effective SEO presence across all markets.",
+        "score": 0.6399392,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.74,
+    "request_id": "15f89dea-fd46-47c9-8e88-50df0493b169"
+  }
+}

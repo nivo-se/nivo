@@ -1,9 +1,8 @@
 /**
- * Valuation Assumptions Loader
- * Loads and manages valuation assumptions from database with fallbacks
+ * Valuation assumptions — loaded from Postgres via pg Pool.
  */
 
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { Pool } from 'pg'
 import { ValuationAssumptions } from './engine.js'
 
 export interface ValuationAssumptionsRecord {
@@ -38,11 +37,8 @@ export interface AssumptionsOverride {
   netDebtDirect?: number
 }
 
-/**
- * Load assumptions for a specific model and company profile
- */
 export async function loadAssumptions(
-  supabase: SupabaseClient,
+  pool: Pool,
   modelKey: string,
   industry: string,
   sizeBucket: string,
@@ -50,57 +46,47 @@ export async function loadAssumptions(
   overrides?: AssumptionsOverride
 ): Promise<ValuationAssumptions> {
   try {
-    // Try to find exact match first
-    let { data, error } = await supabase
-      .from('valuation_assumptions')
-      .select('*')
-      .eq('model_key', modelKey)
-      .eq('industry', industry)
-      .eq('size_bucket', sizeBucket)
-      .eq('growth_bucket', growthBucket)
-      .single()
+    let data =
+      (
+        await pool.query(
+          `SELECT * FROM valuation_assumptions
+           WHERE model_key = $1 AND industry = $2 AND size_bucket = $3 AND growth_bucket = $4
+           LIMIT 1`,
+          [modelKey, industry, sizeBucket, growthBucket]
+        )
+      ).rows[0] ?? null
 
-    // If no exact match, try with null industry (generic)
-    if (error && error.code === 'PGRST116') {
-      const { data: genericData, error: genericError } = await supabase
-        .from('valuation_assumptions')
-        .select('*')
-        .eq('model_key', modelKey)
-        .is('industry', null)
-        .eq('size_bucket', sizeBucket)
-        .eq('growth_bucket', growthBucket)
-        .single()
-
-      if (!genericError && genericData) {
-        data = genericData
-        error = null
-      }
+    if (!data) {
+      const generic =
+        (
+          await pool.query(
+            `SELECT * FROM valuation_assumptions
+             WHERE model_key = $1 AND industry IS NULL AND size_bucket = $2 AND growth_bucket = $3
+             LIMIT 1`,
+            [modelKey, sizeBucket, growthBucket]
+          )
+        ).rows[0] ?? null
+      data = generic
     }
 
-    // If still no match, try with null size/growth (most generic)
-    if (error && error.code === 'PGRST116') {
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('valuation_assumptions')
-        .select('*')
-        .eq('model_key', modelKey)
-        .is('industry', null)
-        .is('size_bucket', null)
-        .is('growth_bucket', null)
-        .single()
-
-      if (!fallbackError && fallbackData) {
-        data = fallbackData
-        error = null
-      }
+    if (!data) {
+      const fallback =
+        (
+          await pool.query(
+            `SELECT * FROM valuation_assumptions
+             WHERE model_key = $1 AND industry IS NULL AND size_bucket IS NULL AND growth_bucket IS NULL
+             LIMIT 1`,
+            [modelKey]
+          )
+        ).rows[0] ?? null
+      data = fallback
     }
 
-    // If still no match, use defaults
-    if (error || !data) {
+    if (!data) {
       console.warn(`No assumptions found for ${modelKey}, using defaults`)
       return getDefaultAssumptions(modelKey, overrides)
     }
 
-    // Convert database record to assumptions object
     const assumptions: ValuationAssumptions = {
       modelKey: data.model_key,
       revenueMultiple: data.revenue_multiple,
@@ -108,12 +94,11 @@ export async function loadAssumptions(
       earningsMultiple: data.earnings_multiple,
       discountRate: data.discount_rate,
       terminalMultiple: data.terminal_multiple,
-      netDebtMethod: (data.net_debt_method as any) || 'zero',
+      netDebtMethod: (data.net_debt_method as ValuationAssumptions['netDebtMethod']) || 'zero',
       netDebtK: data.net_debt_k,
-      netDebtDirect: undefined // Not stored in DB, only from overrides
+      netDebtDirect: undefined,
     }
 
-    // Apply overrides if provided
     if (overrides && overrides.modelKey === modelKey) {
       if (overrides.revenueMultiple !== undefined) assumptions.revenueMultiple = overrides.revenueMultiple
       if (overrides.ebitdaMultiple !== undefined) assumptions.ebitdaMultiple = overrides.ebitdaMultiple
@@ -132,11 +117,8 @@ export async function loadAssumptions(
   }
 }
 
-/**
- * Load all assumptions for a company profile
- */
 export async function loadAllAssumptions(
-  supabase: SupabaseClient,
+  pool: Pool,
   industry: string,
   sizeBucket: string,
   growthBucket: string,
@@ -146,53 +128,49 @@ export async function loadAllAssumptions(
   const assumptions: ValuationAssumptions[] = []
 
   for (const modelKey of modelKeys) {
-    const override = overrides?.find(o => o.modelKey === modelKey)
-    const assumption = await loadAssumptions(supabase, modelKey, industry, sizeBucket, growthBucket, override)
+    const override = overrides?.find((o) => o.modelKey === modelKey)
+    const assumption = await loadAssumptions(pool, modelKey, industry, sizeBucket, growthBucket, override)
     assumptions.push(assumption)
   }
 
   return assumptions
 }
 
-/**
- * Get default assumptions when database lookup fails
- */
 function getDefaultAssumptions(modelKey: string, overrides?: AssumptionsOverride): ValuationAssumptions {
   const defaults: Record<string, Partial<ValuationAssumptions>> = {
     revenue_multiple: {
       revenueMultiple: 1.5,
       netDebtMethod: 'ratio_revenue',
-      netDebtK: 0.2
+      netDebtK: 0.2,
     },
     ebitda_multiple: {
       ebitdaMultiple: 6.0,
       netDebtMethod: 'ratio_revenue',
-      netDebtK: 0.2
+      netDebtK: 0.2,
     },
     earnings_multiple: {
       earningsMultiple: 8.0,
       netDebtMethod: 'ratio_revenue',
-      netDebtK: 0.2
+      netDebtK: 0.2,
     },
     dcf_lite: {
-      discountRate: 0.10,
+      discountRate: 0.1,
       terminalMultiple: 8.0,
       netDebtMethod: 'ratio_revenue',
-      netDebtK: 0.2
+      netDebtK: 0.2,
     },
     hybrid_score: {
       netDebtMethod: 'ratio_revenue',
-      netDebtK: 0.2
-    }
+      netDebtK: 0.2,
+    },
   }
 
   const defaultAssumptions: ValuationAssumptions = {
     modelKey,
     netDebtMethod: 'zero',
-    ...defaults[modelKey]
+    ...defaults[modelKey],
   }
 
-  // Apply overrides if provided
   if (overrides && overrides.modelKey === modelKey) {
     if (overrides.revenueMultiple !== undefined) defaultAssumptions.revenueMultiple = overrides.revenueMultiple
     if (overrides.ebitdaMultiple !== undefined) defaultAssumptions.ebitdaMultiple = overrides.ebitdaMultiple
@@ -207,53 +185,33 @@ function getDefaultAssumptions(modelKey: string, overrides?: AssumptionsOverride
   return defaultAssumptions
 }
 
-/**
- * Get all available assumptions for admin editing
- */
-export async function getAllAssumptions(supabase: SupabaseClient): Promise<ValuationAssumptionsRecord[]> {
+export async function getAllAssumptions(pool: Pool): Promise<ValuationAssumptionsRecord[]> {
   try {
-    const { data, error } = await supabase
-      .from('valuation_assumptions')
-      .select('*')
-      .order('model_key', { ascending: true })
-      .order('industry', { ascending: true })
-      .order('size_bucket', { ascending: true })
-      .order('growth_bucket', { ascending: true })
-
-    if (error) {
-      console.error('Error loading all assumptions:', error)
-      return []
-    }
-
-    return data || []
+    const { rows } = await pool.query(
+      `SELECT * FROM valuation_assumptions
+       ORDER BY model_key ASC, industry ASC NULLS LAST, size_bucket ASC NULLS LAST, growth_bucket ASC NULLS LAST`
+    )
+    return rows as ValuationAssumptionsRecord[]
   } catch (error) {
     console.error('Error loading all assumptions:', error)
     return []
   }
 }
 
-/**
- * Update assumptions (admin only)
- */
 export async function updateAssumptions(
-  supabase: SupabaseClient,
+  pool: Pool,
   id: string,
   updates: Partial<ValuationAssumptionsRecord>
 ): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('valuation_assumptions')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error updating assumptions:', error)
-      return false
-    }
-
+    const keys = Object.keys(updates).filter((k) => k !== 'id' && k !== 'created_at')
+    if (keys.length === 0) return true
+    const setCl = keys.map((k, i) => `${k} = $${i + 2}`).join(', ')
+    const vals = keys.map((k) => (updates as Record<string, unknown>)[k])
+    await pool.query(
+      `UPDATE valuation_assumptions SET ${setCl}, updated_at = NOW() WHERE id = $1`,
+      [id, ...vals]
+    )
     return true
   } catch (error) {
     console.error('Error updating assumptions:', error)
@@ -261,23 +219,15 @@ export async function updateAssumptions(
   }
 }
 
-/**
- * Create new assumptions (admin only)
- */
 export async function createAssumptions(
-  supabase: SupabaseClient,
+  pool: Pool,
   assumptions: Omit<ValuationAssumptionsRecord, 'id' | 'created_at' | 'updated_at'>
 ): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('valuation_assumptions')
-      .insert(assumptions)
-
-    if (error) {
-      console.error('Error creating assumptions:', error)
-      return false
-    }
-
+    const cols = Object.keys(assumptions)
+    const vals = Object.values(assumptions)
+    const ph = cols.map((_, i) => `$${i + 1}`).join(', ')
+    await pool.query(`INSERT INTO valuation_assumptions (${cols.join(', ')}) VALUES (${ph})`, vals)
     return true
   } catch (error) {
     console.error('Error creating assumptions:', error)
@@ -285,21 +235,9 @@ export async function createAssumptions(
   }
 }
 
-/**
- * Delete assumptions (admin only)
- */
-export async function deleteAssumptions(supabase: SupabaseClient, id: string): Promise<boolean> {
+export async function deleteAssumptions(pool: Pool, id: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('valuation_assumptions')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Error deleting assumptions:', error)
-      return false
-    }
-
+    await pool.query('DELETE FROM valuation_assumptions WHERE id = $1', [id])
     return true
   } catch (error) {
     console.error('Error deleting assumptions:', error)

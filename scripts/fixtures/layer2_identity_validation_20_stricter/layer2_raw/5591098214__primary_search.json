@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5591098214",
+  "company_name": "Nordiska Kök AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Nordiska Kök\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Nordiska Kök what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.moebelfertigung.com/en/news/online-kitchen-brand-now-also-increasingly-ships-to-germany",
+        "title": "Nordiska Kök | \"Online kitchen brand\" now also increasingly ships to ...",
+        "content": "Nordiska Kök stands for customized, handmade design kitchens at affordable prices. According to the company's own information, there was a great",
+        "score": 0.7371019,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.linkedin.com/company/nordiska-k%C3%B6k/",
+        "title": "Nordiska Kök | LinkedIn",
+        "content": "Overview:\nWe create our bespoke kitchens in the legacy of timeless Scandinavian design. Each kitchen is locally produced in our carpentry studio outside of Gothenburg, where all our kitchens are built entirely from scratch based on our customer’s needs and wishes. All of our kitchens are available in any NCS color and a variety of different materials. Each cabinet and drawer is then specifically tailored in size and design to create that unique bespoke aesthetic for your kitchen space. We take you through the entire design process to create your very own dream kitchen — a kitchen you can live in for a long time to come, but also a space built around your conscious choices and your own individualized needs. Best of all, it’s not as expensive as you think. OUR VISION - THE DIGITAL KITCHEN COMPANY Many traditional kitchen companies still rely on a business model based on physical locations; we’ve taken a different route, one inspired by the revolution of e-commerce and digital transformation. We’ve created a comprehensive kitchen contact where everything takes place digitally, all the way from initial inspiration to your final order. Since we don’t use retailers, schedule home visits, or have to staff big showrooms all over the countries, we’re able to keep prices down and offer a completely unique, fully bespoke and entirely customized kitchen — all at the same price as a mass-produced standard kitchens of our competitors. Read more about how to build your dream kitchen with us here.\n\nWebsite: https://www.nordiskakok.se/\nCrunchbase Url: N/A\nLinkedin Url: https://www.linkedin.com/company/nordiska-kök\n\nIndustry:\nDesign Services\n\nCompany size:\n51-200 employees\n71 associated members (LinkedIn members who’ve listed Nordiska Kök as their current workplace on their profile)\n\nFounded:\n2017\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.7230167,
+        "raw_content": null
+      },
+      {
+        "url": "https://scanmagazine.co.uk/nordiska-kok-bespoke-quality-kitchens-in-scandinavian-design/",
+        "title": "Nordiska Kök: Bespoke quality kitchens in Scandinavian design",
+        "content": "# Nordiska Kök: Bespoke quality kitchens in Scandinavian design. “With Nordiska Kök, we wanted to change this and offer high-quality design kitchens but at an affordable price, by taking the kitchen sector into the digital era.”. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. “We can offer high-end design kitchens, fully custom-made, at a price that is no more expensive than mass-produced standard kitchens, thanks to our digital process,” says Lundkvist. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. With its innovative digital process and continued growth, Nordiska Kök is a strong challenger to traditional kitchen companies both within Sweden’s borders and now also in Europe. In fact, Nordiska Kök is one of the world’s leading kitchen design accounts on social media with around 300,000 followers on Instagram. Nordiska Kök: Bespoke quality kitchens in Scandinavian design. Nordiska Kök: Bespoke quality kitchens in Scandinavian design.",
+        "score": 0.7213709,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.threads.com/@nordiskakok",
+        "title": "Nordiska Kök | Scandinavian design kitchens (@nordiskakok)",
+        "content": "Award-Winning, bespoke kitchens in Scandinavian design, crafted in our carpentry studio in Sweden. European delivery. ... Step into Vita Russels vibrant London",
+        "score": 0.59880555,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.nordiskakok.com/frequently-asked-questions",
+        "title": "Kitchen FAQs: All Your Questions Answered - Nordiska Kök",
+        "content": "## About our kitchens. ### What’s included in a kitchen from Nordiska Kök? We can build most kinds of kitchens, specially tailored to exact measurements, materials, and design aesthetics to suit your particular taste and personal preferences. ### What types of kitchens does Nordiska Kök build? See the latest kitchen designs. Just ask your kitchen designer for guidance. At the moment we offer kitchen appliances only to our customers in Sweden. If you live in another country, you can still purchase appliances for your Nordiska Kök kitchen by ordering them directly from your local supplier or retailer. The total cost depends on the size of your kitchen, the number of cabinets, any special solutions required, and the interior options you choose. We always strive to be as cost-conscious as possible so that our customers can have their fully-customized bespoke kitchen at a reasonable price. This includes contact with your kitchen designer, measurement instructions, cost estimates, installation and assembly instructions, agreement and Terms & Conditions. ### How is the kitchen delivered?",
+        "score": 0.59089786,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.61,
+    "request_id": "8c709f1b-10a3-4020-bdb4-a1c1b7406adb"
+  }
+}

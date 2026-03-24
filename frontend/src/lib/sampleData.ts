@@ -1,6 +1,6 @@
-import type { CompanyFilter, SupabaseCompany } from './supabaseDataService'
+import type { CompanyFilter, CompanyRecord } from './companyDataService'
 
-export interface LocalCompany extends SupabaseCompany {
+export interface LocalCompany extends CompanyRecord {
   industryCategory: string
   industryCode: string
 }
@@ -13,7 +13,7 @@ export interface LocalIndustrySummary {
 }
 
 const createHistorical = (
-  entries: Array<Pick<NonNullable<SupabaseCompany['historicalData']>[number], 'year' | 'Revenue_growth' | 'EBIT_margin' | 'NetProfit_margin'> & {
+  entries: Array<Pick<NonNullable<CompanyRecord['historicalData']>[number], 'year' | 'Revenue_growth' | 'EBIT_margin' | 'NetProfit_margin'> & {
     SDI?: number | null
   }>
 ) => entries.map(entry => ({
@@ -480,7 +480,7 @@ export const filterLocalCompanies = (filters: CompanyFilter = {}): LocalCompany[
   })
 }
 
-export const getLocalCompanyByOrgNr = (orgNr: string): SupabaseCompany | null => {
+export const getLocalCompanyByOrgNr = (orgNr: string): CompanyRecord | null => {
   const match = localCompanies.find(company => company.OrgNr === orgNr || company.OrgNr === orgNr?.replace(/\D/g, ''))
   return match ?? null
 }

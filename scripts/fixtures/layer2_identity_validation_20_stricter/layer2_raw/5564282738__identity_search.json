@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564282738",
+  "company_name": "Mille Notti AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Mille Notti\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Mille Notti official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://mille-notti.com/c/all-products",
+        "title": "All products - Mille Notti",
+        "content": "- Mille Notti. Since 1991 our family has worked with the passion to create a marvellous experience, a treat for your senses. © 2026 - Mille Notti. About us.",
+        "score": 0.6773251,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/c/outlet",
+        "title": "Outlet | Quality products at reduced prices - Mille Notti",
+        "content": "- Mille Notti. Since 1991 our family has worked with the passion to create a marvellous experience, a treat for your senses. © 2026 - Mille Notti. About us.",
+        "score": 0.67501575,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/about-us/our-story",
+        "title": "Our story - Mille Notti",
+        "content": "Our products are designed in Sweden and crafted with care by our trusted manufacturers across Europe. Learn more about our responsible production here. Our story began on a warm summer day in Portugal during the early 1990’s. Peder Wehtje, the visionary founder of Mille Notti, found himself staying at a traditional Portuguese Pousada that would forever change his perspective. This luxurious design, known as Pousada, remains one of our most cherished products to this day. Today, we are offering a curated selection of superior quality products for the bedroom and the bathroom. Bed linen, down pillows and duvets, beds, headboards, terry towels and accessories, each item thoughtfully designed and meticulously crafted to ensure unparalleled quality. Mille Notti is currently run by Peder Jr. Wehtje (Sales representative), Catherine Wehtje Hustad (Creative Director), and William Wehtje (CEO) continuing in the same spirit as their father- with the aim of consistently delivering and producing exceptional quality in a sustainable and inspiring way. ### PRODUCTION. ### PRODUCTS.",
+        "score": 0.5573882,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/c/bedroom",
+        "title": "Bedroom | Luxury and timeless bedroom textiles | Mille Notti",
+        "content": "Choose bed linen made from crisp percale, silky sateen, or soft linen and luxuriously fluffy pillows and duvets. Match with decorative cushions, plaids, and",
+        "score": 0.5013922,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/c/accessories",
+        "title": "Cushion Covers, Plaids, Throws & Bedspreads | Mille Notti",
+        "content": "With a cosy throw, soft pillows, and bedspreads, you can easily update your room while creating an inviting feel. Choose from several different materials",
+        "score": 0.45101276,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.79,
+    "request_id": "ed143294-719e-4ad1-9004-83274d618a3b"
+  }
+}

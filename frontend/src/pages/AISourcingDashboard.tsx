@@ -4,7 +4,7 @@ import { AIChatFilter, type PromptHistoryItem } from '../components/AIChatFilter
 import { CompanyExplorer, type CompanyRow } from '../components/CompanyExplorer'
 import { apiService, type AIFilterResponse } from '../lib/apiService'
 import { SavedListsService } from '../lib/savedListsService'
-import { supabaseDataService } from '../lib/supabaseDataService'
+import { companyDataService } from '../lib/companyDataService'
 
 const SESSION_KEYS = {
   RESULT: 'aiSourcing_aiResult',
@@ -154,7 +154,7 @@ const AISourcingDashboard: React.FC = () => {
         }
       } catch (error) {
         // Silently handle - already falls back to localStorage
-        console.debug('Saved lists not available (Supabase not configured)')
+        console.debug('Saved lists not available (API or auth not configured)')
       }
     }
     loadSavedLists()
@@ -253,10 +253,10 @@ const AISourcingDashboard: React.FC = () => {
 
   const handleSaveList = async (companiesToSave: CompanyRow[], name: string, description?: string) => {
     try {
-      const supabaseCompanies = await Promise.all(
+      const companiesPayload = await Promise.all(
         companiesToSave.map(async (company) => {
           try {
-            const fullCompany = await supabaseDataService.getCompany(company.orgnr)
+            const fullCompany = await companyDataService.getCompany(company.orgnr)
             if (fullCompany) {
               return fullCompany
             }
@@ -283,7 +283,7 @@ const AISourcingDashboard: React.FC = () => {
       await SavedListsService.saveList({
         name,
         description,
-        companies: supabaseCompanies,
+        companies: companiesPayload,
         filters: aiResult ? { prompt: aiResult.parsed_where_clause } : {},
       })
 

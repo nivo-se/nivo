@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5562146018",
+  "company_name": "Fladen Fishing Aktiebolag",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Fladen Fishing\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Fladen Fishing official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.facebook.com/fladenfishing/",
+        "title": "Fladen Fishing Official | Varberg - Facebook",
+        "content": "Explore our selection of rods, reels and our wide range of lures at your local Fladen reseller or visit us at www.fladenfishing.se Fladen Stores location in",
+        "score": 0.73459625,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.facebook.com/fladenfishing?locale=is_IS",
+        "title": "Fladen Fishing Official | Varberg - Facebook",
+        "content": "The Fladen Fishing 2026 edition is packed with product news, proven favourites and updated ranges across sportfishing and outdoor gear. Available online for all",
+        "score": 0.6894943,
+        "raw_content": null
+      },
+      {
+        "url": "https://fladenfishing.se/en/pages/om-oss?srsltid=AfmBOopq-i3k39B2LZWVwdxT_Eo0Alh3UKNyuQUNsll8JU2FlTQjWG94",
+        "title": "About us – Fladen Fishing AB",
+        "content": "Therefore, we ensure that our production lives up to high standards and that it takes place under good working conditions. Fladen Fishing are members of the Business Social Compliance Initiative - BSCI and through this we have a greater opportunity to influence suppliers and factories in a positive direction. Together with experienced anglers, Fladen Fishing is careful to follow new trends, develop and improve our range continuously. Manufacturing takes place without intermediaries at leading manufacturers around the world and we work actively to find the best manufacturer for each product, all in order to be able to offer the best quality at the best price. Fladen Fishing works actively to ensure that the working environment at our manufacturers is the best possible. Today, you can find products from us at the vast majority of specialist retailers in sport fishing. We have fishing equipment for a small amount of money for those who want to start fishing, but we also have more advanced products for those who want the very best.",
+        "score": 0.68748367,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.mokkimies.com/fladen_fishing",
+        "title": "Fladen Fishing - Mökkimies.com",
+        "content": "We know you will find yours from Fladen products. Fladen has fishing tackle for everyone, and anyone can fish.",
+        "score": 0.6711479,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.anglingactive.co.uk/brands/fladen-fishing.html",
+        "title": "Fladen Fishing - Angling Active",
+        "content": "Fladen Fishing is known for creating quality fishing tackle at prices that make it easier for more people to enjoy the sport.",
+        "score": 0.65412235,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.74,
+    "request_id": "e8e38e3c-b540-4d23-b1dd-3456d6d68208"
+  }
+}

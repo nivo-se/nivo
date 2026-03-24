@@ -58,17 +58,27 @@ class TavilyClient:
         self.api_key = api_key or settings.tavily_api_key
         self.timeout_seconds = timeout_seconds or settings.retrieval_http_timeout_seconds
 
-    def search(
+    def search_and_raw_response(
         self,
         query: str,
         max_results: int = 5,
         topic: str = "general",
         search_depth: str = "basic",
-    ) -> list[TavilySearchResult]:
-        """Search Tavily; return normalized results. Empty list if no API key."""
+        *,
+        max_retries: int | None = None,
+    ) -> tuple[list[TavilySearchResult], dict[str, Any]]:
+        """
+        Single Tavily search HTTP call; returns normalized results and the full JSON body from the API.
+        On failure or missing key, returns ([], {}).
+
+        ``max_retries``: HTTP retries on 429/5xx and RequestException (default ``DEFAULT_MAX_RETRIES``).
+        Use ``0`` for low-credit / single-shot mode.
+        """
         if not self.api_key:
             logger.debug("Tavily API key not configured, skipping search")
-            return []
+            return [], {}
+
+        retries = DEFAULT_MAX_RETRIES if max_retries is None else max_retries
 
         payload = {
             "api_key": self.api_key,
@@ -81,7 +91,7 @@ class TavilyClient:
             payload["topic"] = topic
 
         t0 = time.monotonic()
-        for attempt in range(DEFAULT_MAX_RETRIES + 1):
+        for attempt in range(retries + 1):
             try:
                 response = requests.post(
                     TAVILY_SEARCH_URL,
@@ -90,7 +100,7 @@ class TavilyClient:
                     verify=certifi.where(),
                 )
                 if response.status_code in (429, 500, 502, 503):
-                    if attempt < DEFAULT_MAX_RETRIES:
+                    if attempt < retries:
                         backoff = 2**attempt
                         logger.warning(
                             "Tavily search %s (attempt %d), retrying in %ds",
@@ -101,16 +111,16 @@ class TavilyClient:
                         time.sleep(backoff)
                         continue
                 response.raise_for_status()
-                data = response.json()
-                results = data.get("results") or []
+                data: dict[str, Any] = response.json()
+                results_raw = data.get("results") or []
                 elapsed = time.monotonic() - t0
                 logger.info(
                     "Tavily search query=%r results=%d latency_ms=%d",
                     query[:60],
-                    len(results),
+                    len(results_raw),
                     int(elapsed * 1000),
                 )
-                return [
+                normalized = [
                     TavilySearchResult(
                         url=(r.get("url") or "").strip(),
                         title=(r.get("title") or "Untitled").strip(),
@@ -118,16 +128,36 @@ class TavilyClient:
                         score=r.get("score"),
                         metadata={"raw": r},
                     )
-                    for r in results
+                    for r in results_raw
                     if (r.get("url") or "").strip()
                 ][:max_results]
+                return normalized, data
             except requests.RequestException as e:
                 logger.warning("Tavily search failed: %s", e)
-                if attempt < DEFAULT_MAX_RETRIES:
+                if attempt < retries:
                     time.sleep(2**attempt)
                     continue
-                return []
-        return []
+                return [], {}
+        return [], {}
+
+    def search(
+        self,
+        query: str,
+        max_results: int = 5,
+        topic: str = "general",
+        search_depth: str = "basic",
+        *,
+        max_retries: int | None = None,
+    ) -> list[TavilySearchResult]:
+        """Search Tavily; return normalized results. Empty list if no API key."""
+        r, _ = self.search_and_raw_response(
+            query,
+            max_results=max_results,
+            topic=topic,
+            search_depth=search_depth,
+            max_retries=max_retries,
+        )
+        return r
 
     def extract(
         self,

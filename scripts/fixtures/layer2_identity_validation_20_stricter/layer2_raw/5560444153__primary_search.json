@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560444153",
+  "company_name": "Bring Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Bring Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Bring Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://bring-foreign-goods.wheree.com/",
+        "title": "Bring (foreign goods) - Reviews, Photos & Phone Number - Updated ...",
+        "content": "Fordonsvägen 2, 551 12 Jönköping, Sweden. Bring (foreign goods) is a logistics service provider located in Jönköping, Sweden, known for its efficient unloading process and friendly staff. Price: No information in reviews about this criterion. Warranty: No information in reviews about this criterion. Customer service: Many reviews commend the friendly and communicative nature of the staff, noting their willingness to assist customers during their visits. Reviewers frequently mention the quick unloading process as a key advantage. Bring provides foreign goods transportation services, including fast unloading and customer-friendly support at their terminal in Jönköping. Is there parking available at the venue for customers? Unloading is typically quick at the venue, with many customers noting efficient service and minimal waiting times. Yes, staff members at the venue are communicative and able to assist customers in English. Upplagsvägen 2, 117 43 Stockholm, Sweden. Odengatan 38, 113 51 Stockholm, Sweden. Bäckamarken 5, 555 92 Jönköping, Sweden. Götgatan 35, 116 21 Stockholm, Sweden.",
+        "score": 0.5971152,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bring.se/en/services/parcels-and-cargo/to-companies/parcels-to-companies",
+        "title": "Send parcels from your company to other companies - bring.se/en",
+        "content": "* To recipients in Sweden, most parcels are delivered the day after pickup. When you use Cash On Delivery as an additional service, select the COD in the system you use to print your shipping labels and EDI so that the shipping label states that the parcel will be delivered with Cash On Delivery. This additional service gives you the possibility to notify your recipients via text and/or e-mail that the parcel is on its way, and the date and place of delivery. The message means that the recipient receives information more quickly that the parcel has been delivered to the service office and thus the recipient can pick up his/her consignment without delay. In cases where the parcel is delivered to the recipient's door, the message indicates when delivery will take place to the recipient's address.",
+        "score": 0.42978892,
+        "raw_content": null
+      },
+      {
+        "url": "https://sweden.se/work-business/business-in-sweden/10-swedish-brands-and-innovations",
+        "title": "10 Swedish brands and innovations - Sweden.se",
+        "content": "# 10 Swedish brands and innovations. Some Swedish brands and innovations are known around the world without most people knowing that they're Swedish. While people probably recognise the name Electrolux on their kitchen appliances, many may not know that this company is Swedish – or that it is one of the best selling household appliance manufacturers in the world. Bringing Sweden’s quintessential minimalist yet chic style of fashion to the world is H&M, more known as H&M. Started in 1947 as a women’s clothing store called Hennes (which means 'hers' in Swedish) in Västerås, founder Erling Persson later bought hunting and fishing equipment store Mauritz Widforss – and that’s how Hennes & Mauritz, later H&M, was born. Among the more famous Swedish brands and innovations, we find Volvo – as iconic as Swedish meatballs. There are many personal stories behind Swedish brands and innovations. Among the Swedish brands and innovations, we find the zip. Among the Swedish brands and innovations, we find the zip.",
+        "score": 0.3794479,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.trustpilot.com/review/www.bring.se",
+        "title": "Bring Sverige Reviews | Read Customer Service ... - Trustpilot",
+        "content": "# Bring Sverige Reviews 626,855. Reviewers had a great experience with this company. Many customers consistently praise the service for its efficiency and reliability, noting that packages often arrive on time or even earlier than expected. A few people also mentioned problems with home delivery attempts and the responsiveness of customer service in resolving these issues.See more. Reviewers mention ambiguous feedback about delivery services. I gave 4 stars, as the delivery point is not the point that we usually go to collect parcels from other parcel services that is near to our home. Tracing / notifications say that package will be delivered to pickup location, but then it arrives home and cour... Always within the 2 or 3 day’s stated delivery and the packages are never damaged. I selected the delivery to a box near my home but something went wrong with my delivery the day it was supposed to arrive. The package was set for home delivery and the dude fake delivered it. ## All reviews.",
+        "score": 0.33987194,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.logistik.to/exhibitors/bring/",
+        "title": "Bring - Logistics and Transport",
+        "content": "Bring Intermodal provides low-emission Full Truck Load (FTL) solutions by combining rail, road, and ferry transport. We operate integrated intermodal services",
+        "score": 0.32640076,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.78,
+    "request_id": "24bcb7e3-28b9-456d-b9d9-7a78c0005b7a"
+  }
+}

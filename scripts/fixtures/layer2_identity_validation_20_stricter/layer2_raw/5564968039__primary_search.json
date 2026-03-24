@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564968039",
+  "company_name": "Formenta AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Formenta\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Formenta what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://ec.linkedin.com/company/formenta",
+        "title": "Formenta | LinkedIn",
+        "content": "Overview:\nFormenta design and produce premium products for outdoor environments; flagpoles, lighting columns, planters, sand containers, bikestands, park furnitures and waste bins. Our clients is globally based in more than 30 countries. Formenta is located with production and HQ in Värnamo, Sweden and sales office in Netherlands.\n\nWebsite: https://www.formenta.se/\nCrunchbase Url: N/A\nLinkedin Url: https://www.linkedin.com/company/formenta\n\nIndustry:\nManufacturing\n\nCompany size:\n11-50 employees\n12 associated members (LinkedIn members who’ve listed Formenta as their current workplace on their profile)\n\nFounded:\n1972\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.8390101,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.formenta.se/en/story-of-formenta",
+        "title": "About Us – a third-generation family business - Formenta",
+        "content": "His attention to detail continues to inspire us today in the manufacturing and development of new products. Today, Formenta is led by the third generation of the Nyholm family. Our goal is to develop and strengthen Formenta as an innovative and expanding company, offering a range of sustainable, safe, and smart premium products for public outdoor environments. These are the same qualities that once inspired Olle and Inga to start the company and to manufacture robust products to be proud of – products built to last for generations. Formenta is founded by Olle and Inga Nyholm, with production focused on components made of glass-fibre reinforced polyester. Formenta’s first proprietary product, flagpoles, is launched on the market. The majority shareholding in the Danish company Danomast is acquired by the Group’s parent company and becomes a sister company to Formenta. ## New products. After several years of development, Formenta launches the Streetmast lighting column on the market.",
+        "score": 0.77405477,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.formenta.ca/en/story-of-formenta",
+        "title": "Story of Formenta | A family business of three generations",
+        "content": "Formenta is the original trademark of Nyholm Group, which holds several companies focusing on products for the urban outdoors.",
+        "score": 0.71425,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.dnb.com/business-directory/company-profiles.formenta_ab.31b4fda3234be2bbe956270b441537d1.html",
+        "title": "Formenta AB Company Profile | Competitors, Financials & Contacts",
+        "content": "Plastics Product Manufacturing · Hardware, and Plumbing and Heating Equipment and Supplies Merchant Wholesalers · Apparel, Piece Goods, and Notions Merchant",
+        "score": 0.6747586,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.aplicatorgroup.com/flying-the-flag-for-quality-formenta/",
+        "title": "Flying the flag for quality - Formenta - Aplicator Group",
+        "content": "The story of Formenta starts almost 50 years ago when the engineer Olle Nyholm set out to start production of flagpoles in durable glassfiber and polyester composite. And ever since, Aplicator machines have been vital for their production. A production plant was set up in Värnamo, Sweden and family business Formenta flag poles has been a success story ever since. – Our relationship with Aplicator machines stretches back to the 70s, says Henrik Nyholm, CEO at Formenta and grandson to founder Olle Nyholm. Over the years Formenta has seen many new opportunities the durable and high-quality composite and has entered many markets with a wide range of products. – We have several different machines from Aplicator Group. They are always running and they are absolutely vital for achieving the quality we demand from our finished products, explains Henrik Nyholm. Formenta recently acquired a Barkvall glueing machine from Aplicator Group. This means that we can run both old and new Aplicator machines in parallell, says Henrik Nyholm, CEO at Formenta.",
+        "score": 0.64344186,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.78,
+    "request_id": "a1afa4be-e4e9-48a8-9686-ce38fdec8a3c"
+  }
+}

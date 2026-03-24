@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560957432",
+  "company_name": "Telenor Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Telenor Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Telenor Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.telenor.com/who-we-are/our-companies/nordics/telenor-sweden/",
+        "title": "Telenor Sweden",
+        "content": "# Telenor Sweden. Telenor is Sweden’s third largest mobile operator and provider of fixed broadband services to Swedish consumers. In Sweden, Telenor’s offerings include mobile, fixed and tv services. The company has been present in the Swedish market since 2001, and is considered the third largest player in terms of the number of mobile subscribers. Its network covers 99.9 percent of the population in Sweden. At the end of 2023, revenue market share was around 18% and the number of mobile subscriptions totaled approx. Within consumer fixed broadband, Telenor held around 17% revenue market share at the end of 2023 with 0.7 million broad band subscriptions and 0.5 million tv customers. 0  total revenues, million NOK (2024). 0  monthly mobile ARPU in NOK (Q4 2024). ## Our companies. # Telenor Nordics. # Telenor Norway. # Telenor Sweden. # Telenor Denmark. # Telenor Asia. Family sitting together and having fun with a mobile phone. Family smiling and having fun.",
+        "score": 0.77487355,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.crunchbase.com/organization/telenor-sverige",
+        "title": "Telenor Sverige - Crunchbase Company Profile & Funding",
+        "content": "Telenor Sverige provides telecommunications, computer, and media services, that includes mobile telephony and mobile broadband.",
+        "score": 0.77261686,
+        "raw_content": null
+      },
+      {
+        "url": "https://telenor-sverige.wheree.com/",
+        "title": "Telenor Sverige - Reviews, Photos & Phone Number - Updated ...",
+        "content": "Telenor Sverige is a telecommunications provider located in Lyckeby, Sweden, offering various mobile and internet services. Customer feedback highlights the",
+        "score": 0.7420672,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.zoominfo.com/c/telenor-sweden-ab/471616839",
+        "title": "Telenor - Overview, News & Similar companies | ZoomInfo.com",
+        "content": "Telenor Sverige, founded in 1991 and previously known as Vodafone Sweden, Europolitan, and Nordic Tel, is a comprehensive telecommunications provider in",
+        "score": 0.71948266,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Telenor",
+        "title": "Telenor - Wikipedia",
+        "content": "Telenor is listed on the Oslo Stock Exchange and had a market capitalization in November 2015 of kr 225 billion, making it the third largest company listed on the OSE after DNB and Equinor (previously known as Statoil). Grameenphone was the first Telenor venture in the Asian telecom market and is now the largest mobile operator in Bangladesh, Telenor holds 55.8 per cent of the company. On 22 November 2021, Telenor and Charoen Pokphand Group, officially announced they have agreed to explore a USD 8.6 billion merger plan between Thailand’s second and third largest telecom operators (by subscribers), True Corporation (TRUE) and Total Access Communication (DTAC) – the proposed merger is subject to regulatory approvals. Telenor offers a full range of telecommunication services in the Nordic countries, including mobile and fixed telephony, Internet access and as well as cable TV access and content. At year-end 2021, Telenor held controlling interests in mobile operations in Norway, Denmark, Finland, Sweden, Thailand, Malaysia, Bangladesh, Myanmar and Pakistan.",
+        "score": 0.61972505,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.27,
+    "request_id": "6ec0adca-52e9-4e3a-b7d0-4086fd156578"
+  }
+}

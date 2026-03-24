@@ -41,12 +41,12 @@ import {
   Loader2,
   List
 } from 'lucide-react'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 import { SavedListsService, SavedCompanyList } from '../lib/savedListsService'
 import AIAnalysisWorkflow from './AIAnalysisWorkflow'
 
 interface CompanyAnalysis {
-  company: SupabaseCompany
+  company: CompanyRecord
   financialScore: number
   marketScore: number
   growthScore: number
@@ -229,7 +229,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     }
   }, [selectedList])
 
-  const runAIAnalysis = async (companies: SupabaseCompany[]) => {
+  const runAIAnalysis = async (companies: CompanyRecord[]) => {
     setLoading(true)
     
     // Simulate AI processing time
@@ -266,7 +266,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     setLoading(false)
   }
 
-  const calculateFinancialScore = (company: SupabaseCompany): number => {
+  const calculateFinancialScore = (company: CompanyRecord): number => {
     const revenue = company.SDI || 0
     const growth = (company.Revenue_growth || 0) * 100
     const ebitMargin = (typeof company.EBIT_margin === 'number' ? company.EBIT_margin : 0) * 100
@@ -293,7 +293,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return Math.min(score, 100)
   }
 
-  const calculateMarketScore = (company: SupabaseCompany, allCompanies: SupabaseCompany[]): number => {
+  const calculateMarketScore = (company: CompanyRecord, allCompanies: CompanyRecord[]): number => {
     const industry = company.segment_name || 'Unknown'
     const industryCompanies = allCompanies.filter(c => c.segment_name === industry)
     
@@ -319,7 +319,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return Math.min(score, 100)
   }
 
-  const calculateGrowthScore = (company: SupabaseCompany): number => {
+  const calculateGrowthScore = (company: CompanyRecord): number => {
     const growth = (company.Revenue_growth || 0) * 100
     const digitalPresence = company.digital_presence || 0
     
@@ -343,7 +343,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return Math.min(score, 100)
   }
 
-  const calculateEfficiencyScore = (company: SupabaseCompany): number => {
+  const calculateEfficiencyScore = (company: CompanyRecord): number => {
     const revenue = company.SDI || 0
     const employees = parseInt(company.employees || '0')
     const ebitMargin = (typeof company.EBIT_margin === 'number' ? company.EBIT_margin : 0) * 100
@@ -374,7 +374,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   const calculatePrimeTargetScore = (
-    company: SupabaseCompany, 
+    company: CompanyRecord, 
     financialScore: number, 
     marketScore: number, 
     growthScore: number
@@ -413,7 +413,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   const generateRecommendations = (
-    company: SupabaseCompany, 
+    company: CompanyRecord, 
     financialScore: number, 
     marketScore: number, 
     growthScore: number
@@ -443,7 +443,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return recommendations
   }
 
-  const identifyRiskFactors = (company: SupabaseCompany): string[] => {
+  const identifyRiskFactors = (company: CompanyRecord): string[] => {
     const risks: string[] = []
     
     const growth = (typeof company.Revenue_growth === 'number' ? company.Revenue_growth : 0) * 100
@@ -469,7 +469,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return risks
   }
 
-  const identifyOpportunities = (company: SupabaseCompany, marketScore: number): string[] => {
+  const identifyOpportunities = (company: CompanyRecord, marketScore: number): string[] => {
     const opportunities: string[] = []
     
     const employees = parseInt(company.employees || '0')
@@ -496,8 +496,8 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
     return opportunities
   }
 
-  const generateMarketBenchmarks = (companies: SupabaseCompany[]): MarketBenchmark[] => {
-    const industryMap = new Map<string, SupabaseCompany[]>()
+  const generateMarketBenchmarks = (companies: CompanyRecord[]): MarketBenchmark[] => {
+    const industryMap = new Map<string, CompanyRecord[]>()
     
     companies.forEach(company => {
       const industry = company.segment_name || 'Unknown'
@@ -528,7 +528,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   // Generate comprehensive financial metrics
-  const generateFinancialMetrics = (company: SupabaseCompany): FinancialMetrics => {
+  const generateFinancialMetrics = (company: CompanyRecord): FinancialMetrics => {
     const revenue = company.SDI || 0
     const ebitMargin = (typeof company.EBIT_margin === 'number' ? company.EBIT_margin : 0) * 100
     const netMargin = (typeof company.NetProfit_margin === 'number' ? company.NetProfit_margin : 0) * 100
@@ -586,7 +586,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   // Generate soft factors analysis
-  const generateSoftFactors = (company: SupabaseCompany, financialScore: number): SoftFactors => {
+  const generateSoftFactors = (company: CompanyRecord, financialScore: number): SoftFactors => {
     const revenue = company.SDI || 0
     const growth = (company.Revenue_growth || 0) * 100
     const digitalPresence = company.digital_presence || 0
@@ -621,7 +621,7 @@ const AIAnalytics: React.FC<AIAnalyticsProps> = ({ onExportData }) => {
   }
 
   // Generate comprehensive AI analysis
-  const generateAIAnalysis = (company: SupabaseCompany, financialMetrics: FinancialMetrics, softFactors: SoftFactors): AIInalysis => {
+  const generateAIAnalysis = (company: CompanyRecord, financialMetrics: FinancialMetrics, softFactors: SoftFactors): AIInalysis => {
     const revenue = company.SDI || 0
     const growth = (company.Revenue_growth || 0) * 100
     const ebitMargin = (typeof company.EBIT_margin === 'number' ? company.EBIT_margin : 0) * 100

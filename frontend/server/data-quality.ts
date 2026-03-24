@@ -40,29 +40,27 @@ export interface IndustryBenchmarks {
 }
 
 /**
- * Validates that required tables exist in the database
+ * Validates that required tables exist in the database (Postgres).
  */
 export async function validateTablesExist(
-  supabase: any,
+  pool: import('pg').Pool,
   requiredTables: string[]
 ): Promise<string[]> {
   const missingTables: string[] = []
-  
+
   for (const table of requiredTables) {
     try {
-      const { error } = await supabase
-        .from(table)
-        .select('*')
-        .limit(1)
-      
-      if (error) {
+      const safe = /^[a-zA-Z0-9_]+$/.test(table) ? table : null
+      if (!safe) {
         missingTables.push(table)
+        continue
       }
-    } catch (err) {
+      await pool.query(`SELECT 1 FROM ${safe} LIMIT 1`)
+    } catch {
       missingTables.push(table)
     }
   }
-  
+
   return missingTables
 }
 

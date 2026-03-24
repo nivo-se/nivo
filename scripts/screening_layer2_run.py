@@ -14,8 +14,11 @@ Usage:
   PYTHONPATH=. python3 scripts/screening_layer2_run.py \\
     --input /tmp/screening_top300.csv --out-dir /tmp/layer2 --enrich-homepage-from-db
 
+  # Optional CSV column ``layer2_retrieval_mode``: auto | multi_source | homepage_known | homepage_missing
+  # (defaults to --layer2-retrieval-mode). Default path is multi-source Tavily domain clustering (not a single homepage).
+
 Requires: OPENAI_API_KEY (environment or `.env` / `backend/.env` via python-dotenv),
-optional TAVILY_API_KEY (fallback only), backend deps
+TAVILY_API_KEY recommended for multi-source retrieval, backend deps
 (openai, httpx, pandas, pydantic, bs4, python-dotenv, requests).
 
 Run from repo root with: PYTHONPATH=. python3 scripts/screening_layer2_run.py ...
@@ -51,7 +54,11 @@ from openai import OpenAI
 from pydantic import ValidationError
 
 from backend.services.screening_layer2.blend import blend_score
-from backend.services.screening_layer2.evidence_fetch import build_evidence_pack, log_layer2_tavily_startup
+from backend.services.screening_layer2.evidence_fetch import (
+    LAYER2_RAW_SUBDIR,
+    build_evidence_pack,
+    log_layer2_tavily_startup,
+)
 from backend.services.screening_layer2.models import Layer2Classification, openai_json_schema_strict
 from backend.services.screening_layer2.prompts import SYSTEM_PROMPT, build_user_prompt
 
@@ -108,8 +115,18 @@ def run_openai_classify(
     stage1_score: float,
     evidence_text: str,
     temperature: float,
+    *,
+    layer2_retrieval_mode: str = "homepage_known",
+    layer2_identity_confidence_low: bool = False,
 ) -> Layer2Classification:
-    user = build_user_prompt(orgnr, company_name, f"{stage1_score:.2f}", evidence_text)
+    user = build_user_prompt(
+        orgnr,
+        company_name,
+        f"{stage1_score:.2f}",
+        evidence_text,
+        layer2_retrieval_mode=layer2_retrieval_mode,
+        layer2_identity_confidence_low=layer2_identity_confidence_low,
+    )
     schema = openai_json_schema_strict()
     resp = client.chat.completions.create(
         model=model,
@@ -156,6 +173,51 @@ def main() -> None:
     ap.add_argument("--sleep", type=float, default=0.4, help="Seconds between OpenAI calls")
     ap.add_argument("--w-stage1", type=float, default=0.4, help="Blend weight for Stage 1 (0-1 scale)")
     ap.add_argument("--w-layer2", type=float, default=0.6, help="Blend weight for Layer 2 signal")
+    ap.add_argument(
+        "--layer2-retrieval-mode",
+        choices=["auto", "homepage_known", "homepage_missing", "multi_source"],
+        default="auto",
+        help="Default when CSV has no layer2_retrieval_mode column. "
+        "auto/homepage_missing/multi_source → multi-query domain clustering; "
+        "homepage_known → legacy single-URL crawl.",
+    )
+    ap.add_argument(
+        "--no-tavily-raw",
+        action="store_true",
+        help="Do not write full Tavily search JSON under out-dir/layer2_raw/ (default: write)",
+    )
+    ap.add_argument(
+        "--debug-tavily-orgnr",
+        type=str,
+        default=None,
+        metavar="ORGNR",
+        help="For this orgnr only: write combined debug JSON and print path; use --debug-tavily-print-json for stdout dump",
+    )
+    ap.add_argument(
+        "--debug-tavily-print-json",
+        action="store_true",
+        help="With --debug-tavily-orgnr, print full debug Tavily JSON to stdout",
+    )
+    ap.add_argument(
+        "--tavily-low-credit",
+        action="store_true",
+        help="Optional smoke mode: cap how many rows to process (see --tavily-low-credit-max-rows). "
+        "Layer 2 always uses the efficient 1–2 Tavily search path when multi-source is selected.",
+    )
+    ap.add_argument(
+        "--tavily-low-credit-max-rows",
+        type=int,
+        default=40,
+        metavar="N",
+        help="With --tavily-low-credit: max rows to process (default 40, hard cap 50)",
+    )
+    ap.add_argument(
+        "--tavily-priority-max-rank",
+        type=int,
+        default=40,
+        metavar="R",
+        help="Deprecated: no longer affects Tavily queries (kept for manifest compatibility).",
+    )
     args = ap.parse_args()
 
     api_key = _openai_api_key_from_env()
@@ -196,7 +258,12 @@ def main() -> None:
         df = df.sort_values("rank", ascending=True, kind="mergesort")
 
     df = df.iloc[args.start :]
-    if args.limit is not None:
+    if args.tavily_low_credit:
+        cap = min(max(1, args.tavily_low_credit_max_rows), 50)
+        lim = args.limit if args.limit is not None else cap
+        lim = min(lim, cap)
+        df = df.head(lim)
+    elif args.limit is not None:
         df = df.head(args.limit)
 
     orgnrs = [str(x).strip() for x in df["orgnr"].tolist()]
@@ -223,21 +290,14 @@ def main() -> None:
     client = OpenAI(api_key=api_key, timeout=120.0)
     rows_out: List[Dict[str, Any]] = []
 
-    manifest = {
-        "created_at_utc": ts,
-        "input_csv": str(args.input.resolve()),
-        "model": args.model,
-        "rows": len(df),
-        "blend": {
-            "formula": "100 * (w1 * stage1/100 + w2 * fit_confidence * (1 if is_fit else 0.15)) / (w1+w2)",
-            "w_stage1": args.w_stage1,
-            "w_layer2": args.w_layer2,
-        },
-        "retrieval": {
-            "policy": "homepage-first; link-picked about/product; Tavily only if missing/dead/thin; max 4 pages; max 1 external",
-        },
-    }
-    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    raw_capture_dir: Optional[Path] = None
+    if not args.no_tavily_raw:
+        raw_capture_dir = args.out_dir / LAYER2_RAW_SUBDIR
+    tavily_debug_output_dir: Optional[Path] = (
+        args.out_dir / LAYER2_RAW_SUBDIR if args.debug_tavily_orgnr else None
+    )
+
+    tavily_raw_index: List[Dict[str, Any]] = []
 
     with jsonl_path.open("w", encoding="utf-8") as jf:
         for idx, row in df.iterrows():
@@ -246,11 +306,47 @@ def main() -> None:
             s1 = float(row[score_col]) if score_col and pd.notna(row.get(score_col)) else 0.0
             hp = home_map.get(orgnr) or None
 
+            rmode_cell = row.get("layer2_retrieval_mode")
+            if rmode_cell is not None and pd.notna(rmode_cell) and str(rmode_cell).strip() in (
+                "auto",
+                "homepage_known",
+                "homepage_missing",
+                "multi_source",
+            ):
+                rmode = str(rmode_cell).strip()
+            else:
+                rmode = args.layer2_retrieval_mode
+
             logger.info("Layer2 [%s] %s", orgnr, name[:50])
-            evidence_text, retr_meta, retr_debug = build_evidence_pack(orgnr, name, hp)
+            row_t0 = time.perf_counter()
+            evidence_text, retr_meta, retr_debug = build_evidence_pack(
+                orgnr,
+                name,
+                hp,
+                retrieval_mode=rmode,
+                raw_tavily_dir=raw_capture_dir,
+                tavily_raw_cache_dir=raw_capture_dir,
+                tavily_debug_output_dir=tavily_debug_output_dir,
+                tavily_debug_orgnr=args.debug_tavily_orgnr,
+                tavily_debug_print_json=args.debug_tavily_print_json,
+            )
             retr_debug.log_row(orgnr)
             retr = retr_meta.as_dict()
+            tavily_raw_index.append(
+                {
+                    "orgnr": orgnr,
+                    "company_name": name,
+                    "layer2_retrieval_mode": retr.get("layer2_retrieval_mode"),
+                    "tavily_raw_artifacts": retr.get("tavily_raw_artifacts") or {},
+                }
+            )
+            temp = float(args.temperature)
+            if retr_debug.layer2_retrieval_mode == "multi_source":
+                temp = min(temp, 0.15)
+            if getattr(retr_debug, "layer2_identity_confidence_low", False):
+                temp = min(temp, 0.12)
             try:
+                oai_t0 = time.perf_counter()
                 obj = run_openai_classify(
                     client,
                     args.model,
@@ -258,19 +354,29 @@ def main() -> None:
                     name,
                     s1,
                     evidence_text,
-                    args.temperature,
+                    temp,
+                    layer2_retrieval_mode=retr_debug.layer2_retrieval_mode,
+                    layer2_identity_confidence_low=getattr(
+                        retr_debug, "layer2_identity_confidence_low", False
+                    ),
                 )
+                openai_ms = (time.perf_counter() - oai_t0) * 1000
             except Exception as e:
                 logger.exception("Failed %s: %s", orgnr, e)
+                total_ms = (time.perf_counter() - row_t0) * 1000
+                retr_meta.openai_time_ms = 0.0
+                retr_meta.total_row_time_ms = total_ms
                 err_row = {
                     "orgnr": orgnr,
                     "company_name": name,
                     "error": str(e)[:500],
                     "stage1_total_score": s1,
-                    **retr,
+                    **retr_meta.as_dict(),
                 }
                 jf.write(json.dumps(err_row, ensure_ascii=False) + "\n")
                 rows_out.append(err_row)
+                if tavily_raw_index and tavily_raw_index[-1].get("orgnr") == orgnr:
+                    tavily_raw_index[-1]["openai_error"] = True
                 time.sleep(args.sleep)
                 continue
 
@@ -278,7 +384,10 @@ def main() -> None:
             flat = obj.model_dump()
             flat["stage1_total_score"] = s1
             flat["blended_score"] = round(b, 4)
-            flat.update(retr)
+            total_ms = (time.perf_counter() - row_t0) * 1000
+            retr_meta.openai_time_ms = openai_ms
+            retr_meta.total_row_time_ms = total_ms
+            flat.update(retr_meta.as_dict())
             jf.write(json.dumps(flat, ensure_ascii=False) + "\n")
             rows_out.append(flat)
             time.sleep(args.sleep)
@@ -294,6 +403,35 @@ def main() -> None:
                     if isinstance(v, list):
                         row[k] = "|".join(str(x) for x in v)
                 w.writerow(row)
+
+    manifest = {
+        "created_at_utc": ts,
+        "input_csv": str(args.input.resolve()),
+        "model": args.model,
+        "rows": len(df),
+        "blend": {
+            "formula": "100 * (w1 * stage1/100 + w2 * fit_confidence * (1 if is_fit else 0.15)) / (w1+w2)",
+            "w_stage1": args.w_stage1,
+            "w_layer2": args.w_layer2,
+        },
+        "retrieval": {
+            "policy": "Default: multi-source (1–2 Tavily searches, domain clustering, limited same-origin fetches, LinkedIn snippets). "
+            "homepage_known: legacy single-URL crawl.",
+            "default_layer2_retrieval_mode": args.layer2_retrieval_mode,
+        },
+        "tavily_raw": {
+            "enabled": not args.no_tavily_raw,
+            "directory_relative": LAYER2_RAW_SUBDIR,
+            "rows": tavily_raw_index,
+        },
+        "tavily_low_credit": {
+            "note": "Flag only caps batch size when set; efficient 1–2 Tavily searches are always used for multi-source.",
+            "enabled": bool(args.tavily_low_credit),
+            "max_rows_cap": min(max(1, args.tavily_low_credit_max_rows), 50) if args.tavily_low_credit else None,
+            "priority_max_rank_deprecated": args.tavily_priority_max_rank,
+        },
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     print(f"Wrote {jsonl_path}")
     print(f"Wrote {csv_path}")

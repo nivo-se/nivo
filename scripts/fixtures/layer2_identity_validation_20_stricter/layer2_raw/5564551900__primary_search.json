@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564551900",
+  "company_name": "Texstar AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Texstar\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Texstar what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://texstar.se/en/the-texstar-way-2/",
+        "title": "The Texstar Way",
+        "content": "Our designers draw inspiration from leading brands, and we want all women and men who use our clothing to look great at work. **Designed for sales and service.** We have helped countless companies in the service and sales sectors to put together well-cut, functional clothing collections that provide long-term comfort and satisfaction. **Designed for sales and service.** We have helped countless companies in the service and sales sectors to put together well-cut, functional clothing collections that provide long-term comfort and satisfaction. **Designed for sales and service.** We have helped countless companies in the service and sales sectors to put together well-cut, functional clothing collections that provide long-term comfort and satisfaction. Texstar provides a coherent clothing system for all your staff, whether they work in production, administration or customer sales. Texstar provides a coherent clothing system for all your staff, whether they work in production, administration or customer sales. Texstar provides a coherent clothing system for all your staff, whether they work in production, administration or customer sales.",
+        "score": 0.99978846,
+        "raw_content": null
+      },
+      {
+        "url": "https://texstar.se/en/home/",
+        "title": "Home - Texstar",
+        "content": "Texstar’s dealers are among the best in Sweden on profiling, profile clothes and work clothes. Especially knowledgeable in Texstar’s concept and range – find retailers on the link. To provide the best experiences, we use technologies like cookies to store and/or access device information. The technical storage or access is strictly necessary for the legitimate purpose of enabling the use of a specific service explicitly requested by the subscriber or user, or for the sole purpose of carrying out the transmission of a communication over an electronic communications network. The technical storage or access is necessary for the legitimate purpose of storing preferences that are not requested by the subscriber or user. The technical storage or access that is used exclusively for statistical purposes. The technical storage or access that is used exclusively for anonymous statistical purposes. The technical storage or access is required to create user profiles to send advertising, or to track the user on a website or across several websites for similar marketing purposes.",
+        "score": 0.9997851,
+        "raw_content": null
+      },
+      {
+        "url": "https://m.facebook.com/texstarsweden/about/",
+        "title": "Texstar (@texstarsweden) - Facebook",
+        "content": "Texstar. 1973 likes. Clothes made for conscious people, to be used in life. Professionally at work, as profile garment or private.",
+        "score": 0.99942964,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bloomberg.com/profile/company/2235833D:SS",
+        "title": "Texstar AB - Company Profile and News - Bloomberg Markets",
+        "content": "The company's line of business includes the wholesale distribution of piece goods and yard goods of natural and manmade fibers. SECTOR. Consumer Discretionary",
+        "score": 0.99895966,
+        "raw_content": null
+      },
+      {
+        "url": "https://texstar.se/en/about-texstar/",
+        "title": "About Texstar",
+        "content": "# About Texstar. Texstar are clothes that are made to work for, and fits many different professions. We that create Texstar garments have a long and thorough knowledge of clothing, materials and design. We call this the Texstar Way. To provide the best experiences, we use technologies like cookies to store and/or access device information. The technical storage or access is strictly necessary for the legitimate purpose of enabling the use of a specific service explicitly requested by the subscriber or user, or for the sole purpose of carrying out the transmission of a communication over an electronic communications network. The technical storage or access is necessary for the legitimate purpose of storing preferences that are not requested by the subscriber or user. The technical storage or access that is used exclusively for statistical purposes. The technical storage or access that is used exclusively for anonymous statistical purposes.",
+        "score": 0.99856746,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.68,
+    "request_id": "ea2ac6ba-3ce4-47b2-80cb-0419d1adeab9"
+  }
+}

@@ -58,7 +58,8 @@ from backend.services.shortlist_homepage_resolver import (
 
 logger = logging.getLogger(__name__)
 
-MAX_UNUSABLE_HOMEPAGE_PCT = 5.0
+# Assistive resolver: many rows may be unresolved; do not fail the pipeline on that alone.
+MAX_UNUSABLE_HOMEPAGE_PCT = 100.0
 MAX_ZERO_PAGES_PCT = 10.0
 
 
@@ -83,10 +84,20 @@ def _norm_orgnr(x: Any) -> str:
 
 
 def _row_homepage_unusable(row: Dict[str, Any]) -> bool:
+    """
+    Rows that should fail the resolver gate. Unresolved homepages are allowed: Layer 2 runs in
+    homepage-missing (Tavily-only) mode. Only hard-fail obvious breakage (dead URL, mismatch).
+    """
     st = (row.get("homepage_status") or "").strip()
     hr = (row.get("homepage_resolved") or row.get("homepage") or "").strip()
-    if st in ("unresolved", "dead_original", "rejected_mismatch"):
+    if st in ("unresolved", "manual_curated"):
+        return False
+    if st in ("dead_original", "rejected_mismatch"):
         return True
+    if st in ("verified_existing", "resolved_tavily", "manual_curated") and hr:
+        return False
+    if hr and not st:
+        return False
     if not hr:
         return True
     return False

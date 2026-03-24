@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560000841",
+  "company_name": "Atlas Copco AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Atlas Copco\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Atlas Copco official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.atlascopco.com/",
+        "title": "Atlas Copco | Level up your experience",
+        "content": "Your browser is not supported. You are using a browser we do not support any longer. To continue visiting our website, please choose one of the following supported browsers. We are a world-leading provider of sustainable productivity solutions. Customers benefit from our innovative compressors, vacuum solutions and air treatment systems, construction equipment, power tools and assembly systems.",
+        "score": 0.7147281,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en/about-us",
+        "title": "About us - Atlas Copco Group",
+        "content": "At Atlas Copco Group, we empower our customers to grow and drive society forward. Together, we develop technology that transforms the future.​",
+        "score": 0.6889923,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en",
+        "title": "Atlas Copco Group Homepage",
+        "content": "### Atlas Copco Group publishes Annual Report for 2025. ### Business Area President Industrial Technique Henrik Elmin to leave Atlas Copco Group. Nacka, Sweden, March 4, 2026: Henrik Elmin, Senior Executive Vice President and Business Area President for Industrial Technique, has decided to leave the Group. ### Portable compressor distributor in Louisiana has become part of Atlas Copco Group. (“Cypress”) a portable compressor distributor has become part of Atlas Copco Group. Nacka, February 20, 2026: Atlas Copco AB’s Nomination Committee today announced its proposal for the Board of Directors ahead of the Annual General Meeting 2026. ### Atlas Copco Group Annual Report 2025. ### Atlas Copco Group is set up to harvest more than 150 years of collected knowledge and to quickly adapt to new business conditions. Vagner Rego, President and CEO of Atlas Copco group as of 2024. ##### Atlas Copco Group. Atlas Copco Group develops innovative solutions across business areas including air compression, vacuum, industrial, and power techniques. © Copyright 2026 - Atlas Copco Group.",
+        "score": 0.64236575,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en-us",
+        "title": "Atlas Copco Group USA",
+        "content": "# Atlas Copco Group in the United States. ### Locations in the United States. ## Atlas Copco Group in the United States. Atlas Copco Comptec production facility in New York State. Meet our four business area presidents and discover technologies that transform the future. Atlas Copco Group's four business area presidents in a photo collage. ## Jobs at Atlas Copco Group USA. Our culture is built on trust, opportunity, and a drive for a better way – start your journey with Atlas Copco Group today. ## More from Atlas Copco Group United States. Use the below links to discover more about our locations and our technology that transforms the future. Discover technology that transforms the future:. ##### Atlas Copco Group. Atlas Copco Group develops innovative solutions across business areas including air compression, vacuum, industrial, and power techniques. With a global portfolio of 80+ brands, we enable technology that transforms the future. © Copyright 2026 - Atlas Copco Group.",
+        "score": 0.6383174,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en/careers",
+        "title": "Careers - Atlas Copco Group",
+        "content": "*   [Atlas Copco Group in Sweden](https://www.atlascopcogroup.com/en/about-us/sweden). *   [Our awards](https://www.atlascopcogroup.com/en/about-us/atlas-copco-group-awards). *   [Reasons to join us](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group). *   [Our culture](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/our-culture). *   [Compensation and benefits](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/compensation-and-benefits). *   [Work-life balance](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/work-life-balance). *   [Diversity and inclusion](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/diversity-and-inclusion). *   [Learning and development](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/learning-development). *   [Life at Atlas Copco Group](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group). *   [Work areas](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas). *   [Engineering​](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/engineering). *   [Service​](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/service). *   [Sales and Marketing​](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/sales-and-marketing). *   [Software engineer​ing](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/software-engineer). *   [Manufacturing​](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/manufacturing). *   [Business Services​](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/work-areas/business-services). *   [Meet our colleagues](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/meet-our-colleagues). *   [People Podcast](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group/people-podcast). *   [How we do business](https://www.atlascopcogroup.com/en/investors/atlas-copco-group-for-investors/how-we-do-business). *   [Share information](https://www.atlascopcogroup.com/en/investors/atlas-copco-ab-share/share-information). [Life at Atlas Copco Group ------------------------- See what it is like working here](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group). [Find the reasons for you to join](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group). [Step inside our day-to-day](https://www.atlascopcogroup.com/en/careers/life-at-atlas-copco-group). You are very welcome to reach out with questions about working for Atlas Copco Group.If you want to send a job application, please [apply directly to open roles via our career portal](https://www.atlascopcogroup.com/en/careers/jobs/job-overview). [Discover our culture](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/our-culture). [Learn more about diversity and inclusion](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/diversity-and-inclusion). [Dive into learning and development](https://www.atlascopcogroup.com/en/careers/reasons-to-join-atlas-copco-group/learning-development). *   [How we do business](https://www.atlascopcogroup.com/en/investors/atlas-copco-group-for-investors/how-we-do-business). [Legal and Privacy Notices](https://www.atlascopcogroup.com/en/privacy)Manage cookies[Accessibility](https://www.atlascopcogroup.com/en/accessibility). [Check our Cookie Policy](https://www.atlascopcogroup.com/en/privacy-policy). [Check our Cookie Policy](https://www.atlascopcogroup.com/en/privacy-policy).",
+        "score": 0.62358373,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.9,
+    "request_id": "a9ca8c16-51c4-47c4-b821-c132954ba209"
+  }
+}

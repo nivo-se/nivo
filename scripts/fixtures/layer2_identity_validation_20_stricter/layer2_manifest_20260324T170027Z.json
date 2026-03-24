@@ -1,0 +1,203 @@
+{
+  "created_at_utc": "20260324T170027Z",
+  "input_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/layer2_batch_40.csv",
+  "model": "gpt-4o-mini",
+  "rows": 20,
+  "blend": {
+    "formula": "100 * (w1 * stage1/100 + w2 * fit_confidence * (1 if is_fit else 0.15)) / (w1+w2)",
+    "w_stage1": 0.4,
+    "w_layer2": 0.6
+  },
+  "retrieval": {
+    "policy": "Default: multi-source (1\u20132 Tavily searches, domain clustering, limited same-origin fetches, LinkedIn snippets). homepage_known: legacy single-URL crawl.",
+    "default_layer2_retrieval_mode": "multi_source"
+  },
+  "tavily_raw": {
+    "enabled": true,
+    "directory_relative": "layer2_raw",
+    "rows": [
+      {
+        "orgnr": "5564551900",
+        "company_name": "Texstar AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5564551900__primary_search.json"
+        }
+      },
+      {
+        "orgnr": "5562146018",
+        "company_name": "Fladen Fishing Aktiebolag",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5562146018__primary_search.json",
+          "identity_search": "layer2_raw/5562146018__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5591098214",
+        "company_name": "Nordiska K\u00f6k AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5591098214__primary_search.json",
+          "identity_search": "layer2_raw/5591098214__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5564282738",
+        "company_name": "Mille Notti AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5564282738__primary_search.json",
+          "identity_search": "layer2_raw/5564282738__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5565636353",
+        "company_name": "AB Poly-Produkter",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5565636353__primary_search.json",
+          "identity_search": "layer2_raw/5565636353__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5566816632",
+        "company_name": "Quadpak AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5566816632__primary_search.json",
+          "identity_search": "layer2_raw/5566816632__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5565281427",
+        "company_name": "Thule Sweden AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5565281427__primary_search.json"
+        }
+      },
+      {
+        "orgnr": "5560000841",
+        "company_name": "Atlas Copco AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560000841__primary_search.json",
+          "identity_search": "layer2_raw/5560000841__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560069463",
+        "company_name": "Alfa Laval Corporate AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560069463__primary_search.json",
+          "identity_search": "layer2_raw/5560069463__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560296968",
+        "company_name": "Getinge AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560296968__primary_search.json"
+        }
+      },
+      {
+        "orgnr": "5560168616",
+        "company_name": "Elekta AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560168616__primary_search.json",
+          "identity_search": "layer2_raw/5560168616__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5567370431",
+        "company_name": "SCA Forest Products AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5567370431__primary_search.json",
+          "identity_search": "layer2_raw/5567370431__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560003468",
+        "company_name": "Volvo AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560003468__primary_search.json"
+        }
+      },
+      {
+        "orgnr": "5560197460",
+        "company_name": "Sandvik AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560197460__primary_search.json",
+          "identity_search": "layer2_raw/5560197460__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5564968039",
+        "company_name": "Formenta AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5564968039__primary_search.json",
+          "identity_search": "layer2_raw/5564968039__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5564169786",
+        "company_name": "KRYDDHUSET I LJUNG Aktiebolag",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5564169786__primary_search.json",
+          "identity_search": "layer2_raw/5564169786__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560337136",
+        "company_name": "Cramo AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560337136__primary_search.json",
+          "identity_search": "layer2_raw/5560337136__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5561210560",
+        "company_name": "Loomis Sverige AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5561210560__primary_search.json",
+          "identity_search": "layer2_raw/5561210560__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560444153",
+        "company_name": "Bring Sverige AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560444153__primary_search.json",
+          "identity_search": "layer2_raw/5560444153__identity_search.json"
+        }
+      },
+      {
+        "orgnr": "5560957432",
+        "company_name": "Telenor Sverige AB",
+        "layer2_retrieval_mode": "multi_source",
+        "tavily_raw_artifacts": {
+          "primary_search": "layer2_raw/5560957432__primary_search.json",
+          "identity_search": "layer2_raw/5560957432__identity_search.json"
+        }
+      }
+    ]
+  },
+  "tavily_low_credit": {
+    "note": "Flag only caps batch size when set; efficient 1\u20132 Tavily searches are always used for multi-source.",
+    "enabled": false,
+    "max_rows_cap": null,
+    "priority_max_rank_deprecated": 40
+  }
+}

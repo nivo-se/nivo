@@ -12,7 +12,7 @@ import os
 import re
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Literal, MutableMapping, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 import httpx
@@ -21,18 +21,20 @@ logger = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = 12.0
 USER_AGENT = "NivoShortlistHomepageResolver/1.0 (+https://nivogroup.se)"
-VERIFY_SCORE_MIN = 0.38
-TAVILY_SCORE_MIN = 0.36
+# Stricter than v1: prefer unresolved over weak third-party / directory matches.
+VERIFY_SCORE_MIN = 0.42
+TAVILY_SCORE_MIN = 0.40
 MAX_TAVILY_CANDIDATES_TO_FETCH = 5
 
 HomepageStatus = Literal[
+    "manual_curated",
     "verified_existing",
     "resolved_tavily",
     "unresolved",
     "rejected_mismatch",
     "dead_original",
 ]
-ResolutionMethod = Literal["existing_verified", "tavily_resolved", "none"]
+ResolutionMethod = Literal["manual_csv", "existing_verified", "tavily_resolved", "none"]
 
 ExclusionReason = Literal[
     "excluded_out_of_scope_major_company",
@@ -69,8 +71,13 @@ DEFAULT_MAJOR_NAME_KEYWORDS: Tuple[str, ...] = (
     "nordea bank",
 )
 
-# Never use as homepage_resolved: directories, aggregators, social profiles, registries-as-homepage.
+# Never use as homepage_resolved: directories, aggregators, social profiles, registries, news/investor sites.
 _BLOCKED_CANDIDATE_HOST_SUBSTR: Tuple[str, ...] = (
+    "northdata.com",
+    "merit500.com",
+    "reco.se",
+    "infoisinfo",
+    "inderes",
     "rocketreach.co",
     "linkedin.com",
     "facebook.com",
@@ -99,6 +106,35 @@ _BLOCKED_CANDIDATE_HOST_SUBSTR: Tuple[str, ...] = (
     "google.",
     "youtube.com",
     "apple.com/app",
+    "news.",
+    "medium.com",
+    "reddit.com",
+    "trustpilot.",
+    "g2.com",
+    "capterra.com",
+    "zoominfo.",
+    "apollo.io",
+    "seamless.ai",
+    "dealroom.co",
+    "funderbeam.com",
+    "nasdaq.com",
+    "nyse.com",
+    "marketscreener.com",
+    "finance.yahoo",
+    "ft.com",
+    "cnbc.com",
+    "morningstar.com",
+    "simplywall.st",
+    "dnb.com",
+    "bisnode",
+    "creditsafe",
+    "uc.se",
+    "solidinfo",
+    "merinfo.se",
+    "kreditrapporten",
+    "bygghandel.se",
+    "prnewswire.com",
+    "businesswire.com",
 )
 
 _STOP_TOKENS = frozenset(
@@ -134,6 +170,36 @@ def _norm_orgnr(raw: str) -> str:
     return re.sub(r"\D", "", (raw or "").strip())
 
 
+def _bump(d: Optional[MutableMapping[str, int]], key: str, n: int = 1) -> None:
+    if d is None:
+        return
+    d[key] = d.get(key, 0) + n
+
+
+def collect_tavily_startup_diagnostics() -> Dict[str, Any]:
+    """
+    One-shot probe for logging / summary: import, env, and effective API key (env or settings).
+    """
+    out: Dict[str, Any] = {
+        "tavily_import_ok": False,
+        "tavily_import_error": None,
+        "tavily_api_key_env_present": bool((os.getenv("TAVILY_API_KEY") or "").strip()),
+        "tavily_api_key_configured": False,
+        "tavily_available": False,
+    }
+    try:
+        from backend.services.web_intel.tavily_client import TavilyClient  # noqa: F401
+    except ImportError as e:
+        out["tavily_import_error"] = str(e)
+        return out
+    out["tavily_import_ok"] = True
+    tv = _tavily_client()
+    configured = bool(tv and getattr(tv, "api_key", None))
+    out["tavily_api_key_configured"] = configured
+    out["tavily_available"] = configured
+    return out
+
+
 def _normalize_url(raw: Optional[str]) -> Optional[str]:
     s = (raw or "").strip()
     if not s:
@@ -144,6 +210,14 @@ def _normalize_url(raw: Optional[str]) -> Optional[str]:
     if not p.netloc:
         return None
     return s
+
+
+def row_needs_homepage_tavily_lookup(row: Dict[str, Any]) -> bool:
+    """True when there is no usable homepage URL in the row (Tavily or verify path required)."""
+    hp = row.get("homepage")
+    if hp is not None and not isinstance(hp, str):
+        hp = str(hp)
+    return _normalize_url(hp) is None
 
 
 def _name_tokens(company_name: str) -> List[str]:
@@ -186,12 +260,59 @@ def _strip_html_to_text(html: str, max_chars: int) -> Tuple[str, str]:
 def _blocked_host(host: str) -> bool:
     """Aggregator / profile / directory hosts — never accept as official company homepage."""
     h = (host or "").lower()
+    if h == "av.se" or h.endswith(".av.se"):
+        return True
     return any(b in h for b in _BLOCKED_CANDIDATE_HOST_SUBSTR)
 
 
 def homepage_domain_is_blocklisted(host: str) -> bool:
     """Public alias for pipeline QA (same rule as Tavily / resolver)."""
     return _blocked_host(host)
+
+
+def _url_path_segment_count(path: str) -> int:
+    return len([s for s in (path or "").split("/") if s])
+
+
+def _url_hard_registry_directory(url: str) -> bool:
+    """
+    Third-party registry / listing URL shapes (not first-party corporate subpages).
+    First-party /about, /investors etc. are handled by root upgrade, not listed here.
+    """
+    low = url.lower()
+    if "orgnr=" in low:
+        return True
+    path = (urlparse(url).path or "").lower()
+    if "/company/" in path or "/companies/" in path:
+        return True
+    if "/profile" in path or "/profiles/" in path:
+        return True
+    if "/detail" in path or "/details/" in path:
+        return True
+    if "/listing" in path or "/listings/" in path:
+        return True
+    if re.search(r"/review(?:/|$)", path) or "/reviews/" in path:
+        if "preview" not in path:
+            return True
+    return False
+
+
+def _domain_plausible_for_company(host: str, company_name: str) -> bool:
+    """Require a brand/name token to appear in the registrable host (anti third-party)."""
+    h = (host or "").lower().split("@")[0].split(":")[0]
+    if not h:
+        return False
+    slug = re.sub(r"[^a-z0-9åäö]", "", h)
+    tokens = [t for t in _name_tokens(company_name) if len(t) >= 4]
+    if not tokens:
+        tokens = _name_tokens(company_name)
+    for t in tokens:
+        if len(t) >= 4 and t in slug:
+            return True
+    for t in tokens:
+        if len(t) == 3 and t in slug:
+            return True
+    return False
 
 
 def _verify_page_match(
@@ -224,6 +345,61 @@ def _verify_page_match(
     return score, note
 
 
+def _accept_homepage_candidate(
+    client: httpx.Client,
+    company_name: str,
+    orgnr: str,
+    final_url: str,
+    html: Optional[str],
+    min_score: float,
+    diag: Optional[MutableMapping[str, int]],
+) -> Optional[Tuple[str, float, str]]:
+    """
+    Enforce first-party + content match. Non-root URLs only count if the site root
+    verifies; deep paths are never returned as homepage_resolved.
+    """
+    if not html:
+        return None
+    netloc = urlparse(final_url).netloc.lower()
+    if _blocked_host(netloc):
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    if _url_hard_registry_directory(final_url):
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    if not _domain_plausible_for_company(netloc, company_name):
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    score, note = _verify_page_match(company_name, orgnr, final_url, html)
+    if score < min_score:
+        return None
+
+    path = urlparse(final_url).path or ""
+    if _url_path_segment_count(path) == 0:
+        norm = final_url.split("#")[0].rstrip("/")
+        return (norm, score, note)
+
+    scheme = urlparse(final_url).scheme or "https"
+    root = f"{scheme}://{netloc}/"
+    html_r, err_r, final_r = _fetch_html(client, root)
+    if not html_r or err_r:
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    nl = urlparse(final_r).netloc.lower()
+    if _blocked_host(nl) or _url_hard_registry_directory(final_r):
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    if not _domain_plausible_for_company(nl, company_name):
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    score_r, note_r = _verify_page_match(company_name, orgnr, final_r, html_r)
+    if score_r < min_score:
+        _bump(diag, "rejected_directory_candidates")
+        return None
+    norm = final_r.split("#")[0].rstrip("/")
+    return (norm, score_r, f"root_upgrade {note_r}")
+
+
 def _se_fallback_urls_from_netloc(netloc: str) -> List[str]:
     """
     If the CSV has a simple international .com host, try the same label on .se
@@ -245,22 +421,21 @@ def _probe_verified_homepage(
     urls: Sequence[str],
     homepage_original: str,
     notes_prefix: str,
+    diag: Optional[MutableMapping[str, int]] = None,
 ) -> Optional[ResolutionOutcome]:
     for u in urls:
         html, err, final = _fetch_html(client, u)
         if not html or err:
             continue
-        if _blocked_host(urlparse(final).netloc):
-            continue
-        score, note = _verify_page_match(company_name, orgnr, final, html)
-        if score >= VERIFY_SCORE_MIN:
+        acc = _accept_homepage_candidate(client, company_name, orgnr, final, html, VERIFY_SCORE_MIN, diag)
+        if acc:
             return ResolutionOutcome(
                 homepage_original=homepage_original,
-                homepage_resolved=final.split("#")[0].rstrip("/"),
+                homepage_resolved=acc[0],
                 status="verified_existing",
                 method="existing_verified",
-                confidence=round(score, 3),
-                notes=f"{notes_prefix}: {note}",
+                confidence=round(acc[1], 3),
+                notes=f"{notes_prefix}: {acc[2]}",
             )
     return None
 
@@ -288,12 +463,29 @@ def _tavily_client():
     return TavilyClient(api_key=key)
 
 
-def _tavily_search(company_name: str, orgnr: str) -> list:
+def _tavily_search(
+    company_name: str,
+    orgnr: str,
+    *,
+    diag: Optional[MutableMapping[str, int]] = None,
+    row_key: Optional[str] = None,
+) -> list:
+    _bump(diag, "tavily_search_calls")
+    if diag is not None and row_key is not None:
+        lk = "_tavily_last_row_key"
+        if diag.get(lk) != row_key:
+            diag[lk] = row_key
+            _bump(diag, "tavily_attempted_rows")
     tv = _tavily_client()
     if not tv or not tv.api_key:
+        _bump(diag, "tavily_search_skipped_no_client_or_key")
         return []
     q = f'"{company_name}" Sweden organisationsnummer {orgnr} official website'
-    return tv.search(q, max_results=5, search_depth="basic")
+    results = tv.search(q, max_results=5, search_depth="basic")
+    if results:
+        _bump(diag, "tavily_search_calls_with_results")
+    _bump(diag, "tavily_result_items_returned", len(results))
+    return results
 
 
 def classify_exclusion(
@@ -330,27 +522,39 @@ def resolve_row_homepage(
     company_name: str,
     homepage_input: Optional[str],
     client: httpx.Client,
+    *,
+    diag: Optional[MutableMapping[str, int]] = None,
 ) -> ResolutionOutcome:
     original_raw = (homepage_input or "").strip()
     homepage_original = original_raw
+    # Shortlist CSV: non-empty `homepage` cell is treated as manually curated; never overwritten.
+    if original_raw:
+        url_manual = _normalize_url(homepage_input)
+        if url_manual:
+            return ResolutionOutcome(
+                homepage_original=homepage_original,
+                homepage_resolved=url_manual.split("#")[0].rstrip("/"),
+                status="manual_curated",
+                method="manual_csv",
+                confidence=1.0,
+                notes="manual_curated_from_shortlist_csv",
+            )
+
     url0 = _normalize_url(homepage_input)
 
     # --- Existing URL path ---
     if url0:
         html, err, final = _fetch_html(client, url0)
         if html and not err:
-            score, note = _verify_page_match(company_name, orgnr, final, html)
-            fin_host = urlparse(final).netloc
-            if _blocked_host(fin_host):
-                score, note = 0.0, f"blocked_profile_directory_host:{fin_host}"
-            if score >= VERIFY_SCORE_MIN:
+            acc = _accept_homepage_candidate(client, company_name, orgnr, final, html, VERIFY_SCORE_MIN, diag)
+            if acc:
                 return ResolutionOutcome(
                     homepage_original=homepage_original,
-                    homepage_resolved=final.split("#")[0].rstrip("/"),
+                    homepage_resolved=acc[0],
                     status="verified_existing",
                     method="existing_verified",
-                    confidence=round(score, 3),
-                    notes=f"verified_existing: {note}",
+                    confidence=round(acc[1], 3),
+                    notes=f"verified_existing: {acc[2]}",
                 )
             # Wrong TLD in source (e.g. fladenfishing.com vs fladenfishing.se)
             se_try = _se_fallback_urls_from_netloc(urlparse(url0).netloc)
@@ -361,13 +565,14 @@ def resolve_row_homepage(
                 se_try,
                 homepage_original,
                 "se_tld_fallback_after_mismatch",
+                diag=diag,
             )
             if probed:
                 return probed
             # Mismatch: try Tavily
-            results = _tavily_search(company_name, orgnr)
+            results = _tavily_search(company_name, orgnr, diag=diag, row_key=orgnr)
             best = _pick_and_verify_tavily_candidates(
-                client, company_name, orgnr, results, skip_url=final
+                client, company_name, orgnr, results, skip_url=final, diag=diag
             )
             if best:
                 return ResolutionOutcome(
@@ -383,8 +588,8 @@ def resolve_row_homepage(
                 homepage_resolved="",
                 status="rejected_mismatch",
                 method="none",
-                confidence=round(score, 3),
-                notes=f"mismatch_no_tavily: {note}; err={err}",
+                confidence=0.0,
+                notes="mismatch_no_tavily_candidate",
             )
         # Dead fetch: try .se sibling of a simple *.com before Tavily
         se_try = _se_fallback_urls_from_netloc(urlparse(url0).netloc)
@@ -395,11 +600,12 @@ def resolve_row_homepage(
             se_try,
             homepage_original,
             "se_tld_fallback_after_dead_com",
+            diag=diag,
         )
         if probed:
             return probed
-        results = _tavily_search(company_name, orgnr)
-        best = _pick_and_verify_tavily_candidates(client, company_name, orgnr, results, skip_url=None)
+        results = _tavily_search(company_name, orgnr, diag=diag, row_key=orgnr)
+        best = _pick_and_verify_tavily_candidates(client, company_name, orgnr, results, skip_url=None, diag=diag)
         if best:
             return ResolutionOutcome(
                 homepage_original=homepage_original,
@@ -419,8 +625,9 @@ def resolve_row_homepage(
         )
 
     # --- No original URL ---
-    results = _tavily_search(company_name, orgnr)
-    best = _pick_and_verify_tavily_candidates(client, company_name, orgnr, results, skip_url=None)
+    _bump(diag, "rows_entered_no_input_url_branch")
+    results = _tavily_search(company_name, orgnr, diag=diag, row_key=orgnr)
+    best = _pick_and_verify_tavily_candidates(client, company_name, orgnr, results, skip_url=None, diag=diag)
     if best:
         return ResolutionOutcome(
             homepage_original=homepage_original,
@@ -447,11 +654,13 @@ def _pick_and_verify_tavily_candidates(
     results: list,
     *,
     skip_url: Optional[str],
+    diag: Optional[MutableMapping[str, int]] = None,
 ) -> Optional[Tuple[str, float, str]]:
     if not results:
+        _bump(diag, "tavily_pick_with_empty_results")
         return None
     skip_norm = skip_url.split("#")[0].rstrip("/").lower() if skip_url else ""
-    candidates: List[Tuple[str, float]] = []
+    best: Optional[Tuple[str, float, str]] = None
     checked = 0
     for r in results:
         if checked >= MAX_TAVILY_CANDIDATES_TO_FETCH:
@@ -461,27 +670,30 @@ def _pick_and_verify_tavily_candidates(
             continue
         p = urlparse(u)
         if _blocked_host(p.netloc):
+            _bump(diag, "rejected_directory_candidates")
+            continue
+        if _url_hard_registry_directory(u):
+            _bump(diag, "rejected_directory_candidates")
             continue
         nu = u.split("#")[0].rstrip("/")
         if skip_norm and nu.lower() == skip_norm:
             continue
         html, err, final = _fetch_html(client, u)
         checked += 1
+        _bump(diag, "tavily_candidate_http_fetches")
         if not html or err:
             continue
-        if _blocked_host(urlparse(final).netloc):
-            continue
-        score, note = _verify_page_match(company_name, orgnr, final, html)
-        if score >= TAVILY_SCORE_MIN:
-            norm = final.split("#")[0].rstrip("/")
-            depth = len([p for p in urlparse(norm).path.split("/") if p])
-            candidates.append((norm, score, depth))
-            logger.debug("tavily_candidate ok url=%s score=%s %s", final, score, note)
-    if not candidates:
+        acc = _accept_homepage_candidate(client, company_name, orgnr, final, html, TAVILY_SCORE_MIN, diag)
+        if acc:
+            url, score, note = acc
+            _bump(diag, "tavily_candidates_passed_verify")
+            logger.debug("tavily_candidate ok url=%s score=%s %s", url, score, note)
+            if best is None or score > best[1]:
+                best = (url, score, f"tavily_verified score={score:.2f} {note}")
+    if not best:
+        _bump(diag, "tavily_pick_no_candidate_passed_verify")
         return None
-    candidates.sort(key=lambda x: (-x[1], x[2]))
-    best_url, best_s, _depth = candidates[0]
-    return best_url, best_s, f"tavily_verified score={best_s:.2f}"
+    return best[0], best[1], best[2]
 
 
 def resolve_shortlist_rows(
@@ -492,16 +704,22 @@ def resolve_shortlist_rows(
     min_revenue_column: Optional[str] = None,
     min_revenue_threshold: Optional[float] = None,
     pause_seconds: float = 0.0,
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], Dict[str, int]]:
+    tavily_startup: Optional[Dict[str, Any]] = None,
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], Dict[str, Any]]:
     """
     Process only the given rows. Returns (resolved_rows, excluded_rows, stats).
 
     Each resolved row: original keys + resolution columns + `homepage` set to homepage_resolved for Layer 2.
     Each excluded row: original keys + exclusion_reason.
+
+    ``stats`` includes homepage_status_counts, Tavily call counters, and ``tavily_startup`` diagnostics.
     """
     resolved: List[Dict[str, Any]] = []
     excluded: List[Dict[str, Any]] = []
-    stats: Dict[str, int] = {
+    tavily_diag: MutableMapping[str, int] = {}
+    startup = tavily_startup if tavily_startup is not None else collect_tavily_startup_diagnostics()
+    stats: Dict[str, Any] = {
+        "manual_curated": 0,
         "verified_existing": 0,
         "resolved_tavily": 0,
         "unresolved": 0,
@@ -538,10 +756,15 @@ def resolve_shortlist_rows(
                 stats["excluded"] += 1
                 continue
 
+            if row_needs_homepage_tavily_lookup(row):
+                _bump(tavily_diag, "eligible_rows_without_homepage_url")
+            else:
+                _bump(tavily_diag, "eligible_rows_with_homepage_url")
+
             hp_in = row.get("homepage")
             if hp_in is not None and not isinstance(hp_in, str):
                 hp_in = str(hp_in)
-            out = resolve_row_homepage(orgnr, name, hp_in, client)
+            out = resolve_row_homepage(orgnr, name, hp_in, client, diag=tavily_diag)
             if out.status in stats:
                 stats[out.status] += 1
             logger.info(
@@ -565,4 +788,15 @@ def resolve_shortlist_rows(
             if pause_seconds > 0:
                 time.sleep(pause_seconds)
 
+    tavily_diag.pop("_tavily_last_row_key", None)
+    stats["tavily_startup"] = startup
+    stats["tavily_runtime_counts"] = dict(tavily_diag)
+    stats["rejected_directory_candidates"] = int(tavily_diag.get("rejected_directory_candidates", 0))
+    stats["accepted_first_party_domains"] = (
+        int(stats["manual_curated"])
+        + int(stats["verified_existing"])
+        + int(stats["resolved_tavily"])
+    )
+    stats["unresolved_rows"] = int(stats["unresolved"])
+    stats["tavily_attempted_rows"] = int(tavily_diag.get("tavily_attempted_rows", 0))
     return resolved, excluded, stats

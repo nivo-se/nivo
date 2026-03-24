@@ -160,5 +160,5 @@ export const sellersTranslations = {
     "Att sälja sitt bolag är inget man bestämmer över en dag. Nivo tar gärna ett första samtal — konfidentiellt och utan förpliktelser.",
   kontaktDuKan: "Du kan kontakta oss direkt:",
   kontaktFooter:
-    "Du är välkommen att höra av dig oavsett var du befinner dig i processen.",
+    "Du är välkommen att höra av dig oavsett var du är i processen.",
 } as const;

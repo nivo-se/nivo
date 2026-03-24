@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5567370431",
+  "company_name": "SCA Forest Products AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"SCA Forest Products\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "SCA Forest Products what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://matrixbcg.com/blogs/how-it-works/sca",
+        "title": "How Does SCA Company Work? – MatrixBCG.com",
+        "content": "SCA is a major European forest products company focused on sustainable forest management and producing wood-based goods. SCA generates revenue through solid wood products, pulp, containerboard, and renewable energy. The operational workflow of SCA company involves processing wood unsuitable for solid wood products into pulp, which also generates valuable by-products such as green chemicals, green electricity, heating, and raw materials for biofuels. The company's commitment to innovation and digitalization is key to its SCA company business model, improving production processes, minimizing waste, and optimizing resource use across its operations. SCA company operations are built on a foundation of integrated forest management, transforming wood resources into a diverse range of products and renewable energy. SCA company's business model is strengthened by its high degree of self-sufficiency in raw materials, energy, and logistics, which aids in cost management and earnings stability. The SCA company operates as a significant player in the European forest products sector, leveraging its extensive forest ownership and diversified product range.",
+        "score": 0.8055255,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sca.com/en/forest/about-sca-forest/",
+        "title": "About SCA Forest",
+        "content": "# About SCA Forest. SCA's business area Forest is responsible for the forestry management of SCA's extensive forest holding with 2.7 million hectares of forest land in northern Sweden and Estonia, Latvia and Lithuania. Our operations consist of five functions: Market, Forest and Silviculture, Production, Wood procurement and The Baltics​​​​​​​. **The Market function** is responsible for buying timber from private forest owners and offers them forest-related services for sustainable and profitable forestry. **The Forest and silviculture function** is responsible for the management of SCA's own forest and handles all silvicultural services, in both SCA's own forest and on behalf of private forest owners that buys our services. **The Production function** is responsible for harvesting forest, regardless of whether it is private forest or SCA's own forest. **The Wood procurement function** is responsible for supplying our industries with the transportation of timber from forests to wood terminals and industries. **The Baltics function** is responsible for SCA's forest holdings in Estonia, Latvia and Lithunia.",
+        "score": 0.78054583,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.encyclopedia.com/social-sciences-and-law/economics-business-and-labor/businesses-and-occupations/svenska-cellulosa-aktiebolaget-sca",
+        "title": "Svenska Cellulosa Aktiebolaget Sca - Encyclopedia.com",
+        "content": "Svenska Cellulosa Aktiebolaget SCA is one of Europe's leading forestry companies, specializing in absorbent hygiene products, baby and adult diapers, tissue products, corrugated packaging and containerboard, and publication papers. Pulp and paper accounted for half of SCA's sales of SEK 5.96 billion in 1979, and Mölnlycke was responsible for 30 percent of sales, with BÅKAB, Sunds Defibrator, and packaging companies making up the rest. At the time SCA touted itself as an integrated paper company with three key areas of activity: absorbent hygiene products, corrugated packaging, and graphic papers. In November 2001 SCA augmented its U.S. commercial-tissue operation through the $92 million purchase of Encore Paper Company Inc., which sold products in the Midwest and the northeastern and southeastern states. Svenska Cellulosa Aktiebolaget SCA (SCA for short) is one of Europe’s leading forestry companies, specializing in absorbent hygiene products, corrugated packaging, and graphic papers. At the time SCA touted itself as an integrated paper company with three key areas of activity: absorbent hygiene products, corrugated packaging, and graphic papers.",
+        "score": 0.77261686,
+        "raw_content": null
+      },
+      {
+        "url": "https://manufacturing-today.com/news/sca-timber/",
+        "title": "SCA Timber - Manufacturing Today",
+        "content": "SCA Timber AB, one of the largest sawmilling companies in Europe, operates seven sawmills and six planing mills, as well as wood-processing units, distribution and wholesale operations in Sweden, with a total production of solid-wood products amounting to 1.8 million cubic metres. SCA Timber is a global consumer goods and paper company that develops, produces and markets personal care products, tissue, packaging solutions, publication papers and solid-wood products. On the 29 February 2008, SCA decided to invest SEK 210 million in a new automatic grading mill that will replace the two existing grading mills at one of its sawmills, Tunadal. “We have increased production and productivity at the Tunadal sawmill through a number of investment plans,” states Jerry. Not only a strong believer in ensuring its position as one of the largest sawmilling companies in Europe is retained by investing in modern technologies, SCA Timber also invests to meet the ongoing demands of the market as well as in complying and making a difference to environmental issues.",
+        "score": 0.7591723,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sca.com/en/",
+        "title": "SCA: We are driven by the force of the forest",
+        "content": "The core of SCA's business is the growing forest. ### Over 1,100 hectares of wetland restoration on SCA land. Since 2021, SCA has been dedicated to restoring selected wetlands on its land. By making defibrillators at SCA’s local offices in northern Sweden accessible to the public 24/7, more lives can potentially be saved. SCA is reporting the lowest damage level ever to known archaeological and cultural remains. ### March 27 - SCA Annual General Meeting 2026. * + Press releaseCORRECTION: SCA to increase NBSK price. SCA works actively to make use of the entire tree and all parts of residual streams. Sustainability is integrated into the entire business and part of SCA's business concept. Our pulp products are made from trees from our forests in northern Sweden and have a very strong environmental profile. We are one of Europe's largest producers of forest-based bioenergy with a total production of approximately 10.8 TWh per year.",
+        "score": 0.74697095,
+        "raw_content": null
+      }
+    ],
+    "response_time": 2.07,
+    "request_id": "21298d92-16fe-4907-8515-ed0fb2da8580"
+  }
+}

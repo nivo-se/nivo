@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { supabase } from '../lib/supabase'
 import { Loader2 } from 'lucide-react'
 
 export const AIInsights: React.FC = () => {
@@ -41,22 +40,17 @@ export const AIInsights: React.FC = () => {
       setError('Enter an organization number')
       return
     }
-    if (!supabase) {
-      setError('Supabase client is not configured')
-      return
-    }
     setError(null)
     setIsLoading(true)
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('ai_profiles')
-        .select('*')
-        .eq('org_number', orgnr.trim())
-        .maybeSingle()
-
-      if (supabaseError) throw supabaseError
-      setProfile(data)
-      if (!data) {
+      const res = await fetch(`/api/companies/${encodeURIComponent(orgnr.trim())}/intel`)
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+      const payload = await res.json()
+      const profileRow = payload?.ai_profile ?? null
+      setProfile(profileRow)
+      if (!profileRow) {
         setError('No insights available yet. Run enrichment first.')
       }
     } catch (err: any) {

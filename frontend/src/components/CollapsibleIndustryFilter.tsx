@@ -17,7 +17,6 @@ import {
   RotateCcw,
   ChevronUp
 } from 'lucide-react'
-import { supabase, supabaseConfig } from '../lib/supabase'
 import { getLocalIndustrySummaries } from '../lib/sampleData'
 
 interface Industry {
@@ -46,57 +45,19 @@ const CollapsibleIndustryFilter: React.FC<CollapsibleIndustryFilterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [isExpanded, setIsExpanded] = useState(false)
-  const supabaseEnabled = supabaseConfig.isConfigured
-
-  // Load industries from our new classification system
   useEffect(() => {
     const loadIndustries = async () => {
       try {
         setLoading(true)
-
-        if (!supabaseEnabled) {
-          const fallbackIndustries = getLocalIndustrySummaries().map(summary => ({
-            code: summary.code,
-            name: summary.name,
-            category: summary.category,
-            companyCount: summary.companyCount
-          }))
-
-          setIndustries(fallbackIndustries)
-          setFilteredIndustries(fallbackIndustries)
-          return
-        }
-
-        // Get industry categories from our new classification
-        const { data: industryData, error: industryError } = await supabase
-          .from('industry_classification')
-          .select('industry_category')
-          .not('industry_category', 'is', null)
-
-        if (industryError) {
-          console.error('Error loading industries:', industryError)
-          return
-        }
-
-        // Count companies per industry category
-        const industryCounts = new Map<string, number>()
-        industryData?.forEach(item => {
-          const category = item.industry_category
-          if (category) {
-            industryCounts.set(category, (industryCounts.get(category) || 0) + 1)
-          }
-        })
-
-        // Create industry objects
-        const industriesWithCounts = Array.from(industryCounts.entries()).map(([name, companyCount]) => ({
-          code: name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-          name,
-          category: 'Business Categories',
-          companyCount
+        const fallbackIndustries = getLocalIndustrySummaries().map((summary) => ({
+          code: summary.code,
+          name: summary.name,
+          category: summary.category,
+          companyCount: summary.companyCount,
         }))
 
-        setIndustries(industriesWithCounts)
-        setFilteredIndustries(industriesWithCounts)
+        setIndustries(fallbackIndustries)
+        setFilteredIndustries(fallbackIndustries)
       } catch (error) {
         console.error('Error loading industries:', error)
       } finally {
@@ -105,7 +66,7 @@ const CollapsibleIndustryFilter: React.FC<CollapsibleIndustryFilterProps> = ({
     }
 
     loadIndustries()
-  }, [supabaseEnabled])
+  }, [])
 
   // Filter industries based on search term
   useEffect(() => {

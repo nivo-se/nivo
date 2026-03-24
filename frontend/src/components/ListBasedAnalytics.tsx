@@ -24,13 +24,13 @@ import {
   CheckCircle,
   List
 } from 'lucide-react'
-import { SupabaseCompany } from '../lib/supabaseDataService'
+import type { CompanyRecord } from '../lib/companyDataService'
 
 interface SavedCompanyList {
   id: string
   name: string
   description?: string
-  companies: SupabaseCompany[]
+  companies: CompanyRecord[]
   filters: any
   createdAt: string
   updatedAt: string
@@ -51,14 +51,14 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
   const [isCityModalOpen, setIsCityModalOpen] = useState(false)
 
   // Helper functions to get companies by industry/city
-  const getCompaniesByIndustry = (industryName: string): SupabaseCompany[] => {
+  const getCompaniesByIndustry = (industryName: string): CompanyRecord[] => {
     if (!selectedList) return []
     return selectedList.companies.filter(company => 
       (company.segment_name || company.industry_name || 'Unknown') === industryName
     )
   }
 
-  const getCompaniesByCity = (cityName: string): SupabaseCompany[] => {
+  const getCompaniesByCity = (cityName: string): CompanyRecord[] => {
     if (!selectedList) return []
     return selectedList.companies.filter(company => 
       (company.city || 'Unknown') === cityName
@@ -96,7 +96,7 @@ const ListBasedAnalytics: React.FC<ListBasedAnalyticsProps> = ({ onExportData })
     }
   }, [selectedList])
 
-  const calculateAnalytics = (companies: SupabaseCompany[]) => {
+  const calculateAnalytics = (companies: CompanyRecord[]) => {
     setLoading(true)
     
     // Simulate calculation time

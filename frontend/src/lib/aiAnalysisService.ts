@@ -1,5 +1,4 @@
-import { supabase } from './supabase'
-import { supabaseDataService } from './supabaseDataService'
+import { companyDataService } from './companyDataService'
 
 export interface AIAnalysisRequest {
   query: string
@@ -43,7 +42,7 @@ export class AIAnalysisService {
       // Step 1: Parse the natural language query
       const parsedQuery = await this.parseNaturalLanguageQuery(request.query)
 
-      // Step 2: Convert intent + filters to supabaseDataService filters
+      // Step 2: Convert intent + filters to companyDataService filters
       const combinedFilters = {
         industry: request.filters?.segment || parsedQuery.filters.segment,
         city: request.filters?.city || parsedQuery.filters.city,
@@ -55,7 +54,7 @@ export class AIAnalysisService {
         maxRevenueGrowth: undefined
       }
 
-      const { companies } = await supabaseDataService.getCompanies(1, 200, combinedFilters as any)
+      const { companies } = await companyDataService.getCompanies(1, 200, combinedFilters as any)
       const rawResults = companies
       
       // Step 4: Generate AI insights
@@ -183,58 +182,8 @@ export class AIAnalysisService {
   }
 
   // Execute the built query
-  private static async executeQuery(sqlQuery: string): Promise<any[]> {
-    try {
-      // For now, we'll use Supabase's query builder
-      // In production, you might want to use raw SQL execution
-      
-      // Parse the query to extract table and conditions
-      const tableMatch = sqlQuery.match(/FROM (\w+)/i)
-      const whereMatch = sqlQuery.match(/WHERE (.+?) ORDER/i)
-      const orderMatch = sqlQuery.match(/ORDER BY (\w+)/i)
-      const limitMatch = sqlQuery.match(/LIMIT (\d+)/i)
-
-      if (!tableMatch) throw new Error('Invalid query format')
-
-      let query = supabase.from(tableMatch[1]).select('*')
-
-      if (whereMatch) {
-        // This is simplified - in production you'd need a proper SQL parser
-        const conditions = whereMatch[1].split(' AND ')
-        conditions.forEach(condition => {
-          if (condition.includes('ILIKE')) {
-            const [field, , value] = condition.split(' ')
-            query = query.ilike(field, value.replace(/'/g, ''))
-          } else if (condition.includes('>=')) {
-            const [field, , value] = condition.split(' ')
-            query = query.gte(field, parseFloat(value))
-          } else if (condition.includes('<=')) {
-            const [field, , value] = condition.split(' ')
-            query = query.lte(field, parseFloat(value))
-          } else if (condition.includes('>')) {
-            const [field, , value] = condition.split(' ')
-            query = query.gt(field, parseFloat(value))
-          }
-        })
-      }
-
-      if (orderMatch) {
-        query = query.order(orderMatch[1], { ascending: false })
-      }
-
-      if (limitMatch) {
-        query = query.limit(parseInt(limitMatch[1]))
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-
-      return data || []
-    } catch (error) {
-      console.error('Query execution error:', error)
-      return []
-    }
+  private static async executeQuery(_sqlQuery: string): Promise<any[]> {
+    return []
   }
 
   // Generate AI insights from results

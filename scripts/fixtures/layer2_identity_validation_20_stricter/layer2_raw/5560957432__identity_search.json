@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560957432",
+  "company_name": "Telenor Sverige AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Telenor Sverige\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Telenor Sverige official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Telenor_Sverige",
+        "title": "Telenor Sverige - Wikipedia",
+        "content": "Telenor Sverige (previously Vodafone Sweden, Europolitan and Nordic Tel), is a mobile phone, IPTV and Internet service provider in Sweden, owned by Telenor.",
+        "score": 0.7576693,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.telenor.se/",
+        "title": "Telenor: Köp mobil, bredband & tv i Sveriges bästa nät",
+        "content": "Produkter & abonnemang. Den senaste mobilen eller ett snabbt och säkert abonnemang? Du hittar allt hos Telenor.",
+        "score": 0.6897452,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.telenor.com/who-we-are/our-companies/nordics/telenor-sweden/",
+        "title": "Telenor Sweden",
+        "content": "# Telenor Sweden. Telenor is Sweden’s third largest mobile operator and provider of fixed broadband services to Swedish consumers. In Sweden, Telenor’s offerings include mobile, fixed and tv services. The company has been present in the Swedish market since 2001, and is considered the third largest player in terms of the number of mobile subscribers. Its network covers 99.9 percent of the population in Sweden. At the end of 2023, revenue market share was around 18% and the number of mobile subscriptions totaled approx. Within consumer fixed broadband, Telenor held around 17% revenue market share at the end of 2023 with 0.7 million broad band subscriptions and 0.5 million tv customers. 0  total revenues, million NOK (2024). 0  monthly mobile ARPU in NOK (Q4 2024). ## Our companies. # Telenor Nordics. # Telenor Norway. # Telenor Sweden. # Telenor Denmark. # Telenor Asia. Family sitting together and having fun with a mobile phone. Family smiling and having fun.",
+        "score": 0.68874115,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.telenor.se/mitt-telenor/",
+        "title": "Mitt Telenor - Logga in på dina sidor",
+        "content": "Få full översikt över dina kostnader, se och betala fakturor och håll koll på hela familjens surf. I Mitt Telenor ändrar du även dina abonnemang och tjänster.",
+        "score": 0.6399392,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.telenor.se/support/",
+        "title": "Support | Telenor",
+        "content": "Här kan du få hjälp med våra tjänster och produkter, göra felsökningar och se svar på vanliga frågor. Produkter och tjänster. Faktura och betalning",
+        "score": 0.6326168,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.78,
+    "request_id": "a85e275b-45db-4b62-a262-a615654d12b0"
+  }
+}

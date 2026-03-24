@@ -151,7 +151,7 @@ export default function AICreditsAdmin() {
         <CardHeader>
           <CardTitle className="text-base">Usage by user</CardTitle>
           <p className="text-xs text-muted-foreground">
-            Track each user&apos;s AI spend. Recording runs when migration 022 is applied and Supabase is configured.
+            Track each user&apos;s AI spend. Recording runs when migration 022 is applied and Postgres is configured.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

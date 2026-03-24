@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5561210560",
+  "company_name": "Loomis Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Loomis Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Loomis Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Loomis_(company)",
+        "title": "Loomis (company) - Wikipedia",
+        "content": "Loomis AB is a Swedish cash handling company. The modern company was formed in 1997 by the consolidation of two armoured security concerns, Wells Fargo",
+        "score": 0.80625874,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.bloomberg.com/profile/company/5184730Z:SS",
+        "title": "Loomis Sverige AB - Company Profile and News - Bloomberg Markets",
+        "content": "Loomis Sverige AB offers cash management services. The Company offers detective, guard, and armored car services to protect cash.",
+        "score": 0.7769112,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.linkedin.com/company/loomis",
+        "title": "Loomis | LinkedIn",
+        "content": "Overview:\nLoomis secures valuables and payment flows. We protect cash, assets, and the systems that keep society running every day. With more than 170 years of experience, 25,000+ employees, and 400+ branches across 26 countries, Loomis is a global leader in secure cash management, armored transportation, ATM services, and payment solutions. Our headquarters are in Stockholm, Sweden. We provide comprehensive services for the distribution, handling, recycling, and storage of cash and other valuables. Our customers include financial institutions, Central Banks, retailers, commercial businesses, and public sector organizations. Beyond moving and processing cash, we safeguard trust. Every day, our teams ensure that payment flows remain secure, efficient, and reliable. Our Role in Financial Infrastructure Loomis plays a critical role in maintaining stable and efficient payment systems. Through secure logistics, ATM management, smart safe solutions, bulk till facilities, and advanced cash recycling processes, we reduce unnecessary cash movement and strengthen operational efficiency. By supporting access to financial services and enabling multiple forms of payment, we help build inclusive and resilient societies. Our Culture: People. Service. Integrity. Our culture is built on three core values: People – We invest in competence, teamwork, and development. Service – We are committed to operational excellence and customer focus. Integrity – We act with responsibility, transparency, and strong ethics. From armored vehicle drivers and cash management operators to IT specialists and global leaders, every role contributes to securing valuables and protecting payment flows. Why Join Loomis? We offer stable employment, international opportunities, and career paths across operations, technology, administration, and leadership. Responsibility here is real. Impact is visible. Growth is earned and supported. At Loomis, you protect what matters. And your journey is worth it.\n\nWebsite: https://www.loomis.com/\nCrunchbase Url: https://www.crunchbase.com/organization/loomis-ab?utm_source=linkedin&utm_medium=referral&utm_campaign=linkedin_companies&utm_content=profile_cta_anon&trk=funding_crunchbase\nLinkedin Url: https://www.linkedin.com/company/loomis\n\nIndustry:\nFinancial Services\n\nCompany size:\n10,001+ employees\n7301 associated members (LinkedIn members who’ve listed Loomis as their current workplace on their profile)\n\nFounded:\n1852\n\nFunding:\nLast Round Date: 2025-10-04T00:00:00.000Z\nLast Round Type: Post IPO debt\nTotal Rounds: 6\nLast Round Raised: US$ 190.3M\n\nInvestors:\nN/A",
+        "score": 0.6554468,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/en-se/",
+        "title": "Loomis Sweden - Payment Solutions and Secure Transport",
+        "content": "We understand that it is important for you to have a partner you can trust when it comes to handling cash in your business. Loomis enables you to manage cash efficiently so you can offer your customers the option of choosing how they want to pay. ## LOOMIS DIFFERENCE. ## Why Loomis. Loomis offers many services for managing cash. You and your business are always Loomis' top priority. Supported by the latest technology, Loomis delivers efficient solutions to save your time. Loomis helps you with safe handling of cash. Loomis helps you with that so you can focus on developing your business for a successful future! Safe, efficient and traceable transport is a key component for our customers and it is in Loomis' DNA. With Loomis as a partner, we can guarantee just that to our customers.\". Let us help you reduce costs and improve security when handling payments, cash and valuables. Find out how Loomis can help you cut costs while improving security and accuracy.",
+        "score": 0.54782754,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/en-se/about-us",
+        "title": "About us | Loomis",
+        "content": "## Contact us. ## How can we help? ### New Business Enquiries. Let us help you reduce costs and improve security when handling payments, cash and valuables. ### Support. Contact our customer service by calling 010-163 63 00 or by filling in the form via the link below. Our opening hours are 08:00-17:00 Monday - Friday. Enter your phone number and one of our agents will call you when available. ## Legal. LOOMIS SVERIGE AB | STAFFANS VÄG 1, 192 78 SOLLENTUNA | ORG: 556191-0679. ### We are here to help. Find out how Loomis can help you cut costs while improving security and accuracy.",
+        "score": 0.4797236,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.36,
+    "request_id": "0ec8b5ba-da5f-4e3a-b982-70c90ec767c7"
+  }
+}

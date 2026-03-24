@@ -16,8 +16,7 @@ import {
   Minus,
   RotateCcw
 } from 'lucide-react'
-import { supabase, supabaseConfig } from '../lib/supabase'
-import { supabaseDataService } from '../lib/supabaseDataService'
+import { companyDataService } from '../lib/companyDataService'
 import { getLocalIndustrySummaries } from '../lib/sampleData'
 
 interface Industry {
@@ -46,54 +45,32 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [showAll, setShowAll] = useState(false)
-  const supabaseEnabled = supabaseConfig.isConfigured
-
-  // Load industries from Supabase
   useEffect(() => {
     const loadIndustries = async () => {
       try {
         setLoading(true)
-
-        if (!supabaseEnabled) {
-          const fallbackIndustries = getLocalIndustrySummaries()
-            .map(summary => ({
-              code: summary.code,
-              name: summary.name,
-              category: summary.category,
-              companyCount: summary.companyCount
-            }))
-            .filter(industry => industry.companyCount > 0)
-
-          setIndustries(fallbackIndustries)
-          setFilteredIndustries(fallbackIndustries)
-          return
+        let industryStats: Array<{ industry: string; count: number }> = []
+        try {
+          industryStats = (await companyDataService.getIndustryStats()) as Array<{ industry: string; count: number }>
+        } catch {
+          industryStats = []
         }
-
-        const [{ data: industryData, error: industryError }, industryStats] = await Promise.all([
-          supabase
-            .from('industry_codes')
-            .select('code, name, category')
-            .order('name'),
-          supabaseDataService.getIndustryStats()
-        ])
-
-        if (industryError) {
-          console.error('Error loading industries:', industryError)
-          return
-        }
-
         const countsByIndustry = new Map<string, number>()
         industryStats.forEach(({ industry, count }) => {
           countsByIndustry.set(industry, count)
         })
 
-        const industriesWithCounts = (industryData || []).map(industry => ({
-          ...industry,
-          companyCount: countsByIndustry.get(industry.code) || countsByIndustry.get(industry.name) || 0
-        })).filter(industry => industry.companyCount > 0)
+        const fallbackIndustries = getLocalIndustrySummaries()
+          .map((summary) => ({
+            code: summary.code,
+            name: summary.name,
+            category: summary.category,
+            companyCount: countsByIndustry.get(summary.code) || countsByIndustry.get(summary.name) || summary.companyCount,
+          }))
+          .filter((industry) => industry.companyCount > 0)
 
-        setIndustries(industriesWithCounts)
-        setFilteredIndustries(industriesWithCounts)
+        setIndustries(fallbackIndustries)
+        setFilteredIndustries(fallbackIndustries)
       } catch (error) {
         console.error('Error loading industries:', error)
       } finally {
@@ -102,7 +79,7 @@ const IndustryFilter: React.FC<IndustryFilterProps> = ({
     }
 
     loadIndustries()
-  }, [supabaseEnabled])
+  }, [])
 
   // Filter industries based on search term
   useEffect(() => {

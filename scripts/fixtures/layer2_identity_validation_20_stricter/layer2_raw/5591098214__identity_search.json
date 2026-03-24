@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5591098214",
+  "company_name": "Nordiska Kök AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Nordiska Kök\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Nordiska Kök official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://bio.site/nordiskakok",
+        "title": "Nordiska Kök - Bio Sites",
+        "content": "Nordiska Kök. Bespoke kitchens in Scandinavian design. The Elegant Country Kitchen thumbnail. The Elegant Country Kitchen. The Danish architect's Japandi oak",
+        "score": 0.76490957,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.nordiskakok.com/",
+        "title": "Nordiska Kök",
+        "content": "Svenska · English · Norsk · Dansk.",
+        "score": 0.71137124,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.nordiskakok.com/build-a-kitchen-with-nordiska-kok",
+        "title": "Welcome to Nordiska Kök — Nordiska Kök",
+        "content": "At the meeting, you will go through your thoughts and preferences, and your kitchen designer will guide you through all the choices and possibilities available. You can book your visit through your kitchen designer, and you will then get exclusive access to our showroom during your reserved time. Your kitchen designer adjusts the design sketch and quotation based on your discussions, and if you then want to proceed, you pay a design fee of 7,500 SEK, which will later be deducted from the total cost of the kitchen when ordering. When you feel satisfied with the design of your kitchen and all options have been made, it is time to order the kitchen. Regarding installation, we always recommend that your installer has a review with the responsible kitchen designer at Nordiska Kök. Today, we are proud to offer our Scandinavian design kitchens, built from scratch in our carpentry outside Gothenburg, to customers throughout Europe.",
+        "score": 0.6934942,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.nordiskakok.com/english-nordiska-kok",
+        "title": "Bespoke Nordic Kitchens | Scandinavian Design - Nordiska Kök",
+        "content": "Step into the former home of Norwegian stylist Catrine Svellingen – a beautiful 1890s apartment featuring a minimalist oak kitchen by Nordiska Kök, where light, proportions, and timeless materials create a calm and balanced interior. Designed and crafted for Danish architect Lin Frederiksen’s beautiful Copenhagen home, the minimalist oak kitchen embodies a light Japandi aesthetic with calm, natural materials and a soft tonal palette. Get inspired by the colourful home in London, featuring a Scandinavian design kitchen in dark oak, contrasted by a warm pink hue that adds warmth and character to the space. Designed for an architect-designed cabin nestled in the Norwegian mountain landscape, *The Hytte Kitchen* in light oak by Nordiska Kök captures the essence of Scandinavian design and authentic craftsmanship – calm, tactile, and beautifully in tune with nature. Step into the Star Chef Daniel Berlin's two-star Michelin restaurant Vyn in beautiful Österlen with a specially designed kitchen by Nordiska Kök.",
+        "score": 0.6304352,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.instagram.com/nordiskakok/",
+        "title": "Nordiska Kök | Scandinavian design kitchens (@nordiskakok)",
+        "content": "Award-winning, bespoke quality kitchens in Scandinavian design. • Crafted in Gräfsnäs, Sweden • European delivery. Follow. Message. Accounts you might like.",
+        "score": 0.6227582,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.97,
+    "request_id": "d308897d-42f8-4372-b887-0c96c61a1a74"
+  }
+}

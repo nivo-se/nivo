@@ -14,11 +14,11 @@ import {
 } from 'lucide-react'
 import { getSegmentedTargets, getSegmentationStats, type SegmentedTargets } from '../lib/segmentation'
 import { SavedListsService, type SavedCompanyList } from '../lib/savedListsService'
-import { supabaseCompanyService, type SupabaseCompany } from '../lib/supabaseCompanyService'
+import { companyDataService, type CompanyRecord } from '../lib/companyDataService'
 import AddToListsDialog from './AddToListsDialog'
 
 interface SegmentationTiersProps {
-  onCompanyClick?: (company: SupabaseCompany) => void
+  onCompanyClick?: (company: CompanyRecord) => void
 }
 
 const SegmentationTiers: React.FC<SegmentationTiersProps> = ({ onCompanyClick }) => {
@@ -110,7 +110,7 @@ const SegmentationTiers: React.FC<SegmentationTiersProps> = ({ onCompanyClick })
     loadSavedLists()
   }
 
-  const getCurrentTierCompanies = (): SupabaseCompany[] => {
+  const getCurrentTierCompanies = (): CompanyRecord[] => {
     if (!tiers) return []
     return tiers[selectedTier]
   }
