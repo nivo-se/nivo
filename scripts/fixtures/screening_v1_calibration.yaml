@@ -1,32 +1,34 @@
-# Screening v1 — aggressive trade exclusions + group penalties + service heuristic.
+# Screening v1 — Layer 1: hard operating/service name rules in code + YAML extras below.
 # Low Noise Factory + Snigel not in universe yet.
 
 constraints:
   min_revenue_sek: 50000000
+  # Optional caps (null = off): drop obvious mega-caps before Layer 2
+  max_revenue_sek: null
+  max_employees: null
+  # Multiplicative boost to total_score when company name matches product/manufacturing signals
+  product_similarity_boost: 0.04
+  # If true, exclude rows with no product signal unless orgnr is in liked_orgnrs / archetypes
+  require_product_signal: false
+  # Suffix patterns like " Sweden AB", " Systems AB" (see screening_rank_v1.py)
+  apply_global_shell_suffixes: true
   nace_deny_prefixes: []
   min_calendar_year: null
   max_latest_year_age: null
 
+# Exact orgnr / legal-name denies (merged with built-in major-orgnr list in code)
+hard_exclusion_orgnrs: []
+
+hard_exclusion_company_names: []
+
+# Extra tokens for product-signal boost / optional require gate (merged with defaults in code)
+product_signal_keywords: []
+
 name_exclusion_keywords:
-  # Trades / local services (substring; "el" uses whole-token match in code)
-  - bygg
+  # Extra name substrings not covered by built-in Layer 1 hard lists (substring; "mark" = whole-token)
   - mark
-  - entreprenad
   - anläggning
   - anlaggning
-  - vvs
-  - rör
-  - varme
-  - värme
-  - kyla
-  - el
-  - elservice
-  - installation
-  - installations
-  - kylservice
-  - golvservice
-  - verkstad
-  - åkeri
   - transport
   - grossist
   - grossisten
@@ -35,12 +37,9 @@ name_exclusion_keywords:
   - citrix
   - xilinx
   - grundfos
-  # prior list
   - plåt
   - smide
   - bilverkstad
-  - konsult
-  - consulting
   - osteria
   - hotel
 

@@ -14,7 +14,8 @@ Usage:
   PYTHONPATH=. python3 scripts/screening_layer2_run.py \\
     --input /tmp/screening_top300.csv --out-dir /tmp/layer2 --enrich-homepage-from-db
 
-Requires: OPENAI_API_KEY, optional TAVILY_API_KEY (fallback only), backend deps
+Requires: OPENAI_API_KEY (environment or `.env` / `backend/.env` via python-dotenv),
+optional TAVILY_API_KEY (fallback only), backend deps
 (openai, httpx, pandas, pydantic, bs4, python-dotenv, requests).
 
 Run from repo root with: PYTHONPATH=. python3 scripts/screening_layer2_run.py ...
@@ -50,7 +51,7 @@ from openai import OpenAI
 from pydantic import ValidationError
 
 from backend.services.screening_layer2.blend import blend_score
-from backend.services.screening_layer2.evidence_fetch import build_evidence_pack
+from backend.services.screening_layer2.evidence_fetch import build_evidence_pack, log_layer2_tavily_startup
 from backend.services.screening_layer2.models import Layer2Classification, openai_json_schema_strict
 from backend.services.screening_layer2.prompts import SYSTEM_PROMPT, build_user_prompt
 
@@ -61,6 +62,19 @@ def _load_dotenv() -> None:
     if load_dotenv:
         load_dotenv(REPO_ROOT / ".env")
         load_dotenv(REPO_ROOT / "backend" / ".env", override=False)
+
+
+def _openai_api_key_from_env() -> Optional[str]:
+    """
+    Load repo `.env` files (if python-dotenv is installed), then read OPENAI_API_KEY.
+    Export in the shell also works without dotenv.
+    """
+    _load_dotenv()
+    raw = os.getenv("OPENAI_API_KEY")
+    if raw is None:
+        return None
+    key = raw.strip()
+    return key or None
 
 
 def load_homepages_from_db(orgnrs: List[str]) -> Dict[str, str]:
@@ -144,10 +158,29 @@ def main() -> None:
     ap.add_argument("--w-layer2", type=float, default=0.6, help="Blend weight for Layer 2 signal")
     args = ap.parse_args()
 
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = _openai_api_key_from_env()
     if not api_key:
-        print("OPENAI_API_KEY is required.", file=sys.stderr)
+        print(
+            "OPENAI_API_KEY is not set or empty. Set it in the environment or in "
+            f"{REPO_ROOT / '.env'} or {REPO_ROOT / 'backend' / '.env'} (OPENAI_API_KEY=...).",
+            file=sys.stderr,
+        )
         sys.exit(2)
+
+    if not args.input.is_file():
+        print(f"Input file not found: {args.input}", file=sys.stderr)
+        print(
+            "Use a real path, e.g. --input scripts/fixtures/layer2_smoke_batch.csv "
+            "--out-dir /tmp/layer2_out (from repo root, PYTHONPATH=.)",
+            file=sys.stderr,
+        )
+        print(
+            "If you resolved homepages first, pass that CSV as --input (not /path/to/… placeholders).",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    log_layer2_tavily_startup()
 
     df = pd.read_csv(args.input)
     if "orgnr" not in df.columns or "company_name" not in df.columns:
@@ -214,7 +247,8 @@ def main() -> None:
             hp = home_map.get(orgnr) or None
 
             logger.info("Layer2 [%s] %s", orgnr, name[:50])
-            evidence_text, retr_meta = build_evidence_pack(orgnr, name, hp)
+            evidence_text, retr_meta, retr_debug = build_evidence_pack(orgnr, name, hp)
+            retr_debug.log_row(orgnr)
             retr = retr_meta.as_dict()
             try:
                 obj = run_openai_classify(

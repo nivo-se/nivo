@@ -9,12 +9,15 @@ Homepage-first, input-driven evidence for Layer 2 (no path guessing).
 from __future__ import annotations
 
 import logging
+import os
 import re
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Literal, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
 import httpx
+
+TavilyClientStatus = Literal["ok", "import_failed", "no_api_key"]
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +69,66 @@ class RetrievalMeta:
             "tavily_used": self.tavily_used,
             "evidence_urls": list(self.evidence_urls),
         }
+
+
+@dataclass
+class RetrievalDebugInfo:
+    """Per-row diagnostics for Layer 2 retrieval (logging / audit; not LLM output)."""
+
+    homepage_present: bool
+    homepage_fetch_ok: bool
+    substantive_text_chars: int
+    fallback_reason: Literal["none", "missing_homepage", "homepage_failed", "thin_evidence"]
+    tavily_fallback_entered: bool
+    tavily_used: bool
+
+    def log_row(self, orgnr: str) -> None:
+        logger.info(
+            "Layer2 retrieval row orgnr=%s homepage_present=%s homepage_fetch_ok=%s "
+            "substantive_text_chars=%s fallback_reason=%s tavily_fallback_entered=%s tavily_used=%s",
+            orgnr,
+            self.homepage_present,
+            self.homepage_fetch_ok,
+            self.substantive_text_chars,
+            self.fallback_reason,
+            self.tavily_fallback_entered,
+            self.tavily_used,
+        )
+
+
+def resolve_tavily_client() -> Tuple[Optional[object], TavilyClientStatus]:
+    """
+    Return (client, status). Prefer TAVILY_API_KEY from environment (runner loads dotenv first).
+    """
+    try:
+        from backend.services.web_intel.tavily_client import TavilyClient
+    except ImportError:
+        return None, "import_failed"
+    key = (os.getenv("TAVILY_API_KEY") or "").strip() or None
+    client = TavilyClient(api_key=key)
+    if not client.api_key:
+        return client, "no_api_key"
+    return client, "ok"
+
+
+def log_layer2_tavily_startup() -> None:
+    """Log Tavily readiness once at runner startup (after dotenv)."""
+    key_env = bool((os.getenv("TAVILY_API_KEY") or "").strip())
+    try:
+        from backend.services.web_intel.tavily_client import TavilyClient  # noqa: F401
+    except ImportError as e:
+        logger.warning("tavily_unavailable_import_failed startup error=%s", str(e)[:200])
+        logger.info(
+            "Layer2 startup tavily_import_ok=False tavily_api_key_env_present=%s tavily_available=False",
+            key_env,
+        )
+        return
+    _, status = resolve_tavily_client()
+    logger.info(
+        "Layer2 startup tavily_import_ok=True tavily_api_key_env_present=%s tavily_available=%s",
+        key_env,
+        status == "ok",
+    )
 
 
 def normalize_homepage(raw: Optional[str]) -> Optional[str]:
@@ -197,16 +260,6 @@ def _blocked_host(host: str) -> bool:
     return any(b in h for b in _BLOCKED_TAVILY_HOST_SUBSTR)
 
 
-def _tavily_client():
-    try:
-        from backend.services.web_intel.tavily_client import TavilyClient
-
-        return TavilyClient()
-    except ImportError:
-        logger.debug("TavilyClient unavailable (import path); set PYTHONPATH to repo root.")
-        return None
-
-
 def _pick_official_from_tavily(
     results: list, company_name: str, tokens: List[str]
 ) -> Optional[str]:
@@ -250,28 +303,22 @@ def _substantive_body_chars(chunks: List[str]) -> int:
     return total
 
 
-def _run_tavily_search(company_name: str, orgnr: str, meta: RetrievalMeta) -> list:
-    client = _tavily_client()
-    if not client or not client.api_key:
-        return []
-    meta.tavily_used = True
-    q = f'"{company_name}" Sweden organisationsnummer {orgnr} official website'
-    return client.search(q, max_results=5, search_depth="basic")
-
-
 def build_evidence_pack(
     orgnr: str,
     company_name: str,
     homepage: Optional[str],
-) -> Tuple[str, RetrievalMeta]:
+) -> Tuple[str, RetrievalMeta, RetrievalDebugInfo]:
     """
     Input-driven evidence only. Optional bounded Tavily when homepage missing/dead/thin.
+    Tavily runs inside this function before returning — always before OpenAI in the runner.
     """
     meta = RetrievalMeta()
     chunks: List[str] = []
     pages = 0
     external_pages = 0
     official_host: Optional[str] = None
+    homepage_present = bool(normalize_homepage(homepage))
+    homepage_fetch_ok = False
 
     def record_page(url: str) -> None:
         nonlocal pages
@@ -296,6 +343,7 @@ def build_evidence_pack(
             html, err, final = _fetch_html(client, home_input)
             home_final = final
             if html and not err:
+                homepage_fetch_ok = True
                 home_html = html
                 meta.homepage_used = final.split("#")[0].rstrip("/")
                 official_host = urlparse(final).netloc
@@ -334,13 +382,46 @@ def build_evidence_pack(
             _substantive_body_chars(chunks) >= MIN_TOTAL_CHARS_SUFFICIENT and bool(meta.homepage_used)
         )
 
-        # --- Phase B: Tavily (missing / dead / insufficient) ---
+        # --- Phase B: Tavily (missing / dead / insufficient) — before return / OpenAI ---
         need_tavily = (not home_input) or (home_input and (not meta.homepage_used or home_err)) or (
             not sufficient
         )
 
+        if not need_tavily:
+            fallback_reason: Literal[
+                "none", "missing_homepage", "homepage_failed", "thin_evidence"
+            ] = "none"
+        elif not home_input:
+            fallback_reason = "missing_homepage"
+        elif not meta.homepage_used or home_err:
+            fallback_reason = "homepage_failed"
+        else:
+            fallback_reason = "thin_evidence"
+
+        tavily_client = None
+        results: list = []
+
         if need_tavily:
-            results = _run_tavily_search(company_name, orgnr, meta)
+            logger.info(
+                "Layer2 tavily_fallback_enter orgnr=%s reason=%s substantive_pre=%s pages_pre=%s",
+                orgnr,
+                fallback_reason,
+                _substantive_body_chars(chunks),
+                pages,
+            )
+            tavily_client, tav_status = resolve_tavily_client()
+            if tav_status == "import_failed":
+                logger.warning(
+                    "tavily_unavailable_import_failed orgnr=%s (TavilyClient import failed; check pydantic-settings / PYTHONPATH)",
+                    orgnr,
+                )
+            elif tav_status == "no_api_key":
+                logger.warning("tavily_unavailable_no_api_key orgnr=%s", orgnr)
+            else:
+                meta.tavily_used = True
+                q = f'"{company_name}" Sweden organisationsnummer {orgnr} official website'
+                results = tavily_client.search(q, max_results=5, search_depth="basic")
+
             if results:
                 tokens = _name_tokens(company_name)
                 official_url = _pick_official_from_tavily(results, company_name, tokens)
@@ -386,9 +467,10 @@ def build_evidence_pack(
                         break
 
                     if ext_url:
-                        tv = _tavily_client()
-                        if tv and tv.api_key:
-                            extracted = tv.extract([ext_url], chunks_per_source=2, extract_depth="basic")
+                        if tavily_client and getattr(tavily_client, "api_key", None):
+                            extracted = tavily_client.extract(
+                                [ext_url], chunks_per_source=2, extract_depth="basic"
+                            )
                             for ex in extracted:
                                 if ex.failed or not (ex.raw_content or "").strip():
                                     continue
@@ -425,4 +507,13 @@ def build_evidence_pack(
                                 _append_chunk(chunks, "PAGE", f2, tx)
                                 record_page(f2)
 
-    return "\n\n".join(chunks).strip(), meta
+    subs_final = _substantive_body_chars(chunks)
+    dbg = RetrievalDebugInfo(
+        homepage_present=homepage_present,
+        homepage_fetch_ok=homepage_fetch_ok,
+        substantive_text_chars=subs_final,
+        fallback_reason=fallback_reason,
+        tavily_fallback_entered=need_tavily,
+        tavily_used=meta.tavily_used,
+    )
+    return "\n\n".join(chunks).strip(), meta, dbg

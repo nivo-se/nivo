@@ -1,0 +1,14 @@
+{
+  "created_at_utc": "20260324T111611Z",
+  "input_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/layer2_batch_40.csv",
+  "model": "gpt-4o-mini",
+  "rows": 40,
+  "blend": {
+    "formula": "100 * (w1 * stage1/100 + w2 * fit_confidence * (1 if is_fit else 0.15)) / (w1+w2)",
+    "w_stage1": 0.4,
+    "w_layer2": 0.6
+  },
+  "retrieval": {
+    "policy": "homepage-first; link-picked about/product; Tavily only if missing/dead/thin; max 4 pages; max 1 external"
+  }
+}

@@ -4,6 +4,18 @@ Deterministic screening v1: similarity to liked companies (multi-centroid), CSV 
 
 No API, no LLM, no persistence beyond optional CSV output.
 
+Stage 1 → Layer 2 (production shortlist)
+  This script is the **only** supported source CSV for `shortlist_200.csv` used by the controlled
+  Layer 2 pipeline. After export, **manually inspect** orgnr and company_name, then run:
+    PYTHONPATH=. python3 scripts/screening_controlled_layer2_pipeline.py --out-dir layer2_out_200
+  Do **not** use `scripts/fixtures/layer2_*.csv` for production evaluation.
+
+  Example:
+    PYTHONPATH=. python3 scripts/screening_rank_v1.py --out shortlist_200.csv --top 200
+
+  After changing Layer 1 rules, re-export shortlist_200.csv and **manually review the top ~50**
+  rows (names + orgnr) before running Layer 2.
+
 Usage:
   python3 scripts/screening_rank_v1.py --out /tmp/rank.csv --top 300
   python3 scripts/screening_rank_v1.py --out /tmp/rank.csv --legacy-scores
@@ -42,6 +54,124 @@ except ImportError as e:
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# --- Layer 1 hard name exclusions (always on; YAML may add more via name_exclusion_keywords) ---
+_L1_HARD_OPERATING_KEYWORDS: Tuple[str, ...] = (
+    "holding",
+    "förvaltning",
+    "forvaltning",
+    "fastighet",
+    "fastigheter",
+    "finance",
+    "finans",
+    "family",
+    "group",
+    "grupp",
+)
+
+_L1_HARD_SERVICE_KEYWORDS: Tuple[str, ...] = (
+    "service",
+    "montage",
+    "installation",
+    "installations",
+    "entreprenad",
+    "bygg",
+    "elservice",
+    "elteknik",
+    "el",
+    "kyl",
+    "kyla",
+    "kylkontroll",
+    "kylservice",
+    "rör",
+    "ror",
+    "vvs",
+    "verkstad",
+    "åkeri",
+    "akeri",
+    "konsult",
+    "consulting",
+    "facility",
+    "management",
+    "golvservice",
+)
+
+# Suffix patterns on casefolded legal name (regional / shell / systems entities).
+_L1_SHELL_NAME_SUFFIXES: Tuple[str, ...] = (
+    " sverige ab",
+    " sweden ab",
+    " svenska ab",
+    " scandinavia ab",
+    " systems ab",
+    " systems",
+)
+
+# Default orgnr denylist (majors / irrelevant globals); merge with YAML hard_exclusion_orgnrs.
+_DEFAULT_L1_HARD_ORGNRS: frozenset[str] = frozenset(
+    {
+        "5560197460",  # Sandvik AB
+        "5560069463",  # Alfa Laval Corporate AB
+        "5560000841",  # Atlas Copco AB
+        "5560003468",  # Volvo AB
+        "5560296968",  # Getinge AB
+        "5560168616",  # Elekta AB
+        "5567370431",  # SCA
+    }
+)
+
+# Product / manufacturing / operator name signals — boost and/or optional require-gate (liked orgnrs exempt).
+_L1_DEFAULT_PRODUCT_SIGNAL_KEYWORDS: Tuple[str, ...] = (
+    "pumps",
+    "pump",
+    "hydraulik",
+    "hydraulic",
+    "automation",
+    "gjuteri",
+    "lights",
+    "lighting",
+    "therm",
+    "navigation",
+    "förpackning",
+    "forpackning",
+    "packaging",
+    "tillverkning",
+    "manufacturing",
+    "manufacturer",
+    "fabrik",
+    "factory",
+    "produktion",
+    "maskin",
+    "verktyg",
+    "utrustning",
+    "instrument",
+    "sensor",
+    "polymer",
+    "komponent",
+    "component",
+    "industri",
+    "industrial",
+    "OEM",
+    "livsmedel",
+    "foodtech",
+    "fiske",
+    "fishing",
+    "outdoor",
+    "sport",
+    "kem",
+    "chemical",
+    "coating",
+    "seal",
+    "sealing",
+    "filter",
+    "ventilation",
+    "elektronik",
+    "electronic",
+    "kabel",
+    "cable",
+    "robot",
+    "medtech",
+    "medical",
+)
 
 # Default similarity sharpness if YAML scoring.alpha missing
 DEFAULT_ALPHA = 0.45
@@ -198,6 +328,74 @@ def name_exclusion_hit(name_lc: str, cfg: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _norm_orgnr_digits(raw: Any) -> str:
+    return re.sub(r"\D", "", str(raw or "").strip())
+
+
+def _merged_hard_orgnr_denyset(cfg: Dict[str, Any]) -> Set[str]:
+    out: Set[str] = {x for x in _DEFAULT_L1_HARD_ORGNRS if x}
+    for x in cfg.get("hard_exclusion_orgnrs") or []:
+        o = _norm_orgnr_digits(x)
+        if o:
+            out.add(o)
+    return out
+
+
+def _hard_company_name_exact_set(cfg: Dict[str, Any]) -> Set[str]:
+    return {str(x).strip().casefold() for x in (cfg.get("hard_exclusion_company_names") or []) if str(x).strip()}
+
+
+def _layer1_operating_keyword_hit(name_lc: str, cfg: Dict[str, Any]) -> Optional[str]:
+    extra = cfg.get("layer1_extra_operating_exclusion_keywords") or []
+    tokens = _name_tokens(name_lc)
+    seq = list(_L1_HARD_OPERATING_KEYWORDS) + [str(x).strip() for x in extra if str(x).strip()]
+    for kw in seq:
+        if keyword_matches_name(name_lc, kw, tokens):
+            return kw.strip().casefold()
+    return None
+
+
+def _layer1_service_keyword_hit(name_lc: str, cfg: Dict[str, Any]) -> Optional[str]:
+    extra = cfg.get("layer1_extra_service_exclusion_keywords") or []
+    tokens = _name_tokens(name_lc)
+    seq = list(_L1_HARD_SERVICE_KEYWORDS) + [str(x).strip() for x in extra if str(x).strip()]
+    for kw in seq:
+        if keyword_matches_name(name_lc, kw, tokens):
+            return kw.strip().casefold()
+    return None
+
+
+def _shell_suffix_hit(name_lc: str) -> Optional[str]:
+    n = name_lc.strip()
+    for suf in _L1_SHELL_NAME_SUFFIXES:
+        if n.endswith(suf):
+            return suf.strip()
+    return None
+
+
+def _orgnr_in_calibration_likes(orgnr: Any, cfg: Dict[str, Any]) -> bool:
+    o = _norm_orgnr_digits(orgnr)
+    if not o:
+        return False
+    liked = {_norm_orgnr_digits(x) for x in (cfg.get("liked_orgnrs") or [])}
+    if o in liked:
+        return True
+    for arch in cfg.get("archetypes") or []:
+        if o in {_norm_orgnr_digits(x) for x in (arch.get("liked_orgnrs") or [])}:
+            return True
+    return False
+
+
+def _has_product_name_signal(name_lc: str, cfg: Dict[str, Any]) -> bool:
+    tokens = _name_tokens(name_lc)
+    extra = cfg.get("product_signal_keywords") or []
+    seq = list(_L1_DEFAULT_PRODUCT_SIGNAL_KEYWORDS) + [str(x).strip() for x in extra if str(x).strip()]
+    for kw in seq:
+        if keyword_matches_name(name_lc, kw, tokens):
+            return True
+    return False
+
+
 def name_rule_penalties(name_lc: str, cfg: Dict[str, Any]) -> Tuple[float, List[str]]:
     """
     Sum penalties from name_penalty_keywords (each rule fires at most once if any keyword matches).
@@ -295,14 +493,59 @@ def hard_exclusion_flags(row: pd.Series, cfg: Dict[str, Any]) -> List[str]:
         return flags
 
     constraints = cfg.get("constraints") or {}
-    min_rev = float(constraints.get("min_revenue_sek", 50_000_000))
+    o_digits = _norm_orgnr_digits(orgnr)
+    if o_digits in _merged_hard_orgnr_denyset(cfg):
+        flags.append("HARD_ORGNR_DENYLIST")
+
+    name_lc = _name_lower(row)
+    if name_lc.strip() in _hard_company_name_exact_set(cfg):
+        flags.append("HARD_COMPANY_NAME_EXACT")
+
+    if constraints.get("apply_global_shell_suffixes", True):
+        sh = _shell_suffix_hit(name_lc)
+        if sh:
+            flags.append(f"GLOBAL_SHELL_SUFFIX:{sh}")
+
+    op = _layer1_operating_keyword_hit(name_lc, cfg)
+    if op:
+        flags.append(f"LAYER1_OPERATING:{op}")
+
+    sv = _layer1_service_keyword_hit(name_lc, cfg)
+    if sv:
+        flags.append(f"LAYER1_SERVICE:{sv}")
+
     rev = row.get("latest_revenue_sek")
-    if rev is None or (isinstance(rev, float) and math.isnan(rev)):
+    rev_ok = rev is not None and not (isinstance(rev, float) and math.isnan(rev))
+    try:
+        rev_f = float(rev) if rev_ok else None
+    except (TypeError, ValueError):
+        rev_f = None
+        rev_ok = False
+
+    max_rev = constraints.get("max_revenue_sek")
+    if max_rev is not None and rev_ok and rev_f is not None:
+        try:
+            if rev_f > float(max_rev):
+                flags.append("REVENUE_ABOVE_MAX")
+        except (TypeError, ValueError):
+            pass
+
+    max_emp = constraints.get("max_employees")
+    emp = row.get("employees_latest")
+    if max_emp is not None and emp is not None and not (isinstance(emp, float) and math.isnan(emp)):
+        try:
+            if float(emp) > float(max_emp):
+                flags.append("EMPLOYEES_ABOVE_MAX")
+        except (TypeError, ValueError):
+            pass
+
+    min_rev = float(constraints.get("min_revenue_sek", 50_000_000))
+    if not rev_ok:
         flags.append("NO_REVENUE")
-    elif float(rev) < min_rev:
+    elif rev_f is not None and rev_f < min_rev:
         flags.append("REVENUE_BELOW_MIN")
 
-    ne = name_exclusion_hit(_name_lower(row), cfg)
+    ne = name_exclusion_hit(name_lc, cfg)
     if ne:
         flags.append(f"NAME_EXCLUDED:{ne}")
 
@@ -333,6 +576,10 @@ def hard_exclusion_flags(row: pd.Series, cfg: Dict[str, Any]) -> List[str]:
                 flags.append("LATEST_YEAR_BELOW_MIN")
         except (TypeError, ValueError):
             flags.append("BAD_LATEST_YEAR")
+
+    if constraints.get("require_product_signal") and not _orgnr_in_calibration_likes(orgnr, cfg):
+        if not name_lc.strip() or not _has_product_name_signal(name_lc, cfg):
+            flags.append("NO_PRODUCT_NAME_SIGNAL")
 
     return flags
 
@@ -526,6 +773,8 @@ def score_cohort(
     max_combined_penalty: float,
 ) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
+    constraints = cfg.get("constraints") or {}
+    product_boost = float(constraints.get("product_similarity_boost", 0.0) or 0.0)
     Zm = z[list(feature_keys)].to_numpy(dtype=float)
     for i in range(len(df_cohort)):
         z_row_full = Zm[i]
@@ -561,11 +810,14 @@ def score_cohort(
         )
         row = df_cohort.iloc[i]
         name_lc = _name_lower(row)
+        product_hit = bool(name_lc.strip()) and _has_product_name_signal(name_lc, cfg)
         name_pen_raw, name_pen_flags = name_rule_penalties(name_lc, cfg)
         si = compute_service_indicator(row)
         svc_pen, svc_flag = service_indicator_penalty(si)
         total_pen = min(name_pen_raw + svc_pen, max_combined_penalty)
         final_score = best_score * (1.0 - total_pen)
+        if product_boost > 0.0 and product_hit:
+            final_score *= 1.0 + product_boost
         pen_flags = list(name_pen_flags)
         if svc_flag:
             pen_flags.append(svc_flag)
@@ -576,6 +828,7 @@ def score_cohort(
                 "company_name": row.get("company_name"),
                 "base_similarity_score": best_score,
                 "total_score": final_score,
+                "layer1_product_signal": product_hit,
                 "comp_revenue": comps["comp_revenue"],
                 "comp_growth": comps["comp_growth"],
                 "comp_margins": comps["comp_margins"],
@@ -671,6 +924,7 @@ def write_csv(df: pd.DataFrame, path: Optional[Path], top: Optional[int]) -> Non
         "company_name",
         "total_score",
         "base_similarity_score",
+        "layer1_product_signal",
         "comp_revenue",
         "comp_growth",
         "comp_margins",

@@ -1,0 +1,41 @@
+orgnr,company_name,total_score,homepage,expected_class
+5564551900,Texstar AB,88,https://www.texstar.se,good
+5562146018,Fladen Fishing Aktiebolag,85,https://fladenfishing.se,good
+5591098214,Nordiska Kök AB,90,https://nordiskakok.se,good
+5564282738,Mille Notti AB,82,https://www.millenotti.se,good
+5565636353,AB Poly-Produkter,86,https://www.polyropes.com,good
+5566816632,Quadpak AB,72,https://www.quadpak.se,good
+5565281427,Thule Sweden AB,78,https://www.thule.com,good
+5560000841,Atlas Copco AB,92,https://www.atlascopco.com,good
+5560069463,Alfa Laval Corporate AB,90,https://www.alfalaval.com,good
+5560296968,Getinge AB,84,https://www.getinge.com,good
+5560168616,Elekta AB,80,https://www.elekta.com,good
+5567370431,SCA Forest Products AB,86,https://www.sca.com,good
+5560003468,Volvo AB,88,https://www.volvogroup.com,good
+5560197460,Sandvik AB,90,https://www.home.sandvik,good
+5564968039,Formenta AB,65,https://www.formenta.se,maybe
+5564169786,KRYDDHUSET I LJUNG Aktiebolag,60,https://www.kryddhuset.se,maybe
+5560337136,Cramo AB,68,https://www.cramo.se,maybe
+5561210560,Loomis Sverige AB,70,https://www.loomis.se,maybe
+5560444153,Bring Sverige AB,72,https://www.bring.se,maybe
+5560957432,Telenor Sverige AB,85,https://www.telenor.se,maybe
+5561776089,Dustin AB,74,https://www.dustin.se,maybe
+5560094170,PostNord Sverige AB,82,https://www.postnord.se,maybe
+5562512644,Instalco AB,66,https://www.instalco.se,maybe
+5567049201,Bonnier AB,70,https://www.bonnier.com,maybe
+5565796028,Lantmännen ekonomisk förening,75,https://www.lantmannen.se,maybe
+5560228918,Axfood AB,88,https://www.axfood.se,maybe
+5562991009,Scandic Hotels Aktiebolag,72,https://www.scandichotels.com,bad
+5561974188,Bravida Sverige AB,70,https://www.bravida.se,bad
+5560129206,Ahlsell Sverige AB,82,https://www.ahlsell.se,bad
+5563027241,Securitas AB,78,https://www.securitas.com,bad
+5560125220,Beijer Byggmaterial Aktiebolag,76,https://www.beijerbygg.se,bad
+5560001438,Skanska AB,90,https://www.skanska.se,bad
+5560067517,NCC AB,85,https://www.ncc.se,bad
+5560347328,Peab AB,80,https://www.peab.se,bad
+5562404566,McDonald's Sverige AB,70,https://www.mcdonalds.se,bad
+5560178917,ISS Facility Services AB,82,https://www.se.issworld.com,bad
+5560993286,Adecco Sweden AB,68,https://www.adecco.se,bad
+5560885559,Coor Service Management AB,75,https://www.coor.com,bad
+5591155720,Foodora AB,65,https://www.foodora.se,bad
+5565669668,Academic Work Sweden AB,72,https://www.academicwork.se,bad

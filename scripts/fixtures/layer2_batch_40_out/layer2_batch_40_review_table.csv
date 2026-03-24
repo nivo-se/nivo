@@ -1,0 +1,41 @@
+orgnr,company_name,expected_class,actual_class,fit_confidence,key_flags,homepage_used,tavily_used,pages_fetched_count,hard_veto,thin_no_uplift,post_override_fit
+5564551900,Texstar AB,good,accept,0.85,bt=product_company;op=manufacturer,https://texstar.se,False,3,False,False,True
+5562146018,Fladen Fishing Aktiebolag,good,reject,0.25,bt=unknown;op=unknown,,True,0,False,True,False
+5591098214,Nordiska Kök AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.nordiskakok.se,True,2,False,False,True
+5564282738,Mille Notti AB,good,accept,0.75,bt=product_company;op=brand_owner,https://www.mille-notti.com/about-us/corporate-information,True,3,False,False,True
+5565636353,AB Poly-Produkter,good,reject,0.2,bt=unknown;op=unknown,https://www.av.se/om-oss/diarium-och-allmanna-handlingar/bestall-handlingar/Company/?orgnr=5565636353,True,3,False,False,False
+5566816632,Quadpak AB,good,accept,0.85,bt=product_company;op=manufacturer,https://quadpak.se,False,3,False,False,True
+5565281427,Thule Sweden AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.thule.com/sv-se,False,3,False,False,True
+5560000841,Atlas Copco AB,good,reject,0.25,bt=unknown;op=unknown,https://www.atlascopco.com,False,1,False,False,False
+5560069463,Alfa Laval Corporate AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.alfalaval.com,False,3,False,False,True
+5560296968,Getinge AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.getinge.com/se,False,3,False,False,True
+5560168616,Elekta AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.elekta.com,False,3,False,False,True
+5567370431,SCA Forest Products AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.sca.com/sv,False,3,False,False,True
+5560003468,Volvo AB,good,accept,0.85,construction_install;service_heavy;bt=product_company;op=manufacturer,https://www.volvogroup.com/en,False,3,False,False,True
+5560197460,Sandvik AB,good,accept,0.85,bt=product_company;op=manufacturer,https://www.home.sandvik,False,3,False,False,True
+5564968039,Formenta AB,maybe,reject,0.25,subsidiary_group;bt=product_company;op=manufacturer,https://www.formenta.se,False,2,False,False,False
+5564169786,KRYDDHUSET I LJUNG Aktiebolag,maybe,accept,0.75,bt=product_company;op=manufacturer,https://kryddhuset.se,True,4,False,False,True
+5560337136,Cramo AB,maybe,reject,0.2,construction_install;service_heavy;bt=service_company;op=installer,https://www.cramo.se,True,2,True,False,False
+5561210560,Loomis Sverige AB,maybe,reject,0.25,service_heavy;subsidiary_group;bt=service_company;op=unknown,https://se.loomis.com/sv-se,False,3,False,False,False
+5560444153,Bring Sverige AB,maybe,reject,0.25,service_heavy;bt=service_company;op=unknown,https://www.bring.se,False,3,False,False,False
+5560957432,Telenor Sverige AB,maybe,reject,0.2,service_heavy;subsidiary_group;bt=service_company;op=unknown,https://www.telenor.se,True,2,False,False,False
+5561776089,Dustin AB,maybe,accept,0.85,service_heavy;bt=product_company;op=brand_owner,https://www.dustin.se,False,3,False,False,True
+5560094170,PostNord Sverige AB,maybe,reject,0.25,service_heavy;bt=service_company;op=unknown,https://www.postnord.se,False,3,False,False,False
+5562512644,Instalco AB,maybe,reject,0.2,construction_install;service_heavy;subsidiary_group;bt=service_company;op=installer,https://instalco.se,False,3,True,False,False
+5567049201,Bonnier AB,maybe,reject,0.2,subsidiary_group;bt=unknown;op=unknown,https://www.bonnier.com,False,3,False,False,False
+5565796028,Lantmännen ekonomisk förening,maybe,reject,0.2,bt=unknown;op=unknown,https://www.lantmannen.se,False,3,False,False,False
+5560228918,Axfood AB,maybe,reject,0.2,subsidiary_group;bt=unknown;op=unknown,https://www.axfood.se,False,3,False,False,False
+5562991009,Scandic Hotels Aktiebolag,bad,reject,0.2,hospitality;service_heavy;subsidiary_group;bt=service_company;op=unknown,https://www.scandichotelsgroup.com/our-company/organisation-and-management,True,3,True,False,False
+5561974188,Bravida Sverige AB,bad,reject,0.2,construction_install;service_heavy;subsidiary_group;bt=service_company;op=installer,https://www.bravida.se,False,3,True,False,False
+5560129206,Ahlsell Sverige AB,bad,reject,0.3,generic_dist;bt=unknown;op=distributor,https://www.ahlsell.se,False,3,True,False,False
+5563027241,Securitas AB,bad,reject,0.2,service_heavy;bt=service_company;op=consultancy,https://www.securitas.com,False,3,False,False,False
+5560125220,Beijer Byggmaterial Aktiebolag,bad,reject,0.2,generic_dist;construction_install;bt=unknown;op=unknown,https://www.beijerbygg.se/privat,False,3,True,False,False
+5560001438,Skanska AB,bad,reject,0.2,construction_install;service_heavy;subsidiary_group;bt=service_company;op=installer,https://www.skanska.se,False,2,True,False,False
+5560067517,NCC AB,bad,reject,0.2,construction_install;service_heavy;subsidiary_group;bt=service_company;op=installer,https://www.ncc.se,False,3,True,False,False
+5560347328,Peab AB,bad,reject,0.2,construction_install;service_heavy;subsidiary_group;bt=service_company;op=installer,https://peab.se,False,2,True,False,False
+5562404566,McDonald's Sverige AB,bad,reject,0.2,hospitality;service_heavy;subsidiary_group;bt=service_company;op=unknown,https://www.mcdonalds.com/se/sv-se.html,False,3,True,False,False
+5560178917,ISS Facility Services AB,bad,reject,0.2,service_heavy;subsidiary_group;bt=service_company;op=unknown,https://largestcompanies.com/company/ISS-Facility-Services-AB-2636,True,3,False,False,False
+5560993286,Adecco Sweden AB,bad,reject,0.2,service_heavy;bt=service_company;op=consultancy,https://www.adecco.com/sv-se,False,3,False,False,False
+5560885559,Coor Service Management AB,bad,reject,0.2,hospitality;service_heavy;subsidiary_group;bt=service_company;op=unknown,https://www.coor.com,False,3,True,False,False
+5591155720,Foodora AB,bad,reject,0.2,hospitality;service_heavy;bt=service_company;op=unknown,https://www.foodora.se,False,1,True,False,False
+5565669668,Academic Work Sweden AB,bad,reject,0.2,service_heavy;bt=service_company;op=consultancy,https://www.academicwork.se,False,3,False,False,False
