@@ -107,7 +107,7 @@ function SectionShell({
         <div
           ref={titleBlockRef}
           className={
-            "mb-8 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none " +
+            "mb-10 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none " +
             (titleVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2") +
             " motion-reduce:opacity-100 motion-reduce:translate-y-0"
           }
@@ -157,16 +157,43 @@ function BulletTextRows({
   );
 }
 
-/** Narrative subsection (H3 + paragraph) — sellers sections with less bullet fragmentation. */
-function NarrativeBlock({ title, body }: { title: string; body: string }) {
+/** Narrative subsection (H3 + one or more short paragraphs). */
+function NarrativeBlock({
+  title,
+  body,
+  paragraphs,
+}: {
+  title: string;
+  body?: string;
+  paragraphs?: readonly string[];
+}) {
+  const parts = paragraphs ?? (body != null ? [body] : []);
   return (
-    <div className="border-l-4 pl-4 sm:pl-5 py-1 pr-1" style={{ borderLeftColor: tokens.accent }}>
-      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-2" style={{ color: tokens.text }}>
+    <div className="border-l-4 pl-4 sm:pl-5 py-1 pr-1 max-w-2xl" style={{ borderLeftColor: tokens.accent }}>
+      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-3" style={{ color: tokens.text }}>
         {title}
       </h3>
-      <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
-        {body}
-      </p>
+      <div className="space-y-3">
+        {parts.map((text, i) => (
+          <p key={i} className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+            {text}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Same rail as NarrativeBlock; children = short paragraphs + optional lists. */
+function RailSubsection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="border-l-4 pl-4 sm:pl-5 py-1 pr-1 max-w-2xl" style={{ borderLeftColor: tokens.accent }}>
+      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-3" style={{ color: tokens.text }}>
+        {title}
+      </h3>
+      <div className="space-y-3 text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -180,8 +207,8 @@ function BulletRailSection({
   bullets: readonly [string, string, string];
 }) {
   return (
-    <div className="h-full border-l-4 pl-4 sm:pl-5 py-1 pr-1" style={{ borderLeftColor: tokens.accent }}>
-      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-2" style={{ color: tokens.text }}>
+    <div className="h-full border-l-4 pl-4 sm:pl-5 py-1 pr-1 max-w-xl" style={{ borderLeftColor: tokens.accent }}>
+      <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-3" style={{ color: tokens.text }}>
         {title}
       </h3>
       <BulletTextRows lines={bullets} size="14" />
@@ -393,8 +420,9 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         {/* Intro */}
         <section className="w-full" style={{ backgroundColor: tokens.bg }}>
           <div className={SECTION_CLASS}>
-            <div className="max-w-2xl mx-auto text-[15px] sm:text-base leading-relaxed space-y-4" style={{ color: tokens.text }}>
+            <div className="max-w-2xl mx-auto text-[15px] sm:text-base leading-relaxed space-y-3 sm:space-y-4" style={{ color: tokens.text }}>
               <p>{t.introP1}</p>
+              <p>{t.introP1b}</p>
               <p>{t.introP2}</p>
               <p>{t.introP3}</p>
             </div>
@@ -403,24 +431,31 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
 
         {/* 1. Hur vi arbetar */}
         <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar" sectionIndex={1}>
-          <p className="text-[15px] sm:text-base leading-relaxed max-w-2xl mb-10" style={{ color: tokens.text }}>
-            {t.hurViArbetarIngress}
-          </p>
-          <div className="max-w-2xl space-y-8 sm:space-y-9">
+          <div className="max-w-2xl space-y-3 mb-10 sm:mb-12" style={{ color: tokens.text }}>
+            <p className="text-[15px] sm:text-base leading-relaxed">{t.hurViArbetarIngressP1}</p>
+            <p className="text-[15px] sm:text-base leading-relaxed">{t.hurViArbetarIngressP2}</p>
+            <p className="text-[15px] sm:text-base leading-relaxed">{t.hurViArbetarIngressP3}</p>
+          </div>
+          <div className="space-y-8 sm:space-y-10">
             <NarrativeBlock title={t.hvNarrative1Title} body={t.hvNarrative1Body} />
             <NarrativeBlock title={t.hvNarrative2Title} body={t.hvNarrative2Body} />
             <NarrativeBlock title={t.hvNarrative3Title} body={t.hvNarrative3Body} />
-            <NarrativeBlock title={t.hvNarrative4Title} body={t.hvNarrative4Body} />
+            <NarrativeBlock title={t.hvNarrative4Title} paragraphs={[t.hvNarrative4P1, t.hvNarrative4P2]} />
             <NarrativeBlock title={t.hvNarrative5Title} body={t.hvNarrative5Body} />
           </div>
-          <p className="mt-10 text-[15px] leading-relaxed max-w-2xl font-medium" style={{ color: tokens.text }}>
-            {t.hurViArbetarClosing}
-          </p>
+          <div className="mt-10 sm:mt-12 max-w-2xl space-y-4">
+            <p className="text-[15px] sm:text-base leading-relaxed font-medium" style={{ color: tokens.text }}>
+              {t.hurViArbetarClosing}
+            </p>
+            <p className="text-[15px] sm:text-base leading-relaxed font-medium" style={{ color: tokens.text }}>
+              {t.hurViArbetarTagline}
+            </p>
+          </div>
         </SectionShell>
 
         {/* 2. Vad vi letar efter */}
         <SectionShell title={t.vadViLetarEfterTitle} id="vad-vi-letar-efter" sectionIndex={2}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-12 max-w-4xl">
             <BulletRailSection title={t.vadBlock1Title} bullets={[t.vadB1, t.vadB2, t.vadB3]} />
             <BulletRailSection title={t.vadBlock2Title} bullets={[t.vadB4, t.vadB5, t.vadB6]} />
           </div>
@@ -428,16 +463,34 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
 
         {/* 3. Varför vi är annorlunda */}
         <SectionShell title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda" sectionIndex={3}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
-            <BulletRailSection title={t.vaStrukturTitle} bullets={[t.vaStrukturB1, t.vaStrukturB2, t.vaStrukturB3]} />
-            <BulletRailSection title={t.vaPerspektivTitle} bullets={[t.vaPerspektivB1, t.vaPerspektivB2, t.vaPerspektivB3]} />
-            <BulletRailSection title={t.vaArbetssattTitle} bullets={[t.vaArbetssattB1, t.vaArbetssattB2, t.vaArbetssattB3]} />
+          <div className="space-y-10 sm:space-y-11">
+            <RailSubsection title={t.vaArbetssattTitle}>
+              <p>{t.vaArbetssattP1}</p>
+              <p>{t.vaArbetssattP2}</p>
+            </RailSubsection>
+            <RailSubsection title={t.vaDigitalTitle}>
+              <p>{t.vaDigitalP1}</p>
+              <p className="font-medium text-[15px] sm:text-base">{t.vaDigitalBulletLead}</p>
+              <div className="pt-0.5">
+                <BulletTextRows lines={[t.vaDigitalB1, t.vaDigitalB2, t.vaDigitalB3]} size="15" />
+              </div>
+              <p className="pt-1">{t.vaDigitalP2}</p>
+            </RailSubsection>
+            <RailSubsection title={t.vaNatverkTitle}>
+              <p>{t.vaNatverkP1}</p>
+              <p>{t.vaNatverkP2}</p>
+              <p>{t.vaNatverkP3}</p>
+            </RailSubsection>
+            <RailSubsection title={t.vaErfarenhetTitle}>
+              <p>{t.vaErfarenhetP1}</p>
+              <p>{t.vaErfarenhetP2}</p>
+            </RailSubsection>
           </div>
         </SectionShell>
 
         {/* 4. Vår process */}
         <SectionShell title={t.varProcessTitle} id="var-process" sectionIndex={4}>
-          <ol className="space-y-5 mb-8">
+          <ol className="space-y-5 mb-8 max-w-2xl">
             {[t.vp1, t.vp2, t.vp3, t.vp4].map((step, i) => (
               <li
                 key={step}
@@ -457,7 +510,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
               </li>
             ))}
           </ol>
-          <p className="text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
+          <p className="text-[15px] sm:text-base leading-relaxed font-medium max-w-2xl" style={{ color: tokens.text }}>
             {t.varProcessClosing}
           </p>
         </SectionShell>
@@ -465,16 +518,18 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         {/* 5. Efter affären */}
         <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren" sectionIndex={5}>
           <div className="max-w-2xl">
-            <p className="text-[15px] sm:text-base leading-relaxed mb-10" style={{ color: tokens.text }}>
-              {t.efterAffarenIngress}
-            </p>
-            <div className="space-y-8 sm:space-y-9">
+            <div className="space-y-3 mb-10 sm:mb-12" style={{ color: tokens.text }}>
+              <p className="text-[15px] sm:text-base leading-relaxed">{t.efterAffarenIngressP1}</p>
+              <p className="text-[15px] sm:text-base leading-relaxed">{t.efterAffarenIngressP2}</p>
+              <p className="text-[15px] sm:text-base leading-relaxed">{t.efterAffarenIngressP3}</p>
+            </div>
+            <div className="space-y-8 sm:space-y-10">
               <NarrativeBlock title={t.eaNarrative1Title} body={t.eaNarrative1Body} />
               <NarrativeBlock title={t.eaNarrative2Title} body={t.eaNarrative2Body} />
               <NarrativeBlock title={t.eaNarrative3Title} body={t.eaNarrative3Body} />
               <NarrativeBlock title={t.eaNarrative4Title} body={t.eaNarrative4Body} />
             </div>
-            <p className="mt-10 text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
+            <p className="mt-10 sm:mt-12 text-[15px] sm:text-base leading-relaxed font-medium" style={{ color: tokens.text }}>
               {t.efterAffarenClosing}
             </p>
           </div>
@@ -482,7 +537,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
 
         {/* 6. Kontakt */}
         <SectionShell title={t.kontaktSectionTitle} id="kontakt" sectionIndex={6}>
-          <p className="text-[15px] leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
+          <p className="text-[15px] sm:text-base leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
             {t.kontaktBody}
           </p>
           <p className="text-sm font-semibold mb-4" style={{ color: tokens.text }}>

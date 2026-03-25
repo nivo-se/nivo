@@ -35,8 +35,9 @@ export const sellersTranslations = {
   quoteSub: "Med ambitionen att utveckla och stärka verksamheten vidare.",
 
   // Intro (under citat)
-  introP1:
-    "Du har byggt något över många år. Att ta in en partner handlar inte bara om pris — utan om riktning, arbetssätt och förtroende.",
+  introP1: "Du har byggt något över många år.",
+  introP1b:
+    "Att ta in en partner handlar inte bara om pris — utan om riktning, arbetssätt och förtroende.",
   introP2:
     "Nivo är ett investeringsbolag som går in som delägare i nordiska små och medelstora bolag.",
   introP3:
@@ -45,8 +46,12 @@ export const sellersTranslations = {
   // 1. Hur vi arbetar (partnerskap, fortsatt ägande, gemensamt arbetssätt)
   hurViArbetarTitle: "Så jobbar vi tillsammans",
 
-  hurViArbetarIngress:
-    "När du tar in oss går vi in som partner — inte som någon som ska ta över det du byggt. Du förblir ägare och vi arbetar sida vid sida med den som känner bolaget bäst. Beslut och prioriteringar tar vi nära verksamheten, med tydliga roller och en riktning vi formar gemensamt.",
+  hurViArbetarIngressP1:
+    "När du tar in oss går vi in som partner — inte som någon som ska ta över det du byggt.",
+  hurViArbetarIngressP2:
+    "Du är kvar som ägare i bolaget, och vi bygger partnerskapet tillsammans över tid.",
+  hurViArbetarIngressP3:
+    "Vi arbetar sida vid sida med den som känner bolaget bäst. Beslut och prioriteringar tar vi nära verksamheten, med tydliga roller och en riktning vi formar gemensamt.",
 
   hvNarrative1Title: "Gemensam riktning, tydliga roller",
   hvNarrative1Body:
@@ -60,9 +65,11 @@ export const sellersTranslations = {
   hvNarrative3Body:
     "Du ska slippa långa köer och oklar ägaragenda. Utan fondcykel eller inbyggd exit-press kan vi fatta beslut när det behövs och tänka i tag som passar bolaget — inte en extern tidsplan.",
 
-  hvNarrative4Title: "Teknik och nätverk när det gör skillnad",
-  hvNarrative4Body:
-    "Digitalisering och AI använder vi bara där de verkligen underlättar arbetet. Behövs särskild kompetens eller nya kontakter kopplar vi in människor från nätverket så att ni inte står ensamma.",
+  hvNarrative4Title: "Digitalisering och nätverk",
+  hvNarrative4P1:
+    "Digitalisering och AI använder vi där det faktiskt gör skillnad i vardagen.",
+  hvNarrative4P2:
+    "När det behövs kopplar vi in personer från vårt nätverk — operativt, strategiskt eller finansiellt — för att driva bolaget vidare.",
 
   hvNarrative5Title: "Kompletterar — tar inte över",
   hvNarrative5Body:
@@ -70,6 +77,8 @@ export const sellersTranslations = {
 
   hurViArbetarClosing:
     "I praktiken betyder det här ett arbetssätt som är pragmatiskt, nära bolaget och inriktat på det som skapar värde över tid.",
+  hurViArbetarTagline:
+    "Vi tar det som redan fungerar — och gör det mer skalbart, smartare och redo för nästa steg.",
 
   // 2. Vad vi letar efter (2×3 i kort)
   vadViLetarEfterTitle: "Vad vi letar efter",
@@ -85,20 +94,35 @@ export const sellersTranslations = {
   // 3. Varför vi är annorlunda
   varforAnnorlundaTitle: "Varför vi är annorlunda",
 
-  vaStrukturTitle: "Struktur",
-  vaStrukturB1: "Nivo investerar med eget kapital",
-  vaStrukturB2: "Ingen fondcykel",
-  vaStrukturB3: "Ingen förutbestämd exit",
-
-  vaPerspektivTitle: "Perspektiv",
-  vaPerspektivB1: "Nivo bygger bolag över tid",
-  vaPerspektivB2: "Fokus på utveckling, inte försäljning",
-  vaPerspektivB3: "Beslut tas långsiktigt",
-
   vaArbetssattTitle: "Arbetssätt",
-  vaArbetssattB1: "Inga standardmodeller som trycks på alla",
-  vaArbetssattB2: "Nivo anpassar sig efter bolaget",
-  vaArbetssattB3: "Det som fungerar i praktiken",
+  vaArbetssattP1:
+    "Vi arbetar nära bolagen vi investerar i. Inte genom modeller eller presentationer — utan i det dagliga arbetet där resultaten faktiskt skapas.",
+  vaArbetssattP2:
+    "Vi fokuserar på det som fungerar, och förbättrar det steg för steg. Det handlar om marginaler, prissättning, struktur och tydliga prioriteringar.",
+
+  vaDigitalTitle: "Digitalisering och AI",
+  vaDigitalP1:
+    "Digitalisering och AI är en naturlig del av hur vi utvecklar bolag. Inte som ett sidospår — utan som verktyg i det dagliga arbetet.",
+  vaDigitalBulletLead: "Det kan handla om att:",
+  vaDigitalB1: "förbättra prissättning",
+  vaDigitalB2: "automatisera arbetsflöden",
+  vaDigitalB3: "skapa bättre beslutsunderlag",
+  vaDigitalP2:
+    "Alltid med samma mål: att göra verksamheten mer effektiv, mer lönsam och mer skalbar.",
+
+  vaNatverkTitle: "Nätverk",
+  vaNatverkP1:
+    "Vi har byggt relationer med entreprenörer, operativa ledare, specialister och kapital.",
+  vaNatverkP2:
+    "När det behövs tar vi in rätt personer — för att lösa konkreta problem, stärka team eller driva utveckling framåt.",
+  vaNatverkP3:
+    "Inte som ett lager runt bolaget, utan som ett sätt att få in rätt kompetens vid rätt tillfälle.",
+
+  vaErfarenhetTitle: "Erfarenhet",
+  vaErfarenhetP1:
+    "Vi har arbetat med att bygga, utveckla och finansiera bolag i många år.",
+  vaErfarenhetP2:
+    "Den erfarenheten använder vi praktiskt — i beslut, i prioriteringar och i hur vi driver utveckling tillsammans med entreprenören.",
 
   // 4. Vår process
   varProcessTitle: "Vår process",
@@ -111,8 +135,12 @@ export const sellersTranslations = {
   // 5. Efter affären (fortsatt ägande, gemensam utveckling — ingen “takeover”-ton)
   efterAffarenTitle: "Resan fortsätter",
 
-  efterAffarenIngress:
-    "Affären är inte slutstationen — den är starten på nästa etapp. Du är kvar som ägare, med drivkraften och kunskapen om bolaget intakt. Vi kliver in för att stärka och komplettera det ni redan byggt, i ett partnerskap där samarbetet är själva motorn i värdeskapandet.",
+  efterAffarenIngressP1:
+    "Affären är inte slutstationen — den är starten på nästa etapp. Du är kvar som ägare, med drivkraften och kunskapen om bolaget intakt.",
+  efterAffarenIngressP2:
+    "Vi kliver in för att stärka och komplettera det ni redan byggt, i ett partnerskap där samarbetet är själva motorn i värdeskapandet.",
+  efterAffarenIngressP3:
+    "Vi bygger vidare på det som redan fungerar — och utvecklar det tillsammans.",
 
   eaNarrative1Title: "Du fortsätter äga och vara viktig",
   eaNarrative1Body:
