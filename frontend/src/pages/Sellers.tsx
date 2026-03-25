@@ -157,30 +157,16 @@ function BulletTextRows({
   );
 }
 
-/** Full bordered card (subgrid under Hur vi arbetar). */
-function BulletCard({
-  title,
-  intro,
-  bullets,
-}: {
-  title: string;
-  intro?: string;
-  bullets: readonly [string, string, string];
-}) {
+/** Narrative subsection (H3 + paragraph) — sellers sections with less bullet fragmentation. */
+function NarrativeBlock({ title, body }: { title: string; body: string }) {
   return (
-    <div
-      className="rounded-xl p-5 sm:p-6 border h-full flex flex-col justify-start"
-      style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}
-    >
+    <div className="border-l-4 pl-4 sm:pl-5 py-1 pr-1" style={{ borderLeftColor: tokens.accent }}>
       <h3 className="text-base sm:text-lg font-semibold tracking-tight mb-2" style={{ color: tokens.text }}>
         {title}
       </h3>
-      {intro ? (
-        <p className="text-[14px] leading-relaxed mb-3" style={{ color: tokens.text }}>
-          {intro}
-        </p>
-      ) : null}
-      <BulletTextRows lines={bullets} size="14" />
+      <p className="text-[15px] sm:text-base leading-relaxed" style={{ color: tokens.text }}>
+        {body}
+      </p>
     </div>
   );
 }
@@ -201,10 +187,6 @@ function BulletRailSection({
       <BulletTextRows lines={bullets} size="14" />
     </div>
   );
-}
-
-function BulletList({ items }: { items: readonly string[] }) {
-  return <BulletTextRows lines={items} size="15" />;
 }
 
 function SellersGate({ onUnlock }: { onUnlock: () => void }) {
@@ -421,33 +403,17 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
 
         {/* 1. Hur vi arbetar */}
         <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar" sectionIndex={1}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
-            <BulletRailSection
-              title={t.hvPartnerskapTitle}
-              bullets={[t.hvPartnerskapB1, t.hvPartnerskapB2, t.hvPartnerskapB3]}
-            />
-            <BulletRailSection title={t.hvBeslutTitle} bullets={[t.hvBeslutB1, t.hvBeslutB2, t.hvBeslutB3]} />
-            <BulletRailSection title={t.hvAgarrollTitle} bullets={[t.hvAgarrollB1, t.hvAgarrollB2, t.hvAgarrollB3]} />
-            <BulletRailSection title={t.hvOperativTitle} bullets={[t.hvOperativB1, t.hvOperativB2, t.hvOperativB3]} />
-            <BulletRailSection title={t.hvDigitalTitle} bullets={[t.hvDigitalB1, t.hvDigitalB2, t.hvDigitalB3]} />
-            <BulletRailSection title={t.hvNatverkTitle} bullets={[t.hvNatverkB1, t.hvNatverkB2, t.hvNatverkB3]} />
+          <p className="text-[15px] sm:text-base leading-relaxed max-w-2xl mb-10" style={{ color: tokens.text }}>
+            {t.hurViArbetarIngress}
+          </p>
+          <div className="max-w-2xl space-y-8 sm:space-y-9">
+            <NarrativeBlock title={t.hvNarrative1Title} body={t.hvNarrative1Body} />
+            <NarrativeBlock title={t.hvNarrative2Title} body={t.hvNarrative2Body} />
+            <NarrativeBlock title={t.hvNarrative3Title} body={t.hvNarrative3Body} />
+            <NarrativeBlock title={t.hvNarrative4Title} body={t.hvNarrative4Body} />
+            <NarrativeBlock title={t.hvNarrative5Title} body={t.hvNarrative5Body} />
           </div>
-
-          <h3
-            className="text-lg sm:text-xl font-semibold tracking-tight mt-12 mb-6 leading-snug"
-            style={{ color: tokens.text }}
-          >
-            {t.subgridTitle}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            <BulletCard title={t.sgGrowthTitle} bullets={[t.sgGrowthB1, t.sgGrowthB2, t.sgGrowthB3]} />
-            <BulletCard title={t.sgOrgTitle} bullets={[t.sgOrgB1, t.sgOrgB2, t.sgOrgB3]} />
-            <BulletCard title={t.sgDecisionTitle} bullets={[t.sgDecisionB1, t.sgDecisionB2, t.sgDecisionB3]} />
-            <BulletCard title={t.sgSystemsTitle} bullets={[t.sgSystemsB1, t.sgSystemsB2, t.sgSystemsB3]} />
-            <BulletCard title={t.sgExecutionTitle} bullets={[t.sgExecutionB1, t.sgExecutionB2, t.sgExecutionB3]} />
-            <BulletCard title={t.sgCultureTitle} bullets={[t.sgCultureB1, t.sgCultureB2, t.sgCultureB3]} />
-          </div>
-          <p className="mt-10 text-[15px] leading-relaxed max-w-2xl" style={{ color: tokens.text }}>
+          <p className="mt-10 text-[15px] leading-relaxed max-w-2xl font-medium" style={{ color: tokens.text }}>
             {t.hurViArbetarClosing}
           </p>
         </SectionShell>
@@ -499,8 +465,16 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
         {/* 5. Efter affären */}
         <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren" sectionIndex={5}>
           <div className="max-w-2xl">
-            <BulletList items={[t.eaB1, t.eaB2, t.eaB3]} />
-            <p className="mt-8 text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
+            <p className="text-[15px] sm:text-base leading-relaxed mb-10" style={{ color: tokens.text }}>
+              {t.efterAffarenIngress}
+            </p>
+            <div className="space-y-8 sm:space-y-9">
+              <NarrativeBlock title={t.eaNarrative1Title} body={t.eaNarrative1Body} />
+              <NarrativeBlock title={t.eaNarrative2Title} body={t.eaNarrative2Body} />
+              <NarrativeBlock title={t.eaNarrative3Title} body={t.eaNarrative3Body} />
+              <NarrativeBlock title={t.eaNarrative4Title} body={t.eaNarrative4Body} />
+            </div>
+            <p className="mt-10 text-[15px] leading-relaxed font-medium" style={{ color: tokens.text }}>
               {t.efterAffarenClosing}
             </p>
           </div>
