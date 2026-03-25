@@ -9,8 +9,12 @@ this path: the model uses built-in web search once it has ``company_name`` + bas
 
 **Easiest first test (10 companies):**
 
+  cd /path/to/nivo && set -a && [ -f .env ] && . ./.env && set +a
   PYTHONPATH=. python3 scripts/gpt_search_about_for_run.py \\
     --run-id <uuid> --limit 10 --filter weak
+
+  # Optional: ``--dry-run`` prints selected inputs (no API). ``--out path.json`` sets output file.
+  # Page with ``--limit 20 --offset 0``, then ``--offset 20``, …
 
 ``--filter weak`` prefers rows where our fetch was thin or failed (``home_only``, ``http_error``,
 ``timeout``, ``empty_text``). Use ``--filter any_url`` for the first N rows that have a URL.
@@ -56,6 +60,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from screening_manifest_utils import git_commit_hash, utc_timestamp_iso, write_json
 
 DEFAULT_MODEL = "gpt-4o-search-preview"
+# Large batches need room for web-search + long about_text; default 16k (env override).
+_DEFAULT_MAX_COMPLETION_TOKENS = int(os.getenv("GPT_ABOUT_SEARCH_MAX_COMPLETION_TOKENS", "16384"))
 
 ABOUT_SYSTEM_PROMPT = """You are a research assistant extracting company “About” content for Swedish
 B2B screening.
@@ -76,6 +82,8 @@ Your job:
 5. about_source_url must be the page you used (https), or empty if you found nothing reliable.
 
 Return **only** JSON matching the provided schema (one item per input company, same order and count).
+
+Use normal UTF-8 text inside JSON strings (Swedish letters etc.); do **not** spell text as long ``\\uXXXX`` escape sequences.
 """
 
 
@@ -239,10 +247,28 @@ def build_companies_payload(rows: Sequence[Dict[str, Any]]) -> List[Dict[str, st
     return out
 
 
+def _response_meta(resp: Any) -> Dict[str, Any]:
+    out: Dict[str, Any] = {
+        "id": getattr(resp, "id", None),
+        "model": getattr(resp, "model", None),
+    }
+    choices = getattr(resp, "choices", None) or []
+    if choices:
+        out["finish_reason"] = getattr(choices[0], "finish_reason", None)
+    usage = getattr(resp, "usage", None)
+    if usage is not None and hasattr(usage, "model_dump"):
+        out["usage"] = usage.model_dump()
+    elif usage is not None:
+        out["usage"] = str(usage)
+    return out
+
+
 def call_chat_search_about_batch(
     client: OpenAI,
     model: str,
     companies: List[Dict[str, str]],
+    *,
+    max_completion_tokens: int,
 ) -> Tuple[str, Any]:
     expect = len(companies)
     if expect < 1:
@@ -255,6 +281,7 @@ def call_chat_search_about_batch(
             {"role": "system", "content": ABOUT_SYSTEM_PROMPT},
             {"role": "user", "content": user_text},
         ],
+        max_completion_tokens=max_completion_tokens,
         response_format={
             "type": "json_schema",
             "json_schema": {
@@ -293,6 +320,12 @@ def main() -> None:
         help="Output JSON path (default: scripts/fixtures/gpt_website_retrieval_runs/about_search_<ts>.json)",
     )
     p.add_argument("--dry-run", action="store_true", help="Print payload only; no API call")
+    p.add_argument(
+        "--max-completion-tokens",
+        type=int,
+        default=None,
+        help=f"Chat Completions max_completion_tokens (default: env GPT_ABOUT_SEARCH_MAX_COMPLETION_TOKENS or {_DEFAULT_MAX_COMPLETION_TOKENS})",
+    )
     args = p.parse_args()
 
     _load_dotenv()
@@ -324,6 +357,12 @@ def main() -> None:
         )
     out_path = out_path.resolve()
 
+    max_completion_tokens = (
+        args.max_completion_tokens
+        if args.max_completion_tokens is not None
+        else _DEFAULT_MAX_COMPLETION_TOKENS
+    )
+
     manifest = {
         "schema_version": 1,
         "script": "gpt_search_about_for_run.py",
@@ -334,6 +373,7 @@ def main() -> None:
         "filter": filter_mode,
         "limit": args.limit,
         "offset": args.offset,
+        "max_completion_tokens": max_completion_tokens,
         "row_ids": [r["id"] for r in rows],
         "input_companies": companies,
     }
@@ -343,7 +383,9 @@ def main() -> None:
         return
 
     client = OpenAI(api_key=api_key)
-    raw_text, resp = call_chat_search_about_batch(client, model, companies)
+    raw_text, resp = call_chat_search_about_batch(
+        client, model, companies, max_completion_tokens=max_completion_tokens
+    )
     try:
         parsed = AboutBatchResult.model_validate(json.loads(_strip_json_fence(raw_text)))
     except (json.JSONDecodeError, ValidationError) as e:
@@ -353,6 +395,7 @@ def main() -> None:
                 **manifest,
                 "parse_error": str(e),
                 "raw_model_text": raw_text,
+                "response_meta": _response_meta(resp),
             },
         )
         raise SystemExit(f"Parse failed; partial output written to {out_path}: {e}") from e
@@ -366,7 +409,7 @@ def main() -> None:
         **manifest,
         "items": [i.model_dump() for i in parsed.items],
         "raw_model_text": raw_text,
-        "response_id": getattr(resp, "id", None),
+        "response_meta": _response_meta(resp),
     }
     write_json(out_path, out_payload)
     print(f"Wrote {out_path} ({len(parsed.items)} items)")

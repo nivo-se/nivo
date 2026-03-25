@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "script": "gpt_search_about_for_run.py",
+  "created_at_utc": "2026-03-25T10:05:04Z",
+  "git_commit": "17978627ab96f100a27f30010d97155c9d66f0ac",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "model": "gpt-4o-search-preview",
+  "filter": "weak",
+  "limit": 20,
+  "offset": 0,
+  "max_completion_tokens": 16384,
+  "row_ids": [
+    3,
+    4,
+    8,
+    10,
+    12,
+    13,
+    14,
+    44,
+    48,
+    49,
+    51,
+    54,
+    55,
+    56,
+    58,
+    59,
+    60,
+    66,
+    68,
+    69
+  ],
+  "input_companies": [
+    {
+      "orgnr": "556586-2058",
+      "company_name": "Älmhults Gjuteri AB",
+      "official_website_url": "https://almhultsgjuteri.se"
+    },
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://xperta.com"
+    },
+    {
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "https://www.lecora.se"
+    },
+    {
+      "orgnr": "556332-7351",
+      "company_name": "Smålands Stålgjuteri i Eksjö Aktiebolag",
+      "official_website_url": "https://opima.se"
+    },
+    {
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "https://www.creon.se"
+    },
+    {
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "https://www.karlskogaautomation.se"
+    },
+    {
+      "orgnr": "556184-6238",
+      "company_name": "Aktiebolaget Kulleborn & Stenström",
+      "official_website_url": "https://kulleborn.se"
+    },
+    {
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "https://systemstod.se"
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com"
+    },
+    {
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "https://www.lideco.se"
+    },
+    {
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem"
+    },
+    {
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/"
+    },
+    {
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/"
+    },
+    {
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/"
+    },
+    {
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/"
+    },
+    {
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/"
+    },
+    {
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/"
+    },
+    {
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/"
+    },
+    {
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/"
+    },
+    {
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/"
+    }
+  ],
+  "items": [
+    {
+      "orgnr": "556586-2058",
+      "company_name": "Älmhults Gjuteri AB",
+      "official_website_url": "https://almhultsgjuteri.se",
+      "about_text": "Älmhults Gjuteri är ett gjuteri med tillverkning av grå- och segjärn. Företaget har en lång tradition inom gjuterinäringen.",
+      "about_source_url": "https://holsbyverken.se/almhults-gjuteri/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Holsbyverkens webbplats, där Älmhults Gjuteri presenteras som en del av företagsgruppen."
+    },
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://xperta.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "https://www.lecora.se",
+      "about_text": "Lecora ligger i Vadstena vid Vätterns strand och vi producerar frysta och kylda livsmedel till såväl storhushåll som detaljhandeln.",
+      "about_source_url": "https://www.lecora.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Lecoras webbplats."
+    },
+    {
+      "orgnr": "556332-7351",
+      "company_name": "Smålands Stålgjuteri i Eksjö Aktiebolag",
+      "official_website_url": "https://opima.se",
+      "about_text": "Smålands Stålgjuteri med bas i Eksjö grundades 1967 och är specialister på design och gjutning av skräddarsydda ståldetaljer i små och medelstora serier.",
+      "about_source_url": "https://opima.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Opimas webbplats, där Smålands Stålgjuteri presenteras som en del av företagsgruppen."
+    },
+    {
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "https://www.creon.se",
+      "about_text": "Creon helps businesses create impactful promotional items, custom workwear, and precision-crafted scale models, all seamlessly managed through our Profile Store. With a focus on design, sustainability, and logistics, we ensure that every branded item strengthens your identity and leaves a lasting impression.",
+      "about_source_url": "https://www.creon.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Creons webbplats."
+    },
+    {
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "https://www.karlskogaautomation.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556184-6238",
+      "company_name": "Aktiebolaget Kulleborn & Stenström",
+      "official_website_url": "https://kulleborn.se",
+      "about_text": "Kulleborn & Stenström är ett familjeföretag som erbjuder hållbara, miljövänliga och effektiva förpackningslösningar. Från idé till färdig produkt utvecklar vi förpackningar genom val av design och material, till tillverkning av flaskor, dunkar och burkar.",
+      "about_source_url": "https://kulleborn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Kulleborn & Stenströms webbplats."
+    },
+    {
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "https://systemstod.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com",
+      "about_text": "Blekinge Pressgjuteri och Proal Ltd samlas under varumärket BLEKINGE PROAL. Vi är en pålitlig och kompetent legotillverkare med passion för kundnöjdhet, produktionsteknik, brett kunnande och stort engagemang.",
+      "about_source_url": "https://www.blekingeproal.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Blekinge Proals webbplats."
+    },
+    {
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "https://www.lideco.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem",
+      "about_text": "Rosenfors Bruk är verksamt inom skärande bearbetning av framförallt järn och stål.",
+      "about_source_url": "https://holsbyverken.se/rosenfors-bruk/hem",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Holsbyverkens webbplats, där Rosenfors Bruk presenteras som en del av företagsgruppen."
+    },
+    {
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    }
+  ],
+  "raw_model_text": "{\"items\":[{\"orgnr\":\"556586-2058\",\"company_name\":\"Älmhults Gjuteri AB\",\"official_website_url\":\"https://almhultsgjuteri.se\",\"about_text\":\"Älmhults Gjuteri är ett gjuteri med tillverkning av grå- och segjärn. Företaget har en lång tradition inom gjuterinäringen.\",\"about_source_url\":\"https://holsbyverken.se/almhults-gjuteri/\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Holsbyverkens webbplats, där Älmhults Gjuteri presenteras som en del av företagsgruppen.\"},{\"orgnr\":\"556681-3761\",\"company_name\":\"Xperta AB\",\"official_website_url\":\"https://xperta.com\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556090-3493\",\"company_name\":\"Lecora AB\",\"official_website_url\":\"https://www.lecora.se\",\"about_text\":\"Lecora ligger i Vadstena vid Vätterns strand och vi producerar frysta och kylda livsmedel till såväl storhushåll som detaljhandeln.\",\"about_source_url\":\"https://www.lecora.se\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Lecoras webbplats.\"},{\"orgnr\":\"556332-7351\",\"company_name\":\"Smålands Stålgjuteri i Eksjö Aktiebolag\",\"official_website_url\":\"https://opima.se\",\"about_text\":\"Smålands Stålgjuteri med bas i Eksjö grundades 1967 och är specialister på design och gjutning av skräddarsydda ståldetaljer i små och medelstora serier.\",\"about_source_url\":\"https://opima.se\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Opimas webbplats, där Smålands Stålgjuteri presenteras som en del av företagsgruppen.\"},{\"orgnr\":\"556575-1061\",\"company_name\":\"Creon promotion AB\",\"official_website_url\":\"https://www.creon.se\",\"about_text\":\"Creon helps businesses create impactful promotional items, custom workwear, and precision-crafted scale models, all seamlessly managed through our Profile Store. With a focus on design, sustainability, and logistics, we ensure that every branded item strengthens your identity and leaves a lasting impression.\",\"about_source_url\":\"https://www.creon.se\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Creons webbplats.\"},{\"orgnr\":\"556493-7695\",\"company_name\":\"Karlskoga Automation Aktiebolag\",\"official_website_url\":\"https://www.karlskogaautomation.se\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556184-6238\",\"company_name\":\"Aktiebolaget Kulleborn & Stenström\",\"official_website_url\":\"https://kulleborn.se\",\"about_text\":\"Kulleborn & Stenström är ett familjeföretag som erbjuder hållbara, miljövänliga och effektiva förpackningslösningar. Från idé till färdig produkt utvecklar vi förpackningar genom val av design och material, till tillverkning av flaskor, dunkar och burkar.\",\"about_source_url\":\"https://kulleborn.se\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Kulleborn & Stenströms webbplats.\"},{\"orgnr\":\"556122-0798\",\"company_name\":\"Aktiebolaget Systemstöd Sverige\",\"official_website_url\":\"https://systemstod.se\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556486-1747\",\"company_name\":\"Blekinge Pressgjuteri Aktiebolag\",\"official_website_url\":\"https://www.blekingeproal.com\",\"about_text\":\"Blekinge Pressgjuteri och Proal Ltd samlas under varumärket BLEKINGE PROAL. Vi är en pålitlig och kompetent legotillverkare med passion för kundnöjdhet, produktionsteknik, brett kunnande och stort engagemang.\",\"about_source_url\":\"https://www.blekingeproal.com\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Blekinge Proals webbplats.\"},{\"orgnr\":\"556264-7817\",\"company_name\":\"Lideco i Dalstorp Aktiebolag\",\"official_website_url\":\"https://www.lideco.se\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556441-8092\",\"company_name\":\"Aktiebolaget Rosenfors Bruk\",\"official_website_url\":\"https://holsbyverken.se/rosenfors-bruk/hem\",\"about_text\":\"Rosenfors Bruk är verksamt inom skärande bearbetning av framförallt järn och stål.\",\"about_source_url\":\"https://holsbyverken.se/rosenfors-bruk/hem\",\"confidence_0_1\":0.9,\"source_note\":\"Informationen är hämtad från Holsbyverkens webbplats, där Rosenfors Bruk presenteras som en del av företagsgruppen.\"},{\"orgnr\":\"556295-4569\",\"company_name\":\"Umlax Aktiebolag\",\"official_website_url\":\"https://umlax.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556799-1459\",\"company_name\":\"Säkerhetsteamet i Skåne AB\",\"official_website_url\":\"https://sakerhetsteamet.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556544-8072\",\"company_name\":\"Ascade AB\",\"official_website_url\":\"https://www.ascade.com/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556438-7008\",\"company_name\":\"Smålands Miljö Aktiebolag\",\"official_website_url\":\"https://www.smalandsmiljo.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556794-5778\",\"company_name\":\"P Maskin Automation AB\",\"official_website_url\":\"https://www.pmaskin.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556449-4374\",\"company_name\":\"Gunnar Blomgren Aktiebolag\",\"official_website_url\":\"https://www.gunnarblomgren.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556289-8998\",\"company_name\":\"Biora AB\",\"official_website_url\":\"https://www.bioragroup.com/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556715-4207\",\"company_name\":\"ppm Industrial AB\",\"official_website_url\":\"https://www.ppmindustrial.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"},{\"orgnr\":\"556418-0403\",\"company_name\":\"P&V Ventilation i Nyköping AB\",\"official_website_url\":\"https://www.pvventilation.se/\",\"about_text\":\"\",\"about_source_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Ingen information om företaget hittades på den angivna webbplatsen.\"}]}",
+  "response_meta": {
+    "id": "chatcmpl-2073c761-624e-4790-b8ea-6d9262f8cf41",
+    "model": "gpt-4o-search-preview-2025-03-11",
+    "finish_reason": "stop",
+    "usage": {
+      "completion_tokens": 1882,
+      "prompt_tokens": 1111,
+      "total_tokens": 2993,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      }
+    }
+  }
+}
