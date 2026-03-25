@@ -39,6 +39,7 @@ env/
 ENV/
 env.bak/
 venv.bak/
+.venv-gpt-export/
 
 # Environment variables
 .env
