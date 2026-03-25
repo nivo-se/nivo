@@ -13,10 +13,24 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import httpx
 
+from backend.services.web_intel.site_about_fetch import (
+    MAX_CHARS_PER_PAGE,
+    MAX_PAGES_TOTAL,
+    REQUEST_TIMEOUT,
+    USER_AGENT,
+    fetch_html as _fetch_html,
+    internal_link_candidates as _internal_link_candidates,
+    normalize_homepage,
+    page_text_from_html as _page_text_from_html,
+    pick_best as _pick_best,
+    same_site,
+    score_about as _score_about,
+    score_product as _score_product,
+)
 from backend.services.screening_layer2.domain_identity import (
     TAVILY_QUERY_INDEX_IDENTITY,
     TAVILY_QUERY_INDEX_PRIMARY_SEMANTIC,
@@ -45,11 +59,7 @@ Layer2RetrievalMode = Literal["homepage_known", "multi_source"]
 
 logger = logging.getLogger(__name__)
 
-REQUEST_TIMEOUT = 12.0
-MAX_CHARS_PER_PAGE = 12_000
-MAX_PAGES_TOTAL = 3
 MIN_TOTAL_CHARS_SUFFICIENT = 400
-USER_AGENT = "NivoScreeningLayer2/1.1 (+https://nivogroup.se)"
 
 # Raw Tavily search JSON artifacts (relative to Layer 2 run out_dir)
 LAYER2_RAW_SUBDIR = "layer2_raw"
@@ -188,17 +198,6 @@ _BLOCKED_TAVILY_HOST_SUBSTR = (
     "x.com",
 )
 
-_ABOUT_RE = re.compile(
-    r"about|om-oss|omoss|om\s+oss|company|företag|foretag|who-we|our-story|varum|historia",
-    re.I,
-)
-_PRODUCT_RE = re.compile(
-    r"product|produkt|produkter|service|services|tjanst|tjänst|tjanster|sortiment|"
-    r"catalog|katalog|shop|butik|erbjud|offerings|solutions",
-    re.I,
-)
-
-
 @dataclass
 class RetrievalMeta:
     pages_fetched_count: int = 0
@@ -314,27 +313,6 @@ def log_layer2_tavily_startup() -> None:
     )
 
 
-def normalize_homepage(raw: Optional[str]) -> Optional[str]:
-    s = (raw or "").strip()
-    if not s:
-        return None
-    if not s.startswith(("http://", "https://")):
-        s = "https://" + s
-    p = urlparse(s)
-    if not p.netloc:
-        return None
-    return s
-
-
-def _norm_host(netloc: str) -> str:
-    h = netloc.lower().split("@")[-1].split(":")[0]
-    return h[4:] if h.startswith("www.") else h
-
-
-def _same_site(a: str, b: str) -> bool:
-    return _norm_host(a) == _norm_host(b)
-
-
 def _verify_top_cluster_homepage(
     client: httpx.Client,
     domain: str,
@@ -352,104 +330,6 @@ def _verify_top_cluster_homepage(
         if htm and not err:
             return fin, htm
     return None, None
-
-
-def _strip_html_to_text(html: str, max_chars: int) -> str:
-    try:
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(html, "html.parser")
-        for tag in soup(["script", "style", "nav", "footer", "header"]):
-            tag.decompose()
-        text = soup.get_text(separator="\n", strip=True)
-    except Exception:
-        text = re.sub(r"<[^>]+>", " ", html)
-    text = re.sub(r"\s+", " ", text).strip()
-    if len(text) > max_chars:
-        text = text[:max_chars] + "…"
-    return text
-
-
-def _fetch_html(
-    client: httpx.Client, url: str
-) -> Tuple[Optional[str], Optional[str], str]:
-    """Returns (html_body, error, final_url)."""
-    try:
-        r = client.get(url, follow_redirects=True)
-        final = str(r.url)
-        if r.status_code >= 400:
-            return None, f"HTTP {r.status_code}", final
-        ctype = (r.headers.get("content-type") or "").lower()
-        if "html" not in ctype and "text" not in ctype:
-            return None, "non-html", final
-        return r.text, None, final
-    except Exception as e:
-        return None, str(e)[:200], url
-
-
-def _page_text_from_html(html: str) -> str:
-    return _strip_html_to_text(html, MAX_CHARS_PER_PAGE)
-
-
-def _internal_link_candidates(
-    html: str, base_url: str, official_netloc: str
-) -> List[Tuple[str, str]]:
-    """(absolute_url, anchor_text) same-site only, http(s) only."""
-    try:
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(html, "html.parser")
-    except Exception:
-        return []
-    out: List[Tuple[str, str]] = []
-    seen: set[str] = set()
-    for a in soup.find_all("a", href=True):
-        href = (a.get("href") or "").strip()
-        if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
-            continue
-        if href.lower().endswith((".pdf", ".zip", ".jpg", ".png", ".gif")):
-            continue
-        abs_url = urljoin(base_url, href)
-        p = urlparse(abs_url)
-        if p.scheme not in ("http", "https"):
-            continue
-        if not _same_site(p.netloc, official_netloc):
-            continue
-        key = abs_url.split("#")[0].rstrip("/")
-        if key in seen:
-            continue
-        seen.add(key)
-        label = a.get_text(separator=" ", strip=True) or ""
-        out.append((abs_url, label))
-    return out
-
-
-def _score_about(href: str, label: str) -> int:
-    s = f"{href} {label}"
-    return 3 if _ABOUT_RE.search(s) else 0
-
-
-def _score_product(href: str, label: str) -> int:
-    s = f"{href} {label}"
-    return 3 if _PRODUCT_RE.search(s) else 0
-
-
-def _pick_best(
-    candidates: List[Tuple[str, str]],
-    scorer: Callable[[str, str], int],
-    exclude_urls: set[str],
-) -> Optional[str]:
-    best: Optional[str] = None
-    best_score = 0
-    for url, label in candidates:
-        u = url.split("#")[0].rstrip("/")
-        if u in exclude_urls:
-            continue
-        sc = scorer(url, label)
-        if sc > best_score:
-            best_score = sc
-            best = url
-    return best if best_score > 0 else None
 
 
 def _blocked_host(host: str) -> bool:
@@ -1088,7 +968,7 @@ def build_evidence_pack(
                             continue
                         if _blocked_host(urlparse(u).netloc):
                             continue
-                        if _same_site(urlparse(u).netloc, official_host):
+                        if same_site(urlparse(u).netloc, official_host):
                             continue
                         ext_url = u
                         break
