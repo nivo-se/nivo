@@ -42,6 +42,24 @@ name_exclusion_keywords:
   - bilverkstad
   - osteria
   - hotel
+  # Food / hospitality / architecture (legal name; "mat" is whole-token only — see screening_rank_v1 _SHORT_TOKEN_KEYWORDS)
+  - mat
+  - restaurang
+  - restauranger
+  - restaurant
+  - bageri
+  - bagerier
+  - konditori
+  - pizzeria
+  - brasserie
+  - catering
+  - gastronomi
+  - delikatess
+  - café
+  - cafe
+  - arkitekt
+  - arkitekter
+  - arkitektkontor
 
 name_penalty_keywords:
   group_like:

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Callable
 
 from backend.services.deep_research.input_completeness import DEEP_RESEARCH_THRESHOLDS
 
@@ -140,7 +140,6 @@ def validate_competitors(output: dict) -> StageValidation:
     """Validate competitor_market_synthesis output (Workstream 3)."""
     issues: list[str] = []
     thresholds = DEEP_RESEARCH_THRESHOLDS
-    min_comp = thresholds.get("min_competitors", 1)
     min_verified = thresholds.get("minimum_verified_competitors", 1)
     min_direct = thresholds.get("minimum_direct_competitors", 0)
     min_market_conf = thresholds.get("minimum_market_model_confidence", 0.4)
@@ -334,7 +333,6 @@ def validate_web_evidence_bundle(output: dict) -> StageValidation:
     thresholds = DEEP_RESEARCH_THRESHOLDS
     min_market = thresholds.get("minimum_market_evidence_items", 1)
     min_comp = thresholds.get("minimum_competitor_evidence_items", 1)
-    min_avg_score = thresholds.get("minimum_average_evidence_score", 0.4)
     min_domains = 2 if thresholds.get("require_source_diversity", True) else 1
     confidence_threshold = 0.6
 

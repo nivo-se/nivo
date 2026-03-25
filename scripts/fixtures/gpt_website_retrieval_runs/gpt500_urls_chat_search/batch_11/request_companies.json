@@ -1,0 +1,185 @@
+{
+  "companies": [
+    {
+      "name": "Samuelssons Tak AB",
+      "orgnr": "556518-7969",
+      "address_country": "SE",
+      "primary_nace": "43912 Takarbeten av andra material än plåt",
+      "segment_labels_json": "[\"Byggmästare\", \"Fastighetsbolag, lokaler\"]"
+    },
+    {
+      "name": "Universalisolering Fredriksson Aktiebolag",
+      "orgnr": "556023-2802",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "S K Licenssvets Frölunda Aktiebolag",
+      "orgnr": "556350-8323",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "MARIA ÅKERBERG AB",
+      "orgnr": "556622-6444",
+      "registry_homepage_url": "https://www.group.com",
+      "address_country": "SE",
+      "primary_nace": "20420 Tillverkning av parfymer och toalettartiklar",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Kemikalier, industrikemikalier - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Eliass Georges Fyndmarknad AB",
+      "orgnr": "556192-8127",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Auson Aktiebolag",
+      "orgnr": "556204-5236",
+      "address_country": "SE",
+      "primary_nace": "20590 Tillverkning av övriga kemiska produkter",
+      "segment_labels_json": "[\"Färger, lacker, tapeter\", \"Kemikalier, industrikemikalier\", \"Rengöringsprodukter\", \"Färger, lacker, tapeter - tillverkning\", \"Kemikalier, industrikemikalier - tillverkning\", \"Mineraler - tillverkning\", \"Mineralförädling\", \"Producenter\"]"
+    },
+    {
+      "name": "AV-Line Aktiebolag",
+      "orgnr": "556311-5707",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Astrimant AB",
+      "orgnr": "559244-7113",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "W5 ArcQor AB",
+      "orgnr": "556776-6125",
+      "registry_homepage_url": "https://arcqor.com",
+      "address_country": "SE",
+      "primary_nace": "27900 Tillverkning av annan elapparatur",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Elektronik - Systemkomponenter\", \"Elektronik - Tillverkning\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Autoklinik i Malmö Aktiebolag",
+      "orgnr": "556414-4763",
+      "registry_homepage_url": "https://rydsbilglas.se",
+      "address_country": "SE",
+      "primary_nace": "45202 Plåt-, lack- och glasreparationer på motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\"]"
+    },
+    {
+      "name": "Visma Real Estate AB",
+      "orgnr": "556623-0180",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "EASY ONLINE STORES AB",
+      "orgnr": "556702-9755",
+      "registry_homepage_url": "http://www.easytryck.se",
+      "address_country": "SE",
+      "primary_nace": "46900 Övrig partihandel",
+      "segment_labels_json": "[\"Designers, formgivare\", \"Industridesigners\", \"Profilkläder\", \"Tryckerier\", \"Grossister\"]"
+    },
+    {
+      "name": "Jirotex Furudahlsgruppen AB",
+      "orgnr": "556613-1628",
+      "address_country": "SE",
+      "primary_nace": "22210 Tillverkning av plasthalvfabrikat",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Stora & Goa AB",
+      "orgnr": "556612-5901",
+      "address_country": "SE",
+      "primary_nace": "56100 Restaurangverksamhet",
+      "segment_labels_json": "[\"Restauranger\"]"
+    },
+    {
+      "name": "INAC Process AB",
+      "orgnr": "556675-2332",
+      "address_country": "SE",
+      "primary_nace": "33200 Installation av industrimaskiner och -utrustning",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Industriförnödenheter\", \"Maskinförnödenheter\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    },
+    {
+      "name": "EVI Industries Vaggeryd AB",
+      "orgnr": "556337-6143",
+      "registry_homepage_url": "https://www.eviindustries.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "A. T. Kearney Aktiebolag",
+      "orgnr": "556069-0769",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "TagMaster Aktiebolag",
+      "orgnr": "556487-4534",
+      "address_country": "SE",
+      "primary_nace": "46510 Partihandel med datorer och kringutrustning samt programvara",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "Flyinge Plantshop Aktiebolag",
+      "orgnr": "556403-9005",
+      "address_country": "SE",
+      "primary_nace": "01302 Odling av plantskoleväxter m.m. på friland",
+      "segment_labels_json": "[\"Jordbruk\", \"Jordbruk - odling\"]"
+    },
+    {
+      "name": "SWELIFT AB",
+      "orgnr": "556748-1352",
+      "address_country": "SE",
+      "primary_nace": "77320 Uthyrning och leasing av bygg- och anläggningsmaskiner",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenadmaskinsarbeten\", \"Uthyrning\"]"
+    },
+    {
+      "name": "CA consultadministration AB",
+      "orgnr": "556257-8020",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "C M Betong AB",
+      "orgnr": "556973-2141",
+      "registry_homepage_url": "https://betongforeningen.se",
+      "address_country": "SE",
+      "primary_nace": "23630 Tillverkning av fabriksblandad betong",
+      "segment_labels_json": "[\"Betong, betongvaror\", \"Producenter\", \"Betong, betongvaror - produktion\"]"
+    },
+    {
+      "name": "Atvhuset AB",
+      "orgnr": "556674-8926",
+      "address_country": "SE",
+      "primary_nace": "45400 Handel med och service av motorcyklar inklusive reservdelar och tillbehör",
+      "segment_labels_json": "[\"Bilar\", \"MC, mopeder, skotrar\", \"Motorcykel, ATV och mopeder - detaljister\", \"Detaljhandel\"]"
+    },
+    {
+      "name": "Åsens Projekt AB",
+      "orgnr": "556957-7959",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "E. Södergren Livs AB",
+      "orgnr": "556499-0728",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    }
+  ]
+}

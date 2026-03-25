@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556623-2772",
+      "company_name": "Galore i Uppsala Aktiebolag",
+      "official_website_url": "https://www.galore.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found website www.galore.se listing company name and contact details matching Galore i Uppsala AB."
+    },
+    {
+      "orgnr": "556099-9210",
+      "company_name": "Falcks Omnibus AB",
+      "official_website_url": "https://falcksomnibus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website falcksomnibus.se lists company name, contact details, and orgnr matching Falcks Omnibus AB."
+    },
+    {
+      "orgnr": "556145-5469",
+      "company_name": "VS Truck AB",
+      "official_website_url": "https://www.vstruck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website vstruck.se lists company name and contact details matching VS Truck AB."
+    },
+    {
+      "orgnr": "556864-3141",
+      "company_name": "Bookmark Förlag AB",
+      "official_website_url": "https://www.bookmarkforlag.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bookmarkforlag.se lists company name and contact details matching Bookmark Förlag AB."
+    },
+    {
+      "orgnr": "556623-6450",
+      "company_name": "Bosphorus Aktiebolag",
+      "official_website_url": "https://www.bosphorus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bosphorus.se lists company name and contact details matching Bosphorus Aktiebolag."
+    },
+    {
+      "orgnr": "556665-6442",
+      "company_name": "EPG Projektledning AB",
+      "official_website_url": "https://www.epgprojektledning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website epgprojektledning.se lists company name and contact details matching EPG Projektledning AB."
+    },
+    {
+      "orgnr": "556546-2206",
+      "company_name": "Reason Studios Aktiebolag",
+      "official_website_url": "https://www.reasonstudios.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website reasonstudios.com lists company name and contact details matching Reason Studios Aktiebolag."
+    },
+    {
+      "orgnr": "556729-7832",
+      "company_name": "Markera AB",
+      "official_website_url": "https://www.markera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website markera.se lists company name and contact details matching Markera AB."
+    },
+    {
+      "orgnr": "556509-6384",
+      "company_name": "Play Box AB",
+      "official_website_url": "https://www.playbox.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website playbox.se lists company name and contact details matching Play Box AB."
+    },
+    {
+      "orgnr": "556195-1947",
+      "company_name": "Johpomek Aktiebolag",
+      "official_website_url": "https://www.johpomek.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website johpomek.se lists company name and contact details matching Johpomek Aktiebolag."
+    },
+    {
+      "orgnr": "556072-8528",
+      "company_name": "In & Finn Scandinavien AB",
+      "official_website_url": "https://www.inofinn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website inofinn.se lists company name and contact details matching In & Finn Scandinavien AB."
+    },
+    {
+      "orgnr": "556812-4670",
+      "company_name": "Turner & Townsend AB",
+      "official_website_url": "https://www.turnerandtownsend.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website turnerandtownsend.com lists company name and contact details matching Turner & Townsend AB."
+    },
+    {
+      "orgnr": "556607-8811",
+      "company_name": "Bridgepoint AB",
+      "official_website_url": "https://www.bridgepoint.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bridgepoint.eu lists company name and contact details matching Bridgepoint AB."
+    },
+    {
+      "orgnr": "556550-4866",
+      "company_name": "Presona Aktiebolag",
+      "official_website_url": "https://www.presona.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website presona.se lists company name and contact details matching Presona Aktiebolag."
+    },
+    {
+      "orgnr": "556651-5689",
+      "company_name": "ZilenZio AB",
+      "official_website_url": "https://www.zilenzio.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website zilenzio.se lists company name and contact details matching ZilenZio AB."
+    },
+    {
+      "orgnr": "559136-9110",
+      "company_name": "Svets & Mekano Produktion i Vislanda AB",
+      "official_website_url": "https://www.svetsmekano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website svetsmekano.se lists company name and contact details matching Svets & Mekano Produktion i Vislanda AB."
+    },
+    {
+      "orgnr": "559054-6692",
+      "company_name": "Seafrigo Nordic AB",
+      "official_website_url": "https://www.seafrigo.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website seafrigo.com lists company name and contact details matching Seafrigo Nordic AB."
+    },
+    {
+      "orgnr": "556615-0214",
+      "company_name": "FOBE Produktion AB",
+      "official_website_url": "https://www.fobe.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website fobe.se lists company name and contact details matching FOBE Produktion AB."
+    },
+    {
+      "orgnr": "556747-4514",
+      "company_name": "Widings Elektriska AB",
+      "official_website_url": "https://www.widings.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website widings.se lists company name and contact details matching Widings Elektriska AB."
+    },
+    {
+      "orgnr": "556617-0394",
+      "company_name": "Nordlo Jönköping AB",
+      "official_website_url": "https://www.nordlo.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website nordlo.com lists company name and contact details matching Nordlo Jönköping AB."
+    },
+    {
+      "orgnr": "556270-3024",
+      "company_name": "Ricana Concept AB",
+      "official_website_url": "https://www.ricana.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website ricana.se lists company name and contact details matching Ricana Concept AB."
+    },
+    {
+      "orgnr": "556648-1684",
+      "company_name": "Ventilationsprojekt i Norrköping AB",
+      "official_website_url": "https://www.ventilationsprojekt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website ventilationsprojekt.se lists company name and contact details matching Ventilationsprojekt i Norrköping AB."
+    },
+    {
+      "orgnr": "556255-6133",
+      "company_name": "Logos Payment Solutions AB",
+      "official_website_url": "https://www.logospaymentsolutions.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website logospaymentsolutions.com lists company name and contact details matching Logos Payment Solutions AB."
+    },
+    {
+      "orgnr": "556472-5447",
+      "company_name": "Cegeka Applications AB",
+      "official_website_url": "https://www.cegeka.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website cegeka.com lists company name and contact details matching Cegeka Applications AB."
+    },
+    {
+      "orgnr": "556944-0232",
+      "company_name": "J.K Livs AB",
+      "official_website_url": "https://www.jklivs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website jklivs.se lists company name and contact details matching J.K Livs AB."
+    }
+  ]
+}

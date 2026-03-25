@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560957432",
+  "company_name": "Telenor Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Telenor Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Telenor Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://grokipedia.com/page/telenor_sverige",
+        "title": "Telenor Sverige - Grokipedia",
+        "content": "Telenor Sverige AB is a leading Swedish telecommunications company and wholly owned subsidiary of the Norwegian-based Telenor Group, specializing in mobile telephony, fixed broadband, television, and Internet of Things (IoT) services for consumers and businesses.](#ref-1) As Sweden's third-largest mobile network operator, it holds approximately 18% of the mobile revenue market share and serves around 3 million mobile subscribers (as of end 2023), with its network covering 99.9% of the population.](#ref-1) In fixed broadband, it commands about 17% of the consumer market (as of end 2023), supporting approximately 700,000 broadband subscriptions and 500,000 TV customers through extensive fiber infrastructure investments.](#ref-1) The company's presence in Sweden dates back to 2001, building on the Telenor Group's heritage that traces to 1855 with the establishment of Norway's first telegraph line.](#ref-2) Telenor expanded significantly in 2005 by acquiring Vodafone Sweden for EUR 1,035 million (enterprise value), completing the deal in early 2006 and rebranding the operations as Telenor Sverige in April 2006 to align with its Nordic strategy.](#ref-3) Headquartered in Solna, near Stockholm, Telenor Sverige emphasizes sustainable connectivity, leveraging its networks to support climate-smart industrial solutions and global initiatives like epidemic tracking via mobile data.](#ref-2) Under CEO Jonas Edén, it has invested billions in network upgrades to enhance reliability and enable smart services across the country.](#ref-1).",
+        "score": 0.8194462,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.telenor.com/who-we-are/our-companies/nordics/telenor-sweden/",
+        "title": "Telenor Sweden",
+        "content": "# Telenor Sweden. Telenor is Sweden’s third largest mobile operator and provider of fixed broadband services to Swedish consumers. In Sweden, Telenor’s offerings include mobile, fixed and tv services. The company has been present in the Swedish market since 2001, and is considered the third largest player in terms of the number of mobile subscribers. Its network covers 99.9 percent of the population in Sweden. At the end of 2023, revenue market share was around 18% and the number of mobile subscriptions totaled approx. Within consumer fixed broadband, Telenor held around 17% revenue market share at the end of 2023 with 0.7 million broad band subscriptions and 0.5 million tv customers. 0  total revenues, million NOK (2024). 0  monthly mobile ARPU in NOK (Q4 2024). ## Our companies. # Telenor Nordics. # Telenor Norway. # Telenor Sweden. # Telenor Denmark. # Telenor Asia. Family sitting together and having fun with a mobile phone. Family smiling and having fun.",
+        "score": 0.7746691,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.crunchbase.com/organization/telenor-sverige",
+        "title": "Telenor Sverige - Crunchbase Company Profile & Funding",
+        "content": "Telenor Sverige provides telecommunications, computer, and media services, that includes mobile telephony and mobile broadband.",
+        "score": 0.77261686,
+        "raw_content": null
+      },
+      {
+        "url": "https://telenor-sverige.wheree.com/",
+        "title": "Telenor Sverige - Reviews, Photos & Phone Number - Updated ...",
+        "content": "Telenor Sverige is a telecommunications provider located in Lyckeby, Sweden, offering various mobile and internet services. Customer feedback highlights the",
+        "score": 0.7420672,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.zoominfo.com/c/telenor-sweden-ab/471616839",
+        "title": "Telenor - Overview, News & Similar companies | ZoomInfo.com",
+        "content": "Telenor Sverige, founded in 1991 and previously known as Vodafone Sweden, Europolitan, and Nordic Tel, is a comprehensive telecommunications provider in",
+        "score": 0.71948266,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.33,
+    "request_id": "3dc4d418-781e-4c2c-9e28-3f0b01bb19d8"
+  }
+}

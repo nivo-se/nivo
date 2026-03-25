@@ -49,11 +49,11 @@ class FeatureEngineer:
                     try:
                         parts = val.split('-')
                         return (float(parts[0]) + float(parts[1])) / 2
-                    except:
+                    except (TypeError, ValueError):
                         return 0
                 try:
                     return float(val)
-                except:
+                except (TypeError, ValueError):
                     return 0
             employees_col = employees_col.apply(parse_employees)
             

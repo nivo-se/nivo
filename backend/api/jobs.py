@@ -3,11 +3,9 @@ Background job endpoints for enrichment and AI analysis
 """
 from fastapi import APIRouter, HTTPException, Path
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from rq import Queue
-from rq.job import Job
 from .dependencies import get_redis_client
-import redis
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 

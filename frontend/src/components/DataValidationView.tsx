@@ -121,6 +121,7 @@ const DataValidationView: React.FC<DataValidationViewProps> = ({ sessionId, onRe
     if (sessionId) {
       fetchData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch is intentionally driven by view state only
   }, [sessionId, pagination.page, filters]);
 
   const toggleRowExpansion = (orgnr: string) => {

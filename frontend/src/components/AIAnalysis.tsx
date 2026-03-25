@@ -479,12 +479,14 @@ const AIAnalysis: React.FC<AIAnalysisProps> = ({ selectedDataView = 'company_met
   useEffect(() => {
     loadSavedLists()
     loadHistory()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load uses stable component-local loaders
   }, [])
 
   useEffect(() => {
     if (selectedListId) {
       loadCompaniesFromList(selectedListId)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reload list companies only when selection inputs change
   }, [selectedListId, savedLists])
 
   const toggleCompanySelection = (orgnr: string) => {

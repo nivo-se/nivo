@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { COMPANY_PROFILE_BACK } from "@/lib/navigation/companyProfileBack";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -2014,6 +2015,7 @@ export default function ScreeningCampaignsPage() {
                             <TableCell className="font-mono text-xs">
                               <Link
                                 to={`/company/${r.orgnr}`}
+                                state={COMPANY_PROFILE_BACK.screeningCampaigns}
                                 className="text-primary hover:underline"
                               >
                                 {r.orgnr}
@@ -2023,6 +2025,7 @@ export default function ScreeningCampaignsPage() {
                               <div className="flex min-w-0 flex-col gap-0.5">
                                 <Link
                                   to={`/company/${r.orgnr}`}
+                                  state={COMPANY_PROFILE_BACK.screeningCampaigns}
                                   className="inline-flex min-w-0 items-center gap-1 font-medium text-primary hover:underline"
                                   title={r.name ?? undefined}
                                 >

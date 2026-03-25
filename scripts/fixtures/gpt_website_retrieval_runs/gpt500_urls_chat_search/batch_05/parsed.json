@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556458-6872",
+      "company_name": "Ventab Styr Aktiebolag",
+      "official_website_url": "https://www.ventab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list www.ventab.se as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556062-4230",
+      "company_name": "Aktiebolaget Gamla Jernboden",
+      "official_website_url": "https://www.gamlajernboden.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.gamlajernboden.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "559193-0671",
+      "company_name": "SICE Nordics AB",
+      "official_website_url": "https://www.sice.com",
+      "confidence_0_1": 0.7,
+      "source_note": "SICE Nordics AB is a subsidiary of SICE, whose main website is www.sice.com."
+    },
+    {
+      "orgnr": "556333-6204",
+      "company_name": "Halle System AB",
+      "official_website_url": "https://www.halle.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.halle.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556703-8202",
+      "company_name": "Inlands Luft AB",
+      "official_website_url": "https://www.inlandsluft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.inlandsluft.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556200-0777",
+      "company_name": "Baltic Safety Products Aktiebolag (publ)",
+      "official_website_url": "https://www.baltic.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.baltic.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556500-9072",
+      "company_name": "Carlbergs i Göteborg AB",
+      "official_website_url": "https://www.carlbergs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.carlbergs.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556437-9740",
+      "company_name": "Industriverken i Ronneby AB",
+      "official_website_url": "https://industriverken.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "orgnr": "556055-5814",
+      "company_name": "Hansson PyroTech Aktiebolag",
+      "official_website_url": "https://www.hanssonpyrotech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.hanssonpyrotech.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556271-2082",
+      "company_name": "Ellagro Örebro AB",
+      "official_website_url": "https://ellagro.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "orgnr": "556465-3359",
+      "company_name": "Grothkaross Aktiebolag",
+      "official_website_url": "https://www.grothkaross.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.grothkaross.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556264-2362",
+      "company_name": "Segers Fabriker Aktiebolag",
+      "official_website_url": "https://www.segers.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.segers.com is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556489-7600",
+      "company_name": "Säljar'n i Närke Aktiebolag",
+      "official_website_url": "https://www.saljarn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.saljarn.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556100-1701",
+      "company_name": "Mouldex Plast AB",
+      "official_website_url": "https://www.mouldex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.mouldex.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556017-2065",
+      "company_name": "Klippan Yllefabrik Aktiebolag",
+      "official_website_url": "https://www.klippanyllefabrik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.klippanyllefabrik.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556476-2093",
+      "company_name": "Draken i Reftele Aktiebolag",
+      "official_website_url": "https://www.qosina.com",
+      "confidence_0_1": 0.7,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "orgnr": "559057-7507",
+      "company_name": "Advisera AB",
+      "official_website_url": "https://www.advisera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.advisera.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "559011-7155",
+      "company_name": "Socionomkraft AB",
+      "official_website_url": "https://www.socionomkraft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.socionomkraft.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556076-0497",
+      "company_name": "MEMO AB",
+      "official_website_url": "https://memo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "orgnr": "556710-1992",
+      "company_name": "Kallhälls Nya Vårdcentral AB",
+      "official_website_url": "https://www.kallhallsnyavardcentral.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.kallhallsnyavardcentral.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556666-8025",
+      "company_name": "Brunneby Musteri AB",
+      "official_website_url": "https://www.brunnebymusteri.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.brunnebymusteri.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556388-2470",
+      "company_name": "Göthes Säkerhet Aktiebolag",
+      "official_website_url": "https://www.gothes.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.gothes.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556756-6376",
+      "company_name": "Personlig Almanacka Nordic AB",
+      "official_website_url": "https://www.personligalmanacka.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.personligalmanacka.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "559002-3213",
+      "company_name": "Incluso AB",
+      "official_website_url": "https://www.incluso.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.incluso.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "orgnr": "556179-5690",
+      "company_name": "Aktiebolaget Vårby Färghall",
+      "official_website_url": "https://www.varbyfarghall.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.varbyfarghall.se is listed as the company's website, matching the legal name and orgnr."
+    }
+  ]
+}

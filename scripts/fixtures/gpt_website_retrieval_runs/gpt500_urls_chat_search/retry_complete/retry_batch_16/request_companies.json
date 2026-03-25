@@ -1,0 +1,53 @@
+{
+  "companies": [
+    {
+      "name": "Svalebergs Elektriska AB",
+      "orgnr": "556740-6821",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Plåtslagerier\", \"Takbeläggningar\", \"Energihandel\"]"
+    },
+    {
+      "name": "Lotts Import AB",
+      "orgnr": "556886-4465",
+      "address_country": "SE",
+      "primary_nace": "46340 Partihandel med drycker",
+      "segment_labels_json": "[\"Uthyrning\", \"Grossister\", \"Dryckesvaror\"]"
+    },
+    {
+      "name": "AMV Equipment AB",
+      "orgnr": "559002-6554",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Bilar\", \"Maskinförnödenheter\", \"Bilar - tillverkning\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Keyvent Öst AB",
+      "orgnr": "559135-3171",
+      "address_country": "SE",
+      "primary_nace": "71124 Teknisk konsultverksamhet inom energi-, miljö- och VVS-teknik",
+      "segment_labels_json": "[\"Konsulter\", \"Miljöteknik\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Filipstad Stormarknad AB",
+      "orgnr": "556108-7338",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Vilbergens Livs Aktiebolag",
+      "orgnr": "556155-7264",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Sprinklerbolaget Stockholm AB",
+      "orgnr": "556731-7234",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    }
+  ]
+}

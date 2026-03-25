@@ -7,7 +7,7 @@ Heuristic extraction only; no LLM.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Literal
 

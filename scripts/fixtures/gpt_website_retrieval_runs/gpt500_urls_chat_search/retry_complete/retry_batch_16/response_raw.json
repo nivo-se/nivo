@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-0553af4c-b732-4ea5-bacb-758a5fb75f73",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556740-6821\",\"company_name\":\"Svalebergs Elektriska AB\",\"official_website_url\":\"https://www.svalebergs.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found website www.svalebergs.se listed on multiple directories; matches company name and services.\"},{\"orgnr\":\"556886-4465\",\"company_name\":\"Lotts Import AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"},{\"orgnr\":\"559002-6554\",\"company_name\":\"AMV Equipment AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"},{\"orgnr\":\"559135-3171\",\"company_name\":\"Keyvent Öst AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"},{\"orgnr\":\"556108-7338\",\"company_name\":\"Filipstad Stormarknad AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"},{\"orgnr\":\"556155-7264\",\"company_name\":\"Vilbergens Livs Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"},{\"orgnr\":\"556731-7234\",\"company_name\":\"Sprinklerbolaget Stockholm AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company information available on directories only.\"}]}",
+  "usage": {
+    "completion_tokens": 387,
+    "prompt_tokens": 1670,
+    "total_tokens": 2057,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

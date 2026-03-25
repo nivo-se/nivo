@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Cami Stängsel AB",
+      "orgnr": "556825-6753",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Stängsel, stängselnät\", \"Trävaror\", \"Grossister\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Anderstorp Hydraulik Aktiebolag",
+      "orgnr": "556229-4529",
+      "address_country": "SE",
+      "primary_nace": "33120 Reparation av maskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"VVS-arbeten, material och produkter\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Swedelift AB",
+      "orgnr": "556914-2747",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Gjöco AB",
+      "orgnr": "556647-8292",
+      "address_country": "SE",
+      "primary_nace": "20300 Tillverkning av färg, lack, tryckfärg m.m.",
+      "segment_labels_json": "[\"Färger, lacker, tapeter\", \"Kemikalier, industrikemikalier\", \"Trävaror\", \"Färger, lacker, tapeter - tillverkning\", \"Grossister\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Ifö Electric AB",
+      "orgnr": "556033-3576",
+      "address_country": "SE",
+      "primary_nace": "27400 Tillverkning av belysningsarmatur",
+      "segment_labels_json": "[\"Belysningsarmatur - Komponenter\", \"Elektronik - Legotillverkning\", \"Elektronik - Systemkomponenter\", \"Elmateriel\", \"Glas, glasvaror\", \"Elektrisk installationsmaterial - tillverkning\", \"Elektronik - Tillverkning\", \"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\", \"Kablar och kraftledningar\", \"Kablar och kraftledningar - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "LIP AB",
+      "orgnr": "556596-3542",
+      "address_country": "SE",
+      "primary_nace": "49410 Vägtransport, godstrafik",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreservdelar\", \"Byggmästare\", \"Transportförmedling\", \"Åkerier\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Hexis AB",
+      "orgnr": "556835-6074",
+      "address_country": "SE",
+      "primary_nace": "46769 Partihandel med övriga insatsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\"]"
+    },
+    {
+      "name": "Ottosson Truck Aktiebolag",
+      "orgnr": "556148-6845",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Truckar\", \"Uthyrning\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    }
+  ]
+}

@@ -7,7 +7,6 @@ from dataclasses import dataclass
 
 from .competitor_market_schemas import (
     CompetitorProfileW3,
-    EvidenceRef,
     VerifiedCompetitor,
 )
 from .evidence_loader import EvidenceRecord

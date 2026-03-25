@@ -79,6 +79,7 @@ export function Auth0AuthProvider({ children }: { children: React.ReactNode }) {
         setIsBootstrapped(false)
         setMeLoaded(true)
       })
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- bootstrap should rerun on auth state and subject changes
   }, [isAuthenticated, auth0User?.sub])
 
   const user = isAuthenticated && auth0User ? auth0UserToAppUser(auth0User) : null

@@ -34,8 +34,6 @@ def _evidence_to_point_estimates(
     """Build low/base/high from single value using uncertainty policy."""
     if value is None:
         return None
-    interval_rules = uncertainty_policy.get("interval_rules", {})
-    widen = interval_rules.get("widen_interval_when_conflicts_exist", False)
     default_spread = 0.15  # ±15% for low/high
     low = value * (1 - default_spread) if value else None
     high = value * (1 + default_spread) if value else None

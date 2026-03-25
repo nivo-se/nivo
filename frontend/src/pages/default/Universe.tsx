@@ -282,6 +282,7 @@ export default function Universe() {
       result = result.filter((c) => !evaluateFilterGroup(c, activeFilters.exclude));
     }
     return result;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- exclude filtering only depends on the active rule set size here
   }, [companies, activeFilters.exclude.rules, backendExcludeFilters.length]);
 
   const toggleSort = (field: string) => {
@@ -439,7 +440,7 @@ export default function Universe() {
   const isEmptyDueToNoData = isEmpty && totalCount === 0 && !hasFilters && !debouncedQ;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full min-h-full flex flex-col app-page">
       <div className="shrink-0">
         <div className="max-w-5xl mx-auto px-8 pt-8 pb-2">
           <h1 className="text-base font-semibold text-foreground mb-2">Universe</h1>
@@ -448,7 +449,7 @@ export default function Universe() {
 
       <div className="flex-1 min-h-0 flex overflow-hidden">
         {sidebarOpen && (
-          <div className="w-56 shrink-0 border-r border-border bg-muted/20">
+          <div className="w-56 shrink-0 border-r border-sidebar-border bg-sidebar-bg shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.1)]">
             <LibrarySidebar
               layout="universe"
               mode="views"
@@ -465,7 +466,7 @@ export default function Universe() {
         )}
       <div className="flex-1 min-h-0 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 pb-8 h-full min-h-0 flex flex-col gap-4">
-        <div className="shrink-0 sticky top-0 z-20 bg-background -mx-8 px-8 pt-2 pb-4 border-b border-border space-y-4">
+        <div className="shrink-0 sticky top-0 z-20 bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/75 -mx-8 px-8 pt-2 pb-4 border-b border-border/80 space-y-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <Input

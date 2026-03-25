@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  COMPANY_PROFILE_BACK,
+  companyProfileBackToList,
+} from "@/lib/navigation/companyProfileBack";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useList, useCompaniesBatch, useRemoveFromList, useUpdateList, useDeleteList } from "@/lib/hooks/apiQueries";
@@ -543,6 +547,11 @@ export default function ListDetail() {
                           <div className="flex items-center gap-2">
                             <Link
                               to={`/company/${company.orgnr}`}
+                              state={
+                                listId
+                                  ? companyProfileBackToList(listId)
+                                  : COMPANY_PROFILE_BACK.universe
+                              }
                               className="font-medium text-foreground hover:text-foreground/80"
                             >
                               {company.display_name}

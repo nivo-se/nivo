@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Distriktsläkarna i Västra Götaland AB",
+      "orgnr": "559053-0688",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\"]"
+    },
+    {
+      "name": "Norra Åsbo Renhållningsaktiebolag",
+      "orgnr": "556185-3499",
+      "address_country": "SE",
+      "primary_nace": "38110 Insamling av icke-farligt avfall",
+      "segment_labels_json": "[\"Renhållningsentreprenörer, avfallshantering\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Contribit AB",
+      "orgnr": "556655-6501",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Lomma Tak AB",
+      "orgnr": "556800-0375",
+      "address_country": "SE",
+      "primary_nace": "43912 Takarbeten av andra material än plåt",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "K A Olsson & Gems Aktiebolag",
+      "orgnr": "556070-6037",
+      "address_country": "SE",
+      "primary_nace": "46499 Partihandel med övriga hushållsvaror",
+      "segment_labels_json": "[\"Grossister\"]"
+    },
+    {
+      "name": "Grays Bakery AB",
+      "orgnr": "556487-9442",
+      "address_country": "SE",
+      "primary_nace": "10710 Tillverkning av mjukt matbröd och färska bakverk",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "K Vent AB",
+      "orgnr": "556781-9635",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Wellectronics AB",
+      "orgnr": "556921-9032",
+      "address_country": "SE",
+      "primary_nace": "46431 Partihandel med elektriska hushållsmaskiner och -apparater",
+      "segment_labels_json": "[\"Hushållsutrustningar, vitvaror\", \"Grossister\", \"Hushållsutrustningar, vitvaror - grossister\"]"
+    }
+  ]
+}

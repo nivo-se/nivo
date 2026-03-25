@@ -1,0 +1,184 @@
+{
+  "companies": [
+    {
+      "name": "Installera SW AB",
+      "orgnr": "556750-2561",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Elinzity AB",
+      "orgnr": "556694-5878",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Enerco NTT AB",
+      "orgnr": "556694-1109",
+      "registry_homepage_url": "http://www.nttab.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Bjärefågel i Torekow AB",
+      "orgnr": "556574-2250",
+      "address_country": "SE",
+      "primary_nace": "10120 Beredning och hållbarhetsbehandling av fjäderfäkött",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "MAF Pump Aktiebolag",
+      "orgnr": "556431-5462",
+      "registry_homepage_url": "https://mafpump.se",
+      "address_country": "SE",
+      "primary_nace": "28130 Tillverkning av andra pumpar och kompressorer",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Pumpar\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Eurofins Pegasuslab AB",
+      "orgnr": "556896-4224",
+      "registry_homepage_url": "https://www.eurofins.se",
+      "address_country": "SE",
+      "primary_nace": "71200 Teknisk provning och analys",
+      "segment_labels_json": "[\"Facklig, vetenskaplig och teknisk verksamhet\", \"Teknisk provning och analys\"]"
+    },
+    {
+      "name": "Margret Gardinkonfektion Aktiebolag",
+      "orgnr": "556087-5188",
+      "address_country": "SE",
+      "primary_nace": "46410 Partihandel med textilier",
+      "segment_labels_json": "[\"Textilier\", \"Grossister\", \"Producenter\", \"Textilier - Partihandel\", \"Textilier - Produktion\"]"
+    },
+    {
+      "name": "Bluebeam AB",
+      "orgnr": "556816-5426",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\", \"Grossister\", \"IT - övrigt\", \"Skolor och utbildning\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "Kviberggruppen AB",
+      "orgnr": "556898-8959",
+      "address_country": "SE",
+      "primary_nace": "43341 Måleriarbeten",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Byggmästare\", \"Konsulter\", \"Måleriarbeten\", \"Snickeriarbeten\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "EVLI AB",
+      "orgnr": "559374-3510",
+      "registry_homepage_url": "https://www.evli.com",
+      "address_country": "SE",
+      "primary_nace": "66190 Andra stödtjänster till finansiella tjänster utom försäkring och pensionsfondsverksamhet",
+      "segment_labels_json": "[\"Finansbolag, finansiella tjänster\"]"
+    },
+    {
+      "name": "Caramelle Fashion Club AB",
+      "orgnr": "556496-4756",
+      "address_country": "SE",
+      "primary_nace": "47711 Specialiserad butikshandel med herr-, dam- och barnkläder, blandat",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Konfektion\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Plastomer Sweden Aktiebolag",
+      "orgnr": "556039-0279",
+      "address_country": "SE",
+      "primary_nace": "29320 Tillverkning av andra delar och tillbehör till motorfordon",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreservdelar\", \"Bilar - tillverkning\", \"Producenter\", \"Övriga fordon\"]"
+    },
+    {
+      "name": "Sandbäckens Sprinkler Mitt AB",
+      "orgnr": "556893-4508",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Skandinaviska Områdesskydd AB",
+      "orgnr": "556684-1853",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Järnvaror\", \"Livsmedel\", \"Grossister\", \"Livsmedel - agenturer och grossister\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Sandéns Security Printing AB",
+      "orgnr": "556021-3828",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Tryckerier\"]"
+    },
+    {
+      "name": "Agigo AB",
+      "orgnr": "559329-5339",
+      "address_country": "SE",
+      "primary_nace": "78100 Arbetsförmedling och rekrytering",
+      "segment_labels_json": "[\"Rekrytering\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "Öbergs i Karlstad AB",
+      "orgnr": "556342-1634",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Din Bostad i Stockholm AB",
+      "orgnr": "556701-2587",
+      "address_country": "SE",
+      "primary_nace": "68201 Uthyrning och förvaltning av egna eller arrenderade bostäder",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\"]"
+    },
+    {
+      "name": "BGFIX AB",
+      "orgnr": "556767-5672",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Byggmästare\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Pulverlack i Hedesunda AB",
+      "orgnr": "556340-7724",
+      "registry_homepage_url": "https://www.pulverlackhedesunda.se",
+      "address_country": "SE",
+      "primary_nace": "24330 Tillverkning av andra kallformade produkter av stål",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Metallurgisk industri\", \"Producenter\"]"
+    },
+    {
+      "name": "Aon Assessment (Sweden) AB",
+      "orgnr": "556738-0315",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Anders Gustafsson Livs Aktiebolag",
+      "orgnr": "556519-3660",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "LICAB AB",
+      "orgnr": "556733-1466",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Speeron AB",
+      "orgnr": "556713-8812",
+      "address_country": "SE",
+      "primary_nace": "46510 Partihandel med datorer och kringutrustning samt programvara",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Konsulter\", \"Teknikkonsulter\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "Mulic Livs AB",
+      "orgnr": "556863-9966",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    }
+  ]
+}

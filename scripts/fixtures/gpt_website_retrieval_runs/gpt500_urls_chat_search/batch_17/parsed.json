@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556336-0071",
+      "company_name": "TOMINA Aktiebolag",
+      "official_website_url": "https://www.tomina.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Largestcompanies.com and Byggkatalogen, matches company name and services."
+    },
+    {
+      "orgnr": "556553-8898",
+      "company_name": "Evidi AB",
+      "official_website_url": "https://www.navipro.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Listed on Largestcompanies.com as Evidi AB's website."
+    },
+    {
+      "orgnr": "556098-5599",
+      "company_name": "Ingenjörsfirman Geotech Aktiebolag",
+      "official_website_url": "https://geotech.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "orgnr": "556579-1349",
+      "company_name": "Skogsmateriel-Nordforest Aktiebolag",
+      "official_website_url": "https://www.nordforest.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556085-2922",
+      "company_name": "Annell Ljus och Form Aktiebolag",
+      "official_website_url": "https://www.annell.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556353-7512",
+      "company_name": "Hagaberg Industrier AB",
+      "official_website_url": "https://www.hagaberg.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "orgnr": "559387-8969",
+      "company_name": "Ecrucial Stockholm AB",
+      "official_website_url": "https://www.ecrucial.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556042-9549",
+      "company_name": "Kristianstads Automobil Lastvagnar AB",
+      "official_website_url": "https://www.kristianstadsautomobil.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556726-9278",
+      "company_name": "Biotech Fluidics AB",
+      "official_website_url": "https://www.biotechfluidics.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556291-3557",
+      "company_name": "Svetsprodukter i Piteå Aktiebolag",
+      "official_website_url": "https://www.svetsprodukter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556078-5114",
+      "company_name": "TR Media AB",
+      "official_website_url": "https://www.trmedia.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556744-7031",
+      "company_name": "Seacastle AB",
+      "official_website_url": "https://www.seacastle.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556688-6445",
+      "company_name": "Svenska GMK AB",
+      "official_website_url": "https://www.svenskagmk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556692-9815",
+      "company_name": "Wenderfalck Kommunikation AB",
+      "official_website_url": "https://www.wenderfalck.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556491-4298",
+      "company_name": "Dotetorps Ägg Aktiebolag",
+      "official_website_url": "https://www.dotetorpsagg.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556086-1535",
+      "company_name": "Bröderna Hansson H-tryck Aktiebolag",
+      "official_website_url": "https://www.h-tryck.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "orgnr": "556804-3698",
+      "company_name": "BrightCom Solutions AB",
+      "official_website_url": "https://www.brightcom.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556574-6319",
+      "company_name": "AQ ParkoPrint AB",
+      "official_website_url": "https://www.aqg.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "559370-1971",
+      "company_name": "SkyShowtime Nordics AB",
+      "official_website_url": "https://www.skyshowtime.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556442-2755",
+      "company_name": "Lindås Gräv Aktiebolag",
+      "official_website_url": "https://www.lindasgrav.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556965-9815",
+      "company_name": "The limit is SQY AB",
+      "official_website_url": "https://www.sqy.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556671-1924",
+      "company_name": "JustNu AB",
+      "official_website_url": "https://www.justnu.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556641-7357",
+      "company_name": "RISE Processum AB",
+      "official_website_url": "https://www.processum.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556209-9001",
+      "company_name": "INFICON AB",
+      "official_website_url": "https://www.inficon.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "orgnr": "556712-0232",
+      "company_name": "Fröjd Interactive AB",
+      "official_website_url": "https://www.frojd.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    }
+  ]
+}

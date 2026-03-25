@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556509-0148",
+      "company_name": "Swedish Oat Fiber Aktiebolag",
+      "official_website_url": "https://www.swedishoatfiber.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via company name search."
+    },
+    {
+      "orgnr": "556813-4059",
+      "company_name": "Keeparo AB",
+      "official_website_url": "https://www.keeparo.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Identified official website through company name search."
+    },
+    {
+      "orgnr": "556101-5230",
+      "company_name": "Götaplatsens Foto AB",
+      "official_website_url": "https://www.gotaplatsensfoto.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Official website confirmed via company name search."
+    },
+    {
+      "orgnr": "556578-0250",
+      "company_name": "C. Gustafsson Livs Aktiebolag",
+      "official_website_url": "https://www.ica.se/butiker/supermarket/hallefors/c-gustafsson-livs-ab-ica-supermarket-hallefors-1090/",
+      "confidence_0_1": 0.9,
+      "source_note": "ICA store page lists this entity."
+    },
+    {
+      "orgnr": "556571-7120",
+      "company_name": "Thomas o Marianne Alfredsson AB",
+      "official_website_url": "https://www.ica.se/butiker/supermarket/vaxjo/ica-supermarket-hovshaga-1091/",
+      "confidence_0_1": 0.9,
+      "source_note": "ICA store page lists this entity."
+    },
+    {
+      "orgnr": "556233-8961",
+      "company_name": "Norrbottens Bildemontering Aktiebolag",
+      "official_website_url": "https://www.norrbottensbildemontering.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found via company name search."
+    },
+    {
+      "orgnr": "556649-7565",
+      "company_name": "Realtryck i Stockholm AB",
+      "official_website_url": "https://www.realtryck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website identified through company name search."
+    },
+    {
+      "orgnr": "556543-8941",
+      "company_name": "Citedo AB",
+      "official_website_url": "https://www.citedo.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Official website found via company name search."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "script": "merge_pool_and_gpt_urls.py",
+  "created_at_utc": "2026-03-25T09:26:16Z",
+  "git_commit": "ca0725798e26d9393c8e6b046fe49161e17e4309",
+  "pool_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
+  "pool_sha256": "9ad416ca211ef206303ac6046da2efd2603ed1103fe9ceddc1a1a9631679e034",
+  "urls_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/retry_complete/merged_urls_complete.csv",
+  "urls_sha256": "c6ab9c380d2bb015862621d3d329995ec7490a8281dd3773aa135fa2be5db322",
+  "out_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/gpt500_pool_plus_urls.csv",
+  "row_count": 500,
+  "has_gpt_url": 437,
+  "no_gpt_url": 63
+}

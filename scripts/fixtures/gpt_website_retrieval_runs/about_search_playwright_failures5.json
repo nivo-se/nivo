@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "script": "gpt_search_about_for_run.py",
+  "created_at_utc": "2026-03-25T11:06:02Z",
+  "git_commit": "17c308ccaf1afa5ec59072830108d3b03eb1f2a7",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "model": "gpt-4o-search-preview",
+  "filter": "companies_json:playwright_failures_gpt_batch5.json",
+  "limit": 5,
+  "offset": 0,
+  "max_completion_tokens": 16384,
+  "companies_json": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/playwright_failures_gpt_batch5.json",
+  "row_ids": [],
+  "input_companies": [
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/"
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se"
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se"
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se"
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se"
+    }
+  ],
+  "items": [
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/",
+      "about_text": "Laholms Marin AB är en båtbutik belägen i Laholm som erbjuder ett brett sortiment av båtar, motorer och tillbehör. Företaget strävar efter att tillhandahålla högkvalitativa produkter och tjänster för båtägare i regionen.",
+      "about_source_url": "https://www.laholmsmarin.se/",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se",
+      "about_text": "Holger Andreasen Aktiebolag är ett företag som specialiserar sig på import och distribution av högkvalitativa livsmedelsprodukter. Med lång erfarenhet i branschen fokuserar företaget på att erbjuda sina kunder noggrant utvalda produkter från internationella leverantörer.",
+      "about_source_url": "https://www.holgerandreasen.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se",
+      "about_text": "J.H. Tidbeck Aktiebolag är en ledande leverantör av industriella komponenter och systemlösningar. Företaget erbjuder ett brett sortiment av produkter och tjänster för olika industrisektorer, med fokus på kvalitet och kundanpassade lösningar.",
+      "about_source_url": "https://www.tidbeck.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se",
+      "about_text": "Goodfellows Infra AB är ett företag verksamt inom infrastrukturbranschen, specialiserat på projektledning och konsulttjänster för bygg- och anläggningsprojekt. Företaget strävar efter att leverera effektiva och hållbara lösningar för sina kunder.",
+      "about_source_url": "https://www.goodfellowsinfra.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se",
+      "about_text": "Färg-In Aktiebolag är en färgbutik som erbjuder ett omfattande sortiment av färgprodukter och tillbehör för både professionella målare och privatpersoner. Företaget fokuserar på att tillhandahålla högkvalitativa produkter och expertis inom färg och måleri.",
+      "about_source_url": "https://www.farg-in.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    }
+  ],
+  "raw_model_text": "{\"items\":[{\"orgnr\":\"556991-2677\",\"company_name\":\"Laholms Marin AB\",\"official_website_url\":\"https://www.laholmsmarin.se/\",\"about_text\":\"Laholms Marin AB är en båtbutik belägen i Laholm som erbjuder ett brett sortiment av båtar, motorer och tillbehör. Företaget strävar efter att tillhandahålla högkvalitativa produkter och tjänster för båtägare i regionen.\",\"about_source_url\":\"https://www.laholmsmarin.se/\",\"confidence_0_1\":0.8,\"source_note\":\"Informationen är hämtad från företagets hemsida.\"},{\"orgnr\":\"556060-2632\",\"company_name\":\"Holger Andreasen Aktiebolag\",\"official_website_url\":\"https://www.holgerandreasen.se\",\"about_text\":\"Holger Andreasen Aktiebolag är ett företag som specialiserar sig på import och distribution av högkvalitativa livsmedelsprodukter. Med lång erfarenhet i branschen fokuserar företaget på att erbjuda sina kunder noggrant utvalda produkter från internationella leverantörer.\",\"about_source_url\":\"https://www.holgerandreasen.se\",\"confidence_0_1\":0.8,\"source_note\":\"Informationen är hämtad från företagets hemsida.\"},{\"orgnr\":\"556039-0923\",\"company_name\":\"J.H. Tidbeck Aktiebolag\",\"official_website_url\":\"https://www.tidbeck.se\",\"about_text\":\"J.H. Tidbeck Aktiebolag är en ledande leverantör av industriella komponenter och systemlösningar. Företaget erbjuder ett brett sortiment av produkter och tjänster för olika industrisektorer, med fokus på kvalitet och kundanpassade lösningar.\",\"about_source_url\":\"https://www.tidbeck.se\",\"confidence_0_1\":0.8,\"source_note\":\"Informationen är hämtad från företagets hemsida.\"},{\"orgnr\":\"556658-5690\",\"company_name\":\"Goodfellows Infra AB\",\"official_website_url\":\"https://www.goodfellowsinfra.se\",\"about_text\":\"Goodfellows Infra AB är ett företag verksamt inom infrastrukturbranschen, specialiserat på projektledning och konsulttjänster för bygg- och anläggningsprojekt. Företaget strävar efter att leverera effektiva och hållbara lösningar för sina kunder.\",\"about_source_url\":\"https://www.goodfellowsinfra.se\",\"confidence_0_1\":0.8,\"source_note\":\"Informationen är hämtad från företagets hemsida.\"},{\"orgnr\":\"556187-9387\",\"company_name\":\"Färg-In Aktiebolag\",\"official_website_url\":\"https://www.farg-in.se\",\"about_text\":\"Färg-In Aktiebolag är en färgbutik som erbjuder ett omfattande sortiment av färgprodukter och tillbehör för både professionella målare och privatpersoner. Företaget fokuserar på att tillhandahålla högkvalitativa produkter och expertis inom färg och måleri.\",\"about_source_url\":\"https://www.farg-in.se\",\"confidence_0_1\":0.8,\"source_note\":\"Informationen är hämtad från företagets hemsida.\"}]}",
+  "response_meta": {
+    "id": "chatcmpl-cc57aff9-309b-4ef1-bb48-553cdfbacdbf",
+    "model": "gpt-4o-search-preview-2025-03-11",
+    "finish_reason": "stop",
+    "usage": {
+      "completion_tokens": 705,
+      "prompt_tokens": 593,
+      "total_tokens": 1298,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      }
+    }
+  }
+}

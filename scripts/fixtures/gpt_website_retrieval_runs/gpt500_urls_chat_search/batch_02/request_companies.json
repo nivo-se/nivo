@@ -1,0 +1,182 @@
+{
+  "companies": [
+    {
+      "name": "Aktiebolaget Rosenfors Bruk",
+      "orgnr": "556441-8092",
+      "registry_homepage_url": "https://holsbyverken.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "VEIDEC AB",
+      "orgnr": "556477-8164",
+      "address_country": "SE",
+      "primary_nace": "46761 Partihandel med industriförnödenheter",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Pappersvaror\", \"Grossister\", \"Pappersvaror - Partihandel\"]"
+    },
+    {
+      "name": "Mavera AB",
+      "orgnr": "556758-3702",
+      "address_country": "SE",
+      "primary_nace": "86212 Annan allmän öppen hälso- och sjukvård, ej primärvård",
+      "segment_labels_json": "[\"Hälsotjänster\"]"
+    },
+    {
+      "name": "Umlax Aktiebolag",
+      "orgnr": "556295-4569",
+      "address_country": "SE",
+      "primary_nace": "03220 Fiskodling i sötvatten",
+      "segment_labels_json": "[\"Fisk, skaldjur\", \"Livsmedel\", \"Kontorstjänster\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Säkerhetsteamet i Skåne AB",
+      "orgnr": "556799-1459",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Ascade AB",
+      "orgnr": "556544-8072",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Maskin System Europe AB",
+      "orgnr": "556900-2149",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Smålands Miljö Aktiebolag",
+      "orgnr": "556438-7008",
+      "address_country": "SE",
+      "primary_nace": "38110 Insamling av icke-farligt avfall",
+      "segment_labels_json": "[\"Renhållningsentreprenörer, avfallshantering\", \"Städservice\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "P Maskin Automation AB",
+      "orgnr": "556794-5778",
+      "address_country": "SE",
+      "primary_nace": "71123 Teknisk konsultverksamhet inom elteknik",
+      "segment_labels_json": "[\"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Gunnar Blomgren Aktiebolag",
+      "orgnr": "556449-4374",
+      "address_country": "SE",
+      "primary_nace": "43310 Puts-, fasad- och stuckatörsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Swebolt Järfälla Aktiebolag",
+      "orgnr": "556464-4861",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "APC Elinstallatören Aktiebolag",
+      "orgnr": "556473-0801",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Flux AB",
+      "orgnr": "556444-9824",
+      "address_country": "SE",
+      "primary_nace": "27400 Tillverkning av belysningsarmatur",
+      "segment_labels_json": "[\"Belysningsarmatur - Komponenter\", \"Elektronik - Systemkomponenter\", \"Elektronik - Tillverkning\", \"Grossister\", \"Producenter\"]"
+    },
+    {
+      "name": "Nordic Cleanware AB",
+      "orgnr": "556282-0307",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "dizparc Jönköping Infrastruktur AB",
+      "orgnr": "559052-1398",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Biora AB",
+      "orgnr": "556289-8998",
+      "registry_homepage_url": "https://www.bioragroup.com",
+      "address_country": "SE",
+      "primary_nace": "21200 Tillverkning av läkemedel",
+      "segment_labels_json": "[\"Läkemedel\", \"Producenter\"]"
+    },
+    {
+      "name": "MAPTUN Performance AB",
+      "orgnr": "556600-4106",
+      "address_country": "SE",
+      "primary_nace": "45201 Allmän service och reparation av motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\", \"Bilreservdelar\", \"Detaljhandel\"]"
+    },
+    {
+      "name": "ppm Industrial AB",
+      "orgnr": "556715-4207",
+      "address_country": "SE",
+      "primary_nace": "71122 Teknisk konsultverksamhet inom industriteknik",
+      "segment_labels_json": "[\"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "P&V Ventilation i Nyköping AB",
+      "orgnr": "556418-0403",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Norva24 Miljöhantering AB",
+      "orgnr": "556292-9322",
+      "address_country": "SE",
+      "primary_nace": "38110 Insamling av icke-farligt avfall",
+      "segment_labels_json": "[\"Renhållningsentreprenörer, avfallshantering\", \"Städservice\", \"VVS-arbeten, material och produkter\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Comex Electronics Aktiebolag",
+      "orgnr": "556314-8153",
+      "address_country": "SE",
+      "primary_nace": "26200 Tillverkning av datorer och kringutrustning",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Elektronik- och telekommunikationsutrustning\", \"Elektronik- och telekommunikationsutrustning - grossist\", \"Grossister\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "System Hall AB",
+      "orgnr": "556284-4687",
+      "registry_homepage_url": "https://www.systemhall.com",
+      "address_country": "SE",
+      "primary_nace": "28490 Tillverkning av övriga verktygsmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Laholms Marin AB",
+      "orgnr": "556991-2677",
+      "address_country": "SE",
+      "primary_nace": "33120 Reparation av maskiner",
+      "segment_labels_json": "[\"Bilar\", \"Konsulter\", \"Maskinförnödenheter\", \"Metaller, legeringar\", \"Teknikkonsulter\", \"Karosserifabriker och verkstäder\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Embriq AB",
+      "orgnr": "556583-1822",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datacenters\", \"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\", \"Teknikkonsulter\", \"Kontorstjänster\"]"
+    },
+    {
+      "name": "Digitalist Open Tech AB",
+      "orgnr": "556654-0422",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\", \"Marknadsföringskonsulter\"]"
+    }
+  ]
+}

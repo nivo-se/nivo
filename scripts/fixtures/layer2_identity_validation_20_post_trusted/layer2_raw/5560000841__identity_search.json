@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560000841",
+  "company_name": "Atlas Copco AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"Atlas Copco\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Atlas Copco official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.linkedin.com/company/atlas-copco",
+        "title": "Atlas Copco | LinkedIn",
+        "content": "Overview:\nAtlas Copco delivers innovative products and solutions that help businesses grow and drive progress. Our portfolio spans compressed air and gas systems and treatment, vacuum solutions, industrial power tools, assembly systems, and power and flow solutions. We bring a commitment to long-term success built on expertise, reliable service, and uptime. When you level to the Atlas Copco experience you enter a partnership based on quality, sustainability, and ease of collaboration. The technology we bring, and the decades of experience support the future-proofing of your business.\n\nWebsite: https://www.atlascopco.com/en-uk/sys/in-your-country\nCrunchbase Url: N/A\nLinkedin Url: https://www.linkedin.com/company/atlas-copco\n\nIndustry:\nMachinery Manufacturing\n\nCompany size:\n10,001+ employees\n35319 associated members (LinkedIn members who’ve listed Atlas Copco as their current workplace on their profile)\n\nFounded:\n1873\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.78631157,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopco.com/",
+        "title": "Atlas Copco | Level up your experience",
+        "content": "Your browser is not supported. You are using a browser we do not support any longer. To continue visiting our website, please choose one of the following supported browsers. We are a world-leading provider of sustainable productivity solutions. Customers benefit from our innovative compressors, vacuum solutions and air treatment systems, construction equipment, power tools and assembly systems.",
+        "score": 0.7144891,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en/about-us",
+        "title": "About us - Atlas Copco Group",
+        "content": "At Atlas Copco Group, we empower our customers to grow and drive society forward. Together, we develop technology that transforms the future.​",
+        "score": 0.6889923,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en",
+        "title": "Atlas Copco Group Homepage",
+        "content": "### Atlas Copco Group publishes Annual Report for 2025. ### Business Area President Industrial Technique Henrik Elmin to leave Atlas Copco Group. Nacka, Sweden, March 4, 2026: Henrik Elmin, Senior Executive Vice President and Business Area President for Industrial Technique, has decided to leave the Group. ### Portable compressor distributor in Louisiana has become part of Atlas Copco Group. (“Cypress”) a portable compressor distributor has become part of Atlas Copco Group. Nacka, February 20, 2026: Atlas Copco AB’s Nomination Committee today announced its proposal for the Board of Directors ahead of the Annual General Meeting 2026. ### Atlas Copco Group Annual Report 2025. ### Atlas Copco Group is set up to harvest more than 150 years of collected knowledge and to quickly adapt to new business conditions. Vagner Rego, President and CEO of Atlas Copco group as of 2024. ##### Atlas Copco Group. Atlas Copco Group develops innovative solutions across business areas including air compression, vacuum, industrial, and power techniques. © Copyright 2026 - Atlas Copco Group.",
+        "score": 0.6426349,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en-us",
+        "title": "Atlas Copco Group USA",
+        "content": "# Atlas Copco Group in the United States. ### Locations in the United States. ## Atlas Copco Group in the United States. Atlas Copco Comptec production facility in New York State. Meet our four business area presidents and discover technologies that transform the future. Atlas Copco Group's four business area presidents in a photo collage. ## Jobs at Atlas Copco Group USA. Our culture is built on trust, opportunity, and a drive for a better way – start your journey with Atlas Copco Group today. ## More from Atlas Copco Group United States. Use the below links to discover more about our locations and our technology that transforms the future. Discover technology that transforms the future:. ##### Atlas Copco Group. Atlas Copco Group develops innovative solutions across business areas including air compression, vacuum, industrial, and power techniques. With a global portfolio of 80+ brands, we enable technology that transforms the future. © Copyright 2026 - Atlas Copco Group.",
+        "score": 0.6383174,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.94,
+    "request_id": "9ac34c1a-0677-4e7b-b466-51152facd4b8"
+  }
+}

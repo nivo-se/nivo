@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-30a3f25b-3123-421c-ae13-b65e5aebcfd3",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556402-1003\",\"company_name\":\"Wanås Gods Aktiebolag\",\"official_website_url\":\"https://wanas.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found 'wanas.se' linked to Wanås Gods AB in company profiles.\"},{\"orgnr\":\"556285-0700\",\"company_name\":\"Jarl Sandin & Söner Guld och Silver Aktiebolag\",\"official_website_url\":\"https://jarlsandin.se\",\"confidence_0_1\":0.9,\"source_note\":\"Multiple sources list 'jarlsandin.se' as the company's website.\"},{\"orgnr\":\"556573-8027\",\"company_name\":\"Vygon (Sweden) AB\",\"official_website_url\":\"https://www.vygon.se\",\"confidence_0_1\":0.9,\"source_note\":\"'vygon.se' is the Swedish site for Vygon, matching the company name.\"},{\"orgnr\":\"556313-2058\",\"company_name\":\"Ljung & Sjöberg Aktiebolag\",\"official_website_url\":\"https://www.ljungsjoberg.se\",\"confidence_0_1\":0.9,\"source_note\":\"'ljungsjoberg.se' corresponds to the company name.\"},{\"orgnr\":\"556215-1638\",\"company_name\":\"Fricweld Aktiebolag\",\"official_website_url\":\"https://www.fricweld.se\",\"confidence_0_1\":0.9,\"source_note\":\"'fricweld.se' matches the company name.\"},{\"orgnr\":\"556551-0301\",\"company_name\":\"KEBCO-Kebab Company AB\",\"official_website_url\":\"https://www.kebco.se\",\"confidence_0_1\":0.9,\"source_note\":\"'kebco.se' aligns with the company name.\"},{\"orgnr\":\"556664-8126\",\"company_name\":\"THED Livs AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches.\"},{\"orgnr\":\"559032-1013\",\"company_name\":\"Törnblads livs i Tvååker AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches.\"}]}",
+  "usage": {
+    "completion_tokens": 473,
+    "prompt_tokens": 1832,
+    "total_tokens": 2305,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

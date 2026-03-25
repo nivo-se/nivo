@@ -66,6 +66,17 @@ def _fix_limit_for_postgres(sql: str) -> str:
     return re.sub(r"\bLIMIT\s+-1\b", "LIMIT ALL", sql, flags=re.IGNORECASE)
 
 
+def _jsonb_value(value: Any) -> Any:
+    """Adapt Python containers to Postgres json/jsonb parameters."""
+    if value is None:
+        return None
+    if isinstance(value, extras.Json):
+        return value
+    if isinstance(value, (dict, list, tuple)):
+        return extras.Json(value)
+    return value
+
+
 class PostgresDBService(DatabaseService):
     """Postgres implementation for local Docker Postgres."""
 
@@ -251,17 +262,17 @@ class PostgresDBService(DatabaseService):
             profile.get("ai_notes"),
             profile.get("industry_sector"),
             profile.get("industry_subsector"),
-            profile.get("market_regions"),
+            _jsonb_value(profile.get("market_regions")),
             profile.get("business_model_summary"),
             profile.get("business_summary"),
-            profile.get("risk_flags"),
-            profile.get("industry_keywords"),
+            _jsonb_value(profile.get("risk_flags")),
+            _jsonb_value(profile.get("industry_keywords")),
             profile.get("upside_potential"),
             profile.get("strategic_playbook"),
-            profile.get("next_steps"),
+            _jsonb_value(profile.get("next_steps")),
             profile.get("acquisition_angle"),
             profile.get("agent_type"),
-            profile.get("scraped_pages"),
+            _jsonb_value(profile.get("scraped_pages")),
             profile.get("fit_rationale"),
             profile.get("enrichment_status", "complete"),
             profile.get("last_updated"),

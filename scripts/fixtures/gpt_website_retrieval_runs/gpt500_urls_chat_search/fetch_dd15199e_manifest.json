@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "script": "fetch_website_about_for_run.py",
+  "script_version": "1.0.0",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "completed_at": "2026-03-25T09:55:19Z",
+  "row_count": 437,
+  "status_breakdown": {
+    "home_only": 87,
+    "ok": 275,
+    "http_error": 66,
+    "timeout": 8,
+    "empty_text": 1
+  },
+  "fallback_registry": false,
+  "re_fetch_failed": false
+}

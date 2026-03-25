@@ -1,41 +1,42 @@
 :root {
-  --background: 60 14% 96%;
-  --foreground: 50 6% 26%;
+  /* Stripe-inspired: cool canvas, slate type, purple accent (#635BFF family) */
+  --background: 210 40% 98%;
+  --foreground: 215 25% 27%;
 
-  --card: 50 18% 94%;
-  --card-foreground: 50 6% 26%;
-  --popover: 50 18% 94%;
-  --popover-foreground: 50 6% 26%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 27%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 25% 27%;
 
-  --muted: 60 10% 91%;
-  --muted-foreground: 45 5% 45%;
+  --muted: 210 35% 96%;
+  --muted-foreground: 215 16% 47%;
 
-  --border: 45 6% 79%;
-  --input: 45 6% 79%;
-  --ring: 45 5% 45%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 252 92% 66%;
 
-  --primary: 224 62% 78%;
+  --primary: 252 92% 66%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 60 10% 91%;
-  --secondary-foreground: 50 6% 26%;
-  --accent: 224 42% 88%;
-  --accent-foreground: 50 6% 26%;
+  --secondary: 210 35% 96%;
+  --secondary-foreground: 215 25% 27%;
+  --accent: 250 100% 97%;
+  --accent-foreground: 252 45% 38%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 224 62% 78%;
-  --chart-2: 195 36% 68%;
-  --chart-3: 224 42% 88%;
+  --chart-1: 252 92% 66%;
+  --chart-2: 168 76% 38%;
+  --chart-3: 215 90% 58%;
 
-  --sidebar-bg: #F2F1ED;
-  --sidebar-border: #CBCAC6;
-  --sidebar-fg: #6E6D67;
-  --sidebar-muted: #95938E;
-  --sidebar-hover-bg: #EAEAE6;
-  --sidebar-active-bg: #D4DAEB;
-  --sidebar-active-fg: #6E6D67;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e6ebf1;
+  --sidebar-fg: #3c4257;
+  --sidebar-muted: #697386;
+  --sidebar-hover-bg: #f6f9fc;
+  --sidebar-active-bg: #f3f0ff;
+  --sidebar-active-fg: #635bff;
 
   --radius: 0.5rem;
 
@@ -70,8 +71,8 @@
   --inv2-radial-highlight: radial-gradient(ellipse 80% 50% at 50% 0%, hsl(85 14% 92% / 0.6), transparent 70%);
 
   /* Hero / Glow (overridden per section on color hero demos) */
-  --brand: 85 18% 32%;
-  --brand-foreground: 0 0% 98%;
+  --brand: 252 92% 66%;
+  --brand-foreground: 0 0% 100%;
 
   /* Design profile (Nivo palette) — matches designProfileTokens / nivoPalette */
   --profile-accent: 152 44% 21%;        /* forest #1E4D3C */
@@ -87,45 +88,45 @@
 }
 
 .dark {
-  --background: 30 20% 6%;
-  --foreground: 0 0% 86%;
+  --background: 222 47% 9%;
+  --foreground: 210 40% 96%;
 
-  --card: 40 6% 13%;
-  --card-foreground: 0 0% 86%;
-  --popover: 40 6% 13%;
-  --popover-foreground: 0 0% 86%;
+  --card: 222 40% 12%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 40% 12%;
+  --popover-foreground: 210 40% 96%;
 
-  --muted: 40 5% 17%;
-  --muted-foreground: 40 4% 70%;
+  --muted: 222 32% 16%;
+  --muted-foreground: 215 20% 62%;
 
-  --border: 40 6% 9%;
-  --input: 40 6% 9%;
-  --ring: 40 4% 70%;
+  --border: 222 28% 20%;
+  --input: 222 28% 20%;
+  --ring: 252 88% 68%;
 
-  --primary: 224 76% 55%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 252 88% 68%;
+  --primary-foreground: 222 47% 9%;
 
-  --secondary: 40 5% 17%;
-  --secondary-foreground: 0 0% 86%;
+  --secondary: 222 32% 16%;
+  --secondary-foreground: 210 40% 96%;
 
-  --accent: 40 5% 17%;
-  --accent-foreground: 0 0% 86%;
+  --accent: 252 32% 22%;
+  --accent-foreground: 250 100% 96%;
 
   --destructive: 0 62% 45%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 224 76% 55%;
-  --chart-2: 195 30% 68%;
-  --chart-3: 215 8% 46%;
+  --chart-1: 252 88% 68%;
+  --chart-2: 168 55% 48%;
+  --chart-3: 215 80% 65%;
 
-  --sidebar-bg: #1C1A16;
-  --sidebar-border: #1B1A16;
-  --sidebar-fg: #DCDCDB;
-  --sidebar-muted: #B6B5B2;
-  --sidebar-hover-bg: #242320;
-  --sidebar-active-bg: #1A1812;
-  --sidebar-active-fg: #DCDCDB;
+  --sidebar-bg: #121826;
+  --sidebar-border: #2a3142;
+  --sidebar-fg: #e6eaf2;
+  --sidebar-muted: #9aa3b5;
+  --sidebar-hover-bg: #1c2333;
+  --sidebar-active-bg: #2a2248;
+  --sidebar-active-fg: #c4b5fd;
 
-  --brand: 85 18% 48%;
-  --brand-foreground: 0 0% 98%;
+  --brand: 252 88% 68%;
+  --brand-foreground: 222 47% 9%;
 }

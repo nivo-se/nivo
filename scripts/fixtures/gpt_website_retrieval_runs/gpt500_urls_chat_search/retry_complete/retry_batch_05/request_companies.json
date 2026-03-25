@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Bällsta Handel AB",
+      "orgnr": "556615-8126",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Bright Networks AB",
+      "orgnr": "559214-5717",
+      "address_country": "SE",
+      "primary_nace": "42220 Anläggningsarbeten för el och telekommunikation",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "ProChroma AB",
+      "orgnr": "556991-1497",
+      "address_country": "SE",
+      "primary_nace": "46731 Partihandel med virke och andra byggmaterial",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreservdelar\", \"Färger, lacker, tapeter\", \"Kemikalier, industrikemikalier\", \"Trävaror\", \"Färger, lacker, tapeter - tillverkning\", \"Grossister\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Tovar Livs Aktiebolag",
+      "orgnr": "556379-1101",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Per Sjögren Livs AB",
+      "orgnr": "556531-8150",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "M o P Vestman Livs AB",
+      "orgnr": "556575-1715",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Eriksons Chark i Nossebro Aktiebolag",
+      "orgnr": "556400-7275",
+      "address_country": "SE",
+      "primary_nace": "10130 Charkuteri- och annan köttvarutillverkning",
+      "segment_labels_json": "[\"Förpackningar - Industrin\", \"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Förpackningar\", \"Grossister\", \"Kött-, slakteriprodukter - grossist\", \"Livsmedel - tillverkning\", \"Producenter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Fredrik Mogensen Aktiebolag",
+      "orgnr": "556082-8773",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    }
+  ]
+}

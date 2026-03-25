@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-dd63c851-4718-4b2e-818c-7ad0467a209a",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556835-6074\",\"company_name\":\"Hexis AB\",\"official_website_url\":\"https://www.hexis.se/\",\"confidence_0_1\":0.9,\"source_note\":\"Identified through web search; matches company name and industry.\"},{\"orgnr\":\"556148-6845\",\"company_name\":\"Ottosson Truck Aktiebolag\",\"official_website_url\":\"https://www.ottossontruck.se/\",\"confidence_0_1\":0.95,\"source_note\":\"Found on allabolag.se; matches company name and industry.\"},{\"orgnr\":\"556985-3970\",\"company_name\":\"Alphadev AB\",\"official_website_url\":\"https://www.alphadev.se/\",\"confidence_0_1\":0.9,\"source_note\":\"Identified through web search; matches company name and industry.\"},{\"orgnr\":\"556566-1724\",\"company_name\":\"Stockholms Styr-Team AB\",\"official_website_url\":\"https://www.styrteam.se/\",\"confidence_0_1\":0.9,\"source_note\":\"Identified through web search; matches company name and industry.\"},{\"orgnr\":\"559127-3171\",\"company_name\":\"Bohusbolagen AB\",\"official_website_url\":\"https://www.bohusbolagen.se/\",\"confidence_0_1\":0.9,\"source_note\":\"Identified through web search; matches company name and industry.\"}]}",
+  "usage": {
+    "completion_tokens": 302,
+    "prompt_tokens": 1502,
+    "total_tokens": 1804,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

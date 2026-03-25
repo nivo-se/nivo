@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5561210560",
+  "company_name": "Loomis Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Loomis Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Loomis Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://se.loomis.com/en-se/",
+        "title": "Loomis Sweden - Payment Solutions and Secure Transport",
+        "content": "We understand that it is important for you to have a partner you can trust when it comes to handling cash in your business. Loomis enables you to manage cash efficiently so you can offer your customers the option of choosing how they want to pay. ## LOOMIS DIFFERENCE. ## Why Loomis. Loomis offers many services for managing cash. You and your business are always Loomis' top priority. Supported by the latest technology, Loomis delivers efficient solutions to save your time. Loomis helps you with safe handling of cash. Loomis helps you with that so you can focus on developing your business for a successful future! Safe, efficient and traceable transport is a key component for our customers and it is in Loomis' DNA. With Loomis as a partner, we can guarantee just that to our customers.\". Let us help you reduce costs and improve security when handling payments, cash and valuables. Find out how Loomis can help you cut costs while improving security and accuracy.",
+        "score": 0.98547,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.loomis.com/en/",
+        "title": "Loomis Corporate: Home",
+        "content": "Loomis' services are critical for society. By welcoming all types of payments and facilitating access to financial services, Loomis helps build an inclusive and resilient society. The markets are different in terms of payment solutions, degree of digitalization and security aspects. ### Loomis Pay. An end-to-end payment solution that manages all types of payments in one system; cash, card and digital. Loomis ensures efficiency and safety in payment flows around the world. Loomis' investor relations aims to continuously keep capital markets informed about the company's operations and development. At Loomis, we believe that having the right people in the right roles is crucial for realising our vision of creating an inclusive society with equal access to payment for all. Loomis held a Capital Markets Day on Wednesday November 13, 2024. At the Capital Markets Day Loomis CEO and management presented strategic initiatives and priorities for the next strategic period, including updated targets.",
+        "score": 0.98182,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/en-se/about-us/our-history",
+        "title": "Our History | Loomis",
+        "content": "Securitas Cash Handling Services became Loomis in 2008. However, this seemingly new identity actually belongs to a company with a 170-year-old history; the history of many prominent individuals and visionary companies specializing in cash handling and security. The new company took the name of Loomis, Fargo & Co. In 2001, Securitas acquired Loomis, Fargo & Co., and incorporated it into the division Securitas Cash Handling Services. Securitas Cash Handling Services assumed the name Loomis. In 2012, Loomis expanded into South America through the acquisition of the Argentinian company Vigencia. In 2014, Loomis acquired VIA MAT Holding AG, which enabled them to expand their services by adding international valuables logistics to the existing Cash in Transit and Cash Management Services lines of business. As a result of the acquisition, Loomis also became the market leader in cash handling in Switzerland. Currently, Loomis offers secure and comprehensive solutions for the distribution, handling, storage, and recycling of cash and other valuables for banks, retailers, and more.",
+        "score": 0.97716,
+        "raw_content": null
+      },
+      {
+        "url": "https://se.loomis.com/en-se/about-us",
+        "title": "About us | Loomis",
+        "content": "## Contact us. ## How can we help? ### New Business Enquiries. Let us help you reduce costs and improve security when handling payments, cash and valuables. ### Support. Contact our customer service by calling 010-163 63 00 or by filling in the form via the link below. Our opening hours are 08:00-17:00 Monday - Friday. Enter your phone number and one of our agents will call you when available. ## Legal. LOOMIS SVERIGE AB | STAFFANS VÄG 1, 192 78 SOLLENTUNA | ORG: 556191-0679. ### We are here to help. Find out how Loomis can help you cut costs while improving security and accuracy.",
+        "score": 0.97462,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Loomis_(company)",
+        "title": "Loomis (company) - Wikipedia",
+        "content": "Loomis AB is a Swedish cash handling company. The modern company was formed in 1997 by the consolidation of two armoured security concerns, Wells Fargo",
+        "score": 0.9708,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.39,
+    "request_id": "d9920406-1194-4e02-baa0-c0d24fb029f2"
+  }
+}

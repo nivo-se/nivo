@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "script": "gpt_search_about_for_run.py",
+  "created_at_utc": "2026-03-25T10:03:47Z",
+  "git_commit": "17978627ab96f100a27f30010d97155c9d66f0ac",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "model": "gpt-4o-search-preview",
+  "filter": "weak",
+  "limit": 20,
+  "offset": 0,
+  "row_ids": [
+    3,
+    4,
+    8,
+    10,
+    12,
+    13,
+    14,
+    44,
+    48,
+    49,
+    51,
+    54,
+    55,
+    56,
+    58,
+    59,
+    60,
+    66,
+    68,
+    69
+  ],
+  "input_companies": [
+    {
+      "orgnr": "556586-2058",
+      "company_name": "Älmhults Gjuteri AB",
+      "official_website_url": "https://almhultsgjuteri.se"
+    },
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://xperta.com"
+    },
+    {
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "https://www.lecora.se"
+    },
+    {
+      "orgnr": "556332-7351",
+      "company_name": "Smålands Stålgjuteri i Eksjö Aktiebolag",
+      "official_website_url": "https://opima.se"
+    },
+    {
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "https://www.creon.se"
+    },
+    {
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "https://www.karlskogaautomation.se"
+    },
+    {
+      "orgnr": "556184-6238",
+      "company_name": "Aktiebolaget Kulleborn & Stenström",
+      "official_website_url": "https://kulleborn.se"
+    },
+    {
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "https://systemstod.se"
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com"
+    },
+    {
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "https://www.lideco.se"
+    },
+    {
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem"
+    },
+    {
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/"
+    },
+    {
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/"
+    },
+    {
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/"
+    },
+    {
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/"
+    },
+    {
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/"
+    },
+    {
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/"
+    },
+    {
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/"
+    },
+    {
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/"
+    },
+    {
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/"
+    }
+  ],
+  "parse_error": "Invalid \\uXXXX escape: line 1 column 4039 (char 4038)",
+  "raw_model_text": "{\"items\": [{\"orgnr\": \"556586-2058\", \"company_name\": \"\\u0004c\\u00004c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u0000c\\u00",
+  "response_meta": {
+    "id": "chatcmpl-9b885a15-25b6-4a32-bdd3-49e3e8c9e590",
+    "model": "gpt-4o-search-preview-2025-03-11",
+    "finish_reason": "stop",
+    "usage": {
+      "completion_tokens": 2298,
+      "prompt_tokens": 1079,
+      "total_tokens": 3377,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      }
+    }
+  }
+}

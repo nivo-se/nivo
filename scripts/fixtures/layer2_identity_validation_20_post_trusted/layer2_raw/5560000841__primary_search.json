@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560000841",
+  "company_name": "Atlas Copco AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Atlas Copco\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Atlas Copco what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.emeoutlookmag.com/company-profiles/23-atlas-copco-sweden",
+        "title": "Atlas Copco Sweden : Sustainable Productivity on a Global ...",
+        "content": "**Innovation is the guiding principle at Atlas Copco, which drives engineers and designers to develop new technology and revolutionise productivity in drilling, manufacturing and other industrial processes.**. Atlas Copco Sweden has been a world leading provider of sustainable industrial productivity solutions for over 140 years. Atlas Copco’s history of product development in its four main technological areas dates back to the turn of the last century, when the company’s first compressors, pneumatic tools, rock drills and breakers were launched. To this end, Atlas Copco, as a world leader in the mining and construction industry, is deeply committed to improved safety and environmentally responsible initiatives as the website emphasises: “Safety and the environment are the two most important considerations in every decision we make, today and in the future. Atlas Copco’s energy-efficient products are continuously developed and improved to reduce emissions. “There is always a better way” – For more than a century this guiding principle has driven Atlas Copco’s engineers and designers to develop new technology and revolutionise productivity in drilling, manufacturing and other industrial processes.",
+        "score": 0.8170061,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.airbestpractices.com/industry-news/atlas-copco-group-acquires-swedish-automation-company",
+        "title": "Atlas Copco Group Acquires Swedish Automation Company",
+        "content": "# Atlas Copco Group Acquires Swedish Automation Company. Swed-Weld AB, a Swedish provider of smart automated screw and nut feeding systems with focus on the automotive industry, has become part of Atlas Copco Group. The company is headquartered in Värnamo, Sweden and has 10 employees. Swed-Welds products are designed with a special focus on high productivity in the automated assembly process and are specifically used by the automotive industry. “This acquisition will complement our current product portfolio with an addition of nut and screw feeding solutions, which will strengthen Industrial Technique’s offering in the area of automation,” said Henrik Elmin, Business Area President for Industrial Technique. Swed-Weld has become a part of the Motor Vehicle Industry Tools and Assembly Systems division. Atlas Copco Group innovates to develop products, services and solutions that are key to our customers’ success. Its four business areas offer compressed air and vacuum solutions, energy solutions, dewatering and industrial pumps, industrial power tools and assembly and machine vision solutions.",
+        "score": 0.8127637,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.atlascopcogroup.com/en/about-us/sweden",
+        "title": "Atlas Copco Group in Sweden",
+        "content": "# Atlas Copco Group in Sweden. Atlas Copco Group Sickla Office. Students at Atlas Copco Group. At Atlas Copco Group, our Swedish colleagues represent the spirit of innovation, collaboration, and personal growth that defines our culture. ## Welcome to Atlas Copco Group in Sweden. Atlas Copco Group was founded in 1873 and is headquartered in Nacka, just outside Stockholm. Atlas Copco Group employees worldwide. Atlas Copco Group Sickla Office Entrance. Since its founding in 1873, Atlas Copco Group has had its roots in Sweden, with headquarters located in Nacka, Stockholm since 1898. With around 1,700 employees across six locations from Gothenburg to Kiruna, working in production facilities, R&D centers, and sales offices, Atlas Copco is a driving force for sustainable productivity. ### History of Atlas Copco Group in Sweden. ## Work with us at Atlas Copco Group in Sweden. ##### Atlas Copco Group. Atlas Copco Group develops innovative solutions across business areas including air compression, vacuum, industrial, and power techniques.",
+        "score": 0.76992935,
+        "raw_content": null
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Atlas_Copco",
+        "title": "Atlas Copco",
+        "content": "In 2017, Atlas Copco announced that it planned to move its production of rock excavation, drilling and demolition equipment for the mining and infrastructure sectors into a separate listed company, the shares of which would be distributed to Atlas Copco shareholders. In November the same year, the identity of the business group was separated from the appearance of products sold under the Atlas Copco brand, by introducing a new and visually distinct logotype that includes the word *Group*. Since the split-off in 2018 of parts of the business into an independent company, Atlas Copco has been organized around four main business areas: Compressor technique, Vacuum technique, Industrial technique and Power technique. The Atlas Copco Group has around 90 brands, including Atlas Copco and Chicago Pneumatic for compressors and tools, Edwards and Leybold for vacuum systems, BeaconMedaes for medical gas and Desoutter for assembly equipment.",
+        "score": 0.5372119,
+        "raw_content": null
+      },
+      {
+        "url": "https://matrixbcg.com/blogs/brief-history/atlascopco",
+        "title": "What is Brief History of Atlas Copco Company?",
+        "content": "The company's core business evolved significantly from railway products to compressors, tools, and rock drills in the early 20th century, a strategic shift that proved foundational for its enduring success. A pivotal moment in the Atlas Copco company history involved the introduction of pneumatic tools. The early years of Atlas Copco were characterized by a strategic pivot from its railway origins towards a strong focus on compressed air technology. The 1956 acquisition of Arpic Engineering in Belgium was a pivotal moment, leading to the company's renaming to Atlas Copco and shifting a significant portion of compressor production to Belgium. The Atlas Copco company history is a narrative of consistent innovation and strategic adaptation, marked by significant milestones and the ability to navigate considerable challenges. The Atlas Copco company history is a testament to enduring innovation and strategic adaptation, beginning in 1873 as AB Atlas in Stockholm. | 1956 | Changed its name to Atlas Copco AB after acquiring Belgian compressor company Arpic Engineering.",
+        "score": 0.477238,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.1,
+    "request_id": "bac29473-e65f-4b00-a053-da2f21cddb10"
+  }
+}

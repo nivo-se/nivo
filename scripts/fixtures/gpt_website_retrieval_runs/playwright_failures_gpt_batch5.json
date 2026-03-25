@@ -1,0 +1,31 @@
+{
+  "note": "Five URLs that failed in playwright_about_sample_2026-03-25T11-03-32Z (DNS/cert/connection)",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "input_companies": [
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/"
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se"
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se"
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se"
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se"
+    }
+  ]
+}

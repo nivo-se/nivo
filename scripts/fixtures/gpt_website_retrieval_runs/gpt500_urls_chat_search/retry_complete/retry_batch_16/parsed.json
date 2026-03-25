@@ -1,0 +1,54 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556740-6821",
+      "company_name": "Svalebergs Elektriska AB",
+      "official_website_url": "https://www.svalebergs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found website www.svalebergs.se listed on multiple directories; matches company name and services."
+    },
+    {
+      "orgnr": "556886-4465",
+      "company_name": "Lotts Import AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    },
+    {
+      "orgnr": "559002-6554",
+      "company_name": "AMV Equipment AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    },
+    {
+      "orgnr": "559135-3171",
+      "company_name": "Keyvent Öst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    },
+    {
+      "orgnr": "556108-7338",
+      "company_name": "Filipstad Stormarknad AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    },
+    {
+      "orgnr": "556155-7264",
+      "company_name": "Vilbergens Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    },
+    {
+      "orgnr": "556731-7234",
+      "company_name": "Sprinklerbolaget Stockholm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on directories only."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "run_kind": "layer2_from_gpt_about_json",
+  "created_at_utc": "2026-03-25T12:36:49Z",
+  "git_commit": "f9a0bd56210727c59b30df8e37d25195d9f8117c",
+  "script": "screening_layer2_from_gpt_about_json.py",
+  "script_version": "1.0.0",
+  "input": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/about_search_merged_gpt_url_dd15199e_complete_clean.json",
+  "out_dir": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/layer2_from_gpt_about_dd15199e",
+  "model": "gpt-4o-mini",
+  "temperature": 0.2,
+  "batch_size": 8,
+  "items_count": 224,
+  "fetch_stage1_from_db": true,
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "blend": {
+    "w_stage1": 0.4,
+    "w_layer2": 0.6
+  },
+  "max_completion_tokens": 16384,
+  "artifacts": {
+    "jsonl": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/layer2_from_gpt_about_dd15199e/layer2_from_gpt_about_20260325T123649Z.jsonl",
+    "csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/layer2_from_gpt_about_dd15199e/layer2_from_gpt_about_20260325T123649Z.csv"
+  }
+}

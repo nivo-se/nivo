@@ -3,11 +3,12 @@
  * Applies Latest FY selection and derives metrics from financials when possible.
  */
 import type { Company } from "@/lib/api/types";
-import type { CompanyOverviewModel } from "@/lib/api/companies/types";
+import type { CompanyFinancialsResponse, CompanyOverviewModel } from "@/lib/api/companies/types";
 
 /** Raw financial year from API - margins may be 0-100 or 0-1. */
 type RawFinancialRow = {
   year: number;
+  period?: string | null;
   revenue_sek?: number | null;
   revenue?: number | null;
   ebitda_sek?: number | null;
@@ -21,6 +22,10 @@ type RawFinancialRow = {
   ebitda_margin?: number | null;
 };
 
+const MAX_HISTORY_YEARS = 12;
+/** Overview trend chart: last N fiscal years (product asks for 3–4; we show up to 4). */
+export const OVERVIEW_TREND_YEAR_COUNT = 4;
+
 /** Normalize margin to 0–1 (API may return 0–100). */
 function toMargin01(val: number | null | undefined): number | null {
   if (val === null || val === undefined || Number.isNaN(val)) return null;
@@ -28,7 +33,78 @@ function toMargin01(val: number | null | undefined): number | null {
   return v > 1 ? v / 100 : v;
 }
 
-/** Latest FY: backend returns year DESC, prefer full-year (12 or 1-12). First row is latest. */
+/** Sort by calendar year DESC, then period DESC; one row per year. */
+function normalizeFinancialRows(rows: RawFinancialRow[]): RawFinancialRow[] {
+  const parsed = rows
+    .map((r) => ({ r, y: Number(r?.year) }))
+    .filter((x) => Number.isFinite(x.y));
+  parsed.sort((a, b) => {
+    if (b.y !== a.y) return b.y - a.y;
+    return String(b.r.period ?? "").localeCompare(String(a.r.period ?? ""));
+  });
+  const seen = new Set<number>();
+  const out: RawFinancialRow[] = [];
+  for (const { r, y } of parsed) {
+    if (seen.has(y)) continue;
+    seen.add(y);
+    out.push(r);
+  }
+  return out;
+}
+
+function yearFromPeriodKey(pk: string): number | null {
+  const m = /^(\d{4})/.exec(pk.trim());
+  if (!m) return null;
+  const y = parseInt(m[1], 10);
+  return Number.isFinite(y) ? y : null;
+}
+
+/**
+ * When the summary `financials` array is empty but `full.pnl` has line items
+ * (e.g. client shape mismatch), rebuild yearly rows from P&L keys.
+ */
+function buildRawFromFullPnL(full: NonNullable<CompanyFinancialsResponse["full"]>): RawFinancialRow[] {
+  const pnl = full.pnl ?? [];
+  const get = (key: string) => pnl.find((row) => row.key === key);
+  const net = get("nettoomsattning");
+  if (!net?.years || typeof net.years !== "object") return [];
+
+  const ebitdaRow = get("rorelseresultat");
+  const ebitRow = get("rorelseresultat_efter_avskrivningar");
+  const profitRow = get("arets_resultat");
+
+  const periodKeys = new Set<string>();
+  for (const row of [net, ebitdaRow, ebitRow, profitRow]) {
+    if (row?.years && typeof row.years === "object") {
+      for (const k of Object.keys(row.years)) periodKeys.add(k);
+    }
+  }
+
+  const byYear = new Map<number, RawFinancialRow>();
+  const sortedPk = [...periodKeys].sort((a, b) => {
+    const ya = yearFromPeriodKey(a);
+    const yb = yearFromPeriodKey(b);
+    if (ya == null || yb == null) return 0;
+    if (yb !== ya) return yb - ya;
+    return b.localeCompare(a);
+  });
+
+  for (const pk of sortedPk) {
+    const y = yearFromPeriodKey(pk);
+    if (y == null || byYear.has(y)) continue;
+    byYear.set(y, {
+      year: y,
+      revenue_sek: net.years[pk] ?? null,
+      ebitda_sek: ebitdaRow?.years?.[pk] ?? null,
+      ebit_sek: ebitRow?.years?.[pk] ?? null,
+      profit_sek: profitRow?.years?.[pk] ?? null,
+    });
+  }
+
+  return [...byYear.values()].sort((a, b) => b.year - a.year);
+}
+
+/** Latest FY: after normalize, first row is the latest fiscal year. */
 function selectLatestFY(rows: RawFinancialRow[]): RawFinancialRow | null {
   if (!rows?.length) return null;
   return rows[0];
@@ -41,16 +117,21 @@ function yoyGrowth(curr: number | null, prev: number | null): number | null {
 }
 
 /** Compute CAGR over n years. */
-function cagr( newest: number, oldest: number, years: number ): number | null {
+function cagr(newest: number, oldest: number, years: number): number | null {
   if (oldest <= 0 || newest <= 0 || years <= 0) return null;
   return Math.pow(newest / oldest, 1 / years) - 1;
 }
 
 export function buildCompanyOverviewModel(
   company: Company | null,
-  financialsData: { financials?: RawFinancialRow[] } | null
+  financialsData: CompanyFinancialsResponse | null
 ): CompanyOverviewModel {
-  const raw = financialsData?.financials ?? [];
+  let raw = normalizeFinancialRows((financialsData?.financials ?? []) as RawFinancialRow[]);
+  if (raw.length === 0 && financialsData?.full?.pnl?.length) {
+    raw = normalizeFinancialRows(buildRawFromFullPnL(financialsData.full));
+  }
+  raw = raw.slice(0, MAX_HISTORY_YEARS);
+
   const latestFY = selectLatestFY(raw);
 
   const rev = (r: RawFinancialRow) => r?.revenue_sek ?? r?.revenue ?? null;
@@ -62,10 +143,7 @@ export function buildCompanyOverviewModel(
 
   // Latest FY snapshot
   const year = latestFY?.year ?? company?.latest_year ?? new Date().getFullYear() - 1;
-  const revenue =
-    rev(latestFY!) ??
-    company?.revenue_latest ??
-    null;
+  const revenue = rev(latestFY!) ?? company?.revenue_latest ?? null;
   const ebitda =
     ebitdaVal(latestFY!) ??
     company?.ebitda_latest ??
@@ -149,8 +227,8 @@ export function buildCompanyOverviewModel(
   sourceMap.equityRatio = "company";
   sourceMap.debtToEquity = "company";
 
-  // Series (last 4–6 years, normalized)
-  const series = raw.slice(0, 6).map((r) => ({
+  // Trend chart: up to last OVERVIEW_TREND_YEAR_COUNT fiscal years (newest first in array)
+  const series = raw.slice(0, OVERVIEW_TREND_YEAR_COUNT).map((r) => ({
     year: r.year,
     revenue: rev(r),
     ebitda: ebitdaVal(r),

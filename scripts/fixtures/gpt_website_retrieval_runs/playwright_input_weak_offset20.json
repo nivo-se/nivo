@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "source": "screening_website_research_companies",
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "filter": "weak",
+  "offset": 20,
+  "limit": 15,
+  "input_companies": [
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/"
+    },
+    {
+      "orgnr": "556650-7439",
+      "company_name": "Höglands Logistik AB",
+      "official_website_url": "https://www.hlogistik.se"
+    },
+    {
+      "orgnr": "556861-0256",
+      "company_name": "Bilx Nordic AB",
+      "official_website_url": "https://www.bilx.se"
+    },
+    {
+      "orgnr": "556493-1656",
+      "company_name": "Secor AB",
+      "official_website_url": "https://www.secor.se"
+    },
+    {
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com"
+    },
+    {
+      "orgnr": "556169-2699",
+      "company_name": "Andrénverken AB",
+      "official_website_url": "https://www.andrenverken.se"
+    },
+    {
+      "orgnr": "556662-4762",
+      "company_name": "Permat AB",
+      "official_website_url": "https://www.mantaholding.com"
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se"
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se"
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se"
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se"
+    },
+    {
+      "orgnr": "559169-6413",
+      "company_name": "OAKS AB",
+      "official_website_url": "https://www.oaksab.se"
+    },
+    {
+      "orgnr": "559170-6451",
+      "company_name": "Innergårdsgruppen garage & betong i Stockholm AB",
+      "official_website_url": "https://www.innergardgruppen.se"
+    },
+    {
+      "orgnr": "556657-5535",
+      "company_name": "Rehobot Hydraulics AB",
+      "official_website_url": "https://rehobot.eu"
+    },
+    {
+      "orgnr": "556142-7427",
+      "company_name": "Aktiebolaget Hällnäs Handelsträdgård",
+      "official_website_url": "https://www.hallnas.se"
+    }
+  ]
+}

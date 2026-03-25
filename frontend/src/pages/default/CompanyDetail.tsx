@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useCompaniesBatch, useCompany, useCompanyAIProfile, useCompanyFinancials } from "@/lib/hooks/apiQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -45,6 +45,8 @@ import {
 } from "lucide-react";
 import { upsertProspect } from "@/lib/api/prospects/service";
 import { toast } from "sonner";
+import type { CompanyProfileBackState } from "@/lib/navigation/companyProfileBack";
+import { COMPANY_PROFILE_BACK } from "@/lib/navigation/companyProfileBack";
 
 function deepResearchHandoffUrl(company: {
   orgnr: string;
@@ -126,7 +128,7 @@ function FullFinancialTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[400px] border-collapse">
-        <thead className="bg-muted/40 sticky top-0 z-10">
+        <thead className="bg-primary/[0.05] dark:bg-primary/[0.09] sticky top-0 z-10">
           <tr>
             <th className="px-4 py-3 text-left text-sm font-semibold text-foreground whitespace-nowrap sticky left-0 z-20 bg-muted/80 backdrop-blur-sm">Line item</th>
             {periods.map((p) => (
@@ -232,6 +234,26 @@ function FullFinancialTable({
 
 export default function CompanyDetail() {
   const { companyId } = useParams<{ companyId: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const backState = (location.state ?? null) as CompanyProfileBackState | null;
+  const historyIdx = (window.history.state as { idx?: number } | null)?.idx;
+  const canGoBack = typeof historyIdx === "number" && historyIdx > 0;
+  const backButtonLabel =
+    backState?.backLabel ??
+    (canGoBack ? "Back" : COMPANY_PROFILE_BACK.universe.backLabel);
+  const handleBack = useCallback(() => {
+    if (backState?.from) {
+      navigate(backState.from);
+      return;
+    }
+    if (canGoBack) {
+      navigate(-1);
+      return;
+    }
+    navigate(COMPANY_PROFILE_BACK.universe.from);
+  }, [backState?.from, canGoBack, navigate]);
+
   const orgnr = companyId ?? "";
   const queryClient = useQueryClient();
   const { data: batchCompanies } = useCompaniesBatch([orgnr], { autoEnrich: false });
@@ -306,11 +328,9 @@ export default function CompanyDetail() {
           message={error?.message ?? "Failed to load company"}
           retry={() => refetch()}
           action={
-            <Link to="/universe">
-              <Button variant="outline" size="sm">
-                Back to Universe
-              </Button>
-            </Link>
+            <Button variant="outline" size="sm" type="button" onClick={handleBack}>
+              {backButtonLabel}
+            </Button>
           }
         />
       </div>
@@ -322,23 +342,21 @@ export default function CompanyDetail() {
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-base font-bold text-foreground mb-2">Company not found</h2>
-          <Link to="/universe">
-            <Button>Back to Universe</Button>
-          </Link>
+          <Button type="button" onClick={handleBack}>
+            {backButtonLabel}
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto bg-muted/40">
+    <div className="h-full min-h-full overflow-auto app-page">
       <div className="max-w-7xl mx-auto p-8">
         <div className="mb-6">
-          <Link to="/universe">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back to Universe
-            </Button>
-          </Link>
+          <Button variant="ghost" size="sm" className="mb-4" type="button" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> {backButtonLabel}
+          </Button>
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-base font-bold text-foreground mb-2">
@@ -531,8 +549,22 @@ export default function CompanyDetail() {
                 </div>
               </CardHeader>
               <CardContent>
-                {overviewModel.series.length < 3 ? (
-                  <p className="text-sm text-muted-foreground py-8 text-center">Insufficient history (need at least 3 years of data)</p>
+                {overviewModel.series.length < 2 ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center max-w-md mx-auto leading-relaxed">
+                    {overviewModel.series.length === 0 ? (
+                      <>
+                        No year-by-year financial rows were returned for this organization. Summary metrics above can
+                        still use the latest fiscal year from company aggregates or KPIs even when the multi-year{" "}
+                        <span className="whitespace-nowrap">financials</span> table has no history yet.
+                      </>
+                    ) : (
+                      <>
+                        Only <span className="font-medium text-foreground">FY {overviewModel.series[0]?.year}</span>{" "}
+                        exists in our year-by-year financials. The trend chart needs at least two fiscal years of stored
+                        accounts data for this org.
+                      </>
+                    )}
+                  </p>
                 ) : (
                   <div className="h-[240px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -980,7 +1012,7 @@ export default function CompanyDetail() {
                         </p>
                       )}
                       <table className="w-full">
-                        <thead className="bg-muted/40 sticky top-0 z-10">
+                        <thead className="bg-primary/[0.05] dark:bg-primary/[0.09] sticky top-0 z-10">
                           <tr>
                             <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">Year</th>
                             <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">Revenue (SEK)</th>

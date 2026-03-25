@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556825-6753",
+      "company_name": "Cami St\u0000e4ngsel AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556229-4529",
+      "company_name": "Anderstorp Hydraulik Aktiebolag",
+      "official_website_url": "https://anderstorphydraulik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in company profile on Vainu; matches company name and services."
+    },
+    {
+      "orgnr": "556914-2747",
+      "company_name": "Swedelift AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556647-8292",
+      "company_name": "Gj\u00000fco AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556033-3576",
+      "company_name": "If\u00000f Electric AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556596-3542",
+      "company_name": "LIP AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556835-6074",
+      "company_name": "Hexis AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556148-6845",
+      "company_name": "Ottosson Truck Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    }
+  ]
+}

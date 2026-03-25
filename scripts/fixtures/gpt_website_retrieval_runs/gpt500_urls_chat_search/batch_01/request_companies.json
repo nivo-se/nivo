@@ -1,0 +1,187 @@
+{
+  "companies": [
+    {
+      "name": "Alphadev AB",
+      "orgnr": "556985-3970",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Vimarhem Aktiebolag",
+      "orgnr": "556478-5987",
+      "address_country": "SE",
+      "primary_nace": "68201 Uthyrning och förvaltning av egna eller arrenderade bostäder",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\"]"
+    },
+    {
+      "name": "Noxon Aktiebolag",
+      "orgnr": "556828-0670",
+      "registry_homepage_url": "https://noxon.com",
+      "address_country": "SE",
+      "primary_nace": "28290 Övrig tillverkning av maskiner för allmänt ändamål",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Stockholms Styr-Team AB",
+      "orgnr": "556566-1724",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Bohusbolagen AB",
+      "orgnr": "559127-3171",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Plåtslagerier\", \"Takbeläggningar\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Galdax AB",
+      "orgnr": "556690-1285",
+      "registry_homepage_url": "https://www.galdax.se",
+      "address_country": "SE",
+      "primary_nace": "22110 Tillverkning av däck och slangar; regummering",
+      "segment_labels_json": "[\"Gummivaror\", \"Lager\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Talurit Aktiebolag",
+      "orgnr": "556343-7200",
+      "registry_homepage_url": "https://www.talurit.com",
+      "address_country": "SE",
+      "primary_nace": "28410 Tillverkning av verktygsmaskiner för metallbearbetning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Metaller, legeringar\", \"Maskinförnödenheter - tillverkning\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Verktyg och redskap\", \"Verktyg och redskap - tillverkning\"]"
+    },
+    {
+      "name": "IPC Industriprojekt AB",
+      "orgnr": "556419-1640",
+      "address_country": "SE",
+      "primary_nace": "25290 Tillverkning av andra cisterner, tankar, kar och andra behållare av metall",
+      "segment_labels_json": "[\"Byggmästare\", \"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Metallurgisk industri\", \"Producenter\"]"
+    },
+    {
+      "name": "JO Sport i Hudiksvall Aktiebolag",
+      "orgnr": "556273-2726",
+      "address_country": "SE",
+      "primary_nace": "46491 Partihandel med sport- och fritidsartiklar",
+      "segment_labels_json": "[\"Sport\", \"Grossister\", \"Sport - grossist\"]"
+    },
+    {
+      "name": "Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/",
+      "orgnr": "556256-3279",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Pumphuset Sverige Aktiebolag",
+      "orgnr": "556549-5412",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "HaMi AB",
+      "orgnr": "556452-3453",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Plåtslagerier\", \"Takbeläggningar\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Hallberg-Sekrom Fabriksaktiebolag",
+      "orgnr": "556128-2251",
+      "registry_homepage_url": "https://www.hsfgroup.com",
+      "address_country": "SE",
+      "primary_nace": "25930 Tillverkning av metalltrådvaror, kedjor och fjädrar",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Almnäs Bruk AB",
+      "orgnr": "556307-3468",
+      "address_country": "SE",
+      "primary_nace": "01410 Mjölkproduktion och uppfödning av nötkreatur av mjölkras",
+      "segment_labels_json": "[\"Skogstjänster\", \"Jordbruk\", \"Jordbruk - mjölkproduktion\", \"Jordbruk - odling och djurhållning\", \"Boskap\", \"Mjölkproduktion\"]"
+    },
+    {
+      "name": "Drillab AB",
+      "orgnr": "556990-4583",
+      "address_country": "SE",
+      "primary_nace": "43999 Diverse övrig specialiserad bygg- och anläggningsverksamhet",
+      "segment_labels_json": "[\"Byggmästare\", \"Uthyrning\"]"
+    },
+    {
+      "name": "Nordic door Aktiebolag",
+      "orgnr": "556437-9427",
+      "registry_homepage_url": "http://www.nordicdoor.no",
+      "address_country": "SE",
+      "primary_nace": "25120 Tillverkning av dörrar och fönster av metall",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Metaller, legeringar\", \"Producenter\"]"
+    },
+    {
+      "name": "VEÅ AB",
+      "orgnr": "556135-7988",
+      "address_country": "SE",
+      "primary_nace": "25300 Tillverkning av ånggeneratorer utom varmvattenpannor för centraluppvärmning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Metaller, legeringar - Reparation\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Abacus Sportswear AB",
+      "orgnr": "556437-5714",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Aktiebolaget Systemstöd Sverige",
+      "orgnr": "556122-0798",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Affärssystem\", \"Datorer - Kringutrustningar\", \"Företagsutveckling\", \"Internet - Konsulter, operatörer\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "GLA Aircargo AB",
+      "orgnr": "556194-0437",
+      "address_country": "SE",
+      "primary_nace": "52249 Övrig godshantering",
+      "segment_labels_json": "[\"Spedition\", \"Transportförmedling\", \"Åkerier\", \"Lastning och lossning\"]"
+    },
+    {
+      "name": "Termodyn Industri AB",
+      "orgnr": "556257-9432",
+      "registry_homepage_url": "https://www.termodyn.se",
+      "address_country": "SE",
+      "primary_nace": "25610 Beläggning och överdragning av metall",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "NMV Industripartner AB",
+      "orgnr": "556843-3246",
+      "registry_homepage_url": "https://forvaltning.com",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Blekinge Pressgjuteri Aktiebolag",
+      "orgnr": "556486-1747",
+      "registry_homepage_url": "https://www.blekingeproal.com",
+      "address_country": "SE",
+      "primary_nace": "24530 Gjutning av lättmetall",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Lideco i Dalstorp Aktiebolag",
+      "orgnr": "556264-7817",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Konsulter\", \"Maskinförnödenheter\", \"Metaller, legeringar\", \"Teknikkonsulter\", \"Grossister\", \"Metallurgisk industri\", \"Producenter\", \"Verktyg och redskap\", \"Verktyg och redskap - tillverkning\"]"
+    },
+    {
+      "name": "Nola Industrier Aktiebolag",
+      "orgnr": "556207-4442",
+      "address_country": "SE",
+      "primary_nace": "46650 Partihandel med kontorsmöbler",
+      "segment_labels_json": "[\"Kontorsinredningar\", \"Möbler\", \"Grossister\"]"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "companies": [
+    {
+      "name": "Cami Stängsel AB",
+      "orgnr": "556825-6753",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Stängsel, stängselnät\", \"Trävaror\", \"Grossister\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Swedelift AB",
+      "orgnr": "556914-2747",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Gjöco AB",
+      "orgnr": "556647-8292",
+      "address_country": "SE",
+      "primary_nace": "20300 Tillverkning av färg, lack, tryckfärg m.m.",
+      "segment_labels_json": "[\"Färger, lacker, tapeter\", \"Kemikalier, industrikemikalier\", \"Trävaror\", \"Färger, lacker, tapeter - tillverkning\", \"Grossister\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Ifö Electric AB",
+      "orgnr": "556033-3576",
+      "address_country": "SE",
+      "primary_nace": "27400 Tillverkning av belysningsarmatur",
+      "segment_labels_json": "[\"Belysningsarmatur - Komponenter\", \"Elektronik - Legotillverkning\", \"Elektronik - Systemkomponenter\", \"Elmateriel\", \"Glas, glasvaror\", \"Elektrisk installationsmaterial - tillverkning\", \"Elektronik - Tillverkning\", \"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\", \"Kablar och kraftledningar\", \"Kablar och kraftledningar - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "LIP AB",
+      "orgnr": "556596-3542",
+      "address_country": "SE",
+      "primary_nace": "49410 Vägtransport, godstrafik",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreservdelar\", \"Byggmästare\", \"Transportförmedling\", \"Åkerier\", \"Entreprenörer\"]"
+    }
+  ]
+}

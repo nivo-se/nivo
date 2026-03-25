@@ -13,19 +13,36 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import httpx
 
+from backend.services.web_intel.site_about_fetch import (
+    MAX_CHARS_PER_PAGE,
+    MAX_PAGES_TOTAL,
+    REQUEST_TIMEOUT,
+    USER_AGENT,
+    fetch_html as _fetch_html,
+    internal_link_candidates as _internal_link_candidates,
+    normalize_homepage,
+    page_text_from_html as _page_text_from_html,
+    pick_best as _pick_best,
+    same_site,
+    score_about as _score_about,
+    score_product as _score_product,
+)
 from backend.services.screening_layer2.domain_identity import (
     TAVILY_QUERY_INDEX_IDENTITY,
     TAVILY_QUERY_INDEX_PRIMARY_SEMANTIC,
     TavilyHit,
     collect_supporting_domains_from_hits,
     compute_layer2_identity_low,
+    compute_trusted_identity,
+    filter_grouped_domains_entity_mismatch,
     group_hits_by_domain,
     is_supporting_domain,
     merge_tavily_result_hits,
+    official_pick_tokens,
     pick_linkedin_snippets,
     post_cluster_domain_blocked,
     rank_domains,
@@ -42,11 +59,7 @@ Layer2RetrievalMode = Literal["homepage_known", "multi_source"]
 
 logger = logging.getLogger(__name__)
 
-REQUEST_TIMEOUT = 12.0
-MAX_CHARS_PER_PAGE = 12_000
-MAX_PAGES_TOTAL = 3
 MIN_TOTAL_CHARS_SUFFICIENT = 400
-USER_AGENT = "NivoScreeningLayer2/1.1 (+https://nivogroup.se)"
 
 # Raw Tavily search JSON artifacts (relative to Layer 2 run out_dir)
 LAYER2_RAW_SUBDIR = "layer2_raw"
@@ -185,17 +198,6 @@ _BLOCKED_TAVILY_HOST_SUBSTR = (
     "x.com",
 )
 
-_ABOUT_RE = re.compile(
-    r"about|om-oss|omoss|om\s+oss|company|företag|foretag|who-we|our-story|varum|historia",
-    re.I,
-)
-_PRODUCT_RE = re.compile(
-    r"product|produkt|produkter|service|services|tjanst|tjänst|tjanster|sortiment|"
-    r"catalog|katalog|shop|butik|erbjud|offerings|solutions",
-    re.I,
-)
-
-
 @dataclass
 class RetrievalMeta:
     pages_fetched_count: int = 0
@@ -206,6 +208,7 @@ class RetrievalMeta:
     likely_first_party_domains: List[str] = field(default_factory=list)
     supporting_domains: List[str] = field(default_factory=list)
     layer2_identity_confidence_low: bool = False
+    layer2_trusted_identity: bool = False
     tavily_queries_run: int = 0
     domain_cluster_ranking: List[str] = field(default_factory=list)
     tavily_raw_artifacts: Dict[str, str] = field(default_factory=dict)
@@ -228,6 +231,7 @@ class RetrievalMeta:
             "likely_first_party_domains": list(self.likely_first_party_domains),
             "supporting_domains": list(self.supporting_domains),
             "layer2_identity_confidence_low": self.layer2_identity_confidence_low,
+            "layer2_trusted_identity": self.layer2_trusted_identity,
             "tavily_queries_run": self.tavily_queries_run,
             "domain_cluster_ranking": list(self.domain_cluster_ranking),
             "tavily_raw_artifacts": dict(self.tavily_raw_artifacts),
@@ -309,27 +313,6 @@ def log_layer2_tavily_startup() -> None:
     )
 
 
-def normalize_homepage(raw: Optional[str]) -> Optional[str]:
-    s = (raw or "").strip()
-    if not s:
-        return None
-    if not s.startswith(("http://", "https://")):
-        s = "https://" + s
-    p = urlparse(s)
-    if not p.netloc:
-        return None
-    return s
-
-
-def _norm_host(netloc: str) -> str:
-    h = netloc.lower().split("@")[-1].split(":")[0]
-    return h[4:] if h.startswith("www.") else h
-
-
-def _same_site(a: str, b: str) -> bool:
-    return _norm_host(a) == _norm_host(b)
-
-
 def _verify_top_cluster_homepage(
     client: httpx.Client,
     domain: str,
@@ -347,109 +330,6 @@ def _verify_top_cluster_homepage(
         if htm and not err:
             return fin, htm
     return None, None
-
-
-def _strip_html_to_text(html: str, max_chars: int) -> str:
-    try:
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(html, "html.parser")
-        for tag in soup(["script", "style", "nav", "footer", "header"]):
-            tag.decompose()
-        text = soup.get_text(separator="\n", strip=True)
-    except Exception:
-        text = re.sub(r"<[^>]+>", " ", html)
-    text = re.sub(r"\s+", " ", text).strip()
-    if len(text) > max_chars:
-        text = text[:max_chars] + "…"
-    return text
-
-
-def _fetch_html(
-    client: httpx.Client, url: str
-) -> Tuple[Optional[str], Optional[str], str]:
-    """Returns (html_body, error, final_url)."""
-    try:
-        r = client.get(url, follow_redirects=True)
-        final = str(r.url)
-        if r.status_code >= 400:
-            return None, f"HTTP {r.status_code}", final
-        ctype = (r.headers.get("content-type") or "").lower()
-        if "html" not in ctype and "text" not in ctype:
-            return None, "non-html", final
-        return r.text, None, final
-    except Exception as e:
-        return None, str(e)[:200], url
-
-
-def _page_text_from_html(html: str) -> str:
-    return _strip_html_to_text(html, MAX_CHARS_PER_PAGE)
-
-
-def _internal_link_candidates(
-    html: str, base_url: str, official_netloc: str
-) -> List[Tuple[str, str]]:
-    """(absolute_url, anchor_text) same-site only, http(s) only."""
-    try:
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(html, "html.parser")
-    except Exception:
-        return []
-    out: List[Tuple[str, str]] = []
-    seen: set[str] = set()
-    for a in soup.find_all("a", href=True):
-        href = (a.get("href") or "").strip()
-        if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
-            continue
-        if href.lower().endswith((".pdf", ".zip", ".jpg", ".png", ".gif")):
-            continue
-        abs_url = urljoin(base_url, href)
-        p = urlparse(abs_url)
-        if p.scheme not in ("http", "https"):
-            continue
-        if not _same_site(p.netloc, official_netloc):
-            continue
-        key = abs_url.split("#")[0].rstrip("/")
-        if key in seen:
-            continue
-        seen.add(key)
-        label = a.get_text(separator=" ", strip=True) or ""
-        out.append((abs_url, label))
-    return out
-
-
-def _score_about(href: str, label: str) -> int:
-    s = f"{href} {label}"
-    return 3 if _ABOUT_RE.search(s) else 0
-
-
-def _score_product(href: str, label: str) -> int:
-    s = f"{href} {label}"
-    return 3 if _PRODUCT_RE.search(s) else 0
-
-
-def _pick_best(
-    candidates: List[Tuple[str, str]],
-    scorer: Callable[[str, str], int],
-    exclude_urls: set[str],
-) -> Optional[str]:
-    best: Optional[str] = None
-    best_score = 0
-    for url, label in candidates:
-        u = url.split("#")[0].rstrip("/")
-        if u in exclude_urls:
-            continue
-        sc = scorer(url, label)
-        if sc > best_score:
-            best_score = sc
-            best = url
-    return best if best_score > 0 else None
-
-
-def _name_tokens(company_name: str) -> List[str]:
-    parts = re.split(r"[^\wåäöÅÄÖ]+", company_name, flags=re.I)
-    return [p.lower() for p in parts if len(p) >= 4]
 
 
 def _blocked_host(host: str) -> bool:
@@ -518,6 +398,7 @@ def _build_evidence_pack_multi_source(
     homepage: Optional[str],
     meta: RetrievalMeta,
     *,
+    stage1_total_score: Optional[float] = None,
     raw_tavily_dir: Optional[Path] = None,
     tavily_raw_cache_dir: Optional[Path] = None,
     tavily_debug_output_dir: Optional[Path] = None,
@@ -539,6 +420,7 @@ def _build_evidence_pack_multi_source(
     chunks: List[str] = [intro]
     hint = normalize_homepage(homepage)
     meta.homepage_present = bool(hint)
+    hint_for_trust = hint or (homepage.strip() if isinstance(homepage, str) and homepage.strip() else None)
 
     raw_lists: list = []
     identity_raw: Optional[dict[str, Any]] = None
@@ -619,7 +501,10 @@ def _build_evidence_pack_multi_source(
         raw_lists = [r1 or []]
 
         merged_primary = merge_tavily_result_hits([r1 or []], max_hits=15)
-        grouped_p = group_hits_by_domain(merged_primary)
+        grouped_p = filter_grouped_domains_entity_mismatch(
+            group_hits_by_domain(merged_primary),
+            company_name,
+        )
         ranked_p = rank_domains(
             grouped_p,
             company_name,
@@ -628,6 +513,14 @@ def _build_evidence_pack_multi_source(
         )
         ranked_no_block_p = [r for r in ranked_p if not post_cluster_domain_blocked(r[0])]
         ranked_fp_only_p = [r for r in ranked_no_block_p if not is_supporting_domain(r[0])]
+
+        trusted_primary = compute_trusted_identity(
+            company_name,
+            homepage_hint=hint_for_trust,
+            stage1_total_score=stage1_total_score,
+            ranked_fp_only=ranked_fp_only_p,
+            ranked_no_block=ranked_no_block_p,
+        )
 
         primary_fp = ranked_fp_only_p[0][0] if ranked_fp_only_p else None
         http_ms_verify = 0.0
@@ -654,6 +547,7 @@ def _build_evidence_pack_multi_source(
                 ranked_no_block_p,
                 company_name,
                 homepage_verified=home_verified_p,
+                trusted_identity=trusted_primary,
             ):
                 r2, identity_raw = _one_search(q_secondary, "identity_search", TAVILY_QUERY_INDEX_IDENTITY)
                 queries_executed.append(q_secondary)
@@ -676,7 +570,16 @@ def _build_evidence_pack_multi_source(
         )
 
     merged = merge_tavily_result_hits(raw_lists, max_hits=15)
-    grouped = group_hits_by_domain(merged)
+    grouped = filter_grouped_domains_entity_mismatch(
+        group_hits_by_domain(merged),
+        company_name,
+    )
+    allowed_domains = set(grouped.keys())
+    merged = [
+        h
+        for h in merged
+        if registrable_domain(urlparse(h.url).netloc) in allowed_domains
+    ]
     ranked = rank_domains(
         grouped,
         company_name,
@@ -685,6 +588,15 @@ def _build_evidence_pack_multi_source(
     )
     ranked_no_block = [r for r in ranked if not post_cluster_domain_blocked(r[0])]
     ranked_fp_only = [r for r in ranked_no_block if not is_supporting_domain(r[0])]
+
+    trusted_identity = compute_trusted_identity(
+        company_name,
+        homepage_hint=hint_for_trust,
+        stage1_total_score=stage1_total_score,
+        ranked_fp_only=ranked_fp_only,
+        ranked_no_block=ranked_no_block,
+    )
+    meta.layer2_trusted_identity = trusted_identity
 
     likely_domains: List[str] = []
     if ranked_fp_only:
@@ -706,6 +618,14 @@ def _build_evidence_pack_multi_source(
     if meta.supporting_domains:
         chunks.append(
             "=== SUPPORTING_DOMAINS (non-homepage) ===\n" + ", ".join(meta.supporting_domains)
+        )
+
+    if trusted_identity:
+        chunks.append(
+            "=== TRUSTED_IDENTITY ===\n"
+            "Layer 1 score, CSV homepage alignment, or a very strong single-domain cluster — "
+            "identity checks are slightly relaxed for this row only; competing-entity ambiguity "
+            "and entity-mismatch removals still apply.\n"
         )
 
     for h in merged[:12]:
@@ -769,6 +689,7 @@ def _build_evidence_pack_multi_source(
             company_name,
             homepage_verified=homepage_verified,
             had_top_fp_candidate=bool(ranked_fp_only),
+            trusted_identity=trusted_identity,
         )
         # Never treat a weak or ambiguous cluster as canonical homepage_used — prefer unresolved over wrong.
         use_canonical_homepage = bool(
@@ -839,6 +760,7 @@ def build_evidence_pack(
     homepage: Optional[str],
     *,
     retrieval_mode: Literal["auto", "homepage_known", "homepage_missing", "multi_source"] = "auto",
+    stage1_total_score: Optional[float] = None,
     raw_tavily_dir: Optional[Path] = None,
     tavily_raw_cache_dir: Optional[Path] = None,
     tavily_debug_output_dir: Optional[Path] = None,
@@ -860,6 +782,7 @@ def build_evidence_pack(
             company_name,
             homepage,
             meta,
+            stage1_total_score=stage1_total_score,
             raw_tavily_dir=raw_tavily_dir,
             tavily_raw_cache_dir=tavily_raw_cache_dir,
             tavily_debug_output_dir=tavily_debug_output_dir,
@@ -1007,7 +930,7 @@ def build_evidence_pack(
                 )
 
             if results:
-                tokens = _name_tokens(company_name)
+                tokens = official_pick_tokens(company_name)
                 official_url = _pick_official_from_tavily(results, company_name, tokens)
 
                 # Snippets from top results (not counted as page fetches)
@@ -1045,7 +968,7 @@ def build_evidence_pack(
                             continue
                         if _blocked_host(urlparse(u).netloc):
                             continue
-                        if _same_site(urlparse(u).netloc, official_host):
+                        if same_site(urlparse(u).netloc, official_host):
                             continue
                         ext_url = u
                         break

@@ -1,0 +1,119 @@
+{
+  "script": "gpt_batch_website_urls_500.py",
+  "created_at_utc": "2026-03-25T09:11:44Z",
+  "run_started_utc": "2026-03-25T09:03:15Z",
+  "git_commit": "ca0725798e26d9393c8e6b046fe49161e17e4309",
+  "input_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
+  "input_sha256": "9ad416ca211ef206303ac6046da2efd2603ed1103fe9ceddc1a1a9631679e034",
+  "total_companies": 500,
+  "batch_size": 25,
+  "num_batches": 20,
+  "model": "gpt-4o-search-preview",
+  "api": "chat_completions_search",
+  "non_empty_url_count": 365,
+  "merged_urls_json": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/merged_urls.json",
+  "merged_urls_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/merged_urls.csv",
+  "batches": [
+    {
+      "batch_index": 0,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 8
+    },
+    {
+      "batch_index": 1,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 9
+    },
+    {
+      "batch_index": 2,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 24
+    },
+    {
+      "batch_index": 3,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 4,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 5,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 6,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 21
+    },
+    {
+      "batch_index": 7,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 21
+    },
+    {
+      "batch_index": 8,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 21
+    },
+    {
+      "batch_index": 9,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 4
+    },
+    {
+      "batch_index": 10,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 8
+    },
+    {
+      "batch_index": 11,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 19
+    },
+    {
+      "batch_index": 12,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 5
+    },
+    {
+      "batch_index": 13,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 14,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 23
+    },
+    {
+      "batch_index": 15,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 10
+    },
+    {
+      "batch_index": 16,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 17,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    },
+    {
+      "batch_index": 18,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 17
+    },
+    {
+      "batch_index": 19,
+      "api_mode": "chat_completions_search_json_schema",
+      "non_empty_url_count": 25
+    }
+  ],
+  "deferred_next_step": "Optional: second pass for 1–2 sentence about text per URL (not implemented)."
+}

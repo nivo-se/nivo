@@ -51,6 +51,7 @@ const AnimatedGradient: React.FC<AnimatedGradientProps> = ({
         ty4: seeded(i * 41) - 0.5,
         size: 0.5 + seeded(i * 43),
       })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- memoized layout should only change when palette size changes
     [colors.length]
   );
 

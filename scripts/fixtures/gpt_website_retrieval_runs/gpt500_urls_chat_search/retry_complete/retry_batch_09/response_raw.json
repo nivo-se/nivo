@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-2d7da7d7-e7a3-4296-8fbb-85ef42998428",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"559053-0688\",\"company_name\":\"Distriktsläkarna i Västra Götaland AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556185-3499\",\"company_name\":\"Norra Åsbo Renhållningsaktiebolag\",\"official_website_url\":\"https://www.narab.se\",\"confidence_0_1\":0.9,\"source_note\":\"Official website found via company directories; URL matches company name and services.\"},{\"orgnr\":\"556655-6501\",\"company_name\":\"Contribit AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556800-0375\",\"company_name\":\"Lomma Tak AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556070-6037\",\"company_name\":\"K A Olsson & Gems Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556487-9442\",\"company_name\":\"Grays Bakery AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556781-9635\",\"company_name\":\"K Vent AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"},{\"orgnr\":\"556921-9032\",\"company_name\":\"Wellectronics AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; company information available on directories like allabolag.se.\"}]}",
+  "usage": {
+    "completion_tokens": 470,
+    "prompt_tokens": 1677,
+    "total_tokens": 2147,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

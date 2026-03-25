@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Swedish Oat Fiber Aktiebolag",
+      "orgnr": "556509-0148",
+      "address_country": "SE",
+      "primary_nace": "10612 Tillverkning av frukostflingor, mixer och andra livsmedelsberedningar av kvarnprodukter",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Livsmedel\", \"Kemikalier, industrikemikalier - tillverkning\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Keeparo AB",
+      "orgnr": "556813-4059",
+      "address_country": "SE",
+      "primary_nace": "70210 PR och kommunikation",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Götaplatsens Foto AB",
+      "orgnr": "556101-5230",
+      "address_country": "SE",
+      "primary_nace": "47782 Specialiserad butikshandel med fotoutrustning",
+      "segment_labels_json": "[\"Fotoutrustningar\", \"Butikshandel\"]"
+    },
+    {
+      "name": "C. Gustafsson Livs Aktiebolag",
+      "orgnr": "556578-0250",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Thomas o Marianne Alfredsson AB",
+      "orgnr": "556571-7120",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Norrbottens Bildemontering Aktiebolag",
+      "orgnr": "556233-8961",
+      "address_country": "SE",
+      "primary_nace": "46771 Partihandel med uttjänta fordon",
+      "segment_labels_json": "[\"Grossister\", \"Avfall - grossister\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Realtryck i Stockholm AB",
+      "orgnr": "556649-7565",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Tryckerier\"]"
+    },
+    {
+      "name": "Citedo AB",
+      "orgnr": "556543-8941",
+      "address_country": "SE",
+      "primary_nace": "46510 Partihandel med datorer och kringutrustning samt programvara",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    }
+  ]
+}

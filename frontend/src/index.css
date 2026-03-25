@@ -46,11 +46,15 @@
 
 @layer components {
   .app-bg {
-    @apply bg-background;
+    @apply min-h-full bg-transparent;
+  }
+
+  .app-page {
+    @apply min-h-full w-full overflow-auto bg-transparent;
   }
 
   .app-card {
-    @apply rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary/10;
+    @apply rounded-xl border border-border/80 bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary/15 hover:border-primary/15;
   }
 
   .app-header {

@@ -8,11 +8,11 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Protocol
+from typing import Protocol
 
 from sqlalchemy import select
 
-from backend.db.models.deep_research import EvidenceBundlePersistence, WebEvidence, WebEvidenceRejected
+from backend.db.models.deep_research import EvidenceBundlePersistence
 from backend.models.v2 import (
     EvidenceCoverageSummary,
     EvidenceItem as V2EvidenceItem,
@@ -193,7 +193,6 @@ def build_and_persist_evidence_bundle(
     queries_executed: list[dict] | None = None,
 ) -> tuple[ValidatedEvidenceBundle, EvidenceBundlePersistence]:
     """Build validated bundle (from DB or in-memory) and persist. Returns (bundle, row)."""
-    from backend.services.deep_research.evidence_loader import load_validated_evidence
 
     if load_from_db:
         records = load_validated_evidence(session, run_id, company_id)

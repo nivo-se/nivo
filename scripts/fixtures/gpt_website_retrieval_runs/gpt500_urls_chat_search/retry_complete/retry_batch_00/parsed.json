@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556641-3711",
+      "company_name": "RK Natursten AB",
+      "official_website_url": "https://www.rk-natursten.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Byggkatalogen and Largestcompanies, matching company details."
+    },
+    {
+      "orgnr": "556915-3603",
+      "company_name": "KE Therm AB",
+      "official_website_url": "https://ketherm.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in Byggkatalogen, matching company details."
+    },
+    {
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "https://www.lecora.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    },
+    {
+      "orgnr": "556926-1166",
+      "company_name": "Steamery AB",
+      "official_website_url": "https://steamery.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    },
+    {
+      "orgnr": "556976-8640",
+      "company_name": "Sylog Väst AB",
+      "official_website_url": "https://www.sylog.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    },
+    {
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "https://www.creon.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    },
+    {
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "https://www.karlskogaautomation.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    },
+    {
+      "orgnr": "556814-8752",
+      "company_name": "Tillmobil i Norden AB",
+      "official_website_url": "https://www.tillmobil.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found in multiple sources, including Allabolag and company registry, matching company details."
+    }
+  ]
+}

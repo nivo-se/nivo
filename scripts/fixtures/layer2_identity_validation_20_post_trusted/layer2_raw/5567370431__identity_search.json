@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5567370431",
+  "company_name": "SCA Forest Products AB",
+  "query_role": "identity_search",
+  "query_index": 0,
+  "query_string": "\"SCA Forest Products\" official website",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "SCA Forest Products official website",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://leadiq.com/c/sca---hygiene-and-forest-products-company/5a1d86f02400002400610cb9",
+        "title": "SCA - Hygiene and Forest Products Company - LeadIQ",
+        "content": "Minus sign iconPlus sign icon You can contact SCA - Hygiene and Forest Products Company's main corporate office by phone at. ### What is SCA - Hygiene and Forest Products Company's official website and social media links? Minus sign iconPlus sign iconSCA - Hygiene and Forest Products Company's official website is sca.com and has social profiles on LinkedInCrunchbase. Minus sign iconPlus sign icon As of February 2026, SCA - Hygiene and Forest Products Company's annual revenue is estimated to be $1.3B. Explore SCA - Hygiene and Forest Products Company's employee directory with LeadIQ. ### What technology does SCA - Hygiene and Forest Products Company use? Minus sign iconPlus sign iconSCA - Hygiene and Forest Products Company's email format typically follows the pattern of First.Last@sca.com. Find more SCA - Hygiene and Forest Products Company email formats with LeadIQ. Minus sign iconPlus sign icon As of February 2026, SCA - Hygiene and Forest Products Company has raised $543M in funding. # SCA - Hygiene and Forest Products Company.",
+        "score": 0.8898454,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.zoominfo.com/c/svenska-cellulosa-aktiebolaget-sca/50627644",
+        "title": "SCA - Overview, News & Similar companies | ZoomInfo.com",
+        "content": "What is SCA's official website? SCA's official website is www.sca.com What is SCA's Revenue? SCA's revenue is $2.2 Billion What is SCA's SIC code? SCA's SIC",
+        "score": 0.7559439,
+        "raw_content": null
+      },
+      {
+        "url": "https://aixsponza.com/en/industry/sca-forest-products/",
+        "title": "SCA Forest Products / Aixsponza",
+        "content": "# SCA forest products. Svenska Cellulosa AB (or in short: SCA) is the largest private forest owner in Europe. They are the main supplier of wood products for the paper industries. And we supplied them with super highres renderings of photoscanned intermediate states of their product. Tree trunks, twigs, pine cones, sawdust, pulp,... everything SCA's got on offer was photoscanned and prepared as print renderings large enough to be printed on truck trailers as well as a looping animation for web usage. ## Credits. **Creative Director Aix:** Manuel Casasola Merkle. **3D Artists:** Marcel Dolschon, Lukas Eberle, Can Erduman, Jens Kindler, Lars Korb.",
+        "score": 0.7244226,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sca.com/en/about-sca/",
+        "title": "The core of SCA's business is the forest",
+        "content": "# The core of SCA’s business is the forest. SCA is an important part of society in Sweden, being an important employer with strong ties to the communities in the north where our industries and businesses are located. ​The core of SCA's business is the forest, Europe's largest private forest holding. Around this unique resource, we have built a well-developed value chain based on renewable raw material from our own and others' forests. We offer packaging paper, pulp, wood products, renewable energy, services for forest owners and efficient transport solutions. **SCA A** (ISIN SE0000171886) – full voting rights. ​The core of SCA's business is the forest, Europe's largest private forest holding. Around this unique resource, we have built a well-developed value chain based on renewable raw material from our own and others' forests. ## SCA's historical images. SCA is organized in five business areas: Forest, Wood, Containerboard, Pulp and Renewable Energy. Throughout history, SCA has built a well-invested value chain that maximizes the value of each tree.",
+        "score": 0.60358196,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sca.com/en/",
+        "title": "SCA: We are driven by the force of the forest",
+        "content": "The core of SCA's business is the growing forest. ### Over 1,100 hectares of wetland restoration on SCA land. Since 2021, SCA has been dedicated to restoring selected wetlands on its land. By making defibrillators at SCA’s local offices in northern Sweden accessible to the public 24/7, more lives can potentially be saved. SCA is reporting the lowest damage level ever to known archaeological and cultural remains. ### March 27 - SCA Annual General Meeting 2026. * + Press releaseCORRECTION: SCA to increase NBSK price. SCA works actively to make use of the entire tree and all parts of residual streams. Sustainability is integrated into the entire business and part of SCA's business concept. Our pulp products are made from trees from our forests in northern Sweden and have a very strong environmental profile. We are one of Europe's largest producers of forest-based bioenergy with a total production of approximately 10.8 TWh per year.",
+        "score": 0.58777803,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.89,
+    "request_id": "f79dab28-1786-463f-8246-e87ba1ad73bd"
+  }
+}

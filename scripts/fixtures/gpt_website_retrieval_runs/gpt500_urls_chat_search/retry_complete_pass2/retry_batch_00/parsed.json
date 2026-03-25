@@ -1,0 +1,40 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556825-6753",
+      "company_name": "Cami Stängsel AB",
+      "official_website_url": "https://www.camigruppen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Largestcompanies.com; matches company name and industry."
+    },
+    {
+      "orgnr": "556914-2747",
+      "company_name": "Swedelift AB",
+      "official_website_url": "https://www.partillehiss.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Found on Largestcompanies.com; matches company name and industry."
+    },
+    {
+      "orgnr": "556647-8292",
+      "company_name": "Gjöco AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556033-3576",
+      "company_name": "Ifö Electric AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556596-3542",
+      "company_name": "LIP AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    }
+  ]
+}

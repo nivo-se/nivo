@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Claessons Cykel & Motor Aktiebolag",
+      "orgnr": "556222-7313",
+      "address_country": "SE",
+      "primary_nace": "45400 Handel med och service av motorcyklar inklusive reservdelar och tillbehör",
+      "segment_labels_json": "[\"Bilar\", \"MC, mopeder, skotrar\", \"Motorcykel, ATV och mopeder - detaljister\", \"Detaljhandel\"]"
+    },
+    {
+      "name": "Berkeley Company AB",
+      "orgnr": "559389-4776",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\"]"
+    },
+    {
+      "name": "Solid Beans AB",
+      "orgnr": "556803-8789",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Helge Nyberg Aktiebolag",
+      "orgnr": "556143-2013",
+      "address_country": "SE",
+      "primary_nace": "30990 Diverse övrig transportmedelstillverkning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Truckar\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Övriga fordon\"]"
+    },
+    {
+      "name": "Cordial AB",
+      "orgnr": "556597-6684",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Svetsekonomi i Skövde Aktiebolag",
+      "orgnr": "556295-6556",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Järnvaror\", \"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Karlskoga CNC Quality Aktiebolag",
+      "orgnr": "556450-5575",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Matbutiken Vällebergsvägen AB",
+      "orgnr": "559015-9553",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    }
+  ]
+}

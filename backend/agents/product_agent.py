@@ -44,7 +44,6 @@ class ProductAgent:
 
     def run(self, context: AgentContext) -> ProductAgentOutput:
         text = context.joined_text(max_chars=15000)
-        company_name = context.company_name or "Company"
 
         product_keywords = [
             "product", "products", "service", "services", "solution", "solutions",

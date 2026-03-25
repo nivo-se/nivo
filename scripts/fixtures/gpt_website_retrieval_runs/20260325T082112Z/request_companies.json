@@ -1,0 +1,187 @@
+{
+  "companies": [
+    {
+      "name": "Xperta AB",
+      "orgnr": "556681-3761",
+      "registry_homepage_url": "https://xperta.com",
+      "address_country": "SE",
+      "primary_nace": "58290 Utgivning av annan programvara",
+      "segment_labels_json": "[\"Datautveckling, systemutveckling, programutveckling\"]"
+    },
+    {
+      "name": "Noxon Aktiebolag",
+      "orgnr": "556828-0670",
+      "registry_homepage_url": "https://noxon.com",
+      "address_country": "SE",
+      "primary_nace": "28290 Övrig tillverkning av maskiner för allmänt ändamål",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Blekinge Pressgjuteri Aktiebolag",
+      "orgnr": "556486-1747",
+      "registry_homepage_url": "https://www.blekingeproal.com",
+      "address_country": "SE",
+      "primary_nace": "24530 Gjutning av lättmetall",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Sarstedt Aktiebolag",
+      "orgnr": "556185-7565",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Bookmark Förlag AB",
+      "orgnr": "556864-3141",
+      "address_country": "SE",
+      "primary_nace": "58110 Bokutgivning",
+      "segment_labels_json": "[\"Förlagsbyråer\"]"
+    },
+    {
+      "name": "EPG Projektledning AB",
+      "orgnr": "556665-6442",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Ricana Concept AB",
+      "orgnr": "556270-3024",
+      "address_country": "SE",
+      "primary_nace": "31012 Tillverkning av kontors- och butiksinredningar",
+      "segment_labels_json": "[\"Möbler\"]"
+    },
+    {
+      "name": "Hansson PyroTech Aktiebolag",
+      "orgnr": "556055-5814",
+      "address_country": "SE",
+      "primary_nace": "20510 Sprängämnestillverkning",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Kemikalier, industrikemikalier - tillverkning\", \"Kosmetik, parfym och frisörartiklar\", \"Producenter\"]"
+    },
+    {
+      "name": "Kallhälls Nya Vårdcentral AB",
+      "orgnr": "556710-1992",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\"]"
+    },
+    {
+      "name": "Göthes Säkerhet Aktiebolag",
+      "orgnr": "556388-2470",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Mälardalens Asfalt AB",
+      "orgnr": "559083-3561",
+      "address_country": "SE",
+      "primary_nace": "42110 Anläggning av vägar och motorvägar",
+      "segment_labels_json": "[\"Byggmästare\", \"Väganordningar, trafikanordningar, vägarbeten\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Eqpack AB",
+      "orgnr": "556444-8255",
+      "registry_homepage_url": "https://eqpack.se",
+      "address_country": "SE",
+      "primary_nace": "22220 Plastförpackningstillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Förpackningar - Industrin\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Örebro Bildemontering Aktiebolag",
+      "orgnr": "556436-7067",
+      "address_country": "SE",
+      "primary_nace": "46771 Partihandel med uttjänta fordon",
+      "segment_labels_json": "[\"Grossister\", \"Avfall - grossister\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Götaplatsens Foto AB",
+      "orgnr": "556101-5230",
+      "address_country": "SE",
+      "primary_nace": "47782 Specialiserad butikshandel med fotoutrustning",
+      "segment_labels_json": "[\"Fotoutrustningar\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Aktiebolaget Cernelle.",
+      "orgnr": "556035-5926",
+      "registry_homepage_url": "https://cernelle.eu",
+      "address_country": "SE",
+      "primary_nace": "21200 Tillverkning av läkemedel",
+      "segment_labels_json": "[\"Läkemedel\", \"Producenter\"]"
+    },
+    {
+      "name": "KAMI, Kalix Mekaniska Industrier Aktiebolag",
+      "orgnr": "556193-7086",
+      "registry_homepage_url": "https://kami.se",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Flyinge Plantshop Aktiebolag",
+      "orgnr": "556403-9005",
+      "address_country": "SE",
+      "primary_nace": "01302 Odling av plantskoleväxter m.m. på friland",
+      "segment_labels_json": "[\"Jordbruk\", \"Jordbruk - odling\"]"
+    },
+    {
+      "name": "SWELIFT AB",
+      "orgnr": "556748-1352",
+      "address_country": "SE",
+      "primary_nace": "77320 Uthyrning och leasing av bygg- och anläggningsmaskiner",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenadmaskinsarbeten\", \"Uthyrning\"]"
+    },
+    {
+      "name": "EMV Stainless AB",
+      "orgnr": "556606-1056",
+      "registry_homepage_url": "https://emvholding.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Reco Port Aktiebolag",
+      "orgnr": "556487-7172",
+      "registry_homepage_url": "https://www.recoport.se",
+      "address_country": "SE",
+      "primary_nace": "25120 Tillverkning av dörrar och fönster av metall",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Metaller, legeringar\", \"Producenter\"]"
+    },
+    {
+      "name": "Sennen AB",
+      "orgnr": "556512-0762",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Polyproject Environment AB",
+      "orgnr": "556908-6282",
+      "address_country": "SE",
+      "primary_nace": "22230 Byggplastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Anders Gustafsson Livs Aktiebolag",
+      "orgnr": "556519-3660",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Svalebergs Elektriska AB",
+      "orgnr": "556740-6821",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Plåtslagerier\", \"Takbeläggningar\", \"Energihandel\"]"
+    },
+    {
+      "name": "MVB Umeå AB",
+      "orgnr": "556537-4294",
+      "address_country": "SE",
+      "primary_nace": "43320 Byggnadssnickeriarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Snickeriarbeten\"]"
+    }
+  ]
+}

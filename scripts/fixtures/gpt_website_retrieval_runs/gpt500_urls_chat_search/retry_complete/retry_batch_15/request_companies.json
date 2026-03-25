@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "VinnTer AB",
+      "orgnr": "556860-1057",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\", \"Konsulter\", \"Internet - Konsulter, operatörer\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Twindej Experience AB",
+      "orgnr": "556801-4095",
+      "address_country": "SE",
+      "primary_nace": "78200 Personaluthyrning",
+      "segment_labels_json": "[\"Designers, formgivare\", \"Datakonsulter\", \"Konsulter\", \"Tryckerier\", \"Uthyrning\", \"Video, film - Inspelning, produktion\", \"Skolor och utbildning\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "GUSTIS AB",
+      "orgnr": "556786-5588",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"VVS-arbeten, material och produkter\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Naturell Aktiebolag",
+      "orgnr": "556219-3580",
+      "address_country": "SE",
+      "primary_nace": "10890 Framställning av andra livsmedel",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\"]"
+    },
+    {
+      "name": "Breddens Livs Aktiebolag",
+      "orgnr": "556279-5582",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "CAG Consoden AB",
+      "orgnr": "556261-9287",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Mathuset i Södra Backa AB",
+      "orgnr": "556524-2814",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "August Larsson Charkuteri AB",
+      "orgnr": "556414-7485",
+      "address_country": "SE",
+      "primary_nace": "10130 Charkuteri- och annan köttvarutillverkning",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    }
+  ]
+}

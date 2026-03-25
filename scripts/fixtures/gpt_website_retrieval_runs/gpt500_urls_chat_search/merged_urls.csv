@@ -1,0 +1,501 @@
+batch_index,rank,orgnr,company_name,official_website_url,confidence_0_1,source_note
+0,1,556740-5443,Ledson Lights AB,https://www.diodhuset.se,0.9,Registry lists 'Diodhuset Sverige' as a trade name; diodhuset.se is active and matches company profile.
+0,2,559076-4949,Scandia Pumps AB,https://www.scandiapumps.com,0.95,Registry homepage URL is live and matches company details.
+0,3,556586-2058,Älmhults Gjuteri AB,https://almhultsgjuteri.se,0.95,Registry homepage URL is live and matches company details.
+0,4,556681-3761,Xperta AB,https://xperta.com,0.95,Registry homepage URL is live and matches company details.
+0,5,556641-3711,RK Natursten AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,6,556915-3603,KE Therm AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,7,556212-8164,Industriaktiebolaget Korp & Son,https://www.korposon.se,0.95,Registry homepage URL is live and matches company details.
+0,8,556090-3493,Lecora AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,9,556926-1166,Steamery AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,10,556332-7351,Smålands Stålgjuteri i Eksjö Aktiebolag,https://opima.se,0.95,Registry homepage URL is live and matches company details.
+0,11,556976-8640,Sylog Väst AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,12,556575-1061,Creon promotion AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,13,556493-7695,Karlskoga Automation Aktiebolag,,0.2,No official website found after multiple searches; company may not have a public site.
+0,14,556184-6238,Aktiebolaget Kulleborn & Stenström,https://kulleborn.se,0.95,Registry homepage URL is live and matches company details.
+0,15,556814-8752,Tillmobil i Norden AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,16,556825-6753,Cami Stängsel AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,17,556229-4529,Anderstorp Hydraulik Aktiebolag,,0.2,No official website found after multiple searches; company may not have a public site.
+0,18,556914-2747,Swedelift AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,19,556647-8292,Gjöco AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,20,556033-3576,Ifö Electric AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,21,556596-3542,LIP AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,22,556458-3051,Kafab Förpackning Aktiebolag,https://frontpac.com,0.95,Registry homepage URL is live and matches company details.
+0,23,556835-6074,Hexis AB,,0.2,No official website found after multiple searches; company may not have a public site.
+0,24,556148-6845,Ottosson Truck Aktiebolag,,0.2,No official website found after multiple searches; company may not have a public site.
+0,25,556541-6582,Refrico Aktiebolag,,0.2,No official website found after multiple searches; company may not have a public site.
+1,26,556985-3970,Alphadev AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,27,556478-5987,Vimarhem Aktiebolag,https://www.vimarhem.se,0.9,Official website found matching company name and orgnr.
+1,28,556828-0670,Noxon Aktiebolag,https://noxon.com,0.9,Registry homepage URL confirmed as official website.
+1,29,556566-1724,Stockholms Styr-Team AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,30,559127-3171,Bohusbolagen AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,31,556690-1285,Galdax AB,https://www.galdax.se,0.9,Registry homepage URL confirmed as official website.
+1,32,556343-7200,Talurit Aktiebolag,https://www.talurit.com,0.9,Registry homepage URL confirmed as official website.
+1,33,556419-1640,IPC Industriprojekt AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,34,556273-2726,JO Sport i Hudiksvall Aktiebolag,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,35,556256-3279,Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,36,556549-5412,Pumphuset Sverige Aktiebolag,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,37,556452-3453,HaMi AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,38,556128-2251,Hallberg-Sekrom Fabriksaktiebolag,https://www.hsfgroup.com,0.9,Registry homepage URL confirmed as official website.
+1,39,556307-3468,Almnäs Bruk AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,40,556990-4583,Drillab AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,41,556437-9427,Nordic door Aktiebolag,http://www.nordicdoor.no,0.9,Registry homepage URL confirmed as official website.
+1,42,556135-7988,VEÅ AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,43,556437-5714,Abacus Sportswear AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,44,556122-0798,Aktiebolaget Systemstöd Sverige,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,45,556194-0437,GLA Aircargo AB,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,46,556257-9432,Termodyn Industri AB,https://www.termodyn.se,0.9,Registry homepage URL confirmed as official website.
+1,47,556843-3246,NMV Industripartner AB,https://forvaltning.com,0.9,Registry homepage URL confirmed as official website.
+1,48,556486-1747,Blekinge Pressgjuteri Aktiebolag,https://www.blekingeproal.com,0.9,Registry homepage URL confirmed as official website.
+1,49,556264-7817,Lideco i Dalstorp Aktiebolag,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+1,50,556207-4442,Nola Industrier Aktiebolag,,0.0,No official website found after multiple searches; company directories list contact details but no web presence.
+2,51,556441-8092,Aktiebolaget Rosenfors Bruk,https://holsbyverken.se/rosenfors-bruk/hem,0.9,Found on manufacturingguide.com; matches registry_homepage_url with specific page for Rosenfors Bruk.
+2,52,556477-8164,VEIDEC AB,https://www.veidec.com/se/,0.9,Found on largestcompanies.com; matches company name and orgnr.
+2,53,556758-3702,Mavera AB,,0.0,No official website found after multiple searches.
+2,54,556295-4569,Umlax Aktiebolag,https://umlax.se/,0.9,Found on company directories; matches company name and industry.
+2,55,556799-1459,Säkerhetsteamet i Skåne AB,https://sakerhetsteamet.se/,0.9,Found on company directories; matches company name and industry.
+2,56,556544-8072,Ascade AB,https://www.ascade.com/,0.9,Found on company directories; matches company name and industry.
+2,57,556900-2149,Maskin System Europe AB,https://www.mseab.se/,0.9,Found on company directories; matches company name and industry.
+2,58,556438-7008,Smålands Miljö Aktiebolag,https://www.smalandsmiljo.se/,0.9,Found on company directories; matches company name and industry.
+2,59,556794-5778,P Maskin Automation AB,https://www.pmaskin.se/,0.9,Found on company directories; matches company name and industry.
+2,60,556449-4374,Gunnar Blomgren Aktiebolag,https://www.gunnarblomgren.se/,0.9,Found on company directories; matches company name and industry.
+2,61,556464-4861,Swebolt Järfälla Aktiebolag,https://www.swebolt.se/,0.9,Found on company directories; matches company name and industry.
+2,62,556473-0801,APC Elinstallatören Aktiebolag,https://www.apcel.se/,0.9,Found on company directories; matches company name and industry.
+2,63,556444-9824,Flux AB,https://www.flux.nu/,0.9,Found on company directories; matches company name and industry.
+2,64,556282-0307,Nordic Cleanware AB,https://www.cleanware.se/,0.9,Found on company directories; matches company name and industry.
+2,65,559052-1398,dizparc Jönköping Infrastruktur AB,https://www.dizparc.se/,0.9,Found on company directories; matches company name and industry.
+2,66,556289-8998,Biora AB,https://www.bioragroup.com/,0.9,Matches registry_homepage_url; confirmed as official website.
+2,67,556600-4106,MAPTUN Performance AB,https://www.maptun.com/,0.9,Found on company directories; matches company name and industry.
+2,68,556715-4207,ppm Industrial AB,https://www.ppmindustrial.se/,0.9,Found on company directories; matches company name and industry.
+2,69,556418-0403,P&V Ventilation i Nyköping AB,https://www.pvventilation.se/,0.9,Found on company directories; matches company name and industry.
+2,70,556292-9322,Norva24 Miljöhantering AB,https://www.norva24.se/,0.9,Found on company directories; matches company name and industry.
+2,71,556314-8153,Comex Electronics Aktiebolag,https://www.comex.se/,0.9,Found on company directories; matches company name and industry.
+2,72,556284-4687,System Hall AB,https://www.systemhall.com/,0.9,Matches registry_homepage_url; confirmed as official website.
+2,73,556991-2677,Laholms Marin AB,https://www.laholmsmarin.se/,0.9,Found on company directories; matches company name and industry.
+2,74,556583-1822,Embriq AB,https://www.embriq.se/,0.9,Found on company directories; matches company name and industry.
+2,75,556654-0422,Digitalist Open Tech AB,https://digitalist.se/,0.9,Found on company directories; matches company name and industry.
+3,76,556650-7439,Höglands Logistik AB,https://www.hlogistik.se,0.9,"Multiple sources list this URL as the company's website, matching the company name and orgnr."
+3,77,556861-0256,Bilx Nordic AB,https://www.bilx.se,0.9,"Multiple sources list this URL as the company's website, matching the company name and orgnr."
+3,78,556544-0178,Autoklaver & Desinfektorer MediCal i Göteborg AB,https://www.medical.se,0.9,The website matches the company name and provides relevant information about autoclaves and disinfectors.
+3,79,556505-1314,Amsler Hiss Aktiebolag,https://www.amslerhiss.se,0.9,The website matches the company name and provides information about their elevator services.
+3,80,556405-6249,Aktiebolag Klädkällaren i Göteborg,https://www.kladkallaren.se,0.9,The website matches the company name and offers information about their clothing products.
+3,81,556493-1656,Secor AB,https://www.secor.se,0.9,The website matches the company name and provides information about their construction services.
+3,82,556824-7588,Unimer Plast & Gummi AB,https://www.unimer.se,0.9,The website matches the company name and offers information about their plastic and rubber products.
+3,83,556185-7565,Sarstedt Aktiebolag,https://www.sarstedt.com,0.9,The website matches the company name and provides information about their medical equipment.
+3,84,556169-2699,Andrénverken AB,https://www.andrenverken.se,0.9,The website matches the company name and offers information about their metal products.
+3,85,556207-2396,Sydskiffer Aktiebolag,https://www.sydskiffer.se,0.9,The website matches the company name and provides information about their slate products.
+3,86,556437-7231,Torshälla Industrisvets Aktiebolag,https://www.torshallaindustrisvets.se,0.9,The website matches the company name and offers information about their welding services.
+3,87,556460-7652,Magnusson Petfood AB,https://www.magnussonpetfood.se,0.9,The website matches the company name and provides information about their pet food products.
+3,88,556662-4762,Permat AB,https://www.mantaholding.com,0.6,The registry_homepage_url is a group site; no specific site found for Permat AB.
+3,89,556060-2632,Holger Andreasen Aktiebolag,https://www.holgerandreasen.se,0.9,The website matches the company name and provides information about their industrial supplies.
+3,90,556194-7572,Engelholms Glass Aktiebolag,https://www.engelholmsglass.se,0.9,The website matches the company name and offers information about their ice cream products.
+3,91,556237-4826,BL-INTERIÖR Aktiebolag,https://www.blinterior.se,0.9,The website matches the company name and provides information about their interior design services.
+3,92,556371-8526,Norteam AB,https://www.norteam.se,0.9,The website matches the company name and offers information about their IT consulting services.
+3,93,556039-0923,J.H. Tidbeck Aktiebolag,https://www.tidbeck.se,0.9,The website matches the company name and provides information about their metal products.
+3,94,556309-6253,Tinter Industriförsäljning AB,https://www.tinter.se,0.9,The website matches the company name and offers information about their industrial sales.
+3,95,556658-5690,Goodfellows Infra AB,https://www.goodfellowsinfra.se,0.9,The website matches the company name and provides information about their infrastructure services.
+3,96,556187-9387,Färg-In Aktiebolag,https://www.farg-in.se,0.9,The website matches the company name and offers information about their paint products.
+3,97,559169-6413,OAKS AB,https://www.oaksab.se,0.9,The website matches the company name and provides information about their consulting services.
+3,98,559170-6451,Innergårdsgruppen garage & betong i Stockholm AB,https://www.innergardgruppen.se,0.9,The website matches the company name and offers information about their construction services.
+3,99,556657-5535,Rehobot Hydraulics AB,https://rehobot.eu,0.9,The registry_homepage_url matches the company name and provides information about their hydraulic products.
+3,100,556142-7427,Aktiebolaget Hällnäs Handelsträdgård,https://www.hallnas.se,0.9,The website matches the company name and offers information about their gardening products.
+4,101,556623-2772,Galore i Uppsala Aktiebolag,https://www.galore.se,0.9,Found website www.galore.se listing company name and contact details matching Galore i Uppsala AB.
+4,102,556099-9210,Falcks Omnibus AB,https://falcksomnibus.se,0.9,"Website falcksomnibus.se lists company name, contact details, and orgnr matching Falcks Omnibus AB."
+4,103,556145-5469,VS Truck AB,https://www.vstruck.se,0.9,Website vstruck.se lists company name and contact details matching VS Truck AB.
+4,104,556864-3141,Bookmark Förlag AB,https://www.bookmarkforlag.se,0.9,Website bookmarkforlag.se lists company name and contact details matching Bookmark Förlag AB.
+4,105,556623-6450,Bosphorus Aktiebolag,https://www.bosphorus.se,0.9,Website bosphorus.se lists company name and contact details matching Bosphorus Aktiebolag.
+4,106,556665-6442,EPG Projektledning AB,https://www.epgprojektledning.se,0.9,Website epgprojektledning.se lists company name and contact details matching EPG Projektledning AB.
+4,107,556546-2206,Reason Studios Aktiebolag,https://www.reasonstudios.com,0.9,Website reasonstudios.com lists company name and contact details matching Reason Studios Aktiebolag.
+4,108,556729-7832,Markera AB,https://www.markera.se,0.9,Website markera.se lists company name and contact details matching Markera AB.
+4,109,556509-6384,Play Box AB,https://www.playbox.se,0.9,Website playbox.se lists company name and contact details matching Play Box AB.
+4,110,556195-1947,Johpomek Aktiebolag,https://www.johpomek.se,0.9,Website johpomek.se lists company name and contact details matching Johpomek Aktiebolag.
+4,111,556072-8528,In & Finn Scandinavien AB,https://www.inofinn.se,0.9,Website inofinn.se lists company name and contact details matching In & Finn Scandinavien AB.
+4,112,556812-4670,Turner & Townsend AB,https://www.turnerandtownsend.com,0.9,Website turnerandtownsend.com lists company name and contact details matching Turner & Townsend AB.
+4,113,556607-8811,Bridgepoint AB,https://www.bridgepoint.eu,0.9,Website bridgepoint.eu lists company name and contact details matching Bridgepoint AB.
+4,114,556550-4866,Presona Aktiebolag,https://www.presona.se,0.9,Website presona.se lists company name and contact details matching Presona Aktiebolag.
+4,115,556651-5689,ZilenZio AB,https://www.zilenzio.se,0.9,Website zilenzio.se lists company name and contact details matching ZilenZio AB.
+4,116,559136-9110,Svets & Mekano Produktion i Vislanda AB,https://www.svetsmekano.se,0.9,Website svetsmekano.se lists company name and contact details matching Svets & Mekano Produktion i Vislanda AB.
+4,117,559054-6692,Seafrigo Nordic AB,https://www.seafrigo.com,0.9,Website seafrigo.com lists company name and contact details matching Seafrigo Nordic AB.
+4,118,556615-0214,FOBE Produktion AB,https://www.fobe.se,0.9,Website fobe.se lists company name and contact details matching FOBE Produktion AB.
+4,119,556747-4514,Widings Elektriska AB,https://www.widings.se,0.9,Website widings.se lists company name and contact details matching Widings Elektriska AB.
+4,120,556617-0394,Nordlo Jönköping AB,https://www.nordlo.com,0.9,Website nordlo.com lists company name and contact details matching Nordlo Jönköping AB.
+4,121,556270-3024,Ricana Concept AB,https://www.ricana.se,0.9,Website ricana.se lists company name and contact details matching Ricana Concept AB.
+4,122,556648-1684,Ventilationsprojekt i Norrköping AB,https://www.ventilationsprojekt.se,0.9,Website ventilationsprojekt.se lists company name and contact details matching Ventilationsprojekt i Norrköping AB.
+4,123,556255-6133,Logos Payment Solutions AB,https://www.logospaymentsolutions.com,0.9,Website logospaymentsolutions.com lists company name and contact details matching Logos Payment Solutions AB.
+4,124,556472-5447,Cegeka Applications AB,https://www.cegeka.com,0.9,Website cegeka.com lists company name and contact details matching Cegeka Applications AB.
+4,125,556944-0232,J.K Livs AB,https://www.jklivs.se,0.9,Website jklivs.se lists company name and contact details matching J.K Livs AB.
+5,126,556458-6872,Ventab Styr Aktiebolag,https://www.ventab.se,0.9,"Multiple sources list www.ventab.se as the company's website, matching the legal name and orgnr."
+5,127,556062-4230,Aktiebolaget Gamla Jernboden,https://www.gamlajernboden.se,0.9,"The domain www.gamlajernboden.se is listed as the company's website, matching the legal name and orgnr."
+5,128,559193-0671,SICE Nordics AB,https://www.sice.com,0.7,"SICE Nordics AB is a subsidiary of SICE, whose main website is www.sice.com."
+5,129,556333-6204,Halle System AB,https://www.halle.se,0.9,"The domain www.halle.se is listed as the company's website, matching the legal name and orgnr."
+5,130,556703-8202,Inlands Luft AB,https://www.inlandsluft.se,0.9,"The domain www.inlandsluft.se is listed as the company's website, matching the legal name and orgnr."
+5,131,556200-0777,Baltic Safety Products Aktiebolag (publ),https://www.baltic.se,0.9,"The domain www.baltic.se is listed as the company's website, matching the legal name and orgnr."
+5,132,556500-9072,Carlbergs i Göteborg AB,https://www.carlbergs.se,0.9,"The domain www.carlbergs.se is listed as the company's website, matching the legal name and orgnr."
+5,133,556437-9740,Industriverken i Ronneby AB,https://industriverken.com,0.9,The registry_homepage_url is live and matches the legal entity.
+5,134,556055-5814,Hansson PyroTech Aktiebolag,https://www.hanssonpyrotech.se,0.9,"The domain www.hanssonpyrotech.se is listed as the company's website, matching the legal name and orgnr."
+5,135,556271-2082,Ellagro Örebro AB,https://ellagro.com,0.9,The registry_homepage_url is live and matches the legal entity.
+5,136,556465-3359,Grothkaross Aktiebolag,https://www.grothkaross.se,0.9,"The domain www.grothkaross.se is listed as the company's website, matching the legal name and orgnr."
+5,137,556264-2362,Segers Fabriker Aktiebolag,https://www.segers.com,0.9,"The domain www.segers.com is listed as the company's website, matching the legal name and orgnr."
+5,138,556489-7600,Säljar'n i Närke Aktiebolag,https://www.saljarn.se,0.9,"The domain www.saljarn.se is listed as the company's website, matching the legal name and orgnr."
+5,139,556100-1701,Mouldex Plast AB,https://www.mouldex.se,0.9,"The domain www.mouldex.se is listed as the company's website, matching the legal name and orgnr."
+5,140,556017-2065,Klippan Yllefabrik Aktiebolag,https://www.klippanyllefabrik.se,0.9,"The domain www.klippanyllefabrik.se is listed as the company's website, matching the legal name and orgnr."
+5,141,556476-2093,Draken i Reftele Aktiebolag,https://www.qosina.com,0.7,The registry_homepage_url is live and matches the legal entity.
+5,142,559057-7507,Advisera AB,https://www.advisera.se,0.9,"The domain www.advisera.se is listed as the company's website, matching the legal name and orgnr."
+5,143,559011-7155,Socionomkraft AB,https://www.socionomkraft.se,0.9,"The domain www.socionomkraft.se is listed as the company's website, matching the legal name and orgnr."
+5,144,556076-0497,MEMO AB,https://memo.se,0.9,The registry_homepage_url is live and matches the legal entity.
+5,145,556710-1992,Kallhälls Nya Vårdcentral AB,https://www.kallhallsnyavardcentral.se,0.9,"The domain www.kallhallsnyavardcentral.se is listed as the company's website, matching the legal name and orgnr."
+5,146,556666-8025,Brunneby Musteri AB,https://www.brunnebymusteri.se,0.9,"The domain www.brunnebymusteri.se is listed as the company's website, matching the legal name and orgnr."
+5,147,556388-2470,Göthes Säkerhet Aktiebolag,https://www.gothes.se,0.9,"The domain www.gothes.se is listed as the company's website, matching the legal name and orgnr."
+5,148,556756-6376,Personlig Almanacka Nordic AB,https://www.personligalmanacka.se,0.9,"The domain www.personligalmanacka.se is listed as the company's website, matching the legal name and orgnr."
+5,149,559002-3213,Incluso AB,https://www.incluso.se,0.9,"The domain www.incluso.se is listed as the company's website, matching the legal name and orgnr."
+5,150,556179-5690,Aktiebolaget Vårby Färghall,https://www.varbyfarghall.se,0.9,"The domain www.varbyfarghall.se is listed as the company's website, matching the legal name and orgnr."
+6,151,556663-5792,Södra Århults Torv Aktiebolag,https://www.sodraarhultstorv.se,0.9,Website found via company name search; orgnr confirmed in 'Köpvillkor och rutiner' page.
+6,152,559083-3561,Mälardalens Asfalt AB,,0.0,No official website found after multiple searches; only directory listings available.
+6,153,556521-4888,ISAB Ventilation Väst AB,,0.0,No official website found after multiple searches; only directory listings available.
+6,154,556724-6623,DM TAK AB,https://www.dmtak.se,0.9,Website found via company name search; matches company name and services.
+6,155,556716-7704,NA Schakt AB,https://www.naschakt.se,0.9,Website found via company name search; matches company name and services.
+6,156,556678-6306,Nylands Trä AB,https://www.nylandstra.se,0.9,Website found via company name search; matches company name and services.
+6,157,556974-3320,Knowit Ascend AB,https://www.knowit.se,0.8,Part of Knowit group; subsidiary information found on group website.
+6,158,556540-8514,Europress AB,https://www.europress.se,0.9,Website found via company name search; matches company name and services.
+6,159,556444-8255,Eqpack AB,https://eqpack.se,0.9,Registry homepage URL confirmed as live and matching company.
+6,160,556556-8895,Lyckes Produktionsverktyg AB,https://lyckespv.se,0.9,Registry homepage URL confirmed as live and matching company.
+6,161,556887-5057,Next2Vet AB,,0.0,No official website found after multiple searches; only directory listings available.
+6,162,556446-1472,Axema Access Control AB,https://www.axema.se,0.9,Website found via company name search; matches company name and services.
+6,163,556841-6803,Anton Paar Nordic AB,https://www.anton-paar.com/se-sv,0.9,Website found via company name search; matches company name and services.
+6,164,556443-5120,Converflex Aktiebolag,https://www.converflex.se,0.9,Website found via company name search; matches company name and services.
+6,165,556445-0467,Takab i Jönköping Aktiebolag,https://www.takab.com,0.9,Website found via company name search; matches company name and services.
+6,166,556876-6215,AB Vabon,https://www.vabon.se,0.9,Website found via company name search; matches company name and services.
+6,167,556687-0639,Eboss AB,https://www.eboss.se,0.9,Registry homepage URL confirmed as live and matching company.
+6,168,556509-4983,I M Gunnarsson Handels Aktiebolag,,0.0,No official website found after multiple searches; only directory listings available.
+6,169,556218-6253,Itaab Trading Aktiebolag,https://itaab.com,0.9,Registry homepage URL confirmed as live and matching company.
+6,170,556202-8968,S-Schakt Schönström Aktiebolag,https://www.s-schakt.se,0.9,Website found via company name search; matches company name and services.
+6,171,556265-5430,Carmenta Geospatial Technologies AB,https://carmenta.com,0.9,Website found via company name search; matches company name and services.
+6,172,556402-9766,Aktiebolaget Mercatus Engineering,https://www.mercatus.se,0.9,Website found via company name search; matches company name and services.
+6,173,556526-8421,Mönsterås Bostäder AB,https://www.monsterasbostader.se,0.9,Website found via company name search; matches company name and services.
+6,174,556482-4729,KmK Instrument Aktiebolag,https://www.kmk.se,0.9,Website found via company name search; matches company name and services.
+6,175,556455-8244,GMV Sweden Aktiebolag,https://www.gmv.se,0.9,Website found via company name search; matches company name and services.
+7,176,556723-7986,NFM Flytgolv AB,https://www.nfm.se,0.9,"Found on Byggkatalogen and Largestcompanies, matching orgnr and company name."
+7,177,556198-1308,Busch Pfeiffer Vacuum AB,https://www.buschvacuum.com/se/sv/,0.9,"Identified on Industritorget and Merinfo, matching orgnr and company name."
+7,178,556751-0689,Kaisa Technologies AB,,0.0,"No official website found after multiple searches combining company name, orgnr, and related terms."
+7,179,556534-0014,Netnod AB,https://www.netnod.se,0.9,Official website found matching company name and orgnr.
+7,180,556470-5506,Curant Klimat AB,https://www.curant.se,0.9,Official website found matching company name and orgnr.
+7,181,556531-3623,EH Connector AB,https://ehconnector.se,0.9,Registry homepage URL confirmed as live and matching company details.
+7,182,556436-7067,Örebro Bildemontering Aktiebolag,https://www.orebrobildemo.se,0.9,Official website found matching company name and orgnr.
+7,183,556457-7475,Sordin Vikmanshyttan AB,https://sordin.com,0.9,Registry homepage URL confirmed as live and matching company details.
+7,184,556812-7558,Addvanze AB,https://addvanze.com,0.9,Registry homepage URL confirmed as live and matching company details.
+7,185,556206-8238,Målerås Mekaniska Aktiebolag,https://maleras-mek.se,0.9,Registry homepage URL confirmed as live and matching company details.
+7,186,556394-4874,Aktiebolag Montano,https://www.montano.se,0.9,Official website found matching company name and orgnr.
+7,187,556367-6500,Vitec Mäklarsystem AB,https://www.vitecsoftware.com/maklarsystem,0.9,Official website found matching company name and orgnr.
+7,188,556568-1425,Il Molino AB,https://www.ilmolino.se,0.9,Official website found matching company name and orgnr.
+7,189,556620-3682,IML technologies aktiebolag,https://3buttongroup.com,0.9,Registry homepage URL confirmed as live and matching company details.
+7,190,556537-5994,Hydroscand Machine Aktiebolag,https://hydroscand.se,0.9,Registry homepage URL confirmed as live and matching company details.
+7,191,556722-3234,PQ Projektledning Aktiebolag,https://www.pqprojekt.se,0.9,Official website found matching company name and orgnr.
+7,192,556238-1839,Sjömarkens Isolering Aktiebolag,https://www.sjomarkens.se,0.9,Official website found matching company name and orgnr.
+7,193,559257-0096,Söderqvist Gräv AB,,0.0,"No official website found after multiple searches combining company name, orgnr, and related terms."
+7,194,556737-8236,Industridraperier i Örebro AB,https://www.industridraperier.se,0.9,Official website found matching company name and orgnr.
+7,195,556615-8126,Bällsta Handel AB,,0.0,"No official website found after multiple searches combining company name, orgnr, and related terms."
+7,196,556267-3383,Hydal Components AB,https://raufossaluminium.com,0.9,Registry homepage URL confirmed as live and matching company details.
+7,197,556762-3318,Lybab AB,https://lybab.se,0.9,Registry homepage URL confirmed as live and matching company details.
+7,198,556314-6660,Thor Ahlgren Aktiebolag,https://www.thorahlgren.se,0.9,Registry homepage URL confirmed as live and matching company details.
+7,199,556132-1745,Fillauer Europe AB,https://fillauer.com,0.9,Official website found matching company name and orgnr.
+7,200,559214-5717,Bright Networks AB,,0.0,"No official website found after multiple searches combining company name, orgnr, and related terms."
+8,201,559183-1085,MORA CNC AB,https://www.nordiqongroup.com,0.9,Registry URL verified as live and matching company name.
+8,202,556317-9596,Fasadsystem i Stenkullen Aktiebolag,https://fasadsystem.se,0.9,Registry URL verified as live and matching company name.
+8,203,556991-1497,ProChroma AB,,0.2,No official website found after multiple searches; only directory listings available.
+8,204,556490-7458,Material Handling Modules Europe AB,https://www.mhmodules.com,0.9,Registry URL verified as live and matching company name.
+8,205,556379-1101,Tovar Livs Aktiebolag,,0.2,No official website found after multiple searches; only directory listings available.
+8,206,556592-7646,Patriksson Communication AB,https://www.patriksson.com,0.9,Website found via search; matches company name and services.
+8,207,556531-8150,Per Sjögren Livs AB,,0.2,No official website found after multiple searches; only directory listings available.
+8,208,556328-8199,Multivac Aktiebolag,https://se.multivac.com,0.9,Website found via search; matches company name and services.
+8,209,556234-6089,Tribotec Aktiebolag,https://www.tribotec.se,0.9,Website found via search; matches company name and services.
+8,210,556030-7836,Sifvert Skruv Aktiebolag,https://www.sifvertskruv.se,0.9,Website found via search; matches company name and services.
+8,211,556624-2656,Vertech AB,https://www.vertech.se,0.9,Website found via search; matches company name and services.
+8,212,556583-8595,Schütz Allemballage AB,https://www.allemballage.se,0.9,Registry URL verified as live and matching company name.
+8,213,556998-1920,Vekst AB,https://www.vekst.se,0.9,Website found via search; matches company name and services.
+8,214,556762-5495,Panthera AB,https://www.panthera.se,0.9,Website found via search; matches company name and services.
+8,215,556201-1949,Aktiebolaget Thoreb,https://www.thoreb.com,0.9,Website found via search; matches company name and services.
+8,216,556633-5997,Sänghuset Elgen AB,https://www.sanghusetelgen.se,0.9,Website found via search; matches company name and services.
+8,217,556697-9281,Nya Eriksbo plantskola AB,https://www.eriksboplantskola.se,0.9,Website found via search; matches company name and services.
+8,218,556640-4421,Pall Cargo i Kungsbacka AB,https://www.pallcargo.se,0.9,Website found via search; matches company name and services.
+8,219,556999-4691,Parapix AB,https://parapix.tv,0.9,Registry URL verified as live and matching company name.
+8,220,556468-7597,AB Sundplast,https://sundplast.se,0.9,Registry URL verified as live and matching company name.
+8,221,556800-4328,Set Up AB,https://www.setupab.se,0.9,Website found via search; matches company name and services.
+8,222,556655-0603,TB Printsolutions AB,https://www.tbprintsolutions.se,0.9,Website found via search; matches company name and services.
+8,223,556813-8886,Conoa AB,https://www.conoa.se,0.9,Website found via search; matches company name and services.
+8,224,556508-8639,HA Ventilation AB,https://www.haventilation.se,0.9,Website found via search; matches company name and services.
+8,225,556575-1715,M o P Vestman Livs AB,,0.2,No official website found after multiple searches; only directory listings available.
+9,226,556812-9851,Roland Berger AB,https://www.rolandberger.se,0.9,Found on largestcompanies.com; matches company name and orgnr.
+9,227,556780-7358,Watt Heating AB,https://watt.se,0.9,Found on byggkatalogen.byggtjanst.se; matches company name and orgnr.
+9,228,556400-7275,Eriksons Chark i Nossebro Aktiebolag,,0.0,No official website found after multiple searches.
+9,229,556082-8773,Fredrik Mogensen Aktiebolag,,0.0,No official website found after multiple searches.
+9,230,556575-0279,Fila Nordic AB,,0.0,No official website found after multiple searches.
+9,231,556500-7357,Söderströms Skog & Trädgård AB,,0.0,No official website found after multiple searches.
+9,232,556832-9790,Remotion AB,,0.0,No official website found after multiple searches.
+9,233,556751-6041,Vindelns Livs AB,,0.0,No official website found after multiple searches.
+9,234,556924-1671,Pelago Bioscience AB,https://www.pelagobio.com,0.9,Registry homepage URL confirmed as live and matching company.
+9,235,556468-3349,Lupus Foder AB,,0.0,No official website found after multiple searches.
+9,236,556993-6684,Elovent AB,,0.0,No official website found after multiple searches.
+9,237,556389-8609,Seriline Aktiebolag,,0.0,No official website found after multiple searches.
+9,238,556455-1900,Texstar AB,,0.0,No official website found after multiple searches.
+9,239,556289-7164,Malthe Winje Automation AB,,0.0,No official website found after multiple searches.
+9,240,556844-4243,Gällivare Utveckling AB,,0.0,No official website found after multiple searches.
+9,241,556318-6385,Maskin-Mekano Försäljnings Aktiebolag,,0.0,No official website found after multiple searches.
+9,242,559155-1154,TIQQE AB,,0.0,No official website found after multiple searches.
+9,243,556629-8203,Traryds Metall AB,,0.0,No official website found after multiple searches.
+9,244,556108-9284,Hammarplast Medical Aktiebolag,https://hpm.se,0.9,Registry homepage URL confirmed as live and matching company.
+9,245,556858-5318,Qleano AB,,0.0,No official website found after multiple searches.
+9,246,556527-9279,Olsbergs Electronics AB,,0.0,No official website found after multiple searches.
+9,247,556843-4061,Trygga Hiss i Stockholm AB,,0.0,No official website found after multiple searches.
+9,248,556509-0148,Swedish Oat Fiber Aktiebolag,,0.0,No official website found after multiple searches.
+9,249,556813-4059,Keeparo AB,,0.0,No official website found after multiple searches.
+9,250,556101-5230,Götaplatsens Foto AB,,0.0,No official website found after multiple searches.
+10,251,556578-0250,C. Gustafsson Livs Aktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,252,556495-7297,Protek Projektstyrning i G6teborg AB,https://www.protek-projektstyrning.se,0.9,"Website URL found on multiple business directories, matching company details."
+10,253,556733-2969,Datav 0e4xt AB,https://datavaxt.com,0.95,Registry homepage URL confirmed as live and matching company details.
+10,254,556571-7120,Thomas o Marianne Alfredsson AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,255,556233-8961,Norrbottens Bildemontering Aktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,256,556649-7565,Realtryck i Stockholm AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,257,556543-8941,Citedo AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,258,556035-5926,Aktiebolaget Cernelle.,https://cernelle.eu,0.95,Registry homepage URL confirmed as live and matching company details.
+10,259,556834-1209,Front Automation AB,https://3buttongroup.com,0.9,Registry homepage URL confirmed as live and matching company details.
+10,260,559053-0688,Distriktsl 0e4karna i V 0e4stra G 0f6taland AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,261,556185-3499,Norra  0c5sbo Renh 0e5llningsaktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,262,556655-6501,Contribit AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,263,556193-7086,"KAMI, Kalix Mekaniska Industrier Aktiebolag",https://kami.se,0.95,Registry homepage URL confirmed as live and matching company details.
+10,264,556800-0375,Lomma Tak AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,265,556070-6037,K A Olsson & Gems Aktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,266,556487-9442,Grays Bakery AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,267,556781-9635,K Vent AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,268,556921-9032,Wellectronics AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,269,556630-2245,Ambulansproduktion i Sandviken AB,https://www.ambulansproduktion.se,0.95,Registry homepage URL confirmed as live and matching company details.
+10,270,556488-5720,Actil Warehouse Trucks AB,https://actil.se,0.95,Registry homepage URL confirmed as live and matching company details.
+10,271,559054-0315,Bricks and Lime AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,272,556213-0657,Lagermetall Aktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,273,556464-0497,Ventilationsprojekt i Nyk 0f6ping AB,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,274,556471-7477,TP Mur & Puts Aktiebolag,,0.0,No official website found after multiple searches; likely operates without a public site.
+10,275,556435-6789,Water and Laser Technology i Vansbro Aktiebolag,https://www.waltech.se,0.95,Registry homepage URL confirmed as live and matching company details.
+11,276,556518-7969,Samuelssons Tak AB,https://www.samuelssonstak.se,0.9,"Found on multiple sources, including Byggkatalogen and Hantverkskollen, matching company details."
+11,277,556023-2802,Universalisolering Fredriksson Aktiebolag,https://www.universalisolering.se,0.9,"Website lists company name and orgnr, matching provided details."
+11,278,556350-8323,S K Licenssvets Frölunda Aktiebolag,,0.0,No official website found after multiple searches; only directory listings available.
+11,279,556622-6444,MARIA ÅKERBERG AB,https://mariaakerberg.com,0.9,Website matches company name and product line.
+11,280,556192-8127,Eliass Georges Fyndmarknad AB,,0.0,No official website found after multiple searches; only directory listings available.
+11,281,556204-5236,Auson Aktiebolag,https://www.auson.se,0.9,Website matches company name and product offerings.
+11,282,556311-5707,AV-Line Aktiebolag,https://www.av-line.se,0.9,Website matches company name and services.
+11,283,559244-7113,Astrimant AB,,0.0,No official website found after multiple searches; only directory listings available.
+11,284,556776-6125,W5 ArcQor AB,https://arcqor.com,0.9,Website matches company name and services.
+11,285,556414-4763,Autoklinik i Malmö Aktiebolag,https://rydsbilglas.se,0.7,Website associated with company services; exact match not confirmed.
+11,286,556623-0180,Visma Real Estate AB,https://www.visma.se/fastighetssystem,0.9,Website matches company name and services.
+11,287,556702-9755,EASY ONLINE STORES AB,https://www.easytryck.se,0.9,Website matches company name and services.
+11,288,556613-1628,Jirotex Furudahlsgruppen AB,https://www.jirotex.se,0.9,Website matches company name and products.
+11,289,556612-5901,Stora & Goa AB,,0.0,No official website found after multiple searches; only directory listings available.
+11,290,556675-2332,INAC Process AB,https://www.inac.se,0.9,Website matches company name and services.
+11,291,556337-6143,EVI Industries Vaggeryd AB,https://www.eviindustries.se,0.9,Website matches company name and services.
+11,292,556069-0769,A. T. Kearney Aktiebolag,https://www.kearney.com,0.9,Global website matches company name and services.
+11,293,556487-4534,TagMaster Aktiebolag,https://www.tagmaster.com,0.9,Website matches company name and products.
+11,294,556403-9005,Flyinge Plantshop Aktiebolag,https://www.flyingeplantshop.se,0.9,Website matches company name and services.
+11,295,556748-1352,SWELIFT AB,https://www.swelift.se,0.9,Website matches company name and services.
+11,296,556257-8020,CA consultadministration AB,https://www.ca.se,0.9,Website matches company name and services.
+11,297,556973-2141,C M Betong AB,https://www.cmbetong.se,0.9,Website matches company name and services.
+11,298,556674-8926,Atvhuset AB,https://www.atvhuset.se,0.9,Website matches company name and products.
+11,299,556957-7959,Åsens Projekt AB,,0.0,No official website found after multiple searches; only directory listings available.
+11,300,556499-0728,E. Södergren Livs AB,,0.0,No official website found after multiple searches; only directory listings available.
+12,301,556921-4058,Archus Aff 0rsutveckling & Projektledning AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,302,556491-4637,H P-Borrningar i Klippan Aktiebolag,https://www.hpborrningar.se,0.9,Website found in multiple business directories; matches company name and services.
+12,303,556277-1468,J.N. Elinstallat f6rer Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,304,556627-2927, c5MV Production Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,305,556798-0759,Lone Star Shipping AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,306,556041-7254,Tjeders Industri Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,307,556252-8652,Medela Medical Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,308,556222-7313,Claessons Cykel & Motor Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,309,559389-4776,Berkeley Company AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,310,556803-8789,Solid Beans AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,311,556143-2013,Helge Nyberg Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,312,556597-6684,Cordial AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,313,556616-8190,Osby Mekan AB,https://npoindustrier.se,0.6,Registry homepage URL provided; verified as live and matching company information.
+12,314,556295-6556,Svetsekonomi i Sk f6vde Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,315,556326-7185,Westmatic i Arvika Aktiebolag,https://www.westmatic.se,0.9,Registry homepage URL provided; verified as live and matching company information.
+12,316,556450-5575,Karlskoga CNC Quality Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,317,559015-9553,Matbutiken V e4llebergsv e4gen AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,318,556402-1003,Wan e5s Gods Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,319,556285-0700,Jarl Sandin & S f6ner Guld och Silver Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,320,556573-8027,Vygon (Sweden) AB,,0.0,No official website found after multiple searches; company information available on business directories.
+12,321,556313-2058,Ljung & Sj f6berg Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,322,556215-1638,Fricweld Aktiebolag,,0.0,No official website found after multiple searches; company information available on business directories.
+12,323,556367-4067,AluFlex AB,https://www.indutrade.com,0.6,Registry homepage URL provided; verified as live and matching company information.
+12,324,556606-1056,EMV Stainless AB,https://emvholding.se,0.6,Registry homepage URL provided; verified as live and matching company information.
+12,325,556551-0301,KEBCO-Kebab Company AB,,0.0,No official website found after multiple searches; company information available on business directories.
+13,326,556595-0036,MTB Plattsättning Aktiebolag,https://www.plattsattning-norrkoping.se,0.5,"Found on Byggkatalogen; however, the domain suggests a different location than Mölndal."
+13,327,556557-6401,Böttcher Nordic AB,https://www.boettcher.de,0.7,Parent company site; no dedicated Nordic page found.
+13,328,556487-7172,Reco Port Aktiebolag,https://www.recoport.se,0.9,Registry URL confirmed as live and matching company.
+13,329,556675-3496,Muskövarvet AB,https://www.muskovarvet.se,0.9,Website found matching company name and services.
+13,330,556368-2250,OptiPack AB,https://www.optipack.se,0.9,Website found matching company name and services.
+13,331,556495-5986,F:a GREFS AB,https://www.grefs.se,0.9,Website found matching company name and services.
+13,332,559144-1877,Petro Bio AB,https://www.petro.se,0.9,Website found matching company name and services.
+13,333,556875-2199,Axelssons i Aby AB,https://www.axelssonsiaby.se,0.9,Website found matching company name and services.
+13,334,559256-8108,Nova Park AB,https://www.novapark.se,0.9,Website found matching company name and services.
+13,335,559030-4530,Wisest AB,https://www.wisest.se,0.9,Website found matching company name and services.
+13,336,556914-6771,Proline Väst AB,https://www.proline-group.com,0.7,Group site listing regional subsidiaries.
+13,337,556512-0762,Sennen AB,https://www.sennen.se,0.9,Website found matching company name and services.
+13,338,556774-9055,Doktor.se Geria Vårdcentral AB,https://www.doktor.se/geria-vardcentral,0.9,Website found matching company name and services.
+13,339,556545-6265,Eurostair Produktion Aktiebolag,https://www.eurostair.com,0.9,Website found matching company name and services.
+13,340,556643-7587,Klarvik AB,https://klarvik.se,0.9,Registry URL confirmed as live and matching company.
+13,341,556610-7099,ALO Center Aktiebolag,https://alocenter.se,0.9,Registry URL confirmed as live and matching company.
+13,342,556645-2982,Elkrafterna i Östergötland AB,https://www.elkrafterna.se,0.9,Website found matching company name and services.
+13,343,556940-3388,Exellent Syd AB,https://www.exellentsyd.se,0.9,Registry URL confirmed as live and matching company.
+13,344,556346-6738,Bastec AB,https://www.bastec.se,0.9,Registry URL confirmed as live and matching company.
+13,345,556742-2018,L & A Falks Lantbruksmaskiner AB,https://www.falks.se,0.9,Website found matching company name and services.
+13,346,556740-1913,Amadeuskliniken AB,https://www.amadeuskliniken.se,0.9,Website found matching company name and services.
+13,347,556840-5582,PMC i Strängnäs AB,https://b2b.koncern.eu,0.7,Registry URL points to group site; no dedicated page found.
+13,348,559217-9070,Nexer Insight AB,https://nexergroup.com/insight,0.9,Website found matching company name and services.
+13,349,556822-1195,Boardtalk AB,https://www.boardtalk.se,0.9,Website found matching company name and services.
+13,350,559003-4426,Husverket AB,https://www.husverket.se,0.9,Website found matching company name and services.
+14,351,556587-6066,SchoolSoft AB,https://www.schoolsoft.se,0.9,Found via company name and orgnr search; domain matches company name and services.
+14,352,556653-5174,Itsab AB,https://www.itsabtryckluft.se,0.9,Identified through company name and orgnr search; domain aligns with company name and services.
+14,353,556564-3458,Thelin Data AB,https://www.thelindata.se,0.9,Located via company name and orgnr search; domain corresponds with company name and services.
+14,354,556664-8126,THED Livs AB,,0.2,No official website found after multiple searches; likely operates without a public site.
+14,355,556956-4858,Boliden Electro AB,https://www.bolidenelectro.se,0.9,Discovered through company name and orgnr search; domain matches company name and services.
+14,356,556337-1375,Sandéns Golv i Helsingborg Aktiebolag,https://www.sandensgolv.se,0.9,Found via company name and orgnr search; domain aligns with company name and services.
+14,357,556536-2000,Ingeniörsfirma Bågenfelt & Hellström AB,https://www.bagenfelt-hellstrom.se,0.9,Identified through company name and orgnr search; domain corresponds with company name and services.
+14,358,556415-1362,MOORE KLN AB,https://www.moorekln.se,0.9,Located via company name and orgnr search; domain matches company name and services.
+14,359,556480-3251,Getinge Gräv Aktiebolag,https://www.getingegrav.se,0.9,Discovered through company name and orgnr search; domain aligns with company name and services.
+14,360,556765-8827,Grenland Rail AB,https://www.grenlandrail.se,0.9,Found via company name and orgnr search; domain corresponds with company name and services.
+14,361,556559-8207,Sacco System Nordic AB,https://www.saccosystemnordic.se,0.9,Identified through company name and orgnr search; domain matches company name and services.
+14,362,556816-4924,AV1 AB,https://b2b.koncern.eu,0.7,Registry homepage URL provided; verified as active and relevant to the company.
+14,363,556161-8017,N P Produkter i Jönköping Aktiebolag,https://www.npprodukter.se,0.9,Located via company name and orgnr search; domain aligns with company name and services.
+14,364,556369-9817,INSU AB,https://www.insu.se,0.9,Discovered through company name and orgnr search; domain corresponds with company name and services.
+14,365,556528-7264,Aktiebolaget Smålandsinredningar,https://www.smalandsinredningar.se,0.9,Found via company name and orgnr search; domain matches company name and services.
+14,366,556170-3926,Bimex Verktyg AB,https://www.bimex.se,0.9,Registry homepage URL provided; verified as active and relevant to the company.
+14,367,556545-2298,Torverk Industrial Doors Aktiebolag,https://torverk.se,0.9,Registry homepage URL provided; verified as active and relevant to the company.
+14,368,556519-6382,YTAAB AB,https://www.ytaab.se,0.9,Identified through company name and orgnr search; domain aligns with company name and services.
+14,369,556058-6744,ABAS Protect AB,https://abas.se,0.9,Registry homepage URL provided; verified as active and relevant to the company.
+14,370,556993-8326,LTP Säkerhetsteknik AB,https://www.ltpsakerhetsteknik.se,0.9,Located via company name and orgnr search; domain corresponds with company name and services.
+14,371,559032-1013,Törnblads livs i Tvååker AB,,0.2,No official website found after multiple searches; likely operates without a public site.
+14,372,556908-6282,Polyproject Environment AB,https://www.polyproject.se,0.9,Discovered through company name and orgnr search; domain matches company name and services.
+14,373,559168-0326,Omniarch AB,https://www.omniarch.se,0.9,Found via company name and orgnr search; domain aligns with company name and services.
+14,374,556840-4684,Växtkraft i Skåne Tranås AB,https://www.vaxtkraft.se,0.9,Identified through company name and orgnr search; domain corresponds with company name and services.
+14,375,556753-0992,Dalform AB,https://www.dalform.se,0.9,Located via company name and orgnr search; domain matches company name and services.
+15,376,556218-9596,Lagafors AB,https://www.lagafors.se,0.9,Registry homepage URL verified as live and matching company details.
+15,377,559109-5582,Install Fiber I Norr AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,378,556071-4288,Aktiebolaget Varmförzinkning,https://www.varmforzinkning.se,0.9,Registry homepage URL verified as live and matching company details.
+15,379,556286-9858,U-nite Fasteners Technology AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,380,556214-7800,Mellanskånes Renhållningsaktiebolag,https://www.merab.se,0.9,Registry homepage URL verified as live and matching company details.
+15,381,556183-6700,LECO Nordic AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,382,559362-5253,Basta i Huvudstaden AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,383,556209-6254,Jan Comstedt Aktiebolag,https://www.comstedt.se,0.9,Registry homepage URL verified as live and matching company details.
+15,384,556134-6320,Schunk Intec AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,385,556752-3518,Biolit AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,386,556289-6802,Lättviktsmotor N Hyr AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,387,556106-4543,Åhmans i Åhus Aktiebolag,https://www.ahmans.se,0.9,Registry homepage URL verified as live and matching company details.
+15,388,559087-8236,Eklunds Bildelslager i Skövde AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,389,556382-5198,Lövånger Elektronik Uppsala AB,https://www.leab.se,0.9,Registry homepage URL verified as live and matching company details.
+15,390,556860-1057,VinnTer AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,391,556443-6656,Roger Gustafsson Mekaniska Aktiebolag,https://www.rg-mek.se,0.9,Registry homepage URL verified as live and matching company details.
+15,392,556926-2438,TreForm Packaging AB,https://treform.se,0.9,Registry homepage URL verified as live and matching company details.
+15,393,556801-4095,Twindej Experience AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,394,556786-5588,GUSTIS AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,395,556223-4863,Bollnäs-Ovanåkers Renhållnings Aktiebolag - BORAB,https://www.borab.se,0.9,Registry homepage URL verified as live and matching company details.
+15,396,556219-3580,Naturell Aktiebolag,,0.2,No official website found; company information available on directories like allabolag.se.
+15,397,556279-5582,Breddens Livs Aktiebolag,,0.2,No official website found; company information available on directories like allabolag.se.
+15,398,556261-9287,CAG Consoden AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,399,556524-2814,Mathuset i Södra Backa AB,,0.2,No official website found; company information available on directories like allabolag.se.
+15,400,556618-4510,Mabema AB,https://mabema.com,0.9,Registry homepage URL verified as live and matching company details.
+16,401,556750-2561,Installera SW AB,https://www.installerael.se/,0.9,"Found on multiple reputable sources, including Bygg.se and Byggkatalogen."
+16,402,556694-5878,Elinzity AB,https://www.elinzity.se/,0.9,Listed on Largestcompanies.com and Byggkatalogen.
+16,403,556694-1109,Enerco NTT AB,https://www.nttab.se/,0.9,Registry homepage URL confirmed as live and matching the company.
+16,404,556574-2250,Bjärefågel i Torekow AB,https://www.bjarefagel.se/,0.9,Identified through web search; site content matches company profile.
+16,405,556431-5462,MAF Pump Aktiebolag,https://mafpump.se/,0.9,Registry homepage URL confirmed as live and matching the company.
+16,406,556896-4224,Eurofins Pegasuslab AB,https://www.eurofins.se/,0.9,Registry homepage URL confirmed as live and matching the company.
+16,407,556087-5188,Margret Gardinkonfektion Aktiebolag,https://www.margretgardin.se/,0.9,Identified through web search; site content matches company profile.
+16,408,556816-5426,Bluebeam AB,https://www.bluebeam.com/,0.9,Identified through web search; site content matches company profile.
+16,409,556898-8959,Kviberggruppen AB,https://www.kviberggruppen.se/,0.9,Identified through web search; site content matches company profile.
+16,410,559374-3510,EVLI AB,https://www.evli.com/,0.9,Registry homepage URL confirmed as live and matching the company.
+16,411,556496-4756,Caramelle Fashion Club AB,https://www.caramelle.se/,0.9,Identified through web search; site content matches company profile.
+16,412,556039-0279,Plastomer Sweden Aktiebolag,https://www.plastomer.se/,0.9,Identified through web search; site content matches company profile.
+16,413,556893-4508,Sandbäckens Sprinkler Mitt AB,https://www.sandbackens.se/,0.9,Identified through web search; site content matches company profile.
+16,414,556684-1853,Skandinaviska Områdesskydd AB,https://www.skandinaviska.nu/,0.9,Identified through web search; site content matches company profile.
+16,415,556021-3828,Sandéns Security Printing AB,https://www.sandens.se/,0.9,Identified through web search; site content matches company profile.
+16,416,559329-5339,Agigo AB,https://www.agigo.se/,0.9,Identified through web search; site content matches company profile.
+16,417,556342-1634,Öbergs i Karlstad AB,https://www.obergs.se/,0.9,Identified through web search; site content matches company profile.
+16,418,556701-2587,Din Bostad i Stockholm AB,https://www.dinbostad.se/,0.9,Identified through web search; site content matches company profile.
+16,419,556767-5672,BGFIX AB,https://www.bgfix.se/,0.9,Identified through web search; site content matches company profile.
+16,420,556340-7724,Pulverlack i Hedesunda AB,https://www.pulverlackhedesunda.se/,0.9,Registry homepage URL confirmed as live and matching the company.
+16,421,556738-0315,Aon Assessment (Sweden) AB,https://assessment.aon.com/,0.9,Identified through web search; site content matches company profile.
+16,422,556519-3660,Anders Gustafsson Livs Aktiebolag,https://www.ica.se/butiker/nara/stockholm/anders-gustafsson-livs-ab-ica-nara-nytorget-1090/,0.9,Identified through web search; site content matches company profile.
+16,423,556733-1466,LICAB AB,https://www.licab.se/,0.9,Identified through web search; site content matches company profile.
+16,424,556713-8812,Speeron AB,https://www.speeron.se/,0.9,Identified through web search; site content matches company profile.
+16,425,556863-9966,Mulic Livs AB,https://www.muliclivs.se/,0.9,Identified through web search; site content matches company profile.
+17,426,556336-0071,TOMINA Aktiebolag,https://www.tomina.se,0.9,"Found on Largestcompanies.com and Byggkatalogen, matches company name and services."
+17,427,556553-8898,Evidi AB,https://www.navipro.se,0.85,Listed on Largestcompanies.com as Evidi AB's website.
+17,428,556098-5599,Ingenjörsfirman Geotech Aktiebolag,https://geotech.se,0.95,"Registry homepage URL provided, verified as active and matching company name."
+17,429,556579-1349,Skogsmateriel-Nordforest Aktiebolag,https://www.nordforest.com,0.9,Website found matching company name and industry.
+17,430,556085-2922,Annell Ljus och Form Aktiebolag,https://www.annell.se,0.9,Website found matching company name and industry.
+17,431,556353-7512,Hagaberg Industrier AB,https://www.hagaberg.com,0.95,"Registry homepage URL provided, verified as active and matching company name."
+17,432,559387-8969,Ecrucial Stockholm AB,https://www.ecrucial.se,0.85,Website found matching company name and industry.
+17,433,556042-9549,Kristianstads Automobil Lastvagnar AB,https://www.kristianstadsautomobil.se,0.9,Website found matching company name and industry.
+17,434,556726-9278,Biotech Fluidics AB,https://www.biotechfluidics.com,0.9,Website found matching company name and industry.
+17,435,556291-3557,Svetsprodukter i Piteå Aktiebolag,https://www.svetsprodukter.se,0.9,Website found matching company name and industry.
+17,436,556078-5114,TR Media AB,https://www.trmedia.se,0.9,Website found matching company name and industry.
+17,437,556744-7031,Seacastle AB,https://www.seacastle.se,0.9,Website found matching company name and industry.
+17,438,556688-6445,Svenska GMK AB,https://www.svenskagmk.se,0.9,Website found matching company name and industry.
+17,439,556692-9815,Wenderfalck Kommunikation AB,https://www.wenderfalck.com,0.9,Website found matching company name and industry.
+17,440,556491-4298,Dotetorps Ägg Aktiebolag,https://www.dotetorpsagg.se,0.9,Website found matching company name and industry.
+17,441,556086-1535,Bröderna Hansson H-tryck Aktiebolag,https://www.h-tryck.se,0.95,"Registry homepage URL provided, verified as active and matching company name."
+17,442,556804-3698,BrightCom Solutions AB,https://www.brightcom.se,0.9,Website found matching company name and industry.
+17,443,556574-6319,AQ ParkoPrint AB,https://www.aqg.se,0.9,Website found matching company name and industry.
+17,444,559370-1971,SkyShowtime Nordics AB,https://www.skyshowtime.com,0.9,Website found matching company name and industry.
+17,445,556442-2755,Lindås Gräv Aktiebolag,https://www.lindasgrav.se,0.9,Website found matching company name and industry.
+17,446,556965-9815,The limit is SQY AB,https://www.sqy.se,0.9,Website found matching company name and industry.
+17,447,556671-1924,JustNu AB,https://www.justnu.se,0.9,Website found matching company name and industry.
+17,448,556641-7357,RISE Processum AB,https://www.processum.se,0.9,Website found matching company name and industry.
+17,449,556209-9001,INFICON AB,https://www.inficon.com,0.9,Website found matching company name and industry.
+17,450,556712-0232,Fröjd Interactive AB,https://www.frojd.se,0.9,Website found matching company name and industry.
+18,451,556605-7476,Cyient Engineering AB,https://www.cyient.com,0.9,"Cyient Engineering AB is a subsidiary of Cyient, whose official website is https://www.cyient.com. The parent company's site provides information about its global operations, including services offered by its subsidiaries."
+18,452,556835-5399,WEFIX Trädgård AB,https://www.wefixab.se,0.9,"The domain www.wefixab.se is listed as the company's website on Largestcompanies.se, a reputable business directory."
+18,453,556414-7485,August Larsson Charkuteri AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,454,556337-2761,Röchling Industrial Virserum AB,https://www.roechling.com,0.9,"The registry_homepage_url matches the official website of the Röchling Group, which lists Röchling Industrial Virserum AB as one of its subsidiaries."
+18,455,556650-3321,Vökby Bredband AB,https://www.vokby.se,0.9,The domain www.vokby.se is identified as the company's official website through web searches and business directories.
+18,456,556740-6821,Svalebergs Elektriska AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,457,559001-0533,VentPartner i Västmanland AB,https://www.ventpartner.se,0.9,The domain www.ventpartner.se is identified as the company's official website through web searches and business directories.
+18,458,556886-4465,Lotts Import AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,459,556709-5152,Elopak AB,https://www.elopak.com,0.9,The domain www.elopak.com is identified as the company's official website through web searches and business directories.
+18,460,559002-6554,AMV Equipment AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,461,556854-5106,pour-tech AB,https://pour-tech.com,0.9,The registry_homepage_url matches the official website of pour-tech AB.
+18,462,559135-3171,Keyvent Öst AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,463,556108-7338,Filipstad Stormarknad AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,464,556155-7264,Vilbergens Livs Aktiebolag,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,465,556750-1522,Exista Säkerhet AB,https://www.exista.se,0.9,The registry_homepage_url matches the official website of Exista Säkerhet AB.
+18,466,556731-7234,Sprinklerbolaget Stockholm AB,,0.0,"No official website found after multiple searches combining the company name, orgnr, and related keywords."
+18,467,556917-8386,Better You AB,https://www.betteryou.se,0.9,The domain www.betteryou.se is identified as the company's official website through web searches and business directories.
+18,468,556773-4784,Neoventa Medical AB,https://www.neoventa.com,0.9,The domain www.neoventa.com is identified as the company's official website through web searches and business directories.
+18,469,559234-0623,Giants and Toys content providers AB,https://www.giantsandtoys.com,0.9,The registry_homepage_url matches the official website of Giants and Toys content providers AB.
+18,470,556499-9620,Tollco Aktiebolag,https://www.tollco.se,0.9,The domain www.tollco.se is identified as the company's official website through web searches and business directories.
+18,471,556198-5077,DENSIQ AB,https://www.densiq.com,0.9,The domain www.densiq.com is identified as the company's official website through web searches and business directories.
+18,472,556432-0611,Link Sweden Aktiebolag,https://www.linksweden.se,0.9,The domain www.linksweden.se is identified as the company's official website through web searches and business directories.
+18,473,556424-9059,Skeppsbrons Jönköping AB,https://skeppsbrons.se,0.9,The registry_homepage_url matches the official website of Skeppsbrons Jönköping AB.
+18,474,556283-0124,Range Servant AB,https://www.rangeservant.com,0.9,The domain www.rangeservant.com is identified as the company's official website through web searches and business directories.
+18,475,556495-0557,Kumla Tak Aktiebolag,https://www.kumlatak.se,0.9,The domain www.kumlatak.se is identified as the company's official website through web searches and business directories.
+19,476,556353-3230,Vaggeryds Chark AB,https://www.vaggerydschark.se,0.9,Found official website via web search; matches company name and industry.
+19,477,556145-5246,Svarvmekano i Malmö Aktiebolag,https://www.svarvmekano.se,0.9,Registry homepage URL confirmed as live and matching company details.
+19,478,556750-2777,Hushållningssällskapets Kompetensutveckling i Syd AB (HUSKAB),https://hushallningssallskapet.se,0.7,Parent organization website lists this subsidiary.
+19,479,556940-0251,Lapplands Elnät i Jokkmokk AB,https://www.lapplandsel.se,0.9,Found official website via web search; matches company name and industry.
+19,480,556479-7206,Rigef Plastemballage Aktiebolag,https://www.rigef.se,0.9,Registry homepage URL confirmed as live and matching company details.
+19,481,556043-8318,Aktiebolaget Karl Andersson & Söner Möbelfabrik,https://www.karl-andersson.se,0.9,Found official website via web search; matches company name and industry.
+19,482,559143-4427,MOKO AB,https://www.moko.se,0.9,Found official website via web search; matches company name and industry.
+19,483,556113-9220,Nordlo Skaraborg AB,https://nordlo.com,0.8,Parent company website lists this subsidiary.
+19,484,556436-1441,AGES Kulltorp AB,https://www.ages.se,0.9,Registry homepage URL confirmed as live and matching company details.
+19,485,556442-1484,Aktiebolaget Dalforsån,https://www.dalforsan.se,0.9,Found official website via web search; matches company name and industry.
+19,486,556076-4564,Ackurat Industriplast Aktiebolag,https://www.ackurat.se,0.9,Found official website via web search; matches company name and industry.
+19,487,556123-9046,Götene Plast Aktiebolag,https://goteneplast.se,0.9,Registry homepage URL confirmed as live and matching company details.
+19,488,556613-2295,Br. Göransson AB,https://www.brgoransson.se,0.9,Found official website via web search; matches company name and industry.
+19,489,559075-1664,IDUN Minerals AB,https://idunminerals.com,0.9,Found official website via web search; matches company name and industry.
+19,490,556631-1329,ApartDirect Long Stay AB,https://www.apartdirect.com,0.9,Found official website via web search; matches company name and industry.
+19,491,556131-8717,Bobe Plast AB,https://bobe.se,0.9,Registry homepage URL confirmed as live and matching company details.
+19,492,556066-5746,Wiges AB,https://www.wiges.se,0.9,Found official website via web search; matches company name and industry.
+19,493,556779-8789,EmbeddedArt AB,https://www.embeddedart.se,0.9,Found official website via web search; matches company name and industry.
+19,494,556536-0814,Porsön Livs AB,https://www.porsonlivs.se,0.9,Found official website via web search; matches company name and industry.
+19,495,556753-1461,ST Eriks Vårdbolag AB,https://www.steriksvardbolag.se,0.9,Found official website via web search; matches company name and industry.
+19,496,556537-4294,MVB Umeå AB,https://www.mvb.se,0.8,Parent company website lists this subsidiary.
+19,497,556131-1456,"Big Image Systems, Sweden Aktiebolag",https://bigimagesystems.com,0.9,Registry homepage URL confirmed as live and matching company details.
+19,498,556046-8133,Candor Sweden Aktiebolag,https://www.candorsweden.com,0.9,Found official website via web search; matches company name and industry.
+19,499,559036-6729,Gronko AB,https://www.gronko.se,0.9,Found official website via web search; matches company name and industry.
+19,500,556190-4300,Sajaco Nordic AB,https://www.sajaco.se,0.9,Found official website via web search; matches company name and industry.

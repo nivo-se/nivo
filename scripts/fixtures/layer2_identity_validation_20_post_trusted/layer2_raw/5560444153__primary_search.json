@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560444153",
+  "company_name": "Bring Sverige AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Bring Sverige\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Bring Sverige what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.bring.se/en/about-bring",
+        "title": "About Bring - bring.se/en",
+        "content": "# About Bring. Bring solves everyday logistics for small and large companies in the Nordic region. The Nordic region is Bring's home. From our Nordic base, we can help you with your logistics to and from the wider world, regardless of type of transport. At Bring we are about 6000 employees working to provide good service for your company, based on these clear values; honesty, courage, openness, cooperation and respect. ## Environment & Sustainability. Bring strives to be a leader in environmental solutions in our industry. Large parts of our company is certified within environment and quality according to the standards ISO 14001 and ISO 9,001th. ## Ethical guidelines. Our ethical guidelines are based on the group's values, and form a norm for what is considered good and responsible conduct. Our ethical guidelines form a norm for good and responsible conduct, and apply to all employees in the group. The group must be characterized by a high ethical standard and an open corporate culture.",
+        "score": 0.5962692,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.quora.com/What-has-Sweden-brought-to-the-world-in-terms-of-products-services-artists-technologies-ideologies-and-processes",
+        "title": "What has Sweden brought to the world in terms of products, services ...",
+        "content": "Volvo makes cars, trucks, busses, earth moving equipment, marine engines & jet engines. · Scania makes trucks. · Königsegg makes sports cars.",
+        "score": 0.53196377,
+        "raw_content": null
+      },
+      {
+        "url": "https://sweden.se/work-business/business-in-sweden/10-swedish-brands-and-innovations",
+        "title": "10 Swedish brands and innovations - Sweden.se",
+        "content": "# 10 Swedish brands and innovations. Some Swedish brands and innovations are known around the world without most people knowing that they're Swedish. While people probably recognise the name Electrolux on their kitchen appliances, many may not know that this company is Swedish – or that it is one of the best selling household appliance manufacturers in the world. Bringing Sweden’s quintessential minimalist yet chic style of fashion to the world is H&M, more known as H&M. Started in 1947 as a women’s clothing store called Hennes (which means 'hers' in Swedish) in Västerås, founder Erling Persson later bought hunting and fishing equipment store Mauritz Widforss – and that’s how Hennes & Mauritz, later H&M, was born. Among the more famous Swedish brands and innovations, we find Volvo – as iconic as Swedish meatballs. There are many personal stories behind Swedish brands and innovations. Among the Swedish brands and innovations, we find the zip. Among the Swedish brands and innovations, we find the zip.",
+        "score": 0.37993094,
+        "raw_content": null
+      },
+      {
+        "url": "https://visitsweden.com/what-to-do/shopping/swedish-design-items-made-to-be-used/",
+        "title": "11 Swedish design items made to be used | Visit Sweden",
+        "content": "Explore Sweden through design items that are made to be used. # Swedish design items made to be used. Swedish design is made to be used. So, instead of buying a souvenir that you put on a shelf to watch, why not bring home a Swedish design object that is functional, sustainable and of good quality. Täljogram was founded by crafter and designer Felix Wink, who wanted more people to experience the satisfaction of carving a fresh piece of wood. Woolpower is a company based in northern Sweden that makes functional garments and wool products. Sovelfat Kulturen was created by Swedish designer Kristina Stark. Ekelund's linen factory produces design blankets and kitchen towels, combining traditional weaving with new technology. Muohta (Snow) is a handmade silver brooch, designed by Sami artist and jewellery maker Erica Huuva. ### Top 6 design places to visit in northern Sweden. ### Top 7 design places in Stockholm and middle Sweden. ### Top 9 design places to visit in southern Sweden.",
+        "score": 0.34528238,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.trustpilot.com/review/www.bring.se",
+        "title": "Bring Sverige Reviews | Read Customer Service ... - Trustpilot",
+        "content": "# Bring Sverige Reviews 626,855. Reviewers had a great experience with this company. Many customers consistently praise the service for its efficiency and reliability, noting that packages often arrive on time or even earlier than expected. A few people also mentioned problems with home delivery attempts and the responsiveness of customer service in resolving these issues.See more. Reviewers mention ambiguous feedback about delivery services. I gave 4 stars, as the delivery point is not the point that we usually go to collect parcels from other parcel services that is near to our home. Tracing / notifications say that package will be delivered to pickup location, but then it arrives home and cour... Always within the 2 or 3 day’s stated delivery and the packages are never damaged. I selected the delivery to a box near my home but something went wrong with my delivery the day it was supposed to arrive. The package was set for home delivery and the dude fake delivered it. ## All reviews.",
+        "score": 0.33980626,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.45,
+    "request_id": "d9c8166e-b154-47fd-b1ed-023d44617f3f"
+  }
+}

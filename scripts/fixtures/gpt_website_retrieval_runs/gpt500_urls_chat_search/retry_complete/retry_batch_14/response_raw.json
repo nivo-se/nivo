@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-f56c70d6-bb18-4833-a152-780633dc8c64",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"559109-5582\",\"company_name\":\"Install Fiber I Norr AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556286-9858\",\"company_name\":\"U-nite Fasteners Technology AB\",\"official_website_url\":\"https://www.unitefasteners.com/\",\"confidence_0_1\":0.9,\"source_note\":\"Official website found with matching company name and contact details.\"},{\"orgnr\":\"556183-6700\",\"company_name\":\"LECO Nordic AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"559362-5253\",\"company_name\":\"Basta i Huvudstaden AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556134-6320\",\"company_name\":\"Schunk Intec AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556752-3518\",\"company_name\":\"Biolit AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556289-6802\",\"company_name\":\"Lättviktsmotor N Hyr AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"559087-8236\",\"company_name\":\"Eklunds Bildelslager i Skövde AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"}]}",
+  "usage": {
+    "completion_tokens": 428,
+    "prompt_tokens": 1660,
+    "total_tokens": 2088,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

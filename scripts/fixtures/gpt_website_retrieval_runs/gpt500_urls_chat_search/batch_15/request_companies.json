@@ -1,0 +1,188 @@
+{
+  "companies": [
+    {
+      "name": "Lagafors AB",
+      "orgnr": "556218-9596",
+      "address_country": "SE",
+      "primary_nace": "28290 Övrig tillverkning av maskiner för allmänt ändamål",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Install Fiber I Norr AB",
+      "orgnr": "559109-5582",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Telekommunikation, teleoperatörer\"]"
+    },
+    {
+      "name": "Aktiebolaget Varmförzinkning",
+      "orgnr": "556071-4288",
+      "registry_homepage_url": "https://www.varmforzinkning.se",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "U-nite Fasteners Technology AB",
+      "orgnr": "556286-9858",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "Mellanskånes Renhållningsaktiebolag",
+      "orgnr": "556214-7800",
+      "registry_homepage_url": "https://www.merab.se",
+      "address_country": "SE",
+      "primary_nace": "38110 Insamling av icke-farligt avfall",
+      "segment_labels_json": "[\"Renhållningsentreprenörer, avfallshantering\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "LECO Nordic AB",
+      "orgnr": "556183-6700",
+      "address_country": "SE",
+      "primary_nace": "46691 Partihandel med mät- och precisionsinstrument",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Basta i Huvudstaden AB",
+      "orgnr": "559362-5253",
+      "address_country": "SE",
+      "primary_nace": "56100 Restaurangverksamhet",
+      "segment_labels_json": "[\"Restauranger\"]"
+    },
+    {
+      "name": "Jan Comstedt Aktiebolag",
+      "orgnr": "556209-6254",
+      "registry_homepage_url": "https://www.comstedt.se",
+      "address_country": "SE",
+      "primary_nace": "46900 Övrig partihandel",
+      "segment_labels_json": "[\"Grossister\"]"
+    },
+    {
+      "name": "Schunk Intec AB",
+      "orgnr": "556134-6320",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Biolit AB",
+      "orgnr": "556752-3518",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Lättviktsmotor N Hyr AB",
+      "orgnr": "556289-6802",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"VVS-arbeten, material och produkter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Åhmans i Åhus Aktiebolag",
+      "orgnr": "556106-4543",
+      "registry_homepage_url": "https://www.ahmans.se",
+      "address_country": "SE",
+      "primary_nace": "28220 Tillverkning av lyft- och godshanteringsanordningar",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Möbler\", \"Maskinförnödenheter - tillverkning\", \"Möbler - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Eklunds Bildelslager i Skövde AB",
+      "orgnr": "559087-8236",
+      "address_country": "SE",
+      "primary_nace": "46771 Partihandel med uttjänta fordon",
+      "segment_labels_json": "[\"Transportförmedling\", \"Åkerier\", \"Grossister\", \"Avfall - grossister\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Lövånger Elektronik Uppsala AB",
+      "orgnr": "556382-5198",
+      "registry_homepage_url": "https://www.leab.se",
+      "address_country": "SE",
+      "primary_nace": "26120 Tillverkning av kretskort",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "VinnTer AB",
+      "orgnr": "556860-1057",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\", \"Konsulter\", \"Internet - Konsulter, operatörer\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Roger Gustafsson Mekaniska Aktiebolag",
+      "orgnr": "556443-6656",
+      "registry_homepage_url": "https://www.rg-mek.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "TreForm Packaging AB",
+      "orgnr": "556926-2438",
+      "registry_homepage_url": "https://treform.se",
+      "address_country": "SE",
+      "primary_nace": "22220 Plastförpackningstillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Twindej Experience AB",
+      "orgnr": "556801-4095",
+      "address_country": "SE",
+      "primary_nace": "78200 Personaluthyrning",
+      "segment_labels_json": "[\"Designers, formgivare\", \"Datakonsulter\", \"Konsulter\", \"Tryckerier\", \"Uthyrning\", \"Video, film - Inspelning, produktion\", \"Skolor och utbildning\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "GUSTIS AB",
+      "orgnr": "556786-5588",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"VVS-arbeten, material och produkter\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Bollnäs-Ovanåkers Renhållnings Aktiebolag - BORAB",
+      "orgnr": "556223-4863",
+      "registry_homepage_url": "https://www.borab.se",
+      "address_country": "SE",
+      "primary_nace": "38120 Insamling av farligt avfall",
+      "segment_labels_json": "[\"Renhållningsentreprenörer, avfallshantering\", \"Trävaror\", \"Producenter\", \"Trävaror - produktion\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Naturell Aktiebolag",
+      "orgnr": "556219-3580",
+      "address_country": "SE",
+      "primary_nace": "10890 Framställning av andra livsmedel",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\"]"
+    },
+    {
+      "name": "Breddens Livs Aktiebolag",
+      "orgnr": "556279-5582",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "CAG Consoden AB",
+      "orgnr": "556261-9287",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Mathuset i Södra Backa AB",
+      "orgnr": "556524-2814",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Mabema AB",
+      "orgnr": "556618-4510",
+      "registry_homepage_url": "https://mabema.com",
+      "address_country": "SE",
+      "primary_nace": "71200 Teknisk provning och analys",
+      "segment_labels_json": "[\"Facklig, vetenskaplig och teknisk verksamhet\", \"Teknisk provning och analys\"]"
+    }
+  ]
+}

@@ -22,6 +22,7 @@ import {
   type CompanyWithReport,
   type ResearchRunSummary,
 } from '@/lib/services/deepResearchService'
+import { cn } from '@/lib/utils'
 import { BackendStatusBanner } from '@/components/BackendStatusBanner'
 import { NewReportWizard, type ReportWizardPrefill } from './NewReportWizard'
 
@@ -37,19 +38,19 @@ const STATUS_CONFIG: Record<
   AnalysisStatus['status'],
   { label: string; className: string; icon: typeof CheckCircle }
 > = {
-  pending: { label: 'Not started', className: 'bg-profile-bg-subtle text-profile-fg-muted border-profile-divider', icon: Clock },
+  pending: { label: 'Not started', className: 'bg-muted/60 text-muted-foreground border-border/80', icon: Clock },
   running: {
     label: 'Running',
-    className: 'bg-profile-accent-muted/80 text-profile-accent-secondary border-profile-sage-muted',
+    className: 'bg-primary/10 text-primary border-primary/20',
     icon: Loader2,
   },
   completed: {
     label: 'Complete',
-    className: 'bg-profile-sage-muted text-profile-accent border-profile-divider',
+    className: 'bg-primary/[0.08] text-primary border-primary/15',
     icon: CheckCircle,
   },
-  failed: { label: 'Blocked', className: 'bg-red-500/10 text-red-600 border-red-500/20', icon: XCircle },
-  cancelled: { label: 'Cancelled', className: 'bg-profile-bg-subtle text-profile-fg-muted border-profile-divider', icon: XCircle },
+  failed: { label: 'Blocked', className: 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400', icon: XCircle },
+  cancelled: { label: 'Cancelled', className: 'bg-muted/60 text-muted-foreground border-border/80', icon: XCircle },
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -148,7 +149,13 @@ export default function DeepResearchHomePage() {
     if (!orgnr || orgnr.trim().length < 4) return
     const from = searchParams.get('from')
     const source: ReportWizardPrefill['source'] =
-      from === 'screening' ? 'screening' : from === 'company' ? 'company' : undefined
+      from === 'screening'
+        ? 'screening'
+        : from === 'company'
+          ? 'company'
+          : from === 'gpt_target'
+            ? 'gpt_target'
+            : undefined
     setWizardPrefill({
       orgnr: orgnr.trim(),
       name: searchParams.get('name') || undefined,
@@ -196,7 +203,7 @@ export default function DeepResearchHomePage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-6 space-y-4">
+      <div className="max-w-3xl mx-auto p-6 space-y-4 app-page min-h-[40vh]">
         <Skeleton className="h-8 w-56" />
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-20 w-full" />
@@ -206,20 +213,17 @@ export default function DeepResearchHomePage() {
   }
 
   return (
-    <div className="min-h-[60vh] bg-profile-bg-subtle">
+    <div className="min-h-[60vh] app-page">
       <div className="max-w-3xl mx-auto p-6 space-y-6">
         <BackendStatusBanner />
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-profile-fg">Deep Research</h1>
-            <p className="text-sm text-profile-fg-muted mt-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Deep Research</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Evidence-first research and investment analysis. Launch reports, monitor progress, and access completed analysis.
             </p>
           </div>
-          <Button
-            onClick={() => setWizardOpen(true)}
-            className="bg-profile-accent hover:bg-profile-accent-secondary text-white border-0"
-          >
+          <Button variant="primary" onClick={() => setWizardOpen(true)}>
             <Plus className="h-4 w-4" />
             New report
           </Button>
@@ -230,7 +234,7 @@ export default function DeepResearchHomePage() {
             placeholder="Search by company name or org nr…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="sm:max-w-xs border-profile-divider focus:ring-profile-accent"
+            className="sm:max-w-xs"
           />
           <div className="flex flex-wrap gap-2">
             {statusOptions.map((opt) => (
@@ -240,8 +244,8 @@ export default function DeepResearchHomePage() {
                 onClick={() => setStatusFilter(opt.value)}
                 className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors ${
                   statusFilter === opt.value
-                    ? 'border-profile-accent bg-profile-accent-muted text-profile-accent'
-                    : 'border-profile-divider text-profile-fg-muted hover:text-profile-fg hover:border-profile-sage-muted'
+                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    : 'border-border/80 text-muted-foreground hover:text-foreground hover:border-primary/20'
                 }`}
               >
                 {opt.label}
@@ -251,8 +255,8 @@ export default function DeepResearchHomePage() {
         </div>
 
         {filtered.length === 0 && (
-          <Card className="border-profile-divider bg-profile-bg-surface">
-            <CardContent className="py-12 text-center text-profile-fg-muted">
+          <Card>
+            <CardContent className="py-12 text-center text-muted-foreground">
             {merged.length === 0
               ? 'No reports or runs yet. Start an analysis run to generate a report.'
               : 'No matching reports or runs.'}
@@ -274,16 +278,19 @@ export default function DeepResearchHomePage() {
                 : `/deep-research/company/${item.company_id}/report/latest`
 
           return (
-            <Card key={hasRun ? item.run_id : item.company_id!} className="transition-colors border-profile-divider bg-profile-bg-surface hover:border-profile-accent/50">
+            <Card
+              key={hasRun ? item.run_id : item.company_id!}
+              className="transition-colors hover:border-primary/25"
+            >
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-4">
                   <Link to={linkTarget} className="flex items-center gap-2 min-w-0 group">
-                    <Building2 className="h-4 w-4 text-profile-fg-muted shrink-0" />
-                    <CardTitle className="text-base font-semibold text-profile-fg group-hover:text-profile-accent transition-colors truncate">
+                    <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <CardTitle className="text-base font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                       {companyName}
                     </CardTitle>
                   </Link>
-                  <Badge className={cfg.className}>
+                  <Badge className={cn('font-normal border', cfg.className)}>
                     <Icon className={`h-3 w-3 mr-1 ${item.status === 'running' ? 'animate-spin' : ''}`} />
                     {cfg.label}
                   </Badge>
@@ -291,13 +298,13 @@ export default function DeepResearchHomePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-3 text-sm text-profile-fg-muted">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     {item.orgnr && <span>{item.orgnr}</span>}
                     <span>{formatDate(item.created_at)}</span>
                     <span>{humanStage(item.current_stage)}</span>
                   </div>
                   <Link to={linkTarget}>
-                    <Button variant="outline" size="sm" className="border-profile-divider text-profile-accent hover:bg-profile-accent-muted hover:border-profile-accent">
+                    <Button variant="outline" size="sm">
                       {item.status === 'completed' ? (
                         <>
                           <FileText className="h-3.5 w-3.5 mr-1" />

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "run_id": "dd15199e-e342-4977-b639-9be1d72acb56",
+  "run_kind": "website_research_gpt500",
+  "created_at": "2026-03-25T09:52:17Z",
+  "git_commit": "3aeb0332f507dfe8643aca60254b9b6f1fdb7547",
+  "settings": {
+    "input_csv": "scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/gpt500_pool_plus_urls.csv",
+    "input_csv_sha256": "0e8277ea190a4fffd029f8af8dd036f4a456a49b4c4166b09e574cfd716e6f43",
+    "script_version": "1.0.0",
+    "row_count": 500
+  },
+  "notes": "",
+  "ingested_rows": 500
+}

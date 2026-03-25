@@ -1,0 +1,40 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556419-1640",
+      "company_name": "IPC Industriprojekt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence."
+    },
+    {
+      "orgnr": "556273-2726",
+      "company_name": "JO Sport i Hudiksvall Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence."
+    },
+    {
+      "orgnr": "556256-3279",
+      "company_name": "Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/",
+      "official_website_url": "https://vfb.to",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain vfb.to is listed as the company's website on multiple business directories, including Vainu. ([search.vainu.com](https://search.vainu.com/company/ventilationsforbattringar-i-malmo-aktiebolag-vfb-ab-omsattning-och-nyckeltal/SE5562563279/foretagsinfo?utm_source=openai)) The domain is active and corresponds to the company's name."
+    },
+    {
+      "orgnr": "556549-5412",
+      "company_name": "Pumphuset Sverige Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence."
+    },
+    {
+      "orgnr": "556452-3453",
+      "company_name": "HaMi AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence."
+    }
+  ]
+}

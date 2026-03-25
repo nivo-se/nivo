@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable
 
 import pandas as pd
 from sqlalchemy import create_engine, inspect

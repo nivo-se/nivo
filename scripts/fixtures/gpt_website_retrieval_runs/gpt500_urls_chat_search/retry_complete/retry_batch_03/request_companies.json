@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "HaMi AB",
+      "orgnr": "556452-3453",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Plåtslagerier\", \"Takbeläggningar\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Almnäs Bruk AB",
+      "orgnr": "556307-3468",
+      "address_country": "SE",
+      "primary_nace": "01410 Mjölkproduktion och uppfödning av nötkreatur av mjölkras",
+      "segment_labels_json": "[\"Skogstjänster\", \"Jordbruk\", \"Jordbruk - mjölkproduktion\", \"Jordbruk - odling och djurhållning\", \"Boskap\", \"Mjölkproduktion\"]"
+    },
+    {
+      "name": "Drillab AB",
+      "orgnr": "556990-4583",
+      "address_country": "SE",
+      "primary_nace": "43999 Diverse övrig specialiserad bygg- och anläggningsverksamhet",
+      "segment_labels_json": "[\"Byggmästare\", \"Uthyrning\"]"
+    },
+    {
+      "name": "VEÅ AB",
+      "orgnr": "556135-7988",
+      "address_country": "SE",
+      "primary_nace": "25300 Tillverkning av ånggeneratorer utom varmvattenpannor för centraluppvärmning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Metaller, legeringar - Reparation\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Abacus Sportswear AB",
+      "orgnr": "556437-5714",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Aktiebolaget Systemstöd Sverige",
+      "orgnr": "556122-0798",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Affärssystem\", \"Datorer - Kringutrustningar\", \"Företagsutveckling\", \"Internet - Konsulter, operatörer\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "GLA Aircargo AB",
+      "orgnr": "556194-0437",
+      "address_country": "SE",
+      "primary_nace": "52249 Övrig godshantering",
+      "segment_labels_json": "[\"Spedition\", \"Transportförmedling\", \"Åkerier\", \"Lastning och lossning\"]"
+    },
+    {
+      "name": "Lideco i Dalstorp Aktiebolag",
+      "orgnr": "556264-7817",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Konsulter\", \"Maskinförnödenheter\", \"Metaller, legeringar\", \"Teknikkonsulter\", \"Grossister\", \"Metallurgisk industri\", \"Producenter\", \"Verktyg och redskap\", \"Verktyg och redskap - tillverkning\"]"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ Scope: private (per user) | team (shared).
 """
 import logging
 import os
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel

@@ -7,7 +7,7 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service

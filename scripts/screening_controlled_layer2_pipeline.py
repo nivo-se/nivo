@@ -21,7 +21,11 @@ Default --input is <repo>/shortlist_200.csv.
 Exits:
   0 — all gates passed
   2 — bad CLI / missing input file / forbidden fixture input
-  3 — resolver or post-layer2 validation failed (see controlled_run_report.json)
+  3 — resolver or post-layer2 validation failed (see controlled_run_report.json).
+      Layer 2: fails on orgnr multiset mismatch or structural ``weak`` bucket over threshold
+      (not on high ``pages_fetched_count == 0`` rate).
+
+Also writes `pipeline_manifest_<UTC_RUN_ID>.json` in `--out-dir` (settings, artifact paths, report snapshot).
 """
 
 from __future__ import annotations
@@ -35,6 +39,7 @@ import os
 import subprocess
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
@@ -44,6 +49,15 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(REPO_ROOT / "backend") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "backend"))
+_SCRIPTS_DIR = REPO_ROOT / "scripts"
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from screening_manifest_utils import git_commit_hash, utc_timestamp_iso, write_json
+
+from layer2_confidence_buckets import enrich_layer2_jsonl_and_csv
+
+CONTROLLED_LAYER2_PIPELINE_VERSION = "1.1.0"
 
 try:
     from dotenv import load_dotenv
@@ -60,7 +74,6 @@ logger = logging.getLogger(__name__)
 
 # Assistive resolver: many rows may be unresolved; do not fail the pipeline on that alone.
 MAX_UNUSABLE_HOMEPAGE_PCT = 100.0
-MAX_ZERO_PAGES_PCT = 10.0
 
 
 def _is_forbidden_layer2_fixture_csv(path: Path) -> bool:
@@ -176,6 +189,76 @@ def _latest_layer2_csv(out_dir: Path) -> Optional[Path]:
     return paths[-1] if paths else None
 
 
+def _latest_layer2_jsonl(out_dir: Path) -> Optional[Path]:
+    paths = sorted(out_dir.glob("layer2_results_*.jsonl"))
+    return paths[-1] if paths else None
+
+
+def _latest_layer2_manifest(out_dir: Path) -> Optional[Path]:
+    paths = sorted(out_dir.glob("layer2_manifest_*.json"))
+    return paths[-1] if paths else None
+
+
+def _cli_dict(args: argparse.Namespace) -> Dict[str, Any]:
+    d: Dict[str, Any] = {}
+    for k, v in vars(args).items():
+        d[k] = str(v.resolve()) if isinstance(v, Path) else v
+    return d
+
+
+def _artifact_path_if_exists(p: Path) -> Optional[str]:
+    return str(p.resolve()) if p.is_file() else None
+
+
+def _write_pipeline_manifest(
+    *,
+    out_dir: Path,
+    run_id: str,
+    args: argparse.Namespace,
+    inp: Path,
+    path_resolved: Path,
+    path_excluded: Path,
+    path_summary: Path,
+    path_report: Path,
+    status: str,
+    report: Dict[str, Any],
+    layer2_skipped: bool,
+) -> Path:
+    """Reproducibility snapshot for the controlled resolver + Layer 2 orchestration (see docs/screening_runs_db_proposal.md)."""
+    l2_csv = _latest_layer2_csv(out_dir)
+    l2_jsonl = _latest_layer2_jsonl(out_dir)
+    l2_man = _latest_layer2_manifest(out_dir)
+    man_path = out_dir / f"pipeline_manifest_{run_id}.json"
+    cb = report.get("confidence_buckets")
+    body: Dict[str, Any] = {
+        "run_kind": "controlled_layer2_pipeline",
+        "run_id": run_id,
+        "created_at_utc": utc_timestamp_iso(),
+        "git_commit": git_commit_hash(REPO_ROOT),
+        "script": "screening_controlled_layer2_pipeline.py",
+        "script_version": CONTROLLED_LAYER2_PIPELINE_VERSION,
+        "cli": _cli_dict(args),
+        "status": status,
+        "layer2_skipped": layer2_skipped,
+        "artifacts": {
+            "input_shortlist_csv": str(inp.resolve()),
+            "shortlist_resolved_csv": _artifact_path_if_exists(path_resolved),
+            "shortlist_excluded_csv": _artifact_path_if_exists(path_excluded),
+            "homepage_resolution_summary_json": _artifact_path_if_exists(path_summary),
+            "controlled_run_report_json": _artifact_path_if_exists(path_report),
+            "pipeline_manifest_json": str(man_path.resolve()),
+            "layer2_results_jsonl": str(l2_jsonl.resolve()) if l2_jsonl else None,
+            "layer2_results_csv": str(l2_csv.resolve()) if l2_csv else None,
+            "layer2_manifest_json": str(l2_man.resolve()) if l2_man else None,
+        },
+        "report": report,
+    }
+    if cb is not None:
+        body["confidence_buckets"] = cb
+    write_json(man_path, body)
+    return man_path
+
+
 def _parse_bool_cell(x: Any) -> bool:
     if isinstance(x, bool):
         return x
@@ -183,12 +266,20 @@ def _parse_bool_cell(x: Any) -> bool:
     return s in ("true", "1", "yes")
 
 
-def _validate_layer2_csv(
+def _validate_layer2_outputs(
     resolved_path: Path,
+    out_dir: Path,
     layer2_csv: Path,
     *,
     partial_limit: Optional[int] = None,
+    max_structural_weak_pct: float = 0.15,
+    max_structural_weak_abs: Optional[int] = None,
+    warn_weak_identity_pct: float = 0.40,
 ) -> Tuple[bool, Dict[str, Any]]:
+    """
+    Resolver/Layer2 multiset checks + confidence-bucket enrichment on JSONL/CSV.
+    Fails only when structural `weak` bucket exceeds thresholds (not on high zero-page rate).
+    """
     with resolved_path.open(newline="", encoding="utf-8") as f:
         rdr = csv.DictReader(f)
         res_rows = list(rdr)
@@ -257,11 +348,10 @@ def _validate_layer2_csv(
     zero_pct = (100.0 * zero_pages / n2) if n2 else 0.0
     tavily_pct = (100.0 * tavily_used / n2) if n2 else 0.0
 
-    gate_zero_pages = zero_pct > MAX_ZERO_PAGES_PCT
-    ok = multiset_ok and no_extra and not gate_zero_pages
-
-    detail = {
+    base_detail: Dict[str, Any] = {
         "layer2_csv": str(layer2_csv),
+        "layer2_jsonl": None,
+        "layer2_raw_dir": str(out_dir / "layer2_raw"),
         "row_count_layer2": n2,
         "row_count_resolved_input": len(org_res),
         "layer2_partial_limit": partial_limit,
@@ -269,7 +359,6 @@ def _validate_layer2_csv(
         "orgnr_row_count_match": no_extra,
         "pages_fetched_zero_count": zero_pages,
         "pages_fetched_zero_pct": round(zero_pct, 2),
-        "gate_zero_pages_pct_le_10": not gate_zero_pages,
         "tavily_used_count": tavily_used,
         "tavily_used_pct": round(tavily_pct, 2),
         "accept_count": accept,
@@ -278,7 +367,81 @@ def _validate_layer2_csv(
         "flags_large_listed": flags_listed,
         "flags_irrelevant_industry_fit": flags_irrelevant,
     }
-    return ok, detail
+
+    if not (multiset_ok and no_extra):
+        base_detail["confidence_buckets"] = {
+            "policy_version": "1.1.0",
+            "skipped": "orgnr multiset / row-count mismatch; bucket enrichment not run",
+        }
+        return False, base_detail
+
+    l2_jsonl = _latest_layer2_jsonl(out_dir)
+    raw_dir = out_dir / "layer2_raw"
+    base_detail["layer2_jsonl"] = str(l2_jsonl.resolve()) if l2_jsonl else None
+
+    bucket_counts: Dict[str, int] = {}
+    enrichment_ok = False
+    enrichment_error: Optional[str] = None
+    if l2_jsonl and l2_jsonl.is_file() and raw_dir.is_dir():
+        try:
+            bucket_counts = enrich_layer2_jsonl_and_csv(l2_jsonl, layer2_csv, raw_dir)
+            enrichment_ok = True
+        except Exception as exc:
+            enrichment_error = str(exc)
+            logger.exception("Confidence bucket enrichment failed")
+    else:
+        enrichment_error = "missing layer2_jsonl or layer2_raw directory"
+
+    weak_n = int(bucket_counts.get("weak", 0))
+    weak_id_n = int(bucket_counts.get("weak_identity_zero_page", 0))
+    weak_pct = (100.0 * weak_n / n2) if n2 else 0.0
+    weak_id_pct_total = (100.0 * weak_id_n / n2) if n2 else 0.0
+
+    gate_structural_weak_pct = weak_pct > (100.0 * max_structural_weak_pct)
+    gate_structural_weak_abs = (
+        max_structural_weak_abs is not None and weak_n > max_structural_weak_abs
+    )
+    gate_structural_weak_fail = gate_structural_weak_pct or gate_structural_weak_abs
+
+    warn_weak_identity = weak_id_pct_total > (100.0 * warn_weak_identity_pct)
+
+    ok = enrichment_ok and not gate_structural_weak_fail
+
+    confidence_buckets: Dict[str, Any] = {
+        "policy_version": "1.1.0",
+        "counts": {
+            "high_confidence": int(bucket_counts.get("high_confidence", 0)),
+            "tavily_triage": int(bucket_counts.get("tavily_triage", 0)),
+            "weak": weak_n,
+            "weak_identity_zero_page": weak_id_n,
+        },
+        "thresholds": {
+            "max_structural_weak_pct": max_structural_weak_pct,
+            "max_structural_weak_abs": max_structural_weak_abs,
+            "warn_weak_identity_pct": warn_weak_identity_pct,
+        },
+        "gates": {
+            "gate_structural_weak_pct": not gate_structural_weak_pct,
+            "gate_structural_weak_abs": not gate_structural_weak_abs,
+            "gate_structural_weak_pass": not gate_structural_weak_fail,
+        },
+        "warnings": {
+            "weak_identity_zero_page_pct_of_total": round(weak_id_pct_total, 2),
+            "warn_weak_identity_high": warn_weak_identity,
+        },
+        "enrichment": {
+            "ok": enrichment_ok,
+            "error": enrichment_error,
+        },
+    }
+
+    base_detail["confidence_buckets"] = confidence_buckets
+    if warn_weak_identity:
+        logger.warning(
+            "High weak_identity_zero_page fraction (%.1f%% of rows); see confidence_buckets in report",
+            weak_id_pct_total,
+        )
+    return ok, base_detail
 
 
 def main() -> None:
@@ -321,6 +484,27 @@ def main() -> None:
         action="store_true",
         help="Allow --input under scripts/fixtures/layer2_*.csv (never for production)",
     )
+    ap.add_argument(
+        "--max-structural-weak-pct",
+        type=float,
+        default=0.15,
+        metavar="P",
+        help="Fail if structural weak bucket count / N exceeds this (default: 0.15)",
+    )
+    ap.add_argument(
+        "--max-structural-weak-abs",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Optional: fail if structural weak bucket count exceeds this absolute cap",
+    )
+    ap.add_argument(
+        "--warn-weak-identity-pct",
+        type=float,
+        default=0.40,
+        metavar="P",
+        help="Log warning when weak_identity_zero_page / N exceeds this (default: 0.40); does not fail",
+    )
     args = ap.parse_args()
 
     inp = args.input
@@ -360,6 +544,7 @@ def main() -> None:
 
     out_dir = args.out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     path_resolved = out_dir / "shortlist_resolved.csv"
     path_excluded = out_dir / "shortlist_excluded.csv"
     path_summary = out_dir / "homepage_resolution_summary.json"
@@ -395,6 +580,21 @@ def main() -> None:
     rr = subprocess.run(rcmd, cwd=str(REPO_ROOT), env=env)
     if rr.returncode != 0:
         print(f"resolve_homepages_for_shortlist.py exited {rr.returncode}", file=sys.stderr)
+        fail_report: Dict[str, Any] = {"resolver_subprocess_exit_code": rr.returncode}
+        path_report.write_text(json.dumps(fail_report, indent=2), encoding="utf-8")
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="resolver_subprocess_failed",
+            report=fail_report,
+            layer2_skipped=False,
+        )
         sys.exit(3)
 
     with path_summary.open(encoding="utf-8") as sf:
@@ -418,12 +618,38 @@ def main() -> None:
 
     if not res_ok:
         path_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="resolver_validation_failed",
+            report=report,
+            layer2_skipped=False,
+        )
         logger.error("Resolver validation failed (see %s)", path_report)
         sys.exit(3)
 
     if args.skip_layer2:
         report["layer2_skipped"] = True
         path_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="ok_layer2_skipped",
+            report=report,
+            layer2_skipped=True,
+        )
         logger.info("Skip Layer 2; wrote %s", path_report)
         sys.exit(0)
 
@@ -445,6 +671,19 @@ def main() -> None:
     if r.returncode != 0:
         report["layer2_subprocess_exit_code"] = r.returncode
         path_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="layer2_subprocess_failed",
+            report=report,
+            layer2_skipped=False,
+        )
         logger.error("screening_layer2_run.py exited %s", r.returncode)
         sys.exit(3)
 
@@ -452,20 +691,68 @@ def main() -> None:
     if not l2_csv or not l2_csv.is_file():
         report["layer2_error"] = "no layer2_results_*.csv in out_dir"
         path_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="layer2_output_missing",
+            report=report,
+            layer2_skipped=False,
+        )
         sys.exit(3)
 
-    l2_ok, l2_detail = _validate_layer2_csv(
-        path_resolved, l2_csv, partial_limit=args.layer2_limit
+    l2_ok, l2_detail = _validate_layer2_outputs(
+        path_resolved,
+        out_dir,
+        l2_csv,
+        partial_limit=args.layer2_limit,
+        max_structural_weak_pct=args.max_structural_weak_pct,
+        max_structural_weak_abs=args.max_structural_weak_abs,
+        warn_weak_identity_pct=args.warn_weak_identity_pct,
     )
     report["layer2_validation"] = l2_detail
     report["layer2_validation_ok"] = l2_ok
     report["layer2_results_csv"] = str(l2_csv)
+    if isinstance(l2_detail.get("confidence_buckets"), dict):
+        report["confidence_buckets"] = l2_detail["confidence_buckets"]
 
     path_report.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     if not l2_ok:
+        _write_pipeline_manifest(
+            out_dir=out_dir,
+            run_id=run_id,
+            args=args,
+            inp=inp,
+            path_resolved=path_resolved,
+            path_excluded=path_excluded,
+            path_summary=path_summary,
+            path_report=path_report,
+            status="layer2_validation_failed",
+            report=report,
+            layer2_skipped=False,
+        )
         logger.error("Layer 2 output validation failed (see %s)", path_report)
         sys.exit(3)
+
+    _write_pipeline_manifest(
+        out_dir=out_dir,
+        run_id=run_id,
+        args=args,
+        inp=inp,
+        path_resolved=path_resolved,
+        path_excluded=path_excluded,
+        path_summary=path_summary,
+        path_report=path_report,
+        status="ok",
+        report=report,
+        layer2_skipped=False,
+    )
 
     logger.info("Controlled pipeline OK. Report: %s", path_report)
     logger.info("Layer 2 CSV: %s", l2_csv)

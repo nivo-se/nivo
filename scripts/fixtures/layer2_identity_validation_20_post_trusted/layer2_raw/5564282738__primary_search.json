@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5564282738",
+  "company_name": "Mille Notti AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Mille Notti\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Mille Notti what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://royaldesign.com/us/brands/mille-notti?srsltid=AfmBOoqM11Hk3HSjoILKFa1LqZXocLp_2LDTFGiCjyrfT_5XG0Nqvndu",
+        "title": "Mille Notti - RoyalDesign.com",
+        "content": "## Select country:. # Mille Notti. Mille Notti is a Swedish family-run company that was founded 1991 in Stockholm with a driving force and passion to deliver high quality products with timeless designs. Mille Notti offers a wide selection of bed linen, pillows, duvets and bathroom textiles. All products from Mille Notti are produced in Europe with carefully chosen ethical materials. All down pillow and duvets are recommended by the Swedish Asthma- and Allergy Association. * Hans by Vaarnii: Iconic Design Reimagined. - * Dishcloths, Dishwashing brushes & Dish drainers.",
+        "score": 0.84027237,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/journal/sustainable-conditions-for-timeless-design",
+        "title": "Sustainable conditions for timeless design | Mille Notti",
+        "content": "**European manufacture, organic cotton and natural materials, handmade beds and down that is traceable, unadulterated, and ethically produced - some of the factors that create long-term, sustainable conditions for Mille Notti's stylish high-quality products.**. When Mille Notti designs their range they constantly strive to create stylish, sustainable and high-quality products. You'll be sleeping well for years to come\", says William Wehtje, CEO and son of Mille Notti's founder Peder Wehtje.*. Mille Notti's products are designed and developed in Sweden. Mille Notti's signature - exclusive, high-quality bed linen. *\"We've been making cotton percale bed linen for over 25 years and we supply bed linen to a range of high-class hotels around the world. *\"All Mille Notti's down products are made in Poland in a small factory with meticulous control of both quality and purchasing\", says William Wehtje.*. He has high ambitions; Mille Notti's products should be sustainable down to the very last detail.",
+        "score": 0.7931224,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/about-us",
+        "title": "About Us | Premium Swedish Bed & Bath - Mille Notti",
+        "content": "Our products are designed in Sweden and crafted with care by our trusted manufacturers across Europe. Providing quality is not just about having an excellent product. Mille Notti's story began on a warm summer day in the early 1990s. Peder Wehtje, the visionary founder of Mille Notti, stayed during his journey in Portugal at a traditional Portuguese Pousada that would forever change his perspective. Since 2011, Mille Notti has proudly held the prestigious title of Purveyor to the Royal Court of Sweden – an honour bestowed by H.M. The King Carl XVI Gustaf in recognition of Swedish design and exceptional quality. The Mille Notti Code of Conduct defines the ethical principles and societal responsibility we expect from our employees, suppliers, and partners. ## **Welcome to** **Mille Notti Brand Store**. For questions regarding press images, interviews, and products for photo shoots, please contact **jenny@mille-notti.com**. All images in our image bank are available for publication at no cost – please credit Mille Notti as source. Email: **info@mille-notti.com**.",
+        "score": 0.7797419,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.linkedin.com/company/mille-notti",
+        "title": "Mille Notti | LinkedIn",
+        "content": "Overview:\nMille Notti - A Marvellous sleeping experience With passion for true quality, Mille Notti offers you a unique sensation, for all your senses through a wide range of textile products for bedroom and bathroom. The characterizing design is timeless, sophisticated and contemporary. European manufacturing and sustainable development together with social responsibility are natural priorities. Family, joy of life and passion for true quality have always been present in Mille Nottis values. Creating the place you never want to leave.\n\nWebsite: https://www.mille-notti.com/\nCrunchbase Url: N/A\nLinkedin Url: N/A\n\nIndustry:\nTextile Manufacturing\n\nCompany size:\n11-50 employees\n21 associated members (LinkedIn members who’ve listed Mille Notti as their current workplace on their profile)\n\nFounded:\n1991\n\nFunding:\nLast Round Date: N/A\nLast Round Type: N/A\nTotal Rounds: N/A\nLast Round Raised: N/A\n\nInvestors:\nN/A",
+        "score": 0.68723184,
+        "raw_content": null
+      },
+      {
+        "url": "https://mille-notti.com/about-us/our-production",
+        "title": "Our production - Mille Notti",
+        "content": "# Our production. Providing quality is not just about having an excellent product. We maintain high standards across the entire production chain, from manufacturing and materials to traceability and ethical practices. Manufacturing in Europe with carefully selected suppliers, combed cotton and natural materials, handcrafted beds, and traceable, pure, and ethically produced down are some of the factors that create long-term, sustainable conditions for our quality products. is a certification indicating that the product meets high human-ecological standards, meaning it is free from harmful substances and safe for both children and adults. 100% of our bed linen and terry cloth products are labelled with STANDARD 100 by OEKO-TEX®. 100% of our white percale and white Satina products are GOTS certified. Asthma Allergy Nordic is a certification that ensures the product is clean and allergy-friendly, containing only down that has been thoroughly washed. 97% of our down products are recommended by Asthma Allergy Nordic. ### PRODUCTS.",
+        "score": 0.66569364,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.79,
+    "request_id": "9dddb457-7c80-4cb8-a22e-d23a0f3d8dc9"
+  }
+}

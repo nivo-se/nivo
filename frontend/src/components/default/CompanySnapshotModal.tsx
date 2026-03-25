@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import type { CompanyProfileBackState } from "@/lib/navigation/companyProfileBack";
+import { COMPANY_PROFILE_BACK } from "@/lib/navigation/companyProfileBack";
 import {
   Dialog,
   DialogContent,
@@ -26,12 +28,15 @@ interface CompanySnapshotModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   orgnr: string;
+  /** Where "View Full Profile" should return to; defaults to Universe. */
+  profileLinkState?: CompanyProfileBackState;
 }
 
 export function CompanySnapshotModal({
   open,
   onOpenChange,
   orgnr,
+  profileLinkState = COMPANY_PROFILE_BACK.universe,
 }: CompanySnapshotModalProps) {
   const { data: companies, isLoading: batchLoading, isError: batchError } =
     useCompaniesBatch(open ? [orgnr] : [], { autoEnrich: false });
@@ -69,31 +74,37 @@ export function CompanySnapshotModal({
   const financials = financialsData?.financials ?? [];
   const latestYear = financials[0]?.year ?? new Date().getFullYear();
 
+  const badgeClass =
+    "gap-1 border border-primary/15 bg-primary/[0.06] font-normal text-foreground hover:bg-primary/[0.1]";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-lg border border-border bg-card text-sm text-card-foreground"
+        className="max-w-lg gap-0 overflow-hidden rounded-xl border border-border/80 bg-card p-0 text-sm text-card-foreground shadow-[0_22px_44px_-16px_rgba(15,23,42,0.14),0_0_0_1px_hsl(var(--primary)/0.08)] dark:shadow-[0_22px_44px_-16px_rgba(0,0,0,0.45)] sm:max-w-xl"
         aria-describedby="company-snapshot-desc"
       >
-        <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg font-semibold">
-            Company Snapshot
-          </DialogTitle>
-          <DialogDescription id="company-snapshot-desc" className="sr-only">
-            Quick overview of company details, financials, and actions
-          </DialogDescription>
-        </DialogHeader>
+        <div className="border-b border-primary/10 bg-gradient-to-br from-primary/[0.09] via-card to-accent/40 px-6 pb-4 pt-5">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
+              Company Snapshot
+            </DialogTitle>
+            <DialogDescription id="company-snapshot-desc" className="sr-only">
+              Quick overview of company details, financials, and actions
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : isError || !company ? (
-          <p className="py-4 text-muted-foreground">
-            Could not load company details.
-          </p>
-        ) : (
-          <div className="space-y-4">
+        <div className="px-6 pb-6 pt-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : isError || !company ? (
+            <p className="py-4 text-muted-foreground">
+              Could not load company details.
+            </p>
+          ) : (
+            <div className="space-y-4">
             {/* Header: company name + attributes */}
             <div>
               <h3 className="font-semibold text-foreground">
@@ -105,22 +116,19 @@ export function CompanySnapshotModal({
                   : company.industry_label}
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <Badge
-                  variant="secondary"
-                  className="gap-1 font-normal"
-                >
-                  <Globe className="h-3 w-3" />
+                <Badge variant="secondary" className={badgeClass}>
+                  <Globe className="h-3 w-3 text-primary" />
                   {company.industry_label}
                 </Badge>
                 {company.region && (
-                  <Badge variant="secondary" className="gap-1 font-normal">
-                    <MapPin className="h-3 w-3" />
+                  <Badge variant="secondary" className={badgeClass}>
+                    <MapPin className="h-3 w-3 text-primary" />
                     {company.region}
                   </Badge>
                 )}
                 {company.employees_latest != null && (
-                  <Badge variant="secondary" className="gap-1 font-normal">
-                    <Users className="h-3 w-3" />
+                  <Badge variant="secondary" className={badgeClass}>
+                    <Users className="h-3 w-3 text-primary" />
                     ~{company.employees_latest} employees
                   </Badge>
                 )}
@@ -129,31 +137,31 @@ export function CompanySnapshotModal({
 
             {/* Key metrics */}
             <div>
-              <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary/90">
                 Key Metrics ({latestYear})
               </h4>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <div className="rounded-lg border border-primary/12 bg-primary/[0.04] p-3 dark:bg-primary/[0.08]">
                   <p className="text-xs text-muted-foreground">Revenue</p>
-                  <p className="font-mono text-sm tabular-nums font-medium">
+                  <p className="font-mono text-sm tabular-nums font-semibold text-foreground">
                     {formatRevenueSEK(revenue)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <div className="rounded-lg border border-primary/12 bg-primary/[0.04] p-3 dark:bg-primary/[0.08]">
                   <p className="text-xs text-muted-foreground">EBITDA</p>
-                  <p className="font-mono text-sm tabular-nums font-medium">
+                  <p className="font-mono text-sm tabular-nums font-semibold text-foreground">
                     {formatRevenueSEK(ebitda)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <div className="rounded-lg border border-primary/12 bg-primary/[0.04] p-3 dark:bg-primary/[0.08]">
                   <p className="text-xs text-muted-foreground">3Y CAGR</p>
-                  <p className="font-mono text-sm tabular-nums font-medium">
+                  <p className="font-mono text-sm tabular-nums font-semibold text-foreground">
                     {formatPercent(revenueCagr)} Growth
                   </p>
                 </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <div className="rounded-lg border border-primary/12 bg-primary/[0.04] p-3 dark:bg-primary/[0.08]">
                   <p className="text-xs text-muted-foreground">EBITDA Margin</p>
-                  <p className="font-mono text-sm tabular-nums font-medium">
+                  <p className="font-mono text-sm tabular-nums font-semibold text-foreground">
                     {formatPercent(ebitdaMargin)}
                   </p>
                 </div>
@@ -161,8 +169,8 @@ export function CompanySnapshotModal({
             </div>
 
             {/* About + Contact (web, email, phone) */}
-            <div className="space-y-2 border-t border-border pt-3">
-              <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <div className="space-y-2 border-t border-border/80 pt-3">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-primary/90">
                 About
               </h4>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
@@ -180,31 +188,31 @@ export function CompanySnapshotModal({
                     href={company.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/90 hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
-                    <Globe className="h-4 w-4" />
+                    <Globe className="h-4 w-4 shrink-0" />
                     {company.website_url.replace(/^https?:\/\//, "")}
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3 w-3 shrink-0 opacity-70" />
                   </a>
                 )}
                 {company.email && (
                   <a
                     href={`mailto:${company.email}`}
-                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/90 hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
-                    <Mail className="h-4 w-4" />
+                    <Mail className="h-4 w-4 shrink-0" />
                     {company.email}
                   </a>
                 )}
                 {company.phone && (
                   <a
                     href={`tel:${company.phone.replace(/\s/g, "")}`}
-                    className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/90 hover:underline"
                     onClick={() => onOpenChange(false)}
                   >
-                    <Phone className="h-4 w-4" />
+                    <Phone className="h-4 w-4 shrink-0" />
                     {company.phone}
                   </a>
                 )}
@@ -213,14 +221,14 @@ export function CompanySnapshotModal({
 
             {/* Financial history table */}
             {financials.length > 0 && (
-              <div className="space-y-2 border-t border-border pt-3">
-                <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <div className="space-y-2 border-t border-border/80 pt-3">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-primary/90">
                   Financial Snapshot ({financials.length}-Year History)
                 </h4>
-                <div className="overflow-x-auto rounded-md border border-border">
+                <div className="overflow-x-auto rounded-lg border border-primary/12">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="border-b border-border bg-muted/30">
+                      <tr className="border-b border-primary/10 bg-primary/[0.06] dark:bg-primary/[0.1]">
                         <th className="px-3 py-2 text-left font-medium">Year</th>
                         <th className="px-3 py-2 text-right font-medium">
                           Revenue (M SEK)
@@ -264,15 +272,18 @@ export function CompanySnapshotModal({
             )}
 
             {/* Footer actions */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
-              <Link
-                to={`/company/${company.orgnr}`}
-                onClick={() => onOpenChange(false)}
-                className="inline-flex items-center gap-2 text-sm text-foreground hover:underline"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Full Profile
-              </Link>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/80 pt-4">
+              <Button variant="primary" size="sm" asChild>
+                <Link
+                  to={`/company/${company.orgnr}`}
+                  state={profileLinkState}
+                  onClick={() => onOpenChange(false)}
+                  className="inline-flex items-center gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Full Profile
+                </Link>
+              </Button>
               <div className="flex items-center gap-2">
                 <AddToListDropdown orgnrs={[company.orgnr]} />
                 <Button
@@ -285,7 +296,8 @@ export function CompanySnapshotModal({
               </div>
             </div>
           </div>
-        )}
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

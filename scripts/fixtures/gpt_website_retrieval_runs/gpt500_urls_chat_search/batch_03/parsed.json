@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556650-7439",
+      "company_name": "Höglands Logistik AB",
+      "official_website_url": "https://www.hlogistik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list this URL as the company's website, matching the company name and orgnr."
+    },
+    {
+      "orgnr": "556861-0256",
+      "company_name": "Bilx Nordic AB",
+      "official_website_url": "https://www.bilx.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list this URL as the company's website, matching the company name and orgnr."
+    },
+    {
+      "orgnr": "556544-0178",
+      "company_name": "Autoklaver & Desinfektorer MediCal i Göteborg AB",
+      "official_website_url": "https://www.medical.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides relevant information about autoclaves and disinfectors."
+    },
+    {
+      "orgnr": "556505-1314",
+      "company_name": "Amsler Hiss Aktiebolag",
+      "official_website_url": "https://www.amslerhiss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their elevator services."
+    },
+    {
+      "orgnr": "556405-6249",
+      "company_name": "Aktiebolag Klädkällaren i Göteborg",
+      "official_website_url": "https://www.kladkallaren.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their clothing products."
+    },
+    {
+      "orgnr": "556493-1656",
+      "company_name": "Secor AB",
+      "official_website_url": "https://www.secor.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their construction services."
+    },
+    {
+      "orgnr": "556824-7588",
+      "company_name": "Unimer Plast & Gummi AB",
+      "official_website_url": "https://www.unimer.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their plastic and rubber products."
+    },
+    {
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their medical equipment."
+    },
+    {
+      "orgnr": "556169-2699",
+      "company_name": "Andrénverken AB",
+      "official_website_url": "https://www.andrenverken.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their metal products."
+    },
+    {
+      "orgnr": "556207-2396",
+      "company_name": "Sydskiffer Aktiebolag",
+      "official_website_url": "https://www.sydskiffer.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their slate products."
+    },
+    {
+      "orgnr": "556437-7231",
+      "company_name": "Torshälla Industrisvets Aktiebolag",
+      "official_website_url": "https://www.torshallaindustrisvets.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their welding services."
+    },
+    {
+      "orgnr": "556460-7652",
+      "company_name": "Magnusson Petfood AB",
+      "official_website_url": "https://www.magnussonpetfood.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their pet food products."
+    },
+    {
+      "orgnr": "556662-4762",
+      "company_name": "Permat AB",
+      "official_website_url": "https://www.mantaholding.com",
+      "confidence_0_1": 0.6,
+      "source_note": "The registry_homepage_url is a group site; no specific site found for Permat AB."
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their industrial supplies."
+    },
+    {
+      "orgnr": "556194-7572",
+      "company_name": "Engelholms Glass Aktiebolag",
+      "official_website_url": "https://www.engelholmsglass.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their ice cream products."
+    },
+    {
+      "orgnr": "556237-4826",
+      "company_name": "BL-INTERIÖR Aktiebolag",
+      "official_website_url": "https://www.blinterior.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their interior design services."
+    },
+    {
+      "orgnr": "556371-8526",
+      "company_name": "Norteam AB",
+      "official_website_url": "https://www.norteam.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their IT consulting services."
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their metal products."
+    },
+    {
+      "orgnr": "556309-6253",
+      "company_name": "Tinter Industriförsäljning AB",
+      "official_website_url": "https://www.tinter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their industrial sales."
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their infrastructure services."
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their paint products."
+    },
+    {
+      "orgnr": "559169-6413",
+      "company_name": "OAKS AB",
+      "official_website_url": "https://www.oaksab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their consulting services."
+    },
+    {
+      "orgnr": "559170-6451",
+      "company_name": "Innergårdsgruppen garage & betong i Stockholm AB",
+      "official_website_url": "https://www.innergardgruppen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their construction services."
+    },
+    {
+      "orgnr": "556657-5535",
+      "company_name": "Rehobot Hydraulics AB",
+      "official_website_url": "https://rehobot.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the company name and provides information about their hydraulic products."
+    },
+    {
+      "orgnr": "556142-7427",
+      "company_name": "Aktiebolaget Hällnäs Handelsträdgård",
+      "official_website_url": "https://www.hallnas.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their gardening products."
+    }
+  ]
+}

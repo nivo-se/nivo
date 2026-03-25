@@ -1,0 +1,183 @@
+{
+  "companies": [
+    {
+      "name": "Södra Århults Torv Aktiebolag",
+      "orgnr": "556663-5792",
+      "address_country": "SE",
+      "primary_nace": "20150 Tillverkning av gödselmedel och kväveprodukter",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Sågverk\", \"Trävaror\", \"Gödningsmedel\", \"Gödningsmedel - produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Mälardalens Asfalt AB",
+      "orgnr": "559083-3561",
+      "address_country": "SE",
+      "primary_nace": "42110 Anläggning av vägar och motorvägar",
+      "segment_labels_json": "[\"Byggmästare\", \"Väganordningar, trafikanordningar, vägarbeten\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "ISAB Ventilation Väst AB",
+      "orgnr": "556521-4888",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "DM TAK AB",
+      "orgnr": "556724-6623",
+      "address_country": "SE",
+      "primary_nace": "43911 Takarbeten av plåt",
+      "segment_labels_json": "[\"Byggmästare\", \"Plåtslagerier\", \"Städservice\", \"Takarbeten\", \"Takbeläggningar\"]"
+    },
+    {
+      "name": "NA Schakt AB",
+      "orgnr": "556716-7704",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenadmaskinsarbeten\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Nylands Trä AB",
+      "orgnr": "556678-6306",
+      "address_country": "SE",
+      "primary_nace": "46731 Partihandel med virke och andra byggmaterial",
+      "segment_labels_json": "[\"Sågverk\", \"Trävaror\", \"Grossister\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Knowit Ascend AB",
+      "orgnr": "556974-3320",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Europress AB",
+      "orgnr": "556540-8514",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "Eqpack AB",
+      "orgnr": "556444-8255",
+      "registry_homepage_url": "https://eqpack.se",
+      "address_country": "SE",
+      "primary_nace": "22220 Plastförpackningstillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Förpackningar - Industrin\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Lyckes Produktionsverktyg AB",
+      "orgnr": "556556-8895",
+      "registry_homepage_url": "https://lyckespv.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Next2Vet AB",
+      "orgnr": "556887-5057",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Axema Access Control AB",
+      "orgnr": "556446-1472",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "Anton Paar Nordic AB",
+      "orgnr": "556841-6803",
+      "address_country": "SE",
+      "primary_nace": "46691 Partihandel med mät- och precisionsinstrument",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Converflex Aktiebolag",
+      "orgnr": "556443-5120",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Tryckerier\"]"
+    },
+    {
+      "name": "Takab i Jönköping Aktiebolag",
+      "orgnr": "556445-0467",
+      "address_country": "SE",
+      "primary_nace": "41200 Byggande av bostadshus och andra byggnader",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "AB Vabon",
+      "orgnr": "556876-6215",
+      "address_country": "SE",
+      "primary_nace": "42210 Allmännyttiga anläggningsarbeten för värme, vatten och avlopp",
+      "segment_labels_json": "[\"Byggmästare\", \"VVS-arbeten, material och produkter\"]"
+    },
+    {
+      "name": "Eboss AB",
+      "orgnr": "556687-0639",
+      "registry_homepage_url": "https://www.eboss.se",
+      "address_country": "SE",
+      "primary_nace": "25999 Diverse övrig metallvarutillverkning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "I M Gunnarsson Handels Aktiebolag",
+      "orgnr": "556509-4983",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Itaab Trading Aktiebolag",
+      "orgnr": "556218-6253",
+      "registry_homepage_url": "https://itaab.com",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "S-Schakt Schönström Aktiebolag",
+      "orgnr": "556202-8968",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"VVS-arbeten, material och produkter\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Carmenta Geospatial Technologies AB",
+      "orgnr": "556265-5430",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Aktiebolaget Mercatus Engineering",
+      "orgnr": "556402-9766",
+      "address_country": "SE",
+      "primary_nace": "71122 Teknisk konsultverksamhet inom industriteknik",
+      "segment_labels_json": "[\"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Mönsterås Bostäder AB",
+      "orgnr": "556526-8421",
+      "address_country": "SE",
+      "primary_nace": "68201 Uthyrning och förvaltning av egna eller arrenderade bostäder",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\"]"
+    },
+    {
+      "name": "KmK Instrument Aktiebolag",
+      "orgnr": "556482-4729",
+      "address_country": "SE",
+      "primary_nace": "46691 Partihandel med mät- och precisionsinstrument",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "GMV Sweden Aktiebolag",
+      "orgnr": "556455-8244",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path
 from pydantic import BaseModel
 
 from ..services.db_factory import get_database_service
@@ -582,7 +582,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             FROM ranked
             WHERE rn = 1
             ORDER BY year DESC
-            LIMIT 7
+            LIMIT 15
         """
         rows: List[Dict[str, Any]] = []
         try:
@@ -612,7 +612,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                 FROM ranked
                 WHERE rn = 1
                 ORDER BY year DESC
-                LIMIT 7
+                LIMIT 15
             """
             rows = db.run_raw_query(sql_fallback, params=[orgnr])
 

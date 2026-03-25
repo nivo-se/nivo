@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "RK Natursten AB",
+      "orgnr": "556641-3711",
+      "address_country": "SE",
+      "primary_nace": "23701 Huggning, formning och slutlig bearbetning av sten för byggnadsändamål",
+      "segment_labels_json": "[\"Byggmästare\", \"Stenarbeten\", \"Producenter\"]"
+    },
+    {
+      "name": "KE Therm AB",
+      "orgnr": "556915-3603",
+      "address_country": "SE",
+      "primary_nace": "25210 Tillverkning av radiatorer och pannor för centraluppvärmning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Grossister\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Lecora AB",
+      "orgnr": "556090-3493",
+      "address_country": "SE",
+      "primary_nace": "10310 Beredning och hållbarhetsbehandling av potatis",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Steamery AB",
+      "orgnr": "556926-1166",
+      "address_country": "SE",
+      "primary_nace": "47591 Specialiserad butikshandel med möbler för hemmet",
+      "segment_labels_json": "[\"Elmateriel\", \"Möbler\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Sylog Väst AB",
+      "orgnr": "556976-8640",
+      "address_country": "SE",
+      "primary_nace": "71122 Teknisk konsultverksamhet inom industriteknik",
+      "segment_labels_json": "[\"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Creon promotion AB",
+      "orgnr": "556575-1061",
+      "address_country": "SE",
+      "primary_nace": "46769 Partihandel med övriga insatsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\"]"
+    },
+    {
+      "name": "Karlskoga Automation Aktiebolag",
+      "orgnr": "556493-7695",
+      "address_country": "SE",
+      "primary_nace": "33200 Installation av industrimaskiner och -utrustning",
+      "segment_labels_json": "[\"Industriförnödenheter\", \"Maskinförnödenheter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Tillmobil i Norden AB",
+      "orgnr": "556814-8752",
+      "address_country": "SE",
+      "primary_nace": "61900 Annan telekommunikation",
+      "segment_labels_json": "[\"Telekommunikation, teleoperatörer\"]"
+    }
+  ]
+}

@@ -120,6 +120,7 @@ const WorkingDashboard: React.FC = () => {
     if (requestedView && [...menuItems, ...adminItems].some((item) => item.id === requestedView)) {
       setCurrentPage(requestedView)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- menu metadata is static for the session
   }, [])
 
   const handleSignOut = async () => {

@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Åsens Projekt AB",
+      "orgnr": "556957-7959",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "E. Södergren Livs AB",
+      "orgnr": "556499-0728",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Archus Affärsutveckling & Projektledning AB",
+      "orgnr": "556921-4058",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "J.N. Elinstallatörer Aktiebolag",
+      "orgnr": "556277-1468",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "ÅMV Production Aktiebolag",
+      "orgnr": "556627-2927",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Mekaniska verkstäder\", \"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Lone Star Shipping AB",
+      "orgnr": "556798-0759",
+      "address_country": "SE",
+      "primary_nace": "45201 Allmän service och reparation av motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\", \"Maskinförnödenheter\", \"Transportförmedling\", \"Uthyrning\", \"Åkerier\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "Tjeders Industri Aktiebolag",
+      "orgnr": "556041-7254",
+      "address_country": "SE",
+      "primary_nace": "27900 Tillverkning av annan elapparatur",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Elektronik - Systemkomponenter\", \"Elmateriel\", \"Elektronik - Tillverkning\", \"Grossister\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Medela Medical Aktiebolag",
+      "orgnr": "556252-8652",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    }
+  ]
+}

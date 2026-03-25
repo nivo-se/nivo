@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556452-3453",
+      "company_name": "HaMi AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556307-3468",
+      "company_name": "Almnäs Bruk AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556990-4583",
+      "company_name": "Drillab AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556135-7988",
+      "company_name": "VEÅ AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556437-5714",
+      "company_name": "Abacus Sportswear AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "https://systemstod.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found in company profile; matches company name and services."
+    },
+    {
+      "orgnr": "556194-0437",
+      "company_name": "GLA Aircargo AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "https://www.lideco.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found in company profile; matches company name and services."
+    }
+  ]
+}

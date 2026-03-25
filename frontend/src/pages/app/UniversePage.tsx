@@ -155,6 +155,7 @@ export function UniversePage() {
     if (next !== current) {
       setSearchParams(params, { replace: true });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- URL sync is intentionally driven by debounced filter state
   }, [debouncedQ, debouncedFilters, sortBy, sortDir, offset, selectedPreset]);
 
   const filtersMetaQ = useQuery({

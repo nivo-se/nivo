@@ -6,7 +6,7 @@ import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -17,7 +17,6 @@ from backend.db.models.deep_research import (
     ClaimVerification,
     Company,
     CompanyProfile,
-    ReportSpecPersistence,
     Competitor,
     CompetitorCandidate,
     CompetitorProfile,

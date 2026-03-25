@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5567370431",
+  "company_name": "SCA Forest Products AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"SCA Forest Products\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "SCA Forest Products what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://issuu.com/industryeurope/docs/v23-4/s/14571121",
+        "title": "Global leaders in paper products SCA - Issuu",
+        "content": "Welcome to Issuu’s blog: home to product news, tips, resources, interviews (and more) related to content marketing and publishing. SCA is a global consumer goods and paper company that produces and markets personal care products, tissue, packaging solutions, publication papers and solid-wood products. The SCA Forest Products division is a leading producer of timber, pulp and publication paper. Representing sales and marketing for pulp and paper production for the group, SCA. SCA Forest Products accounts for 17 per cent of group sales and has 4500 workers, all playing a key role in the company culture of openness, efficiency and a passion for nature. SCA Forest Products has always appreciated the value of its natural resources and continues to create value through knowledge of consumer and customer needs, regional presence and efficient production. A key element in the progressive, consistent success of SCA Forest Products is its strategic understanding of maintaining the entire supply chain, which offers great benefits to the company and its customers.",
+        "score": 0.8138313,
+        "raw_content": null
+      },
+      {
+        "url": "https://matrixbcg.com/blogs/how-it-works/sca",
+        "title": "How Does SCA Company Work? – MatrixBCG.com",
+        "content": "SCA is a major European forest products company focused on sustainable forest management and producing wood-based goods. SCA generates revenue through solid wood products, pulp, containerboard, and renewable energy. The operational workflow of SCA company involves processing wood unsuitable for solid wood products into pulp, which also generates valuable by-products such as green chemicals, green electricity, heating, and raw materials for biofuels. The company's commitment to innovation and digitalization is key to its SCA company business model, improving production processes, minimizing waste, and optimizing resource use across its operations. SCA company operations are built on a foundation of integrated forest management, transforming wood resources into a diverse range of products and renewable energy. SCA company's business model is strengthened by its high degree of self-sufficiency in raw materials, energy, and logistics, which aids in cost management and earnings stability. The SCA company operates as a significant player in the European forest products sector, leveraging its extensive forest ownership and diversified product range.",
+        "score": 0.8058924,
+        "raw_content": null
+      },
+      {
+        "url": "https://manufacturing-today.com/news/sca-timber/",
+        "title": "SCA Timber - Manufacturing Today",
+        "content": "SCA Timber AB, one of the largest sawmilling companies in Europe, operates seven sawmills and six planing mills, as well as wood-processing units, distribution and wholesale operations in Sweden, with a total production of solid-wood products amounting to 1.8 million cubic metres. SCA Timber is a global consumer goods and paper company that develops, produces and markets personal care products, tissue, packaging solutions, publication papers and solid-wood products. On the 29 February 2008, SCA decided to invest SEK 210 million in a new automatic grading mill that will replace the two existing grading mills at one of its sawmills, Tunadal. “We have increased production and productivity at the Tunadal sawmill through a number of investment plans,” states Jerry. Not only a strong believer in ensuring its position as one of the largest sawmilling companies in Europe is retained by investing in modern technologies, SCA Timber also invests to meet the ongoing demands of the market as well as in complying and making a difference to environmental issues.",
+        "score": 0.7591723,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sca.com/en/",
+        "title": "SCA: We are driven by the force of the forest",
+        "content": "The core of SCA's business is the growing forest. ### Over 1,100 hectares of wetland restoration on SCA land. Since 2021, SCA has been dedicated to restoring selected wetlands on its land. By making defibrillators at SCA’s local offices in northern Sweden accessible to the public 24/7, more lives can potentially be saved. SCA is reporting the lowest damage level ever to known archaeological and cultural remains. ### March 27 - SCA Annual General Meeting 2026. * + Press releaseCORRECTION: SCA to increase NBSK price. SCA works actively to make use of the entire tree and all parts of residual streams. Sustainability is integrated into the entire business and part of SCA's business concept. Our pulp products are made from trees from our forests in northern Sweden and have a very strong environmental profile. We are one of Europe's largest producers of forest-based bioenergy with a total production of approximately 10.8 TWh per year.",
+        "score": 0.74697095,
+        "raw_content": null
+      },
+      {
+        "url": "https://portersfiveforce.com/blogs/how-it-works/sca",
+        "title": "How Does SCA Company Work? – PortersFiveForce.com",
+        "content": "SCA’s core operations center on sustainable forestry, industrial processing and integrated logistics that convert certified spruce and pine into wood products, pulp, containerboard and renewable energy, underpinning traceable, cost-stable revenue streams. Revenue Streams and Monetization Strategies for the SCA company center on diversified forest-industry sales — wood products, pulp (NBSK), containerboard, forest services, renewable energy and logistics — with pricing and volumes tied to European construction cycles, global pulp indices and long-term commercial contracts to stabilize cash flow. SCA's recent milestones include world-scale NBSK capacity at Östrand, kraftliner ramp to ~**725 ktpa** at Obbola, and Munksund efficiency upgrades; these moves, plus vertical integration and a renewable energy platform, underpin a resilient SCA business model and competitive edge in packaging, tissue and construction markets. SCA business model leverages integrated forestry, pulp, packaging and renewable energy to capture value across the chain; in 2024 SCA's kraftliner volumes and NBSK share rank among Europe’s largest producers.",
+        "score": 0.7295395,
+        "raw_content": null
+      }
+    ],
+    "response_time": 0.83,
+    "request_id": "99d5c233-01a0-404b-99f4-8d623dea5b55"
+  }
+}

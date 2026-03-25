@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560197460",
+  "company_name": "Sandvik AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Sandvik\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Sandvik what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sandvik",
+        "title": "Sandvik - Wikipedia",
+        "content": "**Sandvik AB** is a Swedish multinational engineering company specializing in products and services for mining, rock excavation, rock drilling, rock processing (crushing and screening), metal cutting and machining. In the same year, the *Sandvik Coromant* brand was registered for cemented carbide products, and the company started working on tools for metal cutting and rock drilling. In 1997, Sandvik acquired a majority of the Swedish company *Kanthal AB*, which specialized in metallic electrical resistance products and high-temperature ceramic materials. Also, in the same year, Sandvik bought all remaining shares in the Finnish company *Tamrock*, a manufacturer of mining equipment in which it previously had a minority holding. In 2009, Sandvik bought the Austrian company *Wolfram Bergbau*, which was focused on tungsten production, from mining to cemented-carbide powder. In August 2022, the business area *Sandvik materials technology*, which included tubes, strip steel, medical wires and Kanthal-brand heating technology products, was spun off as a separate company, publicly listed at Nasdaq Stockholm.",
+        "score": 0.91435975,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/sandvik-ab/",
+        "title": "Sandvik AB Company Profile - GlobalData",
+        "content": "It offers products such as breakers and demolition tools, crushers and screens, mobile, rock tools, spare parts and wear parts, surface drill rigs, tunneling",
+        "score": 0.8116913,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.forbes.com/companies/sandvik/",
+        "title": "Sandvik | Company Overview & News - Forbes",
+        "content": "Sandvik AB engages in the development, manufacture, and sale of tools, equipment, and tooling systems for the mining and construction industries.",
+        "score": 0.8106142,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.home.sandvik/en/about-us/sandvik-at-a-glance/",
+        "title": "Our company - Sandvik Group",
+        "content": "You are now visiting the Sandvik Group website in English. # Sandvik at a glance. Sandvik is a global, high-tech engineering group providing solutions that enhance productivity, profitability and sustainability for the manufacturing, mining and infrastructure industries. * Equipment and tools, service, digital solutions and sustainability-driving technologies for the mining and infrastructure industries, such as automated and electric mining equipment and eco-efficient rock processing. * Metal-cutting tools, tooling systems and digital solutions driving higher efficiency and automation in component manufacturing, as well as industrial metrology technologies and metal powder. The Sandvik Group conducts operations in four business areas with divisions responsible for research and development (R&D), production and sales of their respective products and services. ## Business areas. Read more  Read more about our business areas. ## Key facts about Sandvik. Download presentation with facts about the Sandvik Group. Download presentation with facts about the Sandvik Group. Download presentation with facts about the Sandvik Group.",
+        "score": 0.7420672,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.mining.sandvik/en/products/",
+        "title": "Products - Sandvik Mining and Rock Technology",
+        "content": "Welcome to Sandvik, you are now browsing our site in English, would you like to switch to another language? Sandvik Mining and Rock Technology. Whether you need to excavate, transport or process ore, rock or overburden more efficiently, our comprehensive range of cutting-edge surface and underground mining equipment is designed to increase your productivity and boost your bottom line. ## We would like your consent. Sandvik and our vendors use cookies (and similar technologies) to collect and process personal data (such as device identifiers, IP addresses, and website interactions) for essential site functions, analyzing site performance, personalizing content, and delivering targeted ads. Some cookies are necessary and can’t be turned off, while others are used only if you consent. The consent-based cookies help us support Sandvik and individualize your website experience. You can also consent to cookies based on their purposes via the manage cookies link below. Visit our cookie privacy policy for more details on how we use cookies.",
+        "score": 0.71496695,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.48,
+    "request_id": "516a2a3b-99c1-45a4-9721-f9a40135cd62"
+  }
+}

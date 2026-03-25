@@ -5,7 +5,7 @@ Used to show users an estimated cost prior to starting a run.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from backend.config import get_settings
 

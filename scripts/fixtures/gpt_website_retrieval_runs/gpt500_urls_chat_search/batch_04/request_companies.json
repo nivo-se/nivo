@@ -1,0 +1,182 @@
+{
+  "companies": [
+    {
+      "name": "Galore i Uppsala Aktiebolag",
+      "orgnr": "556623-2772",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Falcks Omnibus AB",
+      "orgnr": "556099-9210",
+      "address_country": "SE",
+      "primary_nace": "49311 Linjebussverksamhet",
+      "segment_labels_json": "[\"Busstrafik, biltrafik\", \"Transportförmedling\", \"Passagerartransporter\"]"
+    },
+    {
+      "name": "VS Truck AB",
+      "orgnr": "556145-5469",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Truckar\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Bookmark Förlag AB",
+      "orgnr": "556864-3141",
+      "address_country": "SE",
+      "primary_nace": "58110 Bokutgivning",
+      "segment_labels_json": "[\"Förlagsbyråer\"]"
+    },
+    {
+      "name": "Bosphorus Aktiebolag",
+      "orgnr": "556623-6450",
+      "address_country": "SE",
+      "primary_nace": "10850 Tillverkning av lagad mat och färdigrätter",
+      "segment_labels_json": "[\"Förpackningar - Industrin\", \"Livsmedel\", \"Uthyrning\", \"Förpackningar\", \"Grossister\", \"Livsmedel - tillverkning\", \"Producenter\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "EPG Projektledning AB",
+      "orgnr": "556665-6442",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Reason Studios Aktiebolag",
+      "orgnr": "556546-2206",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Markera AB",
+      "orgnr": "556729-7832",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Play Box AB",
+      "orgnr": "556509-6384",
+      "address_country": "SE",
+      "primary_nace": "32400 Tillverkning av spel och leksaker",
+      "segment_labels_json": "[\"Spel, nöjesanläggningsutrustningar\", \"Grossister\", \"Producenter\", \"Spel, nöjesanläggningsutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Johpomek Aktiebolag",
+      "orgnr": "556195-1947",
+      "address_country": "SE",
+      "primary_nace": "31011 Tillverkning av kontors- och butiksmöbler",
+      "segment_labels_json": "[\"Möbler\", \"Möbler - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "In & Finn Scandinavien AB",
+      "orgnr": "556072-8528",
+      "address_country": "SE",
+      "primary_nace": "47593 Specialiserad butikshandel med glas, porslin och andra bosättningsvaror",
+      "segment_labels_json": "[\"Köksinredningar\", \"Lager\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Turner & Townsend AB",
+      "orgnr": "556812-4670",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Bridgepoint AB",
+      "orgnr": "556607-8811",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Presona Aktiebolag",
+      "orgnr": "556550-4866",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "28990 Tillverkning av övriga specialmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "ZilenZio AB",
+      "orgnr": "556651-5689",
+      "address_country": "SE",
+      "primary_nace": "46650 Partihandel med kontorsmöbler",
+      "segment_labels_json": "[\"Kontorsinredningar\", \"Grossister\"]"
+    },
+    {
+      "name": "Svets & Mekano Produktion i Vislanda AB",
+      "orgnr": "559136-9110",
+      "registry_homepage_url": "https://antraciten.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Seafrigo Nordic AB",
+      "orgnr": "559054-6692",
+      "address_country": "SE",
+      "primary_nace": "52290 Övriga stödtjänster till transport",
+      "segment_labels_json": "[\"Spedition\", \"Transportförmedling\"]"
+    },
+    {
+      "name": "FOBE Produktion AB",
+      "orgnr": "556615-0214",
+      "registry_homepage_url": "https://fobeproduktion.com",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Widings Elektriska AB",
+      "orgnr": "556747-4514",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Nordlo Jönköping AB",
+      "orgnr": "556617-0394",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Grossister\", \"Kontors-, kopieringsmaskiner\"]"
+    },
+    {
+      "name": "Ricana Concept AB",
+      "orgnr": "556270-3024",
+      "address_country": "SE",
+      "primary_nace": "31012 Tillverkning av kontors- och butiksinredningar",
+      "segment_labels_json": "[\"Möbler\"]"
+    },
+    {
+      "name": "Ventilationsprojekt i Norrköping AB",
+      "orgnr": "556648-1684",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Logos Payment Solutions AB",
+      "orgnr": "556255-6133",
+      "address_country": "SE",
+      "primary_nace": "46521 Partihandel med elektronikkomponenter",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Pumpar\", \"Elektronik- och telekommunikationsutrustning\", \"Elektronik- och telekommunikationsutrustning - grossist\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Cegeka Applications AB",
+      "orgnr": "556472-5447",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "J.K Livs AB",
+      "orgnr": "556944-0232",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    }
+  ]
+}

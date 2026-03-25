@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { companyProfileBackToRunResults } from "@/lib/navigation/companyProfileBack";
 import {
   useAIRun,
   useRunResults,
@@ -346,6 +347,7 @@ function ResultDetail({
                 </h2>
                 <Link
                   to={`/company/${result.company_orgnr}`}
+                  state={runId ? companyProfileBackToRunResults(runId) : undefined}
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <ExternalLink className="w-5 h-5" />

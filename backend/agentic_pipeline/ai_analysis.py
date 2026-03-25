@@ -16,7 +16,7 @@ from typing import Any, Iterable, Optional, Sequence
 import pandas as pd
 from openai import OpenAI
 
-from .screening_prompt import SCREENING_SYSTEM_PROMPT, get_screening_prompt, get_batch_screening_prompt
+from .screening_prompt import SCREENING_SYSTEM_PROMPT, get_batch_screening_prompt
 from .web_enrichment import enrich_companies_for_analysis, EnrichmentDataFormatter
 
 logger = logging.getLogger(__name__)
@@ -318,13 +318,6 @@ class ScreeningResult:
     analysis_generated_at: datetime = field(default_factory=datetime.utcnow)
     audit: Optional[AnalysisAuditRecord] = None
     raw_json: dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(slots=True)
-class AIAnalysisBatch:
-    run: AIAnalysisRun
-    companies: list[CompanyAnalysisRecord]
-    errors: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -815,14 +808,14 @@ class AgenticLLMAnalyzer:
 
     def _render_context(self, row: pd.Series, enrichment_data: Optional[str] = None) -> str:
         context_data: dict[str, Any] = {}
-        for field in self.config.context_fields:
-            value = row.get(field)
+        for context_field in self.config.context_fields:
+            value = row.get(context_field)
             if pd.isna(value):
                 continue
             if isinstance(value, (datetime, pd.Timestamp)):
-                context_data[field] = value.isoformat()
+                context_data[context_field] = value.isoformat()
             else:
-                context_data[field] = value
+                context_data[context_field] = value
 
         structured_json = json.dumps(context_data, ensure_ascii=False, indent=2)
         

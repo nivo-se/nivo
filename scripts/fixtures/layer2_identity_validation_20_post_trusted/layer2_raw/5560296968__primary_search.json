@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "orgnr": "5560296968",
+  "company_name": "Getinge AB",
+  "query_role": "primary_search",
+  "query_index": 1,
+  "query_string": "\"Getinge\" what does the company do products Sweden",
+  "search_depth_used": "basic",
+  "tavily_response": {
+    "query": "Getinge what does the company do products Sweden",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.getinge.com/kr/company/",
+        "title": "Getinge – Advancing Healthcare & Life Sciences Solutions",
+        "content": "Man with glasses and medical mask and cap. # Together we can save more lives. * Founded in 1904 in the small town of Getinge, Sweden. * Providing hospitals and life science institutions with products and solutions aiming to improve clinical results and optimize workflows. * Offering includes solutions for intensive care, cardiovascular procedures, operating rooms, sterile reprocessing and life science. * Sales in more than 135 countries. * 31.8 billion SEK in net sales in 2023. * Listed on the Nasdaq Stockholm Large Cap list since 1993. Our recent acquisitions reflect our dedication to expanding our capabilities of making life-saving technology accessible to more people. At Getinge, our passion for life extends to all dimensions of life, from the well-being of patients to the health of our planet. Join our purpose to make life-saving technologies accessible for more people. We believe that our passion for improving patient outcome through leading technology and integrated medtech solutions, adds value to both healthcare and investors.",
+        "score": 0.78670514,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.globaldata.com/company-profile/getinge-ab/",
+        "title": "Getinge AB Company Profile - GlobalData",
+        "content": "# Getinge AB - Company Profile. All the sales intelligence you need on Getinge AB in one solution. when and how to engage with Getinge AB. # Getinge AB: Overview. * Top 10 Medical Companies in the World in 2021 by Number of Marketed Products. Getinge AB (Getinge) is a medical device company. The company's main activities include offering solutions for intensive care, cardiovascular procedures, operating room, sterile reprocessing, digital health, pharmaceutical production, and research laboratories. Gain a 360-degree view of Getinge AB and make more informed decisions for your business. Gain a 360-degree view of Getinge AB and make more informed decisions for your business. ## Getinge AB premium industry data and analytics. IT Client Prospector provides intelligence on Getinge AB’s likely spend across technology areas enabling you to understand the digital strategy. Gain insight into Getinge AB key executives to enhance your sales strategy. Gain insight into Getinge AB key executives to enhance your sales strategy.",
+        "score": 0.7244226,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/company/history/",
+        "title": "Getinge History - A Legacy of Innovation and Excellence",
+        "content": "This is the story of a company from a small rural town in southern Sweden that grew into a global medical technology leader. In 1904, the Swedish entrepreneur Olander Larsson started manufacturing agricultural equipment in the community of Getinge. In 1932, Getinge made its first move into medical technology by starting to produce sterilizers for medical equipment. In the 1960s, Electrolux acquired Getinge. In the decades to come, Getinge acquired over 15 different infection control and sterilization companies across Europe and the United States. These acquisitions enabled Getinge to become a global leader in the field of Surgical Workflows. Growing a financially strong and prosperous company is a core part of the Getinge story. In 2000, the acquisition of Maquet enabled the Getinge Group to start provisioning operating theatres. Since its listing in 1993, Getinge sales have grown continuously, achieved through a combination of organic growth and acquisitions. Getinge is a leader in its chosen business segments, which focus on Acute Care Therapies, Life Science and Surgical Workflows.",
+        "score": 0.70580584,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.sbcuae.se/members-company-news/getinge-in-medtech-120",
+        "title": "A century and beyond with Getinge in medtech",
+        "content": "Celebrating 120 years of pioneering healthcare, Getinge reflects on its journey in the industry. With a strong focus on continuous improvement and innovation, the global medtech company stays committed to address evolving needs in healthcare together with customers and partners. Originating in 1904 on this very day, March 21, Getinge embarked on a mission to evolve healthcare and life science. We designed and built one of the first operating tables, the first modern ventilator, and have been pioneers in sterile transfer systems, to mention a few examples,” says Mattias Perjos, President & CEO at Getinge. As Getinge celebrates the monumental 120-year milestone, co-workers around the globe remain committed to one common purpose: to make life-saving technology accessible for more people. About Getinge With a firm belief that every person and community should have access to the best possible care, Getinge provides hospitals and life science institutions with products and solutions aiming to improve clinical results and optimize workflows.",
+        "score": 0.6628188,
+        "raw_content": null
+      },
+      {
+        "url": "https://www.getinge.com/int/",
+        "title": "Welcome to Getinge - Getinge",
+        "content": "For every life saved and every breakthrough made — Getinge stands behind the moments that matter. Explore our products  Discover the Getinge story. Getinge’s sustainability work is an integral part of our passion for life. And our heritage proves that passion for improving patient outcome, through leading technology and integrated medtech solutions, adds value to both healthcare and investors. ### NOTICE OF ANNUAL GENERAL MEETING IN GETINGE AB (PUBL). ### Getinge transforms sterile reprocessing with Automatiq - a full range of logistic automation modules. ### Getinge introduces new version of Solsus 66 to meet CSSD efficiency needs. The Annual General Meeting in Getinge AB (publ), corporate ID No. 556408-5032, will be held on Tuesday, April 21, 2026 at 3.00 p.m. CEST, in Kongresshallen, Hotel Tylösand, Halmstad, Sweden. ## Getinge Automatiq - Automated Solutions empowering CSSDs through automation. ## Getinge Academy. ### Getinge Automatiq - Automated Solutions empowering CSSDs through automation. ### Getinge Academy. You are now leaving Getinge.com.",
+        "score": 0.63316137,
+        "raw_content": null
+      }
+    ],
+    "response_time": 1.16,
+    "request_id": "dae511ac-27ba-4ec8-884a-422d003efdbc"
+  }
+}

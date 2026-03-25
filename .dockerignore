@@ -1,4 +1,6 @@
 # Shrink API image build context (docker compose build api) — faster uploads and better layer cache hits.
+# AppleDouble files (._*) on exFAT/external volumes break Docker buildx ("failed to xattr ... operation not permitted").
+**/._*
 .git
 .github
 .cursor

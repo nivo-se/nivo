@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://www.xperta.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.xperta.se listed as the company's website on multiple business directories, including Largestcompanies and Allabolag."
+    },
+    {
+      "orgnr": "556828-0670",
+      "company_name": "Noxon Aktiebolag",
+      "official_website_url": "https://www.noxon.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.noxon.com listed as the company's website on multiple business directories, including Dealroom and Allabolag."
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Sarstedt is a global company; the .com domain serves as the primary website for all regions, including Sweden."
+    },
+    {
+      "orgnr": "556864-3141",
+      "company_name": "Bookmark Förlag AB",
+      "official_website_url": "https://www.bookmarkforlag.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.bookmarkforlag.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556665-6442",
+      "company_name": "EPG Projektledning AB",
+      "official_website_url": "https://www.epgprojektledning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.epgprojektledning.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556270-3024",
+      "company_name": "Ricana Concept AB",
+      "official_website_url": "https://www.ricanaconcept.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.ricanaconcept.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556055-5814",
+      "company_name": "Hansson PyroTech Aktiebolag",
+      "official_website_url": "https://www.hanssonpyrotech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.hanssonpyrotech.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556710-1992",
+      "company_name": "Kallhälls Nya Vårdcentral AB",
+      "official_website_url": "https://www.kallhallsnyavardcentral.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.kallhallsnyavardcentral.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556388-2470",
+      "company_name": "Göthes Säkerhet Aktiebolag",
+      "official_website_url": "https://www.gothes.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.gothes.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "559083-3561",
+      "company_name": "Mälardalens Asfalt AB",
+      "official_website_url": "https://www.malardalensasfalt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.malardalensasfalt.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556444-8255",
+      "company_name": "Eqpack AB",
+      "official_website_url": "https://eqpack.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556436-7067",
+      "company_name": "Örebro Bildemontering Aktiebolag",
+      "official_website_url": "https://www.orebrobildemontering.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.orebrobildemontering.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556101-5230",
+      "company_name": "Götaplatsens Foto AB",
+      "official_website_url": "https://www.gpfoto.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.gpfoto.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556035-5926",
+      "company_name": "Aktiebolaget Cernelle.",
+      "official_website_url": "https://cernelle.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556193-7086",
+      "company_name": "KAMI, Kalix Mekaniska Industrier Aktiebolag",
+      "official_website_url": "https://kami.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556403-9005",
+      "company_name": "Flyinge Plantshop Aktiebolag",
+      "official_website_url": "https://www.flyingeplantshop.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.flyingeplantshop.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556748-1352",
+      "company_name": "SWELIFT AB",
+      "official_website_url": "https://www.swelift.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.swelift.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556606-1056",
+      "company_name": "EMV Stainless AB",
+      "official_website_url": "https://emvholding.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556487-7172",
+      "company_name": "Reco Port Aktiebolag",
+      "official_website_url": "https://www.recoport.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; confirmed live and matches company name."
+    },
+    {
+      "orgnr": "556512-0762",
+      "company_name": "Sennen AB",
+      "official_website_url": "https://www.sennen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.sennen.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556908-6282",
+      "company_name": "Polyproject Environment AB",
+      "official_website_url": "https://www.polyproject.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.polyproject.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556519-3660",
+      "company_name": "Anders Gustafsson Livs Aktiebolag",
+      "official_website_url": "https://www.ica.se/butiker/nara/orebro/anders-gustafsson-livs-ab-ica-nara-orebro-1001/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found the company's ICA store page as the primary online presence."
+    },
+    {
+      "orgnr": "556740-6821",
+      "company_name": "Svalebergs Elektriska AB",
+      "official_website_url": "https://www.svalebergs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.svalebergs.se listed as the company's website on multiple business directories."
+    },
+    {
+      "orgnr": "556537-4294",
+      "company_name": "MVB Umeå AB",
+      "official_website_url": "https://www.mvb.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found www.mvb.se listed as the company's website on multiple business directories."
+    }
+  ]
+}

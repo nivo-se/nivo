@@ -1,0 +1,184 @@
+{
+  "companies": [
+    {
+      "name": "TOMINA Aktiebolag",
+      "orgnr": "556336-0071",
+      "address_country": "SE",
+      "primary_nace": "81210 Lokalvård",
+      "segment_labels_json": "[\"Städservice\"]"
+    },
+    {
+      "name": "Evidi AB",
+      "orgnr": "556553-8898",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\", \"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Ingenjörsfirman Geotech Aktiebolag",
+      "orgnr": "556098-5599",
+      "registry_homepage_url": "https://geotech.se",
+      "address_country": "SE",
+      "primary_nace": "26510 Tillverkning av instrument och apparater för mätning, provning och navigering",
+      "segment_labels_json": "[\"Elektronik - Legotillverkning\", \"Elektronik - Produktionsutrustningar\", \"Producenter\"]"
+    },
+    {
+      "name": "Skogsmateriel-Nordforest Aktiebolag",
+      "orgnr": "556579-1349",
+      "address_country": "SE",
+      "primary_nace": "47911 Postorderhandel och detaljhandel på Internet med brett sortiment",
+      "segment_labels_json": "[\"Postorder/e-handel\"]"
+    },
+    {
+      "name": "Annell Ljus och Form Aktiebolag",
+      "orgnr": "556085-2922",
+      "address_country": "SE",
+      "primary_nace": "46150 Provisionshandel med möbler, hushålls- och järnhandelsvaror",
+      "segment_labels_json": "[\"Agenturer\", \"Möbler, hushållsartiklar och järnvaror - agentur\"]"
+    },
+    {
+      "name": "Hagaberg Industrier AB",
+      "orgnr": "556353-7512",
+      "registry_homepage_url": "https://www.hagaberg.com",
+      "address_country": "SE",
+      "primary_nace": "28220 Tillverkning av lyft- och godshanteringsanordningar",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Ecrucial Stockholm AB",
+      "orgnr": "559387-8969",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Finansbolag, finansiella tjänster\", \"Internet - Konsulter, operatörer\", \"Värdepappershandel\"]"
+    },
+    {
+      "name": "Kristianstads Automobil Lastvagnar AB",
+      "orgnr": "556042-9549",
+      "address_country": "SE",
+      "primary_nace": "45191 Handel med lastbilar, bussar och specialfordon",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreparationer\"]"
+    },
+    {
+      "name": "Biotech Fluidics AB",
+      "orgnr": "556726-9278",
+      "address_country": "SE",
+      "primary_nace": "26700 Tillverkning av optiska instrument och fotoutrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Optik och optisk utrustning\", \"Optik och optisk utrustning - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Svetsprodukter i Piteå Aktiebolag",
+      "orgnr": "556291-3557",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Maskinförnödenheter\", \"Grossister\", \"Bränsle - grossist och detaljist\"]"
+    },
+    {
+      "name": "TR Media AB",
+      "orgnr": "556078-5114",
+      "address_country": "SE",
+      "primary_nace": "58140 Utgivning av tidskrifter",
+      "segment_labels_json": "[\"Förlagsbyråer\", \"Tidningar\"]"
+    },
+    {
+      "name": "Seacastle AB",
+      "orgnr": "556744-7031",
+      "address_country": "SE",
+      "primary_nace": "47643 Specialiserad butikshandel med båtar",
+      "segment_labels_json": "[\"Fritidsbåtar och utrustning\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Svenska GMK AB",
+      "orgnr": "556688-6445",
+      "address_country": "SE",
+      "primary_nace": "33200 Installation av industrimaskiner och -utrustning",
+      "segment_labels_json": "[\"Byggmästare\", \"Industriförnödenheter\", \"Maskinförnödenheter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Wenderfalck Kommunikation AB",
+      "orgnr": "556692-9815",
+      "address_country": "SE",
+      "primary_nace": "73111 Reklambyråverksamhet",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Dotetorps Ägg Aktiebolag",
+      "orgnr": "556491-4298",
+      "address_country": "SE",
+      "primary_nace": "46330 Partihandel med mejeriprodukter, ägg, matolja och matfett",
+      "segment_labels_json": "[\"Mejerivaror\", \"Grossister\", \"Jordbruk\", \"Jordbruk - boskap och djurhållning\", \"Mejerivaror - grossist\"]"
+    },
+    {
+      "name": "Bröderna Hansson H-tryck Aktiebolag",
+      "orgnr": "556086-1535",
+      "registry_homepage_url": "https://www.h-tryck.se",
+      "address_country": "SE",
+      "primary_nace": "17220 Tillverkning av hushålls- och hygienartiklar av papper",
+      "segment_labels_json": "[\"Pappersvaror\", \"Tryckerier\", \"Pappersvaror - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "BrightCom Solutions AB",
+      "orgnr": "556804-3698",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "AQ ParkoPrint AB",
+      "orgnr": "556574-6319",
+      "registry_homepage_url": "https://www.group.com",
+      "address_country": "SE",
+      "primary_nace": "28290 Övrig tillverkning av maskiner för allmänt ändamål",
+      "segment_labels_json": "[\"Legoarbeten\", \"Maskinförnödenheter\", \"Sport\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Sport - produktion\"]"
+    },
+    {
+      "name": "SkyShowtime Nordics AB",
+      "orgnr": "559370-1971",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "59110 Produktion av film, video och TV-program",
+      "segment_labels_json": "[\"Video, film - Inspelning, produktion\"]"
+    },
+    {
+      "name": "Lindås Gräv Aktiebolag",
+      "orgnr": "556442-2755",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"VVS-arbeten, material och produkter\", \"Väganordningar, trafikanordningar, vägarbeten\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "The limit is SQY AB",
+      "orgnr": "556965-9815",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "JustNu AB",
+      "orgnr": "556671-1924",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Adressregister\", \"Bokbinderier\", \"Pappersvaror\", \"Tryckerier\", \"Kontorstjänster\", \"Pappersvaror - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "RISE Processum AB",
+      "orgnr": "556641-7357",
+      "address_country": "SE",
+      "primary_nace": "74900 Övrig verksamhet inom juridik, ekonomi, vetenskap och teknik",
+      "segment_labels_json": "[\"Forskning\", \"Konsulter\", \"Facklig, vetenskaplig och teknisk verksamhet\"]"
+    },
+    {
+      "name": "INFICON AB",
+      "orgnr": "556209-9001",
+      "address_country": "SE",
+      "primary_nace": "26510 Tillverkning av instrument och apparater för mätning, provning och navigering",
+      "segment_labels_json": "[\"Elektronik - Legotillverkning\", \"Elektronik - Produktionsutrustningar\", \"Maskinförnödenheter\", \"Grossister\", \"Producenter\"]"
+    },
+    {
+      "name": "Fröjd Interactive AB",
+      "orgnr": "556712-0232",
+      "address_country": "SE",
+      "primary_nace": "73111 Reklambyråverksamhet",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    }
+  ]
+}

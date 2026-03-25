@@ -1,0 +1,184 @@
+{
+  "companies": [
+    {
+      "name": "Cyient Engineering AB",
+      "orgnr": "556605-7476",
+      "address_country": "SE",
+      "primary_nace": "71122 Teknisk konsultverksamhet inom industriteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "WEFIX Trädgård AB",
+      "orgnr": "556835-5399",
+      "address_country": "SE",
+      "primary_nace": "81300 Skötsel och underhåll av grönytor",
+      "segment_labels_json": "[\"Fastighetsförvaltning\", \"Parkanläggningar\"]"
+    },
+    {
+      "name": "August Larsson Charkuteri AB",
+      "orgnr": "556414-7485",
+      "address_country": "SE",
+      "primary_nace": "10130 Charkuteri- och annan köttvarutillverkning",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Röchling Industrial Virserum AB",
+      "orgnr": "556337-2761",
+      "registry_homepage_url": "https://www.roechling.com",
+      "address_country": "SE",
+      "primary_nace": "22210 Tillverkning av plasthalvfabrikat",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Vökby Bredband AB",
+      "orgnr": "556650-3321",
+      "address_country": "SE",
+      "primary_nace": "61100 Trådbunden telekommunikation",
+      "segment_labels_json": "[\"Bredband\", \"Telekommunikation, teleoperatörer\"]"
+    },
+    {
+      "name": "Svalebergs Elektriska AB",
+      "orgnr": "556740-6821",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Plåtslagerier\", \"Takbeläggningar\", \"Energihandel\"]"
+    },
+    {
+      "name": "VentPartner i Västmanland AB",
+      "orgnr": "559001-0533",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Lotts Import AB",
+      "orgnr": "556886-4465",
+      "address_country": "SE",
+      "primary_nace": "46340 Partihandel med drycker",
+      "segment_labels_json": "[\"Uthyrning\", \"Grossister\", \"Dryckesvaror\"]"
+    },
+    {
+      "name": "Elopak AB",
+      "orgnr": "556709-5152",
+      "address_country": "SE",
+      "primary_nace": "46762 Partihandel med emballage",
+      "segment_labels_json": "[\"Förpackningar - Industrin\", \"Förpackningar\", \"Grossister\"]"
+    },
+    {
+      "name": "AMV Equipment AB",
+      "orgnr": "559002-6554",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Bilar\", \"Maskinförnödenheter\", \"Bilar - tillverkning\", \"Maskinförnödenheter - reparationer\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "pour-tech AB",
+      "orgnr": "556854-5106",
+      "registry_homepage_url": "https://pour-tech.com",
+      "address_country": "SE",
+      "primary_nace": "28410 Tillverkning av verktygsmaskiner för metallbearbetning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Keyvent Öst AB",
+      "orgnr": "559135-3171",
+      "address_country": "SE",
+      "primary_nace": "71124 Teknisk konsultverksamhet inom energi-, miljö- och VVS-teknik",
+      "segment_labels_json": "[\"Konsulter\", \"Miljöteknik\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Filipstad Stormarknad AB",
+      "orgnr": "556108-7338",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Vilbergens Livs Aktiebolag",
+      "orgnr": "556155-7264",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Exista Säkerhet AB",
+      "orgnr": "556750-1522",
+      "registry_homepage_url": "https://www.exista.se",
+      "address_country": "SE",
+      "primary_nace": "80200 Säkerhetssystemtjänster",
+      "segment_labels_json": "[\"Bevakningsföretag\"]"
+    },
+    {
+      "name": "Sprinklerbolaget Stockholm AB",
+      "orgnr": "556731-7234",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Better You AB",
+      "orgnr": "556917-8386",
+      "address_country": "SE",
+      "primary_nace": "47291 Specialiserad butikshandel med hälsokost",
+      "segment_labels_json": "[\"Hälsokost, naturläkemedel\", \"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Neoventa Medical AB",
+      "orgnr": "556773-4784",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Giants and Toys content providers AB",
+      "orgnr": "559234-0623",
+      "registry_homepage_url": "https://www.giantsandtoys.com",
+      "address_country": "SE",
+      "primary_nace": "59110 Produktion av film, video och TV-program",
+      "segment_labels_json": "[\"Video, film - Inspelning, produktion\"]"
+    },
+    {
+      "name": "Tollco Aktiebolag",
+      "orgnr": "556499-9620",
+      "address_country": "SE",
+      "primary_nace": "46499 Partihandel med övriga hushållsvaror",
+      "segment_labels_json": "[\"Grossister\"]"
+    },
+    {
+      "name": "DENSIQ AB",
+      "orgnr": "556198-5077",
+      "address_country": "SE",
+      "primary_nace": "46769 Partihandel med övriga insatsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\"]"
+    },
+    {
+      "name": "Link Sweden Aktiebolag",
+      "orgnr": "556432-0611",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Skeppsbrons Jönköping AB",
+      "orgnr": "556424-9059",
+      "registry_homepage_url": "https://skeppsbrons.se",
+      "address_country": "SE",
+      "primary_nace": "45201 Allmän service och reparation av motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\"]"
+    },
+    {
+      "name": "Range Servant AB",
+      "orgnr": "556283-0124",
+      "address_country": "SE",
+      "primary_nace": "28990 Tillverkning av övriga specialmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Kumla Tak Aktiebolag",
+      "orgnr": "556495-0557",
+      "address_country": "SE",
+      "primary_nace": "43912 Takarbeten av andra material än plåt",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    }
+  ]
+}

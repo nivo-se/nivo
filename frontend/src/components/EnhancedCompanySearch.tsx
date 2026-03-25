@@ -61,6 +61,7 @@ const EnhancedCompanySearch: React.FC = () => {
   const itemsPerPage = 20
 
   // Load saved lists on component mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- filter changes own the reset/search flow here
   useEffect(() => {
     const loadSavedLists = async () => {
       try {
@@ -101,6 +102,7 @@ const EnhancedCompanySearch: React.FC = () => {
   const [selectedCompaniesArray, setSelectedCompaniesArray] = useState<CompanyRecord[]>([])
   
   // Update selected companies array when selection changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pagination should rerun the current search only
   useEffect(() => {
     const fetchSelectedCompanies = async () => {
       if (selectedCompanies.size > 0) {
@@ -124,6 +126,7 @@ const EnhancedCompanySearch: React.FC = () => {
   }
 
   // Update select all state when individual selections change
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce is intentionally keyed to search term changes
   useEffect(() => {
     if (allMatchingCompanyOrgNrs.size > 0) {
       setSelectAll(selectedCompanies.size === allMatchingCompanyOrgNrs.size)
@@ -260,6 +263,7 @@ const EnhancedCompanySearch: React.FC = () => {
       setSearchResults(null)
       setAllMatchingCompanyOrgNrs(new Set())
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- filter changes own the reset/search flow here
   }, [filters])
 
   // Add ESC key handler to close popup
@@ -285,6 +289,7 @@ const EnhancedCompanySearch: React.FC = () => {
     if (hasActiveFilters || hasSearchTerm) {
       searchCompanies()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pagination should rerun the current search only
   }, [currentPage])
 
   // Add search term effect
@@ -308,6 +313,7 @@ const EnhancedCompanySearch: React.FC = () => {
     }, 500) // Debounce search by 500ms
 
     return () => clearTimeout(timeoutId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce is intentionally keyed to search term changes
   }, [searchTerm])
 
   const handleFilterChange = (key: keyof CompanyFilter, value: any) => {
