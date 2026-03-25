@@ -39,10 +39,10 @@ export default function DeepResearchWorkbench() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center gap-3 px-6 py-4 border-b">
+      <header className="flex items-center gap-3 px-6 py-4 border-b border-border/80 bg-card/90 backdrop-blur-sm">
         <Link
           to="/deep-research/companies"
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
@@ -55,7 +55,7 @@ export default function DeepResearchWorkbench() {
         </div>
       </header>
 
-      <nav className="flex items-center gap-1 px-6 border-b bg-muted/30">
+      <nav className="flex items-center gap-1 px-6 border-b border-border/80 bg-primary/[0.04] dark:bg-primary/[0.07]">
         {tabs.map((tab) => {
           const href = `${basePath}/${tab.path}`
           const isActive = location.pathname.startsWith(href)
@@ -68,21 +68,21 @@ export default function DeepResearchWorkbench() {
               className={cn(
                 'relative flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
-                  ? 'text-foreground'
+                  ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon className="h-3.5 w-3.5" />
               {tab.label}
               {isActive && (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-foreground rounded-full" />
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-primary rounded-full" />
               )}
             </Link>
           )
         })}
       </nav>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto app-page">
         <Outlet />
       </main>
     </div>

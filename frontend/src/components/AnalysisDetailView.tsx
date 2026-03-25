@@ -91,11 +91,11 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border text-primary-foreground">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-2xl font-bold text-primary-foreground">
+              <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
                 Analys: {analysis.companyName}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">

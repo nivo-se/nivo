@@ -50,7 +50,7 @@ export type ReportWizardPrefill = {
   orgnr: string
   name?: string | null
   website?: string | null
-  source?: 'screening' | 'company'
+  source?: 'screening' | 'company' | 'gpt_target'
   campaignName?: string | null
 }
 
@@ -92,7 +92,7 @@ export function NewReportWizard({
   const [costEstimate, setCostEstimate] = useState<CostEstimate | null>(null)
   const [costEstimateLoading, setCostEstimateLoading] = useState(false)
   const [prefillLoading, setPrefillLoading] = useState(false)
-  const [handoffSource, setHandoffSource] = useState<'screening' | 'company' | null>(null)
+  const [handoffSource, setHandoffSource] = useState<'screening' | 'company' | 'gpt_target' | null>(null)
   const [handoffCampaignName, setHandoffCampaignName] = useState<string | null>(null)
   /** True when handoff org.nr was not found in universe — user should verify manual fields. */
   const [prefillManualFallback, setPrefillManualFallback] = useState(false)
@@ -302,6 +302,11 @@ export function NewReportWizard({
                         <span className="text-muted-foreground"> — campaign &quot;{handoffCampaignName}&quot;</span>
                       ) : null}
                       . Org.nr and company name are pre-filled — continue through the steps when ready.
+                    </>
+                  ) : handoffSource === 'gpt_target' ? (
+                    <>
+                      <span className="font-medium">From GPT target universe</span>
+                      . Org.nr, name, and website are pre-filled when available — verify and continue.
                     </>
                   ) : (
                     <>

@@ -42,6 +42,7 @@ import Universe from "./pages/default/Universe";
 import ScreeningCampaignsPage from "./pages/default/ScreeningCampaignsPage";
 import ScreeningExemplarsPage from "./pages/default/ScreeningExemplarsPage";
 import ScreeningRunShortlistPage from "./pages/default/ScreeningRunShortlistPage";
+import GptTargetUniversePage from "./pages/default/GptTargetUniversePage";
 import MyLists from "./pages/default/MyLists";
 import ListDetail from "./pages/default/ListDetail";
 import AILab from "./pages/default/AILab";
@@ -183,6 +184,7 @@ const App = () => (
               <Route path="screening-campaigns/exemplars" element={<ScreeningExemplarsPage />} />
               <Route path="screening-shortlist/:runId" element={<ScreeningRunShortlistPage />} />
               <Route path="screening-shortlist" element={<ScreeningRunShortlistPage />} />
+              <Route path="gpt-target-universe" element={<GptTargetUniversePage />} />
               <Route path="lists" element={<MyLists />} />
               <Route path="lists/:listId" element={<ListDetail />} />
               <Route path="company/:companyId" element={<CompanyDetail />} />

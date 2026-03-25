@@ -25,10 +25,10 @@ export function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="min-h-screen w-full flex bg-background">
       {/* Sidebar - Admin and User always visible at bottom */}
-      <aside className="w-[220px] border-r bg-background flex flex-col min-h-screen">
-        <div className="h-14 px-4 flex items-center border-b shrink-0">
+      <aside className="w-[220px] border-r border-sidebar-border bg-sidebar-bg flex flex-col min-h-screen shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.18)]">
+        <div className="h-14 px-4 flex items-center border-b border-sidebar-border/80 shrink-0">
           <img
             src="/nivo-wordmark.svg"
             alt="Nivo"
@@ -46,10 +46,10 @@ export function AppLayout() {
                   to={item.to}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                      "flex items-center gap-3 rounded-md py-2 pr-3 pl-3 text-sm transition-colors border-l-[3px]",
                       isActive
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                        ? "border-primary bg-sidebar-active-bg !text-sidebar-active-fg font-medium"
+                        : "border-transparent !text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
                     )
                   }
                 >
@@ -66,16 +66,16 @@ export function AppLayout() {
         </ScrollArea>
 
         {/* Admin + User + Sign out - always visible, sticky at bottom */}
-        <div className="p-3 border-t shrink-0 space-y-2 bg-background">
+        <div className="p-3 border-t border-sidebar-border/80 shrink-0 space-y-2 bg-sidebar-bg">
           {isAdmin && (
             <NavLink
               to="/app/admin"
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  "flex items-center gap-3 rounded-md py-2 pr-3 pl-3 text-sm transition-colors border-l-[3px]",
                   isActive
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                    ? "border-primary bg-sidebar-active-bg !text-sidebar-active-fg font-medium"
+                    : "border-transparent !text-sidebar-muted hover:bg-sidebar-hover-bg hover:!text-sidebar-fg"
                 )
               }
             >
@@ -105,9 +105,13 @@ export function AppLayout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 relative min-h-0">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_50%_-8%,hsl(var(--primary)/0.11),transparent_55%)] dark:bg-[radial-gradient(ellipse_100%_55%_at_50%_-5%,hsl(var(--primary)/0.14),transparent_50%)]"
+          aria-hidden
+        />
         {/* Top bar: Admin + User always visible on all pages */}
-        <div className="h-14 border-b shrink-0 flex items-center justify-between px-4">
+        <div className="relative h-14 border-b border-border/80 shrink-0 flex items-center justify-between px-4 bg-background/80 backdrop-blur-sm">
           <div />
           <div className="flex items-center gap-2">
             {isAdmin && (
@@ -131,7 +135,7 @@ export function AppLayout() {
           </div>
         </div>
 
-        <div className="p-6 flex-1 overflow-auto">
+        <div className="relative p-6 flex-1 overflow-auto">
           <Outlet />
         </div>
       </main>

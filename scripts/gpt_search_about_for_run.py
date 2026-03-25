@@ -16,8 +16,14 @@ this path: the model uses built-in web search once it has ``company_name`` + bas
   # Optional: ``--dry-run`` prints selected inputs (no API). ``--out path.json`` sets output file.
   # Page with ``--limit 20 --offset 0``, then ``--offset 20``, …
 
+  # Ad-hoc batch (e.g. Playwright failures) — skip DB, use JSON with ``input_companies``:
+
+  PYTHONPATH=. python3 scripts/gpt_search_about_for_run.py \\
+    --run-id <uuid> --companies-json scripts/fixtures/.../batch.json
+
 ``--filter weak`` prefers rows where our fetch was thin or failed (``home_only``, ``http_error``,
-``timeout``, ``empty_text``). Use ``--filter any_url`` for the first N rows that have a URL.
+``timeout``, ``empty_text``). ``--filter any_url`` = first rows with GPT or registry home URL.
+``--filter gpt_url`` = **only** rows with non-empty ``gpt_official_website_url`` (confirmed GPT URL).
 
 Output: JSON file with parsed items + raw assistant message (see ``--out``). **Does not** write
 to Postgres (inspect results first). **No retries**: one API call per batch; on error, fix and re-run.
@@ -211,16 +217,54 @@ def fetch_rows(
             params: List[Any] = [run_id]
             if filter_mode == "weak":
                 base_sql += f" AND about_fetch_status IN {weak_statuses}"
-            base_sql += """
-                AND (
-                    (gpt_official_website_url IS NOT NULL AND btrim(gpt_official_website_url) <> '')
-                    OR (about_fetch_final_home_url IS NOT NULL AND btrim(about_fetch_final_home_url) <> '')
-                )
-            """
+            if filter_mode == "gpt_url":
+                base_sql += """
+                    AND gpt_official_website_url IS NOT NULL
+                    AND btrim(gpt_official_website_url) <> ''
+                """
+            else:
+                base_sql += """
+                    AND (
+                        (gpt_official_website_url IS NOT NULL AND btrim(gpt_official_website_url) <> '')
+                        OR (about_fetch_final_home_url IS NOT NULL AND btrim(about_fetch_final_home_url) <> '')
+                    )
+                """
             base_sql += " ORDER BY rank NULLS LAST, orgnr LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             cur.execute(base_sql, tuple(params))
             return list(cur.fetchall())
+    finally:
+        conn.close()
+
+
+def count_rows_for_filter(run_id: str, filter_mode: str) -> int:
+    """Row count matching ``fetch_rows`` (same filter, no limit/offset)."""
+    weak_statuses = ("home_only", "http_error", "timeout", "empty_text", "non_html")
+    conn = _connect()
+    try:
+        with conn.cursor() as cur:
+            sql = (
+                "SELECT COUNT(*) FROM public.screening_website_research_companies "
+                "WHERE run_id = %s::uuid"
+            )
+            params: List[Any] = [run_id]
+            if filter_mode == "weak":
+                sql += f" AND about_fetch_status IN {weak_statuses}"
+            if filter_mode == "gpt_url":
+                sql += (
+                    " AND gpt_official_website_url IS NOT NULL "
+                    "AND btrim(gpt_official_website_url) <> ''"
+                )
+            else:
+                sql += """
+                    AND (
+                        (gpt_official_website_url IS NOT NULL AND btrim(gpt_official_website_url) <> '')
+                        OR (about_fetch_final_home_url IS NOT NULL AND btrim(about_fetch_final_home_url) <> '')
+                    )
+                """
+            cur.execute(sql, tuple(params))
+            r = cur.fetchone()
+            return int(r[0]) if r else 0
     finally:
         conn.close()
 
@@ -244,6 +288,27 @@ def build_companies_payload(rows: Sequence[Dict[str, Any]]) -> List[Dict[str, st
                 "official_website_url": url,
             }
         )
+    return out
+
+
+def companies_from_json_file(path: Path) -> List[Dict[str, str]]:
+    """Load ``input_companies`` from JSON (orgnr, company_name, official_website_url)."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    raw = data.get("input_companies") or data.get("companies")
+    if not raw or not isinstance(raw, list):
+        raise ValueError("JSON must contain input_companies (or companies) array")
+    out: List[Dict[str, str]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        org = _normalize_orgnr(str(item.get("orgnr") or ""))
+        name = str(item.get("company_name") or "").strip()
+        url = str(item.get("official_website_url") or item.get("url") or "").strip()
+        if not url:
+            raise ValueError(f"Missing official_website_url for orgnr={org}")
+        out.append({"orgnr": org, "company_name": name, "official_website_url": url})
+    if not out:
+        raise ValueError("No companies in JSON")
     return out
 
 
@@ -298,14 +363,19 @@ def call_chat_search_about_batch(
 
 def main() -> None:
     p = argparse.ArgumentParser(description="GPT web search: extract About text for website-research run rows.")
-    p.add_argument("--run-id", type=str, required=True)
+    p.add_argument(
+        "--run-id",
+        type=str,
+        required=True,
+        help="screening_runs.id (for manifest); use cohort UUID even with --companies-json",
+    )
     p.add_argument("--limit", type=int, default=10, help="Max rows in this batch (default 10)")
     p.add_argument("--offset", type=int, default=0, help="SQL OFFSET for paging later")
     p.add_argument(
         "--filter",
-        choices=("weak", "any_url"),
+        choices=("weak", "any_url", "gpt_url"),
         default="weak",
-        help="weak = thin/failed HTTP fetch; any_url = first rows with a URL regardless of status",
+        help="weak | any_url (GPT or registry home) | gpt_url (non-empty gpt_official_website_url only)",
     )
     p.add_argument(
         "--model",
@@ -326,6 +396,12 @@ def main() -> None:
         default=None,
         help=f"Chat Completions max_completion_tokens (default: env GPT_ABOUT_SEARCH_MAX_COMPLETION_TOKENS or {_DEFAULT_MAX_COMPLETION_TOKENS})",
     )
+    p.add_argument(
+        "--companies-json",
+        type=Path,
+        default=None,
+        help="Skip DB: JSON file with input_companies [{orgnr, company_name, official_website_url}, ...]",
+    )
     args = p.parse_args()
 
     _load_dotenv()
@@ -336,15 +412,23 @@ def main() -> None:
     model = (args.model or os.getenv("GPT_CHAT_SEARCH_MODEL") or DEFAULT_MODEL).strip()
     run_id = args.run_id.strip()
 
-    filter_mode = "any_url" if args.filter == "any_url" else "weak"
-    rows = fetch_rows(run_id, limit=args.limit, offset=args.offset, filter_mode=filter_mode)
-    if not rows:
-        raise SystemExit(
-            f"No rows for run_id={run_id} filter={filter_mode} limit={args.limit} offset={args.offset}. "
-            "Try --filter any_url or check run_id."
-        )
-
-    companies = build_companies_payload(rows)
+    filter_mode = args.filter
+    row_ids: List[Any] = []
+    if args.companies_json:
+        cj = args.companies_json.resolve()
+        if not cj.is_file():
+            raise SystemExit(f"Not found: {cj}")
+        companies = companies_from_json_file(cj)
+        filter_mode = f"companies_json:{cj.name}"
+    else:
+        rows = fetch_rows(run_id, limit=args.limit, offset=args.offset, filter_mode=filter_mode)
+        if not rows:
+            raise SystemExit(
+                f"No rows for run_id={run_id} filter={filter_mode} limit={args.limit} offset={args.offset}. "
+                "Try --filter any_url or check run_id."
+            )
+        row_ids = [r["id"] for r in rows]
+        companies = build_companies_payload(rows)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_path = args.out
     if out_path is None:
@@ -371,10 +455,11 @@ def main() -> None:
         "run_id": run_id,
         "model": model,
         "filter": filter_mode,
-        "limit": args.limit,
-        "offset": args.offset,
+        "limit": len(companies) if args.companies_json else args.limit,
+        "offset": 0 if args.companies_json else args.offset,
         "max_completion_tokens": max_completion_tokens,
-        "row_ids": [r["id"] for r in rows],
+        "companies_json": str(args.companies_json.resolve()) if args.companies_json else None,
+        "row_ids": row_ids,
         "input_companies": companies,
     }
 

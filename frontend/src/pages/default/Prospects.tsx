@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { COMPANY_PROFILE_BACK } from "@/lib/navigation/companyProfileBack";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProspects, useCompany } from "@/lib/hooks/apiQueries";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,6 +148,7 @@ function ProspectCard({
             <div className="flex items-center gap-3 mb-1">
               <Link
                 to={`/company/${company.orgnr}`}
+                state={COMPANY_PROFILE_BACK.prospects}
                 className="text-base font-medium text-foreground hover:text-foreground/80"
               >
                 {company.display_name}

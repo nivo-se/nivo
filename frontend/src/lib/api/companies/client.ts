@@ -1,5 +1,6 @@
 import { requestJson } from "@/lib/api/httpClient";
 import type { FinancialYear } from "@/lib/api/types";
+import type { CompanyFinancialsResponse } from "@/lib/api/companies/types";
 
 export async function getCompaniesBatchClient(
   orgnrs: string[],
@@ -18,7 +19,7 @@ export async function getCompaniesBatchClient(
 
 export async function getCompanyFinancialsClient(
   orgnr: string
-): Promise<{ financials: FinancialYear[]; count: number }> {
+): Promise<CompanyFinancialsResponse> {
   return requestJson(`/api/companies/${orgnr}/financials`);
 }
 

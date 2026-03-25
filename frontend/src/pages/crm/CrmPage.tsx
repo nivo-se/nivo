@@ -107,8 +107,8 @@ export default function CrmPage() {
     <div className="h-full overflow-hidden app-bg flex flex-col">
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
         {/* List panel */}
-        <aside className="w-full lg:w-72 shrink-0 border-r border-border flex flex-col bg-card/50">
-          <div className="p-4 border-b border-border shrink-0">
+        <aside className="w-full lg:w-72 shrink-0 border-r border-sidebar-border flex flex-col bg-sidebar-bg shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.12)]">
+          <div className="p-4 border-b border-sidebar-border/80 shrink-0">
             <h1 className="text-base font-semibold text-foreground mb-2">Origination CRM</h1>
             <p className="text-xs text-muted-foreground mb-3">
               Companies from Deep Research. Click to view deal and contacts.

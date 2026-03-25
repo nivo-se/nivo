@@ -108,7 +108,7 @@ export default function CreateRun() {
   }
 
   return (
-    <div className="h-full overflow-auto bg-muted/40">
+    <div className="h-full min-h-full overflow-auto app-page">
       <div className="max-w-4xl mx-auto p-8">
         <div className="mb-6">
           <Link to="/ai">

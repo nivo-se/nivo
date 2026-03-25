@@ -582,7 +582,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
             FROM ranked
             WHERE rn = 1
             ORDER BY year DESC
-            LIMIT 7
+            LIMIT 15
         """
         rows: List[Dict[str, Any]] = []
         try:
@@ -612,7 +612,7 @@ async def get_company_financials(orgnr: str = Path(..., description="Organizatio
                 FROM ranked
                 WHERE rn = 1
                 ORDER BY year DESC
-                LIMIT 7
+                LIMIT 15
             """
             rows = db.run_raw_query(sql_fallback, params=[orgnr])
 

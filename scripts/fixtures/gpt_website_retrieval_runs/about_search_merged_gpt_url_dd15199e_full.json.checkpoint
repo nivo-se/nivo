@@ -1,0 +1,2823 @@
+{
+  "next_offset": 220,
+  "merged_items": [
+    {
+      "orgnr": "556740-5443",
+      "company_name": "Ledson Lights AB",
+      "official_website_url": "https://www.diodhuset.se",
+      "about_text": "Diodhuset.se är en webbplats som erbjuder ett brett sortiment av LED-lampor, lysdioder och diodlampor. De erbjuder snabb leverans, frakt från 39 SEK och 30 dagars öppet köp. Kundtjänst kan nås på +46 (0) 42 453 33 30.",
+      "about_source_url": "https://www.diodhuset.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Informationen är hämtad från webbplatsens startsida."
+    },
+    {
+      "orgnr": "559076-4949",
+      "company_name": "Scandia Pumps AB",
+      "official_website_url": "https://www.scandiapumps.com",
+      "about_text": "Scandia Pumps AB är en etablerad helhetsleverantör av tekniska kundanpassade lösningar för vatten och avlopp. Företaget erbjuder produkter som pumpar, pumpstationer, mixrar, omrörare, filtration, mekanisk rening och glasfibertankar. De betjänar applikationer inom avlopp, dagvatten, industri, LTA, renvatten, läns- och dränering, VA och VVS. Scandia Pumps AB har lyhörd personal med personligt engagemang och lång erfarenhet inom branschen.",
+      "about_source_url": "https://www.scandiapumps.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från webbplatsens startsida."
+    },
+    {
+      "orgnr": "556586-2058",
+      "company_name": "Älmhults Gjuteri AB",
+      "official_website_url": "https://almhultsgjuteri.se",
+      "about_text": "Älmhults Gjuteri är en del av Holsbyverken, en modern företagsgrupp som utvecklar, gjuter och bearbetar. Företaget har en lång tradition inom gjuterinäringen och tillverkar grå- och segjärn. Holsbyverken har en omsättning på cirka 500 miljoner och cirka 130 medarbetare. De erbjuder en komplett lösning inom utveckling, gjutning och bearbetning, med fokus på kvalitet och hållbarhet.",
+      "about_source_url": "https://almhultsgjuteri.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från webbplatsens startsida."
+    },
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://xperta.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556641-3711",
+      "company_name": "RK Natursten AB",
+      "official_website_url": "https://www.rk-natursten.se",
+      "about_text": "RK Natursten har sedan 2003 förverkligat visioner i natursten. Med egen verkstad, expertis och erfarenhet erbjuder de skräddarsydda lösningar – från rådgivning till färdig montering. Målet är att skapa vackra, hållbara miljöer för både hem och stora byggprojekt. De har ett av Sveriges största lager av natursten och erbjuder helhetslösningar från rådgivning och projektering till produktion och montering.",
+      "about_source_url": "https://www.rk-natursten.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från webbplatsens startsida."
+    },
+    {
+      "orgnr": "556915-3603",
+      "company_name": "KE Therm AB",
+      "official_website_url": "https://ketherm.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556212-8164",
+      "company_name": "Industriaktiebolaget Korp & Son",
+      "official_website_url": "https://www.korposon.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "https://www.lecora.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556926-1166",
+      "company_name": "Steamery AB",
+      "official_website_url": "https://steamery.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556332-7351",
+      "company_name": "Smålands Stålgjuteri i Eksjö Aktiebolag",
+      "official_website_url": "https://opima.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556976-8640",
+      "company_name": "Sylog Väst AB",
+      "official_website_url": "https://www.sylog.se",
+      "about_text": "Sylog är ett medarbetarfokuserat konsultbolag som stödjer verksamheter inom avancerad produkt-, tjänste- och systemutveckling. Med teknisk spets inom mjukvaruutveckling, digitalisering och automatisering hjälper vi våra kunder att utveckla, förstärka och framtidssäkra sina produkter och verksamheter. Genom att kombinera egna erfarna konsulter med ett etablerat specialistnätverk levererar vi kompetens genom hela kedjan av mjukvaruutveckling. Idag har vi över 500 konsulter i uppdrag genom Sylog, med lokal närvaro runt om i Sverige.",
+      "about_source_url": "https://www.sylog.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Sylogs officiella webbplats."
+    },
+    {
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "https://www.creon.se",
+      "about_text": "Creon hjälper företag att skapa effektfulla profilprodukter, anpassade arbetskläder och noggrant utformade skalmodeller, allt smidigt hanterat genom vår Profile Store. Med fokus på design, hållbarhet och logistik säkerställer vi att varje varumärkesprodukt stärker din identitet och lämnar ett bestående intryck.",
+      "about_source_url": "https://www.creon.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Creons officiella webbplats."
+    },
+    {
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "https://www.karlskogaautomation.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556184-6238",
+      "company_name": "Aktiebolaget Kulleborn & Stenström",
+      "official_website_url": "https://kulleborn.se",
+      "about_text": "Kulleborn & Stenström är ett familjeföretag som erbjuder hållbara, miljövänliga och effektiva förpackningslösningar från idé till färdig produkt. Vi utvecklar förpackningar i samarbete med kunden, från design och materialval till tillverkning av flaskor, dunkar och burkar. Vår affärsidé är att driva förändringsarbetet i övergången från traditionella material till hållbara alternativ baserade på återvunna och/eller icke-fossila material.",
+      "about_source_url": "https://kulleborn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Kulleborn & Stenströms officiella webbplats."
+    },
+    {
+      "orgnr": "556814-8752",
+      "company_name": "Tillmobil i Norden AB",
+      "official_website_url": "https://www.tillmobil.se",
+      "about_text": "Tillmobil är Sveriges största oberoende mäklare inom telefoni och IT. Vi levererar abonnemang, mobilt bredband och växellösningar som du alltid kan lita på. Som telekompartner kombinerar vi trygghet med enkelhet och tillgänglighet. Vi är stolta sponsorer till några av Sveriges främsta idrottsklubbar, inklusive Malmö FF och Malmö Redhawks.",
+      "about_source_url": "https://www.tillmobil.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Tillmobils officiella webbplats."
+    },
+    {
+      "orgnr": "556229-4529",
+      "company_name": "Anderstorp Hydraulik Aktiebolag",
+      "official_website_url": "https://anderstorphydraulik.se",
+      "about_text": "Anderstorp Hydraulik levererar effektiv och professionell hydraulikservice och förebyggande underhåll till industrin. Med stor kompetens utvecklar och effektiviserar vi din produktion för bättre lönsamhet och nöjdare kunder. Vi levererar hydraulikkomponenter till industrin till rätt pris och utan dröjsmål.",
+      "about_source_url": "https://www.anderstorphydraulik.se/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från Anderstorp Hydrauliks officiella webbplats."
+    },
+    {
+      "orgnr": "556458-3051",
+      "company_name": "Kafab Förpackning Aktiebolag",
+      "official_website_url": "https://frontpac.com",
+      "about_text": "FrontPac är Sveriges mest kompletta tillverkare av förpackningar och erbjuder ett av marknadens mest kompletta sortiment av förpackningar i både tryckt well och kartong. Vi samlar design, konstruktion, tillverkning, lager och logistik under samma tak, vilket ger en smidig och flexibel process, korta ledtider och en jämn, hög kvalitet. Med över 40 års erfarenhet kombinerar vi gedigen kunskap med nya innovationer för att möta både dagens och framtidens förpackningsbehov.",
+      "about_source_url": "https://frontpac.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från FrontPacs officiella webbplats."
+    },
+    {
+      "orgnr": "556541-6582",
+      "company_name": "Refrico Aktiebolag",
+      "official_website_url": "https://www.refrico.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556478-5987",
+      "company_name": "Vimarhem Aktiebolag",
+      "official_website_url": "https://www.vimarhem.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556828-0670",
+      "company_name": "Noxon Aktiebolag",
+      "official_website_url": "https://noxon.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556690-1285",
+      "company_name": "Galdax AB",
+      "official_website_url": "https://www.galdax.se",
+      "about_text": "Galdax är Sveriges marknadsledande tillverkare av miljövänliga lastbilsdäck. Med en toppmodern däckanläggning och flera lager och depåer i Växjö, Vellinge, Falun, Sundsvall och Göteborg möjliggör vi snabba och smidiga leveranser till våra kunder. I vår anläggning i Vara tillverkar vi egna regummerade däck enligt Bandag-processen, som är världsledande. Vår affärsidé är att tillgodose marknaden med den mest kostnadseffektiva däcklösningen för både nya och regummerade däck, i samarbete med marknadens bästa återförsäljare och leverantörer för att säkerställa högsta kvalitet.",
+      "about_source_url": "https://www.galdax.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556343-7200",
+      "company_name": "Talurit Aktiebolag",
+      "official_website_url": "https://www.talurit.com",
+      "about_text": "Since 1948, Talurit® has been the pioneering force within the industry, introducing new and innovative solutions with a strong focus on safety and efficiency. As the wire rope specialists’ first choice, we offer a wide range of ferrules, sleeves, swagers, swaging dies, cutting machines, testing machines, and various wire rope equipment. By partnering with us at Talurit Group you can rely on our extensive knowledge and dedicated team, knowing that we are here to support you every step of the way.",
+      "about_source_url": "https://www.talurit.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556128-2251",
+      "company_name": "Hallberg-Sekrom Fabriksaktiebolag",
+      "official_website_url": "https://www.hsfgroup.com",
+      "about_text": "HSF Group är en företagsgrupp med kontraktstillverkare inom mekanisk bearbetning och montage. Vi är specialiserade på skärande bearbetning, plåtbearbetning och montering. Våra kunder är i stor utsträckning högteknologiska företag. Vi deltar i kundens projekt redan i starten då prototyper tas fram, vilket möjliggör snabb och effektiv produktionsstart. HSF Group lanserades i sin nuvarande form 2011 genom en sammanslagning av sex bolag till en koncern. Flera av de pionjärer som startade företagen är fortfarande verksamma inom koncernen, vilket bidrar till den starka entreprenörsandan.",
+      "about_source_url": "https://www.hsfgroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556437-9427",
+      "company_name": "Nordic door Aktiebolag",
+      "official_website_url": "http://www.nordicdoor.no",
+      "about_text": "Nordic Door er Norges største dørprodusent med en produksjon på 100.000 dører i året. Vi stiller høye krav til våre produkter og fokuserer på bærekraft. Våre dører kan kjøpes gjennom din nærmeste byggevareforretning.",
+      "about_source_url": "http://www.nordicdoor.no",
+      "confidence_0_1": 0.9,
+      "source_note": "Informasjonen er hentet fra selskapets offisielle nettside."
+    },
+    {
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "https://systemstod.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556257-9432",
+      "company_name": "Termodyn Industri AB",
+      "official_website_url": "https://www.termodyn.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556843-3246",
+      "company_name": "NMV Industripartner AB",
+      "official_website_url": "https://forvaltning.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com",
+      "about_text": "Blekinge Proal är en pålitlig och kompetent legotillverkare med passion för kundnöjdhet, produktionsteknik, brett kunnande och stort engagemang. Vår styrka ligger i att leverera färdiga produkter med höga krav på flexibilitet, leveransprecision och kvalitet. Vår mångåriga erfarenhet gör oss till en stabil samarbetspartner i långsiktiga affärsrelationer.",
+      "about_source_url": "https://www.blekingeproal.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "https://www.lideco.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556207-4442",
+      "company_name": "Nola Industrier Aktiebolag",
+      "official_website_url": "https://www.nola.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Webbplatsen kunde inte nås på grund av begränsningar i robots.txt."
+    },
+    {
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556477-8164",
+      "company_name": "VEIDEC AB",
+      "official_website_url": "https://www.veidec.com/se/",
+      "about_text": "VEIDEC levererar högteknologiska produkter för reparation och underhåll med fokus på enkelhet, ärlighet och engagemang för hälsa och miljö. Företaget strävar efter att kontinuerligt förbättra och förenkla för sina kunder, leverantörer och medarbetare, och följer alltid lagar och förordningar vid utveckling av sitt sortiment.",
+      "about_source_url": "https://veidec.com/no/contact/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets norska kontaktsida."
+    },
+    {
+      "orgnr": "556758-3702",
+      "company_name": "Mavera AB",
+      "official_website_url": "https://www.mavera.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/",
+      "about_text": "Umlax började sin odling i liten skala för drygt 30 år sedan, med fokus på både forskning och affärsmässighet. Idag har företaget mer än 40 anställda fördelade på sex anläggningar i södra Lappland. Umlax är marknadsledande i Norden på fjällröding och säljer främst till grossister, förädlingsanläggningar och större rökerier runtom i världen.",
+      "about_source_url": "https://www.umlax.se/om-umlax/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen hämtad från företagets 'Om Umlax'-sida."
+    },
+    {
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556900-2149",
+      "company_name": "Maskin System Europe AB",
+      "official_website_url": "https://www.mseab.se/",
+      "about_text": "W5 Solutions strävar efter att bli den ledande globala leverantören av hållbar försvarsteknologi. Företaget utvecklar och levererar avancerade lösningar som stärker egna och allierade styrkor. Deras lösningar inom träning, kraft och integration är designade med fokus på hållbarhet och innovation, vilket gör dem till en pålitlig partner för försvars- och säkerhetsorganisationer världen över.",
+      "about_source_url": "https://w5solutions.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets engelska webbplats."
+    },
+    {
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556464-4861",
+      "company_name": "Swebolt Järfälla Aktiebolag",
+      "official_website_url": "https://www.swebolt.se/",
+      "about_text": "Swebolt har varit industrins naturliga samarbetspartner i 35 år. Vi erbjuder ett unikt sortiment av fästelement, verktyg, elverktyg och tjänster inom maskinbearbetning med moderna CNC-maskiner. Våra smarta systemlösningar sparar både tid och resurser för våra kunder, som sträcker sig från lokala byggföretag till världsledande industriföretag. Kvalitet, service och tekniskt kunnande är utmärkande för oss.",
+      "about_source_url": "https://www.swebolt.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556473-0801",
+      "company_name": "APC Elinstallatören Aktiebolag",
+      "official_website_url": "https://www.apcel.se/",
+      "about_text": "APC Elinstallatören är din partner inom elinstallationer, service/underhåll och projektering. Vi utför uppdrag inom kraft och belysning, tele och datanät samt styr och regler. Med cirka 30 medarbetare levererar vi elinstallationer anpassade efter kundens behov. Vi är en del av Instalco, vilket ger oss lokal närhet med det stora företagets möjligheter.",
+      "about_source_url": "https://www.apcel.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556444-9824",
+      "company_name": "Flux AB",
+      "official_website_url": "https://www.flux.nu/",
+      "about_text": "Flux är ett belysningsföretag som sedan 2002 har skapat innovativa och hållbara belysningslösningar för offentliga miljöer. Med egen produktion i Arninge och samarbeten med ledande leverantörer erbjuder vi både ett brett standardsortiment och specialanpassade armaturer för unika behov. Vi är stora nog att vara stabila och små nog att vara flexibla.",
+      "about_source_url": "https://www.flux.nu/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556282-0307",
+      "company_name": "Nordic Cleanware AB",
+      "official_website_url": "https://www.cleanware.se/",
+      "about_text": "Nordic Cleanware har levererat dammsugare för de flesta användningsområden i över 30 år. I vårt sortiment finns kontorsdammsugare, industridammsugare och centraldammsugare. Vi tillhandahåller även konsumentdammsugare och byggdammsugare. Med ett brett sortiment, mångårig kunskap och kompetens vägleder vår personal dig till rätt investering alltid till bästa pris.",
+      "about_source_url": "https://www.cleanware.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "559052-1398",
+      "company_name": "dizparc Jönköping Infrastruktur AB",
+      "official_website_url": "https://www.dizparc.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556600-4106",
+      "company_name": "MAPTUN Performance AB",
+      "official_website_url": "https://www.maptun.com/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556292-9322",
+      "company_name": "Norva24 Miljöhantering AB",
+      "official_website_url": "https://www.norva24.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556314-8153",
+      "company_name": "Comex Electronics Aktiebolag",
+      "official_website_url": "https://www.comex.se/",
+      "about_text": "Comex Electronics AB, grundat 1988 med huvudkontor i Täby, Stockholm, är en etablerad leverantör av högsäkerhetslösningar inom IT för försvar, myndigheter och statliga verk. Vi är specialister på skydd mot röjande signaler (RÖS och TEMPEST) och levererar lösningar som uppfyller de mest rigorösa nationella och internationella säkerhetskraven. Vår verksamhet omfattar hårdvaru- och mjukvaruutveckling, egen produktion i säkerhetsgodkända lokaler samt ett eget laboratorium för signaldetektering och analys. Comex erbjuder kompletta systemlösningar för hantering av säkerhetsskyddsklassificerad information, avlyssningsskyddad IT-utrustning och säkra autentiseringssystem, inklusive smartkorts- och biometrilösningar. Med decennier av erfarenhet och full kontroll över hela utvecklingsprocessen levererar vi beprövade och driftsäkra lösningar som skyddar kritisk information mot avancerade hot.",
+      "about_source_url": "https://www.comex.se/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556284-4687",
+      "company_name": "System Hall AB",
+      "official_website_url": "https://www.systemhall.com/",
+      "about_text": "System Hall AB är specialiserade på att effektivisera produktionen inom träindustrin genom den senaste tekniken. Vi erbjuder skräddarsydda automationslösningar från idé till installation, inklusive byggnation, elektrisk installation och programmering. Vår värdegrund bygger på ärlighet, lyhördhet och samarbetsvilja för att skapa förtroende hos våra kunder och kollegor. Vi har starka och långvariga samarbeten med ledande företag för att skapa smarta och innovativa lösningar. Vårt mål är att vara en pålitlig partner som säkerställer högsta kvalitet och prestanda i hela produktionskedjan.",
+      "about_source_url": "https://www.systemhall.com/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556583-1822",
+      "company_name": "Embriq AB",
+      "official_website_url": "https://www.embriq.se/",
+      "about_text": "Embriq är ett teknikföretag och en ledande leverantör av avancerad IT-drift, mjukvara, industriell IoT-teknik och konsulttjänster. Genom industrialiserad IT levererar vi lösningar som förenklar komplexa utmaningar, säkerställer verksamhetskritisk verksamhet och optimerar konkurrenskraften. Vi digitaliserar energibranschen med fokus på innovation, hållbarhet och säkerhet. Våra tjänster inkluderar IT-tjänster, mjukvarulösningar och konsulttjänster för att möta komplexa behov inom olika industrier.",
+      "about_source_url": "https://embriq.no/sv/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556654-0422",
+      "company_name": "Digitalist Open Tech AB",
+      "official_website_url": "https://digitalist.se/",
+      "about_text": "Digitalist Open Tech AB hjälper organisationer att digitalisera hållbart med tillämpad AI, förändringsledning, design, utveckling samt underhåll av affärskritiska webbplatser, AI-system och e-tjänster. Vi leder förändring och förbättring genom att designa, utveckla och förvalta affärskritiska digitala lösningar, såsom webbplatser och verksamhetssystem. Vår process innefattar att utforska, prototypa och testa för att identifiera rätt förändringar och utvecklingar, samt att styra utvecklingen mot effekt och förutsägbarhet med hjälp av agilitet.",
+      "about_source_url": "https://www.digitalist.se/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556650-7439",
+      "company_name": "Höglands Logistik AB",
+      "official_website_url": "https://www.hlogistik.se",
+      "about_text": "Höglands Logistik är en komplett logistikpartner som kombinerar rikstäckande kapacitet med personlig service. Vi erbjuder transport- och lagerhantering med det lilla extra, där varje order och transport hanteras med omsorg, engagemang och kvalitet. Vår verksamhet vilar på två ben: åkeri och tredjepartslager, vilket möjliggör flexibla helhetslösningar där pålitlighet, noggrannhet och anpassningsförmåga är självklara grundpelare. Vi levererar inte bara gods – vi skapar struktur, trygghet och fungerande flöden i våra kunders vardag.",
+      "about_source_url": "https://hlogistik.se/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556861-0256",
+      "company_name": "Bilx Nordic AB",
+      "official_website_url": "https://www.bilx.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556544-0178",
+      "company_name": "Autoklaver & Desinfektorer MediCal i Göteborg AB",
+      "official_website_url": "https://www.medical.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556505-1314",
+      "company_name": "Amsler Hiss Aktiebolag",
+      "official_website_url": "https://www.amslerhiss.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556405-6249",
+      "company_name": "Aktiebolag Klädkällaren i Göteborg",
+      "official_website_url": "https://www.kladkallaren.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556493-1656",
+      "company_name": "Secor AB",
+      "official_website_url": "https://www.secor.se",
+      "about_text": "Secor ingår i Daloc-koncernen, Skandinaviens ledande tillverkare av säkra dörrar. Genom åren har vi sålt och installerat hundratusentals dörrar från Daloc, vilket är en trygghet för dig som kund.",
+      "about_source_url": "https://www.secor.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556824-7588",
+      "company_name": "Unimer Plast & Gummi AB",
+      "official_website_url": "https://www.unimer.se",
+      "about_text": "Unimer är en OEM-partner med helhetskompetens inom plast, gummi och slang. Vi utvecklar, tillverkar och levererar produktspecifika komponenter åt ledande industriföretag, från projektledning och design till lagerhållning och leveransoptimering.",
+      "about_source_url": "https://www.unimer.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556169-2699",
+      "company_name": "Andrénverken AB",
+      "official_website_url": "https://www.andrenverken.se",
+      "about_text": "Andrénverken är en komplett leverantör inom plåtbearbetning, svetsning och montering. Vi erbjuder ett unikt utbud av tjänster och levererar produkter klara för montering till världsledande industriföretag.",
+      "about_source_url": "https://www.andrenverken.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556207-2396",
+      "company_name": "Sydskiffer Aktiebolag",
+      "official_website_url": "https://www.sydskiffer.se",
+      "about_text": "Sydskiffer är ett byggföretag som renoverar och restaurerar kulturhistoriska byggnader samt kyrkor. Vi erbjuder helhetslösningar från konsultation till installation med hantverk, produktionsledning och administration.",
+      "about_source_url": "https://www.sydskiffer.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556437-7231",
+      "company_name": "Torshälla Industrisvets Aktiebolag",
+      "official_website_url": "https://www.torshallaindustrisvets.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556460-7652",
+      "company_name": "Magnusson Petfood AB",
+      "official_website_url": "https://www.magnussonpetfood.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556662-4762",
+      "company_name": "Permat AB",
+      "official_website_url": "https://www.mantaholding.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556194-7572",
+      "company_name": "Engelholms Glass Aktiebolag",
+      "official_website_url": "https://www.engelholmsglass.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556237-4826",
+      "company_name": "BL-INTERIÖR Aktiebolag",
+      "official_website_url": "https://www.blinterior.se",
+      "about_text": "BL-Interiör är ett av Norrlands största golvföretag och numer en del av InArea Group. Vår fantastiska resa började redan 1983 och har drivit oss fram till vad vi är idag genom vår vilja och förmåga att utvecklas. Idag består vårt skickliga team av ett 50-tal golvexperter och vi har nöjda kunder runt om i Västerbotten. Vi erbjuder helhetstjänster inom golv, hela vägen från grundidé till färdigt resultat. Att arbeta miljövänligt och resurseffektivt är en viktig del av vår verksamhet. Med yrkesstolthet och känsla för service utför vi såväl stora som små golvuppdrag. Vår kompetens och kunskap delar vi gärna med oss av då allt vi gör bygger på förtroendet mellan våra kunder och oss. Därför är det av yttersta vikt att vi lyssnar på kundernas behov och önskemål genom projektet. Att vi är ett auktoriserat golvföretag gör oss till en trygg partner för alla golvprojekt, såväl för privatkunder som fastighets- och företagskunder. Det är en självklarhet för oss att utföra alla uppdrag enligt överenskommelse kring tidsschema och budget. Vi ligger i framkant gällande kunskap och kvalitet. Tack vare vår breda materialkännedom kan vi rekommendera material som passar perfekt för just dina projekt men som även tar hänsyn till design, funktion och miljö. Vårt team monterar årligen tusentals kvadratmeter golvbeläggningar – varmt välkommen att bli en av våra nöjda kunder!",
+      "about_source_url": "https://www.blinterior.se/om-oss/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556371-8526",
+      "company_name": "Norteam AB",
+      "official_website_url": "https://www.norteam.se",
+      "about_text": "Norteam är ett av Sveriges snabbast växande IT-bolag med ett tydligt fokus på molnbaserade lösningar. Med hjälp av vår expertis inom Microsofts ekosystem – inklusive Azure, Microsoft 365 och Dynamics 365 – erbjuder vi lösningar anpassade efter varje kunds unika behov. Våra lösningar bygger på Microsofts ledande säkerhetstjänster som tillsammans med vår IT-support garanterar närvaro och kvalitet i alla våra samarbeten.",
+      "about_source_url": "https://www.norteam.se/om-oss",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556309-6253",
+      "company_name": "Tinter Industriförsäljning AB",
+      "official_website_url": "https://www.tinter.se",
+      "about_text": "Tinter startades 1984 av Anders och Niklas Folkesson, far och son. Anders som jobbat med färg i 25 år både som säljare och tekniker, hade bred kunskap och rätt erfarenhet. Idag är vi över 25 medarbetare som säljer och distribuerar färg, lim, fog och tillbehör i västra Sverige. Våra lager är välfyllda med allt ifrån industrifärg, billack, högblanka båtfärger, oljor, målerifärg och de tillbehör som behövs för ett professionellt arbete. Leveranser sker till stor del med egna turbilar. Vi finns i närheten med kontor och lager i Kållered, Skövde och från januari 2023 även i Jönköping. Sedan april 2022 är Tinter en del i Layer Group, ett bolag som investerar i och utvecklar företag inom ytskikt, måleri, golv och industrifärg.",
+      "about_source_url": "https://tinter.se/om-oss/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "559169-6413",
+      "company_name": "OAKS AB",
+      "official_website_url": "https://www.oaksab.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "559170-6451",
+      "company_name": "Innergårdsgruppen garage & betong i Stockholm AB",
+      "official_website_url": "https://www.innergardgruppen.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556657-5535",
+      "company_name": "Rehobot Hydraulics AB",
+      "official_website_url": "https://rehobot.eu",
+      "about_text": "REHOBOT Hydraulics utvecklar tekniska innovationer och producerar marknadsledande hydraulikprodukter. Våra produkter baseras på de sedan antiken kända principerna för hydraulik, som säger att vätskor kan sättas under tryck för att multiplicera krafter. REHOBOT utvecklar och tillverkar sina produkter självständigt och levererar effektiva och pålitliga lösningar till sina kunder. I Eskilstuna, Sverige, producerar vi i toppmoderna anläggningar innovativa och högkvalitativa produkter som är marknadsledande. REHOBOT Hydraulics AB har en lång historia och strävar efter innovation genom att driva fram den senaste tekniken och lösningarna.",
+      "about_source_url": "https://rehobot.eu",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556142-7427",
+      "company_name": "Aktiebolaget Hällnäs Handelsträdgård",
+      "official_website_url": "https://www.hallnas.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556623-2772",
+      "company_name": "Galore i Uppsala Aktiebolag",
+      "official_website_url": "https://www.galore.se",
+      "about_text": "Galore Electro AB är ett elinstallations- och elteknikföretag med cirka 40 engagerade medarbetare och verksamhet i Uppsala, Norrtälje och Stockholm. Vi erbjuder kompletta lösningar inom elinstallationer, larmsystem och service – anpassade för både hem och företag. Vi är certifierade enligt ISO 9001, 14001, 45001 och 27001, vilket innebär att vi arbetar systematiskt med kvalitet, miljö, arbetsmiljö och informationssäkerhet.",
+      "about_source_url": "https://www.galore.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556099-9210",
+      "company_name": "Falcks Omnibus AB",
+      "official_website_url": "https://falcksomnibus.se",
+      "about_text": "Falcks Omnibus AB är ett av Sveriges äldsta bussföretag med rötter från 1914 då det första trafiktillståndet för automobil utfärdades. Idag utför Falcks linjetrafik åt Gällivare kommun, Kiruna kommun samt Länstrafiken i Norrbotten. Verksamheten sträcker sig mellan Karesuando i norr till Arvidsjaur i söder.",
+      "about_source_url": "https://falcksomnibus.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556145-5469",
+      "company_name": "VS Truck AB",
+      "official_website_url": "https://www.vstruck.se",
+      "about_text": "VS Truck erbjuder ett brett utbud av truckar, både nya och begagnade, samt service och uthyrning. Företaget fokuserar på att förbättra kundernas truckekonomi genom att erbjuda flexibla lösningar anpassade efter olika behov. De betonar vikten av regelbunden service för att förlänga truckarnas livslängd och förbättra andrahandsvärdet.",
+      "about_source_url": "https://www.vstruck.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556864-3141",
+      "company_name": "Bookmark Förlag AB",
+      "official_website_url": "https://www.bookmarkforlag.se",
+      "about_text": "Bookmark Förlag är ett svenskt bokförlag som ger ut ett brett utbud av litteratur, inklusive skönlitteratur, facklitteratur och barnböcker. Förlaget samarbetar med både svenska och internationella författare och strävar efter att erbjuda läsare högkvalitativa böcker inom olika genrer.",
+      "about_source_url": "https://www.bookmarkforlag.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556623-6450",
+      "company_name": "Bosphorus Aktiebolag",
+      "official_website_url": "https://www.bosphorus.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget kunde hittas på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556665-6442",
+      "company_name": "EPG Projektledning AB",
+      "official_website_url": "https://www.epgprojektledning.se",
+      "about_text": "EPG Projektledning är ett av Västsveriges största och snabbast växande företag inom projektledning och projektorganisation. Företaget erbjuder tjänster inom projektledning, besiktning, byggprojektledning, projekteringsledning, installationsledning, byggarbetsmiljösamordning (BAS) och kontrollansvar enligt PBL (KA).",
+      "about_source_url": "https://www.epgprojektledning.se",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556546-2206",
+      "company_name": "Reason Studios Aktiebolag",
+      "official_website_url": "https://www.reasonstudios.com",
+      "about_text": "Reason Studios är företaget bakom musikproduktionsprogrammet Reason, en komplett mjukvara för musikskapande. Reason fungerar som ett virtuellt rack där användare kan koppla ihop instrument och effekter för att skapa önskade ljud. Programmet kan användas både som en plugin eller som en fullständig DAW med inspelning, sekvensering och mixning.",
+      "about_source_url": "https://www.reasonstudios.com",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets hemsida."
+    },
+    {
+      "orgnr": "556729-7832",
+      "company_name": "Markera AB",
+      "official_website_url": "https://www.markera.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget kunde hittas på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556509-6384",
+      "company_name": "Play Box AB",
+      "official_website_url": "https://www.playbox.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget kunde hittas på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556195-1947",
+      "company_name": "Johpomek Aktiebolag",
+      "official_website_url": "https://www.johpomek.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget kunde hittas på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556072-8528",
+      "company_name": "In & Finn Scandinavien AB",
+      "official_website_url": "https://www.inofinn.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556812-4670",
+      "company_name": "Turner & Townsend AB",
+      "official_website_url": "https://www.turnerandtownsend.com",
+      "about_text": "We work with our partners to deliver projects and programmes that transform businesses, improve people’s lives and benefit the future of our planet.",
+      "about_source_url": "https://www.turnerandtownsend.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556607-8811",
+      "company_name": "Bridgepoint AB",
+      "official_website_url": "https://www.bridgepoint.eu",
+      "about_text": "Bridgepoint är en av världens ledande investerare på medelmarknaden, specialiserad på private equity, infrastruktur, kredit och privat förmögenhet. Med över 86 miljarder dollar i förvaltade tillgångar har vi en stark lokal närvaro i Europa, Nordamerika och Asien. Genom att kombinera global skala med lokal kunskap och sektorexpertis investerar vi i och bygger stora företag samt levererar starka avkastningar genom cykler.",
+      "about_source_url": "https://www.bridgepoint.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556550-4866",
+      "company_name": "Presona Aktiebolag",
+      "official_website_url": "https://www.presona.se",
+      "about_text": "Presona utvecklar och bygger balpressar, komprimatorer, hela lufttransportsystem och andra produkter för återvinningsindustrin. Våra balpressar är av hög kvalitet och älskas av återvinningsindustrin.",
+      "about_source_url": "https://www.presona.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556651-5689",
+      "company_name": "ZilenZio AB",
+      "official_website_url": "https://www.zilenzio.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "559136-9110",
+      "company_name": "Svets & Mekano Produktion i Vislanda AB",
+      "official_website_url": "https://www.svetsmekano.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "559054-6692",
+      "company_name": "Seafrigo Nordic AB",
+      "official_website_url": "https://www.seafrigo.com",
+      "about_text": "Seafrigo är en expert på kylkedjelogistik sedan 1979 och erbjuder omfattande lösningar för internationell logistik. Med närvaro i 26 länder på 5 kontinenter och över 1 200 000 m² lagerutrymme globalt, hanterar Seafrigo över 500 000 tulldeklarationer per år och sysselsätter 1 200 medarbetare.",
+      "about_source_url": "https://www.seafrigo.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556615-0214",
+      "company_name": "FOBE Produktion AB",
+      "official_website_url": "https://www.fobe.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556747-4514",
+      "company_name": "Widings Elektriska AB",
+      "official_website_url": "https://www.widings.se",
+      "about_text": "Widings Akupunktur erbjuder traditionell kinesisk medicin (TCM) och akupunktur i Umeå och Tärnafjällen. Vi erbjuder holistiska behandlingar för att främja ditt välbefinnande och återställa balansen i din kropp.",
+      "about_source_url": "https://www.widings.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556617-0394",
+      "company_name": "Nordlo Jönköping AB",
+      "official_website_url": "https://www.nordlo.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556270-3024",
+      "company_name": "Ricana Concept AB",
+      "official_website_url": "https://www.ricana.se",
+      "about_text": "Ricana Concept AB skapar säljande butikskoncept och varumärkesbyggande shop-in-shop-inredning åt kunder över hela Norden. Med över 30 års erfarenhet kombinerar vi materialkunskap och konstruktion för att skapa lösningar som ökar försäljningen genom rätt miljö och varuexponering. Vår produktion i Hillerstorp tillverkar dagligen butiksinredningar, inklusive standardprodukter och specialtillverkade lösningar, för att hjälpa kunder att bygga unika butikskoncept. Vi erbjuder även konceptutveckling, layout och montage på plats i butik.",
+      "about_source_url": "https://www.ricana.se/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556648-1684",
+      "company_name": "Ventilationsprojekt i Norrköping AB",
+      "official_website_url": "https://www.ventilationsprojekt.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556255-6133",
+      "company_name": "Logos Payment Solutions AB",
+      "official_website_url": "https://www.logospaymentsolutions.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556472-5447",
+      "company_name": "Cegeka Applications AB",
+      "official_website_url": "https://www.cegeka.com",
+      "about_text": "Cegeka är ett europeiskt IT-företag som arbetar nära sina kunder för att säkerställa att teknologin skapar effekt där det behövs som mest. Med över 30 års erfarenhet har Cegeka vuxit från 30 personer till ett globalt företag med 9 000 anställda över tre kontinenter. Företaget erbjuder lösningar inom hybridmoln, data och AI, cybersäkerhet, digital arbetsplats, kvalitetssäkring, applikationstjänster, affärsapplikationer, 5G och mobila privata nätverk samt produkter och plattformar.",
+      "about_source_url": "https://www.cegeka.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556944-0232",
+      "company_name": "J.K Livs AB",
+      "official_website_url": "https://www.jklivs.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556458-6872",
+      "company_name": "Ventab Styr Aktiebolag",
+      "official_website_url": "https://www.ventab.se",
+      "about_text": "Ventab är en av Västsveriges största aktörer inom ventilation, styr och service. Företaget erbjuder expertis för att säkerställa god inomhusmiljö, förbereda fastigheter för framtiden och se till att installationer håller toppklass. Ventabs grundläggande värderingar är omtanke, kreativitet och prestation, vilket säkerställer hög kvalitet och gör dem till det moderna och trygga valet för sina kunder.",
+      "about_source_url": "https://www.ventab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556062-4230",
+      "company_name": "Aktiebolaget Gamla Jernboden",
+      "official_website_url": "https://www.gamlajernboden.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "559193-0671",
+      "company_name": "SICE Nordics AB",
+      "official_website_url": "https://www.sice.com",
+      "about_text": "SICE är ett multinationellt teknologiföretag specialiserat på integration av teknologier för hantering av offentliga infrastrukturer. Företaget utvecklar integrerade lösningar och applikationer baserade på den senaste teknologin inom områden som ITS och tunnlar, betalningssystem, transport, urban mobilitet, belysning, vattenhantering, processkontroll och data science. Med närvaro i över 30 länder och mer än 3 000 anställda är SICE en global ledare inom intelligenta system och infrastrukturhantering.",
+      "about_source_url": "https://www.sice.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets officiella webbplats."
+    },
+    {
+      "orgnr": "556333-6204",
+      "company_name": "Halle System AB",
+      "official_website_url": "https://www.halle.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556703-8202",
+      "company_name": "Inlands Luft AB",
+      "official_website_url": "https://www.inlandsluft.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556200-0777",
+      "company_name": "Baltic Safety Products Aktiebolag (publ)",
+      "official_website_url": "https://www.baltic.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den officiella webbplatsen."
+    },
+    {
+      "orgnr": "556500-9072",
+      "company_name": "Carlbergs i Göteborg AB",
+      "official_website_url": "https://www.carlbergs.se",
+      "about_text": "Vi har varit med länge nu – ända sedan 1960. Mer än ett halvt sekel. Vi har nog tappat räkningen på alla byggen vi lagt grunden för runt om i Göteborg men med varje uppdrag har vi haft viljan att ge våra kunder mycket nytta och mindre bekymmer.\n\nHjärtat i Carlbergs verksamhet är kompletta markentreprenader för byggbranschen. På våra uppdrag försöker vi:\n\n- Se möjligheter utan att krångla till det.\n- Vara realistiska – vi är beredda att lösa problem som uppstår längs vägen.\n- Komma ihåg att tid är pengar.\n- Tänka på att kvalitet också är det.\n- Ha fokus på miljö – både vår arbetsmiljö och naturen vi är rädda om.",
+      "about_source_url": "https://www.carlbergs.se/om-oss/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556437-9740",
+      "company_name": "Industriverken i Ronneby AB",
+      "official_website_url": "https://industriverken.com",
+      "about_text": "Industriverken är en framstående aktör inom verkstadsindustrin. Vi är en privatägd koncern med en passion för plåtbearbetning.\n\nVårt dotterbolag, GOPA AB, har skapat sig ett namn med sina innovativa pneumatiska cylindrar.\n\nSom en detaljdriven och kundcentrerad tillverkare av plåtdetaljer, positionerar sig Industriverken i hjärtat av energi-, fordon- och industriella sektorer.\n\nMed stark närvaro i Sverige och delar av Europa, är vi strategiskt placerade med hjälp av hållbara logistikkedjor, vilket gör oss till en föredragen partner.",
+      "about_source_url": "https://industriverken.com/om-oss/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556055-5814",
+      "company_name": "Hansson PyroTech Aktiebolag",
+      "official_website_url": "https://www.hanssonpyrotech.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den officiella webbplatsen."
+    },
+    {
+      "orgnr": "556271-2082",
+      "company_name": "Ellagro Örebro AB",
+      "official_website_url": "https://ellagro.com",
+      "about_text": "Ellagro är en produktionspartner för teknikföretag. Kvalitet och teknisk expertis är en del av vårt DNA. Genom långsiktiga investeringar i teknisk kompetens och en effektiv maskinpark skapar vi optimala produktionslösningar för våra kunder. Vi värdesätter långsiktiga relationer och trivs med att arbeta nära våra klienter.\n\nVi har 200 anställda och en årsomsättning på 400 MSEK. Vår verksamhet omfattar tre produktionsenheter – två i Sverige och en i Polen. Varje enhet drivs som ett självständigt företag med en egen ledningsgrupp. Samtidigt samarbetar vi tätt inom kompetens och kapacitet för att kunna erbjuda de bästa möjliga lösningarna för våra kunder.",
+      "about_source_url": "https://ellagro.com/sv/om-oss/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556465-3359",
+      "company_name": "Grothkaross Aktiebolag",
+      "official_website_url": "https://www.grothkaross.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den officiella webbplatsen."
+    },
+    {
+      "orgnr": "556264-2362",
+      "company_name": "Segers Fabriker Aktiebolag",
+      "official_website_url": "https://www.segers.com",
+      "about_text": "Segers grundades 1943 som ett familjeföretag och arbetar än idag utifrån samma filosofi: att utveckla stilfulla och funktionella arbetskläder för kök, restaurang och hotell samt vårdsektorn.\n\nVarje kollektion är designad i Borås och tillverkad i våra egna fabriker. Med full kontroll från första stygn till färdig produkt garanterar vi att du får den bästa möjliga kvaliteten i plaggen.",
+      "about_source_url": "https://www.segers.com/pages/vara-arbetsklader",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad från företagets 'Våra arbetskläder'-sida."
+    },
+    {
+      "orgnr": "556489-7600",
+      "company_name": "Säljar'n i Närke Aktiebolag",
+      "official_website_url": "https://www.saljarn.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den officiella webbplatsen."
+    },
+    {
+      "orgnr": "556100-1701",
+      "company_name": "Mouldex Plast AB",
+      "official_website_url": "https://www.mouldex.se",
+      "about_text": "Sedan vi grundades på 1980-talet har Mouldex drivits av en tydlig vision: att bli Nordens ledande aktör inom formsprutad plast. Vi förstår att nyckeln till framgång i branschen ligger i förmågan att upprätthålla långa, stabila produktionsserier med korta ledtider, samt att bidra till hållbarhetsutvecklingen.\n\nFör att uppnå målen har vi utformat vår organisation med flexibilitet och utveckling i åtanke. Det möjliggör snabba produktionsomställningar och ständigt uppdaterad kunskap. Vår strategi omfattar även proaktiv lagerhållning av kundernas produkter, något som fungerar som en buffert mot potentiella störningar i leverantörskedjan.\n\nVi på Mouldex ser ingen utmaning som för stor och uppskattar spännande, nya idéer. Det är därför vi kallar oss för The Can Do Company.",
+      "about_source_url": "https://mouldex.se/om-mouldex/",
+      "confidence_0_1": 1.0,
+      "source_note": "Informationen är hämtad direkt från företagets 'Om Mouldex'-sida."
+    },
+    {
+      "orgnr": "556017-2065",
+      "company_name": "Klippan Yllefabrik Aktiebolag",
+      "official_website_url": "https://www.klippanyllefabrik.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den officiella webbplatsen."
+    },
+    {
+      "orgnr": "556476-2093",
+      "company_name": "Draken i Reftele Aktiebolag",
+      "official_website_url": "https://www.qosina.com",
+      "about_text": "Qosina is a leading medical device component supplier of disposable OEM components to the medical and pharmaceutical industries. Companies purchase from Qosina to eliminate tooling costs and receive immediate delivery of single-use medical components from inventory. Ordering from Qosina will save you time and money because we provide in-stock solutions from our ISO 13485, ISO 9001, ISO 22301 and ISO 14001 certified facility. Sourcing requests are welcome for tool modifications, hard-to-find items, sub-assemblies or tubing to meet your specifications. The Qosina full-line catalog contains OEM medical device component supplies and features full-scale photographs of thousands of stock components on a one-centimeter grid.",
+      "about_source_url": "https://www.qosina.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "559057-7507",
+      "company_name": "Advisera AB",
+      "official_website_url": "https://www.advisera.se",
+      "about_text": "Advisera är en företagspartner som bryr sig och erbjuder lösningar som gör skillnad. De tillhandahåller tjänster inom telefoni, försäkring, digital körjournal, mobil arbetsorder, fiber & mobilt bredband, Advisera Care och IoT-simkort. Med kontor i Malmö, Göteborg och Stockholm strävar de efter att hjälpa företag att hitta smartare lösningar och sänka kostnader.",
+      "about_source_url": "https://www.advisera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "559011-7155",
+      "company_name": "Socionomkraft AB",
+      "official_website_url": "https://www.socionomkraft.se",
+      "about_text": "Socionomkraft erbjuder kvalitativa konsulttjänster för myndighetsutövning, inklusive uthyrning och rekrytering av socionomer till svenska kommuner. De tillhandahåller seniora socionomer, lösningsfokuserad familjebehandling, handledare/mentorer och interimschefer. Socionomkraft är en av de största aktörerna inom bemanning för socialtjänsten.",
+      "about_source_url": "https://www.socionomkraft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "556076-0497",
+      "company_name": "MEMO AB",
+      "official_website_url": "https://memo.se",
+      "about_text": "Vi på Memo tillverkar smarta plastdetaljer för industriella produkter. Vi optimerar varje detalj med hjälp av rätt konstruktion, material och produktion – så att du kan tillverka smartare, lättare och grönare produkter. Förutom formsprutning är vi experter på mekanikkonstruktion specialanpassad för plaster och kan därför lyfta din produkt till nya höjder.",
+      "about_source_url": "https://memo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "556710-1992",
+      "company_name": "Kallhälls Nya Vårdcentral AB",
+      "official_website_url": "https://www.kallhallsnyavardcentral.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No 'About' information found on the official website."
+    },
+    {
+      "orgnr": "556666-8025",
+      "company_name": "Brunneby Musteri AB",
+      "official_website_url": "https://www.brunnebymusteri.se",
+      "about_text": "Brunneby Musteri ligger strax utanför Borensberg, där Östergötlands slätter möter Göta kanal. År 1941 började lantbrukaren Carl-Gösta Kjellin pressa äpplen på Brunneby Gård, vilket lade grunden till familjeföretaget som nu drivs av nästa generation, Gunnar Kjellin och Eva Ronström. I över 70 år har de förädlat frukt och bär, och producerar idag ett brett sortiment av must, saft, sylt och andra produkter.",
+      "about_source_url": "https://www.brunnebymusteri.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "556388-2470",
+      "company_name": "Göthes Säkerhet Aktiebolag",
+      "official_website_url": "https://www.gothes.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No 'About' information found on the official website."
+    },
+    {
+      "orgnr": "556756-6376",
+      "company_name": "Personlig Almanacka Nordic AB",
+      "official_website_url": "https://www.personligalmanacka.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No 'About' information found on the official website."
+    },
+    {
+      "orgnr": "559002-3213",
+      "company_name": "Incluso AB",
+      "official_website_url": "https://www.incluso.se",
+      "about_text": "Incluso är ett engagerat och personligt rekryterings- och konsultuthyrningsbolag med särskilt fokus på internationell kompetens. De har spetskompetens att söka kandidater globalt till kunder i Sverige. För närvarande har de konsulter från 20 olika länder verksamma inom områden som IT, telekom, administration, HR och ekonomi.",
+      "about_source_url": "https://www.incluso.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Information sourced from the official website."
+    },
+    {
+      "orgnr": "556179-5690",
+      "company_name": "Aktiebolaget Vårby Färghall",
+      "official_website_url": "https://www.varbyfarghall.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No 'About' information found on the official website."
+    },
+    {
+      "orgnr": "556663-5792",
+      "company_name": "Södra Århults Torv Aktiebolag",
+      "official_website_url": "https://www.sodraarhultstorv.se",
+      "about_text": "Södra Århults Torv AB förvaltar och utvecklar torvprodukter av högsta kvalitet, från mörk, höghumifierad harvtorv till ljus RHP-certifierad blocktorv. Med hållbarhet som ledord erbjuder företaget jordprodukter som främjar optimal rotutveckling för växter. Den svenska torvens renhet från sjukdomar och ogräsfrön gör den till ett oöverträffat odlingssubstrat för både hobby- och yrkesodlare. Torvens unika förmåga att hålla vatten och luft skapar de bästa förutsättningarna för växternas rotsystem att utvecklas optimalt. Genom att kombinera olika typer av torv kan företaget erbjuda anpassade lösningar för alla trädgårdskulturer. ",
+      "about_source_url": "https://www.sodraarhultstorv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556724-6623",
+      "company_name": "DM TAK AB",
+      "official_website_url": "https://www.dmtak.se",
+      "about_text": "DM TAK är ett familjeföretag med över 20 års erfarenhet av takläggning i Stockholm. Företaget erbjuder tjänster som takomläggning, plåtslageri, taksäkerhet, takservice, takmålning och snöskottning. DM TAK strävar efter att utföra arbete med yrkesstolthet och god känsla för kundens behov, och lämnar 15 års garanti på utfört arbete. Företaget utsågs till Årets Hantverkare 2016 i kategorin Större Byggföretag. ",
+      "about_source_url": "https://www.dmtak.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556716-7704",
+      "company_name": "NA Schakt AB",
+      "official_website_url": "https://www.naschakt.se",
+      "about_text": "NA Schakt är ett lösningsfokuserat familjeföretag med över 20 års erfarenhet inom schaktbranschen. Företaget specialiserar sig på större projekt såsom industritomter, infrastrukturprojekt och nya bostadsområden, inklusive masshantering och sprängning. Med kunden i centrum strävar NA Schakt efter nära och tät dialog för att diskutera lösningar, materialval, tidsplaner och kostnader, vilket minimerar överraskningar. Företaget betonar hög kompetens och kontinuerlig utveckling genom att ta del av nya tekniker och arbetsmetoder. NA Schakt innehar behörighetsutbildningar för att säkerställa att arbetet genomförs enligt svenska branschregler. ",
+      "about_source_url": "https://www.naschakt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556678-6306",
+      "company_name": "Nylands Trä AB",
+      "official_website_url": "https://www.nylandstra.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556974-3320",
+      "company_name": "Knowit Ascend AB",
+      "official_website_url": "https://www.knowit.se",
+      "about_text": "Knowit är ett företag som kombinerar digitalisering med hållbarhet för att skapa en mänsklig och hållbar framtid. Företaget erbjuder tjänster inom områden som AI, molnplattformar och cybersäkerhet, och har samarbetat med kunder som Kappahl Group, Borås Energi och Miljö samt MQ. Knowit strävar efter att vara en digital partner för innovation och hållbar utveckling. ",
+      "about_source_url": "https://www.knowit.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556540-8514",
+      "company_name": "Europress AB",
+      "official_website_url": "https://www.europress.se",
+      "about_text": "Europress erbjuder innovativa balpressar och komprimatorer för avfallshantering och hjälper sina kunder att nå sina mål inom cirkulär ekonomi. Företaget har sedan 1977 hjälpt företag och organisationer att utvecklas mot en cirkulär ekonomi genom att tillhandahålla hållbara produkter och tjänster som effektiviserar avfallshanteringen. Europress betonar vikten av att skydda miljön genom säker insamling av avfall på plats, vilket ökar återvinningskvoten. ",
+      "about_source_url": "https://europressgroup.com/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556444-8255",
+      "company_name": "Eqpack AB",
+      "official_website_url": "https://eqpack.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556556-8895",
+      "company_name": "Lyckes Produktionsverktyg AB",
+      "official_website_url": "https://lyckespv.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556446-1472",
+      "company_name": "Axema Access Control AB",
+      "official_website_url": "https://www.axema.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556841-6803",
+      "company_name": "Anton Paar Nordic AB",
+      "official_website_url": "https://www.anton-paar.com/se-sv",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556443-5120",
+      "company_name": "Converflex Aktiebolag",
+      "official_website_url": "https://www.converflex.se",
+      "about_text": "Converflex AB är ett av Skandinaviens ledande företag inom flexotryckta förpackningar med papper som bas, med inriktning på risomslag för pappersindustrin och flexibla förpackningar inom livsmedelsbranschen. Företaget har mer än 30 års erfarenhet av tillverkning av förpackningar och flexotryckning. En flexibel och kundanpassad organisation möjliggör snabba omställningar i produktionen, vilket ger stor flexibilitet och effektivitet från order till leverans. Produktionskapaciteten ligger på cirka 7 000 ton per år. Converflexs anläggning ligger i Arnäsvall utanför Örnsköldsvik, med närhet till Europaväg 4 och en lastterminal för Botniabanan, vilket ger stora logistiska fördelar.",
+      "about_source_url": "https://converflex.se/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556445-0467",
+      "company_name": "Takab i Jönköping Aktiebolag",
+      "official_website_url": "https://www.takab.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556876-6215",
+      "company_name": "AB Vabon",
+      "official_website_url": "https://www.vabon.se",
+      "about_text": "AB VABON grundades 2012 av Richard Blad, Martin Nyman och Christian Larsson med målet att bygga ett bolag med fokus på både medarbetare och kunder för att utveckla VA-branschen tillsammans. Idag består Vabon av cirka 50 medarbetare och är en av de ledande aktörerna inom VA-sektorn, involverade i flera stora infrastrukturprojekt i Västsverige och med långvariga samarbeten med kunder som ställer höga krav på kvalitet. Problemlösning är grunden för Vabons verksamhet, med fokus på att förstå kundens behov och erbjuda skräddarsydda lösningar för komplexa utmaningar. Arbetsmiljö och kvalitet är högt prioriterade, med kontinuerlig utbildning av medarbetare och säkerställande av nödvändig skyddsutrustning.",
+      "about_source_url": "https://vabon.se/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556687-0639",
+      "company_name": "Eboss AB",
+      "official_website_url": "https://www.eboss.se",
+      "about_text": "Eboss AB har i årtionden levererat stansade och skurna produkter samt monteringar för krävande applikationer inom en rad olika industrier. Företaget erbjuder allt från små kontakter tillverkade av ädelmetaller till stora, takmonterade stålfästen som används i solenergilösningar. Eboss strävar efter att förstå kundens mål och arbetar nära dem för att leverera resultat som överträffar förväntningarna. Företaget betonar vikten av nära samarbete för att uppnå utmärkta resultat och erbjuder lösningar som är både kostnadseffektiva och effektiva, från verktygsdesign till färdiga monterade produkter.",
+      "about_source_url": "https://www.eboss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets webbplats."
+    },
+    {
+      "orgnr": "556218-6253",
+      "company_name": "Itaab Trading Aktiebolag",
+      "official_website_url": "https://itaab.com",
+      "about_text": "I över 70 år har Itaab varit en pionjär inom design och tillverkning av metallundertak och fasadlösningar. Företaget strävar efter att skapa produkter som inspirerar, imponerar och förhöjer livskvaliteten i alla miljöer. Med ett team av experter kombinerar Itaab precision, innovation och hållbarhet för att möta dagens och morgondagens behov. Genom egen produktion säkerställs full kontroll över varje detalj, vilket garanterar resultat som överträffar förväntningarna. Företaget erbjuder skräddarsydda lösningar för att möta specifika krav och önskemål, med fokus på hållbarhet genom val av hållbara material och arbete för att minska miljöavtrycket.",
+      "about_source_url": "https://itaab.com/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556202-8968",
+      "company_name": "S-Schakt Schönström Aktiebolag",
+      "official_website_url": "https://www.s-schakt.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556265-5430",
+      "company_name": "Carmenta Geospatial Technologies AB",
+      "official_website_url": "https://carmenta.com",
+      "about_text": "Carmenta erbjuder geospatial teknologi som möjliggör realtidsvisualisering och analys av geospatial information. Företagets programvaruutvecklingskit (SDK) ger frihet och flexibilitet att skapa kraftfulla geospatiala applikationer för effektiv visualisering och analys. Carmentas teknologi används och är betrodd i system över hela världen, oavsett om det gäller lösningar för luft, hav eller land. Företaget betonar vikten av nära samarbete för att uppnå utmärkta resultat och erbjuder lösningar som är både kostnadseffektiva och effektiva, från verktygsdesign till färdiga monterade produkter.",
+      "about_source_url": "https://carmenta.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets webbplats."
+    },
+    {
+      "orgnr": "556402-9766",
+      "company_name": "Aktiebolaget Mercatus Engineering",
+      "official_website_url": "https://www.mercatus.se",
+      "about_text": "Mercatus designar, installerar och levererar system och utrustning för rening och recirkulering av förorenade processvätskor. Företaget underhåller och servar dessutom dessa anläggningar samt tillhandahåller reservdelar. Affärsområdena inkluderar spånhantering och skärvätskerening samt rening av processvätskor med hjälp av membranteknik, med kunder inom verkstadsindustrin, återvinningsindustrin, processindustrin och energisektorn. Mercatus kompetens täcker både små mobila anläggningar och stora komplexa system för att hantera fullständiga processer. Genom samarbete med leverantörspartners kan företaget skräddarsy lösningar efter kunders unika behov. Med lång erfarenhet av teknikutveckling, design, konstruktion och leverans är Mercatus en framgångsrik totalleverantör både inom Norden och internationellt. Visionen är att göra framtiden renare.",
+      "about_source_url": "https://www.mercatus.se/om-mercatus/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556526-8421",
+      "company_name": "Mönsterås Bostäder AB",
+      "official_website_url": "https://www.monsterasbostader.se",
+      "about_text": "Mönsterås Bostäder AB är ett kommunalt bostadsbolag med 1 396 lägenheter och 12 000 m² lokaler, helägt av Mönsterås kommun. Företaget värdesätter personlig kontakt med kunderna och fokuserar på trevligt bemötande och god service. Verksamheten bedrivs på fem orter: Mönsterås, Ålem, Blomstermåla, Timmernabben och Fliseryd. Lägenheterna ligger naturnära, nära skog eller hav, men också med närhet till affärer och service. Det finns goda pendlingsmöjligheter till Kalmar och Oskarshamn med täta förbindelser. På den kommersiella marknaden erbjuder Mönsterås Bostäder affärs- och kontorslokaler.",
+      "about_source_url": "https://monsterasbostader.se/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556482-4729",
+      "company_name": "KmK Instrument Aktiebolag",
+      "official_website_url": "https://www.kmk.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556455-8244",
+      "company_name": "GMV Sweden Aktiebolag",
+      "official_website_url": "https://www.gmv.se",
+      "about_text": "GMV Sweden AB är en svensk tillverkare av hissar och hisskomponenter med över 60 års erfarenhet. Företaget erbjuder ett brett sortiment av hissar, inklusive bilhissar, personhissar och varuhissar, samt komponenter för hissrenovering. GMV Sweden strävar efter att skapa framtidens hissar med modern teknologi och hög kvalitet.",
+      "about_source_url": "https://www.gmv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556723-7986",
+      "company_name": "NFM Flytgolv AB",
+      "official_website_url": "https://www.nfm.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Webbplatsen kunde inte nås vid sökningstillfället."
+    },
+    {
+      "orgnr": "556198-1308",
+      "company_name": "Busch Pfeiffer Vacuum AB",
+      "official_website_url": "https://www.buschvacuum.com/se/sv/",
+      "about_text": "Busch Vacuum Solutions är en ledande leverantör av vakuumpumpar, vakuumsystem och vakuumservice. Företaget erbjuder ett brett utbud av vakuumteknologier och skräddarsydda systemlösningar för olika processer och krav. Busch strävar efter att säkerställa driftseffektivitet och oavbruten produktivitet för sina kunder.",
+      "about_source_url": "https://www.buschvacuum.com/se/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556534-0014",
+      "company_name": "Netnod AB",
+      "official_website_url": "https://www.netnod.se",
+      "about_text": "Netnod är en neutral, icke-vinstdrivande organisation som arbetar för att säkerställa ett stabilt och säkert internet i Norden och globalt. Företaget erbjuder tjänster såsom Internet Exchange (IX), DNS, tidssynkronisering och transporttjänster. Netnods mål är att bygga en mer robust och motståndskraftig internetinfrastruktur genom teknik, expertis och insikter i lagstiftning.",
+      "about_source_url": "https://www.netnod.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556470-5506",
+      "company_name": "Curant Klimat AB",
+      "official_website_url": "https://www.curant.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556531-3623",
+      "company_name": "EH Connector AB",
+      "official_website_url": "https://ehconnector.se",
+      "about_text": "EH Connector AB är en helhetsleverantör av elektriska kopplingar för motorfordon samt kundanpassade kablage. Med över 70 års erfarenhet erbjuder företaget flexibla och kvalitativa lösningar, från utveckling och konstruktion till testning och tillverkning, med fokus på kvalitet, miljö och service.",
+      "about_source_url": "https://ehconnector.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556436-7067",
+      "company_name": "Örebro Bildemontering Aktiebolag",
+      "official_website_url": "https://www.orebrobildemo.se",
+      "about_text": "Örebro Bildemontering är en av Sveriges största leverantörer av begagnade bildelar och reservdelar. Företaget köper in, lagerhåller och säljer ett brett sortiment av begagnade fordonsdelar i gott skick till bilverkstäder, privata fordonsägare och försäkringsbolag. Sortimentet innefattar nästan alla nyare bilmärken, och alla delar är funktionstestade.",
+      "about_source_url": "https://www.orebrobildemo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556457-7475",
+      "company_name": "Sordin Vikmanshyttan AB",
+      "official_website_url": "https://sordin.com",
+      "about_text": "Sordin är ett svenskt företag som sedan 1988 har tillverkat hörselskydd med fokus på precision och passion. Företaget erbjuder produkter designade för hållbarhet, komfort och prestanda under extrema förhållanden, med omfattande garanti och support.",
+      "about_source_url": "https://sordin.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556812-7558",
+      "company_name": "Addvanze AB",
+      "official_website_url": "https://addvanze.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556206-8238",
+      "company_name": "Målerås Mekaniska Aktiebolag",
+      "official_website_url": "https://maleras-mek.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556394-4874",
+      "company_name": "Aktiebolag Montano",
+      "official_website_url": "https://www.montano.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556367-6500",
+      "company_name": "Vitec M\u0000e4klarsystem AB",
+      "official_website_url": "https://www.vitecsoftware.com/maklarsystem",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556568-1425",
+      "company_name": "Il Molino AB",
+      "official_website_url": "https://www.ilmolino.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556620-3682",
+      "company_name": "IML technologies aktiebolag",
+      "official_website_url": "https://3buttongroup.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556537-5994",
+      "company_name": "Hydroscand Machine Aktiebolag",
+      "official_website_url": "https://hydroscand.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556722-3234",
+      "company_name": "PQ Projektledning Aktiebolag",
+      "official_website_url": "https://www.pqprojekt.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556238-1839",
+      "company_name": "Sj\u0000f6markens Isolering Aktiebolag",
+      "official_website_url": "https://www.sjomarkens.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556737-8236",
+      "company_name": "Industridraperier i \u0000d6rebro AB",
+      "official_website_url": "https://www.industridraperier.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556615-8126",
+      "company_name": "B\u0000e4llsta Handel AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/vallentuna/ica-nara-kragsta-1093/start/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556267-3383",
+      "company_name": "Hydal Components AB",
+      "official_website_url": "https://raufossaluminium.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556762-3318",
+      "company_name": "Lybab AB",
+      "official_website_url": "https://lybab.se",
+      "about_text": "Lybab är ett modernt svenskt företag med en bred verksamhetsbas inom bygg, måleri, smide och entreprenadsektorn. Vi erbjuder kostnadseffektiva tjänster och lösningar där vi alltid sätter kunden först. Våra tjänster inkluderar nybyggnation av bostadshus, ytbehandling och smidesentreprenader, samt renovering, ombyggnation och tillbyggnation av både bostäder och kommersiella byggnader. Vi utför även industrilackering och blästring av stålkonstruktioner och betong, samt erbjuder tjänster inom mark och anläggning. Dessutom sköter vi drift och bemanning av flera återvinningscentraler i Stockholm och erbjuder moderna lösningar inom förnybar energi genom att leverera solpaneler av högsta kvalitet med komplett installationsservice.",
+      "about_source_url": "https://lybab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556314-6660",
+      "company_name": "Thor Ahlgren Aktiebolag",
+      "official_website_url": "https://www.thorahlgren.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556132-1745",
+      "company_name": "Fillauer Europe AB",
+      "official_website_url": "https://fillauer.com",
+      "about_text": "At Fillauer, we are dedicated to creating innovative orthotic and prosthetic products that empower you to achieve your best functional outcomes. We offer a wide range of products including upper and lower prosthetics, orthotics, and fabrication equipment. Our commitment is to provide advanced products, strategic support, and dedicated expertise to both professionals and users in the orthotic and prosthetic community.",
+      "about_source_url": "https://fillauer.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "559214-5717",
+      "company_name": "Bright Networks AB",
+      "official_website_url": "https://www.brightnetworks.se/",
+      "about_text": "Bright Networks är ett fullserviceföretag inom fibernät med tre affärsenheter: Enterprise, Consumer och Services. Vi satsar på att vara marknadsledare när det gäller komplexa arbeten som kräver en hög servicenivå. Bolagets personal har mångårig erfarenhet av alla typer av entreprenader och uppdrag, samt har kapacitet och kompetens inom alla verksamhetsområden för att bygga kompletta totalentreprenader med egen personal.",
+      "about_source_url": "https://brightnetworks.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "559183-1085",
+      "company_name": "MORA CNC AB",
+      "official_website_url": "https://www.nordiqongroup.com",
+      "about_text": "Nordiqon är ett nybildat industribolag inom avancerad CNC-bearbetning och mekanisk legotillverkning. Koncernen uppstår genom sammanslagningen av tre etablerade verksamheter: Mora CNC, Edvin Larsson Maskinteknik i Falun samt HME Tallinn i Estland. Vid våra toppmoderna anläggningar i Sverige och Estland samlar vi ledande kompetens inom CNC-bearbetning och legotillverkning. Vi möjliggör hållbar tillväxt för våra kunder genom att leverera avancerade tillverkningslösningar med precision, automatisering och långsiktiga partnerskap.",
+      "about_source_url": "https://www.nordiqongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556317-9596",
+      "company_name": "Fasadsystem i Stenkullen Aktiebolag",
+      "official_website_url": "https://fasadsystem.se",
+      "about_text": "Fasadsystem erbjuder energismarta solcellsfasader och taklösningar som bidrar till en grönare energiekonomi. Vi konstruerar och tillverkar även dörrar, fönster, fasader, uterum och tak i aluminium, stål och glas. Varje uppdrag är unikt, och vi är specialister på att skräddarsy lösningar efter kundens önskemål. Vi är tidigt på plats i projekten för att optimera konstruktion, tillverkning och montering på ett kostnadseffektivt sätt.",
+      "about_source_url": "https://fasadsystem.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556991-1497",
+      "company_name": "ProChroma AB",
+      "official_website_url": "https://www.prochroma.se/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556490-7458",
+      "company_name": "Material Handling Modules Europe AB",
+      "official_website_url": "https://www.mhmodules.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556379-1101",
+      "company_name": "Tovar Livs Aktiebolag",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-tovar-livs-1094/start/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556592-7646",
+      "company_name": "Patriksson Communication AB",
+      "official_website_url": "https://www.patriksson.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556531-8150",
+      "company_name": "Per Sjögren Livs AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-per-sjogren-livs-1095/start/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen specifik 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbadressen."
+    },
+    {
+      "orgnr": "556328-8199",
+      "company_name": "Multivac Aktiebolag",
+      "official_website_url": "https://se.multivac.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbadressen."
+    },
+    {
+      "orgnr": "556234-6089",
+      "company_name": "Tribotec Aktiebolag",
+      "official_website_url": "https://www.tribotec.se",
+      "about_text": "Med över 40 års erfarenhet levererar Tribotec hållbara och anpassade lösningar inom rostskydd, silikon, lim och smörjmedel. Företaget strävar efter att minimera påverkan på personal och miljö genom aktiva val tillsammans med sina kunder. Tribotec erbjuder kostnadseffektiva lösningar och ett brett sortiment för olika industriella applikationer.",
+      "about_source_url": "https://www.tribotec.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556030-7836",
+      "company_name": "Sifvert Skruv Aktiebolag",
+      "official_website_url": "https://www.sifvertskruv.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbadressen."
+    },
+    {
+      "orgnr": "556624-2656",
+      "company_name": "Vertech AB",
+      "official_website_url": "https://www.vertech.se",
+      "about_text": "Vertech AB har över 20 års erfarenhet av service och underhåll av transportband inom industrin. Företaget erbjuder kvalitetsservice som uppfyller industrikunders behov och är certifierade enligt ISO9001 och ISO14001, vilket garanterar kvalitetsservice och miljöansvar. Vertech strävar efter långsiktiga kundrelationer med hög kundnöjdhet och garanterar leveranser av högsta kvalitet i tid.",
+      "about_source_url": "https://www.vertech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556583-8595",
+      "company_name": "Schütz Allemballage AB",
+      "official_website_url": "https://www.allemballage.se",
+      "about_text": "Schütz Allemballage är Nordens ledande helhetsleverantör inom rekonditionering, returhantering och försäljning av IBC-containers. Tillsammans med sina syskonföretag i den tyskägda Schütz-koncernen är de representerade på närmare 40 platser globalt. I en modern, miljögodkänd anläggning i Jordbro hanterar företaget över 80 000 nya och rekonditionerade IBC:er per år, med fokus på miljömässiga och ekonomiska fördelar för sina kunder.",
+      "about_source_url": "https://www.allemballage.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556998-1920",
+      "company_name": "Vekst AB",
+      "official_website_url": "https://www.vekst.se",
+      "about_text": "Vekst är en partner för marknadsförings- och försäljningstransformation som driver digital tillväxt och operativ integration på global nivå. Företaget levererar strategier som omsätts i handling och resultat, genom att föra marknadsföring och försäljning närmare varandra. Vekst erbjuder tjänster inom strategiutveckling, prestationsmarknadsföring, dataanalys, innehållsproduktion, e-postmarknadsföring och samarbete mellan marknadsföring och försäljning.",
+      "about_source_url": "https://www.vekst.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556762-5495",
+      "company_name": "Panthera AB",
+      "official_website_url": "https://www.panthera.se",
+      "about_text": "Panthera AB tillverkar världens lättaste rullstolar och erbjuder ett brett sortiment av produkter, inklusive Panthera X, U3 Light, U3, S3, S3 Swing och Bambino 3. Företaget är även distributör för V-Traks ryggsystem i Sverige och har nyligen lanserat den nya dynan preTech.",
+      "about_source_url": "https://www.panthera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556201-1949",
+      "company_name": "Aktiebolaget Thoreb",
+      "official_website_url": "https://www.thoreb.com",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbadressen."
+    },
+    {
+      "orgnr": "556633-5997",
+      "company_name": "Sänghuset Elgen AB",
+      "official_website_url": "https://www.sanghusetelgen.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen 'Om oss'-sida eller företagsbeskrivning hittades på den angivna webbadressen."
+    },
+    {
+      "orgnr": "556697-9281",
+      "company_name": "Nya Eriksbo plantskola AB",
+      "official_website_url": "https://www.eriksboplantskola.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556640-4421",
+      "company_name": "Pall Cargo i Kungsbacka AB",
+      "official_website_url": "https://www.pallcargo.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556999-4691",
+      "company_name": "Parapix AB",
+      "official_website_url": "https://parapix.tv",
+      "about_text": "Parapix är ett kreativt produktionsbolag som erbjuder tjänster inom filmproduktion, postproduktion och objektstudio. De har samarbetat med kunder som Absolut, Adidas, BBC, Dior, Electrolux, Google, H&M, IKEA, Netflix, Spotify och Volvo. Deras team inkluderar redigerare, fotografer, VFX-artister och producenter.",
+      "about_source_url": "https://parapix.tv",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är sammanställd från företagets webbplats."
+    },
+    {
+      "orgnr": "556468-7597",
+      "company_name": "AB Sundplast",
+      "official_website_url": "https://sundplast.se",
+      "about_text": "Sundplast är experter på formsprutad plast med fokus på kvalitet, precision och hållbarhet. De erbjuder produkter som Safecap och Safebox samt tjänster inom design, konstruktion, prototyptillverkning, montering och ytbehandling. Företaget arbetar med miljöanpassade materialval och hållbarhetsarbete.",
+      "about_source_url": "https://sundplast.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är sammanställd från företagets webbplats."
+    },
+    {
+      "orgnr": "556800-4328",
+      "company_name": "Set Up AB",
+      "official_website_url": "https://www.setupab.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556655-0603",
+      "company_name": "TB Printsolutions AB",
+      "official_website_url": "https://www.tbprintsolutions.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556813-8886",
+      "company_name": "Conoa AB",
+      "official_website_url": "https://www.conoa.se",
+      "about_text": "Conoa är experter inom Cloud Native, Kubernetes och container-teknik. De erbjuder tjänster från strategi till säker drift och är en komplett partner inom modern IT-infrastruktur. Conoa var först i Sverige att utses till både Kubernetes Certified Service Provider (KCSP) och Kubernetes and Cloud Native Training Partners (KCNTP). Sedan april 2021 är Conoa en del av Proact.",
+      "about_source_url": "https://www.conoa.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är sammanställd från företagets webbplats."
+    },
+    {
+      "orgnr": "556508-8639",
+      "company_name": "HA Ventilation AB",
+      "official_website_url": "https://www.haventilation.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556575-1715",
+      "company_name": "M o P Vestman Livs AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-vestman-livs-1096/start/",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556812-9851",
+      "company_name": "Roland Berger AB",
+      "official_website_url": "https://www.rolandberger.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen information om företaget hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556780-7358",
+      "company_name": "Watt Heating AB",
+      "official_website_url": "https://watt.se",
+      "about_text": "Watt Heating AB har Sveriges största lager av radiatorer med över 50 000 enheter redo för leverans. Företaget fokuserar på den svenska proffsmarknaden men levererar även till hela Norden. Sortimentet inkluderar radiatorer, konvektorer, handdukstorkar, fläktluftvärmare och tillbehör. Watt Heating strävar efter hållbarhet och har introducerat produkter som ONE RECO, en termostat tillverkad av återvunnen plast. Företaget erbjuder också en effektkalkylator på sin webbplats för att hjälpa kunder att välja rätt produkt för sina behov.",
+      "about_source_url": "https://watt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556400-7275",
+      "company_name": "Eriksons Chark i Nossebro Aktiebolag",
+      "official_website_url": "https://www.eriksonschark.se/",
+      "about_text": "Eriksons Chark har snart 100 års erfarenhet av korv- och charkuteritillverkning. Vi arbetar nu som då efter devisen 'svenskt från Sverige'. Det innebär att vi endast använder oss av svenska köttråvaror och material så långt det bara går. Hos oss kan du alltid förvänta dig kôrv och charkuterier som producerats efter metoder och recept som gått i arv i generationer.",
+      "about_source_url": "https://eriksonschark.se/prinskorv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets produktbeskrivning."
+    },
+    {
+      "orgnr": "556082-8773",
+      "company_name": "Fredrik Mogensen Aktiebolag",
+      "official_website_url": "https://www.mogensen.se/",
+      "about_text": "Fredrik Mogensen AB konstruerar och tillverkar siktutrustningar för industrier över hela världen. Företaget erbjuder kompletta lösningar för siktbehov och har erfarenhet av över 400 olika typer av material i många olika branscher. De är internationellt verksamma inom siktning och processteknik.",
+      "about_source_url": "https://www.mogensen.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556575-0279",
+      "company_name": "Fila Nordic AB",
+      "official_website_url": "https://www.lyra.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556500-7357",
+      "company_name": "Söderströms Skog & Trädgård AB",
+      "official_website_url": "https://www.soderstroms.nu",
+      "about_text": "Söderströms Skog & Trädgård AB grundades 1994 som ett lokalt familjeföretag med passion för skog och trädgård. Företaget har utvecklats över åren och firade 30 år 2025. De har expanderat med nya butiker i Jönköping 2024 och Mariestad 2026. Söderströms är ledande på installationer av Husqvarna Ceora, en robot för storskalig skötsel av gräsytor, särskilt på golfbanor.",
+      "about_source_url": "https://soderstroms.nu/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556832-9790",
+      "company_name": "Remotion AB",
+      "official_website_url": "https://www.remotion.se",
+      "about_text": "Vi förenar strategi, teknik och kreativitet för att skapa marknadsföring som gör skillnad—och stärker både tillväxt och kundrelationer. Vi är nyfikna tänkare, modiga problemlösare och ödmjuka lagspelare. Vi utmanar perspektiv, delar generöst med oss av vår kunskap och håller oss nyfikna på det som väntar runt hörnet. Med strategisk skärpa och teknisk höjd hjälper vi våra kunder att navigera i förändring—alltid med en lösningsorienterad inställning och ett äkta engagemang. Vi tror på kraften i samarbete och kollektiva förmågor.",
+      "about_source_url": "https://www.remotion.se/om-oss",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556751-6041",
+      "company_name": "Vindelns Livs AB",
+      "official_website_url": "https://www.vindelnslivs.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556924-1671",
+      "company_name": "Pelago Bioscience AB",
+      "official_website_url": "https://www.pelagobio.com",
+      "about_text": "Pelago Bioscience AB erbjuder CETSA®-teknologi som ger direkt evidens på proteinbeteende i deras naturliga miljö, cellen, vilket ger en tydlig koppling genom hela läkemedelsutvecklingsprocessen. Företaget har över 10 års erfarenhet, samarbetar med över 350 kunder inklusive de 10 största läkemedelsföretagen, och har genomfört över 750 CETSA-projekt. Deras tjänster täcker hela läkemedelsutvecklingsprocessen, från target discovery till prekliniska studier.",
+      "about_source_url": "https://www.pelagobio.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556468-3349",
+      "company_name": "Lupus Foder AB",
+      "official_website_url": "https://www.lupusfoder.se",
+      "about_text": "",
+      "about_source_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Ingen relevant 'Om oss'-information hittades på den angivna webbplatsen."
+    },
+    {
+      "orgnr": "556993-6684",
+      "company_name": "Elovent AB",
+      "official_website_url": "https://www.elovent.se",
+      "about_text": "Elovent startades 2015 i Kalmar, men vårt team av medarbetare har lång erfarenhet inom sina yrkesområden. Vi arbetar också med elservice, tele, data och larm. Vi arbetar både med service och entreprenader inom el och tele. Vår ambition är att vara en naturlig samarbetspartner till både nya och befintliga kunder som vi förlänger vår relation med och etablerar nya långsiktiga samarbeten med. Vi arbetar i hela Kalmar län med fokus på Kalmar och Nybro med omnejd. Vi är en del av Instalco, representerat med nationell bredd i Sverige, Norge och Finland via ett 150-tal dotterbolag med över 6 000 medarbetare.",
+      "about_source_url": "https://elovent.se/om-oss/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets 'Om oss'-sida."
+    },
+    {
+      "orgnr": "556389-8609",
+      "company_name": "Seriline Aktiebolag",
+      "official_website_url": "https://www.seriline.com",
+      "about_text": "Seriline är en ledande leverantör av säkra lösningar inom identitet och åtkomst. Vi erbjuder produkter och tjänster som besöksterminaler, kortläsare, nyckelbrickor och plastkortsskrivare. Vårt mål är att hjälpa företag och organisationer att hantera identiteter och behörigheter på ett effektivt och säkert sätt.",
+      "about_source_url": "https://www.seriline.com/se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556455-1900",
+      "company_name": "Texstar AB",
+      "official_website_url": "https://www.texstar.se",
+      "about_text": "Texstar är en leverantör av arbetskläder och profilkläder för drivna team. Vi erbjuder ett brett sortiment av produkter, inklusive jackor, byxor, tröjor och accessoarer, designade för att kombinera funktionalitet med stil. Vårt mål är att tillhandahålla kläder som passar både på kontoret och på byggarbetsplatsen.",
+      "about_source_url": "https://texstar.se/en/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets engelska hemsida."
+    },
+    {
+      "orgnr": "556289-7164",
+      "company_name": "Malthe Winje Automation AB",
+      "official_website_url": "https://www.mwa.se",
+      "about_text": "Malthe Winje Automation AB marknadsför automations- och installationsprodukter på den svenska marknaden. Vår roll är att ge dig vårt kunnande och en god service och support på alla våra produkter. Denna kombination av kvalitet och support gör dig som kund/partner konkurrenskraftig på en marknad med höga kundkrav. Vi har valt våra produkter med omsorg både vad gäller kvalitet och pris.",
+      "about_source_url": "https://mwa.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556318-6385",
+      "company_name": "Maskin-Mekano Försäljnings Aktiebolag",
+      "official_website_url": "https://www.maskinmekano.se",
+      "about_text": "Maskin Mekano är ett familjeföretag i den expansiva Jönköpingsregionen. Sedan 1956 har vi levererat gedigen utrustning till entreprenadbranschen. Ett fokusområde har varit att bli bäst på mobil kvalificerad siktning.",
+      "about_source_url": "https://www.maskinmekano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "559155-1154",
+      "company_name": "TIQQE AB",
+      "official_website_url": "https://tiqqe.com",
+      "about_text": "TIQQE är ett företag som specialiserar sig på molnbaserade lösningar och tjänster. Vi hjälper organisationer att designa, bygga och driva applikationer i molnet, med fokus på skalbarhet, säkerhet och kostnadseffektivitet. Vårt team av experter arbetar nära kunder för att förstå deras behov och leverera skräddarsydda lösningar.",
+      "about_source_url": "https://tiqqe.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556629-8203",
+      "company_name": "Traryds Metall AB",
+      "official_website_url": "https://www.trarydsmetall.se",
+      "about_text": "Traryds Metall AB är en tillverkare av precisionskomponenter i mässing och andra metaller. Vi erbjuder produkter som ventiler, kopplingar och specialkomponenter för olika industrier. Vår produktion kännetecknas av hög kvalitet och noggrannhet, och vi strävar efter att möta våra kunders specifika behov.",
+      "about_source_url": "https://www.trarydsmetall.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556108-9284",
+      "company_name": "Hammarplast Medical Aktiebolag",
+      "official_website_url": "https://hpm.se",
+      "about_text": "Hammarplast Medical är en ledande tillverkare av medicintekniska produkter och förpackningslösningar. Vi erbjuder ett brett sortiment av produkter för sjukvården, inklusive engångsartiklar och specialförpackningar. Vårt fokus ligger på kvalitet, säkerhet och innovation för att möta hälso- och sjukvårdens krav.",
+      "about_source_url": "https://hpm.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556858-5318",
+      "company_name": "Qleano AB",
+      "official_website_url": "https://www.qleano.se",
+      "about_text": "Qleano är en städtjänstförmedlare som erbjuder professionella städtjänster för både privatpersoner och företag. Vi samarbetar med noggrant utvalda städföretag för att säkerställa hög kvalitet och kundnöjdhet. Vårt mål är att göra det enkelt och bekvämt för kunder att boka städtjänster online.",
+      "about_source_url": "https://www.qleano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556527-9279",
+      "company_name": "Olsbergs Electronics AB",
+      "official_website_url": "https://www.olsbergs.com",
+      "about_text": "Olsbergs Electronics är en tillverkare av elektroniska styrsystem för mobil hydraulik. Vi erbjuder produkter som fjärrkontroller och styrsystem för kranar och andra mobila maskiner. Vårt fokus ligger på innovation, kvalitet och användarvänlighet för att möta kundernas behov.",
+      "about_source_url": "https://www.olsbergs.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    },
+    {
+      "orgnr": "556843-4061",
+      "company_name": "Trygga Hiss i Stockholm AB",
+      "official_website_url": "https://www.tryggahiss.se",
+      "about_text": "Trygga Hiss i Stockholm AB är ett företag som erbjuder installation, service och modernisering av hissar. Vi arbetar med både bostadsrättsföreningar och fastighetsägare för att säkerställa säkra och pålitliga hisslösningar. Vårt team av erfarna tekniker strävar efter hög kvalitet och kundnöjdhet.",
+      "about_source_url": "https://www.tryggahiss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Informationen är hämtad från företagets hemsida."
+    }
+  ],
+  "batches_meta": [
+    {
+      "batch_index": 0,
+      "offset": 0,
+      "row_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "nonempty_in_batch": 4,
+      "cumulative_nonempty": 4,
+      "response_meta": {
+        "id": "chatcmpl-c9125ad8-bcc3-4d31-89f2-b1459bb2c257",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1137,
+          "prompt_tokens": 743,
+          "total_tokens": 1880,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 1,
+      "offset": 10,
+      "row_ids": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        22,
+        25,
+        27,
+        28
+      ],
+      "nonempty_in_batch": 6,
+      "cumulative_nonempty": 10,
+      "response_meta": {
+        "id": "chatcmpl-a49b8422-51ad-45be-b9b2-8c3c7c3a34e0",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1349,
+          "prompt_tokens": 749,
+          "total_tokens": 2098,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 2,
+      "offset": 20,
+      "row_ids": [
+        31,
+        32,
+        38,
+        41,
+        44,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 15,
+      "response_meta": {
+        "id": "chatcmpl-6fc8a08c-963f-40b2-b9c5-47eb506a8c82",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1335,
+          "prompt_tokens": 757,
+          "total_tokens": 2092,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 3,
+      "offset": 30,
+      "row_ids": [
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60
+      ],
+      "nonempty_in_batch": 3,
+      "cumulative_nonempty": 18,
+      "response_meta": {
+        "id": "chatcmpl-10b570cc-d975-4258-b62a-0235f94f1fe4",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1066,
+          "prompt_tokens": 763,
+          "total_tokens": 1829,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 4,
+      "offset": 40,
+      "row_ids": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70
+      ],
+      "nonempty_in_batch": 4,
+      "cumulative_nonempty": 22,
+      "response_meta": {
+        "id": "chatcmpl-a183a97a-41d9-4ec6-be8d-cdedfff2952b",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1133,
+          "prompt_tokens": 760,
+          "total_tokens": 1893,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 5,
+      "offset": 50,
+      "row_ids": [
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 27,
+      "response_meta": {
+        "id": "chatcmpl-a4b7ed5b-bf28-40b0-907e-bf21ec1f3ae1",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1523,
+          "prompt_tokens": 757,
+          "total_tokens": 2280,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 6,
+      "offset": 60,
+      "row_ids": [
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90
+      ],
+      "nonempty_in_batch": 4,
+      "cumulative_nonempty": 31,
+      "response_meta": {
+        "id": "chatcmpl-d052d5e5-7918-4b5b-9fa1-a86820beb046",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 984,
+          "prompt_tokens": 760,
+          "total_tokens": 1744,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 7,
+      "offset": 70,
+      "row_ids": [
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100
+      ],
+      "nonempty_in_batch": 4,
+      "cumulative_nonempty": 35,
+      "response_meta": {
+        "id": "chatcmpl-61aab36e-00ce-4760-a769-197b80ab8553",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1633,
+          "prompt_tokens": 757,
+          "total_tokens": 2390,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 8,
+      "offset": 80,
+      "row_ids": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110
+      ],
+      "nonempty_in_batch": 6,
+      "cumulative_nonempty": 41,
+      "response_meta": {
+        "id": "chatcmpl-ea59a7d7-46b8-4441-a33a-5472c69c39ec",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1260,
+          "prompt_tokens": 734,
+          "total_tokens": 1994,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 9,
+      "offset": 90,
+      "row_ids": [
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 46,
+      "response_meta": {
+        "id": "chatcmpl-f79126a0-2ed8-4581-868c-f1e230717c43",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1047,
+          "prompt_tokens": 739,
+          "total_tokens": 1786,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 10,
+      "offset": 100,
+      "row_ids": [
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130
+      ],
+      "nonempty_in_batch": 4,
+      "cumulative_nonempty": 50,
+      "response_meta": {
+        "id": "chatcmpl-bf639a54-06da-4b95-a01e-fe9d25fb35bb",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1204,
+          "prompt_tokens": 746,
+          "total_tokens": 1950,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 11,
+      "offset": 110,
+      "row_ids": [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 55,
+      "response_meta": {
+        "id": "chatcmpl-113ff1ca-7a49-4172-af90-e12afe6f8f5d",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1612,
+          "prompt_tokens": 764,
+          "total_tokens": 2376,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 12,
+      "offset": 120,
+      "row_ids": [
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150
+      ],
+      "nonempty_in_batch": 6,
+      "cumulative_nonempty": 61,
+      "response_meta": {
+        "id": "chatcmpl-99607363-b71c-4a2b-8943-7b972b8b879b",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1297,
+          "prompt_tokens": 761,
+          "total_tokens": 2058,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 13,
+      "offset": 130,
+      "row_ids": [
+        151,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        162,
+        163
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 66,
+      "response_meta": {
+        "id": "chatcmpl-ede9340c-ea72-4de2-b8ef-7b0451ea83de",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1397,
+          "prompt_tokens": 740,
+          "total_tokens": 2137,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 14,
+      "offset": 140,
+      "row_ids": [
+        164,
+        165,
+        166,
+        167,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174
+      ],
+      "nonempty_in_batch": 7,
+      "cumulative_nonempty": 73,
+      "response_meta": {
+        "id": "chatcmpl-6637389a-47ec-47bc-af6d-6af70c0bc6e7",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1989,
+          "prompt_tokens": 745,
+          "total_tokens": 2734,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 15,
+      "offset": 150,
+      "row_ids": [
+        175,
+        176,
+        177,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185
+      ],
+      "nonempty_in_batch": 6,
+      "cumulative_nonempty": 79,
+      "response_meta": {
+        "id": "chatcmpl-26abba2e-ea1a-47c2-9fe4-3fdb6e0a815b",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1202,
+          "prompt_tokens": 741,
+          "total_tokens": 1943,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 16,
+      "offset": 160,
+      "row_ids": [
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        194,
+        195,
+        196
+      ],
+      "nonempty_in_batch": 0,
+      "cumulative_nonempty": 79,
+      "response_meta": {
+        "id": "chatcmpl-565bd1cc-0850-466f-a86a-3f640937f785",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 968,
+          "prompt_tokens": 778,
+          "total_tokens": 1746,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 17,
+      "offset": 170,
+      "row_ids": [
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 84,
+      "response_meta": {
+        "id": "chatcmpl-541dd6df-6f47-4c4b-891e-eb79f0b53ce8",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1344,
+          "prompt_tokens": 759,
+          "total_tokens": 2103,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 18,
+      "offset": 180,
+      "row_ids": [
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216
+      ],
+      "nonempty_in_batch": 5,
+      "cumulative_nonempty": 89,
+      "response_meta": {
+        "id": "chatcmpl-d8a28675-06de-4afb-8876-a9fb3ed0edcc",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1284,
+          "prompt_tokens": 770,
+          "total_tokens": 2054,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 19,
+      "offset": 190,
+      "row_ids": [
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226
+      ],
+      "nonempty_in_batch": 3,
+      "cumulative_nonempty": 92,
+      "response_meta": {
+        "id": "chatcmpl-12cba587-41b7-4843-9aad-945482833572",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 951,
+          "prompt_tokens": 756,
+          "total_tokens": 1707,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 20,
+      "offset": 200,
+      "row_ids": [
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236
+      ],
+      "nonempty_in_batch": 7,
+      "cumulative_nonempty": 99,
+      "response_meta": {
+        "id": "chatcmpl-77ac350f-9bcc-4b09-8e66-02405a02c7ee",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1623,
+          "prompt_tokens": 753,
+          "total_tokens": 2376,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "batch_index": 21,
+      "offset": 210,
+      "row_ids": [
+        237,
+        238,
+        239,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247
+      ],
+      "nonempty_in_batch": 10,
+      "cumulative_nonempty": 109,
+      "response_meta": {
+        "id": "chatcmpl-d4c20277-fc88-45f6-bd76-a673ca18ce5b",
+        "model": "gpt-4o-search-preview-2025-03-11",
+        "finish_reason": "stop",
+        "usage": {
+          "completion_tokens": 1510,
+          "prompt_tokens": 740,
+          "total_tokens": 2250,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          }
+        }
+      }
+    }
+  ]
+}

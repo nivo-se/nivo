@@ -17,6 +17,24 @@ function toNull<T>(v: T | null | undefined): T | null {
   return v;
 }
 
+/** Compare orgnrs regardless of hyphen / spaces (Swedish org.nr). */
+function normalizeOrgnrKey(s: string): string {
+  return s.replace(/\s/g, "").replace(/-/g, "").toLowerCase();
+}
+
+/** Values to try for SQL `orgnr IN (...)` when opening /company/:id from URLs or GPT tables. */
+function orgnrSqlVariants(raw: string): string[] {
+  const t = raw.trim();
+  if (!t) return [];
+  const digits = t.replace(/\D/g, "");
+  const out = new Set<string>([t]);
+  if (digits.length === 10) {
+    out.add(digits);
+    out.add(`${digits.slice(0, 6)}-${digits.slice(6)}`);
+  }
+  return [...out];
+}
+
 function mapBatchRowToCompany(row: Record<string, unknown>): Company {
   const rev = row.latest_revenue_sek;
   const margin = row.avg_ebitda_margin;
@@ -62,17 +80,33 @@ export async function getCompanyByOrgnr(
   orgnr: string,
   signal?: AbortSignal
 ): Promise<Company | null> {
+  const trimmed = orgnr.trim();
+  if (!trimmed) return null;
+  const target = normalizeOrgnrKey(trimmed);
+
+  try {
+    const variants = orgnrSqlVariants(trimmed);
+    if (variants.length > 0) {
+      const batch = await getCompaniesBatchClient(variants, { autoEnrich: false });
+      for (const raw of batch.companies ?? []) {
+        if (!raw || typeof raw !== "object") continue;
+        const c = mapBatchRowToCompany(raw as Record<string, unknown>);
+        if (normalizeOrgnrKey(c.orgnr) === target) return c;
+      }
+    }
+  } catch {
+    /* fall through to universe search */
+  }
+
   const result = await getUniverseCompaniesWithTotal(
     {
-      q: orgnr.trim(),
-      limit: 1,
+      q: trimmed,
+      limit: 50,
       sort: { by: "orgnr", dir: "asc" },
     },
     signal
   );
-  const row = result.companies[0];
-  if (!row || row.orgnr !== orgnr) return null;
-  return row;
+  return result.companies.find((c) => normalizeOrgnrKey(c.orgnr) === target) ?? null;
 }
 
 export async function searchCompanySummaries(
