@@ -73,6 +73,9 @@ fi
 echo "Target: ${URL%%@*}@*** (run against this DB)"
 echo ""
 
+# Note: 043_screening_features_v1.sql is superseded by 045 (full view + geo/registry columns).
+# Do not list 043 here: applying it after 045 fails with "cannot drop columns from view".
+
 for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/014_coverage_view_add_name_segments.sql \
          database/migrations/015_views_lists_labels.sql \
@@ -103,7 +106,9 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/040_companies_nace_codes.sql \
          database/migrations/041_screening_candidates_exclusion.sql \
          database/migrations/042_exemplar_report_chunks.sql \
-         database/migrations/044_screening_runs.sql; do
+         database/migrations/044_screening_runs.sql \
+         database/migrations/045_screening_features_v1_registry_geo.sql \
+         database/migrations/046_screening_website_research_companies.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"

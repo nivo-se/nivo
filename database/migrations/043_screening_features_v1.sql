@@ -1,5 +1,6 @@
 -- Read-only feature surface for deterministic screening v1 (no new tables).
 -- One row per company; joins companies + company_metrics only.
+-- Superseded for sequential migrations by 045_screening_features_v1_registry_geo.sql (do not apply 043 after 045).
 
 CREATE OR REPLACE VIEW public.screening_features_v1 AS
 SELECT
