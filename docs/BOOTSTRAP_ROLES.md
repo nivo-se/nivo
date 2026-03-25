@@ -1,8 +1,23 @@
 # Bootstrap first admin (roles in local Postgres)
 
-**No seed migration.** First admin is created either from the app (“Claim first admin”) or by manual insert. See [AUTH_AUTH0_SETUP.md](AUTH_AUTH0_SETUP.md) §11 for full detail.
+**No seed migration.** First admin is created either from the app (“Claim first admin”), by manual insert, or via **trusted-domain auto-enrollment** (see below). See [AUTH_AUTH0_SETUP.md](AUTH_AUTH0_SETUP.md) §11 for full detail.
 
-## Option A — From the app (recommended)
+## Option A1 — Trusted domain (team sign-in without manual rows)
+
+For internal deployments (e.g. Mac mini), set in API `.env`:
+
+```bash
+AUTO_APPROVE_EMAIL_DOMAINS=nivogroup.se
+```
+
+On each `POST /api/enroll` (login), if the user has **no** row in `user_roles` yet and their email domain matches:
+
+- **First** such user on an empty `user_roles` table → `admin` (+ `allowed_users` if `REQUIRE_ALLOWLIST=true`)
+- **Later** users from the same domains → `analyst` (+ allowlist if enabled)
+
+Restart the API after changing `.env`. Use only for domains you fully trust.
+
+## Option A — From the app (recommended when not using A1)
 
 1. **Run migrations** on the target DB (e.g. Mac mini):
    ```bash

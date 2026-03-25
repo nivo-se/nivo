@@ -77,7 +77,9 @@ export default function ClaimFirstAdmin() {
               Waiting for approval
             </h1>
             <p className="text-muted-foreground text-center text-sm mb-6">
-              You're signed in as {user?.email ?? user?.id}. Your account is pending — an admin needs to grant you access before you can continue.
+              You're signed in as {user?.email ?? user?.id}. Your account is pending — an admin needs to grant you access in{" "}
+              <strong>Admin → Users</strong>, or ops can set <code className="text-xs bg-muted px-1 rounded">AUTO_APPROVE_EMAIL_DOMAINS</code>{" "}
+              (e.g. <code className="text-xs bg-muted px-1 rounded">nivogroup.se</code>) on the API so team emails get a role on next login.
             </p>
             <div className="flex flex-col gap-3">
               <Button variant="ghost" className="w-full" onClick={() => signOut()}>

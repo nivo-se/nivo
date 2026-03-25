@@ -191,6 +191,7 @@ RBAC is stored in **local Postgres only** (no Supabase, no Auth0 Management API)
 - **Tables:** `user_roles` (sub, role), `allowed_users` (sub, enabled, note). Created by migration `020_user_roles_allowed_users.sql`. No seed; first admin is inserted manually after first login (see docs/BOOTSTRAP_ROLES.md).
 - **Roles:** `admin` and `analyst`. Admin can do everything; analyst is the default role. Enforced in backend via `require_role("admin")` on admin endpoints.
 - **Allowlist (optional):** Set `REQUIRE_ALLOWLIST=true` in `.env`. Then only subs listed in `allowed_users` with `enabled = true` can access protected routes (in addition to valid JWT). Default is `REQUIRE_ALLOWLIST=false`.
+- **Trusted domain auto-role (optional):** Set `AUTO_APPROVE_EMAIL_DOMAINS=nivogroup.se` (comma-separated). On login, users without a role yet get `admin` if `user_roles` is empty, otherwise `analyst`; with `REQUIRE_ALLOWLIST=true` they are also added to `allowed_users`. See [BOOTSTRAP_ROLES.md](BOOTSTRAP_ROLES.md) Option A1.
 
 **Finding a user’s sub**
 
