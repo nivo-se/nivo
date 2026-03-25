@@ -13,13 +13,15 @@ export const sellersTranslations = {
   gateButton: "Öppna",
   gateError: "Fel lösenord. Försök igen.",
   lockPage: "Lås sidan",
+  /** Kompakt etikett i topnav på smal viewport */
+  lockPageShort: "Lås",
 
-  // Nav (exakt 6)
-  navHurViArbetar: "Så jobbar vi tillsammans",
-  navVadViLetarEfter: "Vad vi letar efter",
-  navVarförAnnorlunda: "Varför vi är annorlunda",
-  navVarProcess: "Vår process",
-  navEfterAffaren: "Resan fortsätter",
+  // Nav — ett ord (kompakt topnav; fullständiga rubriker finns i sektionerna)
+  navHurViArbetar: "Tillsammans",
+  navVadViLetarEfter: "Bolag",
+  navVarförAnnorlunda: "Varför",
+  navVarProcess: "Process",
+  navEfterAffaren: "Resan",
   navKontakt: "Kontakt",
 
   // Hero
@@ -34,14 +36,18 @@ export const sellersTranslations = {
   quoteMain: "Tillsammans tar vi det som fungerar — och bygger vidare mot nästa kapitel.",
   quoteSub: "Med ambitionen att utveckla och stärka verksamheten vidare.",
 
-  // Intro (under citat)
+  // Intro (under citat) — sektion 1 på sidan
+  introTitle: "Ett partnerskap för nästa fas",
   introP1: "Du har byggt något över många år.",
-  introP1b:
-    "Att ta in en partner handlar inte bara om pris — utan om riktning, arbetssätt och förtroende.",
   introP2:
-    "Nivo är ett investeringsbolag som går in som delägare i nordiska små och medelstora bolag.",
+    "Att ta in en partner handlar inte bara om pris — utan om riktning, arbetssätt och förtroende.",
   introP3:
-    "Nivo arbetar nära entreprenörer och ledning för att utveckla verksamheten vidare — i praktiken, inte i teori.",
+    "Nivo går in som delägare i nordiska små och medelstora bolag, tillsammans med entreprenörer som vill fortsätta utveckla det de byggt.",
+  introP4:
+    "Vi arbetar nära entreprenör och ledning — i det dagliga arbetet där resultat skapas.",
+  introP5: "Fokus ligger på det som fungerar, och hur det kan bli bättre.",
+  introP6:
+    "Vi tar det som redan fungerar — och jobbar tillsammans för att göra det än mer skalbart, smartare och redo för nästa steg.",
 
   // 1. Hur vi arbetar (partnerskap, fortsatt ägande, gemensamt arbetssätt)
   hurViArbetarTitle: "Så jobbar vi tillsammans",
@@ -63,7 +69,7 @@ export const sellersTranslations = {
 
   hvNarrative3Title: "Snabba besked, lång horisont",
   hvNarrative3Body:
-    "Du ska slippa långa köer och oklar ägaragenda. Utan fondcykel eller inbyggd exit-press kan vi fatta beslut när det behövs och tänka i tag som passar bolaget — inte en extern tidsplan.",
+    "Du ska slippa långa köer och oklar ägaragenda. Utan fondcykel eller inbyggd exit-press kan vi fatta beslut när det behövs och tänka i takt som passar bolaget — inte en extern tidsplan.",
 
   hvNarrative4Title: "Digitalisering och nätverk",
   hvNarrative4P1:
@@ -95,34 +101,20 @@ export const sellersTranslations = {
   varforAnnorlundaTitle: "Varför vi är annorlunda",
 
   vaArbetssattTitle: "Arbetssätt",
-  vaArbetssattP1:
-    "Vi arbetar nära bolagen vi investerar i. Inte genom modeller eller presentationer — utan i det dagliga arbetet där resultaten faktiskt skapas.",
-  vaArbetssattP2:
-    "Vi fokuserar på det som fungerar, och förbättrar det steg för steg. Det handlar om marginaler, prissättning, struktur och tydliga prioriteringar.",
+  vaArbetssattBody:
+    "Vi arbetar nära bolagen vi investerar i — i det dagliga arbetet där resultat skapas. Vi fokuserar på det som fungerar och förbättrar det steg för steg. Som personer är vi sociala och utpräglade lagspelare som drivs av att nå resultat och att få saker och ting gjorda.",
 
   vaDigitalTitle: "Digitalisering och AI",
-  vaDigitalP1:
-    "Digitalisering och AI är en naturlig del av hur vi utvecklar bolag. Inte som ett sidospår — utan som verktyg i det dagliga arbetet.",
-  vaDigitalBulletLead: "Det kan handla om att:",
-  vaDigitalB1: "förbättra prissättning",
-  vaDigitalB2: "automatisera arbetsflöden",
-  vaDigitalB3: "skapa bättre beslutsunderlag",
-  vaDigitalP2:
-    "Alltid med samma mål: att göra verksamheten mer effektiv, mer lönsam och mer skalbar.",
+  vaDigitalBody:
+    "Vi använder digitalisering och AI för att förenkla processer, förbättra uppföljning och skapa bättre beslutsunderlag. Målet är enklare, starkare och mer effektiva bolag.",
 
   vaNatverkTitle: "Nätverk",
-  vaNatverkP1:
-    "Vi har byggt relationer med entreprenörer, operativa ledare, specialister och kapital.",
-  vaNatverkP2:
-    "När det behövs tar vi in rätt personer — för att lösa konkreta problem, stärka team eller driva utveckling framåt.",
-  vaNatverkP3:
-    "Inte som ett lager runt bolaget, utan som ett sätt att få in rätt kompetens vid rätt tillfälle.",
+  vaNatverkBody:
+    "Vi har ett starkt nätverk av entreprenörer, operativa ledare, specialister och kapital. När det behövs tar vi in rätt personer för att lösa konkreta problem och driva utveckling framåt.",
 
   vaErfarenhetTitle: "Erfarenhet",
-  vaErfarenhetP1:
-    "Vi har arbetat med att bygga, utveckla och finansiera bolag i många år.",
-  vaErfarenhetP2:
-    "Den erfarenheten använder vi praktiskt — i beslut, i prioriteringar och i hur vi driver utveckling tillsammans med entreprenören.",
+  vaErfarenhetBody:
+    "Vi har byggt, utvecklat och finansierat bolag i många år. Den erfarenheten använder vi praktiskt — i beslut, prioriteringar och genomförande.",
 
   // 4. Vår process
   varProcessTitle: "Vår process",

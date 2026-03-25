@@ -286,19 +286,19 @@ function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
       className="border-b fixed top-0 left-0 right-0 z-20 backdrop-blur-sm bg-white/90"
       style={{ borderColor: tokens.border, height: SELLERS_HEADER_HEIGHT }}
     >
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 h-full flex items-center justify-between gap-3 sm:gap-4">
+      <div className="max-w-4xl mx-auto px-3 sm:px-6 h-full flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center justify-start flex-shrink-0 min-w-0">
           <img src="/Nivo%20-%20Wordmark%20-%20black.svg" alt="Nivo" className="h-5 sm:h-6 w-auto object-contain" />
         </div>
         <nav
-          className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto overflow-y-hidden flex-nowrap justify-center min-w-0 flex-1 no-scrollbar py-1 -my-1"
+          className="flex items-center justify-center gap-0 sm:gap-1 overflow-x-auto overflow-y-hidden flex-nowrap min-w-0 flex-1 no-scrollbar py-0.5"
           aria-label="Sidsektioner"
         >
           {ANCHOR_LINKS.map(({ href, labelKey }) => (
             <a
               key={href}
               href={href}
-              className="px-2 py-1.5 text-[11px] sm:text-xs font-medium whitespace-nowrap rounded-md transition-colors hover:bg-black/[0.04]"
+              className="px-1.5 sm:px-2 py-1.5 text-[11px] sm:text-xs font-medium whitespace-nowrap rounded-md transition-colors hover:bg-black/[0.04]"
               style={{ color: tokens.textMuted }}
             >
               {t[labelKey]}
@@ -308,11 +308,13 @@ function SellersHeader({ onSignOut }: { onSignOut: () => void }) {
         <button
           type="button"
           onClick={onSignOut}
-          className="flex items-center gap-2 min-h-[44px] px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0 hover:bg-black/[0.04]"
+          className="flex items-center gap-1.5 sm:gap-2 min-h-[44px] px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors shrink-0 hover:bg-black/[0.04]"
           style={{ color: tokens.text }}
+          title={t.lockPage}
         >
-          <Lock className="h-4 w-4 shrink-0" style={{ color: tokens.textMuted }} />
-          {t.lockPage}
+          <Lock className="h-4 w-4 shrink-0" style={{ color: tokens.textMuted }} aria-hidden />
+          <span className="sm:hidden">{t.lockPageShort}</span>
+          <span className="hidden sm:inline">{t.lockPage}</span>
         </button>
       </div>
     </header>
@@ -409,19 +411,25 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </section>
 
-        {/* Intro */}
+        {/* Intro (copy: rubrik + punkter) */}
         <section className="w-full" style={{ backgroundColor: tokens.bg }}>
           <div className={SECTION_CLASS}>
             <div className="max-w-2xl mx-auto">
+              <h2
+                className="text-2xl sm:text-3xl font-semibold tracking-tight leading-snug mb-6"
+                style={{ color: tokens.text }}
+              >
+                {t.introTitle}
+              </h2>
               <BulletTextRows
-                lines={[t.introP1, t.introP1b, t.introP2, t.introP3]}
+                lines={[t.introP1, t.introP2, t.introP3, t.introP4, t.introP5, t.introP6]}
                 size="15"
               />
             </div>
           </div>
         </section>
 
-        {/* 1. Hur vi arbetar */}
+        {/* Hur vi arbetar */}
         <SectionShell title={t.hurViArbetarTitle} bg="bgAlt" id="hur-vi-arbetar">
           <div className="max-w-2xl space-y-3 mb-10 sm:mb-12" style={{ color: tokens.text }}>
             <p className="text-[15px] sm:text-base leading-relaxed">{t.hurViArbetarIngressP1}</p>
@@ -445,7 +453,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </SectionShell>
 
-        {/* 2. Vad vi letar efter */}
+        {/* Vad vi letar efter */}
         <SectionShell title={t.vadViLetarEfterTitle} id="vad-vi-letar-efter">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-12 w-full">
             <BulletRailSection title={t.vadBlock1Title} bullets={[t.vadB1, t.vadB2, t.vadB3]} />
@@ -453,36 +461,27 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </SectionShell>
 
-        {/* 3. Varför vi är annorlunda */}
+        {/* Varför vi är annorlunda */}
         <SectionShell title={t.varforAnnorlundaTitle} bg="bgAlt" id="varfor-annorlunda">
           <div className="space-y-10 sm:space-y-11">
             <RailSubsection title={t.vaArbetssattTitle}>
-              <p>{t.vaArbetssattP1}</p>
-              <p>{t.vaArbetssattP2}</p>
+              <p>{t.vaArbetssattBody}</p>
             </RailSubsection>
             <RailSubsection title={t.vaDigitalTitle}>
-              <p>{t.vaDigitalP1}</p>
-              <p className="font-medium text-[15px] sm:text-base">{t.vaDigitalBulletLead}</p>
-              <div className="pt-0.5">
-                <BulletTextRows lines={[t.vaDigitalB1, t.vaDigitalB2, t.vaDigitalB3]} size="15" />
-              </div>
-              <p className="pt-1">{t.vaDigitalP2}</p>
+              <p>{t.vaDigitalBody}</p>
             </RailSubsection>
             <RailSubsection title={t.vaNatverkTitle}>
-              <p>{t.vaNatverkP1}</p>
-              <p>{t.vaNatverkP2}</p>
-              <p>{t.vaNatverkP3}</p>
+              <p>{t.vaNatverkBody}</p>
             </RailSubsection>
             <RailSubsection title={t.vaErfarenhetTitle}>
-              <p>{t.vaErfarenhetP1}</p>
-              <p>{t.vaErfarenhetP2}</p>
+              <p>{t.vaErfarenhetBody}</p>
             </RailSubsection>
           </div>
         </SectionShell>
 
-        {/* 4. Vår process */}
+        {/* Vår process */}
         <SectionShell title={t.varProcessTitle} id="var-process">
-          <ol className="space-y-5 mb-8 sm:mb-10 max-w-2xl">
+          <ol className="space-y-5 mb-8 max-w-2xl">
             {[t.vp1, t.vp2, t.vp3, t.vp4].map((step, i) => (
               <li
                 key={step}
@@ -507,7 +506,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </p>
         </SectionShell>
 
-        {/* 5. Efter affären */}
+        {/* Efter affären */}
         <SectionShell title={t.efterAffarenTitle} bg="bgAlt" id="efter-affaren">
           <div className="max-w-2xl">
             <div className="space-y-3 mb-10 sm:mb-12" style={{ color: tokens.text }}>
@@ -527,7 +526,7 @@ function SellersContent({ onSignOut }: { onSignOut: () => void }) {
           </div>
         </SectionShell>
 
-        {/* 6. Kontakt */}
+        {/* Kontakt */}
         <SectionShell title={t.kontaktSectionTitle} id="kontakt">
           <p className="text-[15px] sm:text-base leading-relaxed mb-6 max-w-2xl" style={{ color: tokens.text }}>
             {t.kontaktBody}
