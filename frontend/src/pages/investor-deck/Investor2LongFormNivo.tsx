@@ -92,22 +92,36 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-white/95 mt-4">
               {t.heroTagline}
             </p>
-            <div id="why-invest" className="mt-6 max-w-2xl mx-auto text-left rounded-lg p-4 sm:p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.shortVersion}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatPara1}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatParaPartners}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryWhatPara2}</p>
-              <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryValueLabel}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
-              <p className="text-base sm:text-lg leading-relaxed mb-4 font-medium" style={{ color: tokens.text }}>{t.philosophyTagline}</p>
-              <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
-              <ul className="space-y-1 text-base sm:text-lg mb-4 pl-3" style={{ color: tokens.text }}>
-                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
-                <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet2}</li>
-              </ul>
-              <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryTeamLabel}</p>
-              <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.execSummaryTeamPara1}</p>
+            <div
+              id="why-invest"
+              className="mt-6 w-full max-w-[720px] mx-auto text-left rounded-xl border scroll-mt-[100px] backdrop-blur-[12px] p-6 sm:p-8 md:px-10 md:py-9"
+              style={{ backgroundColor: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)" }}
+            >
+              <p className="text-xs sm:text-sm font-medium uppercase tracking-[0.14em] mb-8 text-white/55">{t.shortVersion}</p>
+              <div className="space-y-10">
+                <div className="space-y-3">
+                  <p className="text-lg sm:text-xl leading-[1.65] text-white/88">{t.execSummaryWhatPara1}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryWhatParaPartners}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryWhatPara2}</p>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-white/68">{t.execSummaryValueLabel}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryValueFlow}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryValueEdge}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/55 italic font-normal">{t.philosophyTagline}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-white/68">{t.execSummaryReturnsLabel}</p>
+                  <ul className="space-y-1.5 text-base sm:text-lg pl-3 text-white/78 leading-[1.65]">
+                    <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-white/45" aria-hidden />{t.shortVersionBullet1}</li>
+                    <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0 bg-white/45" aria-hidden />{t.shortVersionBullet2}</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-white/68">{t.execSummaryTeamLabel}</p>
+                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryTeamPara1}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
