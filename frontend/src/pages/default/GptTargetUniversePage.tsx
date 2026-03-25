@@ -263,26 +263,32 @@ export default function GptTargetUniversePage() {
             </div>
           ) : (
             <div
-              className="min-w-0 max-w-full overflow-x-auto rounded-md border [&_th]:h-10 [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-2"
+              className="min-w-0 max-w-full overflow-x-auto rounded-md border [&_th]:h-10 [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-3"
               role="region"
               aria-label="GPT target universe companies"
             >
-              <Table className="w-full min-w-[1080px] table-fixed">
+              <Table className="w-full min-w-[860px] table-auto">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-10">
+                    <TableHead className="w-8 max-w-8 px-1.5 text-center">
                       <span className="sr-only">Select</span>
                     </TableHead>
-                    <TableHead className="w-10">
+                    <TableHead className="w-9 max-w-9 px-1 text-center">
                       <span className="sr-only">Expand</span>
                     </TableHead>
-                    <TableHead className="w-14">
-                      <Button variant="ghost" size="sm" className="-ml-2 h-8 gap-1" onClick={() => toggleSort("rank")}>
-                        Rank
-                        <ArrowUpDown className="h-3 w-3" />
+                    <TableHead className="w-11 max-w-11 px-1.5 whitespace-nowrap">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-0.5 px-1 text-xs"
+                        onClick={() => toggleSort("rank")}
+                        aria-label="Sort by rank"
+                      >
+                        #
+                        <ArrowUpDown className="h-3 w-3 shrink-0" />
                       </Button>
                     </TableHead>
-                    <TableHead className="min-w-[14rem] w-[22%]">
+                    <TableHead className="min-w-[12rem] max-w-[16rem]">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -293,8 +299,8 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead>Fit</TableHead>
-                    <TableHead>
+                    <TableHead className="whitespace-nowrap">Fit</TableHead>
+                    <TableHead className="whitespace-nowrap">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -305,7 +311,7 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead>
+                    <TableHead className="whitespace-nowrap">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -316,14 +322,18 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead className="w-[40%] min-w-[24rem] text-left">Reason</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="min-w-[min(100%,28rem)] text-left">
+                      <span className="text-foreground">Fit summary</span>
+                      <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                        ChatGPT prompt & links
+                      </span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {displayRows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-10">
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
                         No rows. Adjust filters or set{" "}
                         <code className="text-xs bg-muted px-1 rounded">GPT_TARGET_UNIVERSE_RUN_ID</code> on the API.
                       </TableCell>
@@ -335,32 +345,34 @@ export default function GptTargetUniversePage() {
                       return (
                         <Fragment key={row.orgnr}>
                           <TableRow>
-                            <TableCell>
+                            <TableCell className="w-8 max-w-8 px-1.5 py-3 [&:has([role=checkbox])]:pr-0">
                               <Checkbox
                                 checked={selected.has(row.orgnr)}
                                 onCheckedChange={() => toggleSelected(row.orgnr)}
                                 aria-label={`Select ${row.company_name ?? row.orgnr}`}
                               />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="w-9 max-w-9 px-1 py-3 text-center">
                               {row.triage ? (
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8"
+                                  className="h-7 w-7"
                                   aria-expanded={open}
                                   aria-label={open ? "Hide triage JSON" : "Show triage JSON"}
                                   onClick={() => toggleExpanded(row.orgnr)}
                                 >
                                   <ChevronDown
-                                    className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+                                    className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
                                   />
                                 </Button>
                               ) : null}
                             </TableCell>
-                            <TableCell className="text-muted-foreground tabular-nums">{row.rank ?? "—"}</TableCell>
-                            <TableCell className="max-w-0 min-w-[14rem] w-[22%] align-top">
+                            <TableCell className="w-11 max-w-11 px-1.5 py-3 text-right text-muted-foreground tabular-nums">
+                              {row.rank ?? "—"}
+                            </TableCell>
+                            <TableCell className="max-w-[16rem] align-top">
                               <div className="flex min-w-0 flex-col gap-0.5">
                                 <Link
                                   to={`/company/${encodeURIComponent(row.orgnr)}`}
@@ -399,45 +411,45 @@ export default function GptTargetUniversePage() {
                             <TableCell className="tabular-nums">
                               {row.blended_score != null ? row.blended_score.toFixed(2) : "—"}
                             </TableCell>
-                            <TableCell className="w-[40%] min-w-[24rem] align-top text-sm text-muted-foreground">
-                              <p
-                                className="line-clamp-5 whitespace-normal break-words leading-snug"
-                                title={reason.length > 160 ? reason : undefined}
-                              >
-                                {reason || "—"}
-                              </p>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1 flex-wrap">
-                                {row.gpt_official_website_url ? (
-                                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                    <a
-                                      href={row.gpt_official_website_url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      title="Open website"
-                                    >
-                                      <ExternalLink className="h-4 w-4" />
-                                    </a>
-                                  </Button>
-                                ) : null}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-1"
-                                  title="Open a ready-to-paste prompt for ChatGPT Deep Research"
-                                  onClick={() => setPromptModalRow(row)}
+                            <TableCell className="align-top">
+                              <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:gap-5">
+                                <div
+                                  className="min-h-[3rem] min-w-0 flex-1 max-h-56 overflow-y-auto rounded-md border border-border/50 bg-muted/20 px-3 py-2.5 text-sm leading-relaxed text-muted-foreground"
+                                  title={reason.length > 280 ? reason : undefined}
                                 >
-                                  <ClipboardCopy className="h-3.5 w-3.5" />
-                                  ChatGPT prompt
-                                </Button>
+                                  {reason || "—"}
+                                </div>
+                                <div className="flex shrink-0 flex-row flex-wrap items-center gap-2 lg:w-[11rem] lg:flex-col lg:items-stretch">
+                                  {row.gpt_official_website_url ? (
+                                    <Button variant="outline" size="sm" className="h-9 w-full gap-2" asChild>
+                                      <a
+                                        href={row.gpt_official_website_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                                        Website
+                                      </a>
+                                    </Button>
+                                  ) : null}
+                                  <Button
+                                    type="button"
+                                    variant="primary"
+                                    size="sm"
+                                    className="h-9 w-full gap-2"
+                                    title="Open a ready-to-paste prompt for ChatGPT Deep Research"
+                                    onClick={() => setPromptModalRow(row)}
+                                  >
+                                    <ClipboardCopy className="h-3.5 w-3.5 shrink-0" />
+                                    ChatGPT prompt
+                                  </Button>
+                                </div>
                               </div>
                             </TableCell>
                           </TableRow>
                           {row.triage && open ? (
                             <TableRow className="bg-muted/30 hover:bg-muted/30">
-                              <TableCell colSpan={9} className="p-4">
+                              <TableCell colSpan={8} className="p-4">
                                 <pre className="text-xs overflow-x-auto whitespace-pre-wrap break-words max-h-64 overflow-y-auto">
                                   {JSON.stringify(row.triage, null, 2)}
                                 </pre>
