@@ -15,11 +15,11 @@ export const sellersTranslations = {
   lockPage: "Lås sidan",
 
   // Nav (exakt 6)
-  navHurViArbetar: "Hur vi arbetar",
+  navHurViArbetar: "Så jobbar vi tillsammans",
   navVadViLetarEfter: "Vad vi letar efter",
   navVarförAnnorlunda: "Varför vi är annorlunda",
   navVarProcess: "Vår process",
-  navEfterAffaren: "Efter affären",
+  navEfterAffaren: "Resan fortsätter",
   navKontakt: "Kontakt",
 
   // Hero
@@ -42,73 +42,34 @@ export const sellersTranslations = {
   introP3:
     "Nivo arbetar nära entreprenörer och ledning för att utveckla verksamheten vidare — i praktiken, inte i teori.",
 
-  // 1. Hur vi arbetar
-  hurViArbetarTitle: "Hur vi arbetar",
+  // 1. Hur vi arbetar (partnerskap, fortsatt ägande, gemensamt arbetssätt)
+  hurViArbetarTitle: "Så jobbar vi tillsammans",
 
-  hvPartnerskapTitle: "Partnerskap",
-  hvPartnerskapB1: "Nivo bygger bolaget tillsammans med entreprenören",
-  hvPartnerskapB2: "Tydlig rollfördelning mellan ägare och ledning",
-  hvPartnerskapB3: "Beslut tas gemensamt, med bolagets bästa i fokus",
+  hurViArbetarIngress:
+    "När du tar in oss går vi in som partner — inte som någon som ska ta över det du byggt. Du förblir ägare och vi arbetar sida vid sida med den som känner bolaget bäst. Beslut och prioriteringar tar vi nära verksamheten, med tydliga roller och en riktning vi formar gemensamt.",
 
-  hvBeslutTitle: "Beslut",
-  hvBeslutB1: "Korta beslutsvägar och tydliga svar",
-  hvBeslutB2: "Fokus på det som faktiskt spelar roll",
-  hvBeslutB3: "Prioriteringar sätts och följs upp",
+  hvNarrative1Title: "Gemensam riktning, tydliga roller",
+  hvNarrative1Body:
+    "Vi sätter mål och prioriteringar ihop. Din kunskap om kunder, marknad och kultur möter vår erfarenhet av struktur och operativ utveckling. Alla ska veta vem som driver vad — så att tiden går till att bygga bolaget, inte till att reda ut ansvar.",
 
-  hvAgarrollTitle: "Ägarroll",
-  hvAgarrollB1: "Aktiv i strategi och utveckling",
-  hvAgarrollB2: "Inte inne och stör i vardagen",
-  hvAgarrollB3: "Fokus på att stärka, inte ta över",
+  hvNarrative2Title: "Det som faktiskt driver resultat",
+  hvNarrative2Body:
+    "Vi lägger kraften på marginaler, prissättning, leverans och organisation — det som märks i siffrorna och i vardagen. Vi satsar gärna på enkla, hållbara förbättringar i stället för stora paket som aldrig landar.",
 
-  hvOperativTitle: "Operativ utveckling",
-  hvOperativB1: "Förbättra marginaler, prissättning och struktur",
-  hvOperativB2: "Tydliggöra fokus och riktning i bolaget",
-  hvOperativB3: "Arbeta med kontinuerliga förbättringar över tid",
+  hvNarrative3Title: "Snabba besked, lång horisont",
+  hvNarrative3Body:
+    "Du ska slippa långa köer och oklar ägaragenda. Utan fondcykel eller inbyggd exit-press kan vi fatta beslut när det behövs och tänka i tag som passar bolaget — inte en extern tidsplan.",
 
-  hvDigitalTitle: "Digitalisering och AI",
-  hvDigitalB1: "Identifiera var teknik faktiskt gör skillnad",
-  hvDigitalB2: "Automatisera där det förenklar och sparar tid",
-  hvDigitalB3: "Använda AI som ett verktyg – inte ett buzzword",
+  hvNarrative4Title: "Teknik och nätverk när det gör skillnad",
+  hvNarrative4Body:
+    "Digitalisering och AI använder vi bara där de verkligen underlättar arbetet. Behövs särskild kompetens eller nya kontakter kopplar vi in människor från nätverket så att ni inte står ensamma.",
 
-  hvNatverkTitle: "Nätverk",
-  hvNatverkB1: "Tillgång till operativ och industriell erfarenhet",
-  hvNatverkB2: "Stöd vid rekrytering och nyckelroller",
-  hvNatverkB3: "Rätt kompetens in när det behövs",
-
-  subgridTitle: "Så utvecklar Nivo bolag i praktiken",
-
-  sgGrowthTitle: "Tillväxt och riktning",
-  sgGrowthB1: "Tydlig plan för hur bolaget ska utvecklas",
-  sgGrowthB2: "Säkerställa rätt kapabiliteter",
-  sgGrowthB3: "Driva initiativ som faktiskt gör skillnad",
-
-  sgOrgTitle: "Organisation",
-  sgOrgB1: "Klargöra roller och ansvar",
-  sgOrgB2: "Stärka team där det behövs",
-  sgOrgB3: "Skapa en struktur som håller över tid",
-
-  sgDecisionTitle: "Nyckeltal och beslut",
-  sgDecisionB1: "Ett fåtal tydliga nyckeltal",
-  sgDecisionB2: "Beslut baserade på fakta och erfarenhet",
-  sgDecisionB3: "Löpande uppföljning utan onödig komplexitet",
-
-  sgSystemsTitle: "System och verktyg",
-  sgSystemsB1: "Uppgradera det som är affärskritiskt",
-  sgSystemsB2: "Införa verktyg som förenklar arbetet",
-  sgSystemsB3: "Använda AI där det ger konkret effekt",
-
-  sgExecutionTitle: "Genomförande",
-  sgExecutionB1: "Förbättra sälj, prissättning och leverans",
-  sgExecutionB2: "Få saker gjorda – inte bara planerade",
-  sgExecutionB3: "Små förbättringar som bygger värde över tid",
-
-  sgCultureTitle: "Kultur",
-  sgCultureB1: "Tydliga mål och riktning",
-  sgCultureB2: "Synlig progression i arbetet",
-  sgCultureB3: "En arbetstakt som är hållbar",
+  hvNarrative5Title: "Kompletterar — tar inte över",
+  hvNarrative5Body:
+    "Din expertis och dina relationer är centrala i nästa fas. Vi finns där för att stärka och avlasta där det behövs — inte för att köra över eller fasa ut det som redan fungerar.",
 
   hurViArbetarClosing:
-    "Nivo arbetar pragmatiskt och fokuserar på det som faktiskt driver resultat i varje bolag.",
+    "I praktiken betyder det här ett arbetssätt som är pragmatiskt, nära bolaget och inriktat på det som skapar värde över tid.",
 
   // 2. Vad vi letar efter (2×3 i kort)
   vadViLetarEfterTitle: "Vad vi letar efter",
@@ -147,12 +108,30 @@ export const sellersTranslations = {
   vp4: "Genomförande – strukturerat hela vägen",
   varProcessClosing: "Nivo är raka i återkopplingen och snabba i besluten.",
 
-  // 5. Efter affären
-  efterAffarenTitle: "Efter affären",
-  eaB1: "Du kan vara kvar som delägare och fortsätta driva bolaget",
-  eaB2: "Nivo tar ansvar för struktur, riktning och utveckling",
-  eaB3: "Nivo bygger vidare tillsammans med dig, steg för steg",
-  efterAffarenClosing: "Det är i samarbetet mellan oss som värdet skapas.",
+  // 5. Efter affären (fortsatt ägande, gemensam utveckling — ingen “takeover”-ton)
+  efterAffarenTitle: "Resan fortsätter",
+
+  efterAffarenIngress:
+    "Affären är inte slutstationen — den är starten på nästa etapp. Du är kvar som ägare, med drivkraften och kunskapen om bolaget intakt. Vi kliver in för att stärka och komplettera det ni redan byggt, i ett partnerskap där samarbetet är själva motorn i värdeskapandet.",
+
+  eaNarrative1Title: "Du fortsätter äga och vara viktig",
+  eaNarrative1Body:
+    "Det här handlar inte om att sälja ut och kliva av. Du tar in en partner för att kunna utveckla vidare — och vi vill att du fortsätter vara aktiv. Din närvaro är en tillgång vi räknar med, inte något som ska trappas ner.",
+
+  eaNarrative2Title: "Utvecklingen sker tillsammans",
+  eaNarrative2Body:
+    "Riktning och tempo formas gemensamt, nära kunder och medarbetare. Du bidrar med sanningen om verksamheten; vi bidrar med struktur, tydlighet och erfarenhet från liknande resor.",
+
+  eaNarrative3Title: "En partner som lyfter — inte ersätter",
+  eaNarrative3Body:
+    "Efter affären ska det kännas tydligt: vi är med för att göra dig och bolaget starkare, inte för att ta över din roll eller flytta bort besluten från dig och ledningen.",
+
+  eaNarrative4Title: "Trygghet utan jakten på nästa exit",
+  eaNarrative4Body:
+    "Vi bygger för långsiktig utveckling, utan stress över att någon annans tidslinje ska styra prioriteringarna. Det ger utrymme att investera i rätt saker i rätt tempo.",
+
+  efterAffarenClosing:
+    "Kort sagt: du behåller ägandet och förtroendet i bolaget — och får en partner som vill gå vidare med dig, inte i stället för dig.",
 
   // 6. Kontakt
   kontaktSectionTitle: "Kontakt",
