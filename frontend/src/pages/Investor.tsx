@@ -223,13 +223,18 @@ function InvestorShortForm({
               <p className="text-xl sm:text-2xl font-semibold max-w-2xl mx-auto leading-snug text-white">
                 {t.oneLiner}
               </p>
+              <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-white/95 mt-4">
+                {t.heroTagline}
+              </p>
               <div id="why-invest" className="mt-6 max-w-2xl mx-auto text-left rounded-lg p-4 sm:p-5 border scroll-mt-[100px]" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
                 <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.shortVersion}</p>
                 <p className="text-base sm:text-lg leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatPara1}</p>
+                <p className="text-base sm:text-lg leading-relaxed mb-2" style={{ color: tokens.text }}>{t.execSummaryWhatParaPartners}</p>
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryWhatPara2}</p>
                 <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryValueLabel}</p>
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueFlow}</p>
                 <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.execSummaryValueEdge}</p>
+                <p className="text-base sm:text-lg leading-relaxed mb-4 font-medium" style={{ color: tokens.text }}>{t.philosophyTagline}</p>
                 <p className="text-sm font-semibold mb-1" style={{ color: tokens.text }}>{t.execSummaryReturnsLabel}</p>
                 <ul className="space-y-1 text-base sm:text-lg mb-4 pl-3" style={{ color: tokens.text }}>
                   <li className="flex items-start gap-1.5"><span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />{t.shortVersionBullet1}</li>
@@ -248,12 +253,21 @@ function InvestorShortForm({
           <p className="text-lg sm:text-xl leading-relaxed mb-4" style={{ color: tokens.text }}>
             {t.companiesIntro}
           </p>
-          <p className="text-lg sm:text-xl leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
+          <p className="text-lg sm:text-xl leading-relaxed mb-4 font-semibold" style={{ color: tokens.text }}>
             {t.companiesIntroFollowUp}
           </p>
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryModelLabel}</p>
           <p className="text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
+            {t.overviewWhatWeDoClosing}
+          </p>
+          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryModelLabel}</p>
+          <p className="text-base leading-relaxed mb-3" style={{ color: tokens.text }}>
             {t.execSummaryModelSentence}
+          </p>
+          <p className="text-base leading-relaxed mb-3" style={{ color: tokens.text }}>
+            {t.execSummaryModelFounders}
+          </p>
+          <p className="text-base leading-relaxed mb-6 font-medium" style={{ color: tokens.text }}>
+            {t.execSummaryModelClosing}
           </p>
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryWhyLabel}</p>
           <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>
@@ -268,9 +282,12 @@ function InvestorShortForm({
             </div>
           </div>
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryEdgeLabel}</p>
-          <p className="text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
-            {t.sourcingEngine}
-          </p>
+          <div className="space-y-3 text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
+            <p>{t.sourcingEdgeOverview1}</p>
+            <p>{t.sourcingEdgeOverview2}</p>
+            <p>{t.sourcingEdgeOverview3}</p>
+            <p className="font-medium">{t.sourcingEdgeOverviewClosing}</p>
+          </div>
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
           <div id="structure" className="pt-6 pb-6 border-t border-b mb-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
@@ -298,13 +315,16 @@ function InvestorShortForm({
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
                 <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
               </div>
+              <p className="col-span-2 text-sm sm:text-base leading-relaxed pt-1" style={{ color: tokens.text }}>{t.investmentHorizonNote}</p>
             </div>
           </div>
-          <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>The target acquisition capital is SEK 1,000m. Initially investments are executed on a deal-by-deal basis, with capital raised per transaction.</p>
+          <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
+          <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
+          <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
           <br />
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
           <ul className="space-y-2 pl-3">
-            {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
+            {[t.capability1, t.capability2, t.capability3, t.capability4, t.capability5].map((item) => (
               <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
                 <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                 <span>{item}</span>
@@ -345,6 +365,17 @@ function InvestorShortForm({
           <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.investmentResultLabel}</p>
           <p className="text-base sm:text-lg leading-relaxed font-medium" style={{ color: tokens.text }}>{t.investmentResult}</p>
         </div>
+      </Section>
+
+      <Section title={t.ourEdgeTitle} id="our-edge" bg="bgAlt">
+        <ul className="space-y-2 pl-3 max-w-2xl">
+          {[t.ourEdge1, t.ourEdge2, t.ourEdge3, t.ourEdge4, t.ourEdge5, t.ourEdge6].map((item) => (
+            <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
+              <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       {/* Opportunity — full section with cards (same as long form) */}
@@ -477,17 +508,22 @@ function InvestorShortForm({
       <Section title={t.valueCreation} id="value-creation">
         <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.operatingToolkitTitle}</p>
         <div className="space-y-4 mb-6">
-          {[
-            { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
-            { titleKey: "operatingToolkit2Title" as const, textKey: "operatingToolkit2Text" as const },
-            { titleKey: "operatingToolkit3Title" as const, textKey: "operatingToolkit3Text" as const },
-            { titleKey: "operatingToolkit4Title" as const, textKey: "operatingToolkit4Text" as const },
-            { titleKey: "operatingToolkit5Title" as const, textKey: "operatingToolkit5Text" as const },
-            { titleKey: "operatingToolkit6Title" as const, textKey: "operatingToolkit6Text" as const },
-          ].map(({ titleKey, textKey }) => (
-            <div key={titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[titleKey]}</p>
-              <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>{t[textKey]}</p>
+          {(
+            [
+              { titleKey: "operatingToolkit1Title" as const, textKey: "operatingToolkit1Text" as const },
+              { titleKey: "operatingToolkit2Title" as const, textKey: "operatingToolkit2Text" as const },
+              { titleKey: "operatingToolkit3Title" as const, textKey: "operatingToolkit3Text" as const },
+              { titleKey: "operatingToolkit4Title" as const, textKey: "operatingToolkit4Text" as const },
+              { titleKey: "operatingToolkit5Title" as const, textKey: "operatingToolkit5Text" as const, extraKey: "operatingToolkitExecutionExtra" as const },
+              { titleKey: "operatingToolkit6Title" as const, textKey: "operatingToolkit6Text" as const },
+            ] as const
+          ).map((row) => (
+            <div key={row.titleKey} className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+              <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t[row.titleKey]}</p>
+              <p className="text-sm leading-relaxed" style={{ color: tokens.text }}>{t[row.textKey]}</p>
+              {"extraKey" in row ? (
+                <p className="text-sm leading-relaxed mt-2 opacity-95" style={{ color: tokens.text }}>{t[row.extraKey]}</p>
+              ) : null}
             </div>
           ))}
         </div>
