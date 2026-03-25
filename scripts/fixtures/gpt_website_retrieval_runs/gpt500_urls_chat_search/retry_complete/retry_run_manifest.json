@@ -1,0 +1,13 @@
+{
+  "script": "gpt_batch_website_retry_empty.py",
+  "created_at_utc": "2026-03-25T09:22:04Z",
+  "git_commit": "ca0725798e26d9393c8e6b046fe49161e17e4309",
+  "prior_merged_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/merged_urls.csv",
+  "pool_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
+  "out_complete_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_runs/gpt500_urls_chat_search/retry_complete/merged_urls_complete.csv",
+  "model": "gpt-4o-search-preview",
+  "batch_size": 8,
+  "sleep_seconds": 22.0,
+  "total_rows": 500,
+  "non_empty_url_count": 437
+}

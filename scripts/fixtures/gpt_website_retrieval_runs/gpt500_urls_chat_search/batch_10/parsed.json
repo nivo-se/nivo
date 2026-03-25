@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556578-0250",
+      "company_name": "C. Gustafsson Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556495-7297",
+      "company_name": "Protek Projektstyrning i G\u000f6teborg AB",
+      "official_website_url": "https://www.protek-projektstyrning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found on multiple business directories, matching company details."
+    },
+    {
+      "orgnr": "556733-2969",
+      "company_name": "Datav\u00000e4xt AB",
+      "official_website_url": "https://datavaxt.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556571-7120",
+      "company_name": "Thomas o Marianne Alfredsson AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556233-8961",
+      "company_name": "Norrbottens Bildemontering Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556649-7565",
+      "company_name": "Realtryck i Stockholm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556543-8941",
+      "company_name": "Citedo AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556035-5926",
+      "company_name": "Aktiebolaget Cernelle.",
+      "official_website_url": "https://cernelle.eu",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556834-1209",
+      "company_name": "Front Automation AB",
+      "official_website_url": "https://3buttongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "559053-0688",
+      "company_name": "Distriktsl\u00000e4karna i V\u00000e4stra G\u00000f6taland AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556185-3499",
+      "company_name": "Norra \u00000c5sbo Renh\u00000e5llningsaktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556655-6501",
+      "company_name": "Contribit AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556193-7086",
+      "company_name": "KAMI, Kalix Mekaniska Industrier Aktiebolag",
+      "official_website_url": "https://kami.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556800-0375",
+      "company_name": "Lomma Tak AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556070-6037",
+      "company_name": "K A Olsson & Gems Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556487-9442",
+      "company_name": "Grays Bakery AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556781-9635",
+      "company_name": "K Vent AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556921-9032",
+      "company_name": "Wellectronics AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556630-2245",
+      "company_name": "Ambulansproduktion i Sandviken AB",
+      "official_website_url": "https://www.ambulansproduktion.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556488-5720",
+      "company_name": "Actil Warehouse Trucks AB",
+      "official_website_url": "https://actil.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "559054-0315",
+      "company_name": "Bricks and Lime AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556213-0657",
+      "company_name": "Lagermetall Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556464-0497",
+      "company_name": "Ventilationsprojekt i Nyk\u00000f6ping AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556471-7477",
+      "company_name": "TP Mur & Puts Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "orgnr": "556435-6789",
+      "company_name": "Water and Laser Technology i Vansbro Aktiebolag",
+      "official_website_url": "https://www.waltech.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    }
+  ]
+}

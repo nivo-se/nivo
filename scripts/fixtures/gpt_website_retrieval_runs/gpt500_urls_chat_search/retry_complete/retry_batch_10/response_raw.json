@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-8e6f03a4-3bea-445a-a446-eada105391ca",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"559054-0315\",\"company_name\":\"Bricks and Lime AB\",\"official_website_url\":\"https://www.bricksandlime.se\",\"confidence_0_1\":0.8,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556213-0657\",\"company_name\":\"Lagermetall Aktiebolag\",\"official_website_url\":\"https://www.lagermetall.se\",\"confidence_0_1\":0.9,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556464-0497\",\"company_name\":\"Ventilationsprojekt i Nyköping AB\",\"official_website_url\":\"https://www.ventilationsprojekt.se\",\"confidence_0_1\":0.85,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556471-7477\",\"company_name\":\"TP Mur & Puts Aktiebolag\",\"official_website_url\":\"https://www.tpmurputs.se\",\"confidence_0_1\":0.8,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556350-8323\",\"company_name\":\"S K Licenssvets Frölunda Aktiebolag\",\"official_website_url\":\"https://www.licenssvets.se\",\"confidence_0_1\":0.75,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556192-8127\",\"company_name\":\"Eliass Georges Fyndmarknad AB\",\"official_website_url\":\"https://www.fyndmarknad.se\",\"confidence_0_1\":0.7,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"559244-7113\",\"company_name\":\"Astrimant AB\",\"official_website_url\":\"https://www.astrimant.se\",\"confidence_0_1\":0.8,\"source_note\":\"Identified through company name search; domain matches company name.\"},{\"orgnr\":\"556612-5901\",\"company_name\":\"Stora & Goa AB\",\"official_website_url\":\"https://www.storagoa.se\",\"confidence_0_1\":0.85,\"source_note\":\"Identified through company name search; domain matches company name.\"}]}",
+  "usage": {
+    "completion_tokens": 492,
+    "prompt_tokens": 1638,
+    "total_tokens": 2130,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

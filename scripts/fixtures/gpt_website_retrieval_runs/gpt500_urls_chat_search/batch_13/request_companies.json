@@ -1,0 +1,185 @@
+{
+  "companies": [
+    {
+      "name": "MTB Plattsättning Aktiebolag",
+      "orgnr": "556595-0036",
+      "address_country": "SE",
+      "primary_nace": "43330 Golv- och väggbeläggningsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Böttcher Nordic AB",
+      "orgnr": "556557-6401",
+      "address_country": "SE",
+      "primary_nace": "28990 Tillverkning av övriga specialmaskiner",
+      "segment_labels_json": "[\"Elektronik - Legotillverkning\", \"Elmateriel\", \"Maskinförnödenheter\", \"Elektrisk installationsmaterial - tillverkning\", \"Grossister\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Reco Port Aktiebolag",
+      "orgnr": "556487-7172",
+      "registry_homepage_url": "https://www.recoport.se",
+      "address_country": "SE",
+      "primary_nace": "25120 Tillverkning av dörrar och fönster av metall",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Metaller, legeringar\", \"Producenter\"]"
+    },
+    {
+      "name": "Muskövarvet AB",
+      "orgnr": "556675-3496",
+      "address_country": "SE",
+      "primary_nace": "33150 Reparation och underhåll av fartyg och båtar",
+      "segment_labels_json": "[\"Båtvarv, båtbyggare\", \"Reparatörer\"]"
+    },
+    {
+      "name": "OptiPack AB",
+      "orgnr": "556368-2250",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Tryckerier\"]"
+    },
+    {
+      "name": "F:a GREFS AB",
+      "orgnr": "556495-5986",
+      "address_country": "SE",
+      "primary_nace": "42110 Anläggning av vägar och motorvägar",
+      "segment_labels_json": "[\"Byggmästare\", \"Skogstjänster\", \"Väganordningar, trafikanordningar, vägarbeten\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Petro Bio AB",
+      "orgnr": "559144-1877",
+      "address_country": "SE",
+      "primary_nace": "71124 Teknisk konsultverksamhet inom energi-, miljö- och VVS-teknik",
+      "segment_labels_json": "[\"Konsulter\", \"Miljöteknik\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Axelssons i Aby AB",
+      "orgnr": "556875-2199",
+      "address_country": "SE",
+      "primary_nace": "01131 Potatisodling",
+      "segment_labels_json": "[\"Energiförsörjning\", \"Livsmedel\", \"Oljor, oljeprodukter\", \"Gasproduktion\", \"Jordbruk\", \"Jordbruk - odling\", \"Odling av potatis\", \"Producenter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Nova Park AB",
+      "orgnr": "559256-8108",
+      "address_country": "SE",
+      "primary_nace": "55102 Drift av konferensanläggningar",
+      "segment_labels_json": "[\"Konferenslokaler, kurslokaler, konferensgårdar\"]"
+    },
+    {
+      "name": "Wisest AB",
+      "orgnr": "559030-4530",
+      "address_country": "SE",
+      "primary_nace": "46510 Partihandel med datorer och kringutrustning samt programvara",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Datakonsulter\", \"Konsulter\", \"Kontorsinredningar\", \"Grossister\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "Proline Väst AB",
+      "orgnr": "556914-6771",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Sennen AB",
+      "orgnr": "556512-0762",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Doktor.se Geria Vårdcentral AB",
+      "orgnr": "556774-9055",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\", \"Omvårdnad och omsorg\"]"
+    },
+    {
+      "name": "Eurostair Produktion Aktiebolag",
+      "orgnr": "556545-6265",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Trävaror\", \"Grossister\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Klarvik AB",
+      "orgnr": "556643-7587",
+      "registry_homepage_url": "https://klarvik.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "ALO Center Aktiebolag",
+      "orgnr": "556610-7099",
+      "registry_homepage_url": "https://alocenter.se",
+      "address_country": "SE",
+      "primary_nace": "28410 Tillverkning av verktygsmaskiner för metallbearbetning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Elkrafterna i Östergötland AB",
+      "orgnr": "556645-2982",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Snickeriarbeten\"]"
+    },
+    {
+      "name": "Exellent Syd AB",
+      "orgnr": "556940-3388",
+      "registry_homepage_url": "https://www.exellentsyd.se",
+      "address_country": "SE",
+      "primary_nace": "45201 Allmän service och reparation av motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\", \"Uthyrning\"]"
+    },
+    {
+      "name": "Bastec AB",
+      "orgnr": "556346-6738",
+      "registry_homepage_url": "https://www.bastec.se",
+      "address_country": "SE",
+      "primary_nace": "58290 Utgivning av annan programvara",
+      "segment_labels_json": "[\"Datautveckling, systemutveckling, programutveckling\"]"
+    },
+    {
+      "name": "L & A Falks Lantbruksmaskiner AB",
+      "orgnr": "556742-2018",
+      "address_country": "SE",
+      "primary_nace": "46610 Partihandel med jordbruksmaskiner och -utrustning",
+      "segment_labels_json": "[\"Lantbruksmaskiner, förnödenheter\", \"Grossister\", \"Lantbruksmaskiner, förnödenheter - grossist\"]"
+    },
+    {
+      "name": "Amadeuskliniken AB",
+      "orgnr": "556740-1913",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\"]"
+    },
+    {
+      "name": "PMC i Strängnäs AB",
+      "orgnr": "556840-5582",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Nexer Insight AB",
+      "orgnr": "559217-9070",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Boardtalk AB",
+      "orgnr": "556822-1195",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Husverket AB",
+      "orgnr": "559003-4426",
+      "address_country": "SE",
+      "primary_nace": "46731 Partihandel med virke och andra byggmaterial",
+      "segment_labels_json": "[\"Hus\", \"Trävaror\", \"Grossister\", \"Trä och byggvaror - grossist\"]"
+    }
+  ]
+}

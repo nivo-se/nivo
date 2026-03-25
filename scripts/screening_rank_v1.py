@@ -185,8 +185,8 @@ DEFAULT_ALPHA = 0.45
 # Default cap on combined multiplicative penalty (YAML scoring.max_combined_penalty overrides)
 DEFAULT_MAX_COMBINED_PENALTY = 0.85
 
-# Whole-token match only (avoid "electric", "marknadsföring" false positives)
-_SHORT_TOKEN_KEYWORDS = frozenset({"el", "mark"})
+# Whole-token match only (avoid "electric", "marknadsföring", "automation" false positives)
+_SHORT_TOKEN_KEYWORDS = frozenset({"el", "mark", "mat"})
 
 # (substring, weight) — substring match on casefolded name unless token is in _SHORT_TOKEN_KEYWORDS
 _SI_SUBSTRING_WEIGHTS: Tuple[Tuple[str, float], ...] = (
@@ -314,7 +314,7 @@ def _name_tokens(name_lc: str) -> Set[str]:
 
 
 def keyword_matches_name(name_lc: str, keyword: str, tokens: Optional[Set[str]] = None) -> bool:
-    """Substring match, except short ambiguous tokens (el, mark) require whole-token match."""
+    """Substring match, except short ambiguous tokens (el, mark, mat) require whole-token match."""
     k = str(keyword).strip().casefold()
     if not k:
         return False
@@ -735,6 +735,24 @@ def weighted_distance_row(
     return d / wsum, used
 
 
+def _ranked_pass_through_str(row: pd.Series, col: str) -> str:
+    """String for CSV export; missing/NaN → empty."""
+    if col not in row.index:
+        return ""
+    v = row[col]
+    try:
+        if pd.isna(v):
+            return ""
+    except TypeError:
+        pass
+    if v is None:
+        return ""
+    s = str(v).strip()
+    if not s or s.lower() == "nan":
+        return ""
+    return s
+
+
 def component_group_scores(
     z_row: np.ndarray,
     centroid: np.ndarray,
@@ -833,6 +851,12 @@ def score_cohort(
             {
                 "orgnr": row["orgnr"],
                 "company_name": row.get("company_name"),
+                "registry_homepage_url": _ranked_pass_through_str(row, "registry_homepage_url"),
+                "address_city": _ranked_pass_through_str(row, "address_city"),
+                "address_region": _ranked_pass_through_str(row, "address_region"),
+                "address_country": _ranked_pass_through_str(row, "address_country"),
+                "primary_nace": _ranked_pass_through_str(row, "primary_nace"),
+                "segment_labels_json": _ranked_pass_through_str(row, "segment_labels_json"),
                 "base_similarity_score": best_score,
                 "total_score": final_score,
                 "layer1_product_signal": product_hit,
@@ -1023,6 +1047,12 @@ def write_csv(df: pd.DataFrame, path: Optional[Path], top: Optional[int]) -> Non
         "rank",
         "orgnr",
         "company_name",
+        "registry_homepage_url",
+        "address_city",
+        "address_region",
+        "address_country",
+        "primary_nace",
+        "segment_labels_json",
         "total_score",
         "base_similarity_score",
         "layer1_product_signal",

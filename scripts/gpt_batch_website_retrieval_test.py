@@ -21,10 +21,25 @@ Usage:
   # Or pass another ranked CSV (same columns as screening_rank_v1 --out):
   PYTHONPATH=. python3 scripts/gpt_batch_website_retrieval_test.py --input /path/to/rank.csv
 
+  # One-off: top 500 → 20 calls × 25 companies → merged_urls.csv:
+  PYTHONPATH=. python3 scripts/gpt_batch_website_urls_500.py --out-dir /tmp/gpt500_urls
+
 Requires: OPENAI_API_KEY, pydantic, openai, httpx. CSV is read with the stdlib (no pandas required).
 
-Default model is ``gpt-4o-search-preview`` (web_search + structured outputs). Override with
-``--model`` or ``GPT_WEBSITE_RETRIEVAL_MODEL`` (e.g. ``gpt-4o`` if the preview id 404s on your account).
+Default model is ``gpt-5.4-nano`` (Responses + web_search + structured outputs). Override with
+``--model`` or ``GPT_WEBSITE_RETRIEVAL_MODEL`` (e.g. ``gpt-4o`` if needed).
+
+Some API keys return 404 for ``gpt-4o-search-preview`` on **Responses**; that model works on **Chat
+Completions** with built-in search. Use ``--chat-search`` (model default
+``gpt-4o-search-preview``, override with ``--model`` or ``GPT_CHAT_SEARCH_MODEL``).
+
+Quality-first prompts (full instructions); compact input JSON saves tokens without changing meaning.
+``max_output_tokens`` default 8192 (override ``GPT_BATCH_MAX_OUTPUT_TOKENS``). Latency is still mostly
+``web_search``, not generation.
+
+Web search uses ``user_location`` (Sweden) so results favor Swedish domains and local listings. For
+higher URL recall than ``gpt-5.4-nano``, set ``GPT_WEBSITE_RETRIEVAL_MODEL=gpt-4o`` (or another
+Responses-capable model your key supports).
 """
 
 from __future__ import annotations
@@ -61,8 +76,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 logger = logging.getLogger(__name__)
 
-# Search-preview models are tuned for web_search; fall back to gpt-4o via env/CLI if unavailable.
-DEFAULT_MODEL = "gpt-4o-search-preview"
+DEFAULT_MODEL = "gpt-5.4-nano"
+DEFAULT_CHAT_SEARCH_MODEL = "gpt-4o-search-preview"
 DEFAULT_TOP_POOL = 300
 DEFAULT_SAMPLE = 20
 FIXTURE_RUNS_PARENT = REPO_ROOT / "scripts" / "fixtures" / "gpt_website_retrieval_runs"
@@ -133,18 +148,48 @@ def openai_website_batch_json_schema() -> dict[str, Any]:
     }
 
 
-def _responses_text_json_schema_kwarg() -> Dict[str, Any]:
-    """Keyword argument ``text=`` for ``client.responses.create`` structured outputs."""
+def _responses_text_config() -> Dict[str, Any]:
+    """``text=`` value for ``responses.create``: structured JSON only (no verbosity constraint)."""
     block = openai_website_batch_json_schema()
     return {
-        "text": {
-            "format": {
-                "type": "json_schema",
-                "name": block["name"],
-                "strict": block["strict"],
-                "schema": block["schema"],
-            }
+        "format": {
+            "type": "json_schema",
+            "name": block["name"],
+            "strict": block["strict"],
+            "schema": block["schema"],
+        },
+    }
+
+
+# Cap generation latency for large batches (25+ rows); raise via env if JSON truncates.
+_DEFAULT_MAX_OUTPUT_TOKENS = int(os.getenv("GPT_BATCH_MAX_OUTPUT_TOKENS", "8192"))
+
+
+def _web_search_tools() -> List[Dict[str, Any]]:
+    """Swedish-biased web search (ISO country SE) for Bolagsverket-style company lookups."""
+    if (os.getenv("GPT_WEBSITE_RETRIEVAL_NO_USER_LOCATION") or "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    ):
+        return [{"type": "web_search"}]
+    return [
+        {
+            "type": "web_search",
+            "user_location": {
+                "type": "approximate",
+                "country": "SE",
+                "city": "Stockholm",
+                "timezone": "Europe/Stockholm",
+            },
         }
+    ]
+
+
+def _responses_create_speed_kwargs() -> Dict[str, Any]:
+    return {
+        "max_output_tokens": _DEFAULT_MAX_OUTPUT_TOKENS,
+        "text": _responses_text_config(),
     }
 
 
@@ -192,6 +237,19 @@ def _read_csv_rows(path: Path) -> List[Dict[str, str]]:
     return rows
 
 
+def load_ranked_head(path: Path, n: int) -> List[Dict[str, str]]:
+    """Load CSV, sort by rank/total_score, return the first ``n`` rows (no random sampling)."""
+    rows = _read_csv_rows(path)
+    rows = _sort_pool_rows(rows)
+    head = rows[: int(n)]
+    if len(head) < int(n):
+        raise SystemExit(
+            f"CSV has only {len(head)} rows after sort; need at least {n}. "
+            "Regenerate with screening_rank_v1 --top 500 or export_gpt_website_retrieval_pool_csv.py."
+        )
+    return head
+
+
 def load_and_sample(
     path: Path,
     top_pool: int,
@@ -212,28 +270,106 @@ def load_and_sample(
     return pool, sampled
 
 
-def build_request_payload(sampled: List[Dict[str, str]]) -> List[Dict[str, str]]:
-    out: List[Dict[str, str]] = []
+def build_request_payload(sampled: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+    """Build per-company objects for the model; optional DB/registry fields when present on CSV."""
+    out: List[Dict[str, Any]] = []
+    optional_keys = (
+        "registry_homepage_url",
+        "address_city",
+        "address_region",
+        "address_country",
+        "primary_nace",
+        "segment_labels_json",
+    )
     for row in sampled:
         name = (row.get("company_name") or "").strip()
         org_raw = (row.get("orgnr") or "").strip()
-        out.append({"name": name, "orgnr": _fix_orgnr_format(org_raw)})
+        item: Dict[str, Any] = {"name": name, "orgnr": _fix_orgnr_format(org_raw)}
+        for k in optional_keys:
+            v = (row.get(k) or "").strip()
+            if v:
+                item[k] = v
+        out.append(item)
     return out
 
 
-SYSTEM_PROMPT = """You are a research assistant. For each Swedish company given (legal name + orgnr), \
-use web search to find the company's official public website (primary corporate site, not Allabolag, \
-Proff, LinkedIn, or news only). Match each output row to the same orgnr and company_name as input. \
-If you cannot find a confident official URL, set official_website_url to an empty string and lower confidence."""
+SYSTEM_PROMPT = """You are a research assistant resolving official corporate websites for Swedish
+limited companies (Aktiebolag). Input is legal name plus Swedish orgnr (format XXXXXX-XXXX).
+
+Optional fields may be present from our database (Bolagsverket/Allabolag-style enrichment):
+registry_homepage_url (known URL on file — treat as a strong hint only: confirm it is live, uses
+https, and matches this legal entity before adopting it as official_website_url; if it is wrong or
+a directory, search for the real site), address_city, address_region, address_country, primary_nace
+(industry code), segment_labels_json (industry tag JSON text). Use location and industry to
+disambiguate similar company names and to compose search queries; default country is Sweden when
+orgnr is Swedish.
+
+Use web search actively: for EACH company run multiple focused queries before giving up — combine
+legal name, distinctive tokens from the name, orgnr with and without hyphen, and Swedish terms such
+as "hemsida", "kontakt", "official site", "företaget". For names ending in "Nordic AB", "Sweden AB",
+"Sverige AB", or similar, also search the core brand or product line and the apparent parent group;
+the public site may use a group domain while still being the right corporate front door.
+
+Brand vs legal name: The Bolagsverket name may differ from the customer-facing brand (e.g.
+manufacturers selling under a product family name). Use primary_nace and segment_labels_json to
+guess trade names; search those plus "about", "företaget", orgnr. Prefer the domain whose About,
+Contact, or footer ties to THIS legal entity (orgnr or exact legal name) — even if the domain looks
+unrelated to the registered name (e.g. international product site for a Swedish AB).
+
+Regional subsidiaries (e.g. "MVB Umeå AB"): Prefer a URL for that unit if it exists; otherwise a
+regional or group site that explicitly lists this legal name or orgnr. Do not pick a short generic
+domain on acronym match alone if content does not refer to this company (risk of wrong owner).
+
+registry_homepage_url vs search: If the registry URL is wrong or generic but search finds a clearer
+official site (especially with orgnr on-page), prefer the clearer site. If registry matches the
+live entity after verification, you may use it.
+
+Holding / parent: If the AB has no standalone site but the parent or group site documents this
+entity, the group URL is acceptable; use confidence ~0.45–0.65 and say "group/holding site" in
+source_note.
+
+When to return empty: If, after several queries, you only see directories, name collisions, or no
+page plausibly tied to this orgnr/legal name, set official_website_url="" with low confidence.
+Never invent plausible domains (e.g. concatenating name tokens + .se) without search evidence that
+the site belongs to this company.
+
+Target: the company's own primary website (https), not third-party directories or social profiles.
+Reject as official_website_url: allabolag.se, proff.se, bolagsfakta.se, kreditrapporten.se,
+ratsit.se, merinfo.se, eniro.se, hitta.se, linkedin.com, facebook.com, instagram.com, and pure news
+articles. If the best match is a global .com with clear branding for that Swedish entity, that is OK.
+
+Do NOT leave official_website_url empty only because the orgnr is missing from the homepage snippet.
+If search results show a domain that clearly belongs to this company (matching name, product, or
+registered trade name), return that https root URL with honest confidence: use roughly 0.35–0.65 when
+the link is plausible but orgnr is not verified on-page, and higher when terms/privacy/contact pages
+cite the orgnr or legal name.
+
+Reserve official_website_url="" for cases where, after several distinct queries, there is still no
+reasonable domain — not when you merely saw directory pages.
+
+Every output row must use the exact orgnr and company_name from the input list (same order)."""
+
+
+def _companies_json_compact(companies: List[Dict[str, str]]) -> str:
+    return json.dumps(companies, ensure_ascii=False, separators=(",", ":"))
 
 
 def _user_prompt(companies_json: str, expect_count: int) -> str:
-    return f"""Companies (JSON array, each object has \"name\" and \"orgnr\"):
+    return f"""Companies (JSON array). Each object has \"name\" and \"orgnr\"; optional keys may
+include registry_homepage_url, address_city, address_region, address_country, primary_nace,
+segment_labels_json when available:
 {companies_json}
 
-Return a JSON object with key \"items\": an array of exactly {expect_count} objects, one per company above, \
-same order as given. Each object must include: orgnr, company_name, official_website_url (https URL or empty string), \
-confidence_0_1 (0-1), source_note (brief, what you verified)."""
+Work through the list in order. For each company, use web search until you have either (a) a
+defensible https official_website_url or (b) strong evidence that no public site exists. Prefer
+empty string over a guessed domain when you cannot tie a URL to this orgnr/legal name. When you
+choose a brand or group site, say so briefly in source_note (e.g. "product brand site, same entity
+in About" or "group site lists subsidiary").
+
+Return a JSON object with key \"items\": an array of exactly {expect_count} objects, one per company
+above, same order as given. Each object must include: orgnr, company_name, official_website_url
+(https URL or empty string only if truly none found), confidence_0_1 (0-1), source_note (brief:
+which queries/signals led to the URL, or why it is empty)."""
 
 
 def _fallback_user_prompt(companies_json: str, expect_count: int) -> str:
@@ -292,6 +428,42 @@ def _serialize_response_for_debug(response: Any) -> Dict[str, Any]:
     return out
 
 
+def _chat_completion_output_text(response: Any) -> str:
+    choices = getattr(response, "choices", None) or []
+    if not choices:
+        return ""
+    msg = getattr(choices[0], "message", None)
+    if msg is None:
+        return ""
+    return str(getattr(msg, "content", None) or "").strip()
+
+
+def serialize_batch_api_response(response: Any) -> Dict[str, Any]:
+    """Responses API or Chat Completions — unified debug dict with ``output_text``."""
+    if getattr(response, "choices", None):
+        out: Dict[str, Any] = {
+            "id": getattr(response, "id", None),
+            "model": getattr(response, "model", None),
+            "output_text": _chat_completion_output_text(response),
+        }
+        usage = getattr(response, "usage", None)
+        if usage is not None and hasattr(usage, "model_dump"):
+            out["usage"] = usage.model_dump()
+        elif usage is not None:
+            out["usage"] = str(usage)
+        out["api_kind"] = "chat_completions"
+        return out
+    out = _serialize_response_for_debug(response)
+    out["api_kind"] = "responses"
+    return out
+
+
+def batch_response_output_text(response: Any) -> str:
+    if getattr(response, "choices", None):
+        return _chat_completion_output_text(response)
+    return _response_output_text(response)
+
+
 class OpenAIBatchCallError(Exception):
     """Raised when both structured and fallback Responses calls fail."""
 
@@ -303,14 +475,14 @@ class OpenAIBatchCallError(Exception):
 def _call_openai_batch(
     client: OpenAI,
     model: str,
-    companies: List[Dict[str, str]],
+    companies: List[Dict[str, Any]],
 ) -> Tuple[Any, str, Optional[str]]:
     """
     Returns (response, mode_used, structured_format_rejection).
     mode_used: \"structured\" if response_format applied, else \"fallback_parse\".
     structured_format_rejection is set when fallback was used after the first call rejected.
     """
-    companies_json = json.dumps(companies, ensure_ascii=False, indent=2)
+    companies_json = _companies_json_compact(companies)
     expect_count = len(companies)
     user_text = _user_prompt(companies_json, expect_count)
     input_messages = [
@@ -320,12 +492,12 @@ def _call_openai_batch(
     kwargs: Dict[str, Any] = {
         "model": model,
         "input": input_messages,
-        "tools": [{"type": "web_search"}],
+        "tools": _web_search_tools(),
         "tool_choice": "required",
     }
     structured_error: Optional[str] = None
     try:
-        kwargs_fmt = {**kwargs, **_responses_text_json_schema_kwarg()}
+        kwargs_fmt = {**kwargs, **_responses_create_speed_kwargs()}
         resp = client.responses.create(**kwargs_fmt)
         return resp, "structured", None
     except Exception as e:  # noqa: BLE001 — surface any API/SDK rejection
@@ -341,8 +513,9 @@ def _call_openai_batch(
         resp = client.responses.create(
             model=model,
             input=input_fb,
-            tools=[{"type": "web_search"}],
+            tools=_web_search_tools(),
             tool_choice="required",
+            **_responses_create_speed_kwargs(),
         )
     except Exception as e2:  # noqa: BLE001
         raise OpenAIBatchCallError(
@@ -350,6 +523,40 @@ def _call_openai_batch(
             structured_rejection=structured_error,
         ) from e2
     return resp, "fallback_parse", structured_error
+
+
+def _call_openai_batch_chat_search(
+    client: OpenAI,
+    model: str,
+    companies: List[Dict[str, Any]],
+) -> Tuple[Any, str, None]:
+    """
+    Chat Completions + ``gpt-4o-search-preview`` / ``gpt-4o-mini-search-preview`` (built-in web search).
+    Same strict JSON schema as the Responses path. Use when Responses returns 404 for search-preview models.
+    """
+    companies_json = _companies_json_compact(companies)
+    expect_count = len(companies)
+    user_text = _user_prompt(companies_json, expect_count)
+    block = openai_website_batch_json_schema()
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_text},
+            ],
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": block["name"],
+                    "strict": block["strict"],
+                    "schema": block["schema"],
+                },
+            },
+        )
+        return resp, "chat_completions_search_json_schema", None
+    except Exception as e:  # noqa: BLE001
+        raise OpenAIBatchCallError(f"{type(e).__name__}: {e}") from e
 
 
 def parse_batch_from_response_text(text: str) -> WebsiteRetrievalBatchResult:
@@ -427,12 +634,20 @@ def main() -> None:
         "--model",
         type=str,
         default=None,
-        help="OpenAI model (default: env GPT_WEBSITE_RETRIEVAL_MODEL or gpt-4o-search-preview)",
+        help="OpenAI model (default: env GPT_WEBSITE_RETRIEVAL_MODEL or gpt-5.4-nano)",
     )
     parser.add_argument(
         "--head-verify",
         action="store_true",
         help="After parse, HEAD each official_website_url (short timeout per URL)",
+    )
+    parser.add_argument(
+        "--chat-search",
+        action="store_true",
+        help=(
+            "Use Chat Completions with a search-preview model (built-in search), not Responses + "
+            "web_search tool. Default model: gpt-4o-search-preview (env GPT_CHAT_SEARCH_MODEL, --model)."
+        ),
     )
     args = parser.parse_args()
     _load_dotenv()
@@ -440,7 +655,12 @@ def main() -> None:
     if not api_key or not str(api_key).strip():
         raise SystemExit("OPENAI_API_KEY is not set")
 
-    model = (args.model or os.getenv("GPT_WEBSITE_RETRIEVAL_MODEL") or DEFAULT_MODEL).strip()
+    if args.chat_search:
+        model = (
+            (args.model or os.getenv("GPT_CHAT_SEARCH_MODEL") or DEFAULT_CHAT_SEARCH_MODEL).strip()
+        )
+    else:
+        model = (args.model or os.getenv("GPT_WEBSITE_RETRIEVAL_MODEL") or DEFAULT_MODEL).strip()
 
     inp = (args.input or DEFAULT_INPUT_POOL).resolve()
     if not inp.is_file():
@@ -475,6 +695,12 @@ def main() -> None:
         "sampled_orgnrs": [c["orgnr"] for c in request_companies],
         "model": model,
         "head_verify": bool(args.head_verify),
+        "web_search_sweden_user_location": (not args.chat_search)
+        and not (
+            (os.getenv("GPT_WEBSITE_RETRIEVAL_NO_USER_LOCATION") or "").strip().lower()
+            in ("1", "true", "yes")
+        ),
+        "api": "chat_completions_search" if args.chat_search else "responses_web_search_tool",
     }
 
     write_json(out_dir / "manifest.json", manifest)
@@ -482,9 +708,14 @@ def main() -> None:
 
     client = OpenAI(api_key=api_key.strip())
     try:
-        response, mode_used, structured_rejection = _call_openai_batch(
-            client, model, request_companies
-        )
+        if args.chat_search:
+            response, mode_used, structured_rejection = _call_openai_batch_chat_search(
+                client, model, request_companies
+            )
+        else:
+            response, mode_used, structured_rejection = _call_openai_batch(
+                client, model, request_companies
+            )
     except OpenAIBatchCallError as e:
         err_payload = {
             "error": str(e),
@@ -494,12 +725,12 @@ def main() -> None:
         write_json(out_dir / "parsed.json", {"valid": False, "validation_errors": [str(e)]})
         raise SystemExit(1) from e
 
-    raw_debug = _serialize_response_for_debug(response)
+    raw_debug = serialize_batch_api_response(response)
     raw_debug["api_mode"] = mode_used
     raw_debug["structured_format_rejection"] = structured_rejection
     write_json(out_dir / "response_raw.json", raw_debug)
 
-    text = raw_debug.get("output_text") or ""
+    text = batch_response_output_text(response) or raw_debug.get("output_text") or ""
     parsed_ok: Optional[WebsiteRetrievalBatchResult] = None
     parse_errors: List[str] = []
 

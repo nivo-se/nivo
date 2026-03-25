@@ -1,0 +1,186 @@
+{
+  "companies": [
+    {
+      "name": "MORA CNC AB",
+      "orgnr": "559183-1085",
+      "registry_homepage_url": "http://www.nordiqongroup.com",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Fasadsystem i Stenkullen Aktiebolag",
+      "orgnr": "556317-9596",
+      "registry_homepage_url": "https://fasadsystem.se",
+      "address_country": "SE",
+      "primary_nace": "25110 Tillverkning av metallstommar och delar därav",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "ProChroma AB",
+      "orgnr": "556991-1497",
+      "address_country": "SE",
+      "primary_nace": "46731 Partihandel med virke och andra byggmaterial",
+      "segment_labels_json": "[\"Agenturer\", \"Bilar\", \"Bilreservdelar\", \"Färger, lacker, tapeter\", \"Kemikalier, industrikemikalier\", \"Trävaror\", \"Färger, lacker, tapeter - tillverkning\", \"Grossister\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Material Handling Modules Europe AB",
+      "orgnr": "556490-7458",
+      "registry_homepage_url": "https://www.mhmodules.com",
+      "address_country": "SE",
+      "primary_nace": "28220 Tillverkning av lyft- och godshanteringsanordningar",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Tovar Livs Aktiebolag",
+      "orgnr": "556379-1101",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Patriksson Communication AB",
+      "orgnr": "556592-7646",
+      "address_country": "SE",
+      "primary_nace": "70210 PR och kommunikation",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Per Sjögren Livs AB",
+      "orgnr": "556531-8150",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Multivac Aktiebolag",
+      "orgnr": "556328-8199",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Tribotec Aktiebolag",
+      "orgnr": "556234-6089",
+      "address_country": "SE",
+      "primary_nace": "46750 Partihandel med kemiska produkter",
+      "segment_labels_json": "[\"Grossister\", \"Kemikalier, industrikemikaleier - grossist\", \"Bränsle - grossist och detaljist\"]"
+    },
+    {
+      "name": "Sifvert Skruv Aktiebolag",
+      "orgnr": "556030-7836",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "Vertech AB",
+      "orgnr": "556624-2656",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Gummivaror\", \"Maskinförnödenheter\", \"Grossister\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Schütz Allemballage AB",
+      "orgnr": "556583-8595",
+      "registry_homepage_url": "http://www.allemballage.se",
+      "address_country": "SE",
+      "primary_nace": "38320 Återvinning av källsorterat material",
+      "segment_labels_json": "[\"Avfallshantering\"]"
+    },
+    {
+      "name": "Vekst AB",
+      "orgnr": "556998-1920",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Panthera AB",
+      "orgnr": "556762-5495",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "30920 Tillverkning av cyklar och invalidfordon",
+      "segment_labels_json": "[\"Producenter\", \"Övriga fordon\"]"
+    },
+    {
+      "name": "Aktiebolaget Thoreb",
+      "orgnr": "556201-1949",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\", \"Maskinförnödenheter\", \"Transportförmedling\", \"Grossister\", \"Kontorstjänster\"]"
+    },
+    {
+      "name": "Sänghuset Elgen AB",
+      "orgnr": "556633-5997",
+      "address_country": "SE",
+      "primary_nace": "47591 Specialiserad butikshandel med möbler för hemmet",
+      "segment_labels_json": "[\"Möbler\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Nya Eriksbo plantskola AB",
+      "orgnr": "556697-9281",
+      "address_country": "SE",
+      "primary_nace": "01302 Odling av plantskoleväxter m.m. på friland",
+      "segment_labels_json": "[\"Jordbruk\", \"Jordbruk - odling\"]"
+    },
+    {
+      "name": "Pall Cargo i Kungsbacka AB",
+      "orgnr": "556640-4421",
+      "address_country": "SE",
+      "primary_nace": "49410 Vägtransport, godstrafik",
+      "segment_labels_json": "[\"Transportförmedling\", \"Åkerier\"]"
+    },
+    {
+      "name": "Parapix AB",
+      "orgnr": "556999-4691",
+      "registry_homepage_url": "https://parapix.tv",
+      "address_country": "SE",
+      "primary_nace": "59110 Produktion av film, video och TV-program",
+      "segment_labels_json": "[\"Video, film - Inspelning, produktion\"]"
+    },
+    {
+      "name": "AB Sundplast",
+      "orgnr": "556468-7597",
+      "registry_homepage_url": "https://sundplast.se",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Set Up AB",
+      "orgnr": "556800-4328",
+      "address_country": "SE",
+      "primary_nace": "71110 Arkitektverksamhet",
+      "segment_labels_json": "[\"Arkitekter\"]"
+    },
+    {
+      "name": "TB Printsolutions AB",
+      "orgnr": "556655-0603",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Agenturer\", \"Tryckerier\", \"Agenturhandel-övrig\"]"
+    },
+    {
+      "name": "Conoa AB",
+      "orgnr": "556813-8886",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "HA Ventilation AB",
+      "orgnr": "556508-8639",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Metaller, legeringar\", \"Ventilation, luftbehandling\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "M o P Vestman Livs AB",
+      "orgnr": "556575-1715",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    }
+  ]
+}

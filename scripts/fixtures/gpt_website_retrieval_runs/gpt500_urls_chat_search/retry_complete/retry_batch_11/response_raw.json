@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-82babac3-aa3f-463d-8dba-bbdbe9626279",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556957-7959\",\"company_name\":\"Åsens Projekt AB\",\"official_website_url\":\"https://asensgroup.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on Vainu; domain matches company name and services.\"},{\"orgnr\":\"556499-0728\",\"company_name\":\"E. Södergren Livs AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found; company operates ICA Supermarket Sävja in Uppsala.\"},{\"orgnr\":\"556921-4058\",\"company_name\":\"Archus Affärsutveckling & Projektledning AB\",\"official_website_url\":\"https://archus.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"},{\"orgnr\":\"556277-1468\",\"company_name\":\"J.N. Elinstallatörer Aktiebolag\",\"official_website_url\":\"https://jnel.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"},{\"orgnr\":\"556627-2927\",\"company_name\":\"ÅMV Production Aktiebolag\",\"official_website_url\":\"https://amvproduction.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"},{\"orgnr\":\"556798-0759\",\"company_name\":\"Lone Star Shipping AB\",\"official_website_url\":\"https://lonestarshipping.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"},{\"orgnr\":\"556041-7254\",\"company_name\":\"Tjeders Industri Aktiebolag\",\"official_website_url\":\"https://tjeders.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"},{\"orgnr\":\"556252-8652\",\"company_name\":\"Medela Medical Aktiebolag\",\"official_website_url\":\"https://medela.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on company profile; domain matches company name and services.\"}]}",
+  "usage": {
+    "completion_tokens": 468,
+    "prompt_tokens": 1783,
+    "total_tokens": 2251,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

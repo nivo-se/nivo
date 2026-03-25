@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-b3f9b732-27d9-48b5-89ed-07e47921db61",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556222-7313\",\"company_name\":\"Claessons Cykel & Motor Aktiebolag\",\"official_website_url\":\"https://www.claessonsmotor.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found on multiple business directories matching company name and orgnr.\"},{\"orgnr\":\"559389-4776\",\"company_name\":\"Berkeley Company AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"556803-8789\",\"company_name\":\"Solid Beans AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"556143-2013\",\"company_name\":\"Helge Nyberg Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"556597-6684\",\"company_name\":\"Cordial AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"556295-6556\",\"company_name\":\"Svetsekonomi i Skövde Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"556450-5575\",\"company_name\":\"Karlskoga CNC Quality Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"},{\"orgnr\":\"559015-9553\",\"company_name\":\"Matbutiken Vällebergsvägen AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company may not have a public site.\"}]}",
+  "usage": {
+    "completion_tokens": 454,
+    "prompt_tokens": 1714,
+    "total_tokens": 2168,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

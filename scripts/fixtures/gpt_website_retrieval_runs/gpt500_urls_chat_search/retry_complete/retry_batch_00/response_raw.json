@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-b3cf5a07-597d-48a5-8496-41b3a2f89158",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556641-3711\",\"company_name\":\"RK Natursten AB\",\"official_website_url\":\"https://www.rk-natursten.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Byggkatalogen and Largestcompanies, matching company details.\"},{\"orgnr\":\"556915-3603\",\"company_name\":\"KE Therm AB\",\"official_website_url\":\"https://ketherm.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in Byggkatalogen, matching company details.\"},{\"orgnr\":\"556090-3493\",\"company_name\":\"Lecora AB\",\"official_website_url\":\"https://www.lecora.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"},{\"orgnr\":\"556926-1166\",\"company_name\":\"Steamery AB\",\"official_website_url\":\"https://steamery.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"},{\"orgnr\":\"556976-8640\",\"company_name\":\"Sylog Väst AB\",\"official_website_url\":\"https://www.sylog.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"},{\"orgnr\":\"556575-1061\",\"company_name\":\"Creon promotion AB\",\"official_website_url\":\"https://www.creon.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"},{\"orgnr\":\"556493-7695\",\"company_name\":\"Karlskoga Automation Aktiebolag\",\"official_website_url\":\"https://www.karlskogaautomation.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"},{\"orgnr\":\"556814-8752\",\"company_name\":\"Tillmobil i Norden AB\",\"official_website_url\":\"https://www.tillmobil.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website URL found in multiple sources, including Allabolag and company registry, matching company details.\"}]}",
+  "usage": {
+    "completion_tokens": 509,
+    "prompt_tokens": 1698,
+    "total_tokens": 2207,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

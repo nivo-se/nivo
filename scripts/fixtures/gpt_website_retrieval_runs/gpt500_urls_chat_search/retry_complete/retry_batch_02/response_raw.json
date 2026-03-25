@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-3c51f184-531e-4ded-859b-3c3d24af91b7",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556541-6582\",\"company_name\":\"Refrico Aktiebolag\",\"official_website_url\":\"https://www.refrico.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found website www.refrico.se; matches company name and address.\"},{\"orgnr\":\"556985-3970\",\"company_name\":\"Alphadev AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"556566-1724\",\"company_name\":\"Stockholms Styr-Team AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"559127-3171\",\"company_name\":\"Bohusbolagen AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"556419-1640\",\"company_name\":\"IPC Industriprojekt AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"556273-2726\",\"company_name\":\"JO Sport i Hudiksvall Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"556256-3279\",\"company_name\":\"Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"},{\"orgnr\":\"556549-5412\",\"company_name\":\"Pumphuset Sverige Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches; company directories list no website.\"}]}",
+  "usage": {
+    "completion_tokens": 445,
+    "prompt_tokens": 1695,
+    "total_tokens": 2140,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

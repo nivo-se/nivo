@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-3196eeb6-5903-496e-aff9-65735c5eda49",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556825-6753\",\"company_name\":\"Cami Stängsel AB\",\"official_website_url\":\"https://www.camigruppen.se\",\"confidence_0_1\":0.9,\"source_note\":\"Found on Largestcompanies.com; matches company name and industry.\"},{\"orgnr\":\"556914-2747\",\"company_name\":\"Swedelift AB\",\"official_website_url\":\"https://www.partillehiss.se\",\"confidence_0_1\":0.8,\"source_note\":\"Found on Largestcompanies.com; matches company name and industry.\"},{\"orgnr\":\"556647-8292\",\"company_name\":\"Gjöco AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches.\"},{\"orgnr\":\"556033-3576\",\"company_name\":\"Ifö Electric AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches.\"},{\"orgnr\":\"556596-3542\",\"company_name\":\"LIP AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"No official website found after multiple searches.\"}]}",
+  "usage": {
+    "completion_tokens": 253,
+    "prompt_tokens": 1649,
+    "total_tokens": 1902,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556541-6582",
+      "company_name": "Refrico Aktiebolag",
+      "official_website_url": "https://www.refrico.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found website www.refrico.se; matches company name and address."
+    },
+    {
+      "orgnr": "556985-3970",
+      "company_name": "Alphadev AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "556566-1724",
+      "company_name": "Stockholms Styr-Team AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "559127-3171",
+      "company_name": "Bohusbolagen AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "556419-1640",
+      "company_name": "IPC Industriprojekt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "556273-2726",
+      "company_name": "JO Sport i Hudiksvall Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "556256-3279",
+      "company_name": "Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    },
+    {
+      "orgnr": "556549-5412",
+      "company_name": "Pumphuset Sverige Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list no website."
+    }
+  ]
+}

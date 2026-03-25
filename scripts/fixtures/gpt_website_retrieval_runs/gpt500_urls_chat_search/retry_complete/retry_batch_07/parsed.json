@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556289-7164",
+      "company_name": "Malthe Winje Automation AB",
+      "official_website_url": "https://www.mwa.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from multiple sources, including company listings and directories."
+    },
+    {
+      "orgnr": "556844-4243",
+      "company_name": "Gällivare Utveckling AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "Company dissolved through merger on January 20, 2026; no active website found."
+    },
+    {
+      "orgnr": "556318-6385",
+      "company_name": "Maskin-Mekano Försäljnings Aktiebolag",
+      "official_website_url": "https://www.maskinmekano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    },
+    {
+      "orgnr": "559155-1154",
+      "company_name": "TIQQE AB",
+      "official_website_url": "https://tiqqe.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    },
+    {
+      "orgnr": "556629-8203",
+      "company_name": "Traryds Metall AB",
+      "official_website_url": "https://www.trarydsmetall.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    },
+    {
+      "orgnr": "556858-5318",
+      "company_name": "Qleano AB",
+      "official_website_url": "https://www.qleano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    },
+    {
+      "orgnr": "556527-9279",
+      "company_name": "Olsbergs Electronics AB",
+      "official_website_url": "https://www.olsbergs.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    },
+    {
+      "orgnr": "556843-4061",
+      "company_name": "Trygga Hiss i Stockholm AB",
+      "official_website_url": "https://www.tryggahiss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL confirmed from company listings and directories."
+    }
+  ]
+}

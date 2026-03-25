@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-9c818d6c-65ee-419b-b438-9e874d3377e6",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556419-1640\",\"company_name\":\"IPC Industriprojekt AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence.\"},{\"orgnr\":\"556273-2726\",\"company_name\":\"JO Sport i Hudiksvall Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence.\"},{\"orgnr\":\"556256-3279\",\"company_name\":\"Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/\",\"official_website_url\":\"https://vfb.to\",\"confidence_0_1\":0.9,\"source_note\":\"The domain vfb.to is listed as the company's website on multiple business directories, including Vainu. ([search.vainu.com](https://search.vainu.com/company/ventilationsforbattringar-i-malmo-aktiebolag-vfb-ab-omsattning-och-nyckeltal/SE5562563279/foretagsinfo?utm_source=openai)) The domain is active and corresponds to the company's name.\"},{\"orgnr\":\"556549-5412\",\"company_name\":\"Pumphuset Sverige Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence.\"},{\"orgnr\":\"556452-3453\",\"company_name\":\"HaMi AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.0,\"source_note\":\"Despite multiple searches combining the company name, organization number, and related terms, no official website could be identified. The company may not have a public online presence.\"}]}",
+  "usage": {
+    "completion_tokens": 436,
+    "prompt_tokens": 1526,
+    "total_tokens": 1962,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

@@ -1,0 +1,4512 @@
+{
+  "valid": true,
+  "created_at_utc": "2026-03-25T09:11:44Z",
+  "total_companies": 500,
+  "batch_size": 25,
+  "num_batches": 20,
+  "non_empty_url_count": 365,
+  "model": "gpt-4o-search-preview",
+  "input_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
+  "rows": [
+    {
+      "batch_index": 0,
+      "rank": "1",
+      "orgnr": "556740-5443",
+      "company_name": "Ledson Lights AB",
+      "official_website_url": "https://www.diodhuset.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry lists 'Diodhuset Sverige' as a trade name; diodhuset.se is active and matches company profile."
+    },
+    {
+      "batch_index": 0,
+      "rank": "2",
+      "orgnr": "559076-4949",
+      "company_name": "Scandia Pumps AB",
+      "official_website_url": "https://www.scandiapumps.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "3",
+      "orgnr": "556586-2058",
+      "company_name": "Älmhults Gjuteri AB",
+      "official_website_url": "https://almhultsgjuteri.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "4",
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://xperta.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "5",
+      "orgnr": "556641-3711",
+      "company_name": "RK Natursten AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "6",
+      "orgnr": "556915-3603",
+      "company_name": "KE Therm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "7",
+      "orgnr": "556212-8164",
+      "company_name": "Industriaktiebolaget Korp & Son",
+      "official_website_url": "https://www.korposon.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "8",
+      "orgnr": "556090-3493",
+      "company_name": "Lecora AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "9",
+      "orgnr": "556926-1166",
+      "company_name": "Steamery AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "10",
+      "orgnr": "556332-7351",
+      "company_name": "Smålands Stålgjuteri i Eksjö Aktiebolag",
+      "official_website_url": "https://opima.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "11",
+      "orgnr": "556976-8640",
+      "company_name": "Sylog Väst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "12",
+      "orgnr": "556575-1061",
+      "company_name": "Creon promotion AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "13",
+      "orgnr": "556493-7695",
+      "company_name": "Karlskoga Automation Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "14",
+      "orgnr": "556184-6238",
+      "company_name": "Aktiebolaget Kulleborn & Stenström",
+      "official_website_url": "https://kulleborn.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "15",
+      "orgnr": "556814-8752",
+      "company_name": "Tillmobil i Norden AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "16",
+      "orgnr": "556825-6753",
+      "company_name": "Cami Stängsel AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "17",
+      "orgnr": "556229-4529",
+      "company_name": "Anderstorp Hydraulik Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "18",
+      "orgnr": "556914-2747",
+      "company_name": "Swedelift AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "19",
+      "orgnr": "556647-8292",
+      "company_name": "Gjöco AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "20",
+      "orgnr": "556033-3576",
+      "company_name": "Ifö Electric AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "21",
+      "orgnr": "556596-3542",
+      "company_name": "LIP AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "22",
+      "orgnr": "556458-3051",
+      "company_name": "Kafab Förpackning Aktiebolag",
+      "official_website_url": "https://frontpac.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL is live and matches company details."
+    },
+    {
+      "batch_index": 0,
+      "rank": "23",
+      "orgnr": "556835-6074",
+      "company_name": "Hexis AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "24",
+      "orgnr": "556148-6845",
+      "company_name": "Ottosson Truck Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 0,
+      "rank": "25",
+      "orgnr": "556541-6582",
+      "company_name": "Refrico Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "batch_index": 1,
+      "rank": "26",
+      "orgnr": "556985-3970",
+      "company_name": "Alphadev AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "27",
+      "orgnr": "556478-5987",
+      "company_name": "Vimarhem Aktiebolag",
+      "official_website_url": "https://www.vimarhem.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 1,
+      "rank": "28",
+      "orgnr": "556828-0670",
+      "company_name": "Noxon Aktiebolag",
+      "official_website_url": "https://noxon.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "29",
+      "orgnr": "556566-1724",
+      "company_name": "Stockholms Styr-Team AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "30",
+      "orgnr": "559127-3171",
+      "company_name": "Bohusbolagen AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "31",
+      "orgnr": "556690-1285",
+      "company_name": "Galdax AB",
+      "official_website_url": "https://www.galdax.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "32",
+      "orgnr": "556343-7200",
+      "company_name": "Talurit Aktiebolag",
+      "official_website_url": "https://www.talurit.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "33",
+      "orgnr": "556419-1640",
+      "company_name": "IPC Industriprojekt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "34",
+      "orgnr": "556273-2726",
+      "company_name": "JO Sport i Hudiksvall Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "35",
+      "orgnr": "556256-3279",
+      "company_name": "Ventilationsförbättringar i Malmö Aktiebolag /VFB AB/",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "36",
+      "orgnr": "556549-5412",
+      "company_name": "Pumphuset Sverige Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "37",
+      "orgnr": "556452-3453",
+      "company_name": "HaMi AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "38",
+      "orgnr": "556128-2251",
+      "company_name": "Hallberg-Sekrom Fabriksaktiebolag",
+      "official_website_url": "https://www.hsfgroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "39",
+      "orgnr": "556307-3468",
+      "company_name": "Almnäs Bruk AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "40",
+      "orgnr": "556990-4583",
+      "company_name": "Drillab AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "41",
+      "orgnr": "556437-9427",
+      "company_name": "Nordic door Aktiebolag",
+      "official_website_url": "http://www.nordicdoor.no",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "42",
+      "orgnr": "556135-7988",
+      "company_name": "VEÅ AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "43",
+      "orgnr": "556437-5714",
+      "company_name": "Abacus Sportswear AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "44",
+      "orgnr": "556122-0798",
+      "company_name": "Aktiebolaget Systemstöd Sverige",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "45",
+      "orgnr": "556194-0437",
+      "company_name": "GLA Aircargo AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "46",
+      "orgnr": "556257-9432",
+      "company_name": "Termodyn Industri AB",
+      "official_website_url": "https://www.termodyn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "47",
+      "orgnr": "556843-3246",
+      "company_name": "NMV Industripartner AB",
+      "official_website_url": "https://forvaltning.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "48",
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as official website."
+    },
+    {
+      "batch_index": 1,
+      "rank": "49",
+      "orgnr": "556264-7817",
+      "company_name": "Lideco i Dalstorp Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 1,
+      "rank": "50",
+      "orgnr": "556207-4442",
+      "company_name": "Nola Industrier Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company directories list contact details but no web presence."
+    },
+    {
+      "batch_index": 2,
+      "rank": "51",
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on manufacturingguide.com; matches registry_homepage_url with specific page for Rosenfors Bruk."
+    },
+    {
+      "batch_index": 2,
+      "rank": "52",
+      "orgnr": "556477-8164",
+      "company_name": "VEIDEC AB",
+      "official_website_url": "https://www.veidec.com/se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on largestcompanies.com; matches company name and orgnr."
+    },
+    {
+      "batch_index": 2,
+      "rank": "53",
+      "orgnr": "556758-3702",
+      "company_name": "Mavera AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 2,
+      "rank": "54",
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "55",
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "56",
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "57",
+      "orgnr": "556900-2149",
+      "company_name": "Maskin System Europe AB",
+      "official_website_url": "https://www.mseab.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "58",
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "59",
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "60",
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "61",
+      "orgnr": "556464-4861",
+      "company_name": "Swebolt Järfälla Aktiebolag",
+      "official_website_url": "https://www.swebolt.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "62",
+      "orgnr": "556473-0801",
+      "company_name": "APC Elinstallatören Aktiebolag",
+      "official_website_url": "https://www.apcel.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "63",
+      "orgnr": "556444-9824",
+      "company_name": "Flux AB",
+      "official_website_url": "https://www.flux.nu/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "64",
+      "orgnr": "556282-0307",
+      "company_name": "Nordic Cleanware AB",
+      "official_website_url": "https://www.cleanware.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "65",
+      "orgnr": "559052-1398",
+      "company_name": "dizparc Jönköping Infrastruktur AB",
+      "official_website_url": "https://www.dizparc.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "66",
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Matches registry_homepage_url; confirmed as official website."
+    },
+    {
+      "batch_index": 2,
+      "rank": "67",
+      "orgnr": "556600-4106",
+      "company_name": "MAPTUN Performance AB",
+      "official_website_url": "https://www.maptun.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "68",
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "69",
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "70",
+      "orgnr": "556292-9322",
+      "company_name": "Norva24 Miljöhantering AB",
+      "official_website_url": "https://www.norva24.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "71",
+      "orgnr": "556314-8153",
+      "company_name": "Comex Electronics Aktiebolag",
+      "official_website_url": "https://www.comex.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "72",
+      "orgnr": "556284-4687",
+      "company_name": "System Hall AB",
+      "official_website_url": "https://www.systemhall.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Matches registry_homepage_url; confirmed as official website."
+    },
+    {
+      "batch_index": 2,
+      "rank": "73",
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "74",
+      "orgnr": "556583-1822",
+      "company_name": "Embriq AB",
+      "official_website_url": "https://www.embriq.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 2,
+      "rank": "75",
+      "orgnr": "556654-0422",
+      "company_name": "Digitalist Open Tech AB",
+      "official_website_url": "https://digitalist.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "batch_index": 3,
+      "rank": "76",
+      "orgnr": "556650-7439",
+      "company_name": "Höglands Logistik AB",
+      "official_website_url": "https://www.hlogistik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list this URL as the company's website, matching the company name and orgnr."
+    },
+    {
+      "batch_index": 3,
+      "rank": "77",
+      "orgnr": "556861-0256",
+      "company_name": "Bilx Nordic AB",
+      "official_website_url": "https://www.bilx.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list this URL as the company's website, matching the company name and orgnr."
+    },
+    {
+      "batch_index": 3,
+      "rank": "78",
+      "orgnr": "556544-0178",
+      "company_name": "Autoklaver & Desinfektorer MediCal i Göteborg AB",
+      "official_website_url": "https://www.medical.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides relevant information about autoclaves and disinfectors."
+    },
+    {
+      "batch_index": 3,
+      "rank": "79",
+      "orgnr": "556505-1314",
+      "company_name": "Amsler Hiss Aktiebolag",
+      "official_website_url": "https://www.amslerhiss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their elevator services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "80",
+      "orgnr": "556405-6249",
+      "company_name": "Aktiebolag Klädkällaren i Göteborg",
+      "official_website_url": "https://www.kladkallaren.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their clothing products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "81",
+      "orgnr": "556493-1656",
+      "company_name": "Secor AB",
+      "official_website_url": "https://www.secor.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their construction services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "82",
+      "orgnr": "556824-7588",
+      "company_name": "Unimer Plast & Gummi AB",
+      "official_website_url": "https://www.unimer.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their plastic and rubber products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "83",
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their medical equipment."
+    },
+    {
+      "batch_index": 3,
+      "rank": "84",
+      "orgnr": "556169-2699",
+      "company_name": "Andrénverken AB",
+      "official_website_url": "https://www.andrenverken.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their metal products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "85",
+      "orgnr": "556207-2396",
+      "company_name": "Sydskiffer Aktiebolag",
+      "official_website_url": "https://www.sydskiffer.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their slate products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "86",
+      "orgnr": "556437-7231",
+      "company_name": "Torshälla Industrisvets Aktiebolag",
+      "official_website_url": "https://www.torshallaindustrisvets.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their welding services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "87",
+      "orgnr": "556460-7652",
+      "company_name": "Magnusson Petfood AB",
+      "official_website_url": "https://www.magnussonpetfood.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their pet food products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "88",
+      "orgnr": "556662-4762",
+      "company_name": "Permat AB",
+      "official_website_url": "https://www.mantaholding.com",
+      "confidence_0_1": 0.6,
+      "source_note": "The registry_homepage_url is a group site; no specific site found for Permat AB."
+    },
+    {
+      "batch_index": 3,
+      "rank": "89",
+      "orgnr": "556060-2632",
+      "company_name": "Holger Andreasen Aktiebolag",
+      "official_website_url": "https://www.holgerandreasen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their industrial supplies."
+    },
+    {
+      "batch_index": 3,
+      "rank": "90",
+      "orgnr": "556194-7572",
+      "company_name": "Engelholms Glass Aktiebolag",
+      "official_website_url": "https://www.engelholmsglass.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their ice cream products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "91",
+      "orgnr": "556237-4826",
+      "company_name": "BL-INTERIÖR Aktiebolag",
+      "official_website_url": "https://www.blinterior.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their interior design services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "92",
+      "orgnr": "556371-8526",
+      "company_name": "Norteam AB",
+      "official_website_url": "https://www.norteam.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their IT consulting services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "93",
+      "orgnr": "556039-0923",
+      "company_name": "J.H. Tidbeck Aktiebolag",
+      "official_website_url": "https://www.tidbeck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their metal products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "94",
+      "orgnr": "556309-6253",
+      "company_name": "Tinter Industriförsäljning AB",
+      "official_website_url": "https://www.tinter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their industrial sales."
+    },
+    {
+      "batch_index": 3,
+      "rank": "95",
+      "orgnr": "556658-5690",
+      "company_name": "Goodfellows Infra AB",
+      "official_website_url": "https://www.goodfellowsinfra.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their infrastructure services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "96",
+      "orgnr": "556187-9387",
+      "company_name": "Färg-In Aktiebolag",
+      "official_website_url": "https://www.farg-in.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their paint products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "97",
+      "orgnr": "559169-6413",
+      "company_name": "OAKS AB",
+      "official_website_url": "https://www.oaksab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and provides information about their consulting services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "98",
+      "orgnr": "559170-6451",
+      "company_name": "Innergårdsgruppen garage & betong i Stockholm AB",
+      "official_website_url": "https://www.innergardgruppen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their construction services."
+    },
+    {
+      "batch_index": 3,
+      "rank": "99",
+      "orgnr": "556657-5535",
+      "company_name": "Rehobot Hydraulics AB",
+      "official_website_url": "https://rehobot.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the company name and provides information about their hydraulic products."
+    },
+    {
+      "batch_index": 3,
+      "rank": "100",
+      "orgnr": "556142-7427",
+      "company_name": "Aktiebolaget Hällnäs Handelsträdgård",
+      "official_website_url": "https://www.hallnas.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The website matches the company name and offers information about their gardening products."
+    },
+    {
+      "batch_index": 4,
+      "rank": "101",
+      "orgnr": "556623-2772",
+      "company_name": "Galore i Uppsala Aktiebolag",
+      "official_website_url": "https://www.galore.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found website www.galore.se listing company name and contact details matching Galore i Uppsala AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "102",
+      "orgnr": "556099-9210",
+      "company_name": "Falcks Omnibus AB",
+      "official_website_url": "https://falcksomnibus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website falcksomnibus.se lists company name, contact details, and orgnr matching Falcks Omnibus AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "103",
+      "orgnr": "556145-5469",
+      "company_name": "VS Truck AB",
+      "official_website_url": "https://www.vstruck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website vstruck.se lists company name and contact details matching VS Truck AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "104",
+      "orgnr": "556864-3141",
+      "company_name": "Bookmark Förlag AB",
+      "official_website_url": "https://www.bookmarkforlag.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bookmarkforlag.se lists company name and contact details matching Bookmark Förlag AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "105",
+      "orgnr": "556623-6450",
+      "company_name": "Bosphorus Aktiebolag",
+      "official_website_url": "https://www.bosphorus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bosphorus.se lists company name and contact details matching Bosphorus Aktiebolag."
+    },
+    {
+      "batch_index": 4,
+      "rank": "106",
+      "orgnr": "556665-6442",
+      "company_name": "EPG Projektledning AB",
+      "official_website_url": "https://www.epgprojektledning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website epgprojektledning.se lists company name and contact details matching EPG Projektledning AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "107",
+      "orgnr": "556546-2206",
+      "company_name": "Reason Studios Aktiebolag",
+      "official_website_url": "https://www.reasonstudios.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website reasonstudios.com lists company name and contact details matching Reason Studios Aktiebolag."
+    },
+    {
+      "batch_index": 4,
+      "rank": "108",
+      "orgnr": "556729-7832",
+      "company_name": "Markera AB",
+      "official_website_url": "https://www.markera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website markera.se lists company name and contact details matching Markera AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "109",
+      "orgnr": "556509-6384",
+      "company_name": "Play Box AB",
+      "official_website_url": "https://www.playbox.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website playbox.se lists company name and contact details matching Play Box AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "110",
+      "orgnr": "556195-1947",
+      "company_name": "Johpomek Aktiebolag",
+      "official_website_url": "https://www.johpomek.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website johpomek.se lists company name and contact details matching Johpomek Aktiebolag."
+    },
+    {
+      "batch_index": 4,
+      "rank": "111",
+      "orgnr": "556072-8528",
+      "company_name": "In & Finn Scandinavien AB",
+      "official_website_url": "https://www.inofinn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website inofinn.se lists company name and contact details matching In & Finn Scandinavien AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "112",
+      "orgnr": "556812-4670",
+      "company_name": "Turner & Townsend AB",
+      "official_website_url": "https://www.turnerandtownsend.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website turnerandtownsend.com lists company name and contact details matching Turner & Townsend AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "113",
+      "orgnr": "556607-8811",
+      "company_name": "Bridgepoint AB",
+      "official_website_url": "https://www.bridgepoint.eu",
+      "confidence_0_1": 0.9,
+      "source_note": "Website bridgepoint.eu lists company name and contact details matching Bridgepoint AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "114",
+      "orgnr": "556550-4866",
+      "company_name": "Presona Aktiebolag",
+      "official_website_url": "https://www.presona.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website presona.se lists company name and contact details matching Presona Aktiebolag."
+    },
+    {
+      "batch_index": 4,
+      "rank": "115",
+      "orgnr": "556651-5689",
+      "company_name": "ZilenZio AB",
+      "official_website_url": "https://www.zilenzio.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website zilenzio.se lists company name and contact details matching ZilenZio AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "116",
+      "orgnr": "559136-9110",
+      "company_name": "Svets & Mekano Produktion i Vislanda AB",
+      "official_website_url": "https://www.svetsmekano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website svetsmekano.se lists company name and contact details matching Svets & Mekano Produktion i Vislanda AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "117",
+      "orgnr": "559054-6692",
+      "company_name": "Seafrigo Nordic AB",
+      "official_website_url": "https://www.seafrigo.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website seafrigo.com lists company name and contact details matching Seafrigo Nordic AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "118",
+      "orgnr": "556615-0214",
+      "company_name": "FOBE Produktion AB",
+      "official_website_url": "https://www.fobe.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website fobe.se lists company name and contact details matching FOBE Produktion AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "119",
+      "orgnr": "556747-4514",
+      "company_name": "Widings Elektriska AB",
+      "official_website_url": "https://www.widings.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website widings.se lists company name and contact details matching Widings Elektriska AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "120",
+      "orgnr": "556617-0394",
+      "company_name": "Nordlo Jönköping AB",
+      "official_website_url": "https://www.nordlo.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website nordlo.com lists company name and contact details matching Nordlo Jönköping AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "121",
+      "orgnr": "556270-3024",
+      "company_name": "Ricana Concept AB",
+      "official_website_url": "https://www.ricana.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website ricana.se lists company name and contact details matching Ricana Concept AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "122",
+      "orgnr": "556648-1684",
+      "company_name": "Ventilationsprojekt i Norrköping AB",
+      "official_website_url": "https://www.ventilationsprojekt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website ventilationsprojekt.se lists company name and contact details matching Ventilationsprojekt i Norrköping AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "123",
+      "orgnr": "556255-6133",
+      "company_name": "Logos Payment Solutions AB",
+      "official_website_url": "https://www.logospaymentsolutions.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website logospaymentsolutions.com lists company name and contact details matching Logos Payment Solutions AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "124",
+      "orgnr": "556472-5447",
+      "company_name": "Cegeka Applications AB",
+      "official_website_url": "https://www.cegeka.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website cegeka.com lists company name and contact details matching Cegeka Applications AB."
+    },
+    {
+      "batch_index": 4,
+      "rank": "125",
+      "orgnr": "556944-0232",
+      "company_name": "J.K Livs AB",
+      "official_website_url": "https://www.jklivs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website jklivs.se lists company name and contact details matching J.K Livs AB."
+    },
+    {
+      "batch_index": 5,
+      "rank": "126",
+      "orgnr": "556458-6872",
+      "company_name": "Ventab Styr Aktiebolag",
+      "official_website_url": "https://www.ventab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Multiple sources list www.ventab.se as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "127",
+      "orgnr": "556062-4230",
+      "company_name": "Aktiebolaget Gamla Jernboden",
+      "official_website_url": "https://www.gamlajernboden.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.gamlajernboden.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "128",
+      "orgnr": "559193-0671",
+      "company_name": "SICE Nordics AB",
+      "official_website_url": "https://www.sice.com",
+      "confidence_0_1": 0.7,
+      "source_note": "SICE Nordics AB is a subsidiary of SICE, whose main website is www.sice.com."
+    },
+    {
+      "batch_index": 5,
+      "rank": "129",
+      "orgnr": "556333-6204",
+      "company_name": "Halle System AB",
+      "official_website_url": "https://www.halle.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.halle.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "130",
+      "orgnr": "556703-8202",
+      "company_name": "Inlands Luft AB",
+      "official_website_url": "https://www.inlandsluft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.inlandsluft.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "131",
+      "orgnr": "556200-0777",
+      "company_name": "Baltic Safety Products Aktiebolag (publ)",
+      "official_website_url": "https://www.baltic.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.baltic.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "132",
+      "orgnr": "556500-9072",
+      "company_name": "Carlbergs i Göteborg AB",
+      "official_website_url": "https://www.carlbergs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.carlbergs.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "133",
+      "orgnr": "556437-9740",
+      "company_name": "Industriverken i Ronneby AB",
+      "official_website_url": "https://industriverken.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "batch_index": 5,
+      "rank": "134",
+      "orgnr": "556055-5814",
+      "company_name": "Hansson PyroTech Aktiebolag",
+      "official_website_url": "https://www.hanssonpyrotech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.hanssonpyrotech.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "135",
+      "orgnr": "556271-2082",
+      "company_name": "Ellagro Örebro AB",
+      "official_website_url": "https://ellagro.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "batch_index": 5,
+      "rank": "136",
+      "orgnr": "556465-3359",
+      "company_name": "Grothkaross Aktiebolag",
+      "official_website_url": "https://www.grothkaross.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.grothkaross.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "137",
+      "orgnr": "556264-2362",
+      "company_name": "Segers Fabriker Aktiebolag",
+      "official_website_url": "https://www.segers.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.segers.com is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "138",
+      "orgnr": "556489-7600",
+      "company_name": "Säljar'n i Närke Aktiebolag",
+      "official_website_url": "https://www.saljarn.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.saljarn.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "139",
+      "orgnr": "556100-1701",
+      "company_name": "Mouldex Plast AB",
+      "official_website_url": "https://www.mouldex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.mouldex.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "140",
+      "orgnr": "556017-2065",
+      "company_name": "Klippan Yllefabrik Aktiebolag",
+      "official_website_url": "https://www.klippanyllefabrik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.klippanyllefabrik.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "141",
+      "orgnr": "556476-2093",
+      "company_name": "Draken i Reftele Aktiebolag",
+      "official_website_url": "https://www.qosina.com",
+      "confidence_0_1": 0.7,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "batch_index": 5,
+      "rank": "142",
+      "orgnr": "559057-7507",
+      "company_name": "Advisera AB",
+      "official_website_url": "https://www.advisera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.advisera.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "143",
+      "orgnr": "559011-7155",
+      "company_name": "Socionomkraft AB",
+      "official_website_url": "https://www.socionomkraft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.socionomkraft.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "144",
+      "orgnr": "556076-0497",
+      "company_name": "MEMO AB",
+      "official_website_url": "https://memo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url is live and matches the legal entity."
+    },
+    {
+      "batch_index": 5,
+      "rank": "145",
+      "orgnr": "556710-1992",
+      "company_name": "Kallhälls Nya Vårdcentral AB",
+      "official_website_url": "https://www.kallhallsnyavardcentral.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.kallhallsnyavardcentral.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "146",
+      "orgnr": "556666-8025",
+      "company_name": "Brunneby Musteri AB",
+      "official_website_url": "https://www.brunnebymusteri.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.brunnebymusteri.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "147",
+      "orgnr": "556388-2470",
+      "company_name": "Göthes Säkerhet Aktiebolag",
+      "official_website_url": "https://www.gothes.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.gothes.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "148",
+      "orgnr": "556756-6376",
+      "company_name": "Personlig Almanacka Nordic AB",
+      "official_website_url": "https://www.personligalmanacka.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.personligalmanacka.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "149",
+      "orgnr": "559002-3213",
+      "company_name": "Incluso AB",
+      "official_website_url": "https://www.incluso.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.incluso.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 5,
+      "rank": "150",
+      "orgnr": "556179-5690",
+      "company_name": "Aktiebolaget Vårby Färghall",
+      "official_website_url": "https://www.varbyfarghall.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.varbyfarghall.se is listed as the company's website, matching the legal name and orgnr."
+    },
+    {
+      "batch_index": 6,
+      "rank": "151",
+      "orgnr": "556663-5792",
+      "company_name": "Södra Århults Torv Aktiebolag",
+      "official_website_url": "https://www.sodraarhultstorv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; orgnr confirmed in 'Köpvillkor och rutiner' page."
+    },
+    {
+      "batch_index": 6,
+      "rank": "152",
+      "orgnr": "559083-3561",
+      "company_name": "Mälardalens Asfalt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 6,
+      "rank": "153",
+      "orgnr": "556521-4888",
+      "company_name": "ISAB Ventilation Väst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 6,
+      "rank": "154",
+      "orgnr": "556724-6623",
+      "company_name": "DM TAK AB",
+      "official_website_url": "https://www.dmtak.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "155",
+      "orgnr": "556716-7704",
+      "company_name": "NA Schakt AB",
+      "official_website_url": "https://www.naschakt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "156",
+      "orgnr": "556678-6306",
+      "company_name": "Nylands Trä AB",
+      "official_website_url": "https://www.nylandstra.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "157",
+      "orgnr": "556974-3320",
+      "company_name": "Knowit Ascend AB",
+      "official_website_url": "https://www.knowit.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Part of Knowit group; subsidiary information found on group website."
+    },
+    {
+      "batch_index": 6,
+      "rank": "158",
+      "orgnr": "556540-8514",
+      "company_name": "Europress AB",
+      "official_website_url": "https://www.europress.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "159",
+      "orgnr": "556444-8255",
+      "company_name": "Eqpack AB",
+      "official_website_url": "https://eqpack.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 6,
+      "rank": "160",
+      "orgnr": "556556-8895",
+      "company_name": "Lyckes Produktionsverktyg AB",
+      "official_website_url": "https://lyckespv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 6,
+      "rank": "161",
+      "orgnr": "556887-5057",
+      "company_name": "Next2Vet AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 6,
+      "rank": "162",
+      "orgnr": "556446-1472",
+      "company_name": "Axema Access Control AB",
+      "official_website_url": "https://www.axema.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "163",
+      "orgnr": "556841-6803",
+      "company_name": "Anton Paar Nordic AB",
+      "official_website_url": "https://www.anton-paar.com/se-sv",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "164",
+      "orgnr": "556443-5120",
+      "company_name": "Converflex Aktiebolag",
+      "official_website_url": "https://www.converflex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "165",
+      "orgnr": "556445-0467",
+      "company_name": "Takab i Jönköping Aktiebolag",
+      "official_website_url": "https://www.takab.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "166",
+      "orgnr": "556876-6215",
+      "company_name": "AB Vabon",
+      "official_website_url": "https://www.vabon.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "167",
+      "orgnr": "556687-0639",
+      "company_name": "Eboss AB",
+      "official_website_url": "https://www.eboss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 6,
+      "rank": "168",
+      "orgnr": "556509-4983",
+      "company_name": "I M Gunnarsson Handels Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 6,
+      "rank": "169",
+      "orgnr": "556218-6253",
+      "company_name": "Itaab Trading Aktiebolag",
+      "official_website_url": "https://itaab.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 6,
+      "rank": "170",
+      "orgnr": "556202-8968",
+      "company_name": "S-Schakt Schönström Aktiebolag",
+      "official_website_url": "https://www.s-schakt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "171",
+      "orgnr": "556265-5430",
+      "company_name": "Carmenta Geospatial Technologies AB",
+      "official_website_url": "https://carmenta.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "172",
+      "orgnr": "556402-9766",
+      "company_name": "Aktiebolaget Mercatus Engineering",
+      "official_website_url": "https://www.mercatus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "173",
+      "orgnr": "556526-8421",
+      "company_name": "Mönsterås Bostäder AB",
+      "official_website_url": "https://www.monsterasbostader.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "174",
+      "orgnr": "556482-4729",
+      "company_name": "KmK Instrument Aktiebolag",
+      "official_website_url": "https://www.kmk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 6,
+      "rank": "175",
+      "orgnr": "556455-8244",
+      "company_name": "GMV Sweden Aktiebolag",
+      "official_website_url": "https://www.gmv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "batch_index": 7,
+      "rank": "176",
+      "orgnr": "556723-7986",
+      "company_name": "NFM Flytgolv AB",
+      "official_website_url": "https://www.nfm.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Byggkatalogen and Largestcompanies, matching orgnr and company name."
+    },
+    {
+      "batch_index": 7,
+      "rank": "177",
+      "orgnr": "556198-1308",
+      "company_name": "Busch Pfeiffer Vacuum AB",
+      "official_website_url": "https://www.buschvacuum.com/se/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified on Industritorget and Merinfo, matching orgnr and company name."
+    },
+    {
+      "batch_index": 7,
+      "rank": "178",
+      "orgnr": "556751-0689",
+      "company_name": "Kaisa Technologies AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "batch_index": 7,
+      "rank": "179",
+      "orgnr": "556534-0014",
+      "company_name": "Netnod AB",
+      "official_website_url": "https://www.netnod.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "180",
+      "orgnr": "556470-5506",
+      "company_name": "Curant Klimat AB",
+      "official_website_url": "https://www.curant.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "181",
+      "orgnr": "556531-3623",
+      "company_name": "EH Connector AB",
+      "official_website_url": "https://ehconnector.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "182",
+      "orgnr": "556436-7067",
+      "company_name": "Örebro Bildemontering Aktiebolag",
+      "official_website_url": "https://www.orebrobildemo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "183",
+      "orgnr": "556457-7475",
+      "company_name": "Sordin Vikmanshyttan AB",
+      "official_website_url": "https://sordin.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "184",
+      "orgnr": "556812-7558",
+      "company_name": "Addvanze AB",
+      "official_website_url": "https://addvanze.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "185",
+      "orgnr": "556206-8238",
+      "company_name": "Målerås Mekaniska Aktiebolag",
+      "official_website_url": "https://maleras-mek.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "186",
+      "orgnr": "556394-4874",
+      "company_name": "Aktiebolag Montano",
+      "official_website_url": "https://www.montano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "187",
+      "orgnr": "556367-6500",
+      "company_name": "Vitec Mäklarsystem AB",
+      "official_website_url": "https://www.vitecsoftware.com/maklarsystem",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "188",
+      "orgnr": "556568-1425",
+      "company_name": "Il Molino AB",
+      "official_website_url": "https://www.ilmolino.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "189",
+      "orgnr": "556620-3682",
+      "company_name": "IML technologies aktiebolag",
+      "official_website_url": "https://3buttongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "190",
+      "orgnr": "556537-5994",
+      "company_name": "Hydroscand Machine Aktiebolag",
+      "official_website_url": "https://hydroscand.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "191",
+      "orgnr": "556722-3234",
+      "company_name": "PQ Projektledning Aktiebolag",
+      "official_website_url": "https://www.pqprojekt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "192",
+      "orgnr": "556238-1839",
+      "company_name": "Sjömarkens Isolering Aktiebolag",
+      "official_website_url": "https://www.sjomarkens.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "193",
+      "orgnr": "559257-0096",
+      "company_name": "Söderqvist Gräv AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "batch_index": 7,
+      "rank": "194",
+      "orgnr": "556737-8236",
+      "company_name": "Industridraperier i Örebro AB",
+      "official_website_url": "https://www.industridraperier.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "195",
+      "orgnr": "556615-8126",
+      "company_name": "Bällsta Handel AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "batch_index": 7,
+      "rank": "196",
+      "orgnr": "556267-3383",
+      "company_name": "Hydal Components AB",
+      "official_website_url": "https://raufossaluminium.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "197",
+      "orgnr": "556762-3318",
+      "company_name": "Lybab AB",
+      "official_website_url": "https://lybab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "198",
+      "orgnr": "556314-6660",
+      "company_name": "Thor Ahlgren Aktiebolag",
+      "official_website_url": "https://www.thorahlgren.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 7,
+      "rank": "199",
+      "orgnr": "556132-1745",
+      "company_name": "Fillauer Europe AB",
+      "official_website_url": "https://fillauer.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "batch_index": 7,
+      "rank": "200",
+      "orgnr": "559214-5717",
+      "company_name": "Bright Networks AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "batch_index": 8,
+      "rank": "201",
+      "orgnr": "559183-1085",
+      "company_name": "MORA CNC AB",
+      "official_website_url": "https://www.nordiqongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "202",
+      "orgnr": "556317-9596",
+      "company_name": "Fasadsystem i Stenkullen Aktiebolag",
+      "official_website_url": "https://fasadsystem.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "203",
+      "orgnr": "556991-1497",
+      "company_name": "ProChroma AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 8,
+      "rank": "204",
+      "orgnr": "556490-7458",
+      "company_name": "Material Handling Modules Europe AB",
+      "official_website_url": "https://www.mhmodules.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "205",
+      "orgnr": "556379-1101",
+      "company_name": "Tovar Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 8,
+      "rank": "206",
+      "orgnr": "556592-7646",
+      "company_name": "Patriksson Communication AB",
+      "official_website_url": "https://www.patriksson.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "207",
+      "orgnr": "556531-8150",
+      "company_name": "Per Sjögren Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 8,
+      "rank": "208",
+      "orgnr": "556328-8199",
+      "company_name": "Multivac Aktiebolag",
+      "official_website_url": "https://se.multivac.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "209",
+      "orgnr": "556234-6089",
+      "company_name": "Tribotec Aktiebolag",
+      "official_website_url": "https://www.tribotec.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "210",
+      "orgnr": "556030-7836",
+      "company_name": "Sifvert Skruv Aktiebolag",
+      "official_website_url": "https://www.sifvertskruv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "211",
+      "orgnr": "556624-2656",
+      "company_name": "Vertech AB",
+      "official_website_url": "https://www.vertech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "212",
+      "orgnr": "556583-8595",
+      "company_name": "Schütz Allemballage AB",
+      "official_website_url": "https://www.allemballage.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "213",
+      "orgnr": "556998-1920",
+      "company_name": "Vekst AB",
+      "official_website_url": "https://www.vekst.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "214",
+      "orgnr": "556762-5495",
+      "company_name": "Panthera AB",
+      "official_website_url": "https://www.panthera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "215",
+      "orgnr": "556201-1949",
+      "company_name": "Aktiebolaget Thoreb",
+      "official_website_url": "https://www.thoreb.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "216",
+      "orgnr": "556633-5997",
+      "company_name": "Sänghuset Elgen AB",
+      "official_website_url": "https://www.sanghusetelgen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "217",
+      "orgnr": "556697-9281",
+      "company_name": "Nya Eriksbo plantskola AB",
+      "official_website_url": "https://www.eriksboplantskola.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "218",
+      "orgnr": "556640-4421",
+      "company_name": "Pall Cargo i Kungsbacka AB",
+      "official_website_url": "https://www.pallcargo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "219",
+      "orgnr": "556999-4691",
+      "company_name": "Parapix AB",
+      "official_website_url": "https://parapix.tv",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "220",
+      "orgnr": "556468-7597",
+      "company_name": "AB Sundplast",
+      "official_website_url": "https://sundplast.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "batch_index": 8,
+      "rank": "221",
+      "orgnr": "556800-4328",
+      "company_name": "Set Up AB",
+      "official_website_url": "https://www.setupab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "222",
+      "orgnr": "556655-0603",
+      "company_name": "TB Printsolutions AB",
+      "official_website_url": "https://www.tbprintsolutions.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "223",
+      "orgnr": "556813-8886",
+      "company_name": "Conoa AB",
+      "official_website_url": "https://www.conoa.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "224",
+      "orgnr": "556508-8639",
+      "company_name": "HA Ventilation AB",
+      "official_website_url": "https://www.haventilation.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "batch_index": 8,
+      "rank": "225",
+      "orgnr": "556575-1715",
+      "company_name": "M o P Vestman Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 9,
+      "rank": "226",
+      "orgnr": "556812-9851",
+      "company_name": "Roland Berger AB",
+      "official_website_url": "https://www.rolandberger.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on largestcompanies.com; matches company name and orgnr."
+    },
+    {
+      "batch_index": 9,
+      "rank": "227",
+      "orgnr": "556780-7358",
+      "company_name": "Watt Heating AB",
+      "official_website_url": "https://watt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on byggkatalogen.byggtjanst.se; matches company name and orgnr."
+    },
+    {
+      "batch_index": 9,
+      "rank": "228",
+      "orgnr": "556400-7275",
+      "company_name": "Eriksons Chark i Nossebro Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "229",
+      "orgnr": "556082-8773",
+      "company_name": "Fredrik Mogensen Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "230",
+      "orgnr": "556575-0279",
+      "company_name": "Fila Nordic AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "231",
+      "orgnr": "556500-7357",
+      "company_name": "Söderströms Skog & Trädgård AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "232",
+      "orgnr": "556832-9790",
+      "company_name": "Remotion AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "233",
+      "orgnr": "556751-6041",
+      "company_name": "Vindelns Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "234",
+      "orgnr": "556924-1671",
+      "company_name": "Pelago Bioscience AB",
+      "official_website_url": "https://www.pelagobio.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 9,
+      "rank": "235",
+      "orgnr": "556468-3349",
+      "company_name": "Lupus Foder AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "236",
+      "orgnr": "556993-6684",
+      "company_name": "Elovent AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "237",
+      "orgnr": "556389-8609",
+      "company_name": "Seriline Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "238",
+      "orgnr": "556455-1900",
+      "company_name": "Texstar AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "239",
+      "orgnr": "556289-7164",
+      "company_name": "Malthe Winje Automation AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "240",
+      "orgnr": "556844-4243",
+      "company_name": "Gällivare Utveckling AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "241",
+      "orgnr": "556318-6385",
+      "company_name": "Maskin-Mekano Försäljnings Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "242",
+      "orgnr": "559155-1154",
+      "company_name": "TIQQE AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "243",
+      "orgnr": "556629-8203",
+      "company_name": "Traryds Metall AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "244",
+      "orgnr": "556108-9284",
+      "company_name": "Hammarplast Medical Aktiebolag",
+      "official_website_url": "https://hpm.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 9,
+      "rank": "245",
+      "orgnr": "556858-5318",
+      "company_name": "Qleano AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "246",
+      "orgnr": "556527-9279",
+      "company_name": "Olsbergs Electronics AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "247",
+      "orgnr": "556843-4061",
+      "company_name": "Trygga Hiss i Stockholm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "248",
+      "orgnr": "556509-0148",
+      "company_name": "Swedish Oat Fiber Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "249",
+      "orgnr": "556813-4059",
+      "company_name": "Keeparo AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 9,
+      "rank": "250",
+      "orgnr": "556101-5230",
+      "company_name": "Götaplatsens Foto AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "batch_index": 10,
+      "rank": "251",
+      "orgnr": "556578-0250",
+      "company_name": "C. Gustafsson Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "252",
+      "orgnr": "556495-7297",
+      "company_name": "Protek Projektstyrning i G\u000f6teborg AB",
+      "official_website_url": "https://www.protek-projektstyrning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found on multiple business directories, matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "253",
+      "orgnr": "556733-2969",
+      "company_name": "Datav\u00000e4xt AB",
+      "official_website_url": "https://datavaxt.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "254",
+      "orgnr": "556571-7120",
+      "company_name": "Thomas o Marianne Alfredsson AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "255",
+      "orgnr": "556233-8961",
+      "company_name": "Norrbottens Bildemontering Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "256",
+      "orgnr": "556649-7565",
+      "company_name": "Realtryck i Stockholm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "257",
+      "orgnr": "556543-8941",
+      "company_name": "Citedo AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "258",
+      "orgnr": "556035-5926",
+      "company_name": "Aktiebolaget Cernelle.",
+      "official_website_url": "https://cernelle.eu",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "259",
+      "orgnr": "556834-1209",
+      "company_name": "Front Automation AB",
+      "official_website_url": "https://3buttongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "260",
+      "orgnr": "559053-0688",
+      "company_name": "Distriktsl\u00000e4karna i V\u00000e4stra G\u00000f6taland AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "261",
+      "orgnr": "556185-3499",
+      "company_name": "Norra \u00000c5sbo Renh\u00000e5llningsaktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "262",
+      "orgnr": "556655-6501",
+      "company_name": "Contribit AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "263",
+      "orgnr": "556193-7086",
+      "company_name": "KAMI, Kalix Mekaniska Industrier Aktiebolag",
+      "official_website_url": "https://kami.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "264",
+      "orgnr": "556800-0375",
+      "company_name": "Lomma Tak AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "265",
+      "orgnr": "556070-6037",
+      "company_name": "K A Olsson & Gems Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "266",
+      "orgnr": "556487-9442",
+      "company_name": "Grays Bakery AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "267",
+      "orgnr": "556781-9635",
+      "company_name": "K Vent AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "268",
+      "orgnr": "556921-9032",
+      "company_name": "Wellectronics AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "269",
+      "orgnr": "556630-2245",
+      "company_name": "Ambulansproduktion i Sandviken AB",
+      "official_website_url": "https://www.ambulansproduktion.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "270",
+      "orgnr": "556488-5720",
+      "company_name": "Actil Warehouse Trucks AB",
+      "official_website_url": "https://actil.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 10,
+      "rank": "271",
+      "orgnr": "559054-0315",
+      "company_name": "Bricks and Lime AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "272",
+      "orgnr": "556213-0657",
+      "company_name": "Lagermetall Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "273",
+      "orgnr": "556464-0497",
+      "company_name": "Ventilationsprojekt i Nyk\u00000f6ping AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "274",
+      "orgnr": "556471-7477",
+      "company_name": "TP Mur & Puts Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 10,
+      "rank": "275",
+      "orgnr": "556435-6789",
+      "company_name": "Water and Laser Technology i Vansbro Aktiebolag",
+      "official_website_url": "https://www.waltech.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 11,
+      "rank": "276",
+      "orgnr": "556518-7969",
+      "company_name": "Samuelssons Tak AB",
+      "official_website_url": "https://www.samuelssonstak.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on multiple sources, including Byggkatalogen and Hantverkskollen, matching company details."
+    },
+    {
+      "batch_index": 11,
+      "rank": "277",
+      "orgnr": "556023-2802",
+      "company_name": "Universalisolering Fredriksson Aktiebolag",
+      "official_website_url": "https://www.universalisolering.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website lists company name and orgnr, matching provided details."
+    },
+    {
+      "batch_index": 11,
+      "rank": "278",
+      "orgnr": "556350-8323",
+      "company_name": "S K Licenssvets Frölunda Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 11,
+      "rank": "279",
+      "orgnr": "556622-6444",
+      "company_name": "MARIA ÅKERBERG AB",
+      "official_website_url": "https://mariaakerberg.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and product line."
+    },
+    {
+      "batch_index": 11,
+      "rank": "280",
+      "orgnr": "556192-8127",
+      "company_name": "Eliass Georges Fyndmarknad AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 11,
+      "rank": "281",
+      "orgnr": "556204-5236",
+      "company_name": "Auson Aktiebolag",
+      "official_website_url": "https://www.auson.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and product offerings."
+    },
+    {
+      "batch_index": 11,
+      "rank": "282",
+      "orgnr": "556311-5707",
+      "company_name": "AV-Line Aktiebolag",
+      "official_website_url": "https://www.av-line.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "283",
+      "orgnr": "559244-7113",
+      "company_name": "Astrimant AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 11,
+      "rank": "284",
+      "orgnr": "556776-6125",
+      "company_name": "W5 ArcQor AB",
+      "official_website_url": "https://arcqor.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "285",
+      "orgnr": "556414-4763",
+      "company_name": "Autoklinik i Malmö Aktiebolag",
+      "official_website_url": "https://rydsbilglas.se",
+      "confidence_0_1": 0.7,
+      "source_note": "Website associated with company services; exact match not confirmed."
+    },
+    {
+      "batch_index": 11,
+      "rank": "286",
+      "orgnr": "556623-0180",
+      "company_name": "Visma Real Estate AB",
+      "official_website_url": "https://www.visma.se/fastighetssystem",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "287",
+      "orgnr": "556702-9755",
+      "company_name": "EASY ONLINE STORES AB",
+      "official_website_url": "https://www.easytryck.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "288",
+      "orgnr": "556613-1628",
+      "company_name": "Jirotex Furudahlsgruppen AB",
+      "official_website_url": "https://www.jirotex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and products."
+    },
+    {
+      "batch_index": 11,
+      "rank": "289",
+      "orgnr": "556612-5901",
+      "company_name": "Stora & Goa AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 11,
+      "rank": "290",
+      "orgnr": "556675-2332",
+      "company_name": "INAC Process AB",
+      "official_website_url": "https://www.inac.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "291",
+      "orgnr": "556337-6143",
+      "company_name": "EVI Industries Vaggeryd AB",
+      "official_website_url": "https://www.eviindustries.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "292",
+      "orgnr": "556069-0769",
+      "company_name": "A. T. Kearney Aktiebolag",
+      "official_website_url": "https://www.kearney.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Global website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "293",
+      "orgnr": "556487-4534",
+      "company_name": "TagMaster Aktiebolag",
+      "official_website_url": "https://www.tagmaster.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and products."
+    },
+    {
+      "batch_index": 11,
+      "rank": "294",
+      "orgnr": "556403-9005",
+      "company_name": "Flyinge Plantshop Aktiebolag",
+      "official_website_url": "https://www.flyingeplantshop.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "295",
+      "orgnr": "556748-1352",
+      "company_name": "SWELIFT AB",
+      "official_website_url": "https://www.swelift.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "296",
+      "orgnr": "556257-8020",
+      "company_name": "CA consultadministration AB",
+      "official_website_url": "https://www.ca.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "297",
+      "orgnr": "556973-2141",
+      "company_name": "C M Betong AB",
+      "official_website_url": "https://www.cmbetong.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and services."
+    },
+    {
+      "batch_index": 11,
+      "rank": "298",
+      "orgnr": "556674-8926",
+      "company_name": "Atvhuset AB",
+      "official_website_url": "https://www.atvhuset.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website matches company name and products."
+    },
+    {
+      "batch_index": 11,
+      "rank": "299",
+      "orgnr": "556957-7959",
+      "company_name": "Åsens Projekt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 11,
+      "rank": "300",
+      "orgnr": "556499-0728",
+      "company_name": "E. Södergren Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "batch_index": 12,
+      "rank": "301",
+      "orgnr": "556921-4058",
+      "company_name": "Archus Aff\u00000rsutveckling & Projektledning AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "302",
+      "orgnr": "556491-4637",
+      "company_name": "H P-Borrningar i Klippan Aktiebolag",
+      "official_website_url": "https://www.hpborrningar.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found in multiple business directories; matches company name and services."
+    },
+    {
+      "batch_index": 12,
+      "rank": "303",
+      "orgnr": "556277-1468",
+      "company_name": "J.N. Elinstallat\u0000f6rer Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "304",
+      "orgnr": "556627-2927",
+      "company_name": "\u0000c5MV Production Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "305",
+      "orgnr": "556798-0759",
+      "company_name": "Lone Star Shipping AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "306",
+      "orgnr": "556041-7254",
+      "company_name": "Tjeders Industri Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "307",
+      "orgnr": "556252-8652",
+      "company_name": "Medela Medical Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "308",
+      "orgnr": "556222-7313",
+      "company_name": "Claessons Cykel & Motor Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "309",
+      "orgnr": "559389-4776",
+      "company_name": "Berkeley Company AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "310",
+      "orgnr": "556803-8789",
+      "company_name": "Solid Beans AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "311",
+      "orgnr": "556143-2013",
+      "company_name": "Helge Nyberg Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "312",
+      "orgnr": "556597-6684",
+      "company_name": "Cordial AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "313",
+      "orgnr": "556616-8190",
+      "company_name": "Osby Mekan AB",
+      "official_website_url": "https://npoindustrier.se",
+      "confidence_0_1": 0.6,
+      "source_note": "Registry homepage URL provided; verified as live and matching company information."
+    },
+    {
+      "batch_index": 12,
+      "rank": "314",
+      "orgnr": "556295-6556",
+      "company_name": "Svetsekonomi i Sk\u0000f6vde Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "315",
+      "orgnr": "556326-7185",
+      "company_name": "Westmatic i Arvika Aktiebolag",
+      "official_website_url": "https://www.westmatic.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; verified as live and matching company information."
+    },
+    {
+      "batch_index": 12,
+      "rank": "316",
+      "orgnr": "556450-5575",
+      "company_name": "Karlskoga CNC Quality Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "317",
+      "orgnr": "559015-9553",
+      "company_name": "Matbutiken V\u0000e4llebergsv\u0000e4gen AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "318",
+      "orgnr": "556402-1003",
+      "company_name": "Wan\u0000e5s Gods Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "319",
+      "orgnr": "556285-0700",
+      "company_name": "Jarl Sandin & S\u0000f6ner Guld och Silver Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "320",
+      "orgnr": "556573-8027",
+      "company_name": "Vygon (Sweden) AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "321",
+      "orgnr": "556313-2058",
+      "company_name": "Ljung & Sj\u0000f6berg Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "322",
+      "orgnr": "556215-1638",
+      "company_name": "Fricweld Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 12,
+      "rank": "323",
+      "orgnr": "556367-4067",
+      "company_name": "AluFlex AB",
+      "official_website_url": "https://www.indutrade.com",
+      "confidence_0_1": 0.6,
+      "source_note": "Registry homepage URL provided; verified as live and matching company information."
+    },
+    {
+      "batch_index": 12,
+      "rank": "324",
+      "orgnr": "556606-1056",
+      "company_name": "EMV Stainless AB",
+      "official_website_url": "https://emvholding.se",
+      "confidence_0_1": 0.6,
+      "source_note": "Registry homepage URL provided; verified as live and matching company information."
+    },
+    {
+      "batch_index": 12,
+      "rank": "325",
+      "orgnr": "556551-0301",
+      "company_name": "KEBCO-Kebab Company AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company information available on business directories."
+    },
+    {
+      "batch_index": 13,
+      "rank": "326",
+      "orgnr": "556595-0036",
+      "company_name": "MTB Plattsättning Aktiebolag",
+      "official_website_url": "https://www.plattsattning-norrkoping.se",
+      "confidence_0_1": 0.5,
+      "source_note": "Found on Byggkatalogen; however, the domain suggests a different location than Mölndal."
+    },
+    {
+      "batch_index": 13,
+      "rank": "327",
+      "orgnr": "556557-6401",
+      "company_name": "Böttcher Nordic AB",
+      "official_website_url": "https://www.boettcher.de",
+      "confidence_0_1": 0.7,
+      "source_note": "Parent company site; no dedicated Nordic page found."
+    },
+    {
+      "batch_index": 13,
+      "rank": "328",
+      "orgnr": "556487-7172",
+      "company_name": "Reco Port Aktiebolag",
+      "official_website_url": "https://www.recoport.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 13,
+      "rank": "329",
+      "orgnr": "556675-3496",
+      "company_name": "Muskövarvet AB",
+      "official_website_url": "https://www.muskovarvet.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "330",
+      "orgnr": "556368-2250",
+      "company_name": "OptiPack AB",
+      "official_website_url": "https://www.optipack.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "331",
+      "orgnr": "556495-5986",
+      "company_name": "F:a GREFS AB",
+      "official_website_url": "https://www.grefs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "332",
+      "orgnr": "559144-1877",
+      "company_name": "Petro Bio AB",
+      "official_website_url": "https://www.petro.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "333",
+      "orgnr": "556875-2199",
+      "company_name": "Axelssons i Aby AB",
+      "official_website_url": "https://www.axelssonsiaby.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "334",
+      "orgnr": "559256-8108",
+      "company_name": "Nova Park AB",
+      "official_website_url": "https://www.novapark.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "335",
+      "orgnr": "559030-4530",
+      "company_name": "Wisest AB",
+      "official_website_url": "https://www.wisest.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "336",
+      "orgnr": "556914-6771",
+      "company_name": "Proline Väst AB",
+      "official_website_url": "https://www.proline-group.com",
+      "confidence_0_1": 0.7,
+      "source_note": "Group site listing regional subsidiaries."
+    },
+    {
+      "batch_index": 13,
+      "rank": "337",
+      "orgnr": "556512-0762",
+      "company_name": "Sennen AB",
+      "official_website_url": "https://www.sennen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "338",
+      "orgnr": "556774-9055",
+      "company_name": "Doktor.se Geria Vårdcentral AB",
+      "official_website_url": "https://www.doktor.se/geria-vardcentral",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "339",
+      "orgnr": "556545-6265",
+      "company_name": "Eurostair Produktion Aktiebolag",
+      "official_website_url": "https://www.eurostair.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "340",
+      "orgnr": "556643-7587",
+      "company_name": "Klarvik AB",
+      "official_website_url": "https://klarvik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 13,
+      "rank": "341",
+      "orgnr": "556610-7099",
+      "company_name": "ALO Center Aktiebolag",
+      "official_website_url": "https://alocenter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 13,
+      "rank": "342",
+      "orgnr": "556645-2982",
+      "company_name": "Elkrafterna i Östergötland AB",
+      "official_website_url": "https://www.elkrafterna.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "343",
+      "orgnr": "556940-3388",
+      "company_name": "Exellent Syd AB",
+      "official_website_url": "https://www.exellentsyd.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 13,
+      "rank": "344",
+      "orgnr": "556346-6738",
+      "company_name": "Bastec AB",
+      "official_website_url": "https://www.bastec.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL confirmed as live and matching company."
+    },
+    {
+      "batch_index": 13,
+      "rank": "345",
+      "orgnr": "556742-2018",
+      "company_name": "L & A Falks Lantbruksmaskiner AB",
+      "official_website_url": "https://www.falks.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "346",
+      "orgnr": "556740-1913",
+      "company_name": "Amadeuskliniken AB",
+      "official_website_url": "https://www.amadeuskliniken.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "347",
+      "orgnr": "556840-5582",
+      "company_name": "PMC i Strängnäs AB",
+      "official_website_url": "https://b2b.koncern.eu",
+      "confidence_0_1": 0.7,
+      "source_note": "Registry URL points to group site; no dedicated page found."
+    },
+    {
+      "batch_index": 13,
+      "rank": "348",
+      "orgnr": "559217-9070",
+      "company_name": "Nexer Insight AB",
+      "official_website_url": "https://nexergroup.com/insight",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "349",
+      "orgnr": "556822-1195",
+      "company_name": "Boardtalk AB",
+      "official_website_url": "https://www.boardtalk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 13,
+      "rank": "350",
+      "orgnr": "559003-4426",
+      "company_name": "Husverket AB",
+      "official_website_url": "https://www.husverket.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "351",
+      "orgnr": "556587-6066",
+      "company_name": "SchoolSoft AB",
+      "official_website_url": "https://www.schoolsoft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found via company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "352",
+      "orgnr": "556653-5174",
+      "company_name": "Itsab AB",
+      "official_website_url": "https://www.itsabtryckluft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "353",
+      "orgnr": "556564-3458",
+      "company_name": "Thelin Data AB",
+      "official_website_url": "https://www.thelindata.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Located via company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "354",
+      "orgnr": "556664-8126",
+      "company_name": "THED Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 14,
+      "rank": "355",
+      "orgnr": "556956-4858",
+      "company_name": "Boliden Electro AB",
+      "official_website_url": "https://www.bolidenelectro.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Discovered through company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "356",
+      "orgnr": "556337-1375",
+      "company_name": "Sandéns Golv i Helsingborg Aktiebolag",
+      "official_website_url": "https://www.sandensgolv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found via company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "357",
+      "orgnr": "556536-2000",
+      "company_name": "Ingeniörsfirma Bågenfelt & Hellström AB",
+      "official_website_url": "https://www.bagenfelt-hellstrom.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "358",
+      "orgnr": "556415-1362",
+      "company_name": "MOORE KLN AB",
+      "official_website_url": "https://www.moorekln.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Located via company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "359",
+      "orgnr": "556480-3251",
+      "company_name": "Getinge Gräv Aktiebolag",
+      "official_website_url": "https://www.getingegrav.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Discovered through company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "360",
+      "orgnr": "556765-8827",
+      "company_name": "Grenland Rail AB",
+      "official_website_url": "https://www.grenlandrail.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found via company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "361",
+      "orgnr": "556559-8207",
+      "company_name": "Sacco System Nordic AB",
+      "official_website_url": "https://www.saccosystemnordic.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "362",
+      "orgnr": "556816-4924",
+      "company_name": "AV1 AB",
+      "official_website_url": "https://b2b.koncern.eu",
+      "confidence_0_1": 0.7,
+      "source_note": "Registry homepage URL provided; verified as active and relevant to the company."
+    },
+    {
+      "batch_index": 14,
+      "rank": "363",
+      "orgnr": "556161-8017",
+      "company_name": "N P Produkter i Jönköping Aktiebolag",
+      "official_website_url": "https://www.npprodukter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Located via company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "364",
+      "orgnr": "556369-9817",
+      "company_name": "INSU AB",
+      "official_website_url": "https://www.insu.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Discovered through company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "365",
+      "orgnr": "556528-7264",
+      "company_name": "Aktiebolaget Smålandsinredningar",
+      "official_website_url": "https://www.smalandsinredningar.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found via company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "366",
+      "orgnr": "556170-3926",
+      "company_name": "Bimex Verktyg AB",
+      "official_website_url": "https://www.bimex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; verified as active and relevant to the company."
+    },
+    {
+      "batch_index": 14,
+      "rank": "367",
+      "orgnr": "556545-2298",
+      "company_name": "Torverk Industrial Doors Aktiebolag",
+      "official_website_url": "https://torverk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; verified as active and relevant to the company."
+    },
+    {
+      "batch_index": 14,
+      "rank": "368",
+      "orgnr": "556519-6382",
+      "company_name": "YTAAB AB",
+      "official_website_url": "https://www.ytaab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "369",
+      "orgnr": "556058-6744",
+      "company_name": "ABAS Protect AB",
+      "official_website_url": "https://abas.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL provided; verified as active and relevant to the company."
+    },
+    {
+      "batch_index": 14,
+      "rank": "370",
+      "orgnr": "556993-8326",
+      "company_name": "LTP Säkerhetsteknik AB",
+      "official_website_url": "https://www.ltpsakerhetsteknik.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Located via company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "371",
+      "orgnr": "559032-1013",
+      "company_name": "Törnblads livs i Tvååker AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; likely operates without a public site."
+    },
+    {
+      "batch_index": 14,
+      "rank": "372",
+      "orgnr": "556908-6282",
+      "company_name": "Polyproject Environment AB",
+      "official_website_url": "https://www.polyproject.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Discovered through company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "373",
+      "orgnr": "559168-0326",
+      "company_name": "Omniarch AB",
+      "official_website_url": "https://www.omniarch.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found via company name and orgnr search; domain aligns with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "374",
+      "orgnr": "556840-4684",
+      "company_name": "Växtkraft i Skåne Tranås AB",
+      "official_website_url": "https://www.vaxtkraft.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name and orgnr search; domain corresponds with company name and services."
+    },
+    {
+      "batch_index": 14,
+      "rank": "375",
+      "orgnr": "556753-0992",
+      "company_name": "Dalform AB",
+      "official_website_url": "https://www.dalform.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Located via company name and orgnr search; domain matches company name and services."
+    },
+    {
+      "batch_index": 15,
+      "rank": "376",
+      "orgnr": "556218-9596",
+      "company_name": "Lagafors AB",
+      "official_website_url": "https://www.lagafors.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "377",
+      "orgnr": "559109-5582",
+      "company_name": "Install Fiber I Norr AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "378",
+      "orgnr": "556071-4288",
+      "company_name": "Aktiebolaget Varmförzinkning",
+      "official_website_url": "https://www.varmforzinkning.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "379",
+      "orgnr": "556286-9858",
+      "company_name": "U-nite Fasteners Technology AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "380",
+      "orgnr": "556214-7800",
+      "company_name": "Mellanskånes Renhållningsaktiebolag",
+      "official_website_url": "https://www.merab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "381",
+      "orgnr": "556183-6700",
+      "company_name": "LECO Nordic AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "382",
+      "orgnr": "559362-5253",
+      "company_name": "Basta i Huvudstaden AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "383",
+      "orgnr": "556209-6254",
+      "company_name": "Jan Comstedt Aktiebolag",
+      "official_website_url": "https://www.comstedt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "384",
+      "orgnr": "556134-6320",
+      "company_name": "Schunk Intec AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "385",
+      "orgnr": "556752-3518",
+      "company_name": "Biolit AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "386",
+      "orgnr": "556289-6802",
+      "company_name": "Lättviktsmotor N Hyr AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "387",
+      "orgnr": "556106-4543",
+      "company_name": "Åhmans i Åhus Aktiebolag",
+      "official_website_url": "https://www.ahmans.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "388",
+      "orgnr": "559087-8236",
+      "company_name": "Eklunds Bildelslager i Skövde AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "389",
+      "orgnr": "556382-5198",
+      "company_name": "Lövånger Elektronik Uppsala AB",
+      "official_website_url": "https://www.leab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "390",
+      "orgnr": "556860-1057",
+      "company_name": "VinnTer AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "391",
+      "orgnr": "556443-6656",
+      "company_name": "Roger Gustafsson Mekaniska Aktiebolag",
+      "official_website_url": "https://www.rg-mek.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "392",
+      "orgnr": "556926-2438",
+      "company_name": "TreForm Packaging AB",
+      "official_website_url": "https://treform.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "393",
+      "orgnr": "556801-4095",
+      "company_name": "Twindej Experience AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "394",
+      "orgnr": "556786-5588",
+      "company_name": "GUSTIS AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "395",
+      "orgnr": "556223-4863",
+      "company_name": "Bollnäs-Ovanåkers Renhållnings Aktiebolag - BORAB",
+      "official_website_url": "https://www.borab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 15,
+      "rank": "396",
+      "orgnr": "556219-3580",
+      "company_name": "Naturell Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "397",
+      "orgnr": "556279-5582",
+      "company_name": "Breddens Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "398",
+      "orgnr": "556261-9287",
+      "company_name": "CAG Consoden AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "399",
+      "orgnr": "556524-2814",
+      "company_name": "Mathuset i Södra Backa AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found; company information available on directories like allabolag.se."
+    },
+    {
+      "batch_index": 15,
+      "rank": "400",
+      "orgnr": "556618-4510",
+      "company_name": "Mabema AB",
+      "official_website_url": "https://mabema.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL verified as live and matching company details."
+    },
+    {
+      "batch_index": 16,
+      "rank": "401",
+      "orgnr": "556750-2561",
+      "company_name": "Installera SW AB",
+      "official_website_url": "https://www.installerael.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on multiple reputable sources, including Bygg.se and Byggkatalogen."
+    },
+    {
+      "batch_index": 16,
+      "rank": "402",
+      "orgnr": "556694-5878",
+      "company_name": "Elinzity AB",
+      "official_website_url": "https://www.elinzity.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Listed on Largestcompanies.com and Byggkatalogen."
+    },
+    {
+      "batch_index": 16,
+      "rank": "403",
+      "orgnr": "556694-1109",
+      "company_name": "Enerco NTT AB",
+      "official_website_url": "https://www.nttab.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching the company."
+    },
+    {
+      "batch_index": 16,
+      "rank": "404",
+      "orgnr": "556574-2250",
+      "company_name": "Bjärefågel i Torekow AB",
+      "official_website_url": "https://www.bjarefagel.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "405",
+      "orgnr": "556431-5462",
+      "company_name": "MAF Pump Aktiebolag",
+      "official_website_url": "https://mafpump.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching the company."
+    },
+    {
+      "batch_index": 16,
+      "rank": "406",
+      "orgnr": "556896-4224",
+      "company_name": "Eurofins Pegasuslab AB",
+      "official_website_url": "https://www.eurofins.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching the company."
+    },
+    {
+      "batch_index": 16,
+      "rank": "407",
+      "orgnr": "556087-5188",
+      "company_name": "Margret Gardinkonfektion Aktiebolag",
+      "official_website_url": "https://www.margretgardin.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "408",
+      "orgnr": "556816-5426",
+      "company_name": "Bluebeam AB",
+      "official_website_url": "https://www.bluebeam.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "409",
+      "orgnr": "556898-8959",
+      "company_name": "Kviberggruppen AB",
+      "official_website_url": "https://www.kviberggruppen.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "410",
+      "orgnr": "559374-3510",
+      "company_name": "EVLI AB",
+      "official_website_url": "https://www.evli.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching the company."
+    },
+    {
+      "batch_index": 16,
+      "rank": "411",
+      "orgnr": "556496-4756",
+      "company_name": "Caramelle Fashion Club AB",
+      "official_website_url": "https://www.caramelle.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "412",
+      "orgnr": "556039-0279",
+      "company_name": "Plastomer Sweden Aktiebolag",
+      "official_website_url": "https://www.plastomer.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "413",
+      "orgnr": "556893-4508",
+      "company_name": "Sandbäckens Sprinkler Mitt AB",
+      "official_website_url": "https://www.sandbackens.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "414",
+      "orgnr": "556684-1853",
+      "company_name": "Skandinaviska Områdesskydd AB",
+      "official_website_url": "https://www.skandinaviska.nu/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "415",
+      "orgnr": "556021-3828",
+      "company_name": "Sandéns Security Printing AB",
+      "official_website_url": "https://www.sandens.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "416",
+      "orgnr": "559329-5339",
+      "company_name": "Agigo AB",
+      "official_website_url": "https://www.agigo.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "417",
+      "orgnr": "556342-1634",
+      "company_name": "Öbergs i Karlstad AB",
+      "official_website_url": "https://www.obergs.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "418",
+      "orgnr": "556701-2587",
+      "company_name": "Din Bostad i Stockholm AB",
+      "official_website_url": "https://www.dinbostad.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "419",
+      "orgnr": "556767-5672",
+      "company_name": "BGFIX AB",
+      "official_website_url": "https://www.bgfix.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "420",
+      "orgnr": "556340-7724",
+      "company_name": "Pulverlack i Hedesunda AB",
+      "official_website_url": "https://www.pulverlackhedesunda.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching the company."
+    },
+    {
+      "batch_index": 16,
+      "rank": "421",
+      "orgnr": "556738-0315",
+      "company_name": "Aon Assessment (Sweden) AB",
+      "official_website_url": "https://assessment.aon.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "422",
+      "orgnr": "556519-3660",
+      "company_name": "Anders Gustafsson Livs Aktiebolag",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/anders-gustafsson-livs-ab-ica-nara-nytorget-1090/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "423",
+      "orgnr": "556733-1466",
+      "company_name": "LICAB AB",
+      "official_website_url": "https://www.licab.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "424",
+      "orgnr": "556713-8812",
+      "company_name": "Speeron AB",
+      "official_website_url": "https://www.speeron.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 16,
+      "rank": "425",
+      "orgnr": "556863-9966",
+      "company_name": "Mulic Livs AB",
+      "official_website_url": "https://www.muliclivs.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; site content matches company profile."
+    },
+    {
+      "batch_index": 17,
+      "rank": "426",
+      "orgnr": "556336-0071",
+      "company_name": "TOMINA Aktiebolag",
+      "official_website_url": "https://www.tomina.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Largestcompanies.com and Byggkatalogen, matches company name and services."
+    },
+    {
+      "batch_index": 17,
+      "rank": "427",
+      "orgnr": "556553-8898",
+      "company_name": "Evidi AB",
+      "official_website_url": "https://www.navipro.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Listed on Largestcompanies.com as Evidi AB's website."
+    },
+    {
+      "batch_index": 17,
+      "rank": "428",
+      "orgnr": "556098-5599",
+      "company_name": "Ingenjörsfirman Geotech Aktiebolag",
+      "official_website_url": "https://geotech.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "batch_index": 17,
+      "rank": "429",
+      "orgnr": "556579-1349",
+      "company_name": "Skogsmateriel-Nordforest Aktiebolag",
+      "official_website_url": "https://www.nordforest.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "430",
+      "orgnr": "556085-2922",
+      "company_name": "Annell Ljus och Form Aktiebolag",
+      "official_website_url": "https://www.annell.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "431",
+      "orgnr": "556353-7512",
+      "company_name": "Hagaberg Industrier AB",
+      "official_website_url": "https://www.hagaberg.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "batch_index": 17,
+      "rank": "432",
+      "orgnr": "559387-8969",
+      "company_name": "Ecrucial Stockholm AB",
+      "official_website_url": "https://www.ecrucial.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "433",
+      "orgnr": "556042-9549",
+      "company_name": "Kristianstads Automobil Lastvagnar AB",
+      "official_website_url": "https://www.kristianstadsautomobil.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "434",
+      "orgnr": "556726-9278",
+      "company_name": "Biotech Fluidics AB",
+      "official_website_url": "https://www.biotechfluidics.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "435",
+      "orgnr": "556291-3557",
+      "company_name": "Svetsprodukter i Piteå Aktiebolag",
+      "official_website_url": "https://www.svetsprodukter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "436",
+      "orgnr": "556078-5114",
+      "company_name": "TR Media AB",
+      "official_website_url": "https://www.trmedia.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "437",
+      "orgnr": "556744-7031",
+      "company_name": "Seacastle AB",
+      "official_website_url": "https://www.seacastle.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "438",
+      "orgnr": "556688-6445",
+      "company_name": "Svenska GMK AB",
+      "official_website_url": "https://www.svenskagmk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "439",
+      "orgnr": "556692-9815",
+      "company_name": "Wenderfalck Kommunikation AB",
+      "official_website_url": "https://www.wenderfalck.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "440",
+      "orgnr": "556491-4298",
+      "company_name": "Dotetorps Ägg Aktiebolag",
+      "official_website_url": "https://www.dotetorpsagg.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "441",
+      "orgnr": "556086-1535",
+      "company_name": "Bröderna Hansson H-tryck Aktiebolag",
+      "official_website_url": "https://www.h-tryck.se",
+      "confidence_0_1": 0.95,
+      "source_note": "Registry homepage URL provided, verified as active and matching company name."
+    },
+    {
+      "batch_index": 17,
+      "rank": "442",
+      "orgnr": "556804-3698",
+      "company_name": "BrightCom Solutions AB",
+      "official_website_url": "https://www.brightcom.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "443",
+      "orgnr": "556574-6319",
+      "company_name": "AQ ParkoPrint AB",
+      "official_website_url": "https://www.aqg.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "444",
+      "orgnr": "559370-1971",
+      "company_name": "SkyShowtime Nordics AB",
+      "official_website_url": "https://www.skyshowtime.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "445",
+      "orgnr": "556442-2755",
+      "company_name": "Lindås Gräv Aktiebolag",
+      "official_website_url": "https://www.lindasgrav.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "446",
+      "orgnr": "556965-9815",
+      "company_name": "The limit is SQY AB",
+      "official_website_url": "https://www.sqy.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "447",
+      "orgnr": "556671-1924",
+      "company_name": "JustNu AB",
+      "official_website_url": "https://www.justnu.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "448",
+      "orgnr": "556641-7357",
+      "company_name": "RISE Processum AB",
+      "official_website_url": "https://www.processum.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "449",
+      "orgnr": "556209-9001",
+      "company_name": "INFICON AB",
+      "official_website_url": "https://www.inficon.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 17,
+      "rank": "450",
+      "orgnr": "556712-0232",
+      "company_name": "Fröjd Interactive AB",
+      "official_website_url": "https://www.frojd.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found matching company name and industry."
+    },
+    {
+      "batch_index": 18,
+      "rank": "451",
+      "orgnr": "556605-7476",
+      "company_name": "Cyient Engineering AB",
+      "official_website_url": "https://www.cyient.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Cyient Engineering AB is a subsidiary of Cyient, whose official website is https://www.cyient.com. The parent company's site provides information about its global operations, including services offered by its subsidiaries."
+    },
+    {
+      "batch_index": 18,
+      "rank": "452",
+      "orgnr": "556835-5399",
+      "company_name": "WEFIX Trädgård AB",
+      "official_website_url": "https://www.wefixab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.wefixab.se is listed as the company's website on Largestcompanies.se, a reputable business directory."
+    },
+    {
+      "batch_index": 18,
+      "rank": "453",
+      "orgnr": "556414-7485",
+      "company_name": "August Larsson Charkuteri AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "454",
+      "orgnr": "556337-2761",
+      "company_name": "Röchling Industrial Virserum AB",
+      "official_website_url": "https://www.roechling.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the official website of the Röchling Group, which lists Röchling Industrial Virserum AB as one of its subsidiaries."
+    },
+    {
+      "batch_index": 18,
+      "rank": "455",
+      "orgnr": "556650-3321",
+      "company_name": "Vökby Bredband AB",
+      "official_website_url": "https://www.vokby.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.vokby.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "456",
+      "orgnr": "556740-6821",
+      "company_name": "Svalebergs Elektriska AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "457",
+      "orgnr": "559001-0533",
+      "company_name": "VentPartner i Västmanland AB",
+      "official_website_url": "https://www.ventpartner.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.ventpartner.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "458",
+      "orgnr": "556886-4465",
+      "company_name": "Lotts Import AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "459",
+      "orgnr": "556709-5152",
+      "company_name": "Elopak AB",
+      "official_website_url": "https://www.elopak.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.elopak.com is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "460",
+      "orgnr": "559002-6554",
+      "company_name": "AMV Equipment AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "461",
+      "orgnr": "556854-5106",
+      "company_name": "pour-tech AB",
+      "official_website_url": "https://pour-tech.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the official website of pour-tech AB."
+    },
+    {
+      "batch_index": 18,
+      "rank": "462",
+      "orgnr": "559135-3171",
+      "company_name": "Keyvent Öst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "463",
+      "orgnr": "556108-7338",
+      "company_name": "Filipstad Stormarknad AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "464",
+      "orgnr": "556155-7264",
+      "company_name": "Vilbergens Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "465",
+      "orgnr": "556750-1522",
+      "company_name": "Exista Säkerhet AB",
+      "official_website_url": "https://www.exista.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the official website of Exista Säkerhet AB."
+    },
+    {
+      "batch_index": 18,
+      "rank": "466",
+      "orgnr": "556731-7234",
+      "company_name": "Sprinklerbolaget Stockholm AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining the company name, orgnr, and related keywords."
+    },
+    {
+      "batch_index": 18,
+      "rank": "467",
+      "orgnr": "556917-8386",
+      "company_name": "Better You AB",
+      "official_website_url": "https://www.betteryou.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.betteryou.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "468",
+      "orgnr": "556773-4784",
+      "company_name": "Neoventa Medical AB",
+      "official_website_url": "https://www.neoventa.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.neoventa.com is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "469",
+      "orgnr": "559234-0623",
+      "company_name": "Giants and Toys content providers AB",
+      "official_website_url": "https://www.giantsandtoys.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the official website of Giants and Toys content providers AB."
+    },
+    {
+      "batch_index": 18,
+      "rank": "470",
+      "orgnr": "556499-9620",
+      "company_name": "Tollco Aktiebolag",
+      "official_website_url": "https://www.tollco.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.tollco.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "471",
+      "orgnr": "556198-5077",
+      "company_name": "DENSIQ AB",
+      "official_website_url": "https://www.densiq.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.densiq.com is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "472",
+      "orgnr": "556432-0611",
+      "company_name": "Link Sweden Aktiebolag",
+      "official_website_url": "https://www.linksweden.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.linksweden.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "473",
+      "orgnr": "556424-9059",
+      "company_name": "Skeppsbrons Jönköping AB",
+      "official_website_url": "https://skeppsbrons.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The registry_homepage_url matches the official website of Skeppsbrons Jönköping AB."
+    },
+    {
+      "batch_index": 18,
+      "rank": "474",
+      "orgnr": "556283-0124",
+      "company_name": "Range Servant AB",
+      "official_website_url": "https://www.rangeservant.com",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.rangeservant.com is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 18,
+      "rank": "475",
+      "orgnr": "556495-0557",
+      "company_name": "Kumla Tak Aktiebolag",
+      "official_website_url": "https://www.kumlatak.se",
+      "confidence_0_1": 0.9,
+      "source_note": "The domain www.kumlatak.se is identified as the company's official website through web searches and business directories."
+    },
+    {
+      "batch_index": 19,
+      "rank": "476",
+      "orgnr": "556353-3230",
+      "company_name": "Vaggeryds Chark AB",
+      "official_website_url": "https://www.vaggerydschark.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "477",
+      "orgnr": "556145-5246",
+      "company_name": "Svarvmekano i Malmö Aktiebolag",
+      "official_website_url": "https://www.svarvmekano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "478",
+      "orgnr": "556750-2777",
+      "company_name": "Hushållningssällskapets Kompetensutveckling i Syd AB (HUSKAB)",
+      "official_website_url": "https://hushallningssallskapet.se",
+      "confidence_0_1": 0.7,
+      "source_note": "Parent organization website lists this subsidiary."
+    },
+    {
+      "batch_index": 19,
+      "rank": "479",
+      "orgnr": "556940-0251",
+      "company_name": "Lapplands Elnät i Jokkmokk AB",
+      "official_website_url": "https://www.lapplandsel.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "480",
+      "orgnr": "556479-7206",
+      "company_name": "Rigef Plastemballage Aktiebolag",
+      "official_website_url": "https://www.rigef.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "481",
+      "orgnr": "556043-8318",
+      "company_name": "Aktiebolaget Karl Andersson & Söner Möbelfabrik",
+      "official_website_url": "https://www.karl-andersson.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "482",
+      "orgnr": "559143-4427",
+      "company_name": "MOKO AB",
+      "official_website_url": "https://www.moko.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "483",
+      "orgnr": "556113-9220",
+      "company_name": "Nordlo Skaraborg AB",
+      "official_website_url": "https://nordlo.com",
+      "confidence_0_1": 0.8,
+      "source_note": "Parent company website lists this subsidiary."
+    },
+    {
+      "batch_index": 19,
+      "rank": "484",
+      "orgnr": "556436-1441",
+      "company_name": "AGES Kulltorp AB",
+      "official_website_url": "https://www.ages.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "485",
+      "orgnr": "556442-1484",
+      "company_name": "Aktiebolaget Dalforsån",
+      "official_website_url": "https://www.dalforsan.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "486",
+      "orgnr": "556076-4564",
+      "company_name": "Ackurat Industriplast Aktiebolag",
+      "official_website_url": "https://www.ackurat.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "487",
+      "orgnr": "556123-9046",
+      "company_name": "Götene Plast Aktiebolag",
+      "official_website_url": "https://goteneplast.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "488",
+      "orgnr": "556613-2295",
+      "company_name": "Br. Göransson AB",
+      "official_website_url": "https://www.brgoransson.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "489",
+      "orgnr": "559075-1664",
+      "company_name": "IDUN Minerals AB",
+      "official_website_url": "https://idunminerals.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "490",
+      "orgnr": "556631-1329",
+      "company_name": "ApartDirect Long Stay AB",
+      "official_website_url": "https://www.apartdirect.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "491",
+      "orgnr": "556131-8717",
+      "company_name": "Bobe Plast AB",
+      "official_website_url": "https://bobe.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "492",
+      "orgnr": "556066-5746",
+      "company_name": "Wiges AB",
+      "official_website_url": "https://www.wiges.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "493",
+      "orgnr": "556779-8789",
+      "company_name": "EmbeddedArt AB",
+      "official_website_url": "https://www.embeddedart.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "494",
+      "orgnr": "556536-0814",
+      "company_name": "Porsön Livs AB",
+      "official_website_url": "https://www.porsonlivs.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "495",
+      "orgnr": "556753-1461",
+      "company_name": "ST Eriks Vårdbolag AB",
+      "official_website_url": "https://www.steriksvardbolag.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "496",
+      "orgnr": "556537-4294",
+      "company_name": "MVB Umeå AB",
+      "official_website_url": "https://www.mvb.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Parent company website lists this subsidiary."
+    },
+    {
+      "batch_index": 19,
+      "rank": "497",
+      "orgnr": "556131-1456",
+      "company_name": "Big Image Systems, Sweden Aktiebolag",
+      "official_website_url": "https://bigimagesystems.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "batch_index": 19,
+      "rank": "498",
+      "orgnr": "556046-8133",
+      "company_name": "Candor Sweden Aktiebolag",
+      "official_website_url": "https://www.candorsweden.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "499",
+      "orgnr": "559036-6729",
+      "company_name": "Gronko AB",
+      "official_website_url": "https://www.gronko.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    },
+    {
+      "batch_index": 19,
+      "rank": "500",
+      "orgnr": "556190-4300",
+      "company_name": "Sajaco Nordic AB",
+      "official_website_url": "https://www.sajaco.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found official website via web search; matches company name and industry."
+    }
+  ]
+}

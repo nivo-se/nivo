@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556207-4442",
+      "company_name": "Nola Industrier Aktiebolag",
+      "official_website_url": "https://www.nola.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Largestcompanies.com; matches company name and industry."
+    },
+    {
+      "orgnr": "556758-3702",
+      "company_name": "Mavera AB",
+      "official_website_url": "https://www.mavera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Largestcompanies.com; matches company name and industry."
+    },
+    {
+      "orgnr": "559083-3561",
+      "company_name": "Mälardalens Asfalt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556521-4888",
+      "company_name": "ISAB Ventilation Väst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556887-5057",
+      "company_name": "Next2Vet AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556509-4983",
+      "company_name": "I M Gunnarsson Handels Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556751-0689",
+      "company_name": "Kaisa Technologies AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "559257-0096",
+      "company_name": "Söderqvist Gräv AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    }
+  ]
+}

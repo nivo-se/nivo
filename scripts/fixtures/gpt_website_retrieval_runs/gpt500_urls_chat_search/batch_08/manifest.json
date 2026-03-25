@@ -1,0 +1,12 @@
+{
+  "script": "gpt_batch_website_urls_500.py",
+  "run_started_utc": "2026-03-25T09:03:15Z",
+  "batch_index": 8,
+  "batch_count_total": 20,
+  "batch_size": 25,
+  "input_csv": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
+  "input_sha256": "9ad416ca211ef206303ac6046da2efd2603ed1103fe9ceddc1a1a9631679e034",
+  "model": "gpt-4o-search-preview",
+  "git_commit": "ca0725798e26d9393c8e6b046fe49161e17e4309",
+  "api": "chat_completions_search"
+}

@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "559109-5582",
+      "company_name": "Install Fiber I Norr AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556286-9858",
+      "company_name": "U-nite Fasteners Technology AB",
+      "official_website_url": "https://www.unitefasteners.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found with matching company name and contact details."
+    },
+    {
+      "orgnr": "556183-6700",
+      "company_name": "LECO Nordic AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "559362-5253",
+      "company_name": "Basta i Huvudstaden AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556134-6320",
+      "company_name": "Schunk Intec AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556752-3518",
+      "company_name": "Biolit AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556289-6802",
+      "company_name": "Lättviktsmotor N Hyr AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "559087-8236",
+      "company_name": "Eklunds Bildelslager i Skövde AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    }
+  ]
+}

@@ -11,6 +11,9 @@ and Postgres reachable via DATABASE_URL / SUPABASE_DB_URL or POSTGRES_*.
 Usage:
   cd /path/to/nivo && PYTHONPATH=. python3 scripts/export_gpt_website_retrieval_pool_csv.py
   PYTHONPATH=. python3 scripts/export_gpt_website_retrieval_pool_csv.py --top 800 --out /tmp/pool.csv
+
+Next (OpenAI URL batches): ``gpt_batch_website_urls_500.py --out-dir …`` (expects a CSV with at least
+as many rows as ``--total``, default 500).
 """
 
 from __future__ import annotations

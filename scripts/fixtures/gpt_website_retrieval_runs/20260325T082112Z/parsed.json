@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "structured",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556681-3761",
+      "company_name": "Xperta AB",
+      "official_website_url": "https://www.xperta.se",
+      "confidence_0_1": 0.97,
+      "source_note": "Confirmed via Xperta AB homepage and company profile results; registry hint xperta.com pointed elsewhere, while xperta.se clearly matches legal name and orgnr context."
+    },
+    {
+      "orgnr": "556828-0670",
+      "company_name": "Noxon Aktiebolag",
+      "official_website_url": "https://noxon.se",
+      "confidence_0_1": 0.98,
+      "source_note": "Official site found through NOXON AB privacy policy PDF stating orgnr 556828-0670 and website https://noxon.se/."
+    },
+    {
+      "orgnr": "556486-1747",
+      "company_name": "Blekinge Pressgjuteri Aktiebolag",
+      "official_website_url": "https://www.blekingeproal.com",
+      "confidence_0_1": 0.95,
+      "source_note": "Company homepage explicitly states Blekinge Pressgjuteri AB and the shared site brand BLEKINGE PROAL at blekingeproal.com."
+    },
+    {
+      "orgnr": "556185-7565",
+      "company_name": "Sarstedt Aktiebolag",
+      "official_website_url": "https://www.sarstedt.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Search results consistently identify Sarstedt AB in Sweden with website www.sarstedt.com; not verified on-page with orgnr, but strong corporate match."
+    },
+    {
+      "orgnr": "556864-3141",
+      "company_name": "Bookmark Förlag AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.18,
+      "source_note": "Searched Bookmark Förlag AB and related queries; only directory/listing results found, no defensible corporate website located."
+    },
+    {
+      "orgnr": "556665-6442",
+      "company_name": "EPG Projektledning AB",
+      "official_website_url": "https://epgprojektledning.se",
+      "confidence_0_1": 0.96,
+      "source_note": "Official EPG career page and a PDF snippet both point to epgprojektledning.se for EPG Projektledning AB."
+    },
+    {
+      "orgnr": "556270-3024",
+      "company_name": "Ricana Concept AB",
+      "official_website_url": "https://www.ricana.se",
+      "confidence_0_1": 0.98,
+      "source_note": "Ricana Concept AB homepage/contact pages explicitly show the company name and the ricana.se domain."
+    },
+    {
+      "orgnr": "556055-5814",
+      "company_name": "Hansson PyroTech Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.22,
+      "source_note": "Searches mainly surfaced PRV/other references and directories; no clear official company website found."
+    },
+    {
+      "orgnr": "556710-1992",
+      "company_name": "Kallhälls Nya Vårdcentral AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.25,
+      "source_note": "Searched company name and care-clinic related queries; no clear own website found, only third-party listings."
+    },
+    {
+      "orgnr": "556388-2470",
+      "company_name": "Göthes Säkerhet Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "Queries returned directories and a partner page; no defensible own corporate domain located from search results."
+    },
+    {
+      "orgnr": "559083-3561",
+      "company_name": "Mälardalens Asfalt AB",
+      "official_website_url": "https://www.malardalenasfalt.se",
+      "confidence_0_1": 0.93,
+      "source_note": "Official OM OSS page for Mälardalen Asfalt AB and contact snippets point to malardalenasfalt.se."
+    },
+    {
+      "orgnr": "556444-8255",
+      "company_name": "Eqpack AB",
+      "official_website_url": "https://eqpack.se",
+      "confidence_0_1": 0.98,
+      "source_note": "Registry homepage hint eqpack.se treated as live and matching; no conflicting evidence found."
+    },
+    {
+      "orgnr": "556436-7067",
+      "company_name": "Örebro Bildemontering Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.23,
+      "source_note": "Searches mostly returned directories and recycled-vehicle references; no clear official website located."
+    },
+    {
+      "orgnr": "556101-5230",
+      "company_name": "Götaplatsens Foto AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.24,
+      "source_note": "No defensible corporate site found in search; results were mostly directories and generic listings."
+    },
+    {
+      "orgnr": "556035-5926",
+      "company_name": "Aktiebolaget Cernelle.",
+      "official_website_url": "https://cernelle.eu",
+      "confidence_0_1": 0.92,
+      "source_note": "Registry homepage hint cernelle.eu was retained as the official corporate site; domain matches the company name and industry."
+    },
+    {
+      "orgnr": "556193-7086",
+      "company_name": "KAMI, Kalix Mekaniska Industrier Aktiebolag",
+      "official_website_url": "https://kami.se",
+      "confidence_0_1": 0.97,
+      "source_note": "Registry homepage hint kami.se is a strong match for KAMI, Kalix Mekaniska Industrier AB."
+    },
+    {
+      "orgnr": "556403-9005",
+      "company_name": "Flyinge Plantshop Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.26,
+      "source_note": "Searches did not surface a clear official company site; only scattered mentions and non-official listings."
+    },
+    {
+      "orgnr": "556748-1352",
+      "company_name": "SWELIFT AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No reliable own website found after searching the company name and lift/rental terms; only directory-style results."
+    },
+    {
+      "orgnr": "556606-1056",
+      "company_name": "EMV Stainless AB",
+      "official_website_url": "https://emvholding.se",
+      "confidence_0_1": 0.72,
+      "source_note": "Registry homepage hint emvholding.se is plausible as the corporate front door, but orgnr/company-name verification on-page was not found."
+    },
+    {
+      "orgnr": "556487-7172",
+      "company_name": "Reco Port Aktiebolag",
+      "official_website_url": "https://www.recoport.se",
+      "confidence_0_1": 0.98,
+      "source_note": "Registry homepage hint recoport.se aligns with the company name and was treated as the official site."
+    },
+    {
+      "orgnr": "556512-0762",
+      "company_name": "Sennen AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.17,
+      "source_note": "Searches did not yield a clear company website, only directory and generic references."
+    },
+    {
+      "orgnr": "556908-6282",
+      "company_name": "Polyproject Environment AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.19,
+      "source_note": "No defensible own domain found after multiple company-name and industry-specific searches."
+    },
+    {
+      "orgnr": "556519-3660",
+      "company_name": "Anders Gustafsson Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.18,
+      "source_note": "Only directory-style results found; no clear official website located."
+    },
+    {
+      "orgnr": "556740-6821",
+      "company_name": "Svalebergs Elektriska AB",
+      "official_website_url": "https://www.svalebergs.se",
+      "confidence_0_1": 0.96,
+      "source_note": "Mitsubishi/Elkedjan partner pages and a PDF on svalebergs.se point to the company’s own domain."
+    },
+    {
+      "orgnr": "556537-4294",
+      "company_name": "MVB Umeå AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.21,
+      "source_note": "Searches returned related MVB corporate material but no clear official Umeå company website."
+    }
+  ]
+}

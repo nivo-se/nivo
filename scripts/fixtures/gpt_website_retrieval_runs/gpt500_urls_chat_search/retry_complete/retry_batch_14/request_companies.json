@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Install Fiber I Norr AB",
+      "orgnr": "559109-5582",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\", \"Telekommunikation, teleoperatörer\"]"
+    },
+    {
+      "name": "U-nite Fasteners Technology AB",
+      "orgnr": "556286-9858",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "LECO Nordic AB",
+      "orgnr": "556183-6700",
+      "address_country": "SE",
+      "primary_nace": "46691 Partihandel med mät- och precisionsinstrument",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Basta i Huvudstaden AB",
+      "orgnr": "559362-5253",
+      "address_country": "SE",
+      "primary_nace": "56100 Restaurangverksamhet",
+      "segment_labels_json": "[\"Restauranger\"]"
+    },
+    {
+      "name": "Schunk Intec AB",
+      "orgnr": "556134-6320",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Biolit AB",
+      "orgnr": "556752-3518",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Lättviktsmotor N Hyr AB",
+      "orgnr": "556289-6802",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"VVS-arbeten, material och produkter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Eklunds Bildelslager i Skövde AB",
+      "orgnr": "559087-8236",
+      "address_country": "SE",
+      "primary_nace": "46771 Partihandel med uttjänta fordon",
+      "segment_labels_json": "[\"Transportförmedling\", \"Åkerier\", \"Grossister\", \"Avfall - grossister\", \"Avfallshantering\"]"
+    }
+  ]
+}

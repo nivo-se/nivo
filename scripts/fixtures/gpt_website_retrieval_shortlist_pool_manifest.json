@@ -1,11 +1,11 @@
 {
   "run_kind": "layer1_screening_rank_v1",
-  "created_at_utc": "2026-03-25T06:25:16Z",
-  "git_commit": "17eb4f05001c1a088077b90d1a97c30157c1e992",
+  "created_at_utc": "2026-03-25T07:54:05Z",
+  "git_commit": "ca0725798e26d9393c8e6b046fe49161e17e4309",
   "script": "screening_rank_v1.py",
   "script_version": "1.0.0",
   "config_path": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/screening_v1_calibration.yaml",
-  "config_hash_sha256": "664354082e5dab63eb327a38439ee905e7308744c5a13e2478cc0b2370499a98",
+  "config_hash_sha256": "1a6039c00ab8e2b3c29416cb33be71587949faeef0c26c57e611c374e71a889e",
   "cli": {
     "out": "/Volumes/Samsung_T5/Cursor Projects/nivo/scripts/fixtures/gpt_website_retrieval_shortlist_pool.csv",
     "top": 500,
@@ -16,8 +16,8 @@
   "top_n": 500,
   "row_counts": {
     "ranked_output": 500,
-    "excluded_pre_score": 6608,
-    "cohort_after_hard_exclusions": 6993
+    "excluded_pre_score": 6663,
+    "cohort_after_hard_exclusions": 6938
   },
   "settings": {
     "alpha_effective": 2.5,
@@ -92,7 +92,24 @@
         "smide",
         "bilverkstad",
         "osteria",
-        "hotel"
+        "hotel",
+        "mat",
+        "restaurang",
+        "restauranger",
+        "restaurant",
+        "bageri",
+        "bagerier",
+        "konditori",
+        "pizzeria",
+        "brasserie",
+        "catering",
+        "gastronomi",
+        "delikatess",
+        "café",
+        "cafe",
+        "arkitekt",
+        "arkitekter",
+        "arkitektkontor"
       ],
       "yaml_layer1_extra_operating_exclusion_keywords": [],
       "yaml_layer1_extra_service_exclusion_keywords": []

@@ -1,0 +1,39 @@
+{
+  "companies": [
+    {
+      "name": "Hexis AB",
+      "orgnr": "556835-6074",
+      "address_country": "SE",
+      "primary_nace": "46769 Partihandel med övriga insatsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Insatsvaror\", \"Insatsvaror - grossister\"]"
+    },
+    {
+      "name": "Ottosson Truck Aktiebolag",
+      "orgnr": "556148-6845",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Truckar\", \"Uthyrning\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Alphadev AB",
+      "orgnr": "556985-3970",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Stockholms Styr-Team AB",
+      "orgnr": "556566-1724",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Bohusbolagen AB",
+      "orgnr": "559127-3171",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Plåtslagerier\", \"Takbeläggningar\", \"Ventilation, luftbehandling\"]"
+    }
+  ]
+}

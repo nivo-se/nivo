@@ -1,0 +1,181 @@
+{
+  "companies": [
+    {
+      "name": "Roland Berger AB",
+      "orgnr": "556812-9851",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Watt Heating AB",
+      "orgnr": "556780-7358",
+      "address_country": "SE",
+      "primary_nace": "46742 Partihandel med VVS-varor",
+      "segment_labels_json": "[\"Grossister\"]"
+    },
+    {
+      "name": "Eriksons Chark i Nossebro Aktiebolag",
+      "orgnr": "556400-7275",
+      "address_country": "SE",
+      "primary_nace": "10130 Charkuteri- och annan köttvarutillverkning",
+      "segment_labels_json": "[\"Förpackningar - Industrin\", \"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Förpackningar\", \"Grossister\", \"Kött-, slakteriprodukter - grossist\", \"Livsmedel - tillverkning\", \"Producenter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Fredrik Mogensen Aktiebolag",
+      "orgnr": "556082-8773",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Fila Nordic AB",
+      "orgnr": "556575-0279",
+      "address_country": "SE",
+      "primary_nace": "46492 Partihandel med kontorsförbrukningsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Reseeffekter\"]"
+    },
+    {
+      "name": "Söderströms Skog & Trädgård AB",
+      "orgnr": "556500-7357",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"VVS-arbeten, material och produkter\", \"Fastighetsförvaltning\", \"Maskinförnödenheter - reparationer\", \"Parkanläggningar\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Remotion AB",
+      "orgnr": "556832-9790",
+      "address_country": "SE",
+      "primary_nace": "73111 Reklambyråverksamhet",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Vindelns Livs AB",
+      "orgnr": "556751-6041",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Pelago Bioscience AB",
+      "orgnr": "556924-1671",
+      "registry_homepage_url": "https://www.pelagobio.com",
+      "address_country": "SE",
+      "primary_nace": "72110 Bioteknisk forskning och utveckling",
+      "segment_labels_json": "[\"Bioteknik\", \"Forskning\", \"Facklig, vetenskaplig och teknisk verksamhet\"]"
+    },
+    {
+      "name": "Lupus Foder AB",
+      "orgnr": "556468-3349",
+      "address_country": "SE",
+      "primary_nace": "46210 Partihandel med spannmål, råtobak, utsäde och djurfoder",
+      "segment_labels_json": "[\"Livsmedel\", \"Grossister\", \"Spannmål, råtobak, utsäde och djurfoder - grossister\"]"
+    },
+    {
+      "name": "Elovent AB",
+      "orgnr": "556993-6684",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Seriline Aktiebolag",
+      "orgnr": "556389-8609",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Bevakningsföretag\", \"Internet - Konsulter, operatörer\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Texstar AB",
+      "orgnr": "556455-1900",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\"]"
+    },
+    {
+      "name": "Malthe Winje Automation AB",
+      "orgnr": "556289-7164",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Styrteknik, reglerteknik\", \"Grossister\"]"
+    },
+    {
+      "name": "Gällivare Utveckling AB",
+      "orgnr": "556844-4243",
+      "address_country": "SE",
+      "primary_nace": "49410 Vägtransport, godstrafik",
+      "segment_labels_json": "[\"Transportförmedling\", \"Uthyrning\", \"Åkerier\"]"
+    },
+    {
+      "name": "Maskin-Mekano Försäljnings Aktiebolag",
+      "orgnr": "556318-6385",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "TIQQE AB",
+      "orgnr": "559155-1154",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Traryds Metall AB",
+      "orgnr": "556629-8203",
+      "address_country": "SE",
+      "primary_nace": "24540 Gjutning av andra metaller",
+      "segment_labels_json": "[\"Företagsutveckling\", \"Maskinförnödenheter\", \"Metaller, legeringar\", \"Maskinförnödenheter - tillverkning\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Verktyg och redskap\", \"Verktyg och redskap - tillverkning\"]"
+    },
+    {
+      "name": "Hammarplast Medical Aktiebolag",
+      "orgnr": "556108-9284",
+      "registry_homepage_url": "https://hpm.se",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Qleano AB",
+      "orgnr": "556858-5318",
+      "address_country": "SE",
+      "primary_nace": "81100 Fastighetsrelaterade stödtjänster",
+      "segment_labels_json": "[\"Fastighetsförvaltning\"]"
+    },
+    {
+      "name": "Olsbergs Electronics AB",
+      "orgnr": "556527-9279",
+      "address_country": "SE",
+      "primary_nace": "33200 Installation av industrimaskiner och -utrustning",
+      "segment_labels_json": "[\"Industriförnödenheter\", \"Maskinförnödenheter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Trygga Hiss i Stockholm AB",
+      "orgnr": "556843-4061",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Swedish Oat Fiber Aktiebolag",
+      "orgnr": "556509-0148",
+      "address_country": "SE",
+      "primary_nace": "10612 Tillverkning av frukostflingor, mixer och andra livsmedelsberedningar av kvarnprodukter",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Livsmedel\", \"Kemikalier, industrikemikalier - tillverkning\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Keeparo AB",
+      "orgnr": "556813-4059",
+      "address_country": "SE",
+      "primary_nace": "70210 PR och kommunikation",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Götaplatsens Foto AB",
+      "orgnr": "556101-5230",
+      "address_country": "SE",
+      "primary_nace": "47782 Specialiserad butikshandel med fotoutrustning",
+      "segment_labels_json": "[\"Fotoutrustningar\", \"Butikshandel\"]"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-5ad83c7e-e117-42ac-9375-e37f814ed31b",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556575-0279\",\"company_name\":\"Fila Nordic AB\",\"official_website_url\":\"https://www.lyra.se\",\"confidence_0_1\":0.7,\"source_note\":\"Registry lists www.lyra.se; matches parent company Lyra Bleistift-Fabrik GmbH.\"},{\"orgnr\":\"556500-7357\",\"company_name\":\"Söderströms Skog & Trädgård AB\",\"official_website_url\":\"https://www.soderstroms.nu\",\"confidence_0_1\":0.9,\"source_note\":\"Website lists company name and orgnr in footer.\"},{\"orgnr\":\"556832-9790\",\"company_name\":\"Remotion AB\",\"official_website_url\":\"https://www.remotion.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website matches company name; contact page lists orgnr.\"},{\"orgnr\":\"556751-6041\",\"company_name\":\"Vindelns Livs AB\",\"official_website_url\":\"https://www.vindelnslivs.se\",\"confidence_0_1\":0.8,\"source_note\":\"Website matches company name; contact page lists orgnr.\"},{\"orgnr\":\"556468-3349\",\"company_name\":\"Lupus Foder AB\",\"official_website_url\":\"https://www.lupusfoder.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website matches company name; contact page lists orgnr.\"},{\"orgnr\":\"556993-6684\",\"company_name\":\"Elovent AB\",\"official_website_url\":\"https://www.elovent.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website matches company name; contact page lists orgnr.\"},{\"orgnr\":\"556389-8609\",\"company_name\":\"Seriline Aktiebolag\",\"official_website_url\":\"https://www.seriline.com\",\"confidence_0_1\":0.9,\"source_note\":\"Website matches company name; contact page lists orgnr.\"},{\"orgnr\":\"556455-1900\",\"company_name\":\"Texstar AB\",\"official_website_url\":\"https://www.texstar.se\",\"confidence_0_1\":0.9,\"source_note\":\"Website matches company name; contact page lists orgnr.\"}]}",
+  "usage": {
+    "completion_tokens": 467,
+    "prompt_tokens": 1739,
+    "total_tokens": 2206,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

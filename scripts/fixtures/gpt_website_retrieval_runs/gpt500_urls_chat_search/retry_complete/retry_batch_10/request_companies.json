@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Bricks and Lime AB",
+      "orgnr": "559054-0315",
+      "address_country": "SE",
+      "primary_nace": "41200 Byggande av bostadshus och andra byggnader",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Lagermetall Aktiebolag",
+      "orgnr": "556213-0657",
+      "address_country": "SE",
+      "primary_nace": "46720 Partihandel med metaller och metallmalmer",
+      "segment_labels_json": "[\"Grossister\", \"Metaller, legeringar - grossist\"]"
+    },
+    {
+      "name": "Ventilationsprojekt i Nyköping AB",
+      "orgnr": "556464-0497",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "TP Mur & Puts Aktiebolag",
+      "orgnr": "556471-7477",
+      "address_country": "SE",
+      "primary_nace": "43999 Diverse övrig specialiserad bygg- och anläggningsverksamhet",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "S K Licenssvets Frölunda Aktiebolag",
+      "orgnr": "556350-8323",
+      "address_country": "SE",
+      "primary_nace": "43221 Värme- och sanitetsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Eliass Georges Fyndmarknad AB",
+      "orgnr": "556192-8127",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Astrimant AB",
+      "orgnr": "559244-7113",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Stora & Goa AB",
+      "orgnr": "556612-5901",
+      "address_country": "SE",
+      "primary_nace": "56100 Restaurangverksamhet",
+      "segment_labels_json": "[\"Restauranger\"]"
+    }
+  ]
+}

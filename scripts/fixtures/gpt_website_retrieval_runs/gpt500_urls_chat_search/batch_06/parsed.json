@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556663-5792",
+      "company_name": "Södra Århults Torv Aktiebolag",
+      "official_website_url": "https://www.sodraarhultstorv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; orgnr confirmed in 'Köpvillkor och rutiner' page."
+    },
+    {
+      "orgnr": "559083-3561",
+      "company_name": "Mälardalens Asfalt AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556521-4888",
+      "company_name": "ISAB Ventilation Väst AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556724-6623",
+      "company_name": "DM TAK AB",
+      "official_website_url": "https://www.dmtak.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556716-7704",
+      "company_name": "NA Schakt AB",
+      "official_website_url": "https://www.naschakt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556678-6306",
+      "company_name": "Nylands Trä AB",
+      "official_website_url": "https://www.nylandstra.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556974-3320",
+      "company_name": "Knowit Ascend AB",
+      "official_website_url": "https://www.knowit.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Part of Knowit group; subsidiary information found on group website."
+    },
+    {
+      "orgnr": "556540-8514",
+      "company_name": "Europress AB",
+      "official_website_url": "https://www.europress.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556444-8255",
+      "company_name": "Eqpack AB",
+      "official_website_url": "https://eqpack.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "orgnr": "556556-8895",
+      "company_name": "Lyckes Produktionsverktyg AB",
+      "official_website_url": "https://lyckespv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "orgnr": "556887-5057",
+      "company_name": "Next2Vet AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556446-1472",
+      "company_name": "Axema Access Control AB",
+      "official_website_url": "https://www.axema.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556841-6803",
+      "company_name": "Anton Paar Nordic AB",
+      "official_website_url": "https://www.anton-paar.com/se-sv",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556443-5120",
+      "company_name": "Converflex Aktiebolag",
+      "official_website_url": "https://www.converflex.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556445-0467",
+      "company_name": "Takab i Jönköping Aktiebolag",
+      "official_website_url": "https://www.takab.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556876-6215",
+      "company_name": "AB Vabon",
+      "official_website_url": "https://www.vabon.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556687-0639",
+      "company_name": "Eboss AB",
+      "official_website_url": "https://www.eboss.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "orgnr": "556509-4983",
+      "company_name": "I M Gunnarsson Handels Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556218-6253",
+      "company_name": "Itaab Trading Aktiebolag",
+      "official_website_url": "https://itaab.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company."
+    },
+    {
+      "orgnr": "556202-8968",
+      "company_name": "S-Schakt Schönström Aktiebolag",
+      "official_website_url": "https://www.s-schakt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556265-5430",
+      "company_name": "Carmenta Geospatial Technologies AB",
+      "official_website_url": "https://carmenta.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556402-9766",
+      "company_name": "Aktiebolaget Mercatus Engineering",
+      "official_website_url": "https://www.mercatus.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556526-8421",
+      "company_name": "Mönsterås Bostäder AB",
+      "official_website_url": "https://www.monsterasbostader.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556482-4729",
+      "company_name": "KmK Instrument Aktiebolag",
+      "official_website_url": "https://www.kmk.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    },
+    {
+      "orgnr": "556455-8244",
+      "company_name": "GMV Sweden Aktiebolag",
+      "official_website_url": "https://www.gmv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via company name search; matches company name and services."
+    }
+  ]
+}

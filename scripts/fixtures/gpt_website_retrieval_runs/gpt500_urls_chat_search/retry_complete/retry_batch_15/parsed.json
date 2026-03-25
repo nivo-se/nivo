@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556860-1057",
+      "company_name": "VinnTer AB",
+      "official_website_url": "https://www.vinnter.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified via web search; domain matches company name and services."
+    },
+    {
+      "orgnr": "556801-4095",
+      "company_name": "Twindej Experience AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556786-5588",
+      "company_name": "GUSTIS AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556219-3580",
+      "company_name": "Naturell Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556279-5582",
+      "company_name": "Breddens Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556261-9287",
+      "company_name": "CAG Consoden AB",
+      "official_website_url": "https://www.cag.se/consoden",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified via web search; domain matches company name and services."
+    },
+    {
+      "orgnr": "556524-2814",
+      "company_name": "Mathuset i Södra Backa AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556414-7485",
+      "company_name": "August Larsson Charkuteri AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    }
+  ]
+}

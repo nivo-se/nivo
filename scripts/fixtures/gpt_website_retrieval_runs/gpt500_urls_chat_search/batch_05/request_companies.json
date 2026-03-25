@@ -1,0 +1,183 @@
+{
+  "companies": [
+    {
+      "name": "Ventab Styr Aktiebolag",
+      "orgnr": "556458-6872",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Aktiebolaget Gamla Jernboden",
+      "orgnr": "556062-4230",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"VVS-arbeten, material och produkter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "SICE Nordics AB",
+      "orgnr": "559193-0671",
+      "address_country": "SE",
+      "primary_nace": "42110 Anläggning av vägar och motorvägar",
+      "segment_labels_json": "[\"Byggmästare\", \"Järnvägsutrustningar, spårvägsutrustningar\", \"Väganordningar, trafikanordningar, vägarbeten\"]"
+    },
+    {
+      "name": "Halle System AB",
+      "orgnr": "556333-6204",
+      "address_country": "SE",
+      "primary_nace": "25120 Tillverkning av dörrar och fönster av metall",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Gummivaror\", \"Metaller, legeringar\", \"Trävaror\", \"Grossister\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\", \"Trä och byggvaror - grossist\"]"
+    },
+    {
+      "name": "Inlands Luft AB",
+      "orgnr": "556703-8202",
+      "address_country": "SE",
+      "primary_nace": "43222 Ventilationsarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Ventilation, luftbehandling\"]"
+    },
+    {
+      "name": "Baltic Safety Products Aktiebolag (publ)",
+      "orgnr": "556200-0777",
+      "address_country": "SE",
+      "primary_nace": "46491 Partihandel med sport- och fritidsartiklar",
+      "segment_labels_json": "[\"Sport\", \"Grossister\", \"Sport - grossist\"]"
+    },
+    {
+      "name": "Carlbergs i Göteborg AB",
+      "orgnr": "556500-9072",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\", \"Brytning och gruvdrift\"]"
+    },
+    {
+      "name": "Industriverken i Ronneby AB",
+      "orgnr": "556437-9740",
+      "registry_homepage_url": "https://industriverken.com",
+      "address_country": "SE",
+      "primary_nace": "25500 Smidning, pressning, prägling och valsning av metall; pulvermetallurgi",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Hansson PyroTech Aktiebolag",
+      "orgnr": "556055-5814",
+      "address_country": "SE",
+      "primary_nace": "20510 Sprängämnestillverkning",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Kemikalier, industrikemikalier - tillverkning\", \"Kosmetik, parfym och frisörartiklar\", \"Producenter\"]"
+    },
+    {
+      "name": "Ellagro Örebro AB",
+      "orgnr": "556271-2082",
+      "registry_homepage_url": "https://ellagro.com",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Grothkaross Aktiebolag",
+      "orgnr": "556465-3359",
+      "address_country": "SE",
+      "primary_nace": "29200 Tillverkning av karosserier för motorfordon; tillverkning av släpfordon och påhängsvagnar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\", \"Karosserifabriker och verkstäder\", \"Producenter\"]"
+    },
+    {
+      "name": "Segers Fabriker Aktiebolag",
+      "orgnr": "556264-2362",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\"]"
+    },
+    {
+      "name": "Säljar'n i Närke Aktiebolag",
+      "orgnr": "556489-7600",
+      "address_country": "SE",
+      "primary_nace": "47540 Specialiserad butikshandel med elektriska hushållsmaskiner och hushållsapparater",
+      "segment_labels_json": "[\"Elmateriel\", \"VVS-arbeten, material och produkter\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Mouldex Plast AB",
+      "orgnr": "556100-1701",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Maskinförnödenheter\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Klippan Yllefabrik Aktiebolag",
+      "orgnr": "556017-2065",
+      "address_country": "SE",
+      "primary_nace": "46410 Partihandel med textilier",
+      "segment_labels_json": "[\"Textilier\", \"Grossister\", \"Textilier - Partihandel\"]"
+    },
+    {
+      "name": "Draken i Reftele Aktiebolag",
+      "orgnr": "556476-2093",
+      "registry_homepage_url": "https://www.qosina.com",
+      "address_country": "SE",
+      "primary_nace": "22220 Plastförpackningstillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Advisera AB",
+      "orgnr": "559057-7507",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Finansbolag, finansiella tjänster\", \"Företagsutveckling\", \"Telekommunikation, teleoperatörer\"]"
+    },
+    {
+      "name": "Socionomkraft AB",
+      "orgnr": "559011-7155",
+      "address_country": "SE",
+      "primary_nace": "78200 Personaluthyrning",
+      "segment_labels_json": "[\"Rekrytering\", \"Uthyrning\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "MEMO AB",
+      "orgnr": "556076-0497",
+      "registry_homepage_url": "https://memo.se",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Kallhälls Nya Vårdcentral AB",
+      "orgnr": "556710-1992",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\"]"
+    },
+    {
+      "name": "Brunneby Musteri AB",
+      "orgnr": "556666-8025",
+      "address_country": "SE",
+      "primary_nace": "10320 Juice- och safttillverkning",
+      "segment_labels_json": "[\"Livsmedel\", \"Restauranger\", \"Livsmedel - tillverkning\", \"Producenter\", \"Butikshandel\", \"Dryckesvaror\"]"
+    },
+    {
+      "name": "Göthes Säkerhet Aktiebolag",
+      "orgnr": "556388-2470",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Personlig Almanacka Nordic AB",
+      "orgnr": "556756-6376",
+      "address_country": "SE",
+      "primary_nace": "46499 Partihandel med övriga hushållsvaror",
+      "segment_labels_json": "[\"Grossister\"]"
+    },
+    {
+      "name": "Incluso AB",
+      "orgnr": "559002-3213",
+      "address_country": "SE",
+      "primary_nace": "78100 Arbetsförmedling och rekrytering",
+      "segment_labels_json": "[\"Rekrytering\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "Aktiebolaget Vårby Färghall",
+      "orgnr": "556179-5690",
+      "address_country": "SE",
+      "primary_nace": "46731 Partihandel med virke och andra byggmaterial",
+      "segment_labels_json": "[\"Färger, lacker, tapeter\", \"Golvbeläggningar\", \"Trävaror\", \"Grossister\", \"Trä och byggvaror - grossist\", \"Butikshandel\"]"
+    }
+  ]
+}

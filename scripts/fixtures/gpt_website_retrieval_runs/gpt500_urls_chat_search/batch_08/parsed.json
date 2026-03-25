@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "559183-1085",
+      "company_name": "MORA CNC AB",
+      "official_website_url": "https://www.nordiqongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556317-9596",
+      "company_name": "Fasadsystem i Stenkullen Aktiebolag",
+      "official_website_url": "https://fasadsystem.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556991-1497",
+      "company_name": "ProChroma AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556490-7458",
+      "company_name": "Material Handling Modules Europe AB",
+      "official_website_url": "https://www.mhmodules.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556379-1101",
+      "company_name": "Tovar Livs Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556592-7646",
+      "company_name": "Patriksson Communication AB",
+      "official_website_url": "https://www.patriksson.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556531-8150",
+      "company_name": "Per Sjögren Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    },
+    {
+      "orgnr": "556328-8199",
+      "company_name": "Multivac Aktiebolag",
+      "official_website_url": "https://se.multivac.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556234-6089",
+      "company_name": "Tribotec Aktiebolag",
+      "official_website_url": "https://www.tribotec.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556030-7836",
+      "company_name": "Sifvert Skruv Aktiebolag",
+      "official_website_url": "https://www.sifvertskruv.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556624-2656",
+      "company_name": "Vertech AB",
+      "official_website_url": "https://www.vertech.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556583-8595",
+      "company_name": "Schütz Allemballage AB",
+      "official_website_url": "https://www.allemballage.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556998-1920",
+      "company_name": "Vekst AB",
+      "official_website_url": "https://www.vekst.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556762-5495",
+      "company_name": "Panthera AB",
+      "official_website_url": "https://www.panthera.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556201-1949",
+      "company_name": "Aktiebolaget Thoreb",
+      "official_website_url": "https://www.thoreb.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556633-5997",
+      "company_name": "Sänghuset Elgen AB",
+      "official_website_url": "https://www.sanghusetelgen.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556697-9281",
+      "company_name": "Nya Eriksbo plantskola AB",
+      "official_website_url": "https://www.eriksboplantskola.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556640-4421",
+      "company_name": "Pall Cargo i Kungsbacka AB",
+      "official_website_url": "https://www.pallcargo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556999-4691",
+      "company_name": "Parapix AB",
+      "official_website_url": "https://parapix.tv",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556468-7597",
+      "company_name": "AB Sundplast",
+      "official_website_url": "https://sundplast.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry URL verified as live and matching company name."
+    },
+    {
+      "orgnr": "556800-4328",
+      "company_name": "Set Up AB",
+      "official_website_url": "https://www.setupab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556655-0603",
+      "company_name": "TB Printsolutions AB",
+      "official_website_url": "https://www.tbprintsolutions.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556813-8886",
+      "company_name": "Conoa AB",
+      "official_website_url": "https://www.conoa.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556508-8639",
+      "company_name": "HA Ventilation AB",
+      "official_website_url": "https://www.haventilation.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website found via search; matches company name and services."
+    },
+    {
+      "orgnr": "556575-1715",
+      "company_name": "M o P Vestman Livs AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.2,
+      "source_note": "No official website found after multiple searches; only directory listings available."
+    }
+  ]
+}

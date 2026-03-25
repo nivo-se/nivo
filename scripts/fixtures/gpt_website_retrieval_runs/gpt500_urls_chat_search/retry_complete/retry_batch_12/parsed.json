@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556222-7313",
+      "company_name": "Claessons Cykel & Motor Aktiebolag",
+      "official_website_url": "https://www.claessonsmotor.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Website URL found on multiple business directories matching company name and orgnr."
+    },
+    {
+      "orgnr": "559389-4776",
+      "company_name": "Berkeley Company AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556803-8789",
+      "company_name": "Solid Beans AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556143-2013",
+      "company_name": "Helge Nyberg Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556597-6684",
+      "company_name": "Cordial AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556295-6556",
+      "company_name": "Svetsekonomi i Skövde Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "556450-5575",
+      "company_name": "Karlskoga CNC Quality Aktiebolag",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    },
+    {
+      "orgnr": "559015-9553",
+      "company_name": "Matbutiken Vällebergsvägen AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches; company may not have a public site."
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556835-6074",
+      "company_name": "Hexis AB",
+      "official_website_url": "https://www.hexis.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; matches company name and industry."
+    },
+    {
+      "orgnr": "556148-6845",
+      "company_name": "Ottosson Truck Aktiebolag",
+      "official_website_url": "https://www.ottossontruck.se/",
+      "confidence_0_1": 0.95,
+      "source_note": "Found on allabolag.se; matches company name and industry."
+    },
+    {
+      "orgnr": "556985-3970",
+      "company_name": "Alphadev AB",
+      "official_website_url": "https://www.alphadev.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; matches company name and industry."
+    },
+    {
+      "orgnr": "556566-1724",
+      "company_name": "Stockholms Styr-Team AB",
+      "official_website_url": "https://www.styrteam.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; matches company name and industry."
+    },
+    {
+      "orgnr": "559127-3171",
+      "company_name": "Bohusbolagen AB",
+      "official_website_url": "https://www.bohusbolagen.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through web search; matches company name and industry."
+    }
+  ]
+}

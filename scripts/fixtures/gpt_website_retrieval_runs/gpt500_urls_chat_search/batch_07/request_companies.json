@@ -1,0 +1,188 @@
+{
+  "companies": [
+    {
+      "name": "NFM Flytgolv AB",
+      "orgnr": "556723-7986",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Golvbeläggningar\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Busch Pfeiffer Vacuum AB",
+      "orgnr": "556198-1308",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Kaisa Technologies AB",
+      "orgnr": "556751-0689",
+      "address_country": "SE",
+      "primary_nace": "71129 Övrig teknisk konsultverksamhet",
+      "segment_labels_json": "[\"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Netnod AB",
+      "orgnr": "556534-0014",
+      "address_country": "SE",
+      "primary_nace": "61100 Trådbunden telekommunikation",
+      "segment_labels_json": "[\"Telekommunikation, teleoperatörer\"]"
+    },
+    {
+      "name": "Curant Klimat AB",
+      "orgnr": "556470-5506",
+      "address_country": "SE",
+      "primary_nace": "47521 Specialiserad butikshandel med virke och byggvaror",
+      "segment_labels_json": "[\"Järnvaror\", \"Butikshandel\"]"
+    },
+    {
+      "name": "EH Connector AB",
+      "orgnr": "556531-3623",
+      "registry_homepage_url": "https://ehconnector.se",
+      "address_country": "SE",
+      "primary_nace": "27330 Tillverkning av kabeltillbehör",
+      "segment_labels_json": "[\"Elektronik - Systemkomponenter\", \"Kablar och kraftledningar\", \"Kablar och kraftledningar - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Örebro Bildemontering Aktiebolag",
+      "orgnr": "556436-7067",
+      "address_country": "SE",
+      "primary_nace": "46771 Partihandel med uttjänta fordon",
+      "segment_labels_json": "[\"Grossister\", \"Avfall - grossister\", \"Avfallshantering\"]"
+    },
+    {
+      "name": "Sordin Vikmanshyttan AB",
+      "orgnr": "556457-7475",
+      "registry_homepage_url": "https://sordin.com",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Addvanze AB",
+      "orgnr": "556812-7558",
+      "registry_homepage_url": "https://addvanze.com",
+      "address_country": "SE",
+      "primary_nace": "20120 Tillverkning av färgämnen",
+      "segment_labels_json": "[\"Gummivaror\", \"Kemikalier, industrikemikalier\", \"Kemikalier, industrikemikalier - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Målerås Mekaniska Aktiebolag",
+      "orgnr": "556206-8238",
+      "registry_homepage_url": "https://maleras-mek.se",
+      "address_country": "SE",
+      "primary_nace": "29320 Tillverkning av andra delar och tillbehör till motorfordon",
+      "segment_labels_json": "[\"Bilar\", \"Bilar - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Aktiebolag Montano",
+      "orgnr": "556394-4874",
+      "address_country": "SE",
+      "primary_nace": "46720 Partihandel med metaller och metallmalmer",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Grossister\", \"Metaller, legeringar - grossist\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Vitec Mäklarsystem AB",
+      "orgnr": "556367-6500",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\"]"
+    },
+    {
+      "name": "Il Molino AB",
+      "orgnr": "556568-1425",
+      "address_country": "SE",
+      "primary_nace": "46380 Partihandel med andra livsmedel, bl.a. fisk samt skal- och blötdjur",
+      "segment_labels_json": "[\"Livsmedel\", \"Grossister\", \"Livsmedel - agenturer och grossister\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "IML technologies aktiebolag",
+      "orgnr": "556620-3682",
+      "registry_homepage_url": "https://3buttongroup.com",
+      "address_country": "SE",
+      "primary_nace": "28990 Tillverkning av övriga specialmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Hydroscand Machine Aktiebolag",
+      "orgnr": "556537-5994",
+      "registry_homepage_url": "https://hydroscand.se",
+      "address_country": "SE",
+      "primary_nace": "28410 Tillverkning av verktygsmaskiner för metallbearbetning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "PQ Projektledning Aktiebolag",
+      "orgnr": "556722-3234",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Sjömarkens Isolering Aktiebolag",
+      "orgnr": "556238-1839",
+      "address_country": "SE",
+      "primary_nace": "43290 Andra bygginstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Konsulter\", \"Miljöteknik\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Söderqvist Gräv AB",
+      "orgnr": "559257-0096",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Industridraperier i Örebro AB",
+      "orgnr": "556737-8236",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Bällsta Handel AB",
+      "orgnr": "556615-8126",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Hydal Components AB",
+      "orgnr": "556267-3383",
+      "registry_homepage_url": "https://raufossaluminium.com",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Lybab AB",
+      "orgnr": "556762-3318",
+      "registry_homepage_url": "https://lybab.se",
+      "address_country": "SE",
+      "primary_nace": "25610 Beläggning och överdragning av metall",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Thor Ahlgren Aktiebolag",
+      "orgnr": "556314-6660",
+      "registry_homepage_url": "https://www.thorahlgren.se",
+      "address_country": "SE",
+      "primary_nace": "29320 Tillverkning av andra delar och tillbehör till motorfordon",
+      "segment_labels_json": "[\"Bilar\", \"Fästelement\", \"Metaller, legeringar\", \"Bilar - tillverkning\", \"Metaller, legeringar - Produktion\", \"Producenter\", \"Övrig tillverkning\"]"
+    },
+    {
+      "name": "Fillauer Europe AB",
+      "orgnr": "556132-1745",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Medicinteknisk utrustning\", \"Grossister\", \"Medicinteknisk utrustning - produktion\", \"Producenter\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Bright Networks AB",
+      "orgnr": "559214-5717",
+      "address_country": "SE",
+      "primary_nace": "42220 Anläggningsarbeten för el och telekommunikation",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556441-8092",
+      "company_name": "Aktiebolaget Rosenfors Bruk",
+      "official_website_url": "https://holsbyverken.se/rosenfors-bruk/hem",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on manufacturingguide.com; matches registry_homepage_url with specific page for Rosenfors Bruk."
+    },
+    {
+      "orgnr": "556477-8164",
+      "company_name": "VEIDEC AB",
+      "official_website_url": "https://www.veidec.com/se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on largestcompanies.com; matches company name and orgnr."
+    },
+    {
+      "orgnr": "556758-3702",
+      "company_name": "Mavera AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches."
+    },
+    {
+      "orgnr": "556295-4569",
+      "company_name": "Umlax Aktiebolag",
+      "official_website_url": "https://umlax.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556799-1459",
+      "company_name": "Säkerhetsteamet i Skåne AB",
+      "official_website_url": "https://sakerhetsteamet.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556544-8072",
+      "company_name": "Ascade AB",
+      "official_website_url": "https://www.ascade.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556900-2149",
+      "company_name": "Maskin System Europe AB",
+      "official_website_url": "https://www.mseab.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556438-7008",
+      "company_name": "Smålands Miljö Aktiebolag",
+      "official_website_url": "https://www.smalandsmiljo.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556794-5778",
+      "company_name": "P Maskin Automation AB",
+      "official_website_url": "https://www.pmaskin.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556449-4374",
+      "company_name": "Gunnar Blomgren Aktiebolag",
+      "official_website_url": "https://www.gunnarblomgren.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556464-4861",
+      "company_name": "Swebolt Järfälla Aktiebolag",
+      "official_website_url": "https://www.swebolt.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556473-0801",
+      "company_name": "APC Elinstallatören Aktiebolag",
+      "official_website_url": "https://www.apcel.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556444-9824",
+      "company_name": "Flux AB",
+      "official_website_url": "https://www.flux.nu/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556282-0307",
+      "company_name": "Nordic Cleanware AB",
+      "official_website_url": "https://www.cleanware.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "559052-1398",
+      "company_name": "dizparc Jönköping Infrastruktur AB",
+      "official_website_url": "https://www.dizparc.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556289-8998",
+      "company_name": "Biora AB",
+      "official_website_url": "https://www.bioragroup.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Matches registry_homepage_url; confirmed as official website."
+    },
+    {
+      "orgnr": "556600-4106",
+      "company_name": "MAPTUN Performance AB",
+      "official_website_url": "https://www.maptun.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556715-4207",
+      "company_name": "ppm Industrial AB",
+      "official_website_url": "https://www.ppmindustrial.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556418-0403",
+      "company_name": "P&V Ventilation i Nyköping AB",
+      "official_website_url": "https://www.pvventilation.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556292-9322",
+      "company_name": "Norva24 Miljöhantering AB",
+      "official_website_url": "https://www.norva24.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556314-8153",
+      "company_name": "Comex Electronics Aktiebolag",
+      "official_website_url": "https://www.comex.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556284-4687",
+      "company_name": "System Hall AB",
+      "official_website_url": "https://www.systemhall.com/",
+      "confidence_0_1": 0.9,
+      "source_note": "Matches registry_homepage_url; confirmed as official website."
+    },
+    {
+      "orgnr": "556991-2677",
+      "company_name": "Laholms Marin AB",
+      "official_website_url": "https://www.laholmsmarin.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556583-1822",
+      "company_name": "Embriq AB",
+      "official_website_url": "https://www.embriq.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    },
+    {
+      "orgnr": "556654-0422",
+      "company_name": "Digitalist Open Tech AB",
+      "official_website_url": "https://digitalist.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on company directories; matches company name and industry."
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "companies": [
+    {
+      "name": "SchoolSoft AB",
+      "orgnr": "556587-6066",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Internet - Konsulter, operatörer\", \"Skolor och utbildning\"]"
+    },
+    {
+      "name": "Itsab AB",
+      "orgnr": "556653-5174",
+      "address_country": "SE",
+      "primary_nace": "46699 Partihandel med diverse övriga maskiner och utrustning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Thelin Data AB",
+      "orgnr": "556564-3458",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "THED Livs AB",
+      "orgnr": "556664-8126",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Boliden Electro AB",
+      "orgnr": "556956-4858",
+      "address_country": "SE",
+      "primary_nace": "27110 Tillverkning av elmotorer, generatorer och transformatorer",
+      "segment_labels_json": "[\"Elektromekaniska verkstäder\", \"Elektronik - Legotillverkning\", \"Elektronik - Systemkomponenter\", \"Elmateriel\", \"Elmotorer, generatorer\", \"Elektrisk installationsmaterial - tillverkning\", \"Elmotorer, generatorer - produktion\", \"Producenter\", \"Reparatörer\"]"
+    },
+    {
+      "name": "Sandéns Golv i Helsingborg Aktiebolag",
+      "orgnr": "556337-1375",
+      "address_country": "SE",
+      "primary_nace": "43330 Golv- och väggbeläggningsarbeten",
+      "segment_labels_json": "[\"Byggmästare\"]"
+    },
+    {
+      "name": "Ingeniörsfirma Bågenfelt & Hellström AB",
+      "orgnr": "556536-2000",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Järnvaror\", \"Metaller, legeringar\", \"Grossister\", \"Metaller, legeringar - Produktion\", \"Metallurgisk industri\", \"Producenter\"]"
+    },
+    {
+      "name": "MOORE KLN AB",
+      "orgnr": "556415-1362",
+      "address_country": "SE",
+      "primary_nace": "69202 Revision",
+      "segment_labels_json": "[\"Revision\"]"
+    },
+    {
+      "name": "Getinge Gräv Aktiebolag",
+      "orgnr": "556480-3251",
+      "address_country": "SE",
+      "primary_nace": "43120 Mark- och grundarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\"]"
+    },
+    {
+      "name": "Grenland Rail AB",
+      "orgnr": "556765-8827",
+      "address_country": "SE",
+      "primary_nace": "52219 Övriga stödtjänster till landtransport",
+      "segment_labels_json": "[\"Transportförmedling\"]"
+    },
+    {
+      "name": "Sacco System Nordic AB",
+      "orgnr": "556559-8207",
+      "address_country": "SE",
+      "primary_nace": "20140 Tillverkning av andra organiska baskemikalier",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Kemikalier, industrikemikalier - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "AV1 AB",
+      "orgnr": "556816-4924",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "77390 Uthyrning och leasing av övrig utrustning och övriga maskiner och materiella tillgångar",
+      "segment_labels_json": "[\"Uthyrning\"]"
+    },
+    {
+      "name": "N P Produkter i Jönköping Aktiebolag",
+      "orgnr": "556161-8017",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Järnvaror\", \"Grossister\"]"
+    },
+    {
+      "name": "INSU AB",
+      "orgnr": "556369-9817",
+      "address_country": "SE",
+      "primary_nace": "85594 Personalutbildning",
+      "segment_labels_json": "[\"Organisationer\", \"Skolor och utbildning\"]"
+    },
+    {
+      "name": "Aktiebolaget Smålandsinredningar",
+      "orgnr": "556528-7264",
+      "address_country": "SE",
+      "primary_nace": "31012 Tillverkning av kontors- och butiksinredningar",
+      "segment_labels_json": "[\"Möbler\"]"
+    },
+    {
+      "name": "Bimex Verktyg AB",
+      "orgnr": "556170-3926",
+      "registry_homepage_url": "https://www.bimex.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\", \"Producenter\", \"Verktyg och redskap\", \"Verktyg och redskap - tillverkning\"]"
+    },
+    {
+      "name": "Torverk Industrial Doors Aktiebolag",
+      "orgnr": "556545-2298",
+      "registry_homepage_url": "https://torverk.se",
+      "address_country": "SE",
+      "primary_nace": "25120 Tillverkning av dörrar och fönster av metall",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Metaller, legeringar\", \"Producenter\"]"
+    },
+    {
+      "name": "YTAAB AB",
+      "orgnr": "556519-6382",
+      "address_country": "SE",
+      "primary_nace": "43999 Diverse övrig specialiserad bygg- och anläggningsverksamhet",
+      "segment_labels_json": "[\"Byggmästare\", \"Entreprenörer\", \"Parkanläggningar\"]"
+    },
+    {
+      "name": "ABAS Protect AB",
+      "orgnr": "556058-6744",
+      "registry_homepage_url": "https://abas.se",
+      "address_country": "SE",
+      "primary_nace": "25930 Tillverkning av metalltrådvaror, kedjor och fjädrar",
+      "segment_labels_json": "[\"Dörrar, portar\", \"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "LTP Säkerhetsteknik AB",
+      "orgnr": "556993-8326",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Törnblads livs i Tvååker AB",
+      "orgnr": "559032-1013",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Polyproject Environment AB",
+      "orgnr": "556908-6282",
+      "address_country": "SE",
+      "primary_nace": "22230 Byggplastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Omniarch AB",
+      "orgnr": "559168-0326",
+      "address_country": "SE",
+      "primary_nace": "63120 Webbportaler",
+      "segment_labels_json": "[\"Datacenters\"]"
+    },
+    {
+      "name": "Växtkraft i Skåne Tranås AB",
+      "orgnr": "556840-4684",
+      "address_country": "SE",
+      "primary_nace": "01191 Odling av prydnadsväxter i växthus",
+      "segment_labels_json": "[\"Byggmästare\", \"Uthyrning\", \"Växtservice, kontorsservice\", \"Entreprenörer\", \"Jordbruk\", \"Jordbruk - odling\", \"Parkanläggningar\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Dalform AB",
+      "orgnr": "556753-0992",
+      "address_country": "SE",
+      "primary_nace": "31012 Tillverkning av kontors- och butiksinredningar",
+      "segment_labels_json": "[\"Möbler\"]"
+    }
+  ]
+}

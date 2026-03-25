@@ -1,0 +1,60 @@
+{
+  "companies": [
+    {
+      "name": "Fila Nordic AB",
+      "orgnr": "556575-0279",
+      "address_country": "SE",
+      "primary_nace": "46492 Partihandel med kontorsförbrukningsvaror",
+      "segment_labels_json": "[\"Grossister\", \"Reseeffekter\"]"
+    },
+    {
+      "name": "Söderströms Skog & Trädgård AB",
+      "orgnr": "556500-7357",
+      "address_country": "SE",
+      "primary_nace": "47522 Specialiserad butikshandel med järn- och VVS-varor",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"VVS-arbeten, material och produkter\", \"Fastighetsförvaltning\", \"Maskinförnödenheter - reparationer\", \"Parkanläggningar\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Remotion AB",
+      "orgnr": "556832-9790",
+      "address_country": "SE",
+      "primary_nace": "73111 Reklambyråverksamhet",
+      "segment_labels_json": "[\"Reklambyråer\"]"
+    },
+    {
+      "name": "Vindelns Livs AB",
+      "orgnr": "556751-6041",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Lupus Foder AB",
+      "orgnr": "556468-3349",
+      "address_country": "SE",
+      "primary_nace": "46210 Partihandel med spannmål, råtobak, utsäde och djurfoder",
+      "segment_labels_json": "[\"Livsmedel\", \"Grossister\", \"Spannmål, råtobak, utsäde och djurfoder - grossister\"]"
+    },
+    {
+      "name": "Elovent AB",
+      "orgnr": "556993-6684",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Seriline Aktiebolag",
+      "orgnr": "556389-8609",
+      "address_country": "SE",
+      "primary_nace": "62010 Dataprogrammering",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Bevakningsföretag\", \"Internet - Konsulter, operatörer\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Texstar AB",
+      "orgnr": "556455-1900",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\"]"
+    }
+  ]
+}

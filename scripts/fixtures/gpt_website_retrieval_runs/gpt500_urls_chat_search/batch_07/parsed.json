@@ -1,0 +1,184 @@
+{
+  "valid": true,
+  "api_mode": "chat_completions_search_json_schema",
+  "expected_count": 25,
+  "returned_count": 25,
+  "count_ok": true,
+  "items": [
+    {
+      "orgnr": "556723-7986",
+      "company_name": "NFM Flytgolv AB",
+      "official_website_url": "https://www.nfm.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Found on Byggkatalogen and Largestcompanies, matching orgnr and company name."
+    },
+    {
+      "orgnr": "556198-1308",
+      "company_name": "Busch Pfeiffer Vacuum AB",
+      "official_website_url": "https://www.buschvacuum.com/se/sv/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified on Industritorget and Merinfo, matching orgnr and company name."
+    },
+    {
+      "orgnr": "556751-0689",
+      "company_name": "Kaisa Technologies AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "orgnr": "556534-0014",
+      "company_name": "Netnod AB",
+      "official_website_url": "https://www.netnod.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556470-5506",
+      "company_name": "Curant Klimat AB",
+      "official_website_url": "https://www.curant.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556531-3623",
+      "company_name": "EH Connector AB",
+      "official_website_url": "https://ehconnector.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556436-7067",
+      "company_name": "Örebro Bildemontering Aktiebolag",
+      "official_website_url": "https://www.orebrobildemo.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556457-7475",
+      "company_name": "Sordin Vikmanshyttan AB",
+      "official_website_url": "https://sordin.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556812-7558",
+      "company_name": "Addvanze AB",
+      "official_website_url": "https://addvanze.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556206-8238",
+      "company_name": "Målerås Mekaniska Aktiebolag",
+      "official_website_url": "https://maleras-mek.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556394-4874",
+      "company_name": "Aktiebolag Montano",
+      "official_website_url": "https://www.montano.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556367-6500",
+      "company_name": "Vitec Mäklarsystem AB",
+      "official_website_url": "https://www.vitecsoftware.com/maklarsystem",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556568-1425",
+      "company_name": "Il Molino AB",
+      "official_website_url": "https://www.ilmolino.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556620-3682",
+      "company_name": "IML technologies aktiebolag",
+      "official_website_url": "https://3buttongroup.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556537-5994",
+      "company_name": "Hydroscand Machine Aktiebolag",
+      "official_website_url": "https://hydroscand.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556722-3234",
+      "company_name": "PQ Projektledning Aktiebolag",
+      "official_website_url": "https://www.pqprojekt.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556238-1839",
+      "company_name": "Sjömarkens Isolering Aktiebolag",
+      "official_website_url": "https://www.sjomarkens.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "559257-0096",
+      "company_name": "Söderqvist Gräv AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "orgnr": "556737-8236",
+      "company_name": "Industridraperier i Örebro AB",
+      "official_website_url": "https://www.industridraperier.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "556615-8126",
+      "company_name": "Bällsta Handel AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    },
+    {
+      "orgnr": "556267-3383",
+      "company_name": "Hydal Components AB",
+      "official_website_url": "https://raufossaluminium.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556762-3318",
+      "company_name": "Lybab AB",
+      "official_website_url": "https://lybab.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556314-6660",
+      "company_name": "Thor Ahlgren Aktiebolag",
+      "official_website_url": "https://www.thorahlgren.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Registry homepage URL confirmed as live and matching company details."
+    },
+    {
+      "orgnr": "556132-1745",
+      "company_name": "Fillauer Europe AB",
+      "official_website_url": "https://fillauer.com",
+      "confidence_0_1": 0.9,
+      "source_note": "Official website found matching company name and orgnr."
+    },
+    {
+      "orgnr": "559214-5717",
+      "company_name": "Bright Networks AB",
+      "official_website_url": "",
+      "confidence_0_1": 0.0,
+      "source_note": "No official website found after multiple searches combining company name, orgnr, and related terms."
+    }
+  ]
+}

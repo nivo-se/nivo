@@ -1,0 +1,23 @@
+{
+  "id": "chatcmpl-76997f7c-40c2-4bc4-8d95-00dde49ddd3b",
+  "model": "gpt-4o-search-preview-2025-03-11",
+  "output_text": "{\"items\":[{\"orgnr\":\"556860-1057\",\"company_name\":\"VinnTer AB\",\"official_website_url\":\"https://www.vinnter.se\",\"confidence_0_1\":0.9,\"source_note\":\"Identified via web search; domain matches company name and services.\"},{\"orgnr\":\"556801-4095\",\"company_name\":\"Twindej Experience AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556786-5588\",\"company_name\":\"GUSTIS AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556219-3580\",\"company_name\":\"Naturell Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556279-5582\",\"company_name\":\"Breddens Livs Aktiebolag\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556261-9287\",\"company_name\":\"CAG Consoden AB\",\"official_website_url\":\"https://www.cag.se/consoden\",\"confidence_0_1\":0.9,\"source_note\":\"Identified via web search; domain matches company name and services.\"},{\"orgnr\":\"556524-2814\",\"company_name\":\"Mathuset i Södra Backa AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"},{\"orgnr\":\"556414-7485\",\"company_name\":\"August Larsson Charkuteri AB\",\"official_website_url\":\"\",\"confidence_0_1\":0.2,\"source_note\":\"No official website found after multiple searches; only directory listings available.\"}]}",
+  "usage": {
+    "completion_tokens": 432,
+    "prompt_tokens": 1785,
+    "total_tokens": 2217,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    }
+  },
+  "api_kind": "chat_completions",
+  "api_mode": "chat_completions_search_json_schema",
+  "structured_format_rejection": null
+}

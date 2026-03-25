@@ -1,0 +1,16 @@
+{
+  "script": "gpt_batch_website_retry_empty.py",
+  "batch_index": 7,
+  "row_indices": [
+    238,
+    239,
+    240,
+    241,
+    242,
+    244,
+    245,
+    246
+  ],
+  "model": "gpt-4o-search-preview",
+  "run_started_utc": "2026-03-25T09:14:24Z"
+}

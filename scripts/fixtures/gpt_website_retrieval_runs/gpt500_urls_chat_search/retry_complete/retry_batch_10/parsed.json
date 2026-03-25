@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "559054-0315",
+      "company_name": "Bricks and Lime AB",
+      "official_website_url": "https://www.bricksandlime.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556213-0657",
+      "company_name": "Lagermetall Aktiebolag",
+      "official_website_url": "https://www.lagermetall.se",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556464-0497",
+      "company_name": "Ventilationsprojekt i Nyköping AB",
+      "official_website_url": "https://www.ventilationsprojekt.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556471-7477",
+      "company_name": "TP Mur & Puts Aktiebolag",
+      "official_website_url": "https://www.tpmurputs.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556350-8323",
+      "company_name": "S K Licenssvets Frölunda Aktiebolag",
+      "official_website_url": "https://www.licenssvets.se",
+      "confidence_0_1": 0.75,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556192-8127",
+      "company_name": "Eliass Georges Fyndmarknad AB",
+      "official_website_url": "https://www.fyndmarknad.se",
+      "confidence_0_1": 0.7,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "559244-7113",
+      "company_name": "Astrimant AB",
+      "official_website_url": "https://www.astrimant.se",
+      "confidence_0_1": 0.8,
+      "source_note": "Identified through company name search; domain matches company name."
+    },
+    {
+      "orgnr": "556612-5901",
+      "company_name": "Stora & Goa AB",
+      "official_website_url": "https://www.storagoa.se",
+      "confidence_0_1": 0.85,
+      "source_note": "Identified through company name search; domain matches company name."
+    }
+  ]
+}

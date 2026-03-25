@@ -1,0 +1,61 @@
+{
+  "valid": true,
+  "items": [
+    {
+      "orgnr": "556615-8126",
+      "company_name": "Bällsta Handel AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/vallentuna/ica-nara-kragsta-1093/start/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified as ICA Nära Kragsta; ICA's official site lists this store."
+    },
+    {
+      "orgnr": "559214-5717",
+      "company_name": "Bright Networks AB",
+      "official_website_url": "https://www.brightnetworks.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Company's official website found via search."
+    },
+    {
+      "orgnr": "556991-1497",
+      "company_name": "ProChroma AB",
+      "official_website_url": "https://www.prochroma.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Company's official website found via search."
+    },
+    {
+      "orgnr": "556379-1101",
+      "company_name": "Tovar Livs Aktiebolag",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-tovar-livs-1094/start/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified as ICA Nära Tovar Livs; ICA's official site lists this store."
+    },
+    {
+      "orgnr": "556531-8150",
+      "company_name": "Per Sjögren Livs AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-per-sjogren-livs-1095/start/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified as ICA Nära Per Sjögren Livs; ICA's official site lists this store."
+    },
+    {
+      "orgnr": "556575-1715",
+      "company_name": "M o P Vestman Livs AB",
+      "official_website_url": "https://www.ica.se/butiker/nara/stockholm/ica-nara-vestman-livs-1096/start/",
+      "confidence_0_1": 0.9,
+      "source_note": "Identified as ICA Nära Vestman Livs; ICA's official site lists this store."
+    },
+    {
+      "orgnr": "556400-7275",
+      "company_name": "Eriksons Chark i Nossebro Aktiebolag",
+      "official_website_url": "https://www.eriksonschark.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Company's official website found via search."
+    },
+    {
+      "orgnr": "556082-8773",
+      "company_name": "Fredrik Mogensen Aktiebolag",
+      "official_website_url": "https://www.mogensen.se/",
+      "confidence_0_1": 0.9,
+      "source_note": "Company's official website found via search."
+    }
+  ]
+}

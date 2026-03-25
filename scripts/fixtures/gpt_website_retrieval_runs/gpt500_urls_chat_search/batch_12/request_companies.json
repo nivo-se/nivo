@@ -1,0 +1,183 @@
+{
+  "companies": [
+    {
+      "name": "Archus Affärsutveckling & Projektledning AB",
+      "orgnr": "556921-4058",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "H P-Borrningar i Klippan Aktiebolag",
+      "orgnr": "556491-4637",
+      "address_country": "SE",
+      "primary_nace": "43999 Diverse övrig specialiserad bygg- och anläggningsverksamhet",
+      "segment_labels_json": "[\"Borrningsarbeten\", \"Byggmästare\", \"Markentreprenörer, anläggningsentreprenörer\", \"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "J.N. Elinstallatörer Aktiebolag",
+      "orgnr": "556277-1468",
+      "address_country": "SE",
+      "primary_nace": "43210 Elinstallationer",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "ÅMV Production Aktiebolag",
+      "orgnr": "556627-2927",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Mekaniska verkstäder\", \"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Lone Star Shipping AB",
+      "orgnr": "556798-0759",
+      "address_country": "SE",
+      "primary_nace": "45201 Allmän service och reparation av motorfordon utom motorcyklar",
+      "segment_labels_json": "[\"Bilar\", \"Bilreparationer\", \"Maskinförnödenheter\", \"Transportförmedling\", \"Uthyrning\", \"Åkerier\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\", \"Arbetskraftstjänster\"]"
+    },
+    {
+      "name": "Tjeders Industri Aktiebolag",
+      "orgnr": "556041-7254",
+      "address_country": "SE",
+      "primary_nace": "27900 Tillverkning av annan elapparatur",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Elektronik - Systemkomponenter\", \"Elmateriel\", \"Elektronik - Tillverkning\", \"Grossister\", \"Producenter\", \"Datorer och kringutrustningar - tillverkning\"]"
+    },
+    {
+      "name": "Medela Medical Aktiebolag",
+      "orgnr": "556252-8652",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Claessons Cykel & Motor Aktiebolag",
+      "orgnr": "556222-7313",
+      "address_country": "SE",
+      "primary_nace": "45400 Handel med och service av motorcyklar inklusive reservdelar och tillbehör",
+      "segment_labels_json": "[\"Bilar\", \"MC, mopeder, skotrar\", \"Motorcykel, ATV och mopeder - detaljister\", \"Detaljhandel\"]"
+    },
+    {
+      "name": "Berkeley Company AB",
+      "orgnr": "559389-4776",
+      "address_country": "SE",
+      "primary_nace": "46420 Partihandel med kläder och skodon",
+      "segment_labels_json": "[\"Kläder\", \"Grossister\", \"Konfektion\"]"
+    },
+    {
+      "name": "Solid Beans AB",
+      "orgnr": "556803-8789",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Helge Nyberg Aktiebolag",
+      "orgnr": "556143-2013",
+      "address_country": "SE",
+      "primary_nace": "30990 Diverse övrig transportmedelstillverkning",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Truckar\", \"Maskinförnödenheter - tillverkning\", \"Producenter\", \"Övriga fordon\"]"
+    },
+    {
+      "name": "Cordial AB",
+      "orgnr": "556597-6684",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Företagsutveckling\"]"
+    },
+    {
+      "name": "Osby Mekan AB",
+      "orgnr": "556616-8190",
+      "registry_homepage_url": "https://npoindustrier.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Svetsekonomi i Skövde Aktiebolag",
+      "orgnr": "556295-6556",
+      "address_country": "SE",
+      "primary_nace": "46741 Partihandel med järnhandelsvaror",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Järnvaror\", \"Maskinförnödenheter\", \"Grossister\"]"
+    },
+    {
+      "name": "Westmatic i Arvika Aktiebolag",
+      "orgnr": "556326-7185",
+      "registry_homepage_url": "https://www.westmatic.se",
+      "address_country": "SE",
+      "primary_nace": "28990 Tillverkning av övriga specialmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Karlskoga CNC Quality Aktiebolag",
+      "orgnr": "556450-5575",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Matbutiken Vällebergsvägen AB",
+      "orgnr": "559015-9553",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Wanås Gods Aktiebolag",
+      "orgnr": "556402-1003",
+      "address_country": "SE",
+      "primary_nace": "01410 Mjölkproduktion och uppfödning av nötkreatur av mjölkras",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Skogstjänster\", \"Jakt, vilt och naturvård\", \"Jordbruk\", \"Jordbruk - mjölkproduktion\", \"Boskap\", \"Mjölkproduktion\"]"
+    },
+    {
+      "name": "Jarl Sandin & Söner Guld och Silver Aktiebolag",
+      "orgnr": "556285-0700",
+      "address_country": "SE",
+      "primary_nace": "47772 Specialiserad butikshandel med guldsmedsvaror och smycken",
+      "segment_labels_json": "[\"Guld, silver, ädelstenar\", \"Klockor, ur\", \"Guldsmeder\", \"Producenter\", \"Reparatörer\", \"Butikshandel\"]"
+    },
+    {
+      "name": "Vygon (Sweden) AB",
+      "orgnr": "556573-8027",
+      "address_country": "SE",
+      "primary_nace": "46460 Partihandel med medicinsk utrustning och apoteksvaror",
+      "segment_labels_json": "[\"Apoteksvaror, läkemedel - Distribution\", \"Grossister\", \"Apoteksvaror, läkemedel - Partihandel\"]"
+    },
+    {
+      "name": "Ljung & Sjöberg Aktiebolag",
+      "orgnr": "556313-2058",
+      "address_country": "SE",
+      "primary_nace": "70220 Konsultverksamhet avseende företags organisation",
+      "segment_labels_json": "[\"Finansbolag, finansiella tjänster\", \"Företagsutveckling\"]"
+    },
+    {
+      "name": "Fricweld Aktiebolag",
+      "orgnr": "556215-1638",
+      "address_country": "SE",
+      "primary_nace": "28920 Tillverkning av gruv-, bergbrytnings- och byggmaskiner",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "AluFlex AB",
+      "orgnr": "556367-4067",
+      "registry_homepage_url": "https://www.indutrade.com",
+      "address_country": "SE",
+      "primary_nace": "25999 Diverse övrig metallvarutillverkning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "EMV Stainless AB",
+      "orgnr": "556606-1056",
+      "registry_homepage_url": "https://emvholding.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "KEBCO-Kebab Company AB",
+      "orgnr": "556551-0301",
+      "address_country": "SE",
+      "primary_nace": "10112 Styckning av kött",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    }
+  ]
+}

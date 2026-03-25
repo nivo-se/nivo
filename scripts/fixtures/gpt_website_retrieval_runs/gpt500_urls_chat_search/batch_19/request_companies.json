@@ -1,0 +1,186 @@
+{
+  "companies": [
+    {
+      "name": "Vaggeryds Chark AB",
+      "orgnr": "556353-3230",
+      "address_country": "SE",
+      "primary_nace": "10130 Charkuteri- och annan köttvarutillverkning",
+      "segment_labels_json": "[\"Köttprodukter, slakteriprodukter\", \"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Svarvmekano i Malmö Aktiebolag",
+      "orgnr": "556145-5246",
+      "registry_homepage_url": "https://www.svarvmekano.se",
+      "address_country": "SE",
+      "primary_nace": "25620 Metallegoarbeten",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metallurgisk industri\"]"
+    },
+    {
+      "name": "Hushållningssällskapets Kompetensutveckling i Syd AB (HUSKAB)",
+      "orgnr": "556750-2777",
+      "address_country": "SE",
+      "primary_nace": "85311 Studieförberedande gymnasial utbildning",
+      "segment_labels_json": "[\"Fackskolor\", \"Jordbruk\", \"Jordbruk - odling och djurhållning\", \"Skolor och utbildning\"]"
+    },
+    {
+      "name": "Lapplands Elnät i Jokkmokk AB",
+      "orgnr": "556940-0251",
+      "address_country": "SE",
+      "primary_nace": "42220 Anläggningsarbeten för el och telekommunikation",
+      "segment_labels_json": "[\"Byggmästare\", \"Elinstallationer\"]"
+    },
+    {
+      "name": "Rigef Plastemballage Aktiebolag",
+      "orgnr": "556479-7206",
+      "registry_homepage_url": "http://www.rigef.se",
+      "address_country": "SE",
+      "primary_nace": "22220 Plastförpackningstillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Förpackningar - Industrin\", \"Förpackningar\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Aktiebolaget Karl Andersson & Söner Möbelfabrik",
+      "orgnr": "556043-8318",
+      "address_country": "SE",
+      "primary_nace": "31090 Tillverkning av andra möbler",
+      "segment_labels_json": "[\"Möbler\", \"Möbler - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "MOKO AB",
+      "orgnr": "559143-4427",
+      "address_country": "SE",
+      "primary_nace": "71121 Teknisk konsultverksamhet inom bygg- och anläggningsteknik",
+      "segment_labels_json": "[\"Byggentreprenader-Infrastruktur\", \"Konsulter\", \"Teknikkonsulter\"]"
+    },
+    {
+      "name": "Nordlo Skaraborg AB",
+      "orgnr": "556113-9220",
+      "address_country": "SE",
+      "primary_nace": "62030 Datordrifttjänster",
+      "segment_labels_json": "[\"Datorer - Kringutrustningar\", \"Datacenters\", \"Datakonsulter\", \"Konsulter\", \"Maskinförnödenheter\", \"Grossister\", \"Maskinförnödenheter - reparationer\", \"Reparatörer\", \"Datorer och kringutrustningar - Partihandel\"]"
+    },
+    {
+      "name": "AGES Kulltorp AB",
+      "orgnr": "556436-1441",
+      "registry_homepage_url": "https://www.ages.se",
+      "address_country": "SE",
+      "primary_nace": "25999 Diverse övrig metallvarutillverkning",
+      "segment_labels_json": "[\"Metaller, legeringar\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Aktiebolaget Dalforsån",
+      "orgnr": "556442-1484",
+      "registry_homepage_url": "https://b2b.koncern.eu",
+      "address_country": "SE",
+      "primary_nace": "28910 Tillverkning av maskiner för metallurgi",
+      "segment_labels_json": "[\"Maskinförnödenheter\", \"Maskinförnödenheter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Ackurat Industriplast Aktiebolag",
+      "orgnr": "556076-4564",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Grossister\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Götene Plast Aktiebolag",
+      "orgnr": "556123-9046",
+      "registry_homepage_url": "https://goteneplast.se",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Br. Göransson AB",
+      "orgnr": "556613-2295",
+      "address_country": "SE",
+      "primary_nace": "01500 Blandat jordbruk",
+      "segment_labels_json": "[\"Jordbruk\", \"Jordbruk - odling och djurhållning\"]"
+    },
+    {
+      "name": "IDUN Minerals AB",
+      "orgnr": "559075-1664",
+      "address_country": "SE",
+      "primary_nace": "46450 Partihandel med parfym och kosmetika",
+      "segment_labels_json": "[\"Grossister\", \"Kosmetik - tillverkare och grossister\", \"Kosmetik, parfym och frisörartiklar\"]"
+    },
+    {
+      "name": "ApartDirect Long Stay AB",
+      "orgnr": "556631-1329",
+      "address_country": "SE",
+      "primary_nace": "55900 Annan logiverksamhet",
+      "segment_labels_json": "[\"Fastighetsbolag, lokaler\", \"Hotell\"]"
+    },
+    {
+      "name": "Bobe Plast AB",
+      "orgnr": "556131-8717",
+      "registry_homepage_url": "https://bobe.se",
+      "address_country": "SE",
+      "primary_nace": "22290 Annan plastvarutillverkning",
+      "segment_labels_json": "[\"Gummivaror\", \"Gummi och plastprodukter - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Wiges AB",
+      "orgnr": "556066-5746",
+      "address_country": "SE",
+      "primary_nace": "46410 Partihandel med textilier",
+      "segment_labels_json": "[\"Textilier\", \"Grossister\", \"Textilier - Partihandel\"]"
+    },
+    {
+      "name": "EmbeddedArt AB",
+      "orgnr": "556779-8789",
+      "address_country": "SE",
+      "primary_nace": "62020 Datakonsultverksamhet",
+      "segment_labels_json": "[\"Datakonsulter\", \"Konsulter\"]"
+    },
+    {
+      "name": "Porsön Livs AB",
+      "orgnr": "556536-0814",
+      "address_country": "SE",
+      "primary_nace": "47112 Livsmedelshandel med brett sortiment, ej varuhus eller stormarknad",
+      "segment_labels_json": "[\"Livsmedel\", \"Butikshandel\"]"
+    },
+    {
+      "name": "ST Eriks Vårdbolag AB",
+      "orgnr": "556753-1461",
+      "address_country": "SE",
+      "primary_nace": "86211 Primärvårdsmottagningar med läkare m.m.",
+      "segment_labels_json": "[\"Hälsotjänster\", \"Läkare\"]"
+    },
+    {
+      "name": "MVB Umeå AB",
+      "orgnr": "556537-4294",
+      "address_country": "SE",
+      "primary_nace": "43320 Byggnadssnickeriarbeten",
+      "segment_labels_json": "[\"Byggmästare\", \"Snickeriarbeten\"]"
+    },
+    {
+      "name": "Big Image Systems, Sweden Aktiebolag",
+      "orgnr": "556131-1456",
+      "registry_homepage_url": "https://bigimagesystems.com",
+      "address_country": "SE",
+      "primary_nace": "18122 Tryckning av böcker och övriga trycksaker",
+      "segment_labels_json": "[\"Tryckerier\"]"
+    },
+    {
+      "name": "Candor Sweden Aktiebolag",
+      "orgnr": "556046-8133",
+      "address_country": "SE",
+      "primary_nace": "46720 Partihandel med metaller och metallmalmer",
+      "segment_labels_json": "[\"Kemikalier, industrikemikalier\", \"Metaller, legeringar\", \"Grossister\", \"Kemikalier, industrikemikaleier - grossist\", \"Kemikalier, industrikemikalier - tillverkning\", \"Metaller, legeringar - grossist\", \"Metaller, legeringar - Produktion\", \"Producenter\"]"
+    },
+    {
+      "name": "Gronko AB",
+      "orgnr": "559036-6729",
+      "address_country": "SE",
+      "primary_nace": "10850 Tillverkning av lagad mat och färdigrätter",
+      "segment_labels_json": "[\"Livsmedel\", \"Livsmedel - tillverkning\", \"Producenter\"]"
+    },
+    {
+      "name": "Sajaco Nordic AB",
+      "orgnr": "556190-4300",
+      "address_country": "SE",
+      "primary_nace": "46499 Partihandel med övriga hushållsvaror",
+      "segment_labels_json": "[\"Kläder\", \"Redovisning, bokföring\", \"Grossister\", \"Konfektion\"]"
+    }
+  ]
+}
