@@ -397,10 +397,12 @@ export default function GptTargetUniversePage() {
             <CardTitle className="text-base">Companies</CardTitle>
             <CardDescription>
               {isLoading ? "Loading…" : `${data?.total ?? 0} rows`}
-              {selectedOrgnrs.length > 0 ? ` · ${selectedOrgnrs.length} selected` : null}
+              {selectedOrgnrs.length > 0 ? (
+                <span className="hidden md:inline">{` · ${selectedOrgnrs.length} selected`}</span>
+              ) : null}
             </CardDescription>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="hidden flex-wrap gap-2 md:flex">
             <Button type="button" variant="outline" size="sm" onClick={selectAllVisible} disabled={!displayRows.length}>
               Select visible
             </Button>
@@ -421,16 +423,16 @@ export default function GptTargetUniversePage() {
               role="region"
               aria-label="GPT target universe companies"
             >
-              <Table className="w-full min-w-[860px] table-auto">
+              <Table className="w-full min-w-0 table-auto md:min-w-[860px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-8 max-w-8 px-1.5 text-center">
+                    <TableHead className="hidden w-8 max-w-8 px-1.5 text-center md:table-cell">
                       <span className="sr-only">Select</span>
                     </TableHead>
-                    <TableHead className="w-9 max-w-9 px-1 text-center">
+                    <TableHead className="hidden w-9 max-w-9 px-1 text-center md:table-cell">
                       <span className="sr-only">Expand</span>
                     </TableHead>
-                    <TableHead className="w-11 max-w-11 px-1.5 whitespace-nowrap">
+                    <TableHead className="hidden w-11 max-w-11 px-1.5 whitespace-nowrap md:table-cell">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -442,7 +444,7 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3 shrink-0" />
                       </Button>
                     </TableHead>
-                    <TableHead className="min-w-[12rem] max-w-[16rem]">
+                    <TableHead className="min-w-0 max-w-[16rem] md:min-w-[12rem]">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -453,8 +455,8 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead className="whitespace-nowrap">Fit</TableHead>
-                    <TableHead className="whitespace-nowrap">
+                    <TableHead className="hidden whitespace-nowrap md:table-cell">Fit</TableHead>
+                    <TableHead className="hidden whitespace-nowrap md:table-cell">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -465,7 +467,7 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead className="whitespace-nowrap">
+                    <TableHead className="hidden whitespace-nowrap md:table-cell">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -476,9 +478,9 @@ export default function GptTargetUniversePage() {
                         <ArrowUpDown className="h-3 w-3" />
                       </Button>
                     </TableHead>
-                    <TableHead className="min-w-[min(100%,28rem)] text-left">
+                    <TableHead className="min-w-0 text-left md:min-w-[min(100%,28rem)]">
                       <span className="text-foreground">Fit summary</span>
-                      <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                      <span className="mt-0.5 hidden text-xs font-normal text-muted-foreground md:block">
                         ChatGPT prompt & links
                       </span>
                     </TableHead>
@@ -499,14 +501,14 @@ export default function GptTargetUniversePage() {
                       return (
                         <Fragment key={row.orgnr}>
                           <TableRow>
-                            <TableCell className="w-8 max-w-8 px-1.5 py-3 [&:has([role=checkbox])]:pr-0">
+                            <TableCell className="hidden w-8 max-w-8 px-1.5 py-3 md:table-cell [&:has([role=checkbox])]:pr-0">
                               <Checkbox
                                 checked={selected.has(row.orgnr)}
                                 onCheckedChange={() => toggleSelected(row.orgnr)}
                                 aria-label={`Select ${row.company_name ?? row.orgnr}`}
                               />
                             </TableCell>
-                            <TableCell className="w-9 max-w-9 px-1 py-3 text-center">
+                            <TableCell className="hidden w-9 max-w-9 px-1 py-3 text-center md:table-cell">
                               {row.triage ? (
                                 <Button
                                   type="button"
@@ -523,10 +525,10 @@ export default function GptTargetUniversePage() {
                                 </Button>
                               ) : null}
                             </TableCell>
-                            <TableCell className="w-11 max-w-11 px-1.5 py-3 text-right text-muted-foreground tabular-nums">
+                            <TableCell className="hidden w-11 max-w-11 px-1.5 py-3 text-right text-muted-foreground tabular-nums md:table-cell">
                               {row.rank ?? "—"}
                             </TableCell>
-                            <TableCell className="max-w-[16rem] align-top">
+                            <TableCell className="max-w-[min(100vw-2rem,16rem)] align-top md:max-w-[16rem]">
                               <div className="flex min-w-0 flex-col gap-0.5">
                                 <Link
                                   to={`/company/${encodeURIComponent(formatSwedishOrgnrForUrl(row.orgnr))}`}
@@ -546,9 +548,27 @@ export default function GptTargetUniversePage() {
                                 >
                                   {row.orgnr}
                                 </span>
+                                <div className="mt-1 flex flex-wrap items-center gap-1.5 md:hidden">
+                                  {row.is_fit_for_nivo == null ? (
+                                    <span className="text-[10px] text-muted-foreground">Fit pending</span>
+                                  ) : row.is_fit_for_nivo ? (
+                                    <Badge variant="outline" className="border-foreground/25 px-1.5 py-0 text-[10px] text-foreground">
+                                      Fit
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                                      No
+                                    </Badge>
+                                  )}
+                                  {row.fit_confidence != null ? (
+                                    <span className="text-[10px] text-muted-foreground tabular-nums">
+                                      conf. {row.fit_confidence.toFixed(2)}
+                                    </span>
+                                  ) : null}
+                                </div>
                               </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                               {row.is_fit_for_nivo == null ? (
                                 "—"
                               ) : row.is_fit_for_nivo ? (
@@ -559,10 +579,10 @@ export default function GptTargetUniversePage() {
                                 <Badge variant="secondary">No</Badge>
                               )}
                             </TableCell>
-                            <TableCell className="tabular-nums">
+                            <TableCell className="hidden tabular-nums md:table-cell">
                               {row.fit_confidence != null ? row.fit_confidence.toFixed(2) : "—"}
                             </TableCell>
-                            <TableCell className="tabular-nums">
+                            <TableCell className="hidden tabular-nums md:table-cell">
                               {row.blended_score != null ? row.blended_score.toFixed(2) : "—"}
                             </TableCell>
                             <TableCell className="align-top">
