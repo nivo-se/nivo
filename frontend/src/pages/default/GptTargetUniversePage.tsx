@@ -48,6 +48,9 @@ import {
 
 type FitFilter = "__all__" | "fit" | "not_fit";
 
+/** Match API has_triage: all rows vs only triaged vs only pending triage */
+type TriageFilter = "__all__" | "with_triage" | "without_triage";
+
 type SortKey =
   | "default"
   | "company_name"
@@ -77,6 +80,7 @@ export default function GptTargetUniversePage() {
   const [qInput, setQInput] = useState("");
   const [qApplied, setQApplied] = useState("");
   const [fitFilter, setFitFilter] = useState<FitFilter>("__all__");
+  const [triageFilter, setTriageFilter] = useState<TriageFilter>("__all__");
   const [minFitInput, setMinFitInput] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("default");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -87,15 +91,16 @@ export default function GptTargetUniversePage() {
   const minFitValid =
     minFitN === undefined || (!Number.isNaN(minFitN) && minFitN >= 0 && minFitN <= 1);
 
-  const queryOpts = useMemo(
-    () => ({
+  const queryOpts = useMemo(() => {
+    const has_triage =
+      triageFilter === "with_triage" ? true : triageFilter === "without_triage" ? false : undefined;
+    return {
       q: qApplied.trim() || undefined,
       fit: fitFilter === "fit" ? true : fitFilter === "not_fit" ? false : undefined,
-      has_triage: true,
+      has_triage,
       min_fit_confidence: minFitValid ? minFitN : undefined,
-    }),
-    [qApplied, fitFilter, minFitN, minFitValid]
-  );
+    };
+  }, [qApplied, fitFilter, triageFilter, minFitN, minFitValid]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["gpt-target-universe", queryOpts],
@@ -164,7 +169,8 @@ export default function GptTargetUniversePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">GPT target universe</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Companies with LLM triage only (website research + Layer 2). Filter, sort, add to lists, or copy a ChatGPT Deep Research prompt per row.
+            Cohort from <code className="text-xs bg-muted px-1 rounded">screening_website_research_companies</code> for the run in{" "}
+            <code className="text-xs bg-muted px-1 rounded">GPT_TARGET_UNIVERSE_RUN_ID</code>. Filter, sort, add to lists, or copy a ChatGPT Deep Research prompt per row.
             {data?.run_id ? (
               <span className="block font-mono text-xs mt-1 text-muted-foreground/80">
                 run_id {data.run_id}
@@ -201,6 +207,19 @@ export default function GptTargetUniversePage() {
               onChange={(e) => setQInput(e.target.value)}
               placeholder="Substring… (updates after a short pause)"
             />
+          </div>
+          <div className="space-y-2 w-full md:w-[200px]">
+            <Label>LLM triage</Label>
+            <Select value={triageFilter} onValueChange={(v) => setTriageFilter(v as TriageFilter)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">All rows</SelectItem>
+                <SelectItem value="with_triage">With triage only</SelectItem>
+                <SelectItem value="without_triage">Pending triage</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2 w-full md:w-[180px]">
             <Label>Nivo fit</Label>
