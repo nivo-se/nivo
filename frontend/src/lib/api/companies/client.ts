@@ -20,11 +20,13 @@ export async function getCompaniesBatchClient(
 export async function getCompanyFinancialsClient(
   orgnr: string
 ): Promise<CompanyFinancialsResponse> {
-  return requestJson(`/api/companies/${orgnr}/financials`);
+  const enc = encodeURIComponent(orgnr);
+  return requestJson(`/api/companies/${enc}/financials`);
 }
 
 export async function getCompanyAnalysisClient(
   orgnr: string
 ): Promise<Record<string, unknown>> {
-  return requestJson(`/api/analysis/companies/${orgnr}/analysis`);
+  const enc = encodeURIComponent(orgnr);
+  return requestJson(`/api/analysis/companies/${enc}/analysis`);
 }

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useCompaniesBatch, useCompany, useCompanyAIProfile, useCompanyFinancials } from "@/lib/hooks/apiQueries";
+import { normalizeOrgnrKey, orgnrSqlVariants } from "@/lib/api/companies/service";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   formatRevenueSEK,
@@ -255,14 +256,17 @@ export default function CompanyDetail() {
   }, [backState?.from, canGoBack, navigate]);
 
   const orgnr = companyId ?? "";
+  const batchOrgnrVariants = useMemo(() => orgnrSqlVariants(orgnr), [orgnr]);
   const queryClient = useQueryClient();
-  const { data: batchCompanies } = useCompaniesBatch([orgnr], { autoEnrich: false });
+  const { data: batchCompanies } = useCompaniesBatch(batchOrgnrVariants, { autoEnrich: false });
   const { data: universeCompany, isLoading: universeLoading, isError, error, refetch } = useCompany(orgnr, !!orgnr);
-  const { data: financialsData } = useCompanyFinancials(orgnr);
-  const { data: aiProfile } = useCompanyAIProfile(orgnr);
-
-  const batchCompany = batchCompanies?.find((c) => c.orgnr === orgnr) ?? null;
+  const batchCompany =
+    batchCompanies?.find((c) => normalizeOrgnrKey(c.orgnr) === normalizeOrgnrKey(orgnr)) ?? null;
   const company = batchCompany ?? universeCompany ?? null;
+  /** DB canonical orgnr — financials / analysis paths use exact storage format. */
+  const apiOrgnr = company?.orgnr ?? orgnr;
+  const { data: financialsData } = useCompanyFinancials(apiOrgnr, !!apiOrgnr);
+  const { data: aiProfile } = useCompanyAIProfile(apiOrgnr, !!apiOrgnr);
   const isLoading = universeLoading && !company;
 
   const overviewModel = useMemo(

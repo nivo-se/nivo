@@ -18,12 +18,12 @@ function toNull<T>(v: T | null | undefined): T | null {
 }
 
 /** Compare orgnrs regardless of hyphen / spaces (Swedish org.nr). */
-function normalizeOrgnrKey(s: string): string {
+export function normalizeOrgnrKey(s: string): string {
   return s.replace(/\s/g, "").replace(/-/g, "").toLowerCase();
 }
 
 /** Values to try for SQL `orgnr IN (...)` when opening /company/:id from URLs or GPT tables. */
-function orgnrSqlVariants(raw: string): string[] {
+export function orgnrSqlVariants(raw: string): string[] {
   const t = raw.trim();
   if (!t) return [];
   const digits = t.replace(/\D/g, "");
@@ -33,6 +33,17 @@ function orgnrSqlVariants(raw: string): string[] {
     out.add(`${digits.slice(0, 6)}-${digits.slice(6)}`);
   }
   return [...out];
+}
+
+/** Canonical Swedish org.nr for navigation (matches common DB formatting when 10 digits). */
+export function formatSwedishOrgnrForUrl(raw: string): string {
+  const t = raw.trim();
+  if (!t) return t;
+  const digits = t.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `${digits.slice(0, 6)}-${digits.slice(6)}`;
+  }
+  return t;
 }
 
 function mapBatchRowToCompany(row: Record<string, unknown>): Company {

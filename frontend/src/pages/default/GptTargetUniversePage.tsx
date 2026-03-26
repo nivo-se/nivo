@@ -40,6 +40,7 @@ import {
   type GptTargetCompanyRow,
   type GptTargetUniverseMeta,
 } from "@/lib/api/gptTargetUniverse/service";
+import { formatSwedishOrgnrForUrl } from "@/lib/api/companies/service";
 import {
   ChevronDown,
   ExternalLink,
@@ -528,7 +529,7 @@ export default function GptTargetUniversePage() {
                             <TableCell className="max-w-[16rem] align-top">
                               <div className="flex min-w-0 flex-col gap-0.5">
                                 <Link
-                                  to={`/company/${encodeURIComponent(row.orgnr)}`}
+                                  to={`/company/${encodeURIComponent(formatSwedishOrgnrForUrl(row.orgnr))}`}
                                   state={COMPANY_PROFILE_BACK.gptTargetUniverse}
                                   className="inline-flex min-w-0 max-w-full items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                   title={row.company_name ?? undefined}
