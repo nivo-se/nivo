@@ -16,6 +16,7 @@ pydantic-settings>=2.5.2
 pyjwt[crypto]>=2.8.0
 uvicorn[standard]>=0.30.0
 python-multipart>=0.0.9
+svix>=1.40.0
 
 # Redis and job queue
 redis>=5.0.0
@@ -24,8 +25,9 @@ rq>=1.15.0
 # OpenAI for AI reports
 openai>=1.12.0
 
-# OpenAI Agents SDK (pilot for market_analysis)
-openai-agents>=0.12.0
+# OpenAI Agents SDK (pilot for market_analysis). 0.12+ requires Python >=3.10.
+openai-agents>=0.12.0; python_version >= "3.10"
+openai-agents>=0.8.0,<0.9; python_version < "3.10"
 
 # Agent graph orchestration
 langgraph>=0.2.28

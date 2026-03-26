@@ -7,6 +7,7 @@ import { InteractionsService } from '../services/crm/interactions.service.js'
 import { TrackingService } from '../services/crm/tracking.service.js'
 import { SequencesService } from '../services/crm/sequences.service.js'
 import { GmailService } from '../services/gmail/gmail.service.js'
+import { ResendEmailService } from '../services/resend/resend-email.service.js'
 import { EmailsService } from '../services/crm/emails.service.js'
 import { OutreachEmailService } from '../services/ai/outreach-email.service.js'
 import { CRMOverviewService } from '../services/crm/overview.service.js'
@@ -90,7 +91,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     const interactions = new InteractionsService(db)
     const deals = new DealsService(db)
     const contacts = new ContactsService(db)
-    const emails = new EmailsService(db, interactions, new GmailService(), deals)
+    const emails = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
     const overview = new CRMOverviewService(db, deals, contacts, emails, interactions)
     const payload = await overview.companyOverview(companyId)
     return res.json({ success: true, data: payload })
@@ -124,7 +125,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const emails = new EmailsService(db, interactions, new GmailService(), deals)
+    const emails = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
     const aiService = new OutreachEmailService()
 
     const deal = await deals.getOrCreateByCompany(parsed.data.company_id)
@@ -167,9 +168,16 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const service = new EmailsService(db, interactions, new GmailService(), deals)
+    const service = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
     const data = await service.approve(req.params.emailId, parsed.data)
     return res.json({ success: true, data })
+  }))
+
+  app.get('/crm/email-threads/:threadId/messages', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const rows = await db.listCrmEmailMessagesByThreadId(req.params.threadId)
+    return res.json({ success: true, data: rows })
   }))
 
   app.post('/crm/emails/:emailId/send', asyncHandler(async (req, res) => {
@@ -178,7 +186,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const service = new EmailsService(db, interactions, new GmailService(), deals)
+    const service = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
     const data = await service.send(req.params.emailId)
     return res.json({ success: true, data })
   }))

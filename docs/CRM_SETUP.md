@@ -45,11 +45,27 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | `GOOGLE_CLIENT_ID` | Google OAuth2 client ID (for Gmail send). |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret. |
 | `GOOGLE_REFRESH_TOKEN` | OAuth2 refresh token for Gmail API. |
-| `GOOGLE_WORKSPACE_SENDER` | Sender email, e.g. `you@yourdomain.com`. |
+| `GOOGLE_WORKSPACE_SENDER` | Sender email, e.g. `you@yourdomain.com` (Gmail provider). |
+| `CRM_EMAIL_PROVIDER` | `gmail` (default) or `resend` — which backend sends approved CRM mail. |
+| `RESEND_API_KEY` | Resend API key when using `CRM_EMAIL_PROVIDER=resend`. |
+| `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). |
+| `CRM_SENDER_FROM` | Verified **From** address for Resend (e.g. `info@crm.yourdomain.com`). |
+| `RESEND_REPLY_DOMAIN` | Host for structured Reply-To: `reply+<token>@<domain>` (e.g. `reply.send.nivogroup.se`). See [email_inbound_resend.md](./email_inbound_resend.md). |
+| `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |
 
-Gmail vars are only needed for **sending** emails (`POST /crm/emails/:emailId/send`). Creating deals, contacts, and generating drafts works without Gmail.
+Send credentials are only needed for **sending** emails (`POST /crm/emails/:emailId/send`). Creating deals, contacts, and generating drafts works without them.
+
+### Resend: full inbound pipeline
+
+See **[email_inbound_resend.md](./email_inbound_resend.md)** for Reply-To tokens, webhook URL (`POST /webhooks/email/inbound` on the FastAPI backend), env vars, and manual tests.
+
+### Resend: DNS, inbox, and threading
+
+- **Sending:** Add and verify your domain in [Resend Domains](https://resend.com/domains) (SPF/DKIM TXT records). Subdomains like `crm.yourdomain.com` work as **From** once verified.
+- **Receiving (so replies hit Resend):** Put Resend’s **MX** (and related) records on a **subdomain** if Google Workspace or another host already owns the root domain’s MX — see [Receiving / custom domains](https://resend.com/docs/dashboard/receiving/introduction) and [Custom receiving domains](https://resend.com/docs/dashboard/receiving/custom-domains). A `send.` subdomain is often used for **outbound** return-path; **inbound** is a separate MX story — follow Resend’s wizard for the hostname you want to receive on.
+- **Threading in clients:** Inbound replies use **Reply-To** `reply+<token>@RESEND_REPLY_DOMAIN` so traffic hits Resend → webhook → CRM (see [email_inbound_resend.md](./email_inbound_resend.md)). For programmatic **follow-up sends** in the same RFC thread, Resend still documents `In-Reply-To` / `References` using the inbound `message_id` — not implemented for CRM follow-ups yet.
 
 ## 4. Postgres: schema and migrations
 

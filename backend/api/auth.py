@@ -26,6 +26,7 @@ PUBLIC_PATHS = {
     "/docs",
     "/redoc",
     "/openapi.json",
+    "/webhooks",  # Resend Svix (e.g. /webhooks/email/inbound)
 }
 
 # In-memory cache for Auth0 JWKS. Refresh on TTL or on kid-miss (key rotation).

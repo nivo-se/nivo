@@ -41,4 +41,9 @@ export interface CrmDb {
   getCompanyProfile(companyId: string): Promise<Record<string, any> | null>
   getStrategy(companyId: string): Promise<Record<string, any> | null>
   getValueCreation(companyId: string): Promise<Record<string, any> | null>
+
+  /** One thread per (deal, contact); token used in Reply-To. */
+  ensureCrmEmailThread(dealId: string, contactId: string): Promise<{ id: string; token: string }>
+  insertCrmEmailMessage(payload: Record<string, any>): Promise<Record<string, any>>
+  listCrmEmailMessagesByThreadId(threadId: string): Promise<Record<string, any>[]>
 }

@@ -4,10 +4,12 @@ This module adds a CRM layer on top of `deep_research` company intelligence data
 
 ## Environment variables
 
+- `CRM_EMAIL_PROVIDER` — `gmail` (default) or `resend`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_REFRESH_TOKEN`
-- `GOOGLE_WORKSPACE_SENDER`
+- `GOOGLE_WORKSPACE_SENDER` (Gmail send)
+- `RESEND_API_KEY`, `CRM_SENDER_FROM`, `CRM_REPLY_TO` (Resend send — see Resend docs on `reply_to` and threading headers)
 - `OPENAI_API_KEY`
 - `APP_BASE_URL`
 - `DATABASE_URL` or `POSTGRES_HOST` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` (same Postgres as the rest of the stack)
