@@ -1922,7 +1922,7 @@ export default function ScreeningCampaignsPage() {
                 <strong className="text-foreground">Research</strong> for Deep Research with org.nr pre-filled.
               </p>
               <div
-                className="min-w-0 max-w-full overflow-x-auto rounded-md border [&_th]:h-10 [&_th]:px-2 [&_th]:py-2 [&_td]:p-2"
+                className="min-w-0 max-w-full overflow-hidden rounded-md border border-border/80"
                 role="region"
                 aria-label="Campaign candidates"
               >

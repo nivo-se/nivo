@@ -442,7 +442,7 @@ export default function Universe() {
   return (
     <div className="h-full min-h-full flex flex-col app-page">
       <div className="shrink-0">
-        <div className="max-w-5xl mx-auto px-8 pt-8 pb-2">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 pb-2">
           <h1 className="text-base font-semibold text-foreground mb-2">Universe</h1>
         </div>
       </div>
@@ -465,8 +465,8 @@ export default function Universe() {
           </div>
         )}
       <div className="flex-1 min-h-0 overflow-auto">
-        <div className="max-w-5xl mx-auto px-8 pb-8 h-full min-h-0 flex flex-col gap-4">
-        <div className="shrink-0 sticky top-0 z-20 bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/75 -mx-8 px-8 pt-2 pb-4 border-b border-border/80 space-y-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 h-full min-h-0 flex flex-col gap-4">
+        <div className="shrink-0 sticky top-0 z-20 bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/75 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 pt-2 pb-4 border-b border-border/80 space-y-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <Input
@@ -561,8 +561,8 @@ export default function Universe() {
           />
         ) : (
         <div className="app-card text-sm flex-1 min-h-0 flex flex-col overflow-hidden">
-          <div className="flex-1 min-h-0 overflow-auto relative">
-          <table className="w-full border-collapse">
+          <div className="nivo-table-scroll flex-1 min-h-0">
+          <table className="w-full min-w-[960px] border-collapse">
             <thead className="z-20 border-b border-border shadow-sm [&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-card">
               <tr className="bg-card">
                 <th className="px-3 py-2 text-left w-10 text-xs font-medium text-muted-foreground bg-card">
@@ -594,7 +594,7 @@ export default function Universe() {
                 <th className="px-3 py-2 w-20 text-xs font-medium text-muted-foreground bg-card">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filteredCompanies.map((company) => {
                 const latest = getLatestFinancials(company);
                 const cagr = calculateRevenueCagr(company);

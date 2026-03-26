@@ -45,6 +45,22 @@
 }
 
 @layer components {
+  /**
+   * Wide data tables on mobile: horizontal scroll with momentum; use min-w-* on <table> when needed.
+   * min-w-0 lets flex children shrink so overflow-x-auto can engage.
+   */
+  /** Bordered table region (e.g. inside a plain Card body). */
+  .nivo-table-viewport {
+    @apply min-w-0 max-w-full overflow-x-auto overflow-y-auto overscroll-x-contain rounded-md border border-border/60 touch-pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /** Borderless horizontal scroll (e.g. table already inside .app-card). */
+  .nivo-table-scroll {
+    @apply min-w-0 max-w-full overflow-x-auto overflow-y-auto overscroll-x-contain touch-pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .app-bg {
     @apply min-h-full bg-transparent;
   }

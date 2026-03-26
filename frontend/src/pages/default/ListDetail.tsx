@@ -284,7 +284,7 @@ export default function ListDetail() {
 
   return (
     <div className="h-full overflow-auto app-bg">
-      <div className="max-w-5xl mx-auto px-8 py-8 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-6">
         <Link to="/lists" className="inline-flex">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="w-4 h-4 mr-1" /> Back to Lists
@@ -509,25 +509,25 @@ export default function ListDetail() {
           />
         ) : (
           <div className="app-card overflow-hidden">
-            <div className="overflow-auto">
-              <table className="w-full">
+            <div className="nivo-table-scroll">
+              <table className="w-full min-w-[780px] border-collapse">
                 <thead className="bg-muted/40 border-b border-border">
                   <tr>
-                    <th className="px-4 py-3 text-left w-12">
+                    <th className="px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm w-12">
                       <Checkbox
                         checked={companies.length > 0 && selectedCompanies.size === companies.length}
                         onCheckedChange={toggleSelectAll}
                         className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
                       />
                     </th>
-                    <th className="px-4 py-3 text-left">Company Name</th>
-                    <th className="px-4 py-3 text-left">Industry</th>
-                    <th className="px-4 py-3 text-left">Geography</th>
-                    <th className="px-4 py-3 text-right">Revenue</th>
-                    <th className="px-4 py-3 text-right">3Y CAGR</th>
-                    <th className="px-4 py-3 text-right">EBITDA Margin</th>
-                    <th className="px-4 py-3 text-center">AI Score</th>
-                    <th className="px-4 py-3 w-16">Actions</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Company Name</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Industry</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Geography</th>
+                    <th className="px-2 py-2 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">Revenue</th>
+                    <th className="px-2 py-2 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">3Y CAGR</th>
+                    <th className="px-2 py-2 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">EBITDA Margin</th>
+                    <th className="px-2 py-2 text-center text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">AI Score</th>
+                    <th className="px-2 py-2 w-14 text-xs font-medium sm:px-4 sm:py-3 sm:text-sm sm:w-16">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -536,14 +536,14 @@ export default function ListDetail() {
                     const cagr = calculateRevenueCagr(company) ?? 0;
                     return (
                       <tr key={company.orgnr} className="hover:bg-muted/40">
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3">
                           <Checkbox
                             checked={selectedCompanies.has(company.orgnr)}
                             onCheckedChange={() => toggleSelectCompany(company.orgnr)}
                             className="border-border data-[state=checked]:border-border data-[state=checked]:bg-muted data-[state=checked]:text-foreground focus-visible:ring-1 focus-visible:ring-border focus-visible:ring-offset-0"
                           />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3">
                           <div className="flex items-center gap-2">
                             <Link
                               to={`/company/${company.orgnr}`}
@@ -569,14 +569,14 @@ export default function ListDetail() {
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-foreground">
+                        <td className="px-2 py-2 text-foreground sm:px-4 sm:py-3">
                           {company.industry_label ?? "—"}
                         </td>
-                        <td className="px-4 py-3 text-foreground">{company.region ?? "—"}</td>
-                        <td className="px-4 py-3 text-right font-mono text-sm">
+                        <td className="px-2 py-2 text-foreground sm:px-4 sm:py-3">{company.region ?? "—"}</td>
+                        <td className="px-2 py-2 text-right font-mono text-sm sm:px-4 sm:py-3">
                           {formatRevenueSEK(latest.revenue)}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono">
+                        <td className="px-2 py-2 text-right font-mono sm:px-4 sm:py-3">
                           <span
                             className={
                               cagr > 0.15
@@ -589,10 +589,10 @@ export default function ListDetail() {
                             {formatPercent(cagr)}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-sm">
+                        <td className="px-2 py-2 text-right font-mono text-sm sm:px-4 sm:py-3">
                           {formatPercent(latest.ebitdaMargin)}
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-2 py-2 text-center sm:px-4 sm:py-3">
                           {company.ai_profile?.ai_fit_score != null ? (
                             <span
                               className={`font-semibold ${
@@ -609,7 +609,7 @@ export default function ListDetail() {
                             <span className="text-muted-foreground">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 py-2 sm:px-4 sm:py-3">
                           <Button
                             variant="ghost"
                             size="sm"

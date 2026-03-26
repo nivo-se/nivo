@@ -234,7 +234,7 @@ export default function GptTargetUniversePage() {
 
   return (
     <div className="app-page min-h-full">
-    <div className="container max-w-[1400px] py-6 space-y-6">
+    <div className="container max-w-[1400px] px-3 py-4 sm:px-4 sm:py-6 md:px-6 space-y-6">
       <BackendStatusBanner />
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -417,7 +417,7 @@ export default function GptTargetUniversePage() {
             </div>
           ) : (
             <div
-              className="min-w-0 max-w-full overflow-x-auto rounded-md border [&_th]:h-10 [&_th]:px-3 [&_th]:py-2 [&_td]:px-3 [&_td]:py-3"
+              className="overflow-hidden rounded-md border border-border/80"
               role="region"
               aria-label="GPT target universe companies"
             >
