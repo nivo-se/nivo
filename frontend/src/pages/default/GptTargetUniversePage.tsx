@@ -36,6 +36,7 @@ import { AddToListDropdown } from "@/components/default/AddToListDropdown";
 import {
   fetchGptTargetUniverseCompanies,
   fetchGptTargetUniverseMeta,
+  fetchGptTargetUniverseRuns,
   type GptTargetCompanyRow,
   type GptTargetUniverseMeta,
 } from "@/lib/api/gptTargetUniverse/service";
@@ -65,13 +66,13 @@ function metaHints(m: GptTargetUniverseMeta): string[] {
   if (!m.database_source_postgres) {
     out.push("API DATABASE_SOURCE must be postgres for this page.");
   }
-  if (!m.env_run_id_set) {
+  if (m.run_id_resolution === "none") {
     out.push(
-      "Set GPT_TARGET_UNIVERSE_RUN_ID in the repo-root .env (the file Docker Compose uses for the API), then recreate the API container.",
+      "No cohort available: ingest website-research rows, pick a run above, or set a valid GPT_TARGET_UNIVERSE_RUN_ID in the API .env.",
     );
   }
   if (m.run_id_parse_error) {
-    out.push(`GPT_TARGET_UNIVERSE_RUN_ID is not a valid UUID: ${m.run_id_parse_error}`);
+    out.push(m.run_id_parse_error);
   }
   if (m.table_check_error) {
     out.push(`Could not check DB table: ${m.table_check_error}`);
@@ -112,8 +113,12 @@ function sortRows(rows: GptTargetCompanyRow[], key: SortKey, dir: "asc" | "desc"
   return out;
 }
 
+const DEFAULT_COHORT = "__default__";
+
 export default function GptTargetUniversePage() {
   const [promptModalRow, setPromptModalRow] = useState<GptTargetCompanyRow | null>(null);
+  /** Server picks query param > env GPT_TARGET_UNIVERSE_RUN_ID > newest run with data. */
+  const [cohortRunId, setCohortRunId] = useState<string>(DEFAULT_COHORT);
   const [qInput, setQInput] = useState("");
   const [qApplied, setQApplied] = useState("");
   const [fitFilter, setFitFilter] = useState<FitFilter>("__all__");
@@ -128,16 +133,19 @@ export default function GptTargetUniversePage() {
   const minFitValid =
     minFitN === undefined || (!Number.isNaN(minFitN) && minFitN >= 0 && minFitN <= 1);
 
+  const runIdForApi = cohortRunId === DEFAULT_COHORT ? undefined : cohortRunId;
+
   const queryOpts = useMemo(() => {
     const has_triage =
       triageFilter === "with_triage" ? true : triageFilter === "without_triage" ? false : undefined;
     return {
+      run_id: runIdForApi,
       q: qApplied.trim() || undefined,
       fit: fitFilter === "fit" ? true : fitFilter === "not_fit" ? false : undefined,
       has_triage,
       min_fit_confidence: minFitValid ? minFitN : undefined,
     };
-  }, [qApplied, fitFilter, triageFilter, minFitN, minFitValid]);
+  }, [runIdForApi, qApplied, fitFilter, triageFilter, minFitN, minFitValid]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["gpt-target-universe", queryOpts],
@@ -150,9 +158,15 @@ export default function GptTargetUniversePage() {
     error: metaError,
     refetch: refetchMeta,
   } = useQuery({
-    queryKey: ["gpt-target-universe-meta"],
-    queryFn: fetchGptTargetUniverseMeta,
+    queryKey: ["gpt-target-universe-meta", runIdForApi ?? DEFAULT_COHORT],
+    queryFn: () => fetchGptTargetUniverseMeta(runIdForApi),
     staleTime: 30_000,
+  });
+
+  const { data: runOptions = [], refetch: refetchRuns } = useQuery({
+    queryKey: ["gpt-target-universe-runs"],
+    queryFn: fetchGptTargetUniverseRuns,
+    staleTime: 60_000,
   });
 
   const displayRows = useMemo(() => {
@@ -205,6 +219,11 @@ export default function GptTargetUniversePage() {
     return () => clearTimeout(t);
   }, [qInput, minFitValid]);
 
+  useEffect(() => {
+    setSelected(new Set());
+    setExpanded(new Set());
+  }, [cohortRunId]);
+
   const selectedOrgnrs = useMemo(() => Array.from(selected), [selected]);
   const errMsg = error instanceof Error ? error.message : error ? String(error) : null;
   const metaErrMsg = metaError instanceof Error ? metaError.message : metaError ? String(metaError) : null;
@@ -220,11 +239,12 @@ export default function GptTargetUniversePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">GPT target universe</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Cohort from <code className="text-xs bg-muted px-1 rounded">screening_website_research_companies</code> for the run in{" "}
-            <code className="text-xs bg-muted px-1 rounded">GPT_TARGET_UNIVERSE_RUN_ID</code>. Filter, sort, add to lists, or copy a ChatGPT Deep Research prompt per row.
+            Cohort from <code className="text-xs bg-muted px-1 rounded">screening_website_research_companies</code>.
+            Default run: optional <code className="text-xs bg-muted px-1 rounded">GPT_TARGET_UNIVERSE_RUN_ID</code> in the API env, otherwise the{" "}
+            <strong className="font-medium">newest screening run that already has website-research rows</strong>. Override with the cohort control below.
             {data?.run_id ? (
               <span className="block font-mono text-xs mt-1 text-muted-foreground/80">
-                run_id {data.run_id}
+                Active run_id {data.run_id}
               </span>
             ) : null}
           </p>
@@ -237,6 +257,7 @@ export default function GptTargetUniversePage() {
           onClick={() => {
             void refetch();
             void refetchMeta();
+            void refetchRuns();
           }}
           disabled={isFetching}
         >
@@ -253,6 +274,29 @@ export default function GptTargetUniversePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+          <div className="space-y-2 w-full min-w-[240px] md:flex-[2]">
+            <Label htmlFor="gtu-cohort">Screening cohort (run)</Label>
+            <Select
+              value={cohortRunId}
+              onValueChange={(v) => setCohortRunId(v)}
+            >
+              <SelectTrigger id="gtu-cohort" className="w-full">
+                <SelectValue placeholder="Default" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={DEFAULT_COHORT}>Default (API env or latest run with data)</SelectItem>
+                {runOptions.map((r) => (
+                  <SelectItem key={r.run_id} value={r.run_id}>
+                    {r.run_kind || "run"} · {r.row_count} rows ·{" "}
+                    {new Date(r.created_at).toLocaleString(undefined, {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2 flex-1 min-w-[200px]">
             <Label htmlFor="gtu-q">Search name or org.nr</Label>
             <Input
@@ -326,7 +370,8 @@ export default function GptTargetUniversePage() {
                 <ul className="list-none space-y-1 text-muted-foreground font-mono text-xs break-all">
                   <li>DATABASE_SOURCE=postgres: {String(meta.database_source_postgres)}</li>
                   <li>GPT_TARGET_UNIVERSE_RUN_ID set: {String(meta.env_run_id_set)}</li>
-                  {meta.run_id ? <li>run_id: {meta.run_id}</li> : null}
+                  {meta.run_id_resolution ? <li>run_id_resolution: {meta.run_id_resolution}</li> : null}
+                  {meta.run_id ? <li>effective run_id: {meta.run_id}</li> : null}
                   <li>table screening_website_research_companies: {String(meta.table_screening_website_research_companies)}</li>
                   {meta.row_count != null ? <li>row_count for run_id: {meta.row_count}</li> : null}
                 </ul>
@@ -442,8 +487,8 @@ export default function GptTargetUniversePage() {
                   {displayRows.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
-                        No rows. Adjust filters or set{" "}
-                        <code className="text-xs bg-muted px-1 rounded">GPT_TARGET_UNIVERSE_RUN_ID</code> on the API.
+                        No rows for this cohort or filters. Try another screening run, clear filters, or confirm ingest wrote{" "}
+                        <code className="text-xs bg-muted px-1 rounded">screening_website_research_companies</code>.
                       </TableCell>
                     </TableRow>
                   ) : (

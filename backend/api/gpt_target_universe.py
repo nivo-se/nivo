@@ -1,14 +1,18 @@
 """
 Read-only API for the fixed GPT website-research + Layer2 triage universe.
 
-Run id comes from env GPT_TARGET_UNIVERSE_RUN_ID (single cohort; no run picker).
+Run id resolution (first match wins):
+1. Optional query param ``run_id`` (UUID).
+2. Env ``GPT_TARGET_UNIVERSE_RUN_ID`` when set to a valid UUID.
+3. Else the latest ``screening_runs`` row (by ``created_at``) that has at least one
+   ``screening_website_research_companies`` row.
 """
 
 from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -38,17 +42,69 @@ def _require_postgres() -> None:
         raise HTTPException(503, "DATABASE_SOURCE must be postgres for GPT target universe")
 
 
-def _configured_run_id() -> UUID:
-    raw = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
-    if not raw:
-        raise HTTPException(
-            503,
-            "GPT_TARGET_UNIVERSE_RUN_ID is not set — configure the target screening run UUID in the backend environment.",
-        )
+def _auto_latest_website_research_run_id(db: Any) -> Optional[UUID]:
+    """Newest screening_runs row (by created_at) that has website-research company rows."""
     try:
-        return UUID(raw)
-    except ValueError as e:
-        raise HTTPException(503, f"GPT_TARGET_UNIVERSE_RUN_ID is not a valid UUID: {raw}") from e
+        rows = db.run_raw_query(
+            """
+            SELECT r.id AS id
+            FROM public.screening_runs r
+            INNER JOIN public.screening_website_research_companies w ON w.run_id = r.id
+            GROUP BY r.id, r.created_at
+            ORDER BY r.created_at DESC
+            LIMIT 1
+            """
+        )
+    except Exception:
+        logger.debug("auto_latest website-research run_id lookup failed", exc_info=True)
+        return None
+    if not rows:
+        return None
+    val = rows[0].get("id")
+    if val is None:
+        return None
+    return UUID(str(val))
+
+
+def _resolve_run_id_soft(db: Any, query_run_id: Optional[str]) -> Tuple[Optional[UUID], str, Optional[str]]:
+    """
+    Returns (run_uuid_or_none, resolution_tag, error_detail).
+    resolution_tag: query_param | environment | auto_latest | none | invalid_query | invalid_env
+    """
+    q = (query_run_id or "").strip()
+    if q:
+        try:
+            return UUID(q), "query_param", None
+        except ValueError:
+            return None, "invalid_query", f"run_id is not a valid UUID: {q}"
+
+    raw = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
+    if raw:
+        try:
+            return UUID(raw), "environment", None
+        except ValueError as e:
+            return None, "invalid_env", str(e)
+
+    auto = _auto_latest_website_research_run_id(db)
+    if auto:
+        return auto, "auto_latest", None
+    return None, "none", None
+
+
+def _resolve_run_id_required(db: Any, query_run_id: Optional[str]) -> Tuple[UUID, str]:
+    rid, tag, err = _resolve_run_id_soft(db, query_run_id)
+    if rid is not None:
+        return rid, tag
+    if tag == "invalid_query":
+        raise HTTPException(400, err or "Invalid run_id query parameter") from None
+    if tag == "invalid_env":
+        raw = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
+        raise HTTPException(503, f"GPT_TARGET_UNIVERSE_RUN_ID is not a valid UUID: {raw}") from None
+    raise HTTPException(
+        503,
+        "No GPT target universe run: set GPT_TARGET_UNIVERSE_RUN_ID, pass ?run_id=<uuid>, "
+        "or ingest rows into screening_website_research_companies (no runs with data were found).",
+    )
 
 
 class GptTargetCompanyRow(BaseModel):
@@ -83,11 +139,19 @@ class GptTargetUniverseMeta(BaseModel):
     database_source_postgres: bool
     env_run_id_set: bool
     run_id: Optional[str] = None
+    run_id_resolution: Optional[str] = None
     run_id_parse_error: Optional[str] = None
     table_screening_website_research_companies: bool = False
     table_check_error: Optional[str] = None
     row_count: Optional[int] = None
     row_count_error: Optional[str] = None
+
+
+class GptTargetRunOption(BaseModel):
+    run_id: str
+    run_kind: str
+    created_at: str
+    row_count: int
 
 
 def _row_to_model(r: Dict[str, Any]) -> GptTargetCompanyRow:
@@ -144,27 +208,28 @@ def _row_to_model(r: Dict[str, Any]) -> GptTargetCompanyRow:
 
 
 @router.get("/meta", response_model=GptTargetUniverseMeta)
-async def gpt_target_universe_meta(request: Request):
+async def gpt_target_universe_meta(
+    request: Request,
+    run_id: Optional[str] = Query(
+        None,
+        description="Same override as /companies — when set, diagnostics target this run.",
+    ),
+):
     """Return env/table/row-count hints without applying list filters."""
     _require_user(request)
     ds = (os.getenv("DATABASE_SOURCE", "postgres") or "").lower()
+    raw_env = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
     meta: Dict[str, Any] = {
         "database_source_postgres": ds == "postgres",
-        "env_run_id_set": False,
+        "env_run_id_set": bool(raw_env),
         "run_id": None,
+        "run_id_resolution": None,
         "run_id_parse_error": None,
         "table_screening_website_research_companies": False,
         "table_check_error": None,
         "row_count": None,
         "row_count_error": None,
     }
-    raw = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
-    meta["env_run_id_set"] = bool(raw)
-    if raw:
-        try:
-            meta["run_id"] = str(UUID(raw))
-        except ValueError as e:
-            meta["run_id_parse_error"] = str(e)
 
     if ds != "postgres":
         return GptTargetUniverseMeta(**meta)
@@ -184,6 +249,15 @@ async def gpt_target_universe_meta(request: Request):
         meta["table_check_error"] = str(e)
         return GptTargetUniverseMeta(**meta)
 
+    rid_uuid, tag, err = _resolve_run_id_soft(db, run_id)
+    meta["run_id_resolution"] = tag
+    if tag == "invalid_env":
+        meta["run_id_parse_error"] = err
+    elif tag == "invalid_query":
+        meta["run_id_parse_error"] = err
+    if rid_uuid is not None:
+        meta["run_id"] = str(rid_uuid)
+
     rid = meta.get("run_id")
     if rid and meta["table_screening_website_research_companies"]:
         try:
@@ -198,9 +272,49 @@ async def gpt_target_universe_meta(request: Request):
     return GptTargetUniverseMeta(**meta)
 
 
+@router.get("/runs", response_model=List[GptTargetRunOption])
+async def list_gpt_target_runs(request: Request):
+    """Runs that have at least one website-research company row (newest first)."""
+    _require_postgres()
+    _require_user(request)
+    db = get_database_service()
+    try:
+        raw_rows = db.run_raw_query(
+            """
+            SELECT r.id::text AS run_id, r.run_kind, r.created_at, COUNT(w.orgnr)::int AS row_count
+            FROM public.screening_runs r
+            INNER JOIN public.screening_website_research_companies w ON w.run_id = r.id
+            GROUP BY r.id, r.run_kind, r.created_at
+            ORDER BY r.created_at DESC
+            LIMIT 50
+            """
+        )
+    except Exception as e:
+        logger.warning("gpt_target_universe /runs failed: %s", e)
+        return []
+
+    out: List[GptTargetRunOption] = []
+    for r in raw_rows:
+        ca = r.get("created_at")
+        ca_s = ca.isoformat() if hasattr(ca, "isoformat") else str(ca)
+        out.append(
+            GptTargetRunOption(
+                run_id=str(r.get("run_id") or ""),
+                run_kind=str(r.get("run_kind") or ""),
+                created_at=ca_s,
+                row_count=int(r.get("row_count") or 0),
+            )
+        )
+    return out
+
+
 @router.get("/companies", response_model=GptTargetCompaniesResponse)
 async def list_gpt_target_universe_companies(
     request: Request,
+    run_id: Optional[str] = Query(
+        None,
+        description="Override GPT_TARGET_UNIVERSE_RUN_ID for this request (UUID of a screening run).",
+    ),
     q: Optional[str] = Query(None, description="Substring match on company_name or orgnr"),
     fit: Optional[bool] = Query(
         None,
@@ -219,10 +333,11 @@ async def list_gpt_target_universe_companies(
 ):
     _require_postgres()
     _require_user(request)
-    run_id = _configured_run_id()
+    db = get_database_service()
+    run_uuid, _res_tag = _resolve_run_id_required(db, run_id)
 
     where_parts: List[str] = ["w.run_id = %s::uuid"]
-    params: List[Any] = [str(run_id)]
+    params: List[Any] = [str(run_uuid)]
 
     if q and q.strip():
         where_parts.append(
@@ -270,7 +385,6 @@ async def list_gpt_target_universe_companies(
         LIMIT {MAX_ROWS + 1}
     """
 
-    db = get_database_service()
     try:
         raw_rows = db.run_raw_query(sql, params)
     except Exception as e:
@@ -281,4 +395,4 @@ async def list_gpt_target_universe_companies(
         raw_rows = raw_rows[:MAX_ROWS]
 
     rows = [_row_to_model(dict(r)) for r in raw_rows]
-    return GptTargetCompaniesResponse(run_id=str(run_id), total=len(rows), rows=rows)
+    return GptTargetCompaniesResponse(run_id=str(run_uuid), total=len(rows), rows=rows)

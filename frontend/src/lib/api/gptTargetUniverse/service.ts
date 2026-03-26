@@ -59,6 +59,8 @@ function qs(params: Record<string, string | number | boolean | undefined | null>
 }
 
 export type FetchGptTargetCompaniesOptions = {
+  /** When set, overrides GPT_TARGET_UNIVERSE_RUN_ID for this request. */
+  run_id?: string;
   q?: string;
   fit?: boolean;
   has_triage?: boolean;
@@ -69,6 +71,8 @@ export type GptTargetUniverseMeta = {
   database_source_postgres: boolean;
   env_run_id_set: boolean;
   run_id: string | null;
+  /** query_param | environment | auto_latest | none | invalid_query | invalid_env */
+  run_id_resolution?: string | null;
   run_id_parse_error: string | null;
   table_screening_website_research_companies: boolean;
   table_check_error: string | null;
@@ -76,8 +80,16 @@ export type GptTargetUniverseMeta = {
   row_count_error: string | null;
 };
 
-export async function fetchGptTargetUniverseMeta(): Promise<GptTargetUniverseMeta> {
-  const url = `${API_BASE}/api/gpt-target-universe/meta`;
+export type GptTargetRunOption = {
+  run_id: string;
+  run_kind: string;
+  created_at: string;
+  row_count: number;
+};
+
+export async function fetchGptTargetUniverseMeta(runId?: string): Promise<GptTargetUniverseMeta> {
+  const q = qs({ run_id: runId?.trim() || undefined });
+  const url = `${API_BASE}/api/gpt-target-universe/meta${q}`;
   const res = await fetchWithAuth(url);
   if (!res.ok) {
     const t = await res.text();
@@ -86,10 +98,21 @@ export async function fetchGptTargetUniverseMeta(): Promise<GptTargetUniverseMet
   return res.json() as Promise<GptTargetUniverseMeta>;
 }
 
+export async function fetchGptTargetUniverseRuns(): Promise<GptTargetRunOption[]> {
+  const url = `${API_BASE}/api/gpt-target-universe/runs`;
+  const res = await fetchWithAuth(url);
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(httpErrorMessage(t, res.status));
+  }
+  return res.json() as Promise<GptTargetRunOption[]>;
+}
+
 export async function fetchGptTargetUniverseCompanies(
   options: FetchGptTargetCompaniesOptions = {}
 ): Promise<GptTargetCompaniesResponse> {
   const q = qs({
+    run_id: options.run_id?.trim() || undefined,
     q: options.q?.trim() || undefined,
     fit: options.fit === undefined ? undefined : options.fit,
     has_triage: options.has_triage === undefined ? undefined : options.has_triage,
