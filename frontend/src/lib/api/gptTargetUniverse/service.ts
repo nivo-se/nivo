@@ -28,7 +28,10 @@ function httpErrorMessage(text: string, status: number): string {
   const trimmed = text.trim();
   if (!trimmed) return `HTTP ${status}`;
   try {
-    const j = JSON.parse(trimmed) as { detail?: unknown };
+    const j = JSON.parse(trimmed) as { detail?: unknown; error?: unknown };
+    if (status === 401 && j.error === "unauthorized") {
+      return "Unauthorized (401): sign in again, or the access token is missing or rejected. With REQUIRE_AUTH=true the API expects a valid Auth0 Bearer token (same audience as the backend).";
+    }
     const d = j.detail;
     if (typeof d === "string") return d;
     if (Array.isArray(d)) {
@@ -61,6 +64,27 @@ export type FetchGptTargetCompaniesOptions = {
   has_triage?: boolean;
   min_fit_confidence?: number;
 };
+
+export type GptTargetUniverseMeta = {
+  database_source_postgres: boolean;
+  env_run_id_set: boolean;
+  run_id: string | null;
+  run_id_parse_error: string | null;
+  table_screening_website_research_companies: boolean;
+  table_check_error: string | null;
+  row_count: number | null;
+  row_count_error: string | null;
+};
+
+export async function fetchGptTargetUniverseMeta(): Promise<GptTargetUniverseMeta> {
+  const url = `${API_BASE}/api/gpt-target-universe/meta`;
+  const res = await fetchWithAuth(url);
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(httpErrorMessage(t, res.status));
+  }
+  return res.json() as Promise<GptTargetUniverseMeta>;
+}
 
 export async function fetchGptTargetUniverseCompanies(
   options: FetchGptTargetCompaniesOptions = {}

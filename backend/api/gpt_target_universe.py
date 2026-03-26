@@ -77,6 +77,19 @@ class GptTargetCompaniesResponse(BaseModel):
     rows: List[GptTargetCompanyRow]
 
 
+class GptTargetUniverseMeta(BaseModel):
+    """Lightweight config/dataset checks for troubleshooting (same auth as /companies)."""
+
+    database_source_postgres: bool
+    env_run_id_set: bool
+    run_id: Optional[str] = None
+    run_id_parse_error: Optional[str] = None
+    table_screening_website_research_companies: bool = False
+    table_check_error: Optional[str] = None
+    row_count: Optional[int] = None
+    row_count_error: Optional[str] = None
+
+
 def _row_to_model(r: Dict[str, Any]) -> GptTargetCompanyRow:
     triage = r.get("llm_triage_json")
     if triage is not None and not isinstance(triage, dict):
@@ -128,6 +141,61 @@ def _row_to_model(r: Dict[str, Any]) -> GptTargetCompanyRow:
         reason_summary=_s("reason_summary"),
         triage=triage,
     )
+
+
+@router.get("/meta", response_model=GptTargetUniverseMeta)
+async def gpt_target_universe_meta(request: Request):
+    """Return env/table/row-count hints without applying list filters."""
+    _require_user(request)
+    ds = (os.getenv("DATABASE_SOURCE", "postgres") or "").lower()
+    meta: Dict[str, Any] = {
+        "database_source_postgres": ds == "postgres",
+        "env_run_id_set": False,
+        "run_id": None,
+        "run_id_parse_error": None,
+        "table_screening_website_research_companies": False,
+        "table_check_error": None,
+        "row_count": None,
+        "row_count_error": None,
+    }
+    raw = (os.getenv("GPT_TARGET_UNIVERSE_RUN_ID") or "").strip()
+    meta["env_run_id_set"] = bool(raw)
+    if raw:
+        try:
+            meta["run_id"] = str(UUID(raw))
+        except ValueError as e:
+            meta["run_id_parse_error"] = str(e)
+
+    if ds != "postgres":
+        return GptTargetUniverseMeta(**meta)
+
+    db = get_database_service()
+    try:
+        chk = db.run_raw_query(
+            """
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_name = 'screening_website_research_companies'
+            ) AS e
+            """
+        )
+        meta["table_screening_website_research_companies"] = bool(chk and chk[0].get("e"))
+    except Exception as e:
+        meta["table_check_error"] = str(e)
+        return GptTargetUniverseMeta(**meta)
+
+    rid = meta.get("run_id")
+    if rid and meta["table_screening_website_research_companies"]:
+        try:
+            cnt = db.run_raw_query(
+                "SELECT COUNT(*)::int AS c FROM public.screening_website_research_companies WHERE run_id = %s::uuid",
+                [rid],
+            )
+            meta["row_count"] = int(cnt[0]["c"]) if cnt else 0
+        except Exception as e:
+            meta["row_count_error"] = str(e)
+
+    return GptTargetUniverseMeta(**meta)
 
 
 @router.get("/companies", response_model=GptTargetCompaniesResponse)

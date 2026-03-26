@@ -35,7 +35,9 @@ import { BackendStatusBanner } from "@/components/BackendStatusBanner";
 import { AddToListDropdown } from "@/components/default/AddToListDropdown";
 import {
   fetchGptTargetUniverseCompanies,
+  fetchGptTargetUniverseMeta,
   type GptTargetCompanyRow,
+  type GptTargetUniverseMeta,
 } from "@/lib/api/gptTargetUniverse/service";
 import {
   ChevronDown,
@@ -57,6 +59,41 @@ type SortKey =
   | "rank"
   | "fit_confidence"
   | "blended_score";
+
+function metaHints(m: GptTargetUniverseMeta): string[] {
+  const out: string[] = [];
+  if (!m.database_source_postgres) {
+    out.push("API DATABASE_SOURCE must be postgres for this page.");
+  }
+  if (!m.env_run_id_set) {
+    out.push(
+      "Set GPT_TARGET_UNIVERSE_RUN_ID in the repo-root .env (the file Docker Compose uses for the API), then recreate the API container.",
+    );
+  }
+  if (m.run_id_parse_error) {
+    out.push(`GPT_TARGET_UNIVERSE_RUN_ID is not a valid UUID: ${m.run_id_parse_error}`);
+  }
+  if (m.table_check_error) {
+    out.push(`Could not check DB table: ${m.table_check_error}`);
+  } else if (!m.table_screening_website_research_companies) {
+    out.push(
+      "Table screening_website_research_companies is missing — run Postgres migrations (see scripts/run_postgres_migrations.sh).",
+    );
+  }
+  if (m.row_count_error) {
+    out.push(`Row count query failed: ${m.row_count_error}`);
+  } else if (
+    m.database_source_postgres &&
+    m.table_screening_website_research_companies &&
+    m.run_id &&
+    m.row_count === 0
+  ) {
+    out.push(
+      "There are 0 rows for this run_id in screening_website_research_companies — confirm the UUID matches screening_runs.id and that ingest has written rows.",
+    );
+  }
+  return out;
+}
 
 function sortRows(rows: GptTargetCompanyRow[], key: SortKey, dir: "asc" | "desc"): GptTargetCompanyRow[] {
   const mul = dir === "asc" ? 1 : -1;
@@ -106,6 +143,16 @@ export default function GptTargetUniversePage() {
     queryKey: ["gpt-target-universe", queryOpts],
     queryFn: () => fetchGptTargetUniverseCompanies(queryOpts),
     enabled: minFitValid,
+  });
+
+  const {
+    data: meta,
+    error: metaError,
+    refetch: refetchMeta,
+  } = useQuery({
+    queryKey: ["gpt-target-universe-meta"],
+    queryFn: fetchGptTargetUniverseMeta,
+    staleTime: 30_000,
   });
 
   const displayRows = useMemo(() => {
@@ -160,6 +207,10 @@ export default function GptTargetUniversePage() {
 
   const selectedOrgnrs = useMemo(() => Array.from(selected), [selected]);
   const errMsg = error instanceof Error ? error.message : error ? String(error) : null;
+  const metaErrMsg = metaError instanceof Error ? metaError.message : metaError ? String(metaError) : null;
+  const metaIssues = meta ? metaHints(meta) : [];
+  const showMetaPanel =
+    Boolean(meta && (errMsg || (!isLoading && data?.total === 0))) || Boolean(metaErrMsg);
 
   return (
     <div className="app-page min-h-full">
@@ -183,7 +234,10 @@ export default function GptTargetUniversePage() {
           variant="outline"
           size="sm"
           className="gap-2 shrink-0"
-          onClick={() => refetch()}
+          onClick={() => {
+            void refetch();
+            void refetchMeta();
+          }}
           disabled={isFetching}
         >
           {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
@@ -253,6 +307,41 @@ export default function GptTargetUniversePage() {
       {errMsg ? (
         <Card className="border-destructive/50">
           <CardContent className="pt-6 text-sm text-destructive">{errMsg}</CardContent>
+        </Card>
+      ) : null}
+
+      {showMetaPanel ? (
+        <Card className={metaIssues.length || metaErrMsg ? "border-amber-500/40" : ""}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Diagnostics</CardTitle>
+            <CardDescription>
+              <code className="text-xs bg-muted px-1 rounded">GET /api/gpt-target-universe/meta</code> — same authentication as the companies list (401 here usually means the same token problem as the table request).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {metaErrMsg ? (
+              <p className="text-destructive">{metaErrMsg}</p>
+            ) : meta ? (
+              <>
+                <ul className="list-none space-y-1 text-muted-foreground font-mono text-xs break-all">
+                  <li>DATABASE_SOURCE=postgres: {String(meta.database_source_postgres)}</li>
+                  <li>GPT_TARGET_UNIVERSE_RUN_ID set: {String(meta.env_run_id_set)}</li>
+                  {meta.run_id ? <li>run_id: {meta.run_id}</li> : null}
+                  <li>table screening_website_research_companies: {String(meta.table_screening_website_research_companies)}</li>
+                  {meta.row_count != null ? <li>row_count for run_id: {meta.row_count}</li> : null}
+                </ul>
+                {metaIssues.length > 0 ? (
+                  <ul className="list-disc pl-5 space-y-1 text-amber-900 dark:text-amber-200/90">
+                    {metaIssues.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground">No obvious configuration issues reported.</p>
+                )}
+              </>
+            ) : null}
+          </CardContent>
         </Card>
       ) : null}
 
