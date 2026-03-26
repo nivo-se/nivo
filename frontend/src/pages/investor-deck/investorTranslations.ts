@@ -20,7 +20,7 @@ export const investorTranslations = {
 
     // Hero / Short version
     oneLiner:
-      "We acquire profitable, under-digitised companies and create value through digital and AI-enabled operational improvements. Over time, those improvements compound into value.",
+      "We acquire profitable, under-digitised companies and create value through digital and AI-enabled operational improvements. Over time, those improvements create value.",
     heroTagline:
       "We take what already works — and make it scalable, smarter, and future-ready.",
     philosophyTagline:
@@ -28,7 +28,7 @@ export const investorTranslations = {
     shortVersion: "Executive Summary",
     execSummaryWhatLabel: "What we do",
     execSummaryWhatPara1:
-      "Partnering with a small group of investors to acquire and improve Nordic companies, with primary focus on Sweden, over the long term.",
+      "We are partnering with a small group of investors to acquire and improve Nordic companies for the long term.",
     execSummaryWhatParaPartners:
       "We partner with founders who remain as shareholders and operators — ensuring continuity, aligned incentives and better execution.",
     execSummaryWhatPara2:
@@ -66,11 +66,9 @@ export const investorTranslations = {
 
     // Hero paragraphs
     companiesIntro:
-      "Our target companies often have strong products, loyal customers and proven business models — but operational potential remains untapped.",
+      "Our target companies have strong products, loyal customers and proven business models — but operational potential remains untapped.",
     companiesIntroFollowUp:
-      "We focus on applying proven operational practices, supported by modern tools where they clearly improve outcomes.",
-    overviewWhatWeDoClosing:
-      "We focus on building on what already works — and improving it through better execution, structure and tools.",
+      "We apply proven operational practices, supported by modern tools where they clearly improve outcomes.",
     manyOperate:
       "Many operate with manual workflows; fragmented systems; limited visibility. The businesses are sound; execution can be improved.",
     sourcingEdgeOverview1:
@@ -80,13 +78,13 @@ export const investorTranslations = {
     sourcingEdgeOverview3:
       "Advantage is preparation — both in data and in understanding how value can be created before first contact.",
     sourcingEdgeOverviewClosing:
-      "The focus is not to change what works — but to improve and scale it.",
+      "The focus is not to change what works — but to improve and scale good companies.",
     sourcingEngine:
       "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals.",
     focusQuote: "Focus: operational improvement over technology risk.",
 
     // Key terms
-    keyTerms: "Investment overview",
+    keyTerms: "Investment Overview",
     investmentCompany: "Investment Company",
     managementFee: "Management Fee",
     targetAcquisitionCapital: "Target Acquisition Capital",
@@ -101,7 +99,7 @@ export const investorTranslations = {
     ourEdgeTitle: "Our edge",
     ourEdge1: "We work hands-on with a small number of companies.",
     ourEdge2: "We are lean and move quickly.",
-    ourEdge3: "We focus on execution — not theory.",
+    ourEdge3: "We focus on execution.",
     ourEdge4: "We build on what already works and improve it systematically.",
     ourEdge5: "We use digital tools and AI where they make a real difference.",
     ourEdge6: "We have a strong network we use when it matters.",
@@ -212,7 +210,7 @@ export const investorTranslations = {
       "Upgrade core systems and apply modern tools, including AI, where they improve efficiency and visibility.",
     operatingToolkit5Title: "Execution",
     operatingToolkit5Text:
-      "Improve pricing, sales, and operational processes. Small, consistent improvements compound over time — by building on what already works and improving it step by step.",
+      "Improve pricing, sales, and operational processes. Small, consistent improvements compound over time.",
     operatingToolkitExecutionExtra:
       "Execution is about making existing businesses better — not reinventing them.",
     operatingToolkit6Title: "Culture",
@@ -243,7 +241,7 @@ export const investorTranslations = {
     teamHenrikBio:
       "15+ years of commercial leadership across startups and global companies. Scaled businesses from zero to €60m+ revenue and led growth across multiple markets.",
     teamSebastianBio:
-      "15+ years in CFO and corporate finance roles with experience in acquisitions, capital markets and IPO preparation across technology and industrial sectors.",
+      "15+ years in CFO and global operational roles with experience in acquisitions and capital deployment. Building and growing public and private companies across technology and industrial sectors.",
 
     // Pipeline stages
     pipelineActiveDD: "Active due diligence",
@@ -254,8 +252,6 @@ export const investorTranslations = {
     // Long-form only (tightened copy; short version unchanged)
     companiesIntroLong: "Our targets have strong products and loyal customers but untapped operational potential.",
     companiesIntroFollowUpLong: "We apply the Operating Toolbox—pricing, cost control, reporting, workflows—where they clearly improve outcomes.",
-    overviewWhatWeDoClosingLong:
-      "We focus on building on what already works — and improving it through better execution, structure and tools.",
     manyOperateLong: "Manual workflows, fragmented systems, limited visibility; businesses are sound, execution can be improved.",
     execSummaryModelSentenceLong:
       "Acquire profitable companies, improve operating margins through execution and better tools where they help, convert to cash flow, reinvest.",
@@ -264,7 +260,7 @@ export const investorTranslations = {
     whyNowTextLong:
       "Much of the Nordic company base was built before modern systems—profitable but under-optimised.\n\nSoftware and AI have matured: pricing, reporting and workflows can now be systematised. Value comes from execution: closing the gap between current operations and what's possible.",
     sourcingEngineLong:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals. Combined with direct relationships in the market, this allows earlier access, better preparation and more informed first conversations. Advantage is preparation — in data and in how value can be created before first contact. The focus is not to change what works — but to improve and scale it.",
+      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals. Combined with direct relationships in the market, this allows earlier access, better preparation and more informed first conversations. Advantage is preparation — in data and in how value can be created before first contact. The focus is not to change what works — but to improve and scale good companies.",
     investmentStep1TextLong: "Find targets before broad processes via the data-driven sourcing engine.",
     investmentStep2TextLong: "Toolbox: pricing, cost control, reporting, digital workflows.",
     investmentStep3TextLong: "Reporting and operational control to strengthen cash conversion.",
@@ -285,7 +281,7 @@ export const investorTranslations = {
     sourcingEdgePlatformLong:
       "Advantage is preparation — both in data and in understanding how value can be created before first contact.",
     sourcingEdgePhilosophyClosingLong:
-      "The focus is not to change what works — but to improve and scale it.",
+      "The focus is not to change what works — but to improve and scale good companies.",
     sourcingEdgeEngineDetailLong:
       "The engine filters a large universe into a ranked target set; memos summarize financial and operational signals before outreach. AI speeds analysis and reporting; judgment stays with the team.",
     operatingToolkitIntroLong:
@@ -334,7 +330,7 @@ export const investorTranslations = {
     structureCompoundingClosingLong:
       "We grow capital by improving how businesses operate, supporting profitable growth and reinvesting the cash flow they generate. Most capital is retained to compound over time; we may add a modest dividend as the portfolio matures, without compromising compounding.",
     structureCapitalNote:
-      "The target acquisition capital is SEK 1,000m. Initially investments are executed on a deal-by-deal basis, with capital raised per transaction.",
+      "Initially investments are executed on a deal-by-deal basis, with capital raised per transaction.",
     structureEvergreenIntro:
       "Nivo is built as an evergreen holding company with a long-term ownership approach.",
     structureIpoClarification:
@@ -373,7 +369,7 @@ export const investorTranslations = {
 
     // Hero / Short version
     oneLiner:
-      "Vi förvärvar lönsamma, underdigitaliserade företag och skapar värde genom operativ förbättring och digitala uppgraderingar. Över tid ackumuleras dessa förbättringar till värde.",
+      "Vi förvärvar lönsamma, underdigitaliserade företag och skapar värde genom operativ förbättring och digitala uppgraderingar. Över tid skapar dessa förbättringar värde.",
     heroTagline:
       "Vi tar det som redan fungerar — och gör det skalbart, smartare och framtidssäkert.",
     philosophyTagline:
@@ -381,7 +377,7 @@ export const investorTranslations = {
     shortVersion: "Sammanfattning",
     execSummaryWhatLabel: "Vad vi gör",
     execSummaryWhatPara1:
-      "I partnerskap med en liten grupp investerare förvärvar och förbättrar vi nordiska företag, med primärt fokus på Sverige, på lång sikt.",
+      "Vi samarbetar med en liten grupp investerare för att förvärva och förbättra nordiska företag på lång sikt.",
     execSummaryWhatParaPartners:
       "Vi samarbetar med grundare som fortsätter som delägare och operatörer — för kontinuitet, samställda incitament och bättre exekvering.",
     execSummaryWhatPara2:
@@ -419,11 +415,9 @@ export const investorTranslations = {
 
     // Hero paragraphs
     companiesIntro:
-      "Våra målbolag har ofta starka produkter, lojala kunder och beprövade affärsmodeller — men operativ potential finns kvar att utnyttja.",
+      "Våra målbolag har starka produkter, lojala kunder och beprövade affärsmodeller — men operativ potential finns kvar att utnyttja.",
     companiesIntroFollowUp:
-      "Vi fokuserar på att tillämpa beprövade operativa metoder, med stöd av moderna verktyg där de tydligt förbättrar resultatet.",
-    overviewWhatWeDoClosing:
-      "Vi bygger vidare på det som redan fungerar — och förbättrar det genom bättre exekvering, struktur och verktyg.",
+      "Vi tillämpar beprövade operativa metoder, med stöd av moderna verktyg där de tydligt förbättrar resultatet.",
     manyOperate:
       "Många arbetar med manuella arbetsflöden; fragmenterade system; begränsad insyn. Företagen är sunda; exekveringen kan förbättras.",
     sourcingEdgeOverview1:
@@ -433,7 +427,7 @@ export const investorTranslations = {
     sourcingEdgeOverview3:
       "Fördelen är förberedelse — både i data och i förståelse för hur värde kan skapas före första kontakt.",
     sourcingEdgeOverviewClosing:
-      "Fokus är inte att ändra det som fungerar — utan att förbättra och skala det.",
+      "Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
     sourcingEngine:
       "En datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler.",
     focusQuote: "Fokus: operativ förbättring framför teknologirisk.",
@@ -454,7 +448,7 @@ export const investorTranslations = {
     ourEdgeTitle: "Vår styrka",
     ourEdge1: "Vi arbetar hands-on med ett litet antal bolag.",
     ourEdge2: "Vi är lean och rör oss snabbt.",
-    ourEdge3: "Vi fokuserar på exekvering — inte teori.",
+    ourEdge3: "Vi fokuserar på exekvering.",
     ourEdge4: "Vi bygger vidare på det som fungerar och förbättrar det systematiskt.",
     ourEdge5: "Vi använder digitala verktyg och AI där de gör verklig skillnad.",
     ourEdge6: "Vi har ett starkt nätverk som vi tar in när det behövs.",
@@ -566,7 +560,7 @@ export const investorTranslations = {
       "Uppgradera kärnsystem och tillämpa moderna verktyg, inklusive AI, där de förbättrar effektivitet och insyn.",
     operatingToolkit5Title: "Exekvering",
     operatingToolkit5Text:
-      "Förbättra prissättning, försäljning och operativa processer. Små, konsekventa förbättringar ackumuleras över tid — genom att bygga vidare på det som redan fungerar och förbättra det steg för steg.",
+      "Förbättra prissättning, försäljning och operativa processer. Små, konsekventa förbättringar ackumuleras över tid.",
     operatingToolkitExecutionExtra:
       "Exekvering handlar om att göra befintliga verksamheter bättre — inte att uppfinna dem på nytt.",
     operatingToolkit6Title: "Kultur",
@@ -597,7 +591,7 @@ export const investorTranslations = {
     teamHenrikBio:
       "15+ års kommersiell ledarskap över startups och globala företag. Skalade företag från noll till €60m+ omsättning och ledde tillväxt över flera marknader.",
     teamSebastianBio:
-      "15+ års erfarenhet inom CFO och företagsfinansiering med erfarenhet av förvärv, kapitalmarknader och IPO-förberedelser över teknologi- och industrisektorer.",
+      "15+ års erfarenhet som CFO och i globala operativa roller med erfarenhet av förvärv och kapitalplacering. Bygger och utvecklar publika och privata bolag inom teknologi och industri.",
 
     // Pipeline stages
     pipelineActiveDD: "Aktiv due diligence",
@@ -608,8 +602,6 @@ export const investorTranslations = {
     // Long-form only (tightened copy)
     companiesIntroLong: "Våra målbolag har starka produkter och lojala kunder men outnyttjad operativ potential.",
     companiesIntroFollowUpLong: "Vi tillämpar den operativa verktygslådan—prissättning, kostnadskontroll, rapportering, arbetsflöden—där de tydligt förbättrar resultatet.",
-    overviewWhatWeDoClosingLong:
-      "Vi bygger vidare på det som redan fungerar — och förbättrar det genom bättre exekvering, struktur och verktyg.",
     manyOperateLong: "Manuella arbetsflöden, fragmenterade system, begränsad insyn; företagen är sunda, exekveringen kan förbättras.",
     execSummaryModelSentenceLong:
       "Förvärva lönsamma bolag, förbättra rörelsemarginaler genom exekvering och bättre verktyg där de hjälper, omvandla till kassaflöde, återinvestera.",
@@ -618,7 +610,7 @@ export const investorTranslations = {
     whyNowTextLong:
       "Mycket av den nordiska företagsbasen byggdes före moderna system—lönsam men underoptimerad.\n\nMjukvara och AI har mognat: prissättning, rapportering och arbetsflöden kan nu systematiseras. Värde skapas genom exekvering: att stänga gapet mellan nuvarande drift och vad som är möjligt.",
     sourcingEngineLong:
-      "Datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler. Tillsammans med direkta relationer på marknaden ger det tidigare tillträde, bättre förberedelse och mer informerade första samtal. Fördelen är förberedelse — i data och i hur värde kan skapas före första kontakt. Fokus är inte att ändra det som fungerar — utan att förbättra och skala det.",
+      "Datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler. Tillsammans med direkta relationer på marknaden ger det tidigare tillträde, bättre förberedelse och mer informerade första samtal. Fördelen är förberedelse — i data och i hur värde kan skapas före första kontakt. Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
     investmentStep1TextLong: "Hitta mål före breda processer via den datadrivna sökmotorn.",
     investmentStep2TextLong: "Verktygslåda: prissättning, kostnadskontroll, rapportering, digitala arbetsflöden.",
     investmentStep3TextLong: "Rapportering och operativ kontroll för starkare kassakonvertering.",
@@ -639,7 +631,7 @@ export const investorTranslations = {
     sourcingEdgePlatformLong:
       "Fördelen är förberedelse — både i data och i förståelse för hur värde kan skapas före första kontakt.",
     sourcingEdgePhilosophyClosingLong:
-      "Fokus är inte att ändra det som fungerar — utan att förbättra och skala det.",
+      "Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
     sourcingEdgeEngineDetailLong:
       "Motorn filtrerar ett stort universum till en rankad målgrupp; memon sammanfattar finansiella och operativa signaler före kontakt. AI snabbar på analys och rapportering; omdömet sitter kvar i teamet.",
     operatingToolkitIntroLong:
@@ -688,7 +680,7 @@ export const investorTranslations = {
     structureCompoundingClosingLong:
       "Vi växer kapitalet genom att förbättra hur bolagen drivs, stödja lönsam tillväxt och återinvestera genererat kassaflöde. Merparten av kapitalet behålls för att ackumulera; en blygsam utdelning kan tillkomma när portföljen mognar, utan att kompromissa ackumuleringen.",
     structureCapitalNote:
-      "Målförvärvskapital är SEK 1 000 m. Inledningsvis genomförs investeringar affär för affär med kapital som tas in per transaktion.",
+      "Inledningsvis genomförs investeringar affär för affär med kapital som tas in per transaktion.",
     structureEvergreenIntro:
       "Nivo är byggt som ett evergreen-holdingbolag med långsiktigt ägande.",
     structureIpoClarification:

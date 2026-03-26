@@ -19,6 +19,9 @@ import { investorTranslations, type InvestorLang } from "./investor-deck/investo
 const INVESTOR_STORAGE_KEY = "nivo_investor_unlocked";
 const INVESTOR_PASSWORD = "nivo2020";
 
+/** Subsection labels under Overview (What we do, How the model works, etc.) — bolder than body, smaller than Section h2 */
+const INVESTOR_SUBSECTION_LABEL_CLASS = "text-sm font-bold uppercase tracking-wider";
+
 // ─── Data (condensed for short form) ─────────────────────────────────────
 const PIPELINE_ITEMS = [
   { stageKey: "pipelineActiveDD" as const, count: "2" },
@@ -263,17 +266,14 @@ function InvestorShortForm({
 
         {/* Overview — Part 2 (restructured: What, Model, Why, Edge, Returns, Team) */}
         <Section title={t.overviewSection} id="executive-summary">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryWhatLabel}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.execSummaryWhatLabel}</p>
           <p className="text-lg sm:text-xl leading-relaxed mb-4" style={{ color: tokens.text }}>
             {t.companiesIntro}
           </p>
-          <p className="text-lg sm:text-xl leading-relaxed mb-4 font-semibold" style={{ color: tokens.text }}>
+          <p className="text-lg sm:text-xl leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
             {t.companiesIntroFollowUp}
           </p>
-          <p className="text-base leading-relaxed mb-6" style={{ color: tokens.text }}>
-            {t.overviewWhatWeDoClosing}
-          </p>
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryModelLabel}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.execSummaryModelLabel}</p>
           <p className="text-base leading-relaxed mb-3" style={{ color: tokens.text }}>
             {t.execSummaryModelSentence}
           </p>
@@ -283,26 +283,26 @@ function InvestorShortForm({
           <p className="text-base leading-relaxed mb-6 font-medium" style={{ color: tokens.text }}>
             {t.execSummaryModelClosing}
           </p>
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryWhyLabel}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.execSummaryWhyLabel}</p>
           <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>
             {t.manyOperate}
           </p>
           <div id="why-now" className="mb-6 scroll-mt-[100px]">
-            <h2 className="text-xl font-semibold mb-3" style={{ color: tokens.text }}>{t.whyNow}</h2>
+            <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-3`} style={{ color: tokens.accent }}>{t.whyNow}</p>
             <div className="space-y-4 text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>
               {t.whyNowText.split("\n\n").map((para, i, arr) => (
                 <p key={i} className={i === arr.length - 1 ? "font-semibold" : undefined}>{para}</p>
               ))}
             </div>
           </div>
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.execSummaryEdgeLabel}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.execSummaryEdgeLabel}</p>
           <div className="space-y-3 text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
             <p>{t.sourcingEdgeOverview1}</p>
             <p>{t.sourcingEdgeOverview2}</p>
             <p>{t.sourcingEdgeOverview3}</p>
             <p className="font-medium">{t.sourcingEdgeOverviewClosing}</p>
           </div>
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.keyTerms}</p>
           <div id="structure" className="pt-6 pb-6 border-t border-b mb-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
               <div className="flex items-center justify-between gap-2">
@@ -336,7 +336,7 @@ function InvestorShortForm({
           <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
           <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
           <br />
-          <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
+          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
           <ul className="space-y-2 pl-3">
             {[t.capability1, t.capability2, t.capability3, t.capability4, t.capability5].map((item) => (
               <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>

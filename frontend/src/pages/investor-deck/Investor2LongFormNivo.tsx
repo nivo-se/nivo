@@ -37,7 +37,7 @@ const PUNCH_CLASS = "text-center text-xl sm:text-2xl font-semibold text-profile-
 const H1_CLASS = "font-heading font-semibold text-profile-fg tracking-tight text-3xl sm:text-4xl md:text-5xl leading-[1.15] mb-6";
 const H2_CLASS = "font-heading font-semibold text-profile-fg tracking-tight text-2xl sm:text-3xl mb-4";
 const H3_CLASS = "font-heading font-semibold text-profile-fg text-lg sm:text-xl mb-3";
-const SECTION_SUBTITLE_CLASS = "text-profile-accent font-medium uppercase tracking-widest text-sm mb-6";
+const SECTION_SUBTITLE_CLASS = "text-profile-accent font-bold uppercase tracking-widest text-sm mb-6";
 const LABEL_CLASS = "text-sm font-semibold text-profile-fg mb-2";
 const LABEL_OLIVE_CLASS = "text-sm font-semibold text-profile-accent uppercase tracking-wider mb-2";
 
@@ -135,11 +135,8 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>
               {t.companiesIntroLong}
             </p>
-            <p className="text-base sm:text-lg leading-relaxed mb-4 font-semibold" style={{ color: tokens.text }}>
+            <p className="text-base sm:text-lg leading-relaxed mb-6 font-semibold" style={{ color: tokens.text }}>
               {t.companiesIntroFollowUpLong}
-            </p>
-            <p className="text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>
-              {t.overviewWhatWeDoClosingLong}
             </p>
             <p className={SECTION_SUBTITLE_CLASS}>{t.execSummaryModelLabel}</p>
             <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: tokens.text }}>
@@ -156,7 +153,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               {t.manyOperateLong}
             </p>
             <div id="why-now" className="mb-6 scroll-mt-[100px]">
-              <h2 className={H2_CLASS}>{t.whyNow}</h2>
+              <p className={SECTION_SUBTITLE_CLASS}>{t.whyNow}</p>
               <div className="space-y-4 text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>
                 {t.whyNowTextLong.split("\n\n").map((para, i, arr) => (
                   <p key={i} className={i === arr.length - 1 ? "font-semibold" : undefined}>{para}</p>
@@ -170,7 +167,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <p>{t.sourcingEdgeOverview3}</p>
               <p className="font-medium">{t.sourcingEdgeOverviewClosing}</p>
             </div>
-            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.keyTerms}</p>
+            <p className="text-profile-accent font-bold uppercase tracking-widest text-sm mb-2">{t.keyTerms}</p>
             <div id="key-terms" className="pt-6 pb-6 border-t border-b mb-8 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
                 <div className="flex items-center justify-between gap-2">
@@ -203,7 +200,7 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
             <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
             <p className="text-base sm:text-lg leading-relaxed mt-2 mb-6" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
-            <p className="text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
+            <p className="text-profile-accent font-bold uppercase tracking-widest text-sm mb-2">{t.teamCapabilities}</p>
             <ul className="space-y-2 max-w-2xl pl-3">
               {[t.capability1, t.capability2, t.capability3, t.capability4, t.capability5].map((item) => (
                 <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
