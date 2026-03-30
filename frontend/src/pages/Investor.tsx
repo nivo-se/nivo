@@ -117,7 +117,7 @@ const ANCHOR_LINKS = [
   { href: "#why-invest", labelKey: "navWhyInvest" as const },
   { href: "#why-now", labelKey: "navWhyNow" as const },
   { href: "#investment-process", labelKey: "navInvestmentProcess" as const },
-  { href: "#approach", labelKey: "navApproach" as const },
+  { href: "#the-opportunity", labelKey: "navOpportunity" as const },
   { href: "#value-creation", labelKey: "navValueCreation" as const },
   { href: "#pipeline", labelKey: "navPipeline" as const },
   { href: "#team", labelKey: "navTeam" as const },
@@ -302,49 +302,16 @@ function InvestorShortForm({
             <p>{t.sourcingEdgeOverview3}</p>
             <p className="font-medium">{t.sourcingEdgeOverviewClosing}</p>
           </div>
-          <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.keyTerms}</p>
-          <div id="structure" className="pt-6 pb-6 border-t border-b mb-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
-                <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.managementFee}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>0%</span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Target className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetAcquisitionCapital}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>SEK 1,000m</span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetIRR}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>20–25%</span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetMOIC}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
-              </div>
-              <p className="col-span-2 text-sm sm:text-base leading-relaxed pt-1" style={{ color: tokens.text }}>{t.investmentHorizonNote}</p>
-            </div>
-          </div>
-          <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
-          <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
-          <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
-          <br />
           <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.teamCapabilities}</p>
           <ul className="space-y-2 pl-3">
-            {[t.capability1, t.capability2, t.capability3, t.capability4, t.capability5].map((item) => (
+            {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
               <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
                 <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
+          <p className="text-base sm:text-lg leading-relaxed mt-4 max-w-2xl" style={{ color: tokens.text }}>{t.capability5}</p>
         </Section>
 
       {/* Investment Process — timeline with boxes */}
@@ -381,19 +348,8 @@ function InvestorShortForm({
         </div>
       </Section>
 
-      <Section title={t.ourEdgeTitle} id="our-edge" bg="bgAlt">
-        <ul className="space-y-2 pl-3 max-w-2xl">
-          {[t.ourEdge1, t.ourEdge2, t.ourEdge3, t.ourEdge4, t.ourEdge5, t.ourEdge6].map((item) => (
-            <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
-              <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
       {/* Opportunity — full section with cards (same as long form) */}
-      <Section title={t.theOpportunity} id="approach">
+      <Section title={t.theOpportunity} id="the-opportunity">
         <div className="rounded-xl p-5 sm:p-6 mb-8 sm:mb-10 border shadow-sm" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
           <p className="text-lg sm:text-xl font-semibold mb-4 leading-snug" style={{ color: tokens.text }}>
             {t.opportunityThesis}
@@ -491,31 +447,15 @@ function InvestorShortForm({
         </div>
       </Section>
 
-      {/* Pipeline — distinct background to separate from approach and value-creation */}
-      <Section title={t.pipeline} id="pipeline" bg="bgAlt">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.pipelineLabel}</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {PIPELINE_ITEMS.map((item) => (
-            <div key={item.stageKey} className="rounded-lg p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
-              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[item.stageKey]}</p>
-            </div>
+      <Section title={t.ourEdgeTitle} id="our-edge" bg="bgAlt">
+        <ul className="space-y-2 pl-3 max-w-2xl">
+          {[t.ourEdge1, t.ourEdge2, t.ourEdge3, t.ourEdge4, t.ourEdge5, t.ourEdge6].map((item) => (
+            <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
+              <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+              <span>{item}</span>
+            </li>
           ))}
-        </div>
-        <p className="text-sm mb-4" style={{ color: tokens.text }}>{t.activeTargets}</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { name: "Company A", sectorKey: "sectorIndustrial" as const, revenue: "SEK 120m", statusKey: "dueDiligence" as const },
-            { name: "Company B", sectorKey: "sectorBusinessServices" as const, revenue: "SEK 75m", statusKey: "advanced" as const },
-            { name: "Company C", sectorKey: "sectorDistribution" as const, revenue: "SEK 165m", statusKey: "dueDiligence" as const },
-          ].map((c) => (
-            <div key={c.name} className="rounded-lg p-5 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
-              <p className="font-semibold" style={{ color: tokens.text }}>{c.name}</p>
-              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[c.sectorKey]} · {c.revenue}</p>
-              <p className="text-sm font-medium mt-3" style={{ color: tokens.accent }}>{t.status}: {t[c.statusKey]}</p>
-            </div>
-          ))}
-        </div>
+        </ul>
       </Section>
 
       {/* Value creation — Operating toolkit */}
@@ -546,6 +486,33 @@ function InvestorShortForm({
         </p>
       </Section>
 
+      {/* Pipeline — distinct background to separate from approach and value-creation */}
+      <Section title={t.pipeline} id="pipeline" bg="bgAlt">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: tokens.accent }}>{t.pipelineLabel}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {PIPELINE_ITEMS.map((item) => (
+            <div key={item.stageKey} className="rounded-lg p-5 text-center border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
+              <p className="text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{item.count}</p>
+              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[item.stageKey]}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-sm mb-4" style={{ color: tokens.text }}>{t.activeTargets}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { name: "Company A", sectorKey: "sectorIndustrial" as const, revenue: "SEK 120m", statusKey: "dueDiligence" as const },
+            { name: "Company B", sectorKey: "sectorBusinessServices" as const, revenue: "SEK 75m", statusKey: "advanced" as const },
+            { name: "Company C", sectorKey: "sectorDistribution" as const, revenue: "SEK 165m", statusKey: "dueDiligence" as const },
+          ].map((c) => (
+            <div key={c.name} className="rounded-lg p-5 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border }}>
+              <p className="font-semibold" style={{ color: tokens.text }}>{c.name}</p>
+              <p className="text-sm mt-1" style={{ color: tokens.text }}>{t[c.sectorKey]} · {c.revenue}</p>
+              <p className="text-sm font-medium mt-3" style={{ color: tokens.accent }}>{t.status}: {t[c.statusKey]}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
       {/* Team */}
       <Section title={t.team} bg="bgAlt" id="team">
         <p className="text-sm font-semibold uppercase tracking-wider mb-6" style={{ color: tokens.accent }}>{t.teamSubtitle}</p>
@@ -563,6 +530,41 @@ function InvestorShortForm({
               )}
             </div>
           ))}
+        </div>
+      </Section>
+
+      <Section title={t.navStructure} id="structure" bg="bgAlt">
+        <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
+        <p className="text-base sm:text-lg leading-relaxed mb-4" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
+        <p className="text-base sm:text-lg leading-relaxed mb-6" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
+        <p className={`${INVESTOR_SUBSECTION_LABEL_CLASS} mb-2`} style={{ color: tokens.accent }}>{t.keyTerms}</p>
+        <div className="pt-6 pb-6 border-t border-b scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Building2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentCompany}</span>
+              <Check className="w-4 h-4 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.managementFee}</span>
+              <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>0%</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Target className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetAcquisitionCapital}</span>
+              <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>SEK 1,000m</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetIRR}</span>
+              <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>20–25%</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetMOIC}</span>
+              <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
+              <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
+            </div>
+          </div>
         </div>
       </Section>
 

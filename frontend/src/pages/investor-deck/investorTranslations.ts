@@ -11,7 +11,7 @@ export const investorTranslations = {
     navWhyInvest: "Why Invest",
     navWhyNow: "Why Now",
     navInvestmentProcess: "Investment Process",
-    navApproach: "Approach",
+    navOpportunity: "Opportunity",
     navValueCreation: "Value Creation",
     navPipeline: "Pipeline",
     navTeam: "Team",
@@ -22,13 +22,13 @@ export const investorTranslations = {
     oneLiner:
       "We acquire profitable, under-digitised companies and create value through digital and AI-enabled operational improvements. Over time, those improvements create value.",
     heroTagline:
-      "We take what already works — and make it scalable, smarter, and future-ready.",
+      "We take what already works — and make it scalable and more efficient",
     philosophyTagline:
-      "We take what already works — and make it scalable, smarter, and future-ready.",
+      "We take what already works — and make it scalable and more efficient",
     shortVersion: "Executive Summary",
     execSummaryWhatLabel: "What we do",
     execSummaryWhatPara1:
-      "We are partnering with a small group of investors to acquire and improve Nordic companies for the long term.",
+      "Nivo partners with a small group of investors to acquire and improve Nordic companies for the long term.",
     execSummaryWhatParaPartners:
       "We partner with founders who remain as shareholders and operators — ensuring continuity, aligned incentives and better execution.",
     execSummaryWhatPara2:
@@ -38,14 +38,14 @@ export const investorTranslations = {
     execSummaryValueFlow:
       "Acquire resilient companies → improve execution and operating margins → generate cash flow → reinvest and compound.",
     execSummaryValueEdge:
-      "Our edge is hands-on ownership, structured operating playbooks, a strong network across operators, industry and capital, and digital and AI-enabled operational improvements applied in practice.",
+      "Our edge is hands-on ownership, structured operating playbook, a strong network across operators, industry, capital and AI-enabled operational improvements.",
     execSummaryModelLabel: "How the model works",
     execSummaryModelSentence:
       "We acquire profitable companies, improve operating margins through execution and better tools where they help, convert improvements to cash flow, and reinvest over time.",
     execSummaryModelFounders:
       "We typically invest alongside founders who remain involved — maintaining continuity and aligning incentives through the next phase.",
     execSummaryModelClosing:
-      "The model is simple: build on what works, improve execution, and compound results over time.",
+      "A simple model: build on what works, rapidly identify opportunities using modern tools, execute with speed, and compound results over time.",
     shortVersionBullet1: "20–25% IRR",
     shortVersionBullet2: "4–5x MOIC",
     shortVersionBullet3:
@@ -54,7 +54,7 @@ export const investorTranslations = {
     execSummaryReturnsNote:
       "With returns driven primarily by operating margin expansion and cash generation.",
     execSummaryTeamPara1:
-      "The team combines capital markets and company-building experience with hands-on scaling, M&A, capital raising and IPO work.",
+      "The team combines capital markets and company-building experience with scaling, M&A and capital raising.",
     execSummaryTeamPara2: "Active ownership in every portfolio company.",
     execSummaryWhyLabel: "Why it works",
     execSummaryEdgeLabel: "Edge",
@@ -68,19 +68,19 @@ export const investorTranslations = {
     companiesIntro:
       "Our target companies have strong products, loyal customers and proven business models — but operational potential remains untapped.",
     companiesIntroFollowUp:
-      "We apply proven operational practices, supported by modern tools where they clearly improve outcomes.",
+      "We apply proven operational practices, supported by modern tools where they clearly improve results.",
     manyOperate:
       "Many operate with manual workflows; fragmented systems; limited visibility. The businesses are sound; execution can be improved.",
     sourcingEdgeOverview1:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals.",
+      "Data-driven sourcing engine screens all Swedish companies and delivers pre-ranked potential acquisitions with financial and operational signals.",
     sourcingEdgeOverview2:
-      "Combined with direct relationships in the market, this allows earlier access, better preparation and more informed first conversations.",
+      "The sourcing allows Nivo to proactively build relationships with potential acquisitions allowing for earlier access, better preparation and more informed first conversations directly with the owners.",
     sourcingEdgeOverview3:
-      "Advantage is preparation — both in data and in understanding how value can be created before first contact.",
+      "Preparation is our advantage — both in data and in understanding how value can be created before the first contact. Nivo leverages our AI enabled sourcing engine which allows for an efficient sourcing and efficiencies to unlock, both financially and operationally.",
     sourcingEdgeOverviewClosing:
       "The focus is not to change what works — but to improve and scale good companies.",
     sourcingEngine:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals.",
+      "Data-driven sourcing engine screens all Swedish companies and delivers pre-ranked potential acquisitions with financial and operational signals.",
     focusQuote: "Focus: operational improvement over technology risk.",
 
     // Key terms
@@ -91,8 +91,6 @@ export const investorTranslations = {
     targetIRR: "Target IRR",
     targetMOIC: "Target MOIC",
     investmentHorizon: "Investment horizon",
-    investmentHorizonNote:
-      "We invest without a fixed exit timeline and focus on long-term compounding of cash flow and value.",
 
     // Team capabilities
     teamCapabilities: "Team capabilities",
@@ -101,8 +99,9 @@ export const investorTranslations = {
     ourEdge2: "We are lean and move quickly.",
     ourEdge3: "We focus on execution.",
     ourEdge4: "We build on what already works and improve it systematically.",
-    ourEdge5: "We use digital tools and AI where they make a real difference.",
-    ourEdge6: "We have a strong network we use when it matters.",
+    ourEdge5:
+      "We use digital tools and AI where they make a real difference. Not just as buzz words.",
+    ourEdge6: "We have a strong network",
     capability1:
       "Corporate finance and capital markets — valuation, structuring and execution expertise",
     capability2: "Venture and growth investing — sourcing, due diligence and transactions",
@@ -114,28 +113,31 @@ export const investorTranslations = {
     // Why Now
     whyNow: "Why Now",
     whyNowText:
-      "A large part of the Nordic company base was built before modern systems. These businesses are often profitable and resilient—but operationally under-optimised.\n\nAt the same time, practical software and AI have matured. What previously required significant investment is now accessible: pricing can be tested and adjusted systematically, reporting can be automated, and workflows can be standardised across functions.\n\nThis creates a clear window. The underlying businesses are strong, but the operating model has not kept pace with available tools.\n\nValue is not created through disruption, but through execution—closing the gap between how these companies operate today and what is now possible.",
+      "A large part of the Nordic company base was built before modern systems. These businesses are often profitable and resilient—but operationally under-optimised.\n\nAt the same time, practical software and AI have matured. What previously required significant investment is now accessible eg. pricing adjusted systematically, reporting automated and workflows standardised across functions.\n\nThis creates a clear window. The underlying businesses are strong, but the operating model has not kept pace with available tools.\n\nValue is not created through disruption, but through execution—closing the gap between how these companies operate today and what is now possible.",
     // Sections
     overviewSection: "Overview",
     investmentProcess: "Investment Process",
     investmentEngineIntro: "We follow a simple, repeatable model:",
-    investmentStep1Title: "Source better opportunities",
+    investmentStep1Title: "Source better opportunities earlier",
     investmentStep1Text: "Identify under-digitised companies before competitive processes using the in-house sourcing engine.",
-    investmentStep2Title: "Improve operating margins through execution",
-    investmentStep2Text: "Increase profitability through pricing discipline, cost control and digital workflows.",
+    investmentStep2Title: "Improve operating margins through data driven execution",
+    investmentStep2Text:
+      "Nivo quickly identifies efficiencies through lean AI-powered analysis and hands-on execution.",
     investmentStep3Title: "Convert operating margins into cash flow",
-    investmentStep3Text: "Use improved reporting and operational control to strengthen cash conversion.",
+    investmentStep3Text:
+      "through for example hands on execution, clearer reporting and leveraging Nivo's toolbox",
     investmentStep4Title: "Reinvest and compound",
-    investmentStep4Text: "Reinvest cash flow into the business and future acquisitions over time.",
+    investmentStep4Text:
+      "Cash flow reinvested into high-impact initiatives and selected add-on acquisitions to drive continuous value creation.",
     investmentResultLabel: "Result",
     investmentResult:
-      "The model is simple: build on what works, improve execution, and compound results over time.",
-    theOpportunity: "The Opportunity",
+      "A simple model: build on what works, rapidly identify opportunities using modern tools, execute with speed, and compound results over time.",
+    theOpportunity: "Opportunity",
     whyNordicSmes: "Why Nordic companies, why now",
     opportunityIntro:
       "The opportunity is defined by scale and structure: a large universe of profitable Nordic companies with predictable business models and clear operational improvement potential. We target SEK 50–200m revenue companies where execution—not speculation—drives returns.",
     opportunityThesis:
-      "We acquire profitable, under-digitised Nordic companies and compound value through digital and AI-enabled operational improvements. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
+      "Nivo acquires profitable, under-digitised Nordic companies and compound value through digital and AI-enabled operational improvements. We typically target SEK 50–200m revenue; our edge is disciplined execution and systematic sourcing.",
     badge1: "15,000+ Nordic companies in target segment",
     badge2: "20–25% target ROIC through operational improvement",
     badge3: "Data-driven sourcing; pragmatic tools in portfolio",
@@ -251,35 +253,39 @@ export const investorTranslations = {
 
     // Long-form only (tightened copy; short version unchanged)
     companiesIntroLong: "Our targets have strong products and loyal customers but untapped operational potential.",
-    companiesIntroFollowUpLong: "We apply the Operating Toolbox—pricing, cost control, reporting, workflows—where they clearly improve outcomes.",
+    companiesIntroFollowUpLong: "We apply the Operating Toolbox—pricing, cost control, reporting, workflows—where they clearly improve results.",
     manyOperateLong: "Manual workflows, fragmented systems, limited visibility; businesses are sound, execution can be improved.",
     execSummaryModelSentenceLong:
       "Acquire profitable companies, improve operating margins through execution and better tools where they help, convert to cash flow, reinvest.",
     execSummaryModelFoundersLong:
       "We typically invest alongside founders who remain involved — maintaining continuity and aligning incentives through the next phase.",
     whyNowTextLong:
-      "Much of the Nordic company base was built before modern systems—profitable but under-optimised.\n\nSoftware and AI have matured: pricing, reporting and workflows can now be systematised. Value comes from execution: closing the gap between current operations and what's possible.",
+      "Much of the Nordic company base was built before modern systems—profitable but under-optimised.\n\nSoftware and AI have matured: what previously required significant investment is now accessible eg. pricing adjusted systematically, reporting automated and workflows standardised across functions. Value comes from execution: closing the gap between current operations and what's possible.",
     sourcingEngineLong:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals. Combined with direct relationships in the market, this allows earlier access, better preparation and more informed first conversations. Advantage is preparation — in data and in how value can be created before first contact. The focus is not to change what works — but to improve and scale good companies.",
-    investmentStep1TextLong: "Find targets before broad processes via the data-driven sourcing engine.",
-    investmentStep2TextLong: "Toolbox: pricing, cost control, reporting, digital workflows.",
-    investmentStep3TextLong: "Reporting and operational control to strengthen cash conversion.",
-    investmentStep4TextLong: "Reinvest and compound.",
+      "Data-driven sourcing engine screens all Swedish companies and delivers pre-ranked potential acquisitions with financial and operational signals. The sourcing allows Nivo to proactively build relationships with potential acquisitions allowing for earlier access, better preparation and more informed first conversations directly with the owners. Preparation is our advantage — both in data and in understanding how value can be created before the first contact. Nivo leverages our AI enabled sourcing engine which allows for an efficient sourcing and efficiencies to unlock, both financially and operationally. The focus is not to change what works — but to improve and scale good companies.",
+    investmentStep1TextLong:
+      "Identify under-digitised companies before competitive processes using the in-house sourcing engine.",
+    investmentStep2TextLong:
+      "Nivo quickly identifies efficiencies through lean AI-powered analysis and hands-on execution.",
+    investmentStep3TextLong:
+      "through for example hands on execution, clearer reporting and leveraging Nivo's toolbox",
+    investmentStep4TextLong:
+      "Cash flow reinvested into high-impact initiatives and selected add-on acquisitions to drive continuous value creation.",
     investmentResultLong:
-      "The model is simple: build on what works, improve execution, and compound results over time.",
+      "A simple model: build on what works, rapidly identify opportunities using modern tools, execute with speed, and compound results over time.",
     opportunityIntroLong:
       "Large universe of profitable Nordic companies (SEK 50–200m revenue) with clear operational improvement potential. Execution, not speculation, drives returns.",
     opportunityThesisLong:
-      "We acquire profitable Nordic companies and compound value through the Operating Toolbox and digital upgrades. Edge: disciplined execution and systematic sourcing.",
+      "Nivo acquires profitable Nordic companies and compound value through the Operating Toolbox and digital upgrades. Edge: disciplined execution and systematic sourcing.",
     universeTextLong: "Profitable but structurally under-digitised—a large, underserved opportunity.",
     gapTextLong: "Same operational inefficiencies across the segment. They need better execution and modern tools, not disruption.",
     ourTakeTextLong: "A large share of companies remain operationally under-digitized with an upside in improving overall execution, accelerated with digital solutions.",
     sourcingEdgeMainLong:
-      "Data-driven sourcing engine screens the Swedish company universe and delivers pre-ranked targets with financial and operational signals.",
+      "Data-driven sourcing engine screens all Swedish companies and delivers pre-ranked potential acquisitions with financial and operational signals.",
     sourcingEdgePreparationLong:
-      "Combined with direct relationships in the market, this allows earlier access, better preparation and more informed first conversations.",
+      "The sourcing allows Nivo to proactively build relationships with potential acquisitions allowing for earlier access, better preparation and more informed first conversations directly with the owners.",
     sourcingEdgePlatformLong:
-      "Advantage is preparation — both in data and in understanding how value can be created before first contact.",
+      "Preparation is our advantage — both in data and in understanding how value can be created before the first contact. Nivo leverages our AI enabled sourcing engine which allows for an efficient sourcing and efficiencies to unlock, both financially and operationally.",
     sourcingEdgePhilosophyClosingLong:
       "The focus is not to change what works — but to improve and scale good companies.",
     sourcingEdgeEngineDetailLong:
@@ -305,7 +311,7 @@ export const investorTranslations = {
       "Nivo is an evergreen investment company focused on long-term compounding. We combine capital markets discipline with hands-on execution — pricing, cost control, and better tools where they help — alongside founders in Nordic companies.",
     teamPageClosingLine:
       "We stay close to the businesses we own — hands-on, lean, and execution-first.",
-    approachSectionTitleLong: "Approach",
+    approachSectionTitleLong: "Opportunity",
     approachSectionSubtitleLong: "Disciplined entry, relentless execution, long-term compounding",
     approachThreePillarsLabelLong: "Three pillars",
     approachPillar1TitleLong: "Acquire right",
@@ -360,7 +366,7 @@ export const investorTranslations = {
     navWhyInvest: "Varför investera",
     navWhyNow: "Varför nu",
     navInvestmentProcess: "Investeringsmodell",
-    navApproach: "Tillvägagångssätt",
+    navOpportunity: "Möjlighet",
     navValueCreation: "Värdeskapande",
     navPipeline: "Pipeline",
     navTeam: "Team",
@@ -371,13 +377,13 @@ export const investorTranslations = {
     oneLiner:
       "Vi förvärvar lönsamma, underdigitaliserade företag och skapar värde genom operativ förbättring och digitala uppgraderingar. Över tid skapar dessa förbättringar värde.",
     heroTagline:
-      "Vi tar det som redan fungerar — och gör det skalbart, smartare och framtidssäkert.",
+      "Vi tar det som redan fungerar — och gör det skalbart och mer effektivt",
     philosophyTagline:
-      "Vi tar det som redan fungerar — och gör det skalbart, smartare och framtidssäkert.",
+      "Vi tar det som redan fungerar — och gör det skalbart och mer effektivt",
     shortVersion: "Sammanfattning",
     execSummaryWhatLabel: "Vad vi gör",
     execSummaryWhatPara1:
-      "Vi samarbetar med en liten grupp investerare för att förvärva och förbättra nordiska företag på lång sikt.",
+      "Nivo samarbetar med en liten grupp investerare för att förvärva och förbättra nordiska företag på lång sikt.",
     execSummaryWhatParaPartners:
       "Vi samarbetar med grundare som fortsätter som delägare och operatörer — för kontinuitet, samställda incitament och bättre exekvering.",
     execSummaryWhatPara2:
@@ -387,14 +393,14 @@ export const investorTranslations = {
     execSummaryValueFlow:
       "Förvärva motståndskraftiga bolag → förbättra exekvering och rörelsemarginaler → generera kassaflöde → återinvestera och ackumulera.",
     execSummaryValueEdge:
-      "Vår styrka är hands-on ägande, strukturerade operativa playbooks, ett starkt nätverk bland operatörer, industri och kapital samt digitala och AI-stödda operativa förbättringar som tillämpas i praktiken.",
+      "Vår styrka är hands-on ägande, strukturerad operativ playbook, ett starkt nätverk bland operatörer, industri, kapital och AI-stödda operativa förbättringar.",
     execSummaryModelLabel: "Hur modellen fungerar",
     execSummaryModelSentence:
       "Vi förvärvar lönsamma bolag, förbättrar rörelsemarginaler genom exekvering och bättre verktyg där de hjälper, omvandlar förbättringar till kassaflöde och återinvesterar över tid.",
     execSummaryModelFounders:
       "Vi investerar ofta tillsammans med grundare som fortsätter vara involverade — för kontinuitet och samställda incitament i nästa fas.",
     execSummaryModelClosing:
-      "Modellen är enkel: bygg vidare på det som fungerar, förbättra exekveringen och låt resultat ackumulera över tid.",
+      "En enkel modell: bygg vidare på det som fungerar, identifiera möjligheter snabbt med moderna verktyg, exekvera med tempo och låt resultat ackumulera över tid.",
     shortVersionBullet1: "20–25 % IRR",
     shortVersionBullet2: "4–5x MOIC",
     shortVersionBullet3:
@@ -403,7 +409,7 @@ export const investorTranslations = {
     execSummaryReturnsNote:
       "Med avkastning driven främst av marginalexpansion och kassagenerering.",
     execSummaryTeamPara1:
-      "Teamet kombinerar erfarenhet från kapitalmarknader och företagsbyggande med hands-on skalning, M&A, kapitalanskaffning och IPO-arbete.",
+      "Teamet kombinerar erfarenhet från kapitalmarknader och företagsbyggande med skalning, M&A och kapitalanskaffning.",
     execSummaryTeamPara2: "Aktivt ägande i varje portföljbolag.",
     execSummaryWhyLabel: "Varför det fungerar",
     execSummaryEdgeLabel: "Vår styrka",
@@ -421,15 +427,15 @@ export const investorTranslations = {
     manyOperate:
       "Många arbetar med manuella arbetsflöden; fragmenterade system; begränsad insyn. Företagen är sunda; exekveringen kan förbättras.",
     sourcingEdgeOverview1:
-      "En datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler.",
+      "En datadriven sourcingmotor söker igenom alla svenska bolag och levererar förrankade potentiella förvärv med finansiella och operativa signaler.",
     sourcingEdgeOverview2:
-      "Tillsammans med direkta relationer på marknaden ger det tidigare tillträde, bättre förberedelse och mer informerade första samtal.",
+      "Sourcingen gör att Nivo proaktivt kan bygga relationer med potentiella förvärv, vilket ger tidigare tillträde, bättre förberedelse och mer informerade första samtal direkt med ägarna.",
     sourcingEdgeOverview3:
-      "Fördelen är förberedelse — både i data och i förståelse för hur värde kan skapas före första kontakt.",
+      "Förberedelse är vår fördel — både i data och i förståelse för hur värde kan skapas före första kontakt. Nivo utnyttjar vår AI-stödda sourcingmotor som möjliggör effektiv sourcing och effektiviteter att frigöra, både finansiellt och operativt.",
     sourcingEdgeOverviewClosing:
       "Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
     sourcingEngine:
-      "En datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler.",
+      "En datadriven sourcingmotor söker igenom alla svenska bolag och levererar förrankade potentiella förvärv med finansiella och operativa signaler.",
     focusQuote: "Fokus: operativ förbättring framför teknologirisk.",
 
     // Key terms
@@ -440,8 +446,6 @@ export const investorTranslations = {
     targetIRR: "Mål IRR",
     targetMOIC: "Mål MOIC",
     investmentHorizon: "Investeringshorisont",
-    investmentHorizonNote:
-      "Vi investerar utan fast exit-tidsplan och fokuserar på långsiktig ackumulering av kassaflöde och värde.",
 
     // Team capabilities
     teamCapabilities: "Teamkapaciteter",
@@ -450,8 +454,9 @@ export const investorTranslations = {
     ourEdge2: "Vi är lean och rör oss snabbt.",
     ourEdge3: "Vi fokuserar på exekvering.",
     ourEdge4: "Vi bygger vidare på det som fungerar och förbättrar det systematiskt.",
-    ourEdge5: "Vi använder digitala verktyg och AI där de gör verklig skillnad.",
-    ourEdge6: "Vi har ett starkt nätverk som vi tar in när det behövs.",
+    ourEdge5:
+      "Vi använder digitala verktyg och AI där de gör verklig skillnad. Inte bara som tomma ord.",
+    ourEdge6: "Vi har ett starkt nätverk",
     capability1:
       "Företagsfinansiering och kapitalmarknader — värdering, strukturering och exekvering",
     capability2: "Venture och tillväxtinvesteringar — sourcing, due diligence och transaktioner",
@@ -463,29 +468,32 @@ export const investorTranslations = {
     // Why Now
     whyNow: "Varför nu",
     whyNowText:
-      "En stor del av den nordiska företagsbasen byggdes innan moderna system. Dessa företag är ofta lönsamma och motståndskraftiga—men operativt underoptimerade.\n\nSamtidigt har praktisk mjukvara och AI mognat. Det som tidigare krävde betydande investeringar är nu tillgängligt: prissättning kan testas och justeras systematiskt, rapportering kan automatiseras och arbetsflöden kan standardiseras över funktioner.\n\nDetta skapar ett tydligt fönster. De underliggande företagen är starka, men operativmodellen har inte hållit jämna steg med tillgängliga verktyg.\n\nVärde skapas inte genom disruption, utan genom exekvering—att stänga gapet mellan hur dessa företag opererar idag och vad som nu är möjligt.",
+      "En stor del av den nordiska företagsbasen byggdes innan moderna system. Dessa företag är ofta lönsamma och motståndskraftiga—men operativt underoptimerade.\n\nSamtidigt har praktisk mjukvara och AI mognat. Det som tidigare krävde betydande investeringar är nu tillgängligt t.ex. prissättning justerad systematiskt, rapportering automatiserad och arbetsflöden standardiserade över funktioner.\n\nDetta skapar ett tydligt fönster. De underliggande företagen är starka, men operativmodellen har inte hållit jämna steg med tillgängliga verktyg.\n\nVärde skapas inte genom disruption, utan genom exekvering—att stänga gapet mellan hur dessa företag opererar idag och vad som nu är möjligt.",
 
     // Sections
     overviewSection: "Översikt",
     investmentProcess: "Investeringsmodell",
     investmentEngineIntro: "Vi arbetar enligt en enkel, repeterbar modell:",
-    investmentStep1Title: "Identifiera bättre möjligheter",
+    investmentStep1Title: "Identifiera bättre möjligheter tidigare",
     investmentStep1Text: "Vi identifierar underdigitaliserade bolag innan breda processer genom vår egen sourcingmodell.",
-    investmentStep2Title: "Förbättra marginaler genom operativt arbete",
-    investmentStep2Text: "Vi ökar lönsamheten genom prissättning, kostnadskontroll och digitala arbetsflöden.",
+    investmentStep2Title: "Förbättra marginaler genom datadriven exekvering",
+    investmentStep2Text:
+      "Nivo identifierar snabbt effektiviteter genom lean AI-analys och hands-on exekvering.",
     investmentStep3Title: "Omvandla marginaler till kassaflöde",
-    investmentStep3Text: "Bättre rapportering och operativ kontroll stärker kassaflödet.",
-    investmentStep4Title: "Återinvestera och skapa tillväxt över tid",
-    investmentStep4Text: "Kassaflödet återinvesteras i bolagen och i nya förvärv.",
+    investmentStep3Text:
+      "t.ex. genom hands-on exekvering, tydligare rapportering och Nivos verktygslåda",
+    investmentStep4Title: "Återinvestera och ackumulera",
+    investmentStep4Text:
+      "Kassaflöde återinvesterat i högeffektinitiativ och utvalda tilläggsförvärv för att driva kontinuerligt värdeskapande.",
     investmentResultLabel: "Resultat",
     investmentResult:
-      "Modellen är enkel: bygg vidare på det som fungerar, förbättra exekveringen och låt resultat ackumulera över tid.",
-    theOpportunity: "Möjligheten",
+      "En enkel modell: bygg vidare på det som fungerar, identifiera möjligheter snabbt med moderna verktyg, exekvera med tempo och låt resultat ackumulera över tid.",
+    theOpportunity: "Möjlighet",
     whyNordicSmes: "Varför nordiska företag, varför nu",
     opportunityIntro:
       "Möjligheten definieras av skala och struktur: ett stort universum av lönsamma nordiska företag med förutsägbara affärsmodeller och tydlig operativ förbättringspotential. Vi riktar oss mot företag med SEK 50–200 mkr omsättning där exekvering—inte spekulation—driver avkastningen.",
     opportunityThesis:
-      "Vi förvärvar lönsamma, underdigitaliserade nordiska företag och ackumulerar värde genom operativ förbättring och digitala uppgraderingar. Vi riktar oss typiskt mot SEK 50–200 mkr omsättning; vår styrka är disciplinerad exekvering och systematisk sourcing.",
+      "Nivo förvärvar lönsamma, underdigitaliserade nordiska företag och ackumulerar värde genom operativ förbättring och digitala uppgraderingar. Vi riktar oss typiskt mot SEK 50–200 mkr omsättning; vår styrka är disciplinerad exekvering och systematisk sourcing.",
     badge1: "15 000+ nordiska företag i målsegmentet",
     badge2: "20–25 % mål ROIC genom operativ förbättring",
     badge3: "Datadriven sourcing; pragmatiska verktyg i portföljen",
@@ -608,28 +616,32 @@ export const investorTranslations = {
     execSummaryModelFoundersLong:
       "Vi investerar ofta tillsammans med grundare som fortsätter vara involverade — för kontinuitet och samställda incitament i nästa fas.",
     whyNowTextLong:
-      "Mycket av den nordiska företagsbasen byggdes före moderna system—lönsam men underoptimerad.\n\nMjukvara och AI har mognat: prissättning, rapportering och arbetsflöden kan nu systematiseras. Värde skapas genom exekvering: att stänga gapet mellan nuvarande drift och vad som är möjligt.",
+      "Mycket av den nordiska företagsbasen byggdes före moderna system—lönsam men underoptimerad.\n\nMjukvara och AI har mognat: det som tidigare krävde betydande investeringar är nu tillgängligt t.ex. prissättning justerad systematiskt, rapportering automatiserad och arbetsflöden standardiserade över funktioner. Värde skapas genom exekvering: att stänga gapet mellan nuvarande drift och vad som är möjligt.",
     sourcingEngineLong:
-      "Datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler. Tillsammans med direkta relationer på marknaden ger det tidigare tillträde, bättre förberedelse och mer informerade första samtal. Fördelen är förberedelse — i data och i hur värde kan skapas före första kontakt. Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
-    investmentStep1TextLong: "Hitta mål före breda processer via den datadrivna sökmotorn.",
-    investmentStep2TextLong: "Verktygslåda: prissättning, kostnadskontroll, rapportering, digitala arbetsflöden.",
-    investmentStep3TextLong: "Rapportering och operativ kontroll för starkare kassakonvertering.",
-    investmentStep4TextLong: "Återinvestera och ackumulera.",
+      "En datadriven sourcingmotor söker igenom alla svenska bolag och levererar förrankade potentiella förvärv med finansiella och operativa signaler. Sourcingen gör att Nivo proaktivt kan bygga relationer med potentiella förvärv, vilket ger tidigare tillträde, bättre förberedelse och mer informerade första samtal direkt med ägarna. Förberedelse är vår fördel — både i data och i förståelse för hur värde kan skapas före första kontakt. Nivo utnyttjar vår AI-stödda sourcingmotor som möjliggör effektiv sourcing och effektiviteter att frigöra, både finansiellt och operativt. Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
+    investmentStep1TextLong:
+      "Vi identifierar underdigitaliserade bolag innan breda processer genom vår egen sourcingmodell.",
+    investmentStep2TextLong:
+      "Nivo identifierar snabbt effektiviteter genom lean AI-analys och hands-on exekvering.",
+    investmentStep3TextLong:
+      "t.ex. genom hands-on exekvering, tydligare rapportering och Nivos verktygslåda",
+    investmentStep4TextLong:
+      "Kassaflöde återinvesterat i högeffektinitiativ och utvalda tilläggsförvärv för att driva kontinuerligt värdeskapande.",
     investmentResultLong:
-      "Modellen är enkel: bygg vidare på det som fungerar, förbättra exekveringen och låt resultat ackumulera över tid.",
+      "En enkel modell: bygg vidare på det som fungerar, identifiera möjligheter snabbt med moderna verktyg, exekvera med tempo och låt resultat ackumulera över tid.",
     opportunityIntroLong:
       "Stort universum av lönsamma nordiska bolag (SEK 50–200 mkr omsättning) med tydlig operativ förbättringspotential. Exekvering, inte spekulation, driver avkastningen.",
     opportunityThesisLong:
-      "Vi förvärvar lönsamma nordiska bolag och ackumulerar värde genom den operativa verktygslådan och digitala uppgraderingar. Styrka: disciplinerad exekvering och systematisk sourcing.",
+      "Nivo förvärvar lönsamma nordiska bolag och ackumulerar värde genom den operativa verktygslådan och digitala uppgraderingar. Styrka: disciplinerad exekvering och systematisk sourcing.",
     universeTextLong: "Lönsamma men strukturellt underdigitaliserade—en stor, otillräckligt betjänad möjlighet.",
     gapTextLong: "Samma operativa ineffektiviteter i segmentet. De behöver bättre exekvering och moderna verktyg, inte disruption.",
     ourTakeTextLong: "Nivo adresserar detta med ett disciplinerat förhållningssätt: sökmotor, verktygslåda i portföljen, operativ exekvering framför finansiell engineering.",
     sourcingEdgeMainLong:
-      "En datadriven sourcingmotor söker igenom det svenska bolagsuniversumet och levererar förrankade mål med finansiella och operativa signaler.",
+      "En datadriven sourcingmotor söker igenom alla svenska bolag och levererar förrankade potentiella förvärv med finansiella och operativa signaler.",
     sourcingEdgePreparationLong:
-      "Tillsammans med direkta relationer på marknaden ger det tidigare tillträde, bättre förberedelse och mer informerade första samtal.",
+      "Sourcingen gör att Nivo proaktivt kan bygga relationer med potentiella förvärv, vilket ger tidigare tillträde, bättre förberedelse och mer informerade första samtal direkt med ägarna.",
     sourcingEdgePlatformLong:
-      "Fördelen är förberedelse — både i data och i förståelse för hur värde kan skapas före första kontakt.",
+      "Förberedelse är vår fördel — både i data och i förståelse för hur värde kan skapas före första kontakt. Nivo utnyttjar vår AI-stödda sourcingmotor som möjliggör effektiv sourcing och effektiviteter att frigöra, både finansiellt och operativt.",
     sourcingEdgePhilosophyClosingLong:
       "Fokus är inte att ändra det som fungerar — utan att förbättra och skala bra bolag.",
     sourcingEdgeEngineDetailLong:
@@ -655,7 +667,7 @@ export const investorTranslations = {
       "Nivo är ett evergreen-investeringsbolag med fokus på långsiktig ackumulering. Vi kombinerar kapitalmarknadsdisciplin med hands-on exekvering — prissättning, kostnadskontroll och bättre verktyg där de hjälper — tillsammans med grundare i nordiska bolag.",
     teamPageClosingLine:
       "Vi ligger nära verksamheterna vi äger — hands-on, lean och exekveringsfokuserade.",
-    approachSectionTitleLong: "Tillvägagångssätt",
+    approachSectionTitleLong: "Möjlighet",
     approachSectionSubtitleLong: "Disciplinerad entry, konsekvent exekvering, långsiktig ackumulering",
     approachThreePillarsLabelLong: "Tre pelare",
     approachPillar1TitleLong: "Förvärva rätt",

@@ -167,6 +167,9 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <p>{t.sourcingEdgeOverview3}</p>
               <p className="font-medium">{t.sourcingEdgeOverviewClosing}</p>
             </div>
+            <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
+            <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
+            <p className="text-base sm:text-lg leading-relaxed mt-2 mb-6" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
             <p className="text-profile-accent font-bold uppercase tracking-widest text-sm mb-2">{t.keyTerms}</p>
             <div id="key-terms" className="pt-6 pb-6 border-t border-b mb-8 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-base sm:text-lg">
@@ -194,21 +197,18 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                   <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
                   <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
                 </div>
-                <p className="col-span-2 text-sm sm:text-base leading-relaxed pt-1" style={{ color: tokens.text }}>{t.investmentHorizonNote}</p>
               </div>
             </div>
-            <p className="text-base sm:text-lg leading-relaxed mt-4" style={{ color: tokens.text }}>{t.structureEvergreenIntro}</p>
-            <p className="text-base sm:text-lg leading-relaxed mt-2" style={{ color: tokens.text }}>{t.structureIpoClarification}</p>
-            <p className="text-base sm:text-lg leading-relaxed mt-2 mb-6" style={{ color: tokens.text }}>{t.structureCapitalNote}</p>
             <p className="text-profile-accent font-bold uppercase tracking-widest text-sm mb-2">{t.teamCapabilities}</p>
             <ul className="space-y-2 max-w-2xl pl-3">
-              {[t.capability1, t.capability2, t.capability3, t.capability4, t.capability5].map((item) => (
+              {[t.capability1, t.capability2, t.capability3, t.capability4].map((item) => (
                 <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
                   <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
+            <p className="text-base sm:text-lg leading-relaxed mt-4 max-w-2xl" style={{ color: tokens.text }}>{t.capability5}</p>
           </div>
         </div>
       </section>
@@ -349,7 +349,119 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               </p>
             </div>
           </div>
+
+          <div className="pt-10 mt-10 border-t w-full" style={{ borderColor: tokens.border }}>
+            <p className={SECTION_SUBTITLE_CLASS}>{t.approachSectionSubtitleLong}</p>
+            <div className="w-full space-y-8">
+              <div>
+                <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachThreePillarsLabelLong}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                    <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar1TitleLong}</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar1Long}</p>
+                  </div>
+                  <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                    <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar2TitleLong}</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar2Long}</p>
+                  </div>
+                  <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                    <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar3TitleLong}</p>
+                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar3Long}</p>
+                  </div>
+                </div>
+                <div className="rounded-lg py-3 px-4 w-full mt-6" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
+                  <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachReturnDriversLabelLong}</p>
+                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.returnDriversLong}</p>
+                </div>
+                <p className="text-base sm:text-lg text-profile-fg mt-6 leading-relaxed font-bold text-center w-full">
+                  {t.approachExecutionChainLong}
+                </p>
+              </div>
+
+              <div id="case" className="pt-6 border-t space-y-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
+                <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachIllustrativeExampleLabelLong}</p>
+                <p className={PROSE_CLASS}>
+                  {t.caseIntroLong}
+                </p>
+                <div className="max-w-2xl space-y-3">
+                  <p className={LABEL_CLASS}>{t.approachValueCreationLabelLong}</p>
+                  <div className="space-y-3">
+                    <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                      <p className={LABEL_CLASS}>Pricing</p>
+                      <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
+                    </div>
+                    <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                      <p className={LABEL_CLASS}>Operations</p>
+                      <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
+                    </div>
+                    <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                      <p className={LABEL_CLASS}>Cost</p>
+                      <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Consolidated functions and vendor renegotiation. Impact: +50 bps.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 w-full rounded-lg overflow-hidden p-6 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
+              <p className={`${CAPTION_CLASS} font-medium mb-4`} style={{ color: tokens.text }}>{t.approachEvBuildCaptionLong}</p>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--profile-divider))" vertical={false} />
+                    <XAxis dataKey="label" tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" />
+                    <YAxis tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" width={36} />
+                    <Tooltip
+                      cursor={false}
+                      contentStyle={{ backgroundColor: "white", border: "1px solid hsl(var(--profile-divider))", borderRadius: 6, fontSize: 12 }}
+                      formatter={(value: number, name: string) => [value.toFixed(1), name === "equityValue" ? "Equity" : "Debt"]}
+                      labelFormatter={(l) => l}
+                    />
+                    <Bar dataKey="equityValue" stackId="a" fill="hsl(var(--profile-accent))" name="equityValue" radius={[0, 2, 0, 0]} />
+                    <Bar dataKey="debt" stackId="a" fill="hsl(var(--profile-accent-secondary) / 0.35)" name="debt" radius={[0, 2, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="mt-6 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                <p className={LABEL_CLASS}>{t.approachEntryExitLabelLong}</p>
+                <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY.toFixed(1)}</p>
+              </div>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                <p className={LABEL_CLASS}>Gross MOIC</p>
+                <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
+              </div>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                <p className={LABEL_CLASS}>IRR</p>
+                <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
+              </div>
+            </div>
+            <div className="mt-10 w-full">
+              <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachAssumptionsLabelLong}</p>
+              <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
+                <p className="text-base sm:text-lg text-profile-fg leading-relaxed">{t.assumptionsLong}</p>
+              </div>
+            </div>
+          </div>
         </div>
+        </div>
+      </section>
+
+      <section className="w-full scroll-mt-[100px]" id="our-edge" style={{ backgroundColor: tokens.bgAlt }}>
+        <div className={DECK_SECTION_CLASS}>
+          <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
+            <h2 className={H2_CLASS}>{t.ourEdgeTitle}</h2>
+            <ul className="space-y-2 max-w-2xl pl-3">
+              {[t.ourEdge1, t.ourEdge2, t.ourEdge3, t.ourEdge4, t.ourEdge5, t.ourEdge6].map((item) => (
+                <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
+                  <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -383,124 +495,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
           <p className={PROSE_CLASS + " font-medium"}>
             {t.operatingToolkitClosingLong}
           </p>
-        </div>
-        </div>
-      </section>
-
-      <section className="w-full scroll-mt-[100px]" id="our-edge" style={{ backgroundColor: tokens.bgAlt }}>
-        <div className={DECK_SECTION_CLASS}>
-          <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-            <h2 className={H2_CLASS}>{t.ourEdgeTitle}</h2>
-            <ul className="space-y-2 max-w-2xl pl-3">
-              {[t.ourEdge1, t.ourEdge2, t.ourEdge3, t.ourEdge4, t.ourEdge5, t.ourEdge6].map((item) => (
-                <li key={item} className="flex items-start gap-1.5 text-base sm:text-lg" style={{ color: tokens.text }}>
-                  <span className="mt-[0.65em] w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: tokens.accent }} aria-hidden />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Approach & Illustrative Case (merged) ────────────────────────── */}
-      <section className="w-full scroll-mt-[100px]" id="approach" style={{ backgroundColor: tokens.bgAlt }}>
-        <div className={DECK_SECTION_CLASS}>
-        <div className={SECTION_TOP_CLASS} style={{ borderColor: tokens.border }}>
-          <h2 className={H2_CLASS}>{t.approachSectionTitleLong}</h2>
-          <p className={SECTION_SUBTITLE_CLASS}>{t.approachSectionSubtitleLong}</p>
-          <div className="w-full space-y-8">
-            <div>
-              <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachThreePillarsLabelLong}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                  <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar1TitleLong}</p>
-                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar1Long}</p>
-                </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                  <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar2TitleLong}</p>
-                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar2Long}</p>
-                </div>
-                <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                  <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachPillar3TitleLong}</p>
-                  <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.approachPillar3Long}</p>
-                </div>
-              </div>
-              <div className="rounded-lg py-3 px-4 w-full mt-6" style={{ backgroundColor: tokens.bg, border: `1px solid ${tokens.border}` }}>
-                <p className="font-semibold text-base mb-1" style={{ color: tokens.text }}>{t.approachReturnDriversLabelLong}</p>
-                <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>{t.returnDriversLong}</p>
-              </div>
-              <p className="text-base sm:text-lg text-profile-fg mt-6 leading-relaxed font-bold text-center w-full">
-                {t.approachExecutionChainLong}
-              </p>
-            </div>
-
-            <div id="case" className="pt-6 border-t space-y-6 scroll-mt-[100px]" style={{ borderColor: tokens.border }}>
-              <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachIllustrativeExampleLabelLong}</p>
-              <p className={PROSE_CLASS}>
-                {t.caseIntroLong}
-              </p>
-              <div className="max-w-2xl space-y-3">
-                <p className={LABEL_CLASS}>{t.approachValueCreationLabelLong}</p>
-                <div className="space-y-3">
-                  <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                    <p className={LABEL_CLASS}>Pricing</p>
-                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Value-based pricing and clearer discount discipline. Impact: +150 bps margin.</p>
-                  </div>
-                  <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                    <p className={LABEL_CLASS}>Operations</p>
-                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Digital workflows and better planning replacing manual processes. Impact: +100 bps.</p>
-                  </div>
-                  <div className="pl-4 border-l-2 rounded-r-lg py-2 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-                    <p className={LABEL_CLASS}>Cost</p>
-                    <p className="text-base sm:text-lg leading-relaxed" style={{ color: tokens.text }}>Consolidated functions and vendor renegotiation. Impact: +50 bps.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 w-full rounded-lg overflow-hidden p-6 border" style={{ backgroundColor: tokens.bg, borderColor: tokens.border, boxShadow: "var(--profile-shadow-soft)" }}>
-            <p className={`${CAPTION_CLASS} font-medium mb-4`} style={{ color: tokens.text }}>{t.approachEvBuildCaptionLong}</p>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={PROJ} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--profile-divider))" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" />
-                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--profile-fg-muted))" }} stroke="hsl(var(--profile-divider))" width={36} />
-                  <Tooltip
-                    cursor={false}
-                    contentStyle={{ backgroundColor: "white", border: "1px solid hsl(var(--profile-divider))", borderRadius: 6, fontSize: 12 }}
-                    formatter={(value: number, name: string) => [value.toFixed(1), name === "equityValue" ? "Equity" : "Debt"]}
-                    labelFormatter={(l) => l}
-                  />
-                  <Bar dataKey="equityValue" stackId="a" fill="hsl(var(--profile-accent))" name="equityValue" radius={[0, 2, 0, 0]} />
-                  <Bar dataKey="debt" stackId="a" fill="hsl(var(--profile-accent-secondary) / 0.35)" name="debt" radius={[0, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="mt-6 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className={LABEL_CLASS}>{t.approachEntryExitLabelLong}</p>
-              <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>Equity {ENTRY_EQUITY} → {EXIT_EQUITY.toFixed(1)}</p>
-            </div>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className={LABEL_CLASS}>Gross MOIC</p>
-              <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_MOIC}x</p>
-            </div>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className={LABEL_CLASS}>IRR</p>
-              <p className="text-xl sm:text-2xl font-semibold tabular-nums" style={{ color: tokens.accent }}>{GROSS_IRR}%</p>
-            </div>
-          </div>
-          <div className="mt-10 w-full">
-            <p className={LABEL_OLIVE_CLASS + " mb-4"}>{t.approachAssumptionsLabelLong}</p>
-            <div className="pl-4 border-l-2 rounded-r-lg py-3 pr-4 w-full" style={{ borderColor: tokens.accent, backgroundColor: tokens.washSage }}>
-              <p className="text-base sm:text-lg text-profile-fg leading-relaxed">{t.assumptionsLong}</p>
-            </div>
-          </div>
         </div>
         </div>
       </section>
@@ -869,13 +863,12 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><BarChart3 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.targetMOIC}</span>
                 <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>4–5x</span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
-                <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5" style={{ color: tokens.text }}><Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tokens.accent }} aria-hidden />{t.investmentHorizon}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: tokens.text }}>Evergreen</span>
+                </div>
               </div>
-              <p className="col-span-2 text-sm sm:text-base leading-relaxed pt-1" style={{ color: tokens.text }}>{t.investmentHorizonNote}</p>
             </div>
-          </div>
 
           <div className="space-y-10 mb-12 mt-10">
             <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
@@ -994,7 +987,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-profile-fg leading-relaxed mb-6 max-w-2xl mx-auto text-center">{t.investmentHorizonNote}</p>
             <p className="w-full text-profile-fg leading-relaxed text-base sm:text-lg">
               {t.structureCompoundingClosingLong}
             </p>
