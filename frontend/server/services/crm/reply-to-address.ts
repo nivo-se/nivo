@@ -25,7 +25,7 @@ export function validateThreadTokenFormat(token: string): boolean {
 }
 
 /**
- * Extract token from a full recipient like reply+abc...@reply.send.example.com
+ * Extract token from a full recipient like reply+abc...@send.example.com
  * Returns null if local part does not match reply+<token> or domain mismatch.
  */
 export function parseThreadTokenFromRecipient(recipient: string, expectedReplyDomain: string): string | null {
