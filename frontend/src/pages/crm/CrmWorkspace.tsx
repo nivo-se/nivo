@@ -168,7 +168,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     }
     setEditorSubject(selectedEmail.subject ?? "");
     setEditorBody(selectedEmail.body_text ?? "");
-  }, [selectedEmail?.id, selectedEmail?.subject, selectedEmail?.body_text]);
+  }, [selectedEmail]);
 
   useEffect(() => {
     const tid = selectedEmail?.crm_thread_id;
