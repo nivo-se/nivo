@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeft, Loader2, Mail, Pencil, RefreshCw, Send, Sparkles, Wand2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ChevronDown,
+  Loader2,
+  Mail,
+  MoreHorizontal,
+  Pencil,
+  RefreshCw,
+  Send,
+  Sparkles,
+  StickyNote,
+  Wand2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +28,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -24,6 +44,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import {
+  addDealNote,
   approveEmail,
   createContact,
   createManualDraft,
@@ -35,6 +56,7 @@ import {
   patchDealNextAction,
   patchDraftEmail,
   sendEmail,
+  updateDealStatus,
   type CrmCompanyOverview,
   type CrmEmailConfig,
   type CrmOutboundEmailRow,
@@ -59,6 +81,27 @@ function formatDateTime(ts: string | null | undefined): string {
     minute: "2-digit",
   });
 }
+
+function emailStatusBadgeVariant(
+  status: string
+): "default" | "secondary" | "outline" | "destructive" {
+  if (status === "sent" || status === "replied") return "secondary";
+  if (status === "approved") return "default";
+  if (status === "bounced" || status === "failed") return "destructive";
+  return "outline";
+}
+
+const DEAL_STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: "target_identified", label: "Target identified" },
+  { value: "outreach_ready", label: "Outreach ready" },
+  { value: "outreach_sent", label: "Outreach sent" },
+  { value: "replied", label: "Replied" },
+  { value: "in_dialogue", label: "In dialogue" },
+  { value: "meeting_scheduled", label: "Meeting scheduled" },
+  { value: "declined", label: "Declined" },
+  { value: "parked", label: "Parked" },
+  { value: "closed", label: "Closed" },
+];
 
 function toDatetimeLocalValue(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -113,6 +156,10 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
   const [approveBusy, setApproveBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
   const [nextActionBusy, setNextActionBusy] = useState(false);
+
+  const [noteDraft, setNoteDraft] = useState("");
+  const [noteBusy, setNoteBusy] = useState(false);
+  const [dealStatusBusy, setDealStatusBusy] = useState(false);
 
   const refreshOverview = useCallback(async () => {
     setLoadingOverview(true);
@@ -373,6 +420,46 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     }
   };
 
+  const handleDealStatusChange = async (next: string) => {
+    if (!dealId) return;
+    setDealStatusBusy(true);
+    try {
+      await updateDealStatus(dealId, {
+        status: next,
+        summary: `Deal status set to ${next}`,
+      });
+      toast({ title: "Deal status updated" });
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Could not update status",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setDealStatusBusy(false);
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!dealId || !noteDraft.trim()) return;
+    setNoteBusy(true);
+    try {
+      await addDealNote(dealId, { summary: noteDraft.trim() });
+      toast({ title: "Note saved" });
+      setNoteDraft("");
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Could not save note",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setNoteBusy(false);
+    }
+  };
+
   const handleAddContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyId || !addContactEmail.trim()) return;
@@ -444,22 +531,17 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
           <Button type="button" variant="ghost" size="sm" className="mb-2 -ml-2 h-8" onClick={onBack}>
-            <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-            Companies
+            <ArrowLeft className="h-3.5 w-3.5 mr-1" aria-hidden />
+            Back to list
           </Button>
-          <h2 className="text-lg font-semibold text-foreground flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-semibold text-foreground tracking-tight">
             {(company?.name as string) ?? "—"}
-            {deal?.status && (
-              <Badge variant="secondary" className="font-normal">
-                {formatStatus(deal.status)}
-              </Badge>
-            )}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {(company?.industry as string) || ""}
+            {(company?.industry as string) || "—"}
             {company?.website ? (
               <>
                 {" · "}
@@ -467,21 +549,48 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
                   href={String(company.website)}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline font-medium"
                 >
                   Website
                 </a>
               </>
             ) : null}
           </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Label htmlFor="deal-status" className="text-xs text-muted-foreground sr-only">
+              Deal status
+            </Label>
+            <Select
+              value={deal?.status ?? "target_identified"}
+              onValueChange={(v) => void handleDealStatusChange(v)}
+              disabled={dealStatusBusy}
+            >
+              <SelectTrigger id="deal-status" className="h-8 w-[min(100%,220px)] text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {DEAL_STATUS_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          <span>
-            Opens: {overview.engagement_summary?.open_count ?? 0} · Clicks:{" "}
+        <div className="rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground shrink-0">
+          <p className="font-medium text-foreground text-[11px] uppercase tracking-wide">Engagement</p>
+          <p className="mt-1 tabular-nums">
+            Opens {overview.engagement_summary?.open_count ?? 0} · Clicks{" "}
             {overview.engagement_summary?.click_count ?? 0}
-          </span>
+            {overview.engagement_summary?.interaction_count != null
+              ? ` · ${overview.engagement_summary.interaction_count} events`
+              : ""}
+          </p>
         </div>
       </div>
+
+      <Separator className="my-2" />
 
       <Card>
         <CardHeader className="pb-2">
@@ -536,6 +645,78 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
       </Card>
 
       <Card>
+        <Collapsible defaultOpen={false} className="group">
+          <CardHeader className="pb-2">
+            <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-md py-1 text-left hover:bg-muted/40 outline-none focus-visible:ring-2 focus-visible:ring-ring -mx-1 px-1">
+              <div>
+                <CardTitle className="text-sm font-medium">Activity & notes</CardTitle>
+                <CardDescription>Interaction history and internal notes on this deal.</CardDescription>
+              </div>
+              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+          </CardHeader>
+          <CollapsibleContent>
+            <CardContent className="space-y-4 pt-0">
+              <div className="space-y-2">
+                <Label htmlFor="deal-note" className="text-xs">
+                  Add note
+                </Label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Textarea
+                    id="deal-note"
+                    rows={2}
+                    value={noteDraft}
+                    onChange={(e) => setNoteDraft(e.target.value)}
+                    placeholder="Visible in timeline — use for context the team should share."
+                    className="min-h-[72px] sm:flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="sm:self-end shrink-0"
+                    disabled={noteBusy || !noteDraft.trim()}
+                    onClick={() => void handleAddNote()}
+                  >
+                    {noteBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><StickyNote className="h-3.5 w-3.5 mr-1" />Save note</>}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-2">Recent activity</p>
+                {Array.isArray(overview.activity_timeline) && overview.activity_timeline.length > 0 ? (
+                  <ul className="max-h-56 overflow-y-auto space-y-2 rounded-md border bg-muted/20 p-3 text-sm">
+                    {(overview.activity_timeline as Record<string, unknown>[]).map((ev, idx) => {
+                      const t = typeof ev.type === "string" ? ev.type : "event";
+                      const sum = typeof ev.summary === "string" ? ev.summary : "";
+                      const at =
+                        typeof ev.created_at === "string"
+                          ? ev.created_at
+                          : typeof ev.created_at === "object" && ev.created_at
+                            ? String(ev.created_at)
+                            : "";
+                      return (
+                        <li key={idx} className="border-b border-border/60 pb-2 last:border-0 last:pb-0">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <span className="text-xs font-medium text-foreground">{formatStatus(t)}</span>
+                            <time className="text-[11px] text-muted-foreground tabular-nums">
+                              {formatDateTime(at)}
+                            </time>
+                          </div>
+                          {sum ? <p className="text-xs text-muted-foreground mt-1 leading-snug">{sum}</p> : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No activity yet.</p>
+                )}
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </Card>
+
+      <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Contacts</CardTitle>
           <CardDescription>Prospects to email for this company.</CardDescription>
@@ -583,7 +764,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
                 <TableRow>
                   <TableHead className="text-xs">Name</TableHead>
                   <TableHead className="text-xs">Email</TableHead>
-                  <TableHead className="text-xs text-right">Actions</TableHead>
+                  <TableHead className="text-xs text-right w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -596,49 +777,48 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
                     <TableRow key={id}>
                       <TableCell className="text-sm">{name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{email}</TableCell>
-                      <TableCell className="text-right space-x-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-7"
-                          onClick={() => openGenerate(id)}
-                        >
-                          <Sparkles className="h-3 w-3 mr-1" />
-                          AI draft
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-7"
-                          onClick={() => {
-                            setComposeContactId(id);
-                            setComposeSubject("");
-                            setComposeBody("");
-                            setComposeOpen(true);
-                          }}
-                        >
-                          <Pencil className="h-3 w-3 mr-1" />
-                          Compose
-                        </Button>
-                        {subj ? (
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            className="h-7"
-                            onClick={() =>
-                              openGenerate(
-                                id,
-                                `Short follow-up to our previous email (“${subj}”). Stay concise and reference the earlier message.`
-                              )
-                            }
-                          >
-                            <Wand2 className="h-3 w-3 mr-1" />
-                            Follow-up
-                          </Button>
-                        ) : null}
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="outline" size="sm" className="h-8 gap-1">
+                              <span className="sr-only">Open actions for {name}</span>
+                              <MoreHorizontal className="h-4 w-4" aria-hidden />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => openGenerate(id)}>
+                              <Sparkles className="h-3.5 w-3.5 mr-2" />
+                              AI draft
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setComposeContactId(id);
+                                setComposeSubject("");
+                                setComposeBody("");
+                                setComposeOpen(true);
+                              }}
+                            >
+                              <Pencil className="h-3.5 w-3.5 mr-2" />
+                              Compose manually
+                            </DropdownMenuItem>
+                            {subj ? (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    openGenerate(
+                                      id,
+                                      `Short follow-up to our previous email (“${subj}”). Stay concise and reference the earlier message.`
+                                    )
+                                  }
+                                >
+                                  <Wand2 className="h-3.5 w-3.5 mr-2" />
+                                  Follow-up draft
+                                </DropdownMenuItem>
+                              </>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   );
@@ -719,7 +899,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
                       {row.contact_name || row.contact_email || "—"}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-xs font-normal">
+                      <Badge variant={emailStatusBadgeVariant(row.status)} className="text-xs font-normal capitalize">
                         {row.status}
                       </Badge>
                     </TableCell>
@@ -736,7 +916,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
             <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium">Review</span>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant={emailStatusBadgeVariant(selectedEmail.status)} className="text-xs capitalize">
                   {selectedEmail.status}
                 </Badge>
               </div>

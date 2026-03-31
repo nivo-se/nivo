@@ -1,14 +1,21 @@
 /**
- * CRM API (Node enhanced server, proxied `/crm` in dev).
- * Uses same-origin relative URLs when VITE_API_BASE_URL is unset.
+ * CRM API — Node enhanced server (`frontend/server`, default port 3001), NOT FastAPI.
+ *
+ * Never use VITE_API_BASE_URL here: that points at FastAPI, which has no `/crm` routes and
+ * returns 401 {"error":"unauthorized"} from JWT middleware when REQUIRE_AUTH=true.
+ *
+ * - `VITE_CRM_BASE_URL` unset: same-origin paths `/crm/...` (Vite dev proxies to 3001; prod
+ *   must route `/crm` to the enhanced server or set this env to the server’s public URL).
+ * - `VITE_CRM_BASE_URL` set: absolute base, e.g. https://crm-api.example.com
  */
 import { fetchWithAuth } from "@/lib/backendFetch";
-import { API_BASE } from "@/lib/apiClient";
+
+const CRM_BASE = (import.meta.env.VITE_CRM_BASE_URL ?? "").trim();
 
 function crmUrl(path: string): string {
-  const base = API_BASE.replace(/\/$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${p}`;
+  if (!CRM_BASE) return p;
+  return `${CRM_BASE.replace(/\/$/, "")}${p}`;
 }
 
 function parseError(json: Record<string, unknown>, status: number): string {
@@ -49,6 +56,26 @@ export interface CrmCompanyOverview {
     click_count: number;
     interaction_count?: number;
   };
+}
+
+export async function updateDealStatus(
+  dealId: string,
+  payload: { status: string; summary?: string }
+): Promise<Record<string, unknown>> {
+  return crmFetchJson(`/crm/deals/${encodeURIComponent(dealId)}/status`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function addDealNote(
+  dealId: string,
+  payload: { summary: string; metadata?: Record<string, unknown> }
+): Promise<Record<string, unknown>> {
+  return crmFetchJson(`/crm/deals/${encodeURIComponent(dealId)}/notes`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function getCrmCompanyOverview(companyId: string): Promise<CrmCompanyOverview> {

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -33,7 +33,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Loader2, Building2, Inbox, AlertTriangle, ListPlus, Plus } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+import {
+  Search,
+  Loader2,
+  Building2,
+  Inbox,
+  AlertTriangle,
+  ListPlus,
+  Plus,
+  RefreshCw,
+} from "lucide-react";
 import { getAllLists } from "@/lib/api/lists/service";
 import type { List } from "@/lib/api/types";
 import {
@@ -139,17 +150,23 @@ export default function CrmPage() {
   const [extWebsite, setExtWebsite] = useState("");
   const [extBusy, setExtBusy] = useState(false);
 
-  useEffect(() => {
+  const loadCompanies = useCallback(async () => {
     setLoadingCompanies(true);
     setListError(null);
-    listCrmCompanies(debouncedSearch, 50)
-      .then((data) => setCompanies(data ?? []))
-      .catch((e) => {
-        setCompanies([]);
-        setListError(e instanceof Error ? e.message : "Failed to load companies");
-      })
-      .finally(() => setLoadingCompanies(false));
+    try {
+      const data = await listCrmCompanies(debouncedSearch, 50);
+      setCompanies(data ?? []);
+    } catch (e) {
+      setCompanies([]);
+      setListError(e instanceof Error ? e.message : "Failed to load companies");
+    } finally {
+      setLoadingCompanies(false);
+    }
   }, [debouncedSearch]);
+
+  useEffect(() => {
+    void loadCompanies();
+  }, [loadCompanies]);
 
   useEffect(() => {
     getAllLists()
@@ -162,31 +179,45 @@ export default function CrmPage() {
       .catch(() => setSavedLists([]));
   }, []);
 
+  const loadInbox = useCallback(async () => {
+    setLoadingInbox(true);
+    try {
+      const rows = await getRecentInbound(80);
+      setInboxRows(rows);
+    } catch {
+      setInboxRows([]);
+      toast({ title: "Could not load inbox", variant: "destructive" });
+    } finally {
+      setLoadingInbox(false);
+    }
+  }, [toast]);
+
+  const loadUnmatched = useCallback(async () => {
+    setLoadingUnmatched(true);
+    try {
+      const rows = await getUnmatchedInbound(80);
+      setUnmatchedRows(rows);
+    } catch {
+      setUnmatchedRows([]);
+      toast({ title: "Could not load unmatched mail", variant: "destructive" });
+    } finally {
+      setLoadingUnmatched(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (tab !== "inbox") return;
-    setLoadingInbox(true);
-    getRecentInbound(80)
-      .then(setInboxRows)
-      .catch(() => {
-        setInboxRows([]);
-        toast({ title: "Could not load inbox", variant: "destructive" });
-      })
-      .finally(() => setLoadingInbox(false));
-  }, [tab, toast]);
+    void loadInbox();
+  }, [tab, loadInbox]);
 
   useEffect(() => {
     if (tab !== "unmatched") return;
-    setLoadingUnmatched(true);
-    getUnmatchedInbound(80)
-      .then(setUnmatchedRows)
-      .catch(() => {
-        setUnmatchedRows([]);
-        toast({ title: "Could not load unmatched mail", variant: "destructive" });
-      })
-      .finally(() => setLoadingUnmatched(false));
-  }, [tab, toast]);
+    void loadUnmatched();
+  }, [tab, loadUnmatched]);
 
   const showDetail = !!companyId;
+  /** Company list sidebar is only relevant on the Companies tab */
+  const showCompanySidebar = tab === "companies";
 
   const handleBatchGenerate = async () => {
     if (!batchListId) {
@@ -262,53 +293,68 @@ export default function CrmPage() {
 
   return (
     <div className="h-full overflow-hidden app-bg flex flex-col">
-      <div className="shrink-0 border-b border-sidebar-border bg-sidebar-bg px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="shrink-0 border-b border-sidebar-border bg-sidebar-bg px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-base font-semibold text-foreground">Origination CRM</h1>
-          <p className="text-xs text-muted-foreground">Outreach, replies, and My List batch drafts.</p>
+          <h1 className="text-base font-semibold text-foreground tracking-tight">Origination CRM</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Outreach, inbound replies, and batch drafts from My Lists.
+          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Tabs value={tab} onValueChange={(v) => navigateToTab(v as CrmTab)}>
-            <TabsList className="h-9">
-              <TabsTrigger value="companies" className="text-xs gap-1">
-                <Building2 className="h-3.5 w-3.5" />
-                Companies
-              </TabsTrigger>
-              <TabsTrigger value="inbox" className="text-xs gap-1">
-                <Inbox className="h-3.5 w-3.5" />
-                Inbox
-              </TabsTrigger>
-              <TabsTrigger value="unmatched" className="text-xs gap-1">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Unmatched
-              </TabsTrigger>
-              <TabsTrigger value="batch" className="text-xs gap-1">
-                <ListPlus className="h-3.5 w-3.5" />
-                From My List
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Button type="button" variant="outline" size="sm" className="h-9" onClick={() => setExternalOpen(true)}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            External company
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
+          <div className="overflow-x-auto max-w-[100vw] sm:max-w-none pb-1 -mb-1">
+            <Tabs value={tab} onValueChange={(v) => navigateToTab(v as CrmTab)}>
+              <TabsList className="h-9 inline-flex w-max min-w-0">
+                <TabsTrigger value="companies" className="text-xs gap-1">
+                  <Building2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  Companies
+                </TabsTrigger>
+                <TabsTrigger value="inbox" className="text-xs gap-1">
+                  <Inbox className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  Inbox
+                </TabsTrigger>
+                <TabsTrigger value="unmatched" className="text-xs gap-1">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  Unmatched
+                </TabsTrigger>
+                <TabsTrigger value="batch" className="text-xs gap-1">
+                  <ListPlus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  Batch
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+          <Button type="button" variant="outline" size="sm" className="h-9 shrink-0" onClick={() => setExternalOpen(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1" aria-hidden />
+            Add company
           </Button>
         </div>
-      </div>
+      </header>
 
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
+        {showCompanySidebar ? (
         <aside className="w-full lg:w-72 shrink-0 border-r border-sidebar-border flex flex-col bg-sidebar-bg shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.12)]">
-          <div className="p-4 border-b border-sidebar-border/80 shrink-0">
+          <div className="p-4 border-b border-sidebar-border/80 shrink-0 space-y-2">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" aria-hidden />
               <Input
                 placeholder="Search companies…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 h-9"
+                aria-label="Search companies"
               />
             </div>
             {listError ? (
-              <p className="text-xs text-destructive mt-2">{listError}</p>
+              <Alert variant="destructive" className="py-2">
+                <AlertTitle className="text-xs">Could not load companies</AlertTitle>
+                <AlertDescription className="text-xs flex flex-col gap-2">
+                  <span className="break-words">{listError}</span>
+                  <Button type="button" variant="outline" size="sm" className="h-7 w-fit" onClick={() => void loadCompanies()}>
+                    <RefreshCw className="h-3 w-3 mr-1" />
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
             ) : null}
           </div>
           <div className="flex-1 min-h-0 overflow-auto">
@@ -367,15 +413,56 @@ export default function CrmPage() {
             )}
           </div>
         </aside>
+        ) : null}
 
-        <main className="flex-1 min-w-0 overflow-auto p-4">
+        <main
+          className={cn(
+            "flex-1 min-w-0 overflow-auto p-4 md:p-6",
+            !showCompanySidebar && "lg:px-8"
+          )}
+        >
           {tab === "inbox" && (
-            <div className="max-w-4xl space-y-3">
-              <h2 className="text-sm font-medium">Recent inbound replies</h2>
+            <div className="max-w-5xl mx-auto space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Inbound replies</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Recent mail matched to a deal thread. Open a row to jump to the company workspace.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => void loadInbox()}
+                  disabled={loadingInbox}
+                >
+                  {loadingInbox ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                      Refresh
+                    </>
+                  )}
+                </Button>
+              </div>
               {loadingInbox ? (
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <div className="space-y-2" aria-busy="true" aria-label="Loading inbox">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-md" />
+                  ))}
+                </div>
               ) : inboxRows.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No inbound messages yet.</p>
+                <Card className="border-dashed bg-muted/30">
+                  <CardHeader>
+                    <CardTitle className="text-base">No inbound mail yet</CardTitle>
+                    <CardDescription>
+                      When prospects reply to outreach, messages appear here after Resend inbound is configured.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
               ) : (
                 <Table>
                   <TableHeader>
@@ -408,16 +495,47 @@ export default function CrmPage() {
           )}
 
           {tab === "unmatched" && (
-            <div className="max-w-4xl space-y-3">
-              <h2 className="text-sm font-medium">Unmatched inbound (no thread token)</h2>
-              <p className="text-xs text-muted-foreground">
-                See <code className="bg-muted px-1 rounded">docs/email_inbound_resend.md</code> for Reply-To
-                setup.
-              </p>
+            <div className="max-w-5xl mx-auto space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Unmatched inbound</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Mail received without a valid Reply-To token. Check{" "}
+                    <code className="bg-muted px-1 rounded text-xs">docs/email_inbound_resend.md</code> for
+                    DNS and Resend receiving.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => void loadUnmatched()}
+                  disabled={loadingUnmatched}
+                >
+                  {loadingUnmatched ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                      Refresh
+                    </>
+                  )}
+                </Button>
+              </div>
               {loadingUnmatched ? (
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <div className="space-y-2" aria-busy="true" aria-label="Loading unmatched">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-md" />
+                  ))}
+                </div>
               ) : unmatchedRows.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No unmatched messages.</p>
+                <Card className="border-dashed bg-muted/30">
+                  <CardHeader>
+                    <CardTitle className="text-base">Nothing unmatched</CardTitle>
+                    <CardDescription>All inbound mail is tied to a thread, or no mail has arrived.</CardDescription>
+                  </CardHeader>
+                </Card>
               ) : (
                 <Table>
                   <TableHeader>
@@ -444,15 +562,34 @@ export default function CrmPage() {
           )}
 
           {tab === "batch" && (
-            <div className="max-w-3xl space-y-4">
-              <h2 className="text-sm font-medium">Generate drafts from My List</h2>
-              <p className="text-xs text-muted-foreground">
-                One AI draft per company in the list. Companies need a contact; skipped rows are listed below.
-              </p>
+            <div className="max-w-3xl mx-auto space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Batch drafts from My Lists</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  One AI draft per company in the list. Each company needs at least one contact; skipped rows are
+                  explained below.
+                </p>
+              </div>
+              {savedLists.length === 0 ? (
+                <Card className="border-dashed bg-muted/30">
+                  <CardHeader>
+                    <CardTitle className="text-base">No lists yet</CardTitle>
+                    <CardDescription>
+                      Create a list under{" "}
+                      <Link to="/lists" className="text-primary font-medium underline-offset-4 hover:underline">
+                        My Lists
+                      </Link>{" "}
+                      , add companies, then return here to generate drafts in bulk.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ) : null}
+              {savedLists.length > 0 ? (
+                <>
               <div className="space-y-2 max-w-md">
-                <Label className="text-xs">My List</Label>
+                <Label htmlFor="batch-list">My List</Label>
                 <Select value={batchListId} onValueChange={setBatchListId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="batch-list">
                     <SelectValue placeholder="Choose a list" />
                   </SelectTrigger>
                   <SelectContent>
@@ -465,8 +602,9 @@ export default function CrmPage() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Instructions (optional)</Label>
+                <Label htmlFor="batch-instr">Instructions (optional)</Label>
                 <Textarea
+                  id="batch-instr"
                   rows={3}
                   value={batchInstructions}
                   onChange={(e) => setBatchInstructions(e.target.value)}
@@ -474,8 +612,8 @@ export default function CrmPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Reason for interest (optional)</Label>
-                <Input value={batchReason} onChange={(e) => setBatchReason(e.target.value)} />
+                <Label htmlFor="batch-reason">Reason for interest (optional)</Label>
+                <Input id="batch-reason" value={batchReason} onChange={(e) => setBatchReason(e.target.value)} />
               </div>
               <Button type="button" variant="primary" onClick={() => void handleBatchGenerate()} disabled={batchBusy}>
                 {batchBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generate drafts"}
@@ -527,6 +665,8 @@ export default function CrmPage() {
                   </ul>
                 </div>
               )}
+                </>
+              ) : null}
             </div>
           )}
 
