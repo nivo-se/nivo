@@ -1,21 +1,14 @@
 import { randomUUID } from 'crypto'
 import type { CrmDb } from './db-interface.js'
 import type { InteractionsService } from './interactions.service.js'
-import type { GmailService } from '../gmail/gmail.service.js'
 import type { ResendEmailService } from '../resend/resend-email.service.js'
 import type { DealsService } from './deals.service.js'
 import { buildReplyToAddress } from './reply-to-address.js'
-
-function crmEmailProvider(): 'gmail' | 'resend' {
-  const p = (process.env.CRM_EMAIL_PROVIDER || 'gmail').toLowerCase()
-  return p === 'resend' ? 'resend' : 'gmail'
-}
 
 export class EmailsService {
   constructor(
     private readonly db: CrmDb,
     private readonly interactions: InteractionsService,
-    private readonly gmailService: GmailService,
     private readonly resendService: ResendEmailService,
     private readonly dealsService: DealsService,
   ) {}
@@ -24,7 +17,6 @@ export class EmailsService {
     const appBase = (process.env.APP_BASE_URL || 'http://localhost:3001').replace(/\/$/, '')
     const html = baseHtml || ''
     const withLinks = html.replace(/href="(https?:\/\/[^"]+)"/g, (_m: string, href: string) => {
-      // Append tid to intro page links so the page can report page_view and section_view
       let targetUrl = href
       try {
         const u = new URL(href)
@@ -86,71 +78,51 @@ export class EmailsService {
     if (email.status !== 'approved') throw new Error('Email must be approved before send')
 
     const contact = await this.db.getContactById(email.contact_id)
-    const provider = crmEmailProvider()
+    if (!contact?.email) throw new Error('Contact email missing')
 
-    let gmailMessageId: string | null = null
-    let gmailThreadId: string | null = null
-
-    if (provider === 'resend') {
-      const from =
-        process.env.RESEND_FROM_EMAIL || process.env.CRM_SENDER_FROM || process.env.RESEND_FROM
-      if (!from) {
-        throw new Error('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM) is required when CRM_EMAIL_PROVIDER=resend')
-      }
-      const replyDomain = process.env.RESEND_REPLY_DOMAIN?.trim()
-      if (!replyDomain) {
-        throw new Error('RESEND_REPLY_DOMAIN is required when CRM_EMAIL_PROVIDER=resend (e.g. reply.send.nivogroup.se)')
-      }
-
-      const { id: threadId, token } = await this.db.ensureCrmEmailThread(email.deal_id, email.contact_id)
-      await this.db.updateEmail(emailId, { crm_thread_id: threadId })
-
-      const replyTo = buildReplyToAddress(token, replyDomain)
-      const resend = await this.resendService.sendEmail({
-        to: contact.email,
-        from,
-        subject: email.subject,
-        bodyText: email.body_text,
-        bodyHtml: email.body_html,
-        replyTo,
-      })
-      gmailMessageId = resend.id
-      gmailThreadId = null
-
-      const dedupeKey = `resend:sent:${resend.id}`
-      await this.db.insertCrmEmailMessage({
-        thread_id: threadId,
-        direction: 'outbound',
-        provider: 'resend',
-        provider_message_id: resend.id,
-        deep_research_email_id: emailId,
-        from_email: from,
-        to_emails: [contact.email],
-        subject: email.subject,
-        text_body: email.body_text,
-        html_body: email.body_html,
-        dedupe_key: dedupeKey,
-        sent_at: new Date().toISOString(),
-      })
-    } else {
-      const sender = process.env.GOOGLE_WORKSPACE_SENDER
-      if (!sender) throw new Error('GOOGLE_WORKSPACE_SENDER is not configured')
-
-      const gmail = await this.gmailService.sendEmail({
-        to: contact.email,
-        from: sender,
-        subject: email.subject,
-        bodyText: email.body_text,
-        bodyHtml: email.body_html,
-      })
-      gmailMessageId = gmail.messageId
-      gmailThreadId = gmail.threadId
+    const from =
+      process.env.RESEND_FROM_EMAIL || process.env.CRM_SENDER_FROM || process.env.RESEND_FROM
+    if (!from) {
+      throw new Error('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM) is required for CRM send')
     }
+    const replyDomain = process.env.RESEND_REPLY_DOMAIN?.trim()
+    if (!replyDomain) {
+      throw new Error('RESEND_REPLY_DOMAIN is required (e.g. reply.send.nivogroup.se)')
+    }
+
+    const { id: threadId, token } = await this.db.ensureCrmEmailThread(email.deal_id, email.contact_id)
+    await this.db.updateEmail(emailId, { crm_thread_id: threadId })
+
+    const replyTo = buildReplyToAddress(token, replyDomain)
+    const resend = await this.resendService.sendEmail({
+      to: contact.email,
+      from,
+      subject: email.subject,
+      bodyText: email.body_text,
+      bodyHtml: email.body_html,
+      replyTo,
+    })
+
+    const dedupeKey = `resend:sent:${resend.id}`
+    await this.db.insertCrmEmailMessage({
+      thread_id: threadId,
+      direction: 'outbound',
+      provider: 'resend',
+      provider_message_id: resend.id,
+      deep_research_email_id: emailId,
+      from_email: from,
+      to_emails: [contact.email],
+      subject: email.subject,
+      text_body: email.body_text,
+      html_body: email.body_html,
+      dedupe_key: dedupeKey,
+      sent_at: new Date().toISOString(),
+    })
 
     const data = await this.db.updateEmail(emailId, {
       status: 'sent',
-      gmail_message_id: gmailMessageId,
-      gmail_thread_id: gmailThreadId,
+      gmail_message_id: resend.id,
+      gmail_thread_id: null,
       sent_at: new Date().toISOString(),
     })
 

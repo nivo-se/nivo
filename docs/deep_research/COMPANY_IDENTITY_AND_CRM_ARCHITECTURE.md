@@ -77,7 +77,7 @@ public.prospects (company_id = orgnr, deep_research_company_id → deep_research
 ## 5. Service Boundary Review (CRM: Express vs FastAPI)
 
 ### Current split
-- **Express (frontend/server)**: CRM routes (`/crm/*`), tracking (`/track/*`), Gmail send
+- **Express (frontend/server)**: CRM routes (`/crm/*`), tracking (`/track/*`), Resend CRM send
 - **FastAPI (backend)**: Analysis, Deep Research, companies, prospects, universe, lists
 
 ### Option A: Keep CRM in Express
@@ -85,7 +85,7 @@ public.prospects (company_id = orgnr, deep_research_company_id → deep_research
 **Pros:**
 - No migration risk; CRM already works
 - Express shares Vite dev server; simpler local dev
-- Gmail/Node ecosystem fits email tooling
+- Resend fits CRM outbound from Node; inbound webhooks on FastAPI
 
 **Cons:**
 - Two backends to maintain
@@ -100,15 +100,15 @@ public.prospects (company_id = orgnr, deep_research_company_id → deep_research
 - Easier to add CRM logic to analysis pipeline
 
 **Cons:**
-- Large migration; CRM routes, Gmail, tracking, AI draft generation
-- Gmail API from Python (google-api-python-client) vs Node
+- Large migration; CRM routes, Resend, tracking, AI draft generation
+- Email provider logic would move if CRM lived entirely in FastAPI
 - Frontend proxy config changes
 
 ### Recommendation
 
 **Keep CRM in Express for now.** The identity layer (view, functions, prospects link) unifies data without moving code. Revisit migration when:
 - CRM features grow significantly
-- Gmail sync or other Python-native integrations are needed
+- CRM logic must live tightly in the FastAPI analysis pipeline
 - Single-backend deployment becomes a priority
 
 ---

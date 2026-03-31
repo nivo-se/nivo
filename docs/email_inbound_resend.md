@@ -2,7 +2,7 @@
 
 ## Architecture
 
-- **Outbound:** The enhanced Node server (`frontend/server`) sends CRM mail via Resend when `CRM_EMAIL_PROVIDER=resend`. Each deal/contact pair has at most one **thread** row (`deep_research.crm_email_threads`) with an opaque **32-hex token**.
+- **Outbound:** The enhanced Node server (`frontend/server`) sends CRM mail via **Resend** (only). Each deal/contact pair has at most one **thread** row (`deep_research.crm_email_threads`) with an opaque **32-hex token**.
 - **Reply-To:** Every outbound send uses  
   `reply+<token>@<RESEND_REPLY_DOMAIN>`  
   (e.g. `reply.send.nivogroup.se`). Recipients’ replies go to that address, not to Google Workspace.
@@ -18,7 +18,6 @@ Human company mail stays on **Google Workspace** (root MX unchanged). Only the R
 | `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. |
 | `RESEND_REPLY_DOMAIN` | Hostname for Reply-To only (e.g. `reply.send.nivogroup.se`). Must match DNS/Resend receiving. |
 | `RESEND_WEBHOOK_SECRET` | Svix signing secret from Resend **Webhooks** (same value Resend shows for verifying payloads). |
-| `CRM_EMAIL_PROVIDER` | Set to `resend` to enable this pipeline for CRM send. |
 | `ENVIRONMENT` / `APP_ENV` | `production` / `staging` require webhook secret; development may use `RESEND_WEBHOOK_VERIFY_DISABLED=true` if secret unset (local only). |
 | `RESEND_WEBHOOK_VERIFY_DISABLED` | `true` only for local testing without `RESEND_WEBHOOK_SECRET` (never in production). |
 | Postgres `DATABASE_URL` or `POSTGRES_*` | Same DB for Node CRM and Python webhook. |
@@ -38,7 +37,7 @@ Configure in Resend:
 ## Manual testing
 
 1. Apply migration `047_crm_email_threads_inbound.sql`.
-2. Set env vars (including `RESEND_REPLY_DOMAIN`, `RESEND_FROM_EMAIL`, `CRM_EMAIL_PROVIDER=resend`).
+2. Set env vars (including `RESEND_REPLY_DOMAIN`, `RESEND_FROM_EMAIL`, `RESEND_API_KEY`).
 3. Send an approved CRM email via `POST /crm/emails/:id/send`.
 4. Inspect the sent message: **From** = `RESEND_FROM_EMAIL`, **Reply-To** = `reply+<token>@…`.
 5. Reply from an external mailbox; confirm Resend shows delivery and the webhook returns 200.

@@ -42,20 +42,14 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | Variable | Description |
 |----------|-------------|
 | `APP_BASE_URL` | Base URL for tracking links (defaults to `http://localhost:3001`). Set to `http://localhost:8080` when using the Vite app. |
-| `GOOGLE_CLIENT_ID` | Google OAuth2 client ID (for Gmail send). |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret. |
-| `GOOGLE_REFRESH_TOKEN` | OAuth2 refresh token for Gmail API. |
-| `GOOGLE_WORKSPACE_SENDER` | Sender email, e.g. `you@yourdomain.com` (Gmail provider). |
-| `CRM_EMAIL_PROVIDER` | `gmail` (default) or `resend` — which backend sends approved CRM mail. |
-| `RESEND_API_KEY` | Resend API key when using `CRM_EMAIL_PROVIDER=resend`. |
-| `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). |
-| `CRM_SENDER_FROM` | Verified **From** address for Resend (e.g. `info@crm.yourdomain.com`). |
+| `RESEND_API_KEY` | Resend API key (CRM outbound + Python inbound fetch). |
+| `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. |
 | `RESEND_REPLY_DOMAIN` | Host for structured Reply-To: `reply+<token>@<domain>` (e.g. `reply.send.nivogroup.se`). See [email_inbound_resend.md](./email_inbound_resend.md). |
 | `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |
 
-Send credentials are only needed for **sending** emails (`POST /crm/emails/:emailId/send`). Creating deals, contacts, and generating drafts works without them.
+Resend credentials are only needed for **sending** (`POST /crm/emails/:emailId/send`) and **inbound webhooks**. Creating deals, contacts, and generating drafts works without them.
 
 ### Resend: full inbound pipeline
 
@@ -73,6 +67,7 @@ The CRM uses the **`deep_research`** schema. Run migrations so tables exist:
 
 - `024_deep_research_persistence.sql` – companies, company_profiles, strategy, value_creation
 - `026_crm_foundation.sql` – deals, contacts, emails, interactions, tracking_events, sequences
+- `047_crm_email_threads_inbound.sql` – CRM email threads + messages (Resend Reply-To)
 - `032_company_identity_and_prospects_crm_link.sql` – company identity view, prospects↔CRM link
 
 Run: `./scripts/run_postgres_migrations.sh` or apply migrations manually.
@@ -100,7 +95,7 @@ If the overview fails with "Database client unavailable" or 500, check the enhan
 | PATCH | `/crm/contacts/:contactId` | Update contact. |
 | POST | `/crm/emails/generate` | Generate draft (uses OpenAI). |
 | POST | `/crm/emails/:emailId/approve` | Mark draft approved. |
-| POST | `/crm/emails/:emailId/send` | Send via Gmail (needs Google env vars). |
+| POST | `/crm/emails/:emailId/send` | Send via Resend (`RESEND_*`, `RESEND_REPLY_DOMAIN`). |
 | POST | `/crm/deals/:dealId/notes` | Add note. |
 | POST | `/crm/deals/:dealId/status` | Update deal status. |
 | GET | `/crm/deals/:dealId/timeline` | Timeline for deal. |
