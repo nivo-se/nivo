@@ -1,0 +1,860 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Loader2, Mail, Pencil, Send, Sparkles, Wand2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import {
+  approveEmail,
+  createContact,
+  createManualDraft,
+  generateEmail,
+  getCrmCompanyOverview,
+  getDealEmails,
+  getThreadMessages,
+  patchDealNextAction,
+  patchDraftEmail,
+  sendEmail,
+  type CrmCompanyOverview,
+  type CrmOutboundEmailRow,
+  type CrmThreadMessage,
+} from "@/lib/api/crm";
+
+function formatStatus(status: string | null | undefined): string {
+  if (!status) return "—";
+  return status
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function formatDateTime(ts: string | null | undefined): string {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function toDatetimeLocalValue(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+interface CrmWorkspaceProps {
+  companyIdParam: string;
+  onBack: () => void;
+}
+
+export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
+  const { toast } = useToast();
+  const [overview, setOverview] = useState<CrmCompanyOverview | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadingOverview, setLoadingOverview] = useState(true);
+
+  const [emails, setEmails] = useState<CrmOutboundEmailRow[]>([]);
+  const [loadingEmails, setLoadingEmails] = useState(false);
+
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [editorSubject, setEditorSubject] = useState("");
+  const [editorBody, setEditorBody] = useState("");
+
+  const [threadMessages, setThreadMessages] = useState<CrmThreadMessage[]>([]);
+  const [loadingThread, setLoadingThread] = useState(false);
+
+  const [nextActionInput, setNextActionInput] = useState("");
+
+  const [generateOpen, setGenerateOpen] = useState(false);
+  const [generateContactId, setGenerateContactId] = useState<string | null>(null);
+  const [generateInstructions, setGenerateInstructions] = useState("");
+  const [generateReason, setGenerateReason] = useState("");
+  const [generateBusy, setGenerateBusy] = useState(false);
+
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeContactId, setComposeContactId] = useState<string | null>(null);
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeBusy, setComposeBusy] = useState(false);
+
+  const [addContactEmail, setAddContactEmail] = useState("");
+  const [addContactName, setAddContactName] = useState("");
+  const [addContactTitle, setAddContactTitle] = useState("");
+  const [addContactBusy, setAddContactBusy] = useState(false);
+
+  const [saveDraftBusy, setSaveDraftBusy] = useState(false);
+  const [approveBusy, setApproveBusy] = useState(false);
+  const [sendBusy, setSendBusy] = useState(false);
+  const [nextActionBusy, setNextActionBusy] = useState(false);
+
+  const refreshOverview = useCallback(async () => {
+    setLoadingOverview(true);
+    setLoadError(null);
+    try {
+      const data = await getCrmCompanyOverview(companyIdParam);
+      setOverview(data);
+      const deal = data.deal as { id?: string; next_action_at?: string | null };
+      setNextActionInput(toDatetimeLocalValue(deal?.next_action_at ?? null));
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : "Failed to load company");
+      setOverview(null);
+    } finally {
+      setLoadingOverview(false);
+    }
+  }, [companyIdParam]);
+
+  useEffect(() => {
+    void refreshOverview();
+  }, [refreshOverview]);
+
+  const dealId = overview?.deal && typeof overview.deal === "object" ? (overview.deal as { id: string }).id : null;
+  const companyId =
+    overview?.company && typeof overview.company === "object"
+      ? String((overview.company as { id: string }).id)
+      : null;
+
+  const refreshEmails = useCallback(async () => {
+    if (!dealId) return;
+    setLoadingEmails(true);
+    try {
+      const rows = await getDealEmails(dealId);
+      setEmails(rows);
+    } catch {
+      setEmails([]);
+      toast({ title: "Could not load emails", variant: "destructive" });
+    } finally {
+      setLoadingEmails(false);
+    }
+  }, [dealId, toast]);
+
+  useEffect(() => {
+    void refreshEmails();
+  }, [refreshEmails]);
+
+  const selectedEmail = useMemo(
+    () => emails.find((e) => e.id === selectedEmailId) ?? null,
+    [emails, selectedEmailId]
+  );
+
+  useEffect(() => {
+    if (!selectedEmail) {
+      setEditorSubject("");
+      setEditorBody("");
+      return;
+    }
+    setEditorSubject(selectedEmail.subject ?? "");
+    setEditorBody(selectedEmail.body_text ?? "");
+  }, [selectedEmail?.id, selectedEmail?.subject, selectedEmail?.body_text]);
+
+  useEffect(() => {
+    const tid = selectedEmail?.crm_thread_id;
+    if (!tid || selectedEmail?.status !== "sent") {
+      setThreadMessages([]);
+      return;
+    }
+    setLoadingThread(true);
+    getThreadMessages(tid)
+      .then(setThreadMessages)
+      .catch(() => {
+        setThreadMessages([]);
+        toast({ title: "Could not load thread", variant: "destructive" });
+      })
+      .finally(() => setLoadingThread(false));
+  }, [selectedEmail?.crm_thread_id, selectedEmail?.status, selectedEmail?.id, toast]);
+
+  const lastSentSubjectForContact = useCallback(
+    (contactId: string) => {
+      const sent = emails.filter((e) => e.contact_id === contactId && e.status === "sent");
+      sent.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return sent[0]?.subject ?? null;
+    },
+    [emails]
+  );
+
+  const openGenerate = (contactId: string, presetInstructions?: string) => {
+    setGenerateContactId(contactId);
+    setGenerateInstructions(presetInstructions ?? "");
+    setGenerateReason("");
+    setGenerateOpen(true);
+  };
+
+  const handleGenerateSubmit = async () => {
+    if (!companyId || !generateContactId) return;
+    setGenerateBusy(true);
+    try {
+      const result = await generateEmail({
+        company_id: companyId,
+        contact_id: generateContactId,
+        user_instructions: generateInstructions.trim() || undefined,
+        reason_for_interest: generateReason.trim() || undefined,
+      });
+      toast({ title: "Draft created" });
+      setGenerateOpen(false);
+      await refreshOverview();
+      await refreshEmails();
+      if (result.email_id) {
+        setSelectedEmailId(result.email_id);
+      }
+    } catch (e) {
+      toast({
+        title: "Generate failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setGenerateBusy(false);
+    }
+  };
+
+  const handleComposeSubmit = async () => {
+    if (!companyId || !composeContactId || !composeSubject.trim() || !composeBody.trim()) return;
+    setComposeBusy(true);
+    try {
+      const row = await createManualDraft({
+        company_id: companyId,
+        contact_id: composeContactId,
+        subject: composeSubject.trim(),
+        body_text: composeBody.trim(),
+      });
+      toast({ title: "Draft saved" });
+      setComposeOpen(false);
+      setComposeSubject("");
+      setComposeBody("");
+      await refreshEmails();
+      const id = row.id as string | undefined;
+      if (id) setSelectedEmailId(id);
+    } catch (e) {
+      toast({
+        title: "Could not create draft",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setComposeBusy(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!selectedEmail || selectedEmail.status !== "draft") return;
+    setSaveDraftBusy(true);
+    try {
+      await patchDraftEmail(selectedEmail.id, {
+        subject: editorSubject,
+        body_text: editorBody,
+      });
+      toast({ title: "Draft saved" });
+      await refreshEmails();
+    } catch (e) {
+      toast({
+        title: "Save failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setSaveDraftBusy(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!selectedEmail) return;
+    setApproveBusy(true);
+    try {
+      await approveEmail(selectedEmail.id, {
+        subject: editorSubject,
+        body_text: editorBody,
+      });
+      toast({ title: "Approved" });
+      await refreshEmails();
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Approve failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setApproveBusy(false);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!selectedEmail) return;
+    setSendBusy(true);
+    try {
+      if (selectedEmail.status === "approved") {
+        await approveEmail(selectedEmail.id, {
+          subject: editorSubject,
+          body_text: editorBody,
+        });
+      }
+      await sendEmail(selectedEmail.id);
+      toast({ title: "Sent" });
+      await refreshEmails();
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Send failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setSendBusy(false);
+    }
+  };
+
+  const handleSaveNextAction = async () => {
+    if (!dealId) return;
+    setNextActionBusy(true);
+    try {
+      const iso = nextActionInput.trim() ? new Date(nextActionInput).toISOString() : null;
+      await patchDealNextAction(dealId, iso);
+      toast({ title: "Follow-up date saved" });
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Could not save date",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setNextActionBusy(false);
+    }
+  };
+
+  const handleAddContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyId || !addContactEmail.trim()) return;
+    setAddContactBusy(true);
+    try {
+      await createContact({
+        company_id: companyId,
+        email: addContactEmail.trim(),
+        full_name: addContactName.trim() || undefined,
+        title: addContactTitle.trim() || undefined,
+        is_primary: (overview?.contacts?.length ?? 0) === 0,
+      });
+      toast({ title: "Contact added" });
+      setAddContactEmail("");
+      setAddContactName("");
+      setAddContactTitle("");
+      await refreshOverview();
+    } catch (err) {
+      toast({
+        title: "Could not add contact",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setAddContactBusy(false);
+    }
+  };
+
+  if (loadingOverview && !overview) {
+    return (
+      <div className="p-8 flex items-center gap-2 text-muted-foreground text-sm">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading company…
+      </div>
+    );
+  }
+
+  if (loadError || !overview) {
+    return (
+      <div className="p-8">
+        <p className="text-sm text-destructive">{loadError ?? "Not found"}</p>
+        <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={onBack}>
+          <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+          Back
+        </Button>
+      </div>
+    );
+  }
+
+  const company = overview.company as Record<string, unknown> | null;
+  const deal = overview.deal as { id: string; status?: string; next_action_at?: string | null };
+  const contacts = Array.isArray(overview.contacts) ? overview.contacts : [];
+
+  return (
+    <div className="p-4 lg:p-6 max-w-4xl mx-auto space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <Button type="button" variant="ghost" size="sm" className="mb-2 -ml-2 h-8" onClick={onBack}>
+            <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+            Companies
+          </Button>
+          <h2 className="text-lg font-semibold text-foreground flex flex-wrap items-center gap-2">
+            {(company?.name as string) ?? "—"}
+            {deal?.status && (
+              <Badge variant="secondary" className="font-normal">
+                {formatStatus(deal.status)}
+              </Badge>
+            )}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {(company?.industry as string) || ""}
+            {company?.website ? (
+              <>
+                {" · "}
+                <a
+                  href={String(company.website)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Website
+                </a>
+              </>
+            ) : null}
+          </p>
+        </div>
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+          <span>
+            Opens: {overview.engagement_summary?.open_count ?? 0} · Clicks:{" "}
+            {overview.engagement_summary?.click_count ?? 0}
+          </span>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Plan follow-up</CardTitle>
+          <CardDescription>Optional reminder date for this deal.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-end gap-2">
+          <div className="space-y-1">
+            <Label htmlFor="next-action" className="text-xs">
+              Next touch
+            </Label>
+            <Input
+              id="next-action"
+              type="datetime-local"
+              value={nextActionInput}
+              onChange={(e) => setNextActionInput(e.target.value)}
+              className="w-[220px]"
+            />
+          </div>
+          <Button type="button" size="sm" onClick={() => void handleSaveNextAction()} disabled={nextActionBusy}>
+            {nextActionBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save date"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setNextActionInput("");
+              void (async () => {
+                if (!dealId) return;
+                setNextActionBusy(true);
+                try {
+                  await patchDealNextAction(dealId, null);
+                  toast({ title: "Date cleared" });
+                  await refreshOverview();
+                } catch (e) {
+                  toast({
+                    title: "Could not clear",
+                    description: e instanceof Error ? e.message : String(e),
+                    variant: "destructive",
+                  });
+                } finally {
+                  setNextActionBusy(false);
+                }
+              })();
+            }}
+            disabled={nextActionBusy}
+          >
+            Clear
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Contacts</CardTitle>
+          <CardDescription>Prospects to email for this company.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {contacts.length === 0 ? (
+            <form onSubmit={handleAddContact} className="space-y-3 max-w-md border border-dashed rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">Add a contact to start outreach.</p>
+              <div className="space-y-1">
+                <Label htmlFor="new-email">Email</Label>
+                <Input
+                  id="new-email"
+                  type="email"
+                  required
+                  value={addContactEmail}
+                  onChange={(e) => setAddContactEmail(e.target.value)}
+                  placeholder="name@company.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new-name">Name</Label>
+                <Input
+                  id="new-name"
+                  value={addContactName}
+                  onChange={(e) => setAddContactName(e.target.value)}
+                  placeholder="Full name"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="new-title">Title</Label>
+                <Input
+                  id="new-title"
+                  value={addContactTitle}
+                  onChange={(e) => setAddContactTitle(e.target.value)}
+                  placeholder="Role"
+                />
+              </div>
+              <Button type="submit" size="sm" disabled={addContactBusy}>
+                {addContactBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add contact"}
+              </Button>
+            </form>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Name</TableHead>
+                  <TableHead className="text-xs">Email</TableHead>
+                  <TableHead className="text-xs text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {contacts.map((c) => {
+                  const id = String((c as { id: string }).id);
+                  const name = (c as { full_name?: string }).full_name ?? "—";
+                  const email = String((c as { email: string }).email);
+                  const subj = lastSentSubjectForContact(id);
+                  return (
+                    <TableRow key={id}>
+                      <TableCell className="text-sm">{name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{email}</TableCell>
+                      <TableCell className="text-right space-x-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7"
+                          onClick={() => openGenerate(id)}
+                        >
+                          <Sparkles className="h-3 w-3 mr-1" />
+                          AI draft
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7"
+                          onClick={() => {
+                            setComposeContactId(id);
+                            setComposeSubject("");
+                            setComposeBody("");
+                            setComposeOpen(true);
+                          }}
+                        >
+                          <Pencil className="h-3 w-3 mr-1" />
+                          Compose
+                        </Button>
+                        {subj ? (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="h-7"
+                            onClick={() =>
+                              openGenerate(
+                                id,
+                                `Short follow-up to our previous email (“${subj}”). Stay concise and reference the earlier message.`
+                              )
+                            }
+                          >
+                            <Wand2 className="h-3 w-3 mr-1" />
+                            Follow-up
+                          </Button>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+          {contacts.length > 0 && (
+            <form onSubmit={handleAddContact} className="flex flex-wrap gap-2 items-end pt-2 border-t">
+              <div className="space-y-1 flex-1 min-w-[140px]">
+                <Label htmlFor="add-email-2" className="text-xs">
+                  Add contact
+                </Label>
+                <Input
+                  id="add-email-2"
+                  type="email"
+                  required
+                  value={addContactEmail}
+                  onChange={(e) => setAddContactEmail(e.target.value)}
+                  placeholder="email"
+                  className="h-8"
+                />
+              </div>
+              <Input
+                placeholder="Name"
+                value={addContactName}
+                onChange={(e) => setAddContactName(e.target.value)}
+                className="h-8 max-w-[140px]"
+              />
+              <Input
+                placeholder="Title"
+                value={addContactTitle}
+                onChange={(e) => setAddContactTitle(e.target.value)}
+                className="h-8 max-w-[120px]"
+              />
+              <Button type="submit" size="sm" className="h-8" disabled={addContactBusy}>
+                {addContactBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+              </Button>
+            </form>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Outbound emails</CardTitle>
+          <CardDescription>Drafts and sent messages for this deal.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {loadingEmails ? (
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading…
+            </p>
+          ) : emails.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No emails yet. Generate or compose from a contact.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Subject</TableHead>
+                  <TableHead className="text-xs">Contact</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="text-xs">Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {emails.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className={`cursor-pointer ${selectedEmailId === row.id ? "bg-muted/50" : ""}`}
+                    onClick={() => setSelectedEmailId(row.id)}
+                  >
+                    <TableCell className="text-sm max-w-[200px] truncate" title={row.subject}>
+                      {row.subject}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {row.contact_name || row.contact_email || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs font-normal">
+                        {row.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                      {formatDateTime(row.created_at)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+
+          {selectedEmail && (
+            <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium">Review</span>
+                <Badge variant="secondary" className="text-xs">
+                  {selectedEmail.status}
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="subj">Subject</Label>
+                <Input
+                  id="subj"
+                  value={editorSubject}
+                  onChange={(e) => setEditorSubject(e.target.value)}
+                  disabled={selectedEmail.status !== "draft" && selectedEmail.status !== "approved"}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="body">Body</Label>
+                <Textarea
+                  id="body"
+                  rows={12}
+                  value={editorBody}
+                  onChange={(e) => setEditorBody(e.target.value)}
+                  disabled={selectedEmail.status !== "draft" && selectedEmail.status !== "approved"}
+                  className="font-mono text-sm"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedEmail.status === "draft" && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => void handleSaveDraft()}
+                      disabled={saveDraftBusy}
+                    >
+                      {saveDraftBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save draft"}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => void handleApprove()}
+                      disabled={approveBusy}
+                    >
+                      {approveBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Approve"}
+                    </Button>
+                  </>
+                )}
+                {selectedEmail.status === "approved" && (
+                  <Button type="button" size="sm" onClick={() => void handleSend()} disabled={sendBusy}>
+                    {sendBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3.5 w-3.5 mr-1" />Send</>}
+                  </Button>
+                )}
+                {selectedEmail.status === "sent" && selectedEmail.crm_thread_id && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Mail className="h-3.5 w-3.5" />
+                    Thread synced
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {selectedEmail?.status === "sent" && selectedEmail.crm_thread_id && (
+            <div className="border rounded-lg p-4 space-y-2">
+              <span className="text-sm font-medium">Conversation</span>
+              {loadingThread ? (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : threadMessages.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No thread messages yet (replies appear after inbound mail).</p>
+              ) : (
+                <ul className="space-y-3">
+                  {threadMessages.map((m) => (
+                    <li
+                      key={m.id}
+                      className={`text-sm rounded-md p-3 border ${
+                        m.direction === "inbound" ? "bg-background border-primary/20" : "bg-muted/30"
+                      }`}
+                    >
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <span className="font-medium text-foreground">{m.direction}</span>
+                        <span>{formatDateTime(m.received_at || m.sent_at || m.created_at)}</span>
+                      </div>
+                      {m.subject ? <p className="text-xs font-medium mb-1">{m.subject}</p> : null}
+                      <pre className="whitespace-pre-wrap font-sans text-sm">{m.text_body || "(no body)"}</pre>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <p className="text-xs text-muted-foreground">
+        Sending uses Resend when configured. See <code className="bg-muted px-1 rounded">docs/email_inbound_resend.md</code>.
+      </p>
+
+      <Dialog open={generateOpen} onOpenChange={setGenerateOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Generate draft</DialogTitle>
+            <DialogDescription>Optional instructions tailor the AI output for this prospect.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1">
+              <Label htmlFor="instr">Instructions</Label>
+              <Textarea
+                id="instr"
+                rows={4}
+                value={generateInstructions}
+                onChange={(e) => setGenerateInstructions(e.target.value)}
+                placeholder="e.g. Mention their recent expansion; keep tone formal."
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="reason">Reason for interest (optional)</Label>
+              <Input
+                id="reason"
+                value={generateReason}
+                onChange={(e) => setGenerateReason(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setGenerateOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={() => void handleGenerateSubmit()} disabled={generateBusy}>
+              {generateBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Compose manually</DialogTitle>
+            <DialogDescription>Write subject and body without AI.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1">
+              <Label htmlFor="csub">Subject</Label>
+              <Input id="csub" value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="cbody">Body</Label>
+              <Textarea id="cbody" rows={8} value={composeBody} onChange={(e) => setComposeBody(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setComposeOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void handleComposeSubmit()}
+              disabled={composeBusy || !composeSubject.trim() || !composeBody.trim()}
+            >
+              {composeBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create draft"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

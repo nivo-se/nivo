@@ -18,7 +18,9 @@ export interface CrmDb {
   getCompanyByOrgnr(orgnr: string): Promise<Record<string, any> | null>
   insertDeal(companyId: string): Promise<Record<string, any>>
   getDealByCompanyId(companyId: string): Promise<Record<string, any> | null>
+  getDealById(dealId: string): Promise<Record<string, any> | null>
   updateDealStatus(dealId: string, status: string): Promise<Record<string, any>>
+  patchDeal(dealId: string, fields: { next_action_at?: string | null }): Promise<Record<string, any> | null>
   touchDealLastContacted(dealId: string): Promise<void>
   listContactsByCompany(companyId: string): Promise<Record<string, any>[]>
   createContact(payload: Record<string, any>): Promise<Record<string, any>>
@@ -29,6 +31,7 @@ export interface CrmDb {
   updateEmail(emailId: string, payload: Record<string, any>): Promise<Record<string, any>>
   getEmailById(id: string): Promise<Record<string, any> | null>
   getLatestOutboundEmailByDeal(dealId: string): Promise<Record<string, any> | null>
+  listOutboundEmailsByDeal(dealId: string): Promise<Record<string, any>[]>
   countSentEmailsByDeal(dealId: string): Promise<number>
   getEmailByTrackingId(trackingId: string): Promise<Record<string, any> | null>
   insertInteraction(payload: Record<string, any>): Promise<Record<string, any>>

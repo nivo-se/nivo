@@ -1,6 +1,18 @@
 import type { Express, Request, Response, NextFunction } from 'express'
 import type { CrmDb } from '../services/crm/db-interface.js'
-import { addNoteSchema, approveEmailSchema, createContactSchema, enrollSequenceSchema, fromCompanySchema, generateEmailSchema, updateContactSchema, updateStatusSchema } from '../services/crm/validation.js'
+import {
+  addNoteSchema,
+  approveEmailSchema,
+  createContactSchema,
+  draftEmailSchema,
+  enrollSequenceSchema,
+  fromCompanySchema,
+  generateEmailSchema,
+  patchDealSchema,
+  updateContactSchema,
+  updateDraftEmailSchema,
+  updateStatusSchema,
+} from '../services/crm/validation.js'
 import { DealsService } from '../services/crm/deals.service.js'
 import { ContactsService } from '../services/crm/contacts.service.js'
 import { InteractionsService } from '../services/crm/interactions.service.js'
@@ -158,6 +170,78 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     })
 
     return res.json({ success: true, data: { ...draft, email_id: email.id, tracking_id: email.tracking_id } })
+  }))
+
+  app.post('/crm/emails/draft', asyncHandler(async (req, res) => {
+    const parsed = draftEmailSchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const emails = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
+
+    const deal = await deals.getOrCreateByCompany(parsed.data.company_id)
+    const contact = await db.getContactById(parsed.data.contact_id)
+    if (!contact) return res.status(404).json({ success: false, error: 'Contact not found' })
+    if (contact.company_id !== parsed.data.company_id) {
+      return res.status(400).json({ success: false, error: 'Contact does not belong to the specified company' })
+    }
+
+    const email = await emails.createDraft({
+      deal_id: deal.id,
+      contact_id: parsed.data.contact_id,
+      subject: parsed.data.subject,
+      body_text: parsed.data.body_text,
+      body_html: parsed.data.body_html,
+    })
+
+    return res.json({ success: true, data: email })
+  }))
+
+  app.get('/crm/deals/:dealId/emails', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const rows = await db.listOutboundEmailsByDeal(req.params.dealId)
+    return res.json({ success: true, data: rows })
+  }))
+
+  app.patch('/crm/deals/:dealId', asyncHandler(async (req, res) => {
+    const parsed = patchDealSchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const existing = await db.getDealById(req.params.dealId)
+    if (!existing) return res.status(404).json({ success: false, error: 'Deal not found' })
+    const updated = await db.patchDeal(req.params.dealId, { next_action_at: parsed.data.next_action_at })
+    return res.json({ success: true, data: updated })
+  }))
+
+  app.patch('/crm/emails/:emailId', asyncHandler(async (req, res) => {
+    const parsed = updateDraftEmailSchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    const email = await db.getEmailById(req.params.emailId)
+    if (!email) return res.status(404).json({ success: false, error: 'Email not found' })
+    if (email.status !== 'draft') {
+      return res.status(400).json({ success: false, error: 'Only draft emails can be edited here' })
+    }
+
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const service = new EmailsService(db, interactions, new GmailService(), new ResendEmailService(), deals)
+
+    const payload: Record<string, string> = {}
+    if (parsed.data.subject !== undefined) payload.subject = parsed.data.subject
+    if (parsed.data.body_text !== undefined) payload.body_text = parsed.data.body_text
+    if (parsed.data.body_html !== undefined) {
+      payload.body_html = service.buildInstrumentedHtml(parsed.data.body_html, email.tracking_id as string)
+    }
+    const data = await db.updateEmail(req.params.emailId, payload)
+    return res.json({ success: true, data })
   }))
 
   app.post('/crm/emails/:emailId/approve', asyncHandler(async (req, res) => {

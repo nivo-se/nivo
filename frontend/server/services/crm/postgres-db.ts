@@ -105,6 +105,20 @@ export class PostgresCrmDb implements CrmDb {
     return rows[0] ?? null
   }
 
+  async getDealById(dealId: string) {
+    const { rows } = await this.query(`SELECT * FROM ${SCHEMA}.deals WHERE id = $1`, [dealId])
+    return rows[0] ?? null
+  }
+
+  async patchDeal(dealId: string, fields: { next_action_at?: string | null }) {
+    if (fields.next_action_at === undefined) return this.getDealById(dealId)
+    const { rows } = await this.query(
+      `UPDATE ${SCHEMA}.deals SET next_action_at = $2 WHERE id = $1::uuid RETURNING *`,
+      [dealId, fields.next_action_at]
+    )
+    return rows[0] ?? null
+  }
+
   async updateDealStatus(dealId: string, status: string) {
     const { rows } = await this.query(
       `UPDATE ${SCHEMA}.deals SET status = $1 WHERE id = $2 RETURNING *`,
@@ -200,6 +214,20 @@ export class PostgresCrmDb implements CrmDb {
       [dealId]
     )
     return rows[0] ?? null
+  }
+
+  async listOutboundEmailsByDeal(dealId: string) {
+    const { rows } = await this.query(
+      `SELECT e.id, e.deal_id, e.contact_id, e.subject, e.status, e.sent_at, e.created_at, e.updated_at,
+              e.crm_thread_id, e.tracking_id, e.body_text,
+              c.full_name AS contact_name, c.email AS contact_email
+       FROM ${SCHEMA}.emails e
+       LEFT JOIN ${SCHEMA}.contacts c ON c.id = e.contact_id
+       WHERE e.deal_id = $1::uuid AND e.direction = 'outbound'
+       ORDER BY e.created_at DESC`,
+      [dealId]
+    )
+    return rows
   }
 
   async countSentEmailsByDeal(dealId: string) {
