@@ -32,6 +32,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Loader2, Building2, Inbox, AlertTriangle, ListPlus, Plus } from "lucide-react";
 import { getAllLists } from "@/lib/api/lists/service";
 import type { List } from "@/lib/api/types";
@@ -530,9 +531,17 @@ export default function CrmPage() {
           )}
 
           {tab === "companies" && !showDetail && (
-            <div className="flex items-center justify-center h-full min-h-[200px] text-muted-foreground text-sm p-8">
-              Select a company to manage contacts, drafts, and sends — or use Inbox / From My List tabs.
-            </div>
+            <Card className="max-w-lg border-dashed bg-muted/20">
+              <CardHeader>
+                <CardTitle className="text-base">Company workspace</CardTitle>
+                <CardDescription>
+                  Pick a company in the list to draft and send outreach, or switch to{" "}
+                  <strong className="text-foreground font-medium">Inbox</strong> for replies,{" "}
+                  <strong className="text-foreground font-medium">From My List</strong> for batch drafts, and{" "}
+                  <strong className="text-foreground font-medium">External company</strong> to add a prospect.
+                </CardDescription>
+              </CardHeader>
+            </Card>
           )}
 
           {tab === "companies" && showDetail && (

@@ -38,6 +38,7 @@ const mainNavItems: NavItem[] = [
   { path: "/universe", label: "Universe", icon: Globe },
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
+  { path: "/crm", label: "CRM", icon: Briefcase },
   { path: "/ai", label: "AI Lab", icon: Cpu },
 ];
 
@@ -54,7 +55,6 @@ const testingNavItems: NavItem[] = [
   { path: "/screening-campaigns/exemplars", label: "Playbook & examples", icon: BookOpen, indent: true },
   { path: "/deep-research", label: "Deep Research", icon: Search },
   { path: "/deep-research/runs", label: "Runs", icon: LayoutList, indent: true },
-  { path: "/crm", label: "CRM", icon: Briefcase },
 ];
 
 export default function AppLayout() {
