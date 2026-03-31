@@ -11,11 +11,17 @@ import {
   Send,
   Sparkles,
   StickyNote,
+  UserRound,
   Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +30,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -53,6 +67,8 @@ import {
   getCrmEmailConfig,
   getDealEmails,
   getThreadMessages,
+  patchContact,
+  patchCrmCompany,
   patchDealNextAction,
   patchDraftEmail,
   sendEmail,
@@ -147,6 +163,18 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
   const [composeBody, setComposeBody] = useState("");
   const [composeBusy, setComposeBusy] = useState(false);
 
+  const [editContactOpen, setEditContactOpen] = useState(false);
+  const [editContactId, setEditContactId] = useState<string | null>(null);
+  const [editContactFullName, setEditContactFullName] = useState("");
+  const [editContactTitle, setEditContactTitle] = useState("");
+  const [editContactEmail, setEditContactEmail] = useState("");
+  const [editContactBusy, setEditContactBusy] = useState(false);
+
+  const [companySubtitleEditing, setCompanySubtitleEditing] = useState(false);
+  const [industryDraft, setIndustryDraft] = useState("");
+  const [websiteDraft, setWebsiteDraft] = useState("");
+  const [companySubtitleBusy, setCompanySubtitleBusy] = useState(false);
+
   const [addContactEmail, setAddContactEmail] = useState("");
   const [addContactName, setAddContactName] = useState("");
   const [addContactTitle, setAddContactTitle] = useState("");
@@ -210,6 +238,15 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
   useEffect(() => {
     void refreshEmails();
   }, [refreshEmails]);
+
+  /** Keep review panel useful: select a row when list loads or current id is missing. */
+  useEffect(() => {
+    if (loadingEmails || emails.length === 0) return;
+    const valid = selectedEmailId != null && emails.some((e) => e.id === selectedEmailId);
+    if (!valid) {
+      setSelectedEmailId(emails[0].id);
+    }
+  }, [loadingEmails, emails, selectedEmailId]);
 
   const selectedEmail = useMemo(
     () => emails.find((e) => e.id === selectedEmailId) ?? null,
@@ -275,6 +312,43 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     setGenerateInstructions(presetInstructions ?? "");
     setGenerateReason("");
     setGenerateOpen(true);
+  };
+
+  const openEditContact = (c: Record<string, unknown>) => {
+    setEditContactId(String(c.id));
+    setEditContactFullName(typeof c.full_name === "string" ? c.full_name : "");
+    setEditContactTitle(typeof c.title === "string" ? c.title : "");
+    setEditContactEmail(String(c.email ?? ""));
+    setEditContactOpen(true);
+  };
+
+  const handleEditContactSubmit = async () => {
+    if (!editContactId) return;
+    const email = editContactEmail.trim();
+    if (!email) {
+      toast({ title: "Email is required", variant: "destructive" });
+      return;
+    }
+    setEditContactBusy(true);
+    try {
+      await patchContact(editContactId, {
+        full_name: editContactFullName.trim(),
+        title: editContactTitle.trim(),
+        email,
+      });
+      toast({ title: "Contact updated" });
+      setEditContactOpen(false);
+      await refreshOverview();
+      await refreshEmails();
+    } catch (e) {
+      toast({
+        title: "Could not update contact",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setEditContactBusy(false);
+    }
   };
 
   const handleGenerateSubmit = async () => {
@@ -488,6 +562,44 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     }
   };
 
+  const openCompanySubtitleEdit = useCallback(() => {
+    const c = overview?.company as Record<string, unknown> | null | undefined;
+    if (!c) return;
+    setIndustryDraft(typeof c.industry === "string" ? c.industry : "");
+    setWebsiteDraft(typeof c.website === "string" ? c.website : "");
+    setCompanySubtitleEditing(true);
+  }, [overview?.company]);
+
+  const cancelCompanySubtitleEdit = useCallback(() => {
+    setCompanySubtitleEditing(false);
+  }, []);
+
+  const handleSaveCompanySubtitle = useCallback(async () => {
+    if (!companyId) return;
+    setCompanySubtitleBusy(true);
+    try {
+      await patchCrmCompany(companyId, {
+        industry: industryDraft.trim() || null,
+        website: websiteDraft.trim() || null,
+      });
+      toast({ title: "Company details updated" });
+      setCompanySubtitleEditing(false);
+      await refreshOverview();
+    } catch (e) {
+      toast({
+        title: "Could not save",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setCompanySubtitleBusy(false);
+    }
+  }, [companyId, industryDraft, websiteDraft, toast, refreshOverview]);
+
+  useEffect(() => {
+    setCompanySubtitleEditing(false);
+  }, [companyIdParam]);
+
   if (loadingOverview && !overview) {
     return (
       <div className="p-8 flex items-center gap-2 text-muted-foreground text-sm">
@@ -522,9 +634,11 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
         >
           <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
           <div>
-            <p className="font-medium">Outbound email not fully configured</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Set: {emailConfig.missing.join(", ")}. See{" "}
+            <p className="font-medium">Sending email is not configured yet</p>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Drafting still works: scroll to Contacts, use the row menu (⋯) → AI draft or Compose manually.
+              Drafts appear under Outbound emails for review and approve. To actually send, set{" "}
+              {emailConfig.missing.join(", ")} — see{" "}
               <code className="bg-muted px-1 rounded">docs/CRM_SETUP.md</code>.
             </p>
           </div>
@@ -540,22 +654,84 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
           <h2 className="text-xl font-semibold text-foreground tracking-tight">
             {(company?.name as string) ?? "—"}
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {(company?.industry as string) || "—"}
-            {company?.website ? (
-              <>
-                {" · "}
-                <a
-                  href={String(company.website)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline font-medium"
+          {!companySubtitleEditing ? (
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <p className="text-sm text-muted-foreground">
+                {(company?.industry as string) || "—"}
+                {company?.website ? (
+                  <>
+                    {" · "}
+                    <a
+                      href={String(company.website)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Website
+                    </a>
+                  </>
+                ) : null}
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground"
+                onClick={openCompanySubtitleEdit}
+              >
+                <Pencil className="h-3.5 w-3.5 mr-1" aria-hidden />
+                Edit industry / website
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-2 flex flex-col gap-2 max-w-md">
+              <div className="space-y-1">
+                <Label htmlFor="co-industry" className="text-xs">
+                  Industry
+                </Label>
+                <Input
+                  id="co-industry"
+                  value={industryDraft}
+                  onChange={(e) => setIndustryDraft(e.target.value)}
+                  placeholder="e.g. Software"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="co-website" className="text-xs">
+                  Website URL
+                </Label>
+                <Input
+                  id="co-website"
+                  value={websiteDraft}
+                  onChange={(e) => setWebsiteDraft(e.target.value)}
+                  placeholder="https://example.com"
+                  autoComplete="url"
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Leave fields empty to clear. A scheme is added automatically if you omit https://
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => void handleSaveCompanySubtitle()}
+                  disabled={companySubtitleBusy}
                 >
-                  Website
-                </a>
-              </>
-            ) : null}
-          </p>
+                  {companySubtitleBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelCompanySubtitleEdit}
+                  disabled={companySubtitleBusy}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <Label htmlFor="deal-status" className="text-xs text-muted-foreground sr-only">
               Deal status
@@ -785,7 +961,14 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
                               <MoreHorizontal className="h-4 w-4" aria-hidden />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onClick={() => openEditContact(c as Record<string, unknown>)}
+                            >
+                              <UserRound className="h-3.5 w-3.5 mr-2" />
+                              Edit name and email
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => openGenerate(id)}>
                               <Sparkles className="h-3.5 w-3.5 mr-2" />
                               AI draft
@@ -1030,6 +1213,55 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
       <p className="text-xs text-muted-foreground">
         Sending uses Resend when configured. See <code className="bg-muted px-1 rounded">docs/email_inbound_resend.md</code>.
       </p>
+
+      <Dialog open={editContactOpen} onOpenChange={setEditContactOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit contact</DialogTitle>
+            <DialogDescription>
+              Name appears in the table and in AI drafts. Email must stay valid for sending.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1">
+              <Label htmlFor="edit-contact-name">Name</Label>
+              <Input
+                id="edit-contact-name"
+                value={editContactFullName}
+                onChange={(e) => setEditContactFullName(e.target.value)}
+                placeholder="Full name"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-contact-title">Title (optional)</Label>
+              <Input
+                id="edit-contact-title"
+                value={editContactTitle}
+                onChange={(e) => setEditContactTitle(e.target.value)}
+                placeholder="Role"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-contact-email">Email</Label>
+              <Input
+                id="edit-contact-email"
+                type="email"
+                required
+                value={editContactEmail}
+                onChange={(e) => setEditContactEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setEditContactOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={() => void handleEditContactSubmit()} disabled={editContactBusy}>
+              {editContactBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={generateOpen} onOpenChange={setGenerateOpen}>
         <DialogContent className="sm:max-w-lg">

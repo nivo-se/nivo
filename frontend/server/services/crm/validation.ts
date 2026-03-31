@@ -2,6 +2,16 @@ import { z } from 'zod'
 
 export const fromCompanySchema = z.object({ company_id: z.string().uuid() })
 
+/** CRM company subtitle fields (industry + website link in workspace) */
+export const patchCompanySchema = z
+  .object({
+    industry: z.string().max(500).nullable().optional(),
+    website: z.string().max(2000).nullable().optional(),
+  })
+  .refine((obj) => obj.industry !== undefined || obj.website !== undefined, {
+    message: 'Provide industry and/or website',
+  })
+
 export const createContactSchema = z.object({
   company_id: z.string().uuid(),
   full_name: z.string().optional(),

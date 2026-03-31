@@ -145,6 +145,7 @@ export default function CrmPage() {
 
   const [externalOpen, setExternalOpen] = useState(false);
   const [extName, setExtName] = useState("");
+  const [extContactName, setExtContactName] = useState("");
   const [extEmail, setExtEmail] = useState("");
   const [extOrgnr, setExtOrgnr] = useState("");
   const [extWebsite, setExtWebsite] = useState("");
@@ -271,11 +272,13 @@ export default function CrmPage() {
       await createContact({
         company_id: cid,
         email,
+        full_name: extContactName.trim() || undefined,
         is_primary: true,
       });
       toast({ title: "Company and contact added" });
       setExternalOpen(false);
       setExtName("");
+      setExtContactName("");
       setExtEmail("");
       setExtOrgnr("");
       setExtWebsite("");
@@ -702,6 +705,15 @@ export default function CrmPage() {
             <div className="space-y-1">
               <Label htmlFor="ext-name">Company name</Label>
               <Input id="ext-name" value={extName} onChange={(e) => setExtName(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="ext-contact-name">Contact name (optional)</Label>
+              <Input
+                id="ext-contact-name"
+                value={extContactName}
+                onChange={(e) => setExtContactName(e.target.value)}
+                placeholder="e.g. Jane Doe"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="ext-email">Contact email</Label>

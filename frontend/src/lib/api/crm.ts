@@ -125,6 +125,20 @@ export async function createContact(payload: {
   });
 }
 
+export async function patchContact(
+  contactId: string,
+  payload: {
+    full_name?: string;
+    title?: string;
+    email?: string;
+  }
+): Promise<Record<string, unknown>> {
+  return crmFetchJson<Record<string, unknown>>(`/crm/contacts/${encodeURIComponent(contactId)}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function generateEmail(payload: {
   company_id: string;
   contact_id: string;
@@ -283,6 +297,16 @@ export async function createExternalCompany(payload: {
 }): Promise<Record<string, unknown>> {
   return crmFetchJson<Record<string, unknown>>("/crm/companies", {
     method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function patchCrmCompany(
+  companyId: string,
+  payload: { industry?: string | null; website?: string | null }
+): Promise<Record<string, unknown>> {
+  return crmFetchJson<Record<string, unknown>>(`/crm/companies/${encodeURIComponent(companyId)}`, {
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }

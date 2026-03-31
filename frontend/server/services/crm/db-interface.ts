@@ -41,6 +41,7 @@ export interface CrmDb {
   listCompanies(search?: string, limit?: number): Promise<CrmCompanyListItem[]>
   getCompany(id: string): Promise<Record<string, any> | null>
   getCompanyByOrgnr(orgnr: string): Promise<Record<string, any> | null>
+  patchCompany(companyId: string, fields: { industry?: string | null; website?: string | null }): Promise<Record<string, any> | null>
   insertDeal(companyId: string): Promise<Record<string, any>>
   getDealByCompanyId(companyId: string): Promise<Record<string, any> | null>
   getDealById(dealId: string): Promise<Record<string, any> | null>

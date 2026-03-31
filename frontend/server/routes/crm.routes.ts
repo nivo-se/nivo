@@ -11,6 +11,7 @@ import {
   fromCompanySchema,
   generateBatchEmailSchema,
   generateEmailSchema,
+  patchCompanySchema,
   patchDealSchema,
   updateContactSchema,
   updateDraftEmailSchema,
@@ -119,6 +120,42 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
       website: parsed.data.website?.trim() || undefined,
     })
     return res.json({ success: true, data: row })
+  }))
+
+  app.patch('/crm/companies/:companyId', asyncHandler(async (req, res) => {
+    const parsed = patchCompanySchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    let companyId = req.params.companyId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(companyId)) {
+      const byOrgnr = await db.getCompanyByOrgnr(companyId)
+      if (!byOrgnr) return res.status(404).json({ success: false, error: 'Company not found' })
+      companyId = byOrgnr.id as string
+    }
+
+    const existing = await db.getCompany(companyId)
+    if (!existing) return res.status(404).json({ success: false, error: 'Company not found' })
+
+    const patch: { industry?: string | null; website?: string | null } = {}
+    if ('industry' in parsed.data) {
+      const v = parsed.data.industry
+      patch.industry = v == null || v === '' ? null : v.trim()
+    }
+    if ('website' in parsed.data) {
+      const v = parsed.data.website
+      if (v == null || v === '') {
+        patch.website = null
+      } else {
+        const t = v.trim()
+        patch.website = /^https?:\/\//i.test(t) ? t : `https://${t}`
+      }
+    }
+
+    const data = await db.patchCompany(companyId, patch)
+    return res.json({ success: true, data })
   }))
 
   app.get('/crm/email-config', asyncHandler(async (_req, res) => {

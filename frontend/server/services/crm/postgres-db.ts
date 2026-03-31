@@ -88,6 +88,17 @@ export class PostgresCrmDb implements CrmDb {
     return rows[0] ?? null
   }
 
+  async patchCompany(companyId: string, payload: { industry?: string | null; website?: string | null }) {
+    const cols = Object.keys(payload).filter((k) => (payload as Record<string, unknown>)[k] !== undefined)
+    if (cols.length === 0) return this.getCompany(companyId)
+    const sets = cols.map((c, i) => `${c} = $${i + 2}`).join(', ')
+    const { rows } = await this.query(
+      `UPDATE ${SCHEMA}.companies SET ${sets}, updated_at = now() WHERE id = $1::uuid RETURNING id, orgnr, name, industry, website, headquarters`,
+      [companyId, ...cols.map((c) => (payload as Record<string, unknown>)[c])]
+    )
+    return rows[0] ?? null
+  }
+
   // ─── Deals ─────────────────────────────────────────────────────────────
   async insertDeal(companyId: string) {
     const { rows } = await this.query(
