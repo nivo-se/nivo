@@ -31,8 +31,26 @@ export const approveEmailSchema = z.object({
   body_html: z.string().optional(),
 })
 
+export const updateDraftEmailSchema = z.object({
+  subject: z.string().min(1).optional(),
+  body_text: z.string().min(1).optional(),
+  body_html: z.string().optional(),
+})
+
 export const addNoteSchema = z.object({ summary: z.string().min(1), metadata: z.record(z.any()).optional() })
 
 export const updateStatusSchema = z.object({ status: z.string().min(1), summary: z.string().optional() })
 
 export const enrollSequenceSchema = z.object({ sequence_id: z.string().uuid().optional() })
+
+export const draftEmailSchema = z.object({
+  company_id: z.string().uuid(),
+  contact_id: z.string().uuid(),
+  subject: z.string().min(1),
+  body_text: z.string().min(1),
+  body_html: z.string().optional(),
+})
+
+export const patchDealSchema = z.object({
+  next_action_at: z.union([z.string().min(1), z.null()]).optional(),
+})

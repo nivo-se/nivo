@@ -40,6 +40,7 @@ export function isCrmPostgresConfigured(): boolean {
 }
 
 import type { CrmDb } from './db-interface.js'
+import { generateThreadToken } from './reply-to-address.js'
 
 /** Postgres-backed CRM DB. */
 export class PostgresCrmDb implements CrmDb {
@@ -100,6 +101,20 @@ export class PostgresCrmDb implements CrmDb {
     const { rows } = await this.query(
       `SELECT * FROM ${SCHEMA}.deals WHERE company_id = $1`,
       [companyId]
+    )
+    return rows[0] ?? null
+  }
+
+  async getDealById(dealId: string) {
+    const { rows } = await this.query(`SELECT * FROM ${SCHEMA}.deals WHERE id = $1`, [dealId])
+    return rows[0] ?? null
+  }
+
+  async patchDeal(dealId: string, fields: { next_action_at?: string | null }) {
+    if (fields.next_action_at === undefined) return this.getDealById(dealId)
+    const { rows } = await this.query(
+      `UPDATE ${SCHEMA}.deals SET next_action_at = $2 WHERE id = $1::uuid RETURNING *`,
+      [dealId, fields.next_action_at]
     )
     return rows[0] ?? null
   }
@@ -199,6 +214,20 @@ export class PostgresCrmDb implements CrmDb {
       [dealId]
     )
     return rows[0] ?? null
+  }
+
+  async listOutboundEmailsByDeal(dealId: string) {
+    const { rows } = await this.query(
+      `SELECT e.id, e.deal_id, e.contact_id, e.subject, e.status, e.sent_at, e.created_at, e.updated_at,
+              e.crm_thread_id, e.tracking_id, e.body_text,
+              c.full_name AS contact_name, c.email AS contact_email
+       FROM ${SCHEMA}.emails e
+       LEFT JOIN ${SCHEMA}.contacts c ON c.id = e.contact_id
+       WHERE e.deal_id = $1::uuid AND e.direction = 'outbound'
+       ORDER BY e.created_at DESC`,
+      [dealId]
+    )
+    return rows
   }
 
   async countSentEmailsByDeal(dealId: string) {
@@ -307,5 +336,48 @@ export class PostgresCrmDb implements CrmDb {
       [companyId]
     )
     return rows[0] ?? null
+  }
+
+  // ─── CRM email threads (Resend Reply-To correlation) ─────────────────────
+  async ensureCrmEmailThread(dealId: string, contactId: string) {
+    const existing = await this.query<{ id: string; token: string }>(
+      `SELECT id, token FROM ${SCHEMA}.crm_email_threads WHERE deal_id = $1 AND contact_id = $2`,
+      [dealId, contactId]
+    )
+    if (existing.rows[0]) return existing.rows[0]
+
+    const token = generateThreadToken()
+    const { rows } = await this.query<{ id: string; token: string }>(
+      `INSERT INTO ${SCHEMA}.crm_email_threads (token, deal_id, contact_id, company_id)
+       SELECT $1::text, $2::uuid, $3::uuid, d.company_id
+       FROM ${SCHEMA}.deals d
+       INNER JOIN ${SCHEMA}.contacts c ON c.id = $3::uuid AND c.company_id = d.company_id
+       WHERE d.id = $2::uuid
+       RETURNING id, token`,
+      [token, dealId, contactId]
+    )
+    if (!rows[0]) {
+      throw new Error('ensureCrmEmailThread: deal and contact must belong to the same company')
+    }
+    return rows[0]
+  }
+
+  async insertCrmEmailMessage(payload: Record<string, any>) {
+    const cols = Object.keys(payload).filter((k) => payload[k] !== undefined)
+    const vals = cols.map((c) => payload[c])
+    const placeholders = cols.map((_, i) => `$${i + 1}`).join(', ')
+    const { rows } = await this.query(
+      `INSERT INTO ${SCHEMA}.crm_email_messages (${cols.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+      vals
+    )
+    return rows[0]
+  }
+
+  async listCrmEmailMessagesByThreadId(threadId: string) {
+    const { rows } = await this.query(
+      `SELECT * FROM ${SCHEMA}.crm_email_messages WHERE thread_id = $1::uuid ORDER BY created_at ASC`,
+      [threadId]
+    )
+    return rows
   }
 }
