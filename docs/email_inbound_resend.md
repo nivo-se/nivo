@@ -5,7 +5,7 @@
 - **Outbound:** The enhanced Node server (`frontend/server`) sends CRM mail via **Resend** (only). Each deal/contact pair has at most one **thread** row (`deep_research.crm_email_threads`) with an opaque **32-hex token**.
 - **Reply-To:** Every outbound send uses  
   `reply+<token>@<RESEND_REPLY_DOMAIN>`  
-  (e.g. `reply.send.nivogroup.se`). Recipients’ replies go to that address, not to Google Workspace.
+  (e.g. `send.nivogroup.se` on the same verified subdomain as receiving). Recipients’ replies go to that address, not to Google Workspace.
 - **Inbound:** Resend receives mail on the configured receiving domain and POSTs `email.received` to the FastAPI backend at **`POST /webhooks/email/inbound`**. The handler verifies the Svix signature, loads full content via **GET** `https://api.resend.com/emails/receiving/{email_id}`, resolves the token to a thread, and inserts **`crm_email_messages`** (inbound). Unmatched mail is stored in **`crm_email_inbound_unmatched`**. A **`reply_received`** interaction is created on success (not on duplicates).
 
 Human company mail stays on **Google Workspace** (root MX unchanged). Only the Reply-To path uses the inbound subdomain.
@@ -16,7 +16,7 @@ Human company mail stays on **Google Workspace** (root MX unchanged). Only the R
 |----------|---------|
 | `RESEND_API_KEY` | Resend API key (Node send + Python fetch received body). |
 | `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. |
-| `RESEND_REPLY_DOMAIN` | Hostname for Reply-To only (e.g. `reply.send.nivogroup.se`). Must match DNS/Resend receiving. |
+| `RESEND_REPLY_DOMAIN` | Hostname for Reply-To only (e.g. `send.nivogroup.se`). Must match the host where Resend’s **inbound** MX is set (avoid a second MX on `reply.send` if that breaks verification). |
 | `RESEND_WEBHOOK_SECRET` | Svix signing secret from Resend **Webhooks** (same value Resend shows for verifying payloads). |
 | `ENVIRONMENT` / `APP_ENV` | `production` / `staging` require webhook secret; development may use `RESEND_WEBHOOK_VERIFY_DISABLED=true` if secret unset (local only). |
 | `RESEND_WEBHOOK_VERIFY_DISABLED` | `true` only for local testing without `RESEND_WEBHOOK_SECRET` (never in production). |

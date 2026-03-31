@@ -49,7 +49,7 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | `APP_BASE_URL` | Base URL for tracking links (defaults to `http://localhost:3001`). Set to `http://localhost:8080` when using the Vite app. |
 | `RESEND_API_KEY` | Resend API key (CRM outbound + Python inbound fetch). |
 | `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. |
-| `RESEND_REPLY_DOMAIN` | Host for structured Reply-To: `reply+<token>@<domain>` (e.g. `reply.send.nivogroup.se`). See [email_inbound_resend.md](./email_inbound_resend.md). |
+| `RESEND_REPLY_DOMAIN` | Host for structured Reply-To: `reply+<token>@<domain>` (e.g. `send.nivogroup.se` where inbound MX lives). See [email_inbound_resend.md](./email_inbound_resend.md). |
 | `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |

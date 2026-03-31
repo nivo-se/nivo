@@ -455,8 +455,23 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
     const service = new EmailsService(db, interactions, resendOutbound, deals)
-    const data = await service.send(req.params.emailId)
-    return res.json({ success: true, data })
+    try {
+      const data = await service.send(req.params.emailId)
+      return res.json({ success: true, data })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('[CRM] POST /crm/emails/:emailId/send failed:', msg)
+      const lower = msg.toLowerCase()
+      const isClient =
+        lower.includes('must be approved') ||
+        lower.includes('contact email missing') ||
+        lower.includes('required for crm send') ||
+        lower.includes('resend_reply_domain is required') ||
+        lower.includes('deal and contact must belong')
+      const isResend = lower.includes('resend')
+      const status = isClient ? 400 : isResend ? 502 : 500
+      return res.status(status).json({ success: false, error: msg })
+    }
   }))
 
   app.post('/crm/deals/:dealId/notes', asyncHandler(async (req, res) => {

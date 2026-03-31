@@ -17,8 +17,8 @@ class ParseThreadTokenTest(unittest.TestCase):
         self.assertTrue(validate_thread_token_format(tok))
         self.assertEqual(
             parse_thread_token_from_recipient(
-                f"reply+{tok}@reply.send.nivogroup.se",
-                "reply.send.nivogroup.se",
+                f"reply+{tok}@send.nivogroup.se",
+                "send.nivogroup.se",
             ),
             tok,
         )
@@ -27,12 +27,12 @@ class ParseThreadTokenTest(unittest.TestCase):
         self.assertIsNone(
             parse_thread_token_from_recipient(
                 "reply+abcdef0123456789abcdef0123456789@other.com",
-                "reply.send.nivogroup.se",
+                "send.nivogroup.se",
             )
         )
 
     def test_find_reply_recipient(self):
-        dom = "reply.send.nivogroup.se"
+        dom = "send.nivogroup.se"
         r = find_reply_recipient(
             ["someone@example.com", "reply+abcdef0123456789abcdef0123456789@" + dom],
             dom,

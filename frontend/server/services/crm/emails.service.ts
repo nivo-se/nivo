@@ -87,7 +87,7 @@ export class EmailsService {
     }
     const replyDomain = process.env.RESEND_REPLY_DOMAIN?.trim()
     if (!replyDomain) {
-      throw new Error('RESEND_REPLY_DOMAIN is required (e.g. reply.send.nivogroup.se)')
+      throw new Error('RESEND_REPLY_DOMAIN is required (e.g. send.nivogroup.se)')
     }
 
     const { id: threadId, token } = await this.db.ensureCrmEmailThread(email.deal_id, email.contact_id)

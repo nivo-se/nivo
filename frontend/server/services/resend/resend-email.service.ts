@@ -11,7 +11,7 @@ export interface ResendSendInput {
   bodyHtml?: string | null
   cc?: string[]
   bcc?: string[]
-  /** Reply-To — CRM structured address reply+<token>@reply.send... */
+  /** Reply-To — CRM structured address reply+<token>@RESEND_REPLY_DOMAIN */
   replyTo?: string | null
   /** RFC 5322 headers, e.g. In-Reply-To / References when replying in-thread. */
   headers?: Record<string, string>
