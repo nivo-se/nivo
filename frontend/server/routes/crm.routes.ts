@@ -1,12 +1,15 @@
 import type { Express, Request, Response, NextFunction } from 'express'
 import type { CrmDb } from '../services/crm/db-interface.js'
+import { randomUUID } from 'node:crypto'
 import {
   addNoteSchema,
   approveEmailSchema,
   createContactSchema,
+  createExternalCompanySchema,
   draftEmailSchema,
   enrollSequenceSchema,
   fromCompanySchema,
+  generateBatchEmailSchema,
   generateEmailSchema,
   patchDealSchema,
   updateContactSchema,
@@ -51,6 +54,24 @@ function asyncHandler(
   }
 }
 
+function getCrmEmailConfigPayload() {
+  const hasKey = Boolean(process.env.RESEND_API_KEY?.trim())
+  const from =
+    process.env.RESEND_FROM_EMAIL?.trim() ||
+    process.env.CRM_SENDER_FROM?.trim() ||
+    process.env.RESEND_FROM?.trim()
+  const hasFrom = Boolean(from)
+  const hasReplyDomain = Boolean(process.env.RESEND_REPLY_DOMAIN?.trim())
+  const missing: string[] = []
+  if (!hasKey) missing.push('RESEND_API_KEY')
+  if (!hasFrom) missing.push('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM)')
+  if (!hasReplyDomain) missing.push('RESEND_REPLY_DOMAIN')
+  return {
+    resend_configured: hasKey && hasFrom && hasReplyDomain,
+    missing,
+  }
+}
+
 async function loadOutreachContext(db: CrmDb, companyId: string) {
   const [company, profile, strategy, valueCreation] = await Promise.all([
     db.getCompany(companyId),
@@ -77,6 +98,131 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     const limit = typeof req.query.limit === 'string' ? Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50)) : 50
     const data = await db.listCompanies(search, limit)
     return res.json({ success: true, data })
+  }))
+
+  /** Minimal company row for prospects not yet in Universe (unique orgnr: auto crm-ext-*) */
+  app.post('/crm/companies', asyncHandler(async (req, res) => {
+    const parsed = createExternalCompanySchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    const orgnr =
+      parsed.data.orgnr?.trim() || `crm-ext-${randomUUID().replace(/-/g, '')}`
+    const existing = await db.getCompanyByOrgnr(orgnr)
+    if (existing) {
+      return res.json({ success: true, data: existing, existing: true })
+    }
+    const row = await db.insertCompany({
+      orgnr,
+      name: parsed.data.name.trim(),
+      website: parsed.data.website?.trim() || undefined,
+    })
+    return res.json({ success: true, data: row })
+  }))
+
+  app.get('/crm/email-config', asyncHandler(async (_req, res) => {
+    return res.json({ success: true, data: getCrmEmailConfigPayload() })
+  }))
+
+  app.get('/crm/inbound/recent', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const raw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 50
+    const limit = Math.min(100, Math.max(1, Number.isFinite(raw) ? raw : 50))
+    const data = await db.listRecentInboundMessages(limit)
+    return res.json({ success: true, data })
+  }))
+
+  app.get('/crm/inbound/unmatched', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const raw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 50
+    const limit = Math.min(100, Math.max(1, Number.isFinite(raw) ? raw : 50))
+    const data = await db.listInboundUnmatched(limit)
+    return res.json({ success: true, data })
+  }))
+
+  app.post('/crm/emails/generate-batch', asyncHandler(async (req, res) => {
+    const parsed = generateBatchEmailSchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    const listOk = await db.savedListExists(parsed.data.list_id)
+    if (!listOk) return res.status(404).json({ success: false, error: 'List not found' })
+
+    const orgnrs = await db.listSavedListOrgnrs(parsed.data.list_id)
+    if (orgnrs.length === 0) {
+      return res.json({
+        success: true,
+        data: { drafts: [] as unknown[], skipped: [{ reason: 'empty_list' as const }] },
+      })
+    }
+
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const aiService = new OutreachEmailService()
+
+    const drafts: {
+      email_id: string
+      company_id: string
+      contact_id: string
+      orgnr: string
+      subject: string
+      company_name?: string
+    }[] = []
+    const skipped: { orgnr: string; company_id?: string; reason: string }[] = []
+
+    for (const orgnr of orgnrs) {
+      const resolved = await db.resolveOrCreateCompanyByOrgnr(orgnr)
+      if (!resolved) {
+        skipped.push({ orgnr, reason: 'could_not_resolve_company' })
+        continue
+      }
+      const companyId = resolved.id
+      const company = await db.getCompany(companyId)
+      const contact = await db.getPrimaryOrFirstContact(companyId)
+      if (!contact) {
+        skipped.push({ orgnr, company_id: companyId, reason: 'no_contact' })
+        continue
+      }
+      const deal = await deals.getOrCreateByCompany(companyId)
+      const context = await loadOutreachContext(db, companyId)
+      const draft = await aiService.generateDraft({
+        companyName: context.company?.name,
+        industry: context.company?.industry,
+        companyProfile: context.profile?.summary,
+        strategicStrengths: context.strategy?.investment_thesis,
+        reasonForInterest: parsed.data.reason_for_interest || context.strategy?.acquisition_rationale,
+        valueCreationAngle: JSON.stringify(context.valueCreation?.initiatives || {}),
+        contactName: contact?.full_name,
+        contactTitle: contact?.title,
+        userInstructions: parsed.data.user_instructions,
+      })
+
+      const email = await emails.createDraft({
+        deal_id: deal.id,
+        contact_id: contact.id as string,
+        subject: draft.subject,
+        body_text: draft.body_text,
+        body_html: draft.body_html,
+        ai_prompt_version: draft.prompt_version,
+        generation_context: context,
+      })
+
+      drafts.push({
+        email_id: email.id,
+        company_id: companyId,
+        contact_id: contact.id as string,
+        orgnr,
+        subject: draft.subject,
+        company_name: company?.name as string | undefined,
+      })
+    }
+
+    return res.json({ success: true, data: { drafts, skipped } })
   }))
 
   app.post('/crm/deals/from-company', asyncHandler(async (req, res) => {

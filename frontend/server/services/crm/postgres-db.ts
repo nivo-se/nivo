@@ -39,7 +39,7 @@ export function isCrmPostgresConfigured(): boolean {
   return true
 }
 
-import type { CrmDb } from './db-interface.js'
+import type { CrmDb, CrmInboundRecentRow, CrmInboundUnmatchedRow } from './db-interface.js'
 import { generateThreadToken } from './reply-to-address.js'
 
 /** Postgres-backed CRM DB. */
@@ -379,5 +379,106 @@ export class PostgresCrmDb implements CrmDb {
       [threadId]
     )
     return rows
+  }
+
+  async listRecentInboundMessages(limit: number): Promise<CrmInboundRecentRow[]> {
+    const cap = Math.min(200, Math.max(1, limit))
+    const { rows } = await this.query<CrmInboundRecentRow>(
+      `SELECT m.id::text, m.thread_id::text, m.subject, m.text_body,
+              m.received_at::text, m.created_at::text,
+              t.company_id::text, c.name AS company_name,
+              t.deal_id::text, t.contact_id::text, co.email AS contact_email
+       FROM ${SCHEMA}.crm_email_messages m
+       INNER JOIN ${SCHEMA}.crm_email_threads t ON t.id = m.thread_id
+       INNER JOIN ${SCHEMA}.companies c ON c.id = t.company_id
+       LEFT JOIN ${SCHEMA}.contacts co ON co.id = t.contact_id
+       WHERE m.direction = 'inbound'
+       ORDER BY COALESCE(m.received_at, m.created_at) DESC
+       LIMIT $1`,
+      [cap]
+    )
+    return rows
+  }
+
+  async listInboundUnmatched(limit: number): Promise<CrmInboundUnmatchedRow[]> {
+    const cap = Math.min(200, Math.max(1, limit))
+    const { rows } = await this.query<CrmInboundUnmatchedRow>(
+      `SELECT id::text, token_attempted, from_email, to_email, subject,
+              provider_inbound_email_id, created_at::text
+       FROM ${SCHEMA}.crm_email_inbound_unmatched
+       ORDER BY created_at DESC
+       LIMIT $1`,
+      [cap]
+    )
+    return rows
+  }
+
+  async listSavedListOrgnrs(listId: string): Promise<string[]> {
+    const { rows } = await this.query<{ orgnr: string }>(
+      `SELECT orgnr FROM public.saved_list_items WHERE list_id = $1::uuid`,
+      [listId]
+    )
+    return rows.map((r) => r.orgnr).filter(Boolean)
+  }
+
+  async savedListExists(listId: string): Promise<boolean> {
+    const { rows } = await this.query<{ ok: number }>(
+      `SELECT 1 AS ok FROM public.saved_lists WHERE id = $1::uuid LIMIT 1`,
+      [listId]
+    )
+    return rows.length > 0
+  }
+
+  async insertCompany(payload: { orgnr: string; name: string; website?: string | null }) {
+    const { rows } = await this.query(
+      `INSERT INTO ${SCHEMA}.companies (orgnr, name, website, country_code)
+       VALUES ($1, $2, $3, 'SE')
+       RETURNING *`,
+      [payload.orgnr, payload.name, payload.website ?? null]
+    )
+    return rows[0]
+  }
+
+  async resolveOrCreateCompanyByOrgnr(orgnr: string): Promise<{ id: string } | null> {
+    if (!orgnr || !orgnr.trim()) return null
+    const trimmed = orgnr.trim()
+    const existing = await this.getCompanyByOrgnr(trimmed)
+    if (existing?.id) return { id: existing.id as string }
+
+    let name = `Company ${trimmed}`
+    let website: string | null = null
+    try {
+      const { rows: pub } = await this.query<{ company_name: string; homepage: string | null }>(
+        `SELECT company_name, homepage FROM public.companies WHERE orgnr = $1 LIMIT 1`,
+        [trimmed]
+      )
+      if (pub[0]?.company_name?.trim()) name = pub[0].company_name.trim()
+      website = pub[0]?.homepage ?? null
+    } catch {
+      /* public.companies may be absent in some dev DBs */
+    }
+    try {
+      const { rows } = await this.query<{ id: string }>(
+        `INSERT INTO ${SCHEMA}.companies (orgnr, name, website, country_code)
+         VALUES ($1, $2, $3, 'SE')
+         ON CONFLICT (orgnr) DO UPDATE SET updated_at = now()
+         RETURNING id::text`,
+        [trimmed, name, website]
+      )
+      return rows[0] ? { id: rows[0].id } : null
+    } catch {
+      const again = await this.getCompanyByOrgnr(trimmed)
+      return again?.id ? { id: again.id as string } : null
+    }
+  }
+
+  async getPrimaryOrFirstContact(companyId: string) {
+    const { rows } = await this.query(
+      `SELECT * FROM ${SCHEMA}.contacts WHERE company_id = $1::uuid
+       ORDER BY is_primary DESC, created_at DESC
+       LIMIT 1`,
+      [companyId]
+    )
+    return rows[0] ?? null
   }
 }

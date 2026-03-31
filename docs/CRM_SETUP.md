@@ -4,10 +4,15 @@ The CRM layer lives in `frontend/server`: API routes under `/crm/*` and services
 
 ## 1. Is there a CRM frontend?
 
-Yes. A minimal **CRM page** is available at **/crm** in the app. It lets you:
+Yes. The **CRM page** at **/crm** includes:
 
-- Open a company by **company ID** (UUID from Deep Research / Universe) and see CRM overview (deal, contacts, emails, timeline).
-- Use the API for creating deals from companies, contacts, generating/sending emails, and tracking.
+- **Companies** — search and open a company (UUID or orgnr) for overview, contacts, drafts, send, and conversation thread.
+- **Inbox** — recent inbound replies across deals (linked to Resend webhooks).
+- **Unmatched** — inbound mail that could not be matched to a thread (Reply-To / token issues).
+- **From My List** — pick a **My List**, generate **one AI draft per company** (requires a contact per company); review links open each company workspace.
+- **External company** — create a minimal `deep_research.companies` row + contact + deal for a prospect not yet in Universe.
+
+Use the API for automation (see table below) and tracking.
 
 The backend also exposes REST endpoints you can call with curl or Postman (see [frontend/server/docs/crm-foundation.md](../frontend/server/docs/crm-foundation.md)).
 
@@ -68,11 +73,14 @@ The CRM uses the **`deep_research`** schema. Run migrations so tables exist:
 - `024_deep_research_persistence.sql` – companies, company_profiles, strategy, value_creation
 - `026_crm_foundation.sql` – deals, contacts, emails, interactions, tracking_events, sequences
 - `047_crm_email_threads_inbound.sql` – CRM email threads + messages (Resend Reply-To)
+- `049_rename_crm_email_provider_columns.sql` – renames `deep_research.emails.gmail_message_id` → `outbound_provider_message_id`, drops unused `gmail_thread_id`
 - `032_company_identity_and_prospects_crm_link.sql` – company identity view, prospects↔CRM link
 
 Run: `./scripts/run_postgres_migrations.sh` or apply migrations manually.
 
 **Company identity:** `orgnr` bridges `public.companies` and `deep_research.companies`. `GET /crm/company/:companyId` accepts either UUID or orgnr.
+
+**Outbound id column:** After migration `049`, sent Resend message ids are stored in `emails.outbound_provider_message_id` (not legacy Gmail column names).
 
 ## 5. Quick check
 
@@ -90,12 +98,17 @@ If the overview fails with "Database client unavailable" or 500, check the enhan
 | Method | Path | Purpose |
 |--------|------|--------|
 | POST | `/crm/deals/from-company` | Create or get deal by company ID. |
+| POST | `/crm/companies` | Create minimal company (ad-hoc / external prospect); optional `orgnr`, `website`. |
 | GET | `/crm/company/:companyId` | Company CRM overview (deal, contacts, emails, timeline). |
 | POST | `/crm/contacts` | Create contact. |
 | PATCH | `/crm/contacts/:contactId` | Update contact. |
 | POST | `/crm/emails/generate` | Generate draft (uses OpenAI). |
+| POST | `/crm/emails/generate-batch` | Body: `{ list_id }` — one draft per list orgnr (skips companies without contact). |
 | POST | `/crm/emails/:emailId/approve` | Mark draft approved. |
 | POST | `/crm/emails/:emailId/send` | Send via Resend (`RESEND_*`, `RESEND_REPLY_DOMAIN`). |
+| GET | `/crm/email-config` | Returns `{ resend_configured, missing[] }` (no secrets). |
+| GET | `/crm/inbound/recent` | Recent inbound messages (CRM inbox). |
+| GET | `/crm/inbound/unmatched` | Unmatched inbound rows. |
 | POST | `/crm/deals/:dealId/notes` | Add note. |
 | POST | `/crm/deals/:dealId/status` | Update deal status. |
 | GET | `/crm/deals/:dealId/timeline` | Timeline for deal. |
@@ -104,3 +117,13 @@ If the overview fails with "Database client unavailable" or 500, check the enhan
 Tracking: `/track/open/:trackingId`, `/track/click/:trackingId` (used in email links).
 
 See [frontend/server/docs/crm-foundation.md](../frontend/server/docs/crm-foundation.md) for more detail.
+
+## 7. Private email smoke test (send, reply, tracking)
+
+Use a **personal test address** as the CRM contact email to verify deliverability without contacting real prospects.
+
+1. **Send:** Approve and send a short test message; confirm it arrives in your inbox and `Reply-To` is `reply+<token>@<RESEND_REPLY_DOMAIN>`.
+2. **Reply:** Reply from that mailbox so the message hits Resend receiving → FastAPI webhook `POST /webhooks/email/inbound`, then check **Inbox** / **Conversation** in `/crm`.
+3. **Open / click:** Open the email (images on) and click a tracked `https` link; confirm interactions / timeline counts.
+
+If inbound fails, verify Resend receiving, DNS, and that the FastAPI backend URL is reachable from Resend (tunnel for local dev). See [email_inbound_resend.md](./email_inbound_resend.md).

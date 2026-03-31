@@ -12,6 +12,31 @@ export interface CrmCompanyListItem {
   last_contacted_at: string | null
 }
 
+/** Recent inbound CRM message with thread/company for Inbox tab */
+export interface CrmInboundRecentRow {
+  id: string
+  thread_id: string
+  subject: string | null
+  text_body: string | null
+  received_at: string | null
+  created_at: string
+  company_id: string
+  company_name: string | null
+  deal_id: string
+  contact_id: string
+  contact_email: string | null
+}
+
+export interface CrmInboundUnmatchedRow {
+  id: string
+  token_attempted: string | null
+  from_email: string | null
+  to_email: string | null
+  subject: string | null
+  provider_inbound_email_id: string | null
+  created_at: string
+}
+
 export interface CrmDb {
   listCompanies(search?: string, limit?: number): Promise<CrmCompanyListItem[]>
   getCompany(id: string): Promise<Record<string, any> | null>
@@ -49,4 +74,19 @@ export interface CrmDb {
   ensureCrmEmailThread(dealId: string, contactId: string): Promise<{ id: string; token: string }>
   insertCrmEmailMessage(payload: Record<string, any>): Promise<Record<string, any>>
   listCrmEmailMessagesByThreadId(threadId: string): Promise<Record<string, any>[]>
+
+  listRecentInboundMessages(limit: number): Promise<CrmInboundRecentRow[]>
+  listInboundUnmatched(limit: number): Promise<CrmInboundUnmatchedRow[]>
+
+  /** My List membership (orgnrs) for batch draft generation */
+  listSavedListOrgnrs(listId: string): Promise<string[]>
+  savedListExists(listId: string): Promise<boolean>
+
+  /** Create minimal company row (e.g. external prospect). orgnr must be unique. */
+  insertCompany(payload: { orgnr: string; name: string; website?: string | null }): Promise<Record<string, any>>
+  /** Resolve deep_research company by Swedish orgnr; create from public.companies or placeholder if missing */
+  resolveOrCreateCompanyByOrgnr(orgnr: string): Promise<{ id: string } | null>
+
+  /** Primary contact for company, or first by recency */
+  getPrimaryOrFirstContact(companyId: string): Promise<Record<string, any> | null>
 }

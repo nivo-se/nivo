@@ -54,3 +54,16 @@ export const draftEmailSchema = z.object({
 export const patchDealSchema = z.object({
   next_action_at: z.union([z.string().min(1), z.null()]).optional(),
 })
+
+export const generateBatchEmailSchema = z.object({
+  list_id: z.string().uuid(),
+  user_instructions: z.string().max(1000).optional(),
+  reason_for_interest: z.string().max(500).optional(),
+})
+
+/** Ad-hoc company for CRM (e.g. researched outside the app). orgnr optional — generated if omitted */
+export const createExternalCompanySchema = z.object({
+  name: z.string().min(1).max(500),
+  orgnr: z.string().min(5).max(32).optional(),
+  website: z.union([z.string().url(), z.literal('')]).optional(),
+})

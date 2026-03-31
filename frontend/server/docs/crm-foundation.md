@@ -15,11 +15,12 @@ CRM outbound email uses **Resend only** (`frontend/server/services/resend/resend
 ## Flow
 
 1. `POST /crm/deals/from-company`
-2. `POST /crm/contacts`
-3. `POST /crm/emails/generate`
+2. `POST /crm/contacts` (or `POST /crm/companies` for an ad-hoc company, then contact + deal)
+3. `POST /crm/emails/generate` (single) or `POST /crm/emails/generate-batch` (My List → one draft per company)
 4. `POST /crm/emails/:emailId/approve`
 5. `POST /crm/emails/:emailId/send` (Resend)
 6. Track engagement using `/track/open/:trackingId` and `/track/click/:trackingId`
+7. Inbound: `GET /crm/inbound/recent`, `GET /crm/inbound/unmatched`, `GET /crm/email-config`
 
 ## Notes
 

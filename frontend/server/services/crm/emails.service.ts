@@ -121,8 +121,7 @@ export class EmailsService {
 
     const data = await this.db.updateEmail(emailId, {
       status: 'sent',
-      gmail_message_id: resend.id,
-      gmail_thread_id: null,
+      outbound_provider_message_id: resend.id,
       sent_at: new Date().toISOString(),
     })
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Loader2, Mail, Pencil, Send, Sparkles, Wand2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, Mail, Pencil, RefreshCw, Send, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,12 +29,14 @@ import {
   createManualDraft,
   generateEmail,
   getCrmCompanyOverview,
+  getCrmEmailConfig,
   getDealEmails,
   getThreadMessages,
   patchDealNextAction,
   patchDraftEmail,
   sendEmail,
   type CrmCompanyOverview,
+  type CrmEmailConfig,
   type CrmOutboundEmailRow,
   type CrmThreadMessage,
 } from "@/lib/api/crm";
@@ -86,6 +88,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
   const [threadMessages, setThreadMessages] = useState<CrmThreadMessage[]>([]);
   const [loadingThread, setLoadingThread] = useState(false);
+  const [emailConfig, setEmailConfig] = useState<CrmEmailConfig | null>(null);
 
   const [nextActionInput, setNextActionInput] = useState("");
 
@@ -131,6 +134,12 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     void refreshOverview();
   }, [refreshOverview]);
 
+  useEffect(() => {
+    getCrmEmailConfig()
+      .then(setEmailConfig)
+      .catch(() => setEmailConfig({ resend_configured: false, missing: ["unknown"] }));
+  }, []);
+
   const dealId = overview?.deal && typeof overview.deal === "object" ? (overview.deal as { id: string }).id : null;
   const companyId =
     overview?.company && typeof overview.company === "object"
@@ -170,21 +179,40 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     setEditorBody(selectedEmail.body_text ?? "");
   }, [selectedEmail]);
 
+  const refetchThread = useCallback(
+    async (opts?: { showSpinner?: boolean; silent?: boolean }) => {
+      const tid = selectedEmail?.crm_thread_id;
+      if (!tid || selectedEmail?.status !== "sent") {
+        setThreadMessages([]);
+        return;
+      }
+      const showSpinner = opts?.showSpinner !== false;
+      if (showSpinner) setLoadingThread(true);
+      try {
+        const rows = await getThreadMessages(tid);
+        setThreadMessages(rows);
+      } catch {
+        setThreadMessages([]);
+        if (!opts?.silent) {
+          toast({ title: "Could not load thread", variant: "destructive" });
+        }
+      } finally {
+        if (showSpinner) setLoadingThread(false);
+      }
+    },
+    [selectedEmail?.crm_thread_id, selectedEmail?.status, selectedEmail?.id, toast]
+  );
+
+  useEffect(() => {
+    void refetchThread({ showSpinner: true });
+  }, [selectedEmail?.crm_thread_id, selectedEmail?.status, selectedEmail?.id, refetchThread]);
+
   useEffect(() => {
     const tid = selectedEmail?.crm_thread_id;
-    if (!tid || selectedEmail?.status !== "sent") {
-      setThreadMessages([]);
-      return;
-    }
-    setLoadingThread(true);
-    getThreadMessages(tid)
-      .then(setThreadMessages)
-      .catch(() => {
-        setThreadMessages([]);
-        toast({ title: "Could not load thread", variant: "destructive" });
-      })
-      .finally(() => setLoadingThread(false));
-  }, [selectedEmail?.crm_thread_id, selectedEmail?.status, selectedEmail?.id, toast]);
+    if (!tid || selectedEmail?.status !== "sent") return;
+    const iv = setInterval(() => void refetchThread({ showSpinner: false, silent: true }), 25000);
+    return () => clearInterval(iv);
+  }, [selectedEmail?.crm_thread_id, selectedEmail?.status, refetchThread]);
 
   const lastSentSubjectForContact = useCallback(
     (contactId: string) => {
@@ -400,6 +428,22 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
   return (
     <div className="p-4 lg:p-6 max-w-4xl mx-auto space-y-6">
+      {emailConfig && !emailConfig.resend_configured ? (
+        <div
+          className="flex gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-foreground"
+          role="status"
+        >
+          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+          <div>
+            <p className="font-medium">Outbound email not fully configured</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Set: {emailConfig.missing.join(", ")}. See{" "}
+              <code className="bg-muted px-1 rounded">docs/CRM_SETUP.md</code>.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Button type="button" variant="ghost" size="sm" className="mb-2 -ml-2 h-8" onClick={onBack}>
@@ -755,8 +799,27 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
           {selectedEmail?.status === "sent" && selectedEmail.crm_thread_id && (
             <div className="border rounded-lg p-4 space-y-2">
-              <span className="text-sm font-medium">Conversation</span>
-              {loadingThread ? (
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium">Conversation</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7"
+                  onClick={() => void refetchThread({ showSpinner: true })}
+                  disabled={loadingThread}
+                >
+                  {loadingThread ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                      Refresh
+                    </>
+                  )}
+                </Button>
+              </div>
+              {loadingThread && threadMessages.length === 0 ? (
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               ) : threadMessages.length === 0 ? (
                 <p className="text-xs text-muted-foreground">No thread messages yet (replies appear after inbound mail).</p>

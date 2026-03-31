@@ -182,3 +182,87 @@ export async function listCrmCompanies(search: string, limit = 50): Promise<
   params.set("limit", String(limit));
   return crmFetchJson(`/crm/companies?${params.toString()}`);
 }
+
+export interface CrmEmailConfig {
+  resend_configured: boolean;
+  missing: string[];
+}
+
+export async function getCrmEmailConfig(): Promise<CrmEmailConfig> {
+  return crmFetchJson<CrmEmailConfig>("/crm/email-config");
+}
+
+export interface CrmInboundRecentRow {
+  id: string;
+  thread_id: string;
+  subject: string | null;
+  text_body: string | null;
+  received_at: string | null;
+  created_at: string;
+  company_id: string;
+  company_name: string | null;
+  deal_id: string;
+  contact_id: string;
+  contact_email: string | null;
+}
+
+export async function getRecentInbound(limit = 50): Promise<CrmInboundRecentRow[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return crmFetchJson<CrmInboundRecentRow[]>(`/crm/inbound/recent?${params}`);
+}
+
+export interface CrmInboundUnmatchedRow {
+  id: string;
+  token_attempted: string | null;
+  from_email: string | null;
+  to_email: string | null;
+  subject: string | null;
+  provider_inbound_email_id: string | null;
+  created_at: string;
+}
+
+export async function getUnmatchedInbound(limit = 50): Promise<CrmInboundUnmatchedRow[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return crmFetchJson<CrmInboundUnmatchedRow[]>(`/crm/inbound/unmatched?${params}`);
+}
+
+export interface CrmBatchDraftRow {
+  email_id: string;
+  company_id: string;
+  contact_id: string;
+  orgnr: string;
+  subject: string;
+  company_name?: string;
+}
+
+export async function generateBatchEmails(payload: {
+  list_id: string;
+  user_instructions?: string;
+  reason_for_interest?: string;
+}): Promise<{
+  drafts: CrmBatchDraftRow[];
+  skipped: { orgnr?: string; company_id?: string; reason: string }[];
+}> {
+  return crmFetchJson("/crm/emails/generate-batch", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createExternalCompany(payload: {
+  name: string;
+  orgnr?: string;
+  website?: string;
+}): Promise<Record<string, unknown>> {
+  return crmFetchJson<Record<string, unknown>>("/crm/companies", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function ensureDealFromCompany(companyId: string): Promise<Record<string, unknown>> {
+  return crmFetchJson("/crm/deals/from-company", {
+    method: "POST",
+    body: JSON.stringify({ company_id: companyId }),
+  });
+}
