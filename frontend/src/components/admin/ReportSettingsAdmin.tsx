@@ -107,7 +107,8 @@ export default function ReportSettingsAdmin() {
             Retrieval limits
           </CardTitle>
           <p className="text-xs text-muted-foreground">
-            Control how much web data Deep Research fetches per run. Higher values improve report depth but increase cost and latency.
+            Shared for all users in this environment. Control how much web data Deep Research fetches per run. Higher
+            values improve report depth but increase cost and latency.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

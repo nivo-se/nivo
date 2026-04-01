@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAIRuns, useLists, useCompanies } from "@/lib/hooks/apiQueries";
+import { useQuery } from "@tanstack/react-query";
+import { useLists, useCompaniesWithTotal } from "@/lib/hooks/apiQueries";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
 import { getAnalysisRun, getAnalysisRuns } from "@/lib/api/analysis/service";
@@ -36,9 +37,13 @@ function AdminAccessDenied() {
 /** All data hooks live here so they only run for admins (Rules of Hooks). */
 function AdminDashboard() {
   const { user, session } = useAuth();
-  const { data: companies = [], isError: companiesError } = useCompanies({ limit: 100 });
+  const { data: universeData, isError: universeError } = useCompaniesWithTotal({ limit: 1 });
+  const universeTotal = universeData?.total ?? 0;
   const { data: lists = [], isError: listsError } = useLists();
-  const { data: runs = [], isError: runsError } = useAIRuns();
+  const { data: runs = [], isError: runsError } = useQuery({
+    queryKey: ["app", "aiRuns", "adminOverview", 500],
+    queryFn: () => getAnalysisRuns(500),
+  });
 
   const [whoami, setWhoami] = useState<WhoAmI | null>(null);
   const [whoamiError, setWhoamiError] = useState<string | null>(null);
@@ -59,7 +64,7 @@ function AdminDashboard() {
   const [urlTestPass, setUrlTestPass] = useState<boolean | null>(null);
 
   const apiErrors = getRecentApiErrors();
-  const hasError = companiesError || listsError || runsError || apiErrors.length > 0;
+  const hasError = universeError || listsError || runsError || apiErrors.length > 0;
 
   const runSmokeTests = async () => {
     setSmokeState({ step1: "running", step2: "idle", step3: "idle", step4: "idle", step5: "idle" });
@@ -160,19 +165,33 @@ function AdminDashboard() {
                 {session ? `Signed in (${user?.email ?? "user"})` : "Not signed in"}
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-4 pt-2">
-              <div>
-                <span className="text-foreground">getCompanies(): </span>
-                <span className="font-mono font-medium">{companies.length}</span>
-              </div>
-              <div>
-                <span className="text-foreground">getLists(): </span>
-                <span className="font-mono font-medium">{lists.length}</span>
-              </div>
-              <div>
-                <span className="text-foreground">getAIRuns(): </span>
-                <span className="font-mono font-medium">{runs.length}</span>
-              </div>
+            <div className="rounded-md border border-border/80 bg-muted/20 px-3 py-3 pt-2">
+              <p className="text-xs font-medium text-muted-foreground mb-2">API snapshot (live counts)</p>
+              <dl className="grid gap-3 sm:grid-cols-3 text-sm">
+                <div>
+                  <dt className="text-muted-foreground">Universe companies</dt>
+                  <dd className="mt-0.5 font-semibold tabular-nums text-foreground">
+                    {universeError ? "—" : universeTotal.toLocaleString()}
+                  </dd>
+                  <dd className="text-[11px] text-muted-foreground mt-0.5">Postgres total (default filters)</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">My Lists</dt>
+                  <dd className="mt-0.5 font-semibold tabular-nums text-foreground">
+                    {listsError ? "—" : lists.length.toLocaleString()}
+                  </dd>
+                  <dd className="text-[11px] text-muted-foreground mt-0.5">Lists visible to your session</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">AI Lab runs</dt>
+                  <dd className="mt-0.5 font-semibold tabular-nums text-foreground">
+                    {runsError ? "—" : runs.length.toLocaleString()}
+                  </dd>
+                  <dd className="text-[11px] text-muted-foreground mt-0.5">
+                    {runs.length >= 500 ? "Showing latest 500" : "Recent runs returned by API"}
+                  </dd>
+                </div>
+              </dl>
             </div>
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-sm font-medium text-foreground mb-2">MVP Smoke Test</p>
@@ -181,7 +200,7 @@ function AdminDashboard() {
                   Run smoke tests
                 </Button>
                 <span className="text-xs text-muted-foreground">
-                  1) getCompanies {smokeState.step1 === "pass" ? "✓" : smokeState.step1 === "fail" ? "✗" : ""}
+                  1) Universe query {smokeState.step1 === "pass" ? "✓" : smokeState.step1 === "fail" ? "✗" : ""}
                   {" "}2) getLists {smokeState.step2 === "pass" ? "✓" : smokeState.step2 === "fail" ? "✗" : ""}
                   {" "}3) getListItems {smokeState.step3 === "pass" ? "✓" : smokeState.step3 === "fail" ? "✗" : ""}
                   {" "}4) Universe query {smokeState.step4 === "pass" ? "✓" : smokeState.step4 === "fail" ? "✗" : ""}
@@ -237,23 +256,34 @@ function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-foreground mb-1">Companies (sample)</p>
-              <p className="text-base font-semibold">{companies.length}</p>
+              <p className="text-sm font-medium text-foreground mb-1">Universe companies</p>
+              <p className="text-2xl font-semibold tabular-nums tracking-tight">
+                {universeError ? "—" : universeTotal.toLocaleString()}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">Full count from the same source as Universe (Postgres).</p>
             </CardContent>
           </Card>
           <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-foreground mb-1">Lists</p>
-              <p className="text-base font-semibold">{lists.length}</p>
+              <p className="text-sm font-medium text-foreground mb-1">My Lists</p>
+              <p className="text-2xl font-semibold tabular-nums tracking-tight">
+                {listsError ? "—" : lists.length.toLocaleString()}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">Lists your account can access via the lists API.</p>
             </CardContent>
           </Card>
           <Card className="app-card">
             <CardContent className="p-6">
-              <p className="text-sm text-foreground mb-1">AI Runs</p>
-              <p className="text-base font-semibold">{runs.length}</p>
+              <p className="text-sm font-medium text-foreground mb-1">AI Lab runs</p>
+              <p className="text-2xl font-semibold tabular-nums tracking-tight">
+                {runsError ? "—" : runs.length.toLocaleString()}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {runs.length >= 500 ? "Capped at 500 most recent in this view." : "Runs returned by the analysis API (up to 500)."}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -263,11 +293,19 @@ function AdminDashboard() {
             <AdminPanel currentUser={user} />
           </TabsContent>
 
-          <TabsContent value="credits" className="mt-6">
+          <TabsContent value="credits" className="mt-6 space-y-3">
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              <span className="text-foreground font-medium">Team-wide.</span> Limits and usage here are stored in the backend and apply to
+              everyone using this deployment, not per browser profile.
+            </p>
             <AICreditsAdmin />
           </TabsContent>
 
-          <TabsContent value="report-settings" className="mt-6">
+          <TabsContent value="report-settings" className="mt-6 space-y-3">
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              <span className="text-foreground font-medium">Team-wide.</span> Deep Research retrieval limits are shared configuration for all
+              users on this environment.
+            </p>
             <ReportSettingsAdmin />
           </TabsContent>
 

@@ -736,6 +736,56 @@ export default function CrmPage() {
             </div>
           )}
 
+          {tab === "companies" && !showDetail && (
+            <div className="max-w-xl space-y-5 rounded-lg border border-border/70 bg-muted/15 px-5 py-5">
+              <div className="space-y-2">
+                <h2 className="text-sm font-semibold text-foreground">What fills Workspace</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  This area is the <span className="text-foreground">execution view for one CRM company</span>{" "}
+                  — drafts, threads, contacts, and deal fields. It stays empty until you open a record. Finding
+                  and prioritizing companies happens in Universe and Prospects; replying to matched inbound mail
+                  is under Inbox.
+                </p>
+              </div>
+              <Button type="button" variant="primary" size="sm" className="w-fit" onClick={() => setCompanyPickerOpen(true)}>
+                Browse CRM companies
+              </Button>
+              <div className="border-t border-border/60 pt-4">
+                <p className="text-xs font-medium text-foreground mb-2">Tie-in to daily work</p>
+                <ul className="text-xs text-muted-foreground space-y-2 list-none pl-0">
+                  <li>
+                    <Link to="/universe" className="text-foreground underline-offset-4 hover:underline">
+                      Universe
+                    </Link>
+                    {" · "}
+                    search and shortlist from the full set
+                  </li>
+                  <li>
+                    <Link to="/prospects" className="text-foreground underline-offset-4 hover:underline">
+                      Prospects
+                    </Link>
+                    {" · "}
+                    team statuses and notes before deep outreach
+                  </li>
+                  <li>
+                    <Link to="/" className="text-foreground underline-offset-4 hover:underline">
+                      Today
+                    </Link>
+                    {" · "}
+                    dashboard snapshot for the day
+                  </li>
+                  <li>
+                    <Link to="/crm?tab=inbox" className="text-foreground underline-offset-4 hover:underline">
+                      Inbox tab
+                    </Link>
+                    {" · "}
+                    replies already linked to deals
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
           {tab === "companies" && showDetail && (
             <CrmWorkspace companyIdParam={companyId!} onBack={() => navigate("/crm")} />
           )}

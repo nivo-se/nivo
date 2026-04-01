@@ -199,8 +199,8 @@ export async function duplicateAnalysisTemplate(templateId: string): Promise<Pro
   return mapTemplate(row);
 }
 
-export async function getAnalysisRuns(): Promise<AnalysisRun[]> {
-  const res = await getAnalysisRunsClient(50);
+export async function getAnalysisRuns(limit = 50): Promise<AnalysisRun[]> {
+  const res = await getAnalysisRunsClient(limit);
   const runs = Array.isArray(res.runs) ? (res.runs as AnalysisRunApi[]) : [];
   return runs.map((r) => mapAnalysisRunToRun(r));
 }

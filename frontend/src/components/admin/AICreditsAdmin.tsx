@@ -105,7 +105,8 @@ export default function AICreditsAdmin() {
             Spend limits
           </CardTitle>
           <p className="text-xs text-muted-foreground">
-            Set monthly caps on total AI spend (USD). Per-user limit is optional; leave empty for global cap only.
+            One backend config for the whole team. Set monthly caps on total AI spend (USD). Per-user limit is optional;
+            leave empty for global cap only.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
