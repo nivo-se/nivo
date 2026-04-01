@@ -17,9 +17,16 @@ import {
   ListFilter,
   ScanSearch,
   Menu,
+  CalendarDays,
+  Inbox as InboxIcon,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
+import {
+  isHideInDevelopmentNav,
+  isHideLegacySurfacesNav,
+  isNavUnifiedV1,
+} from "@/lib/featureFlags";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
@@ -31,6 +38,8 @@ interface NavItem {
   adminOnly?: boolean;
   /** Match this path only (no sub-routes). Use for parent items with nested pages. */
   exact?: boolean;
+  /** Unified nav: custom active state (e.g. alias routes vs real URLs after redirect). */
+  matchesLocation?: (pathname: string, search: string) => boolean;
 }
 
 const mainNavItems: NavItem[] = [
@@ -40,6 +49,45 @@ const mainNavItems: NavItem[] = [
   { path: "/lists", label: "My Lists", icon: List },
   { path: "/crm", label: "CRM", icon: Briefcase },
   { path: "/ai", label: "AI Lab", icon: Cpu },
+];
+
+/** Phase-1 unified nav: routes alias to existing pages until dedicated surfaces land. */
+const unifiedNavItems: NavItem[] = [
+  {
+    path: "/today",
+    label: "Today",
+    icon: CalendarDays,
+    matchesLocation: (pathname) => pathname === "/" || pathname === "/today",
+  },
+  {
+    path: "/companies",
+    label: "Companies",
+    icon: Globe,
+    matchesLocation: (pathname) => pathname === "/universe" || pathname === "/companies",
+  },
+  {
+    path: "/pipeline",
+    label: "Pipeline",
+    icon: Briefcase,
+    matchesLocation: (pathname, search) => {
+      if (!pathname.startsWith("/crm")) return false;
+      const tab = new URLSearchParams(search).get("tab");
+      return tab !== "inbox";
+    },
+  },
+  {
+    path: "/inbox",
+    label: "Inbox",
+    icon: InboxIcon,
+    matchesLocation: (pathname, search) =>
+      pathname.startsWith("/crm") && new URLSearchParams(search).get("tab") === "inbox",
+  },
+  {
+    path: "/research",
+    label: "Research",
+    icon: Cpu,
+    matchesLocation: (pathname) => pathname === "/ai" || pathname.startsWith("/ai/") || pathname === "/research",
+  },
 ];
 
 /** Shown above the "In development" divider */
@@ -57,11 +105,22 @@ const testingNavItems: NavItem[] = [
   { path: "/deep-research/runs", label: "Runs", icon: LayoutList, indent: true },
 ];
 
+function buildLegacyMainNav(): NavItem[] {
+  if (!isHideLegacySurfacesNav()) return mainNavItems;
+  return mainNavItems.filter((item) => item.path !== "/prospects");
+}
+
 export default function AppLayout() {
   const location = useLocation();
   const { user, userRole, signOut } = useAuth();
   const isAdmin = isAdminLinkVisible(userRole, user?.email, !!user);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const navUnified = isNavUnifiedV1();
+  const hideInDev = isHideInDevelopmentNav();
+  const primaryNavItems = navUnified ? unifiedNavItems : buildLegacyMainNav();
+  const showAboveDevNav = !navUnified && !isHideLegacySurfacesNav();
+  const showInDevelopmentSection = !hideInDev && !navUnified;
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -86,7 +145,9 @@ export default function AppLayout() {
     items.map((item) => {
       if (item.adminOnly && !isAdmin) return null;
       const Icon = item.icon;
-      const active = isActive(item.path, item.exact);
+      const active = item.matchesLocation
+        ? item.matchesLocation(location.pathname, location.search)
+        : isActive(item.path, item.exact);
       return (
         <Link
           key={`${item.path}-${item.label}`}
@@ -119,15 +180,21 @@ export default function AppLayout() {
         </Link>
       </div>
       <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain p-3">
-        {navLinks(mainNavItems, onNavigate)}
-        <div className="mt-3 space-y-0.5">{navLinks(aboveDevNavItems, onNavigate)}</div>
-        <div
-          className="mt-3 border-t border-sidebar-border/80 px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted"
-          role="presentation"
-        >
-          In development
-        </div>
-        {navLinks(testingNavItems, onNavigate)}
+        {navLinks(primaryNavItems, onNavigate)}
+        {showAboveDevNav ? (
+          <div className="mt-3 space-y-0.5">{navLinks(aboveDevNavItems, onNavigate)}</div>
+        ) : null}
+        {showInDevelopmentSection ? (
+          <>
+            <div
+              className="mt-3 border-t border-sidebar-border/80 px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted"
+              role="presentation"
+            >
+              In development
+            </div>
+            {navLinks(testingNavItems, onNavigate)}
+          </>
+        ) : null}
       </nav>
       <div className="mt-auto w-full shrink-0 pt-3">
         <div className="space-y-3 border-t border-sidebar-border/80 px-4 pb-4 pt-4">

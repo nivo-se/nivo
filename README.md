@@ -23,6 +23,31 @@ nivo/
 └── .env.example            # Env template (copy to .env)
 ```
 
+## Unified Nav v1 (feature flags)
+
+Phase-1 navigation unification is **off by default**. Set these in `frontend/.env.local` (or root `.env` if you load the same keys into Vite) to roll out safely:
+
+| Variable | Effect |
+|----------|--------|
+| `VITE_NAV_UNIFIED_V1=true` | Sidebar shows **Today**, **Companies**, **Pipeline**, **Inbox**, **Research** instead of Dashboard/Universe/Prospects/My Lists/CRM/AI Lab. |
+| `VITE_HIDE_IN_DEVELOPMENT=true` | Hides the **In development** sidebar section (screening / deep research preview links). |
+| `VITE_HIDE_LEGACY_SURFACES=true` | On **legacy** nav only: hides **Prospects** and **GPT target universe** from the sidebar. |
+
+**Route aliases** (always registered; bookmarks work regardless of flags): `/today` → `/`, `/companies` → `/universe`, `/pipeline` → `/crm`, `/inbox` → `/crm?tab=inbox`, `/research` → `/ai`, and `/research/*` → `/ai/*`.
+
+**Rollback:** set `VITE_NAV_UNIFIED_V1=false` (and optionally turn off the other two flags). No code deploy required beyond env.
+
+Implementation: [`frontend/src/lib/featureFlags.ts`](frontend/src/lib/featureFlags.ts), [`frontend/src/pages/default/AppLayout.tsx`](frontend/src/pages/default/AppLayout.tsx), [`frontend/src/App.tsx`](frontend/src/App.tsx).
+
+## Dev API: laptop/iMac + Mac mini on LAN
+
+- **Mac mini (server):** configure **repo root `.env`** only (`DATABASE_*`, `OPENAI_API_KEY`, etc.) and run the API there. No need to duplicate that in the laptop’s frontend env.
+- **Laptop / iMac:** in **`frontend/.env.local`** (gitignored), set **`VITE_DEV_API_PROXY_TARGET=http://<mini-ip>:8000`**. Leave **`VITE_API_BASE_URL` unset** so the browser uses same-origin `/api` and Vite proxies to the mini (avoids CORS churn and no URL flipping when you move between machines).
+- **Same machine as API:** omit `VITE_DEV_API_PROXY_TARGET` or set it to `http://127.0.0.1:8000`.
+- **Production (Vercel, etc.):** set **`VITE_API_BASE_URL`** to the public API; there is no Vite proxy.
+
+Details: [`frontend/.env.example`](frontend/.env.example), [`frontend/vite.config.ts`](frontend/vite.config.ts).
+
 ## 📚 Documentation
 
 **Full doc index:** [docs/README.md](docs/README.md) — setup, data source of truth, API, smoke tests, and production checklists.

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n server,vite \"tsx server/enhanced-server.ts\" \"wait-on tcp:127.0.0.1:3001 && vite\"",
+    "dev": "concurrently -n server,vite \"tsx server/enhanced-server.ts\" \"npx wait-on tcp:127.0.0.1:3001 && vite\"",
     "start": "tsx server/enhanced-server.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",

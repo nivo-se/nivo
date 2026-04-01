@@ -28,7 +28,7 @@ The backend also exposes REST endpoints you can call with curl or Postman (see [
 
 ## 3. Environment variables
 
-Set these in the **root `.env`** (or `frontend/.env.local`). The enhanced server loads root `.env` first, then `frontend/.env.local`.
+Put **secrets and shared backend config** (`OPENAI_API_KEY`, `POSTGRES_*`, `DATABASE_URL`, etc.) in the **repo root `.env`**. Use **`frontend/.env.local` only for `VITE_*` overrides** (API URL, feature flags). The enhanced server loads root `.env` first, then `frontend/.env.local`.
 
 ### Required for CRM API and page
 

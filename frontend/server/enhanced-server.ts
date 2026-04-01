@@ -60,7 +60,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(__dirname, '../..')
 
-// Load environment: project root .env first (Mac Mini / single .env), then frontend/.env.local override
+// Load environment: project root .env first (secrets, OPENAI_API_KEY, Postgres), then frontend/.env.local for Vite-only overrides (VITE_*).
 config({ path: path.resolve(PROJECT_ROOT, '.env') })
 config({ path: path.resolve(__dirname, '../.env.local') })
 
@@ -83,8 +83,12 @@ function getCrmDb() {
 }
 registerCrmRoutes(app, getCrmDb)
 
-// FastAPI backend URL for proxying lists, views, universe, etc.
-const FASTAPI_BACKEND = process.env.FASTAPI_BACKEND_URL || process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+// FastAPI backend URL for proxying lists, views, universe, etc. (same target as Vite /api proxy in dev)
+const FASTAPI_BACKEND =
+  process.env.FASTAPI_BACKEND_URL ||
+  process.env.VITE_API_BASE_URL ||
+  process.env.VITE_DEV_API_PROXY_TARGET ||
+  "http://127.0.0.1:8000";
 
 // Proxy /api/lists, /api/views, /api/labels, /api/prospects, /api/universe to FastAPI backend
 const PROXY_PREFIXES = ['/api/lists', '/api/views', '/api/labels', '/api/prospects', '/api/universe', '/api/companies/', '/api/status', '/api/admin', '/api/home', '/api/coverage', '/api/filters', '/api/analysis/']
@@ -135,7 +139,7 @@ app.get('/api/ai-status', (_req, res) => {
     crmConfigured,
     crmDatabase: dbUrl ? 'DATABASE_URL' : `Postgres ${dbHost}:${dbPort}/${dbName}`,
     message: !openaiConfigured
-      ? 'Set OPENAI_API_KEY in .env (project root) or frontend/.env.local'
+      ? 'Set OPENAI_API_KEY in .env at the project root (do not put API keys in frontend/.env.local)'
       : !crmConfigured
         ? 'Set POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD for CRM'
         : 'AI and CRM (Postgres) configured',
@@ -3203,7 +3207,7 @@ app.listen(port, () => {
   console.log(`🚀 Enhanced AI Analysis Server running on http://localhost:${port}`)
   console.log('✨ Features: Enhanced Codex AI analysis with Swedish localization')
   console.log('📊 Features: Multi-model valuation engine with EV vs Equity handling')
-  console.log(`🔑 AI (OpenAI): ${openaiOk ? 'configured' : 'NOT CONFIGURED — set OPENAI_API_KEY in .env or frontend/.env.local'}`)
+  console.log(`🔑 AI (OpenAI): ${openaiOk ? 'configured' : 'NOT CONFIGURED — set OPENAI_API_KEY in project root .env'}`)
   console.log(`🔑 Postgres: ${pgOk ? 'configured' : 'NOT CONFIGURED — set DATABASE_URL or POSTGRES_*'}`)
   console.log(`   Debug: GET http://localhost:${port}/api/ai-status`)
 })

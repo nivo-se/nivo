@@ -223,7 +223,7 @@ function AdminDashboard() {
                         <p className="font-medium mb-1">Troubleshooting (network/CORS):</p>
                         <ol className="list-decimal list-inside text-xs space-y-0.5">
                           <li>Start backend: <code className="bg-destructive/15 px-1 rounded">./scripts/start_backend.sh</code> (default port 8000)</li>
-                          <li>Ensure <code className="bg-destructive/15 px-1 rounded">VITE_API_BASE_URL</code> in frontend <code className="bg-destructive/15 px-1 rounded">.env</code> matches backend (local: <code className="bg-destructive/15 px-1 rounded">http://127.0.0.1:8000</code>)</li>
+                          <li>Dev: omit <code className="bg-destructive/15 px-1 rounded">VITE_API_BASE_URL</code>; set <code className="bg-destructive/15 px-1 rounded">VITE_DEV_API_PROXY_TARGET</code> in <code className="bg-destructive/15 px-1 rounded">frontend/.env.local</code> to FastAPI (LAN mini e.g. <code className="bg-destructive/15 px-1 rounded">http://192.168.x.x:8000</code>, same machine <code className="bg-destructive/15 px-1 rounded">http://127.0.0.1:8000</code>). Prod: set <code className="bg-destructive/15 px-1 rounded">VITE_API_BASE_URL</code>.</li>
                           <li>For Universe/Lists: set <code className="bg-destructive/15 px-1 rounded">DATABASE_SOURCE=postgres</code> and run migrations</li>
                         </ol>
                       </div>

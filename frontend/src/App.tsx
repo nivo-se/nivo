@@ -5,6 +5,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 
+/** Phase-1 migration: /research/* -> /ai/* (same suffix + query). */
+function ResearchAliasRedirect() {
+  const loc = useLocation();
+  const prefix = "/research";
+  if (!loc.pathname.startsWith(prefix)) {
+    return <Navigate to="/ai" replace />;
+  }
+  const rest = loc.pathname.slice(prefix.length);
+  const target = "/ai" + (rest || "");
+  return <Navigate to={`${target}${loc.search}`} replace />;
+}
+
 function RedirectWithParam({ to, param }: { to: string; param: string }) {
   const params = useParams();
   const value = params[param];
@@ -178,6 +190,13 @@ const App = () => (
             {/* Default UI: landing for guests, app for logged-in users */}
             <Route path="/" element={<RootOrLanding />}>
               <Route index element={<WorkDashboard />} />
+              {/* Migration aliases (phase-1): unified product vocabulary -> existing routes */}
+              <Route path="today" element={<Navigate to="/" replace />} />
+              <Route path="companies" element={<Navigate to="/universe" replace />} />
+              <Route path="pipeline" element={<Navigate to="/crm" replace />} />
+              <Route path="inbox" element={<Navigate to="/crm?tab=inbox" replace />} />
+              <Route path="research" element={<Navigate to="/ai" replace />} />
+              <Route path="research/*" element={<ResearchAliasRedirect />} />
               <Route path="prospects" element={<Prospects />} />
               <Route path="universe" element={<Universe />} />
               <Route path="screening-campaigns" element={<ScreeningCampaignsPage />} />

@@ -58,7 +58,8 @@ services:
       # Must use Docker service name — localhost inside the API container is not host Redis
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "127.0.0.1:8000:8000"  # Explicit host binding for cloudflared tunnel
+      # 0.0.0.0: LAN dev (laptop Vite proxy → mini:8000). Cloudflared on the mini still uses http://127.0.0.1:8000.
+      - "0.0.0.0:8000:8000"
     networks:
       - nivo_net
     depends_on:
