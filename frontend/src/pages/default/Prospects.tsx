@@ -349,7 +349,9 @@ export default function Prospects() {
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="mb-8">
           <h1 className="text-base font-semibold text-foreground mb-2">Prospects</h1>
-          <p className="text-sm text-muted-foreground">Team pipeline • {prospects.length} companies</p>
+          <p className="text-sm text-muted-foreground">
+            Companies in the prospect list · {prospects.length} {prospects.length === 1 ? "company" : "companies"}
+          </p>
         </div>
 
         <div className="mb-6 flex items-center gap-4">
@@ -371,14 +373,14 @@ export default function Prospects() {
         </div>
 
         {isLoading ? (
-          <div className="text-sm text-muted-foreground">Loading prospects...</div>
+          <div className="text-sm text-muted-foreground">Loading prospects…</div>
         ) : filteredProspects.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <p className="text-muted-foreground mb-4">
                 {prospects.length === 0
-                  ? "No prospects yet. Add companies from Universe or Lists to your pipeline."
-                  : "No prospects found with this status"}
+                  ? "No prospects yet. Add companies from Universe or My Lists."
+                  : "No prospects match this status"}
               </p>
               <Link to="/universe">
                 <Button variant="outline">Go to Universe</Button>

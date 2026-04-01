@@ -66,8 +66,14 @@ const unifiedNavItems: NavItem[] = [
     matchesLocation: (pathname) => pathname === "/universe" || pathname === "/companies",
   },
   {
-    path: "/pipeline",
-    label: "Pipeline",
+    path: "/prospects",
+    label: "Prospects",
+    icon: Target,
+    matchesLocation: (pathname) => pathname === "/prospects",
+  },
+  {
+    path: "/crm",
+    label: "CRM",
     icon: Briefcase,
     matchesLocation: (pathname, search) => {
       if (!pathname.startsWith("/crm")) return false;

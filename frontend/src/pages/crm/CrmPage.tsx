@@ -23,6 +23,19 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -34,15 +47,12 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import {
   Search,
   Loader2,
   Building2,
-  Inbox,
-  AlertTriangle,
-  ListPlus,
   Plus,
+  ChevronDown,
   RefreshCw,
 } from "lucide-react";
 import { getAllLists } from "@/lib/api/lists/service";
@@ -150,6 +160,7 @@ export default function CrmPage() {
   const [extOrgnr, setExtOrgnr] = useState("");
   const [extWebsite, setExtWebsite] = useState("");
   const [extBusy, setExtBusy] = useState(false);
+  const [companyPickerOpen, setCompanyPickerOpen] = useState(false);
 
   const loadCompanies = useCallback(async () => {
     setLoadingCompanies(true);
@@ -217,8 +228,10 @@ export default function CrmPage() {
   }, [tab, loadUnmatched]);
 
   const showDetail = !!companyId;
-  /** Company list sidebar is only relevant on the Companies tab */
-  const showCompanySidebar = tab === "companies";
+
+  useEffect(() => {
+    if (tab !== "companies") setCompanyPickerOpen(false);
+  }, [tab]);
 
   const handleBatchGenerate = async () => {
     if (!batchListId) {
@@ -296,134 +309,184 @@ export default function CrmPage() {
 
   return (
     <div className="h-full overflow-hidden app-bg flex flex-col">
-      <header className="shrink-0 border-b border-sidebar-border bg-sidebar-bg px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-base font-semibold text-foreground tracking-tight">Origination CRM</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Outreach, inbound replies, and batch drafts from My Lists.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <div className="overflow-x-auto max-w-[100vw] sm:max-w-none pb-1 -mb-1">
-            <Tabs value={tab} onValueChange={(v) => navigateToTab(v as CrmTab)}>
-              <TabsList className="h-9 inline-flex w-max min-w-0">
-                <TabsTrigger value="companies" className="text-xs gap-1">
-                  <Building2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                  Companies
+      <header className="shrink-0 border-b border-sidebar-border bg-sidebar-bg px-4 py-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <h1 className="text-base font-semibold text-foreground tracking-tight">Origination CRM</h1>
+            <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
+              Inbound, outreach, and batch drafts from My Lists.
+            </p>
+          </div>
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-end sm:gap-3">
+            <div className="min-w-0 max-w-full overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] sm:overflow-visible">
+              <Tabs value={tab} onValueChange={(v) => navigateToTab(v as CrmTab)} className="w-max min-w-full sm:min-w-0">
+                <TabsList className="inline-flex h-auto w-max min-w-full justify-start gap-0 rounded-none border-b border-border bg-transparent p-0 sm:min-w-0">
+                <TabsTrigger
+                  value="companies"
+                  className="rounded-none border-b-2 border-transparent px-3 py-2 text-xs font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:text-sm"
+                >
+                  Workspace
                 </TabsTrigger>
-                <TabsTrigger value="inbox" className="text-xs gap-1">
-                  <Inbox className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <TabsTrigger
+                  value="inbox"
+                  className="rounded-none border-b-2 border-transparent px-3 py-2 text-xs font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:text-sm"
+                >
                   Inbox
                 </TabsTrigger>
-                <TabsTrigger value="unmatched" className="text-xs gap-1">
-                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <TabsTrigger
+                  value="unmatched"
+                  className="rounded-none border-b-2 border-transparent px-3 py-2 text-xs font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:text-sm"
+                >
                   Unmatched
                 </TabsTrigger>
-                <TabsTrigger value="batch" className="text-xs gap-1">
-                  <ListPlus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <TabsTrigger
+                  value="batch"
+                  className="rounded-none border-b-2 border-transparent px-3 py-2 text-xs font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:text-sm"
+                >
                   Batch
                 </TabsTrigger>
               </TabsList>
             </Tabs>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-9 w-full shrink-0 gap-1 sm:w-auto"
+                  aria-label="Company actions"
+                >
+                  Company
+                  <ChevronDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem
+                  onClick={() => setCompanyPickerOpen(true)}
+                  className="gap-2"
+                >
+                  <Building2 className="h-3.5 w-3.5" aria-hidden />
+                  {showDetail ? "Switch company…" : "Browse companies…"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setExternalOpen(true)} className="gap-2">
+                  <Plus className="h-3.5 w-3.5" aria-hidden />
+                  Add external company…
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <Button type="button" variant="outline" size="sm" className="h-9 shrink-0" onClick={() => setExternalOpen(true)}>
-            <Plus className="h-3.5 w-3.5 mr-1" aria-hidden />
-            Add company
-          </Button>
         </div>
       </header>
 
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
-        {showCompanySidebar ? (
-        <aside className="w-full lg:w-72 shrink-0 border-r border-sidebar-border flex flex-col bg-sidebar-bg shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.12)]">
-          <div className="p-4 border-b border-sidebar-border/80 shrink-0 space-y-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" aria-hidden />
-              <Input
-                placeholder="Search companies…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 h-9"
-                aria-label="Search companies"
-              />
-            </div>
-            {listError ? (
-              <Alert variant="destructive" className="py-2">
-                <AlertTitle className="text-xs">Could not load companies</AlertTitle>
-                <AlertDescription className="text-xs flex flex-col gap-2">
-                  <span className="break-words">{listError}</span>
-                  <Button type="button" variant="outline" size="sm" className="h-7 w-fit" onClick={() => void loadCompanies()}>
-                    <RefreshCw className="h-3 w-3 mr-1" />
-                    Retry
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            ) : null}
-          </div>
-          <div className="flex-1 min-h-0 overflow-auto">
-            {loadingCompanies ? (
-              <div className="p-4 space-y-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full" />
-                ))}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <Sheet open={companyPickerOpen} onOpenChange={setCompanyPickerOpen}>
+            <SheetContent side="left" className="flex w-full flex-col gap-0 border-sidebar-border bg-sidebar-bg p-0 sm:max-w-sm">
+              <SheetHeader className="space-y-1 border-b border-sidebar-border px-4 py-4 pr-12 text-left">
+                <SheetTitle>Browse companies</SheetTitle>
+                <SheetDescription>
+                  Search and open a company workspace for outreach and threads.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="shrink-0 space-y-2 border-b border-sidebar-border/80 p-4">
+                  <label htmlFor="crm-company-search" className="text-xs font-medium text-muted-foreground">
+                    Search CRM companies
+                  </label>
+                  <div className="relative">
+                    <Search
+                      className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
+                    />
+                    <Input
+                      id="crm-company-search"
+                      placeholder="Company name…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="h-9 pl-8"
+                      autoComplete="off"
+                    />
+                  </div>
+                  {listError ? (
+                    <Alert variant="destructive" className="py-2">
+                      <AlertTitle className="text-xs">Could not load companies</AlertTitle>
+                      <AlertDescription className="flex flex-col gap-2 text-xs">
+                        <span className="break-words">{listError}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-fit"
+                          onClick={() => void loadCompanies()}
+                        >
+                          <RefreshCw className="mr-1 h-3 w-3" />
+                          Retry
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  ) : null}
+                </div>
+                <div className="min-h-0 flex-1 overflow-auto">
+                  {loadingCompanies ? (
+                    <div className="space-y-2 p-4">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Skeleton key={i} className="h-10 w-full" />
+                      ))}
+                    </div>
+                  ) : companies.length === 0 ? (
+                    <div className="p-6 text-center text-sm text-muted-foreground">
+                      No companies found. Add via Deep Research or External company.
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">Company</TableHead>
+                          <TableHead className="text-xs hidden sm:table-cell">Status</TableHead>
+                          <TableHead className="text-xs hidden md:table-cell">Last contact</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {companies.map((c) => (
+                          <TableRow
+                            key={c.id}
+                            className={`cursor-pointer ${companyId === c.id ? "bg-muted/50" : "hover:bg-muted/30"}`}
+                            onClick={() => {
+                              navigate(`/crm/company/${c.id}`);
+                              setCompanyPickerOpen(false);
+                            }}
+                          >
+                            <TableCell className="py-2">
+                              <div className="max-w-[140px] truncate text-sm font-medium" title={c.name}>
+                                {c.name}
+                              </div>
+                              {c.industry ? (
+                                <div className="max-w-[140px] truncate text-xs text-muted-foreground">{c.industry}</div>
+                              ) : null}
+                            </TableCell>
+                            <TableCell className="hidden py-2 sm:table-cell">
+                              {c.deal_status ? (
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                  {formatStatus(c.deal_status)}
+                                </Badge>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="hidden py-2 text-xs text-muted-foreground md:table-cell">
+                              {formatDate(c.last_contacted_at)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
               </div>
-            ) : companies.length === 0 ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">
-                No companies found. Add via Deep Research or External company.
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs">Company</TableHead>
-                    <TableHead className="text-xs hidden sm:table-cell">Status</TableHead>
-                    <TableHead className="text-xs hidden md:table-cell">Last contact</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {companies.map((c) => (
-                    <TableRow
-                      key={c.id}
-                      className={`cursor-pointer ${companyId === c.id ? "bg-muted/50" : "hover:bg-muted/30"}`}
-                      onClick={() => navigate(`/crm/company/${c.id}`)}
-                    >
-                      <TableCell className="py-2">
-                        <div className="font-medium text-sm truncate max-w-[140px]" title={c.name}>
-                          {c.name}
-                        </div>
-                        {c.industry && (
-                          <div className="text-xs text-muted-foreground truncate max-w-[140px]">
-                            {c.industry}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-2 hidden sm:table-cell">
-                        {c.deal_status ? (
-                          <Badge variant="secondary" className="text-xs font-normal">
-                            {formatStatus(c.deal_status)}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-2 hidden md:table-cell text-xs text-muted-foreground">
-                        {formatDate(c.last_contacted_at)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </div>
-        </aside>
-        ) : null}
+            </SheetContent>
+        </Sheet>
 
-        <main
-          className={cn(
-            "flex-1 min-w-0 overflow-auto p-4 md:p-6",
-            !showCompanySidebar && "lg:px-8"
-          )}
-        >
+        <main className="flex-1 min-w-0 overflow-auto p-4 md:p-6 lg:px-8">
           {tab === "inbox" && (
             <div className="max-w-5xl mx-auto space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -671,20 +734,6 @@ export default function CrmPage() {
                 </>
               ) : null}
             </div>
-          )}
-
-          {tab === "companies" && !showDetail && (
-            <Card className="max-w-lg border-dashed bg-muted/20">
-              <CardHeader>
-                <CardTitle className="text-base">Company workspace</CardTitle>
-                <CardDescription>
-                  Pick a company in the list to draft and send outreach, or switch to{" "}
-                  <strong className="text-foreground font-medium">Inbox</strong> for replies,{" "}
-                  <strong className="text-foreground font-medium">From My List</strong> for batch drafts, and{" "}
-                  <strong className="text-foreground font-medium">External company</strong> to add a prospect.
-                </CardDescription>
-              </CardHeader>
-            </Card>
           )}
 
           {tab === "companies" && showDetail && (

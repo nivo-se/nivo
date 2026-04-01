@@ -34,6 +34,8 @@ export interface LibrarySidebarProps {
   onNewList?: () => void;
   onModeChange?: (mode: LibraryMode) => void;
   className?: string;
+  /** When true (e.g. inside a sheet), omit the duplicate "Saved Views" title bar. */
+  embeddedInSheet?: boolean;
 }
 
 export function LibrarySidebar({
@@ -46,6 +48,7 @@ export function LibrarySidebar({
   onNewList,
   onModeChange,
   className,
+  embeddedInSheet = false,
 }: LibrarySidebarProps) {
   const [search, setSearch] = useState("");
   const [listsOpen, setListsOpen] = useState(true);
@@ -107,18 +110,21 @@ export function LibrarySidebar({
 
   if (layout === "universe") {
     return (
-        <div className={cn("flex flex-col border-r bg-muted/30 min-h-0 min-w-0 overflow-hidden", className)}>
+        <div className={cn("flex flex-col border-r bg-muted/30 min-h-0 min-w-0 overflow-hidden", embeddedInSheet && "border-0 bg-transparent", className)}>
+          {!embeddedInSheet ? (
           <div className="p-3 border-b shrink-0">
             <div className="text-sm font-medium">Saved Views</div>
           </div>
+          ) : null}
           <div className="p-2 shrink-0">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search…"
+                placeholder="Filter views & lists…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 h-9"
+                aria-label="Filter saved views and lists by name"
               />
             </div>
           </div>

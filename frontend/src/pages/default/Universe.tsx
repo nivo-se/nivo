@@ -19,6 +19,13 @@ import { includeRulesToBackendFilters, excludeRulesToBackendFilters } from "@/li
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { FilterBuilder } from "@/components/default/FilterBuilder";
 import { SaveListDialog } from "@/components/default/SaveListDialog";
 import { AddToListDropdown } from "@/components/default/AddToListDropdown";
@@ -29,7 +36,7 @@ import { ScoreExplanationTooltip } from "@/components/universe/ScoreExplanationT
 import { LibrarySidebar } from "@/components/library";
 import type { SavedView } from "@/lib/services/viewsService";
 import type { SavedList } from "@/lib/services/listsService";
-import { ChevronDown, ChevronUp, Send } from "lucide-react";
+import { ChevronDown, ChevronUp, Library, Send } from "lucide-react";
 import { getUniverseCompaniesWithTotal } from "@/lib/api/universe/service";
 
 const COMPANIES_PER_PAGE = 50;
@@ -203,7 +210,7 @@ export default function Universe() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [snapshotOrgnr, setSnapshotOrgnr] = useState<string | null>(null);
   const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{
     include: { id?: string; type: string; rules: unknown[] };
     exclude: { id?: string; type: string; rules: unknown[] };
@@ -448,37 +455,68 @@ export default function Universe() {
       </div>
 
       <div className="flex-1 min-h-0 flex overflow-hidden">
-        {sidebarOpen && (
-          <div className="w-56 shrink-0 border-r border-sidebar-border bg-sidebar-bg shadow-[4px_0_24px_-12px_hsl(var(--primary)/0.1)]">
+      <Sheet open={libraryOpen} onOpenChange={setLibraryOpen}>
+        <SheetContent side="left" className="flex w-full flex-col gap-0 p-0 sm:max-w-sm">
+          <SheetHeader className="space-y-1 border-b border-border px-4 py-4 pr-12 text-left">
+            <SheetTitle>Saved views & lists</SheetTitle>
+            <SheetDescription>
+              Pick a view to load its filters and search here. Pick a list to open it in My Lists.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <LibrarySidebar
               layout="universe"
               mode="views"
+              embeddedInSheet
               selectedId={selectedViewId}
+              className="min-h-0 flex-1"
               onSelectView={(view: SavedView) => {
                 setSelectedViewId(view.id);
                 applyViewToState(view);
+                setLibraryOpen(false);
               }}
               onSelectList={(list: SavedList) => {
+                setLibraryOpen(false);
                 navigate(`/lists/${list.id}`);
               }}
             />
           </div>
-        )}
+        </SheetContent>
+      </Sheet>
+
       <div className="flex-1 min-h-0 overflow-auto">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 h-full min-h-0 flex flex-col gap-4">
         <div className="shrink-0 sticky top-0 z-20 bg-background/90 backdrop-blur-sm supports-[backdrop-filter]:bg-background/75 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 pt-2 pb-4 border-b border-border/80 space-y-4">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <Input
-                placeholder="Search by name..."
-                value={searchInput}
-                onChange={(e) => {
-                  setSearchInput(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-72 max-w-full"
-              />
-              <div className="flex gap-3 shrink-0">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+              <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end sm:gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full shrink-0 sm:w-auto"
+                  onClick={() => setLibraryOpen(true)}
+                >
+                  <Library className="mr-2 h-4 w-4" />
+                  Saved views & lists
+                </Button>
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <label htmlFor="universe-company-search" className="text-xs font-medium text-muted-foreground">
+                    Search companies
+                  </label>
+                  <Input
+                    id="universe-company-search"
+                    placeholder="Company name…"
+                    value={searchInput}
+                    onChange={(e) => {
+                      setSearchInput(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full max-w-md"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2 sm:gap-3">
               <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
                 {showFilters ? "Hide" : "Show"} Filters
               </Button>
@@ -600,21 +638,19 @@ export default function Universe() {
                 const cagr = calculateRevenueCagr(company);
                 const cagrNum = cagr ?? 0;
                 return (
-                  <tr key={company.orgnr} className="hover:bg-muted/40 transition-colors">
-                    <td className="px-3 py-2">
+                  <tr
+                    key={company.orgnr}
+                    className="cursor-pointer hover:bg-muted/40 transition-colors"
+                    onClick={() => setSnapshotOrgnr(company.orgnr)}
+                  >
+                    <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedCompanies.has(company.orgnr)}
                         onCheckedChange={() => toggleSelectCompany(company.orgnr)}
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => setSnapshotOrgnr(company.orgnr)}
-                        className="font-medium text-foreground hover:text-foreground text-left"
-                      >
-                        {company.display_name}
-                      </button>
+                      <span className="font-medium text-foreground">{company.display_name}</span>
                     </td>
                     <td className="px-3 py-2 text-foreground">{company.industry_label}</td>
                     <td className="px-3 py-2 text-right text-foreground font-mono tabular-nums" title={company.latest_year ? `FY${company.latest_year}` : undefined}>
@@ -671,7 +707,7 @@ export default function Universe() {
                         <span className="text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                       <AddToListDropdown orgnrs={[company.orgnr]} />
                     </td>
                   </tr>
