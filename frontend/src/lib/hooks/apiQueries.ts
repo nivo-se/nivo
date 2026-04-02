@@ -218,7 +218,7 @@ export function usePromptTemplate(templateId: string | undefined, enabled = true
 export function useAIRuns() {
   return useQuery({
     queryKey: ["app", "aiRuns"],
-    queryFn: getAnalysisRuns,
+    queryFn: () => getAnalysisRuns(50),
   });
 }
 
