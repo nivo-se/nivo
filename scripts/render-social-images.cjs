@@ -24,8 +24,8 @@ const html = `<!DOCTYPE html>
 <div id="og-card" style="width:1200px;height:630px;background:#F7F5F2;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#2E2A2B;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;box-sizing:border-box;">
   <h1 style="font-size:108px;font-weight:700;margin:0;letter-spacing:-0.035em;line-height:1;">Nivo</h1>
   <div style="width:72px;height:4px;background:#596152;margin:26px 0 22px;"></div>
-  <p style="font-size:28px;font-weight:500;margin:0;max-width:1000px;text-align:center;line-height:1.35;opacity:0.96;">Swedish investors backing stable, profitable companies.</p>
-  <p style="font-size:19px;font-weight:500;margin:20px 0 0;max-width:980px;text-align:center;line-height:1.42;opacity:0.78;">We acquire with respect for what you&apos;ve built and focus on practical ways to strengthen the business together.</p>
+  <p style="font-size:28px;font-weight:500;margin:0;max-width:1000px;text-align:center;line-height:1.35;opacity:0.96;">Nivo - backing great companies</p>
+  <p style="font-size:19px;font-weight:500;margin:20px 0 0;max-width:980px;text-align:center;line-height:1.42;opacity:0.78;">Nivo backing stable, profitable companies. We acquire with respect for what you&apos;ve built and focus on practical ways to strengthen the business together.</p>
 </div>
 <div id="og-square" style="width:512px;height:512px;background:#F7F5F2;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
   ${nMarkSvg(300)}

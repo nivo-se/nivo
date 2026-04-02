@@ -1,6 +1,6 @@
 # Origination CRM Foundation (v1)
 
-This module adds a CRM layer on top of `deep_research` company intelligence data.
+This module adds a CRM layer on top of `deep_research` company and research data.
 
 ## Environment variables
 

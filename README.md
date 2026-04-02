@@ -1,6 +1,6 @@
-# Nivo - Advanced Swedish Company Intelligence Platform
+# Nivo
 
-A comprehensive AI-powered system for analyzing, valuing, and managing Swedish companies with advanced financial modeling, multi-model valuation engine, and intelligent company insights powered by GPT-4.
+**Nivo - backing great companies.** This monorepo powers our internal sourcing, analysis, and investment operations: a **Vite + React** SPA, **FastAPI** API, and **Postgres** as the source of truth. It covers company and financial data, multi-model valuation, AI-assisted research and screening, lists and pipeline views, and CRM-style workflows—built so analysis stays traceable to sources and the database schema evolves through migrations in `database/`.
 
 ## 🏗️ Project Structure
 
@@ -211,13 +211,6 @@ For issues and questions:
 
 **Built with React, TypeScript, Vite, FastAPI, Postgres, and OpenAI**
 
-## 🎉 Production Ready
+## Production
 
-The Nivo platform is now a comprehensive, production-ready Swedish company intelligence system with:
-- **Advanced AI capabilities** for company analysis
-- **Multi-model valuation engine** for financial assessment  
-- **Complete saved lists functionality** for company management
-- **Secure, scalable architecture** with proper error handling
-- **Comprehensive documentation** for easy maintenance and development
-
-**All systems are operational and ready for live deployment!** 🚀
+The app is deployed with the SPA on Vercel and the API plus Postgres on our own host (see [docs/DEPLOY_MAC_MINI.md](docs/DEPLOY_MAC_MINI.md)). Use [docs/PRODUCTION_ENV_CHECKLIST.md](docs/PRODUCTION_ENV_CHECKLIST.md) and `GET /api/status/config` after changes.

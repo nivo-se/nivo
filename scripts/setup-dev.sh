@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🚀 Setting up Nivo Intelligence Development Environment"
+echo "🚀 Setting up Nivo development environment"
 echo ""
 
 # Check if Redis is running

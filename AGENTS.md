@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository contains the Nivo deep research platform.
+This repository is the Nivo monorepo: apps, API, and deep research tooling.
 
 All coding agents working in this repo must follow the implementation architecture defined in `docs/deep_research`.
 
@@ -23,7 +23,7 @@ When working on the Nivo deep research system, always read and follow:
 
 ## Project intent
 
-This system is an evidence-first, agentic research and investment analysis platform.
+This system is evidence-first, agentic research and investment analysis. Do not describe Nivo as an “intelligence platform” in user-facing or marketing copy.
 
 It must:
 

@@ -138,7 +138,7 @@ def main() -> int:
             service = body.get("service", "")
             if "Deep Research" in service:
                 print(f"   Health: OK — but wrong backend: '{service}'")
-                print("   ⚠️  Universe needs the full Nivo Intelligence API (backend.api.main), not the Deep Research–only app.")
+                print("   ⚠️  Universe needs the full Nivo API (backend.api.main), not the Deep Research–only app.")
                 print("   Stop the current process on 8000 and run: ./scripts/start-backend.sh")
                 ok = False
             else:

@@ -1,5 +1,5 @@
 """
-FastAPI application for Nivo Intelligence API
+FastAPI application for the Nivo API.
 """
 import re
 
@@ -18,8 +18,8 @@ env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
 app = FastAPI(
-    title="Nivo Intelligence API",
-    description="API for company intelligence, enrichment, and AI analysis",
+    title="Nivo API",
+    description="Company data, enrichment, analysis, and research workflows",
     version="0.1.0"
 )
 
@@ -124,7 +124,7 @@ def ping():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "nivo-intelligence-api"}
+    return {"status": "healthy", "service": "nivo-api"}
 
 # Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
 from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, email_webhooks, export, filters, gpt_target_universe, home, jobs, labels, lists, me, prospects, report_settings, screening, screening_campaigns, screening_run_shortlist, shortlists, status, analysis, saved_lists, universe, views  # noqa: E402

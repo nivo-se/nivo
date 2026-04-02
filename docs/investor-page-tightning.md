@@ -81,7 +81,7 @@ We acquire profitable Nordic SMEs with strong products, loyal customers and prov
 
 Many of these companies operate with manual workflows, fragmented systems and limited operational visibility. The businesses themselves are sound; execution can be significantly improved.
 
-Nivo combines hands-on ownership with a proprietary AI-enabled platform used for sourcing, analysis and operational upgrades. This allows us to identify opportunities faster, analyse companies systematically and implement improvements more effectively.
+Nivo combines hands-on ownership with proprietary internal tooling for sourcing, analysis and operational upgrades. This allows us to identify opportunities faster, analyse companies systematically and implement improvements more effectively.
 
 
 ------------------------------------------------------------
@@ -305,7 +305,7 @@ Replace:
 
 With:
 
-Our platform analyses Swedish SMEs in the SEK 50–200m revenue range.
+Our sourcing and analysis workflow covers Swedish SMEs in the SEK 50–200m revenue range.
 
 
 ------------------------------------------------------------

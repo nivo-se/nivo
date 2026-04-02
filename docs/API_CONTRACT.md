@@ -1,6 +1,6 @@
 # API Contract
 
-Frozen contract for core Nivo intelligence endpoints. Fields marked **stable** are guaranteed; **extras** may change.
+Frozen contract for core Nivo API endpoints. Fields marked **stable** are guaranteed; **extras** may change.
 
 ---
 

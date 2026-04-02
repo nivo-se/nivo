@@ -31,7 +31,7 @@ BACKEND_URL="${VITE_API_BASE_URL:-http://localhost:8000}"
 
 # Health check
 curl $BACKEND_URL/health
-# Should return: {"status":"healthy","service":"nivo-intelligence-api"}
+# Should return: {"status":"healthy","service":"nivo-api"}
 
 # API status
 curl $BACKEND_URL/api/status

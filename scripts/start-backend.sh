@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🚀 Starting Nivo Intelligence Backend API"
+echo "🚀 Starting Nivo backend API"
 echo "=========================================="
 
 # Get project root (parent of scripts directory)

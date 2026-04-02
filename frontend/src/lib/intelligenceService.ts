@@ -179,7 +179,7 @@ class IntelligenceService {
     })
   }
 
-  // Company Intelligence
+  // Company profile / enrichment (legacy path name)
   async getCompanyIntel(orgnr: string): Promise<CompanyIntel> {
     return this.fetch<CompanyIntel>(`/api/companies/${orgnr}/intel`)
   }

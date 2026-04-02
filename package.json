@@ -1,7 +1,7 @@
 {
   "name": "nivo",
   "version": "1.0.0",
-  "description": "Nivo - Swedish Company Intelligence Platform - Full Stack Application",
+  "description": "Nivo - backing great companies. Full-stack app (Vite/React, FastAPI, Postgres).",
   "private": true,
   "scripts": {
     "dev": "cd frontend && npm run dev",

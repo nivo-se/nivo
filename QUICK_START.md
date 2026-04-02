@@ -1,5 +1,5 @@
 # Quick Start Guide
-## Get Nivo Intelligence System Running in 15 Minutes
+## Get Nivo running in 15 minutes
 
 ---
 
@@ -125,7 +125,7 @@ npm run dev
 ## Step 7: Verify Setup
 
 1. **Backend API**: http://localhost:8000/health
-   - Should return: `{"status": "healthy", "service": "nivo-intelligence-api"}`
+   - Should return: `{"status": "healthy", "service": "nivo-api"}`
 
 2. **Frontend**: http://localhost:5173
    - Should load dashboard
@@ -162,7 +162,7 @@ Once everything is running:
 
 1. ✅ Test financial filter endpoint (when implemented)
 2. ✅ Trigger first enrichment job (when implemented)
-3. ✅ View company intelligence (when implemented)
+3. ✅ View company profiles and enrichment (when implemented)
 
 See `docs/IMPLEMENTATION_START_GUIDE.md` for detailed implementation plan.
 

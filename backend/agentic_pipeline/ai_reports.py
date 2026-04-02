@@ -1,5 +1,5 @@
 """
-AI Report Generation for Company Intelligence
+AI report generation for deep research runs
 Generates business model summaries, weakness detection, uplift assessment, and outreach angles.
 """
 from __future__ import annotations

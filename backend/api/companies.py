@@ -1,5 +1,5 @@
 """
-Company intelligence endpoints
+Company data and enrichment endpoints.
 """
 import json
 import logging
@@ -46,7 +46,7 @@ class BatchCompanyRequest(BaseModel):
 @router.get("/{orgnr}/intel")
 async def get_company_intel(orgnr: str = Path(..., description="Organization number")):
     """
-    Get all intelligence data for a company from Postgres (ai_profiles + company_enrichment).
+    Get profile and enrichment data for a company from Postgres (ai_profiles + company_enrichment).
     """
     try:
         db = get_database_service()
