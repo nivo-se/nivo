@@ -227,6 +227,8 @@ export async function listCrmCompanies(search: string, limit = 50): Promise<
 export interface CrmEmailConfig {
   resend_configured: boolean;
   missing: string[];
+  /** True when Reply-To host was taken from the From address (RESEND_REPLY_DOMAIN not set). */
+  reply_domain_inferred?: boolean;
 }
 
 export async function getCrmEmailConfig(): Promise<CrmEmailConfig> {

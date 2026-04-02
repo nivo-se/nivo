@@ -52,47 +52,63 @@ const mainNavItems: NavItem[] = [
 ];
 
 /** Phase-1 unified nav: routes alias to existing pages until dedicated surfaces land. */
-const unifiedNavItems: NavItem[] = [
+const unifiedNavSections: { title: string; items: NavItem[] }[] = [
   {
-    path: "/today",
-    label: "Today",
-    icon: CalendarDays,
-    matchesLocation: (pathname) => pathname === "/" || pathname === "/today",
+    title: "Daily workstreams",
+    items: [
+      {
+        path: "/today",
+        label: "Today",
+        icon: CalendarDays,
+        matchesLocation: (pathname) => pathname === "/" || pathname === "/today",
+      },
+    ],
   },
   {
-    path: "/companies",
-    label: "Companies",
-    icon: Globe,
-    matchesLocation: (pathname) => pathname === "/universe" || pathname === "/companies",
+    title: "Research",
+    items: [
+      {
+        path: "/companies",
+        label: "Companies",
+        icon: Globe,
+        matchesLocation: (pathname) => pathname === "/universe" || pathname === "/companies",
+      },
+      {
+        path: "/prospects",
+        label: "Prospects",
+        icon: Target,
+        matchesLocation: (pathname) => pathname === "/prospects",
+      },
+      {
+        path: "/research",
+        label: "Research",
+        icon: Cpu,
+        matchesLocation: (pathname) =>
+          pathname === "/ai" || pathname.startsWith("/ai/") || pathname === "/research",
+      },
+    ],
   },
   {
-    path: "/prospects",
-    label: "Prospects",
-    icon: Target,
-    matchesLocation: (pathname) => pathname === "/prospects",
-  },
-  {
-    path: "/crm",
-    label: "CRM",
-    icon: Briefcase,
-    matchesLocation: (pathname, search) => {
-      if (!pathname.startsWith("/crm")) return false;
-      const tab = new URLSearchParams(search).get("tab");
-      return tab !== "inbox";
-    },
-  },
-  {
-    path: "/inbox",
-    label: "Inbox",
-    icon: InboxIcon,
-    matchesLocation: (pathname, search) =>
-      pathname.startsWith("/crm") && new URLSearchParams(search).get("tab") === "inbox",
-  },
-  {
-    path: "/research",
-    label: "Research",
-    icon: Cpu,
-    matchesLocation: (pathname) => pathname === "/ai" || pathname.startsWith("/ai/") || pathname === "/research",
+    title: "CRM",
+    items: [
+      {
+        path: "/crm",
+        label: "CRM",
+        icon: Briefcase,
+        matchesLocation: (pathname, search) => {
+          if (!pathname.startsWith("/crm")) return false;
+          const tab = new URLSearchParams(search).get("tab");
+          return tab !== "inbox";
+        },
+      },
+      {
+        path: "/inbox",
+        label: "Inbox",
+        icon: InboxIcon,
+        matchesLocation: (pathname, search) =>
+          pathname.startsWith("/crm") && new URLSearchParams(search).get("tab") === "inbox",
+      },
+    ],
   },
 ];
 
@@ -124,7 +140,7 @@ export default function AppLayout() {
 
   const navUnified = isNavUnifiedV1();
   const hideInDev = isHideInDevelopmentNav();
-  const primaryNavItems = navUnified ? unifiedNavItems : buildLegacyMainNav();
+  const primaryNavItems = buildLegacyMainNav();
   const showAboveDevNav = !navUnified && !isHideLegacySurfacesNav();
   const showInDevelopmentSection = !hideInDev && !navUnified;
 
@@ -186,7 +202,27 @@ export default function AppLayout() {
         </Link>
       </div>
       <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain p-3">
-        {navLinks(primaryNavItems, onNavigate)}
+        {navUnified ? (
+          <>
+            {unifiedNavSections.map((section, idx) => (
+              <div key={section.title}>
+                <div
+                  className={
+                    idx === 0
+                      ? "px-3 pb-2 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted"
+                      : "mt-3 border-t border-sidebar-border/80 px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted"
+                  }
+                  role="presentation"
+                >
+                  {section.title}
+                </div>
+                <div className="space-y-0.5">{navLinks(section.items, onNavigate)}</div>
+              </div>
+            ))}
+          </>
+        ) : (
+          navLinks(primaryNavItems, onNavigate)
+        )}
         {showAboveDevNav ? (
           <div className="mt-3 space-y-0.5">{navLinks(aboveDevNavItems, onNavigate)}</div>
         ) : null}

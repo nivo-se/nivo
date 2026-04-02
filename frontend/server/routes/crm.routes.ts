@@ -23,6 +23,7 @@ import { InteractionsService } from '../services/crm/interactions.service.js'
 import { TrackingService } from '../services/crm/tracking.service.js'
 import { SequencesService } from '../services/crm/sequences.service.js'
 import { ResendEmailService } from '../services/resend/resend-email.service.js'
+import { getCrmEmailConfigPayload } from '../services/resend/crm-resend-env.js'
 import { EmailsService } from '../services/crm/emails.service.js'
 import { OutreachEmailService } from '../services/ai/outreach-email.service.js'
 import { CRMOverviewService } from '../services/crm/overview.service.js'
@@ -52,24 +53,6 @@ function asyncHandler(
 ): (req: Request, res: Response, next: NextFunction) => void {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next)
-  }
-}
-
-function getCrmEmailConfigPayload() {
-  const hasKey = Boolean(process.env.RESEND_API_KEY?.trim())
-  const from =
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    process.env.CRM_SENDER_FROM?.trim() ||
-    process.env.RESEND_FROM?.trim()
-  const hasFrom = Boolean(from)
-  const hasReplyDomain = Boolean(process.env.RESEND_REPLY_DOMAIN?.trim())
-  const missing: string[] = []
-  if (!hasKey) missing.push('RESEND_API_KEY')
-  if (!hasFrom) missing.push('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM)')
-  if (!hasReplyDomain) missing.push('RESEND_REPLY_DOMAIN')
-  return {
-    resend_configured: hasKey && hasFrom && hasReplyDomain,
-    missing,
   }
 }
 

@@ -10,7 +10,8 @@
     "build:dev": "vite build --mode development",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint .",
     "preview": "vite preview",
-    "test:reply-to": "node --import tsx --test server/services/crm/reply-to-address.test.ts"
+    "test:reply-to": "node --import tsx --test server/services/crm/reply-to-address.test.ts",
+    "test:crm-server": "node --import tsx --test server/services/crm/reply-to-address.test.ts server/services/resend/crm-resend-env.test.ts"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.15.0",

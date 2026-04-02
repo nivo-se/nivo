@@ -60,8 +60,9 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(__dirname, '../..')
 
-// Load environment: project root .env first (secrets, OPENAI_API_KEY, Postgres), then frontend/.env.local for Vite-only overrides (VITE_*).
+// Load environment: repo root .env → frontend/.env → frontend/.env.local (later overrides).
 config({ path: path.resolve(PROJECT_ROOT, '.env') })
+config({ path: path.resolve(__dirname, '../.env') })
 config({ path: path.resolve(__dirname, '../.env.local') })
 
 // Environment check (only when DEBUG=true to avoid leaking operational hints)

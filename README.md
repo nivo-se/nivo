@@ -25,11 +25,11 @@ nivo/
 
 ## Unified Nav v1 (feature flags)
 
-Phase-1 navigation unification is **off by default**. Set these in `frontend/.env.local` (or root `.env` if you load the same keys into Vite) to roll out safely:
+Phase-1 navigation is the **default** product shell (segmented sidebar: Daily workstreams, Research, CRM). Optional overrides in `frontend/.env.local` (or root `.env` if you load the same keys into Vite):
 
 | Variable | Effect |
 |----------|--------|
-| `VITE_NAV_UNIFIED_V1=true` | Sidebar shows **Today**, **Companies**, **Pipeline**, **Inbox**, **Research** instead of Dashboard/Universe/Prospects/My Lists/CRM/AI Lab. |
+| `VITE_NAV_UNIFIED_V1=false` | Use the **legacy** sidebar (Dashboard, Universe, Prospects, My Lists, CRM, AI Lab) instead of unified nav. Omit or leave empty for unified (default). |
 | `VITE_HIDE_IN_DEVELOPMENT=true` | Hides the **In development** sidebar section (screening / deep research preview links). |
 | `VITE_HIDE_LEGACY_SURFACES=true` | On **legacy** nav only: hides **Prospects** and **GPT target universe** from the sidebar. |
 

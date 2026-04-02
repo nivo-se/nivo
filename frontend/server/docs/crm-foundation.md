@@ -4,7 +4,7 @@ This module adds a CRM layer on top of `deep_research` company intelligence data
 
 ## Environment variables
 
-- `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (or `CRM_SENDER_FROM` / `RESEND_FROM`), `RESEND_REPLY_DOMAIN`
+- `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (or `CRM_SENDER_FROM` / `RESEND_FROM`); `RESEND_REPLY_DOMAIN` optional (defaults to the domain part of From — see `services/resend/crm-resend-env.ts`)
 - `RESEND_WEBHOOK_SECRET` (FastAPI inbound webhook — see [email_inbound_resend.md](../../../docs/email_inbound_resend.md))
 - `OPENAI_API_KEY`
 - `APP_BASE_URL`

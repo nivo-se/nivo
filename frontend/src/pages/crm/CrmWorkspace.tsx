@@ -284,7 +284,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
         if (showSpinner) setLoadingThread(false);
       }
     },
-    [selectedEmail?.crm_thread_id, selectedEmail?.status, selectedEmail?.id, toast]
+    [selectedEmail?.crm_thread_id, selectedEmail?.status, toast]
   );
 
   useEffect(() => {
@@ -637,11 +637,25 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
             <p className="font-medium">Sending email is not configured yet</p>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
               Drafting still works: scroll to Contacts, use the row menu (⋯) → AI draft or Compose manually.
-              Drafts appear under Outbound emails for review and approve. To actually send, set{" "}
-              {emailConfig.missing.join(", ")} — see{" "}
+              Drafts appear under Outbound emails for review and approve. To send via Resend, set in{" "}
+              <code className="bg-muted px-1 rounded">.env</code> (repo root) or{" "}
+              <code className="bg-muted px-1 rounded">frontend/.env.local</code>:{" "}
+              <code className="bg-muted px-1 rounded">RESEND_API_KEY</code> and a verified{" "}
+              <code className="bg-muted px-1 rounded">RESEND_FROM_EMAIL</code> (optional:{" "}
+              <code className="bg-muted px-1 rounded">RESEND_REPLY_DOMAIN</code> if Reply-To host differs from the From
+              domain). Missing: {emailConfig.missing.join(" · ")}. See{" "}
               <code className="bg-muted px-1 rounded">docs/CRM_SETUP.md</code>.
             </p>
           </div>
+        </div>
+      ) : emailConfig?.resend_configured && emailConfig.reply_domain_inferred ? (
+        <div
+          className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
+          role="status"
+        >
+          Resend send is on. Reply-To uses the same domain as your From address. Set{" "}
+          <code className="bg-muted px-1 rounded">RESEND_REPLY_DOMAIN</code> explicitly if inbound mail should use a
+          different hostname.
         </div>
       ) : null}
 

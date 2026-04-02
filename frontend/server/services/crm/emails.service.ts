@@ -4,6 +4,7 @@ import type { InteractionsService } from './interactions.service.js'
 import type { ResendEmailService } from '../resend/resend-email.service.js'
 import type { DealsService } from './deals.service.js'
 import { buildReplyToAddress } from './reply-to-address.js'
+import { resolveCrmFromAddress, resolveCrmReplyDomain } from '../resend/crm-resend-env.js'
 
 export class EmailsService {
   constructor(
@@ -80,14 +81,15 @@ export class EmailsService {
     const contact = await this.db.getContactById(email.contact_id)
     if (!contact?.email) throw new Error('Contact email missing')
 
-    const from =
-      process.env.RESEND_FROM_EMAIL || process.env.CRM_SENDER_FROM || process.env.RESEND_FROM
+    const from = resolveCrmFromAddress()
     if (!from) {
       throw new Error('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM) is required for CRM send')
     }
-    const replyDomain = process.env.RESEND_REPLY_DOMAIN?.trim()
+    const replyDomain = resolveCrmReplyDomain()
     if (!replyDomain) {
-      throw new Error('RESEND_REPLY_DOMAIN is required (e.g. send.nivogroup.se)')
+      throw new Error(
+        'RESEND_REPLY_DOMAIN is required, or set From to user@your-verified-domain so Reply-To can use that domain'
+      )
     }
 
     const { id: threadId, token } = await this.db.ensureCrmEmailThread(email.deal_id, email.contact_id)

@@ -28,7 +28,7 @@ The backend also exposes REST endpoints you can call with curl or Postman (see [
 
 ## 3. Environment variables
 
-Put **secrets and shared backend config** (`OPENAI_API_KEY`, `POSTGRES_*`, `DATABASE_URL`, etc.) in the **repo root `.env`**. Use **`frontend/.env.local` only for `VITE_*` overrides** (API URL, feature flags). The enhanced server loads root `.env` first, then `frontend/.env.local`.
+Put **secrets and shared backend config** (`OPENAI_API_KEY`, `POSTGRES_*`, `DATABASE_URL`, etc.) in the **repo root `.env`**. The enhanced server loads **`/.env` → `frontend/.env` → `frontend/.env.local`** (each file overrides the previous). You can put **`RESEND_*`** in root `.env` or `frontend/.env.local`. Use **`frontend/.env.local`** for **`VITE_*`** overrides (API URL, feature flags) as well.
 
 ### Required for CRM API and page
 
@@ -47,9 +47,9 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | Variable | Description |
 |----------|-------------|
 | `APP_BASE_URL` | Base URL for tracking links (defaults to `http://localhost:3001`). Set to `http://localhost:8080` when using the Vite app. |
-| `RESEND_API_KEY` | Resend API key (CRM outbound + Python inbound fetch). |
-| `RESEND_FROM_EMAIL` | Verified From address (e.g. `hello@nivogroup.se`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. |
-| `RESEND_REPLY_DOMAIN` | Host for structured Reply-To: `reply+<token>@<domain>` (e.g. `send.nivogroup.se` where inbound MX lives). See [email_inbound_resend.md](./email_inbound_resend.md). |
+| `RESEND_API_KEY` | Resend API key (CRM outbound + Python inbound fetch). [Create a key](https://resend.com/api-keys). |
+| `RESEND_FROM_EMAIL` | Verified **From** address (e.g. `outreach@updates.yourdomain.com`). Aliases: `CRM_SENDER_FROM`, `RESEND_FROM`. Add the domain in [Resend → Domains](https://resend.com/domains) and complete SPF/DKIM. |
+| `RESEND_REPLY_DOMAIN` | Optional. Host for structured Reply-To: `reply+<token>@<domain>`. If omitted, the **domain part of `RESEND_FROM_EMAIL`** is used (same hostname as From). Set explicitly when inbound MX lives on a different subdomain (e.g. `send.nivogroup.se`). See [email_inbound_resend.md](./email_inbound_resend.md). |
 | `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |
