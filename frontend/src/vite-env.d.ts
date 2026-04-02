@@ -6,6 +6,8 @@ interface ImportMetaEnv {
   readonly VITE_AUTH0_CLIENT_ID?: string
   readonly VITE_AUTH0_AUDIENCE?: string
   readonly VITE_API_BASE_URL?: string
+  /** Dev only: when true with VITE_DISABLE_AUTH, still use VITE_API_BASE_URL (remote API + real JWT testing). */
+  readonly VITE_DEV_ALLOW_REMOTE_API?: string
   /** Dev only: FastAPI URL for Vite proxy (/api, /health). Set per machine in .env.local. */
   readonly VITE_DEV_API_PROXY_TARGET?: string
   /** Dev only: enhanced-server URL for Vite proxy (/crm). */

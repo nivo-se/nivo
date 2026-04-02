@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { config } from 'dotenv'
@@ -59,10 +58,14 @@ import { getCrmPool, PostgresCrmDb, isCrmPostgresConfigured } from './services/c
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(__dirname, '../..')
+const FRONTEND_ROOT = path.resolve(__dirname, '..')
 
-// Load environment: project root .env first (secrets, OPENAI_API_KEY, Postgres), then frontend/.env.local for Vite-only overrides (VITE_*).
-config({ path: path.resolve(PROJECT_ROOT, '.env') })
-config({ path: path.resolve(__dirname, '../.env.local') })
+// Env load order (do not use `import 'dotenv/config'` — it loads cwd/.env first and can let frontend/.env
+// override repo-root Postgres credentials when `npm run dev` runs from frontend/).
+// Root .env wins for duplicate keys; frontend/.env then .env.local only fill missing vars (e.g. VITE_*).
+config({ path: path.join(PROJECT_ROOT, '.env') })
+config({ path: path.join(FRONTEND_ROOT, '.env') })
+config({ path: path.join(FRONTEND_ROOT, '.env.local') })
 
 // Environment check (only when DEBUG=true to avoid leaking operational hints)
 if (process.env.DEBUG === 'true' || process.env.DEBUG === '1') {

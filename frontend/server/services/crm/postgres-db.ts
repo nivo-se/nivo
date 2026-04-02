@@ -6,19 +6,21 @@
  */
 
 import pg from 'pg'
+import { PG_POOL_OPTIONS, attachPoolErrorLogging } from '../../pg-pool-options.js'
+
 const { Pool } = pg
 
 const SCHEMA = 'deep_research'
 
 function getConnectionConfig(): pg.PoolConfig {
   const url = process.env.DATABASE_URL
-  if (url) return { connectionString: url }
+  if (url) return { connectionString: url, ...PG_POOL_OPTIONS }
   const host = process.env.POSTGRES_HOST || 'localhost'
   const port = Number(process.env.POSTGRES_PORT || 5433)
   const database = process.env.POSTGRES_DB || 'nivo'
   const user = process.env.POSTGRES_USER || 'nivo'
   const password = process.env.POSTGRES_PASSWORD || 'nivo'
-  return { host, port, database, user, password }
+  return { host, port, database, user, password, ...PG_POOL_OPTIONS }
 }
 
 let pool: pg.Pool | null = null
@@ -28,6 +30,7 @@ export function getCrmPool(): pg.Pool | null {
   const config = getConnectionConfig()
   try {
     pool = new Pool(config)
+    attachPoolErrorLogging(pool, 'CRM')
     return pool
   } catch (err) {
     console.error('[CRM] Postgres pool init failed:', err)
