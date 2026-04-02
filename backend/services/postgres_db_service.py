@@ -25,6 +25,27 @@ logger = logging.getLogger(__name__)
 
 _FIRST_DB_ERROR_LOGGED = False
 
+# Libpq TCP keepalives — reduces “silent” dead connections behind Docker/NAT restarts.
+# Reconnect-on-error still handles server restarts and explicit closes.
+_CONN_EXTRA = dict(
+    connect_timeout=10,
+    keepalives=1,
+    keepalives_idle=30,
+    keepalives_interval=10,
+    keepalives_count=5,
+)
+
+
+def _recoverable_connection_error(exc: BaseException) -> bool:
+    """True if the next query may succeed after opening a new connection."""
+    if isinstance(exc, (psycopg2.OperationalError, psycopg2.InterfaceError)):
+        return True
+    # Rare: wrapped errors
+    cause = getattr(exc, "__cause__", None)
+    if cause and isinstance(cause, (psycopg2.OperationalError, psycopg2.InterfaceError)):
+        return True
+    return False
+
 
 def _log_db_exception(op_name: str, exc: BaseException) -> None:
     """Log first DB exception with full detail (class, message, op)."""
@@ -44,14 +65,14 @@ def _make_conn():
     """Use DATABASE_URL if set; otherwise POSTGRES_* vars. SUPABASE_DB_URL is still read for backward compatibility."""
     url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")
     if url:
-        return psycopg2.connect(url, connect_timeout=5)
+        return psycopg2.connect(url, **_CONN_EXTRA)
     return psycopg2.connect(
         host=os.getenv("POSTGRES_HOST", "localhost"),
         port=int(os.getenv("POSTGRES_PORT", "5433")),
         dbname=os.getenv("POSTGRES_DB", "nivo"),
         user=os.getenv("POSTGRES_USER", "nivo"),
         password=os.getenv("POSTGRES_PASSWORD", "nivo"),
-        connect_timeout=5,
+        **_CONN_EXTRA,
     )
 
 
@@ -88,6 +109,16 @@ class PostgresDBService(DatabaseService):
         conn_display = "DATABASE_URL" if url else f"{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'nivo')}"
         logger.info("Connected to Postgres (%s)", conn_display)
 
+    def _reconnect_unlocked(self) -> None:
+        """Replace socket (caller must hold self._lock). Used after recoverable disconnect."""
+        try:
+            if self._conn is not None and not self._conn.closed:
+                self._conn.close()
+        except Exception:
+            pass
+        self._conn = _make_conn()
+        self._conn.autocommit = False
+
     def _execute(
         self,
         sql: str,
@@ -96,20 +127,31 @@ class PostgresDBService(DatabaseService):
     ) -> List[Dict[str, Any]]:
         sql = _sqlite_to_psycopg(sql)
         sql = _fix_limit_for_postgres(sql)
-        with self._lock:
-            try:
-                with self._conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
-                    cur.execute(sql, params or [])
-                    self._conn.commit()
-                    rows = cur.fetchall() if cur.description else []
-                return [dict(row) for row in rows]
-            except Exception as e:
+        attempt = 0
+        while True:
+            with self._lock:
                 try:
-                    self._conn.rollback()
-                except Exception as rollback_err:
-                    logger.warning("Rollback failed: %s", rollback_err)
-                _log_db_exception(op_name, e)
-                raise
+                    with self._conn.cursor(cursor_factory=extras.RealDictCursor) as cur:
+                        cur.execute(sql, params or [])
+                        self._conn.commit()
+                        rows = cur.fetchall() if cur.description else []
+                    return [dict(row) for row in rows]
+                except Exception as e:
+                    try:
+                        self._conn.rollback()
+                    except Exception as rollback_err:
+                        logger.warning("Rollback failed: %s", rollback_err)
+                    if _recoverable_connection_error(e) and attempt < 1:
+                        logger.warning(
+                            "Postgres connection error in %s (%s), reconnecting once",
+                            op_name,
+                            type(e).__name__,
+                        )
+                        self._reconnect_unlocked()
+                        attempt += 1
+                        continue
+                    _log_db_exception(op_name, e)
+                    raise
 
     def fetch_companies(
         self,
@@ -169,20 +211,30 @@ class PostgresDBService(DatabaseService):
         from psycopg2.extras import execute_values
 
         sql = _sqlite_to_psycopg(sql)
-        with self._lock:
-            try:
-                with self._conn.cursor() as cur:
-                    execute_values(cur, sql, values, page_size=2000)
-                    rowcount = cur.rowcount
-                self._conn.commit()
-                return rowcount
-            except Exception as e:
+        attempt = 0
+        while True:
+            with self._lock:
                 try:
-                    self._conn.rollback()
-                except Exception as rollback_err:
-                    logger.warning("Rollback failed: %s", rollback_err)
-                _log_db_exception("run_execute_values", e)
-                raise
+                    with self._conn.cursor() as cur:
+                        execute_values(cur, sql, values, page_size=2000)
+                        rowcount = cur.rowcount
+                    self._conn.commit()
+                    return rowcount
+                except Exception as e:
+                    try:
+                        self._conn.rollback()
+                    except Exception as rollback_err:
+                        logger.warning("Rollback failed: %s", rollback_err)
+                    if _recoverable_connection_error(e) and attempt < 1:
+                        logger.warning(
+                            "Postgres connection error in run_execute_values (%s), reconnecting once",
+                            type(e).__name__,
+                        )
+                        self._reconnect_unlocked()
+                        attempt += 1
+                        continue
+                    _log_db_exception("run_execute_values", e)
+                    raise
 
     def table_exists(self, table_name: str) -> bool:
         rows = self._execute(
@@ -432,7 +484,12 @@ class PostgresDBService(DatabaseService):
     def close(self) -> None:
         with self._lock:
             try:
-                self._conn.rollback()
+                if self._conn is not None and not self._conn.closed:
+                    self._conn.rollback()
             except Exception:
                 pass
-            self._conn.close()
+            try:
+                if self._conn is not None and not self._conn.closed:
+                    self._conn.close()
+            except Exception:
+                pass

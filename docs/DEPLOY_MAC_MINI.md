@@ -20,13 +20,15 @@ For **local dev on your Mac**, use `docker-compose.postgres.yml` for Postgres an
 
 There is **no automated deploy**. The Mac Mini does not pull from GitHub by itself.
 
-1. **On the Mac Mini** (e.g. SSH in): go to the repo and pull the latest:
+1. **On the Mac Mini** (e.g. SSH in): go to the repo, **use the deploy branch** (usually `main`), pull, then rebuild/restart the API so the running container matches `docker-compose.yml` (including host port bindings, e.g. `0.0.0.0:8000:8000` for LAN access):
    ```bash
    cd /srv/nivo
+   git checkout main   # or your deploy branch
    git pull
    docker compose build api && docker compose up -d api
    ```
-   (Use `docker compose up -d --build` only when you need to recreate all services or refresh base images.)
+   `docker compose up -d api` recreates/restarts the `api` container when the compose definition or image changed—required after a `git pull` that updates `docker-compose.yml` (ports, env, etc.).  
+   (Use `docker compose up -d --build` for all services when you need Postgres/Redis/worker refreshed or base images updated; add `--force-recreate api` only if the API container seems stuck on old port mappings.)
 2. **The Mac Mini keeps its own `.env`** in `/srv/nivo/.env`. That file is **not in git** (and must not be). You create it once from `.env.example` and edit it on the mini with production secrets (e.g. `POSTGRES_PASSWORD`, OpenAI, Auth0). When you `git pull`, `.env` is untouched, so the mini keeps using the same DB (Postgres in Docker on the mini) and the same secrets.
 3. **DB connection on the mini:** The API runs **inside** Docker and gets `POSTGRES_HOST=postgres` and `POSTGRES_PORT=5432` from `docker-compose.yml` (overrides in the compose file), so it talks to the Postgres container on the same host. You do **not** need `DATABASE_URL` or `POSTGRES_HOST` in the mini’s `.env` for the API; the compose file sets them. You only need `POSTGRES_PASSWORD` (and optionally `POSTGRES_DB` / `POSTGRES_USER`) for the Postgres service and for any host-side tools (e.g. migrations, pg_dump).
 
@@ -131,6 +133,25 @@ docker compose up -d --build
 ```
 
 This rebuilds and restarts the API; Postgres keeps running and keeps its data (in volume `nivo_pg_data`). To restart Postgres too: `docker compose up -d --build` restarts all services.
+
+### 4.3 No database access on the mini itself
+
+SSH to the mini, `cd` to the repo (e.g. `/srv/nivo`), then:
+
+```bash
+./scripts/check_mini_postgres.sh
+```
+
+It checks: `nivo-pg` running, SQL inside the container, **host → `127.0.0.1:5433`** (password must match `.env`), and **`GET http://127.0.0.1:8000/api/db/ping`** from the API container.
+
+**Common causes**
+
+| Symptom | What to do |
+|--------|------------|
+| `nivo-pg` not running | `docker compose up -d` — ensure `POSTGRES_PASSWORD` is set in `.env` (compose requires it). |
+| Host `psql` to `:5433` fails, but `docker exec nivo-pg psql` works | **Password mismatch.** Postgres stores the password when the **volume is first created**. Changing `POSTGRES_PASSWORD` in `.env` later does **not** change the existing DB user. Fix: `docker exec -it nivo-pg psql -U nivo -d postgres -c "ALTER USER nivo PASSWORD 'same_as_env';"` or, if you can wipe data, `docker compose down -v` then `up -d` (destructive). |
+| `/api/db/ping` returns 503 | Read `docker logs nivo-api`. Confirm root `.env` has `DATABASE_SOURCE=postgres` and that the API image was rebuilt after `.env` changes: `docker compose up -d --build api`. |
+| Fresh install, empty tables | Run migrations from the host: `export DATABASE_URL=postgresql://nivo:YOUR_PASSWORD@127.0.0.1:5433/nivo` then `./scripts/run_postgres_migrations.sh` (see §5b). |
 
 ---
 

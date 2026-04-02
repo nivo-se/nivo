@@ -1,0 +1,42 @@
+name: Deploy Ubuntu
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ubuntu
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync code to live repo
+        env:
+          DEPLOY_PATH: /home/jeppe/nivo-web
+        run: |
+          set -euo pipefail
+          mkdir -p "$DEPLOY_PATH"
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.env' \
+            --exclude 'backend/.env' \
+            --exclude 'frontend/.env' \
+            --exclude 'frontend/.env.development' \
+            ./ "$DEPLOY_PATH/"
+
+      - name: Deploy nivo
+        env:
+          DEPLOY_PATH: /home/jeppe/nivo-web
+        run: |
+          set -euo pipefail
+          bash "$DEPLOY_PATH/scripts/deploy_ubuntu.sh"
