@@ -17,13 +17,22 @@ jobs:
       - linux
       - x64
     steps:
-      - name: Update live repo to main
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync code to live repo
         env:
           DEPLOY_PATH: /home/jeppe/nivo-web
         run: |
           set -euo pipefail
-          git -C "$DEPLOY_PATH" fetch origin main
-          git -C "$DEPLOY_PATH" reset --hard origin/main
+          mkdir -p "$DEPLOY_PATH"
+          rsync -a --delete \
+            --exclude '.git/' \
+            --exclude '.env' \
+            --exclude 'backend/.env' \
+            --exclude 'frontend/.env' \
+            --exclude 'frontend/.env.development' \
+            ./ "$DEPLOY_PATH/"
 
       - name: Deploy nivo
         env:
@@ -31,4 +40,3 @@ jobs:
         run: |
           set -euo pipefail
           bash "$DEPLOY_PATH/scripts/deploy_ubuntu.sh"
-
