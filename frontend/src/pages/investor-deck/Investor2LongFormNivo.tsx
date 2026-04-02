@@ -89,9 +89,6 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
             <p className="text-xl sm:text-2xl font-semibold max-w-2xl mx-auto leading-snug text-white">
               {t.oneLiner}
             </p>
-            <p className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-white/95 mt-4">
-              {t.heroTagline}
-            </p>
             <div
               id="why-invest"
               className="mt-6 w-full max-w-[720px] mx-auto text-left rounded-xl border scroll-mt-[100px] backdrop-blur-[12px] p-6 sm:p-8 md:px-10 md:py-9"
@@ -101,14 +98,12 @@ export function Investor2LongFormNivo({ lang }: { lang: InvestorLang }) {
               <div className="space-y-10">
                 <div className="space-y-3">
                   <p className="text-lg sm:text-xl leading-[1.65] text-white/88">{t.execSummaryWhatPara1}</p>
-                  <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryWhatParaPartners}</p>
                   <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryWhatPara2}</p>
                 </div>
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-white/68">{t.execSummaryValueLabel}</p>
                   <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryValueFlow}</p>
                   <p className="text-base sm:text-lg leading-[1.65] text-white/72">{t.execSummaryValueEdge}</p>
-                  <p className="text-base sm:text-lg leading-[1.65] text-white/55 italic font-normal">{t.philosophyTagline}</p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-white/68">{t.execSummaryReturnsLabel}</p>
