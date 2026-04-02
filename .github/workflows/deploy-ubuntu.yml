@@ -1,0 +1,34 @@
+name: Deploy Ubuntu
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ubuntu
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Update live repo to main
+        env:
+          DEPLOY_PATH: /home/jeppe/nivo-web
+        run: |
+          set -euo pipefail
+          git -C "$DEPLOY_PATH" fetch origin main
+          git -C "$DEPLOY_PATH" reset --hard origin/main
+
+      - name: Deploy nivo
+        env:
+          DEPLOY_PATH: /home/jeppe/nivo-web
+        run: |
+          set -euo pipefail
+          bash "$DEPLOY_PATH/scripts/deploy_ubuntu.sh"
+
