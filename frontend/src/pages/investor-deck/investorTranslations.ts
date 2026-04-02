@@ -21,16 +21,10 @@ export const investorTranslations = {
     // Hero / Short version
     oneLiner:
       "We acquire profitable, under-digitised companies and create value through digital and AI-enabled operational improvements. Over time, those improvements create value.",
-    heroTagline:
-      "We take what already works — and make it scalable and more efficient",
-    philosophyTagline:
-      "We take what already works — and make it scalable and more efficient",
     shortVersion: "Executive Summary",
     execSummaryWhatLabel: "What we do",
     execSummaryWhatPara1:
       "Nivo partners with a small group of investors to acquire and improve Nordic companies for the long term.",
-    execSummaryWhatParaPartners:
-      "We partner with founders who remain as shareholders and operators — ensuring continuity, aligned incentives and better execution.",
     execSummaryWhatPara2:
       "Focus is on profitable businesses with strong fundamentals — where operational improvements, not market timing, drive value.",
     execSummaryValueLabel: "How value is created",
@@ -376,16 +370,10 @@ export const investorTranslations = {
     // Hero / Short version
     oneLiner:
       "Vi förvärvar lönsamma, underdigitaliserade företag och skapar värde genom operativ förbättring och digitala uppgraderingar. Över tid skapar dessa förbättringar värde.",
-    heroTagline:
-      "Vi tar det som redan fungerar — och gör det skalbart och mer effektivt",
-    philosophyTagline:
-      "Vi tar det som redan fungerar — och gör det skalbart och mer effektivt",
     shortVersion: "Sammanfattning",
     execSummaryWhatLabel: "Vad vi gör",
     execSummaryWhatPara1:
       "Nivo samarbetar med en liten grupp investerare för att förvärva och förbättra nordiska företag på lång sikt.",
-    execSummaryWhatParaPartners:
-      "Vi samarbetar med grundare som fortsätter som delägare och operatörer — för kontinuitet, samställda incitament och bättre exekvering.",
     execSummaryWhatPara2:
       "Fokus ligger på lönsamma företag med starka fundament — där operativa förbättringar, inte marknadstiming, driver värde.",
     execSummaryValueLabel: "Hur värde skapas",
