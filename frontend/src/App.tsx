@@ -84,6 +84,7 @@ import VerificationPanel from "./pages/deep-research/VerificationPanel";
 import CompetitorEditorPage from "./pages/deep-research/CompetitorEditorPage";
 import AssumptionOverridePage from "./pages/deep-research/AssumptionOverridePage";
 import CrmPage from "./pages/crm/CrmPage";
+import AnalysisPage from "./pages/AnalysisPage";
 
 const queryClient = new QueryClient();
 
@@ -206,6 +207,7 @@ const App = () => (
               <Route path="gpt-target-universe" element={<GptTargetUniversePage />} />
               <Route path="lists" element={<MyLists />} />
               <Route path="lists/:listId" element={<ListDetail />} />
+              <Route path="sourcing" element={<AnalysisPage />} />
               <Route path="company/:companyId" element={<CompanyDetail />} />
               <Route path="ai" element={<AILab />} />
               <Route path="ai/run/create" element={<CreateRun />} />
@@ -266,7 +268,7 @@ const App = () => (
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/admin" element={<Navigate to="/admin" replace />} />
             <Route path="/valuation" element={<Navigate to="/" replace />} />
-            <Route path="/analysis" element={<Navigate to="/" replace />} />
+            <Route path="/analysis" element={<Navigate to="/sourcing" replace />} />
             <Route path="/app" element={<Navigate to="/" replace />} />
             <Route path="/app/home" element={<Navigate to="/" replace />} />
             <Route path="/app/universe" element={<Navigate to="/universe" replace />} />

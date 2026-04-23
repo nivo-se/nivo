@@ -13,6 +13,7 @@ import {
   generateEmailSchema,
   patchCompanySchema,
   patchDealSchema,
+  quickSendSchema,
   updateContactSchema,
   updateDraftEmailSchema,
   updateStatusSchema,
@@ -367,10 +368,132 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     return res.json({ success: true, data: email })
   }))
 
+  /**
+   * Quick send: paste subject + body, target a contact email at a company, send in one shot.
+   * Resolves/creates company, contact, and deal as needed; runs createDraft → approve → send.
+   * Use this for the Step-1 paste-from-Claude UX so the user does not navigate the workspace flow.
+   */
+  app.post('/crm/quick-send', asyncHandler(async (req, res) => {
+    const parsed = quickSendSchema.safeParse(req.body)
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+
+    const deals = new DealsService(db)
+    const interactions = new InteractionsService(db)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+
+    let companyId: string | null = parsed.data.company_id ?? null
+
+    if (!companyId && parsed.data.orgnr) {
+      const byOrgnr = await db.getCompanyByOrgnr(parsed.data.orgnr)
+      if (byOrgnr?.id) companyId = byOrgnr.id as string
+    }
+
+    if (!companyId) {
+      if (!parsed.data.company_name) {
+        return res
+          .status(400)
+          .json({ success: false, error: 'company_id or company_name is required' })
+      }
+      const orgnr = parsed.data.orgnr?.trim() || `crm-ext-${randomUUID().replace(/-/g, '')}`
+      const created = await db.insertCompany({
+        orgnr,
+        name: parsed.data.company_name.trim(),
+        website: parsed.data.website?.trim() || undefined,
+      })
+      companyId = created.id as string
+    } else {
+      const exists = await db.getCompany(companyId)
+      if (!exists) return res.status(404).json({ success: false, error: 'Company not found' })
+    }
+
+    const targetEmail = parsed.data.to_email.trim().toLowerCase()
+    const existingContacts = await db.listContactsByCompany(companyId)
+    let contact = existingContacts.find(
+      (c) => typeof c.email === 'string' && c.email.toLowerCase() === targetEmail
+    ) ?? null
+
+    if (!contact) {
+      const hasPrimary = existingContacts.some((c) => c.is_primary === true)
+      contact = await db.createContact({
+        company_id: companyId,
+        email: parsed.data.to_email.trim(),
+        full_name: parsed.data.recipient_name?.trim() || undefined,
+        is_primary: !hasPrimary,
+      })
+    } else if (parsed.data.recipient_name && !contact.full_name) {
+      const updated = await db.updateContact(contact.id as string, {
+        full_name: parsed.data.recipient_name.trim(),
+      })
+      contact = updated ?? contact
+    }
+
+    const deal = await deals.getOrCreateByCompany(companyId)
+
+    const draft = await emails.createDraft({
+      deal_id: deal.id as string,
+      contact_id: contact.id as string,
+      subject: parsed.data.subject,
+      body_text: parsed.data.body_text,
+      body_html: parsed.data.body_html,
+    })
+
+    try {
+      await emails.approve(draft.id as string, {})
+      const sent = await emails.send(draft.id as string)
+      return res.json({
+        success: true,
+        data: {
+          email_id: draft.id,
+          deal_id: deal.id,
+          company_id: companyId,
+          contact_id: contact.id,
+          status: sent.status,
+          sent_at: sent.sent_at,
+        },
+      })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('[CRM] POST /crm/quick-send failed during send:', msg)
+      const lower = msg.toLowerCase()
+      const isClient =
+        lower.includes('contact email missing') ||
+        lower.includes('required for crm send') ||
+        lower.includes('resend_reply_domain is required') ||
+        lower.includes('deal and contact must belong')
+      const isResend = lower.includes('resend')
+      const status = isClient ? 400 : isResend ? 502 : 500
+      // Draft was created and may be left in 'approved' state; surface so caller can retry/edit.
+      return res.status(status).json({
+        success: false,
+        error: msg,
+        data: {
+          email_id: draft.id,
+          deal_id: deal.id,
+          company_id: companyId,
+          contact_id: contact.id,
+        },
+      })
+    }
+  }))
+
   app.get('/crm/deals/:dealId/emails', asyncHandler(async (req, res) => {
     const db = getCrmDb()
     if (!requireCrmDb(res, db)) return
     const rows = await db.listOutboundEmailsByDeal(req.params.dealId)
+    return res.json({ success: true, data: rows })
+  }))
+
+  /** Recent outbound emails across all deals — feeds the CRM home "Sent" panel. */
+  app.get('/crm/recent-sent', asyncHandler(async (req, res) => {
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const limit =
+      typeof req.query.limit === 'string'
+        ? Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20))
+        : 20
+    const rows = await db.listRecentOutboundEmails(limit)
     return res.json({ success: true, data: rows })
   }))
 

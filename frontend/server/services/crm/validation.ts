@@ -77,3 +77,24 @@ export const createExternalCompanySchema = z.object({
   orgnr: z.string().min(5).max(32).optional(),
   website: z.union([z.string().url(), z.literal('')]).optional(),
 })
+
+/**
+ * Quick-send: paste subject+body, target a contact email at a company, and send in one shot.
+ * Either `company_id` (existing CRM company) or `company_name` (auto-create) must be provided.
+ */
+export const quickSendSchema = z
+  .object({
+    to_email: z.string().email(),
+    recipient_name: z.string().max(200).optional(),
+    company_id: z.string().uuid().optional(),
+    company_name: z.string().min(1).max(500).optional(),
+    orgnr: z.string().min(5).max(32).optional(),
+    website: z.union([z.string().url(), z.literal('')]).optional(),
+    subject: z.string().min(1).max(998),
+    body_text: z.string().min(1),
+    body_html: z.string().optional(),
+  })
+  .refine((v) => !!v.company_id || !!v.company_name, {
+    message: 'company_id or company_name is required',
+    path: ['company_name'],
+  })

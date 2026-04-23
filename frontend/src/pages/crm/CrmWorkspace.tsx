@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  AlertTriangle,
   ArrowLeft,
   ChevronDown,
+  ExternalLink,
   Loader2,
   Mail,
   MoreHorizontal,
   Pencil,
   RefreshCw,
   Send,
+  Share2,
   Sparkles,
   StickyNote,
   UserRound,
@@ -64,7 +65,6 @@ import {
   createManualDraft,
   generateEmail,
   getCrmCompanyOverview,
-  getCrmEmailConfig,
   getDealEmails,
   getThreadMessages,
   patchContact,
@@ -74,10 +74,15 @@ import {
   sendEmail,
   updateDealStatus,
   type CrmCompanyOverview,
-  type CrmEmailConfig,
   type CrmOutboundEmailRow,
   type CrmThreadMessage,
 } from "@/lib/api/crm";
+import {
+  isAttioDisabledError,
+  sendCompanyToAttio,
+  type SendCompanyResult,
+} from "@/lib/api/attio";
+import { ApiRequestError } from "@/lib/api/httpClient";
 
 function formatStatus(status: string | null | undefined): string {
   if (!status) return "—";
@@ -147,7 +152,9 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
   const [threadMessages, setThreadMessages] = useState<CrmThreadMessage[]>([]);
   const [loadingThread, setLoadingThread] = useState(false);
-  const [emailConfig, setEmailConfig] = useState<CrmEmailConfig | null>(null);
+
+  const [attioSending, setAttioSending] = useState(false);
+  const [attioLastResult, setAttioLastResult] = useState<SendCompanyResult | null>(null);
 
   const [nextActionInput, setNextActionInput] = useState("");
 
@@ -208,12 +215,6 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
   useEffect(() => {
     void refreshOverview();
   }, [refreshOverview]);
-
-  useEffect(() => {
-    getCrmEmailConfig()
-      .then(setEmailConfig)
-      .catch(() => setEmailConfig({ resend_configured: false, missing: ["unknown"] }));
-  }, []);
 
   const dealId = overview?.deal && typeof overview.deal === "object" ? (overview.deal as { id: string }).id : null;
   const companyId =
@@ -494,6 +495,47 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     }
   };
 
+  const handleSendToAttio = async () => {
+    if (!companyId || attioSending) return;
+    setAttioSending(true);
+    try {
+      const result = await sendCompanyToAttio(companyId);
+      setAttioLastResult(result);
+      const summary =
+        `${result.contacts_pushed}/${result.contacts_total} contacts` +
+        (result.notes_appended ? ` · ${result.notes_appended} note` : "");
+      toast({
+        title: result.errors.length ? "Sent to Attio (with warnings)" : "Sent to Attio",
+        description: result.errors.length
+          ? `${summary}. Issues: ${result.errors.join("; ")}`
+          : summary,
+        variant: result.errors.length ? "destructive" : "default",
+      });
+    } catch (e) {
+      if (isAttioDisabledError(e)) {
+        toast({
+          title: "Attio sync is off",
+          description:
+            "Set ATTIO_SYNC_ENABLED=true and ATTIO_API_KEY in the API env, then restart.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Could not send to Attio",
+          description:
+            e instanceof ApiRequestError
+              ? `${e.status ?? "?"}: ${e.message}`
+              : e instanceof Error
+              ? e.message
+              : String(e),
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setAttioSending(false);
+    }
+  };
+
   const handleDealStatusChange = async (next: string) => {
     if (!dealId) return;
     setDealStatusBusy(true);
@@ -627,37 +669,43 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
   return (
     <div className="p-4 lg:p-6 max-w-4xl mx-auto space-y-6">
-      {emailConfig && !emailConfig.resend_configured ? (
-        <div
-          className="flex gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-foreground"
-          role="status"
-        >
-          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
-          <div>
-            <p className="font-medium">Sending email is not configured yet</p>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Drafting still works: scroll to Contacts, use the row menu (⋯) → AI draft or Compose manually.
-              Drafts appear under Outbound emails for review and approve. To send via Resend, set in{" "}
-              <code className="bg-muted px-1 rounded">.env</code> (repo root) or{" "}
-              <code className="bg-muted px-1 rounded">frontend/.env.local</code>:{" "}
-              <code className="bg-muted px-1 rounded">RESEND_API_KEY</code> and a verified{" "}
-              <code className="bg-muted px-1 rounded">RESEND_FROM_EMAIL</code> (optional:{" "}
-              <code className="bg-muted px-1 rounded">RESEND_REPLY_DOMAIN</code> if Reply-To host differs from the From
-              domain). Missing: {emailConfig.missing.join(" · ")}. See{" "}
-              <code className="bg-muted px-1 rounded">docs/CRM_SETUP.md</code>.
-            </p>
-          </div>
+      <div
+        className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs"
+        role="region"
+        aria-label="Attio sync"
+      >
+        <div className="text-muted-foreground">
+          CRM source of truth lives in Attio. Push this company ad-hoc when you're
+          ready — re-running just refreshes Attio with the latest data.
         </div>
-      ) : emailConfig?.resend_configured && emailConfig.reply_domain_inferred ? (
-        <div
-          className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
-          role="status"
-        >
-          Resend send is on. Reply-To uses the same domain as your From address. Set{" "}
-          <code className="bg-muted px-1 rounded">RESEND_REPLY_DOMAIN</code> explicitly if inbound mail should use a
-          different hostname.
+        <div className="flex items-center gap-2">
+          {attioLastResult?.company_attio_url ? (
+            <a
+              href={attioLastResult.company_attio_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Open in Attio
+              <ExternalLink className="h-3 w-3" aria-hidden />
+            </a>
+          ) : null}
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void handleSendToAttio()}
+            disabled={!companyId || attioSending}
+          >
+            {attioSending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" aria-hidden />
+            ) : (
+              <Share2 className="h-3.5 w-3.5 mr-1.5" aria-hidden />
+            )}
+            {attioSending ? "Sending…" : "Send to Attio"}
+          </Button>
         </div>
-      ) : null}
+      </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">

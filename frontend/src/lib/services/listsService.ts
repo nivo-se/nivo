@@ -69,6 +69,32 @@ export async function createListFromQuery(
   return res.json();
 }
 
+export type CreateFromSourcingPayload = {
+  name: string;
+  scope?: "private" | "team" | "public";
+  criteria: Record<string, unknown>;
+};
+
+export type CreateFromSourcingResponse = {
+  listId: string;
+  insertedCount: number;
+  totalMatched: number;
+  whyThisList: string;
+};
+
+/** Save sourcing-chat FilterCriteria as a Pipeline list with stored plain-language “why”. */
+export async function createListFromSourcing(
+  payload: CreateFromSourcingPayload
+): Promise<CreateFromSourcingResponse> {
+  const res = await fetchWithAuth(`${API_BASE}/api/lists/from_sourcing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throwApiError(await res.text() || "Failed to save list from sourcing", res);
+  return res.json();
+}
+
 export async function addListItems(listId: string, orgnrs: string[]): Promise<{ added: number }> {
   const res = await fetchWithAuth(`${API_BASE}/api/lists/${listId}/items`, {
     method: "POST",

@@ -42,7 +42,7 @@ export function isCrmPostgresConfigured(): boolean {
   return true
 }
 
-import type { CrmDb, CrmInboundRecentRow, CrmInboundUnmatchedRow } from './db-interface.js'
+import type { CrmDb, CrmInboundRecentRow, CrmInboundUnmatchedRow, CrmRecentSentRow } from './db-interface.js'
 import { generateThreadToken } from './reply-to-address.js'
 
 /** Postgres-backed CRM DB. */
@@ -408,6 +408,28 @@ export class PostgresCrmDb implements CrmDb {
        LEFT JOIN ${SCHEMA}.contacts co ON co.id = t.contact_id
        WHERE m.direction = 'inbound'
        ORDER BY COALESCE(m.received_at, m.created_at) DESC
+       LIMIT $1`,
+      [cap]
+    )
+    return rows
+  }
+
+  async listRecentOutboundEmails(limit: number): Promise<CrmRecentSentRow[]> {
+    const cap = Math.min(100, Math.max(1, limit))
+    const { rows } = await this.query<CrmRecentSentRow>(
+      `SELECT e.id::text, e.deal_id::text, e.contact_id::text,
+              d.company_id::text, co.name AS company_name,
+              c.full_name AS contact_name, c.email AS contact_email,
+              e.subject, e.status,
+              e.sent_at::text, e.created_at::text,
+              e.tracking_id::text
+       FROM ${SCHEMA}.emails e
+       INNER JOIN ${SCHEMA}.deals d ON d.id = e.deal_id
+       LEFT JOIN ${SCHEMA}.companies co ON co.id = d.company_id
+       LEFT JOIN ${SCHEMA}.contacts c ON c.id = e.contact_id
+       WHERE e.direction = 'outbound'
+         AND e.status IN ('sent', 'failed', 'bounced')
+       ORDER BY COALESCE(e.sent_at, e.created_at) DESC
        LIMIT $1`,
       [cap]
     )

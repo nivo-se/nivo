@@ -51,6 +51,22 @@ export async function createListFromQueryClient(payload: CreateFromQueryPayload)
   );
 }
 
+export async function createListFromSourcingClient(payload: {
+  name: string;
+  scope?: "private" | "team" | "public";
+  criteria: Record<string, unknown>;
+}) {
+  return requestJson<{
+    listId: string;
+    insertedCount: number;
+    totalMatched: number;
+    whyThisList: string;
+  }>("/api/lists/from_sourcing", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function getListItemsClient(listId: string) {
   return requestJson<{ list_id: string; items: Array<{ orgnr: string; added_by: string; added_at: string }> }>(
     `/api/lists/${listId}/items`

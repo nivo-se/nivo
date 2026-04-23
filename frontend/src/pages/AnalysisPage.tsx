@@ -35,7 +35,7 @@ interface CompanyAnalysis {
 
 export default function AnalysisPage() {
     const navigate = useNavigate()
-    const [criteria, setCriteria] = useState<any>(null)
+    const [criteria, setCriteria] = useState<Record<string, unknown> | null>(null)
     const [currentRun, setCurrentRun] = useState<RunStatus | null>(null)
     const [companies, setCompanies] = useState<CompanyAnalysis[]>([])
     const [selectedCompanies, setSelectedCompanies] = useState<Set<string>>(new Set())

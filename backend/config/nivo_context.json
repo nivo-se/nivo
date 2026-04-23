@@ -1,0 +1,7 @@
+{
+  "version": "2026-04-23",
+  "last_reviewed": "2026-04-23",
+  "canonical_doc": "docs/nivo/NIVO_INVESTMENT_THESIS.md",
+  "summary_for_llm": "Nivo is a Nordic lower-mid-market active owner. We typically screen for product-led, differentiated B2B businesses, roughly ~50–250M SEK revenue (bands vary by strategy in investment_criteria.json), with sustainable margins and defensible growth when the thesis requires it. We deprioritise pure project/installation, generic distribution, hotel/restaurant/property as core, passive holdings, and generic consultancies unless productized. Use only valid universe fields; never fabricate financials. Align suggestions with the canonical thesis document.",
+  "default_strategy": "core_thesis"
+}

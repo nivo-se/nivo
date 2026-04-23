@@ -19,6 +19,7 @@ import {
   Menu,
   CalendarDays,
   Inbox as InboxIcon,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isAdminLinkVisible } from "@/lib/isAdmin";
@@ -74,6 +75,12 @@ const unifiedNavSections: { title: string; items: NavItem[] }[] = [
         matchesLocation: (pathname) => pathname === "/universe" || pathname === "/companies",
       },
       {
+        path: "/sourcing",
+        label: "Sourcing chat",
+        icon: Sparkles,
+        matchesLocation: (pathname) => pathname === "/sourcing",
+      },
+      {
         path: "/prospects",
         label: "Prospects",
         icon: Target,
@@ -119,6 +126,7 @@ const aboveDevNavItems: NavItem[] = [
 
 /** WIP / preview surfaces visible to the whole team while features stabilize */
 const testingNavItems: NavItem[] = [
+  { path: "/sourcing", label: "Sourcing chat", icon: Sparkles, exact: true },
   /** prefix match so `/screening-shortlist/:runId` stays highlighted */
   { path: "/screening-shortlist", label: "Screening shortlist", icon: ListFilter },
   { path: "/screening-campaigns", label: "Screening campaigns", icon: Building2, exact: true },

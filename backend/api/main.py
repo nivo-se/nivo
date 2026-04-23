@@ -127,7 +127,7 @@ async def health_check():
     return {"status": "healthy", "service": "nivo-api"}
 
 # Import routers. All app API routes live under /api/* (e.g. /api/me, /api/admin/*) for consistent CORS and proxy/tunnel routing.
-from . import admin_users, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, email_webhooks, export, filters, gpt_target_universe, home, jobs, labels, lists, me, prospects, report_settings, screening, screening_campaigns, screening_run_shortlist, shortlists, status, analysis, saved_lists, universe, views  # noqa: E402
+from . import admin_users, attio, bootstrap, enroll, ai_credits, ai_filter, ai_reports, ai_analysis_api, companies, coverage, db, debug, email_webhooks, export, filters, gpt_target_universe, home, jobs, labels, lists, me, prospects, report_settings, screening, screening_campaigns, screening_run_shortlist, shortlists, status, analysis, saved_lists, universe, views  # noqa: E402
 from .chat import router as chat_router  # noqa: E402
 from .deep_research import router as deep_research_router  # noqa: E402
 from .enrichment import router as enrichment_router  # noqa: E402
@@ -166,6 +166,7 @@ app.include_router(analysis.router)
 app.include_router(chat_router)
 app.include_router(deep_research_router)
 app.include_router(email_webhooks.router)
+app.include_router(attio.router)
 
 # TODO: Add when implemented
 # from . import search

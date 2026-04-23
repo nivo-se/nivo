@@ -110,7 +110,9 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/045_screening_features_v1_registry_geo.sql \
          database/migrations/046_screening_website_research_companies.sql \
          database/migrations/047_crm_email_threads_inbound.sql \
-         database/migrations/049_rename_crm_email_provider_columns.sql; do
+         database/migrations/049_rename_crm_email_provider_columns.sql \
+         database/migrations/050_attio_record_ids.sql \
+         database/migrations/051_ai_conversations.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"

@@ -10,7 +10,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
 
@@ -31,6 +31,65 @@ class FilterCriteria:
     description: str = ""  # The user's natural language request
     suggestions: List[str] = field(default_factory=list) # AI generated follow-up questions
 
+
+def filter_criteria_from_dict(d: Optional[Dict[str, Any]]) -> FilterCriteria:
+    """Build FilterCriteria from client JSON (sourcing chat / save-as-list)."""
+    if not d:
+        return FilterCriteria()
+    allowed = {
+        "min_revenue",
+        "min_ebitda_margin",
+        "min_growth",
+        "industries",
+        "max_results",
+        "custom_sql_conditions",
+        "description",
+        "suggestions",
+    }
+    clean = {k: v for k, v in d.items() if k in allowed}
+    return FilterCriteria(**clean)
+
+
+def humanize_filter_criteria(criteria: FilterCriteria) -> str:
+    """
+    Short, human-readable explanation of active filters (not raw JSON).
+    Use for UI and saved list notes.
+    """
+    lines: List[str] = []
+    if (criteria.description or "").strip():
+        lines.append(criteria.description.strip())
+
+    details: List[str] = []
+    if criteria.min_revenue > 0:
+        msek = criteria.min_revenue / 1_000_000.0
+        if msek >= 0.1:
+            details.append(f"Minimum revenue: about {msek:.1f} MSEK")
+        else:
+            details.append(f"Minimum revenue: {criteria.min_revenue:,.0f} SEK")
+    if criteria.min_ebitda_margin > -1.0:
+        details.append(f"Minimum EBITDA margin: {criteria.min_ebitda_margin * 100:.1f}%")
+    if criteria.min_growth > -1.0:
+        details.append(f"Minimum 3-year revenue CAGR: {criteria.min_growth * 100:.1f}%")
+    if criteria.industries:
+        details.append(f"Industry (NACE) codes: {', '.join(criteria.industries)}")
+    for cond in criteria.custom_sql_conditions or []:
+        c = (cond or "").strip()
+        if c:
+            details.append(f"Rule: {c}")
+
+    if details:
+        if lines:
+            lines.append("")
+        lines.append("Active constraints:")
+        for item in details:
+            lines.append(f"• {item}")
+
+    if not lines:
+        return "No specific financial filters (matches all companies in the metrics set)."
+
+    return "\n".join(lines)
+
+
 class IntentAnalyzer:
     """Analyzes user intent to create filter criteria"""
     
@@ -39,9 +98,19 @@ class IntentAnalyzer:
         self.client = OpenAI(api_key=api_key)
         self.model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-    def parse_prompt(self, prompt: str, current_criteria: Optional[FilterCriteria] = None) -> FilterCriteria:
+    def parse_prompt(
+        self,
+        prompt: str,
+        current_criteria: Optional[FilterCriteria] = None,
+        *,
+        nivo_thesis_block: str = "",
+        history_messages: Optional[List[Dict[str, Any]]] = None,
+    ) -> FilterCriteria:
         """
-        Convert natural language prompt to FilterCriteria
+        Convert natural language prompt to FilterCriteria.
+
+        `nivo_thesis_block` is appended to the system prompt (versioned Nivo mandate).
+        `history_messages` are prior OpenAI-shaped messages; current turn is `prompt` only.
         """
         logger.info(f"Parsing prompt: {prompt}")
         
@@ -79,19 +148,26 @@ class IntentAnalyzer:
         - Use custom_sql_conditions for things like location, name matching, or specific exclusions.
         - Be smart about "profitable" (margin > 0) or "high growth" (growth > 0.2).
         """
+        if nivo_thesis_block:
+            system_prompt = system_prompt.rstrip() + "\n\n" + nivo_thesis_block.strip()
         
         # Build context from current criteria if exists
         context = ""
         if current_criteria:
             context = f"Current Criteria: Revenue>{current_criteria.min_revenue}, Margin>{current_criteria.min_ebitda_margin}, Growth>{current_criteria.min_growth}"
 
+        msg_list: List[Dict[str, Any]] = [{"role": "system", "content": system_prompt}]
+        for m in history_messages or []:
+            role = m.get("role")
+            content = m.get("content")
+            if role in ("user", "assistant") and isinstance(content, str) and content.strip():
+                msg_list.append({"role": role, "content": content.strip()})
+        msg_list.append({"role": "user", "content": f"{context}\nUser Request: {prompt}"})
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"{context}\nUser Request: {prompt}"}
-                ],
+                messages=msg_list,
                 response_format={"type": "json_object"},
                 temperature=0.0
             )

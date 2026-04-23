@@ -27,6 +27,22 @@ export interface CrmInboundRecentRow {
   contact_email: string | null
 }
 
+/** Recent outbound CRM email (for the global "Sent" home feed) */
+export interface CrmRecentSentRow {
+  id: string
+  deal_id: string
+  contact_id: string | null
+  company_id: string | null
+  company_name: string | null
+  contact_name: string | null
+  contact_email: string | null
+  subject: string
+  status: string
+  sent_at: string | null
+  created_at: string
+  tracking_id: string | null
+}
+
 export interface CrmInboundUnmatchedRow {
   id: string
   token_attempted: string | null
@@ -78,6 +94,9 @@ export interface CrmDb {
 
   listRecentInboundMessages(limit: number): Promise<CrmInboundRecentRow[]>
   listInboundUnmatched(limit: number): Promise<CrmInboundUnmatchedRow[]>
+
+  /** Recent outbound emails across all deals, joined with company/contact for the Sent feed. */
+  listRecentOutboundEmails(limit: number): Promise<CrmRecentSentRow[]>
 
   /** My List membership (orgnrs) for batch draft generation */
   listSavedListOrgnrs(listId: string): Promise<string[]>

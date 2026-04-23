@@ -2,6 +2,7 @@
 Saved lists API: static company lists for Pipeline.
 Scope: private | team | public. Items stored in saved_list_items.
 """
+import copy
 import logging
 import os
 from typing import Any, List, Optional
@@ -9,6 +10,7 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from ..analysis.stage1_filter import FinancialFilter, filter_criteria_from_dict, humanize_filter_criteria
 from ..services.db_factory import get_database_service
 from .dependencies import get_current_user_id
 from .universe import (
@@ -36,6 +38,14 @@ class ListFromQuery(BaseModel):
     name: str
     scope: str = "private"
     queryPayload: UniverseQueryPayload
+
+
+class ListFromSourcing(BaseModel):
+    """Persist Pipeline list from sourcing-chat FilterCriteria (financial + custom rules)."""
+
+    name: str
+    scope: str = "private"
+    criteria: dict
 
 
 class ListItemsAdd(BaseModel):
@@ -125,6 +135,7 @@ async def list_lists(request: Request, scope: str = Query("all")):
                 "owner_email": _owner_email(owner_id),
                 "scope": r["scope"],
                 "source_view_id": str(r["source_view_id"]) if r.get("source_view_id") else None,
+                "description": r.get("description"),
                 "stage": str(r.get("stage", "research")),
                 "created_at": str(r.get("created_at", "")),
                 "updated_at": str(r.get("updated_at", "")),
@@ -247,6 +258,91 @@ async def create_list_from_query(request: Request, body: ListFromQuery):
         "listId": list_id,
         "insertedCount": inserted,
         "totalMatched": total_matched,
+    }
+
+
+@router.post("/from_sourcing")
+async def create_list_from_sourcing(request: Request, body: ListFromSourcing):
+    """
+    Create a Pipeline list from refined sourcing-chat criteria (FilterCriteria).
+    Resolves up to 50k orgnrs via the same financial filter as /api/analysis/chat; stores a plain-language why.
+    """
+    _require_postgres()
+    uid = _require_user(request)
+    if body.scope not in ("private", "team", "public"):
+        raise HTTPException(400, "scope must be private, team, or public")
+
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(400, "name cannot be empty")
+
+    db = get_database_service()
+    if not hasattr(db, "run_execute_values"):
+        raise HTTPException(503, "create_list_from_sourcing requires Postgres")
+
+    fc = filter_criteria_from_dict(body.criteria)
+    filter_engine = FinancialFilter()
+    stats = filter_engine.get_filter_stats(fc)
+    total = int(stats["total_matches"])
+    if total >= MAX_ORGNR_FROM_QUERY:
+        raise HTTPException(
+            400,
+            f"This filter matches at least {MAX_ORGNR_FROM_QUERY:,} companies. Refine the chat filters before saving as a list.",
+        )
+    if total == 0:
+        raise HTTPException(400, "No companies match these filters. Adjust criteria and try again.")
+
+    why = humanize_filter_criteria(fc)
+    fc_run = copy.copy(fc)
+    fc_run.max_results = MAX_ORGNR_FROM_QUERY
+    orgnrs = filter_engine.filter(fc_run)
+    total_matched = len(orgnrs)
+    if total_matched == 0:
+        raise HTTPException(400, "No companies to insert. Try again or narrow filters.")
+
+    try:
+        db.run_raw_query(
+            "INSERT INTO saved_lists (name, owner_user_id, scope, description) VALUES (?, ?, ?, ?)",
+            [name, uid, body.scope, why],
+        )
+    except Exception as e:
+        err = str(e).lower()
+        if "description" in err or "column" in err:
+            db.run_raw_query(
+                "INSERT INTO saved_lists (name, owner_user_id, scope) VALUES (?, ?, ?)",
+                [name, uid, body.scope],
+            )
+        else:
+            raise
+
+    list_rows = db.run_raw_query(
+        "SELECT id FROM saved_lists WHERE owner_user_id::text = ? ORDER BY created_at DESC LIMIT 1",
+        [uid],
+    )
+    list_id = str(list_rows[0]["id"]) if list_rows else ""
+    if not list_id:
+        raise HTTPException(500, "Failed to create list")
+
+    values = [(list_id, o, uid) for o in orgnrs]
+    insert_sql = """
+    INSERT INTO saved_list_items (list_id, orgnr, added_by_user_id)
+    VALUES %s
+    ON CONFLICT (list_id, orgnr) DO NOTHING
+    """
+    inserted = db.run_execute_values(insert_sql, values)
+
+    logger.info(
+        "create_list_from_sourcing: list_id=%s inserted=%d total_matched=%d",
+        list_id,
+        inserted,
+        total_matched,
+    )
+
+    return {
+        "listId": list_id,
+        "insertedCount": inserted,
+        "totalMatched": total_matched,
+        "whyThisList": why,
     }
 
 

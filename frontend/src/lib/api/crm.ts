@@ -254,6 +254,26 @@ export async function getRecentInbound(limit = 50): Promise<CrmInboundRecentRow[
   return crmFetchJson<CrmInboundRecentRow[]>(`/crm/inbound/recent?${params}`);
 }
 
+export interface CrmRecentSentRow {
+  id: string;
+  deal_id: string;
+  contact_id: string | null;
+  company_id: string | null;
+  company_name: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  subject: string;
+  status: string;
+  sent_at: string | null;
+  created_at: string;
+  tracking_id: string | null;
+}
+
+export async function getRecentSent(limit = 20): Promise<CrmRecentSentRow[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return crmFetchJson<CrmRecentSentRow[]>(`/crm/recent-sent?${params}`);
+}
+
 export interface CrmInboundUnmatchedRow {
   id: string;
   token_attempted: string | null;
@@ -317,5 +337,35 @@ export async function ensureDealFromCompany(companyId: string): Promise<Record<s
   return crmFetchJson("/crm/deals/from-company", {
     method: "POST",
     body: JSON.stringify({ company_id: companyId }),
+  });
+}
+
+export interface QuickSendInput {
+  to_email: string;
+  recipient_name?: string;
+  /** Either company_id or company_name is required. */
+  company_id?: string;
+  company_name?: string;
+  orgnr?: string;
+  website?: string;
+  subject: string;
+  body_text: string;
+  body_html?: string;
+}
+
+export interface QuickSendResult {
+  email_id: string;
+  deal_id: string;
+  company_id: string;
+  contact_id: string;
+  status: string;
+  sent_at: string | null;
+}
+
+/** Single-call paste-and-send: creates company/contact/deal as needed, drafts, approves, and sends. */
+export async function quickSend(payload: QuickSendInput): Promise<QuickSendResult> {
+  return crmFetchJson<QuickSendResult>("/crm/quick-send", {
+    method: "POST",
+    body: JSON.stringify(payload),
   });
 }

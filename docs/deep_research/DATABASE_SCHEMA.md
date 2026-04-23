@@ -1,41 +1,16 @@
+# Database schema in this repository
 
-# DATABASE_SCHEMA.md
+> **This file is no longer a hand-maintained list of three tables.** The real schema is defined by **migrations** and the **database schema spec**.
 
-## companies
+- **Quick map (public vs `deep_research`):** [docs/nivo/DATA_LAYERS.md](../nivo/DATA_LAYERS.md)
+- **Full design reference:** [13_database-schema-spec.md](./13_database-schema-spec.md)
+- **DDL history:** [database/migrations/](../../database/migrations/)
 
-id
-name
-org_number
-website
-industry
+The placeholder tables below are **historical**; use the links above for implementation.
 
-## research_facts
-
-id
-company_id
-fact_type
-fact_value
-confidence_score
-source_url
-retrieved_at
-agent
-
-## competitors
-
-id
-company_id
-competitor_name
-revenue_estimate
-margin_estimate
-segment
-
-## transactions
-
-id
-industry
-company
-year
-EV
-EBITDA
-multiple
-buyer
+| Concern | Location |
+|--------|----------|
+| Universe / metrics | `public` — see migrations touching `companies`, `company_kpis`, views |
+| Screening | `public.screening_*` — see `033_screening_profiles.sql` and later |
+| Sourcing chat memory | `public.ai_conversations`, `public.ai_messages` — `051_ai_conversations.sql` |
+| Deep research + CRM | `deep_research.*` — see `024_*`, `026_crm_foundation.sql`, and later |

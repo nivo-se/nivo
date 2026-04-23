@@ -54,6 +54,7 @@ import {
   Plus,
   ChevronDown,
   RefreshCw,
+  Send,
 } from "lucide-react";
 import { getAllLists } from "@/lib/api/lists/service";
 import type { List } from "@/lib/api/types";
@@ -69,7 +70,9 @@ import {
   type CrmInboundUnmatchedRow,
   type CrmBatchDraftRow,
 } from "@/lib/api/crm";
+import { CrmHome } from "./CrmHome";
 import { CrmWorkspace } from "./CrmWorkspace";
+import { QuickSendDialog } from "./QuickSendDialog";
 
 interface CrmCompany {
   id: string;
@@ -153,6 +156,7 @@ export default function CrmPage() {
     []
   );
 
+  const [quickSendOpen, setQuickSendOpen] = useState(false);
   const [externalOpen, setExternalOpen] = useState(false);
   const [extName, setExtName] = useState("");
   const [extContactName, setExtContactName] = useState("");
@@ -312,9 +316,9 @@ export default function CrmPage() {
       <header className="shrink-0 border-b border-sidebar-border bg-sidebar-bg px-4 py-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h1 className="text-base font-semibold text-foreground tracking-tight">Origination CRM</h1>
+            <h1 className="text-base font-semibold text-foreground tracking-tight">Mailbox</h1>
             <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
-              Inbound, outreach, and batch drafts from My Lists.
+              Send emails, see what's been sent, and read replies.
             </p>
           </div>
           <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:justify-end sm:gap-3">
@@ -325,7 +329,7 @@ export default function CrmPage() {
                   value="companies"
                   className="rounded-none border-b-2 border-transparent px-3 py-2 text-xs font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none sm:text-sm"
                 >
-                  Workspace
+                  Home
                 </TabsTrigger>
                 <TabsTrigger
                   value="inbox"
@@ -348,6 +352,16 @@ export default function CrmPage() {
               </TabsList>
             </Tabs>
             </div>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              className="h-9 w-full shrink-0 gap-1 sm:w-auto"
+              onClick={() => setQuickSendOpen(true)}
+            >
+              <Send className="h-3.5 w-3.5" aria-hidden />
+              Quick send
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -737,53 +751,12 @@ export default function CrmPage() {
           )}
 
           {tab === "companies" && !showDetail && (
-            <div className="max-w-xl space-y-5 rounded-lg border border-border/70 bg-muted/15 px-5 py-5">
-              <div className="space-y-2">
-                <h2 className="text-sm font-semibold text-foreground">What fills Workspace</h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  This area is the <span className="text-foreground">execution view for one CRM company</span>{" "}
-                  — drafts, threads, contacts, and deal fields. It stays empty until you open a record. Finding
-                  and prioritizing companies happens in Universe and Prospects; replying to matched inbound mail
-                  is under Inbox.
-                </p>
-              </div>
-              <Button type="button" variant="primary" size="sm" className="w-fit" onClick={() => setCompanyPickerOpen(true)}>
-                Browse CRM companies
-              </Button>
-              <div className="border-t border-border/60 pt-4">
-                <p className="text-xs font-medium text-foreground mb-2">Tie-in to daily work</p>
-                <ul className="text-xs text-muted-foreground space-y-2 list-none pl-0">
-                  <li>
-                    <Link to="/universe" className="text-foreground underline-offset-4 hover:underline">
-                      Universe
-                    </Link>
-                    {" · "}
-                    search and shortlist from the full set
-                  </li>
-                  <li>
-                    <Link to="/prospects" className="text-foreground underline-offset-4 hover:underline">
-                      Prospects
-                    </Link>
-                    {" · "}
-                    team statuses and notes before deep outreach
-                  </li>
-                  <li>
-                    <Link to="/" className="text-foreground underline-offset-4 hover:underline">
-                      Today
-                    </Link>
-                    {" · "}
-                    dashboard snapshot for the day
-                  </li>
-                  <li>
-                    <Link to="/crm?tab=inbox" className="text-foreground underline-offset-4 hover:underline">
-                      Inbox tab
-                    </Link>
-                    {" · "}
-                    replies already linked to deals
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <CrmHome
+              onCompose={() => setQuickSendOpen(true)}
+              onOpenCompany={(id) => navigate(`/crm/company/${id}`)}
+              onOpenInbox={() => navigateToTab("inbox")}
+              onBrowseCompanies={() => setCompanyPickerOpen(true)}
+            />
           )}
 
           {tab === "companies" && showDetail && (
@@ -842,6 +815,15 @@ export default function CrmPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <QuickSendDialog
+        open={quickSendOpen}
+        onOpenChange={setQuickSendOpen}
+        onSent={(result) => {
+          navigate(`/crm/company/${result.company_id}`);
+          void loadCompanies();
+        }}
+      />
     </div>
   );
 }
