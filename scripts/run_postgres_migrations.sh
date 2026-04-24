@@ -112,7 +112,10 @@ for f in database/migrations/013_add_coverage_view.sql \
          database/migrations/047_crm_email_threads_inbound.sql \
          database/migrations/049_rename_crm_email_provider_columns.sql \
          database/migrations/050_attio_record_ids.sql \
-         database/migrations/051_ai_conversations.sql; do
+         database/migrations/051_ai_conversations.sql \
+         database/migrations/050_user_gmail_oauth.sql \
+         database/migrations/051_user_gmail_oauth_scopes.sql \
+         database/migrations/052_saved_lists_description.sql; do
   if [ -f "$f" ]; then
     echo "Applying $(basename $f)..."
     apply_sql_file "$f"
