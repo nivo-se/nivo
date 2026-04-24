@@ -714,7 +714,19 @@ export function registerCrmRoutes(
     if (parsed.data.subject !== undefined) payload.subject = parsed.data.subject
     if (parsed.data.body_text !== undefined) payload.body_text = parsed.data.body_text
     if (parsed.data.body_html !== undefined) {
-      payload.body_html = service.buildInstrumentedHtml(parsed.data.body_html, email.tracking_id as string)
+      const t =
+        parsed.data.body_text !== undefined ? parsed.data.body_text : (email.body_text as string)
+      payload.body_html = service.buildInstrumentedHtml(
+        parsed.data.body_html,
+        email.tracking_id as string,
+        t,
+      )
+    } else if (parsed.data.body_text !== undefined) {
+      payload.body_html = service.buildInstrumentedHtml(
+        null,
+        email.tracking_id as string,
+        parsed.data.body_text,
+      )
     }
     const data = await db.updateEmail(req.params.emailId, payload)
     return res.json({ success: true, data })

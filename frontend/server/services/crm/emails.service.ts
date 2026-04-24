@@ -6,6 +6,7 @@ import type { DealsService } from './deals.service.js'
 import type { GmailOutboundService } from '../gmail/gmail-outbound.service.js'
 import { buildReplyToAddress } from './reply-to-address.js'
 import { resolveCrmFromAddress, resolveCrmReplyDomain } from '../resend/crm-resend-env.js'
+import { isOpenPixelOnlyOrEmpty, plainTextToSimpleEmailHtml } from './plain-text-to-html.js'
 
 export type CrmSendProvider = 'auto' | 'resend' | 'gmail'
 
@@ -24,9 +25,23 @@ export class EmailsService {
     private readonly gmail: GmailOutboundService | null = null,
   ) {}
 
-  buildInstrumentedHtml(baseHtml: string | null | undefined, trackingId: string): string {
+  /**
+   * @param bodyTextFallback — when `baseHtml` is empty, we wrap this as simple HTML so the MIME
+   *  `text/html` part is not just the open-tracking pixel.
+   */
+  buildInstrumentedHtml(
+    baseHtml: string | null | undefined,
+    trackingId: string,
+    bodyTextFallback?: string | null,
+  ): string {
     const appBase = (process.env.APP_BASE_URL || 'http://localhost:3001').replace(/\/$/, '')
-    const html = baseHtml || ''
+    const trimmed = baseHtml?.trim() ?? ''
+    const html =
+      trimmed
+        ? baseHtml as string
+        : bodyTextFallback?.trim()
+          ? plainTextToSimpleEmailHtml(bodyTextFallback)
+          : ''
     const withLinks = html.replace(/href="(https?:\/\/[^"]+)"/g, (_m: string, href: string) => {
       let targetUrl = href
       try {
@@ -55,7 +70,11 @@ export class EmailsService {
     generation_context?: Record<string, any>
   }) {
     const trackingId = randomUUID()
-    const instrumentedHtml = this.buildInstrumentedHtml(input.body_html, trackingId)
+    const instrumentedHtml = this.buildInstrumentedHtml(
+      input.body_html,
+      trackingId,
+      input.body_text,
+    )
     const data = await this.db.insertEmail({
       ...input,
       body_html: instrumentedHtml,
@@ -77,9 +96,20 @@ export class EmailsService {
 
   async approve(emailId: string, payload: Record<string, any>) {
     const email = await this.db.getEmailById(emailId)
-    const body_html = payload.body_html
-      ? this.buildInstrumentedHtml(payload.body_html, email.tracking_id)
-      : undefined
+    let body_html: string | undefined
+    if (payload.body_html) {
+      body_html = this.buildInstrumentedHtml(
+        payload.body_html,
+        email.tracking_id,
+        payload.body_text ?? email.body_text,
+      )
+    } else if (payload.body_text !== undefined) {
+      body_html = this.buildInstrumentedHtml(
+        null,
+        email.tracking_id,
+        payload.body_text,
+      )
+    }
     const data = await this.db.updateEmail(emailId, { ...payload, body_html, status: 'approved' })
     return data
   }
@@ -119,6 +149,17 @@ export class EmailsService {
     const replyTo =
       replyDomain && token ? buildReplyToAddress(token, replyDomain) : undefined
 
+    const storedHtml = email.body_html
+    let outboundHtml = storedHtml
+    if (isOpenPixelOnlyOrEmpty(outboundHtml)) {
+      outboundHtml = this.buildInstrumentedHtml(
+        null,
+        email.tracking_id as string,
+        email.body_text,
+      )
+    }
+    const persistRepairedHtml = isOpenPixelOnlyOrEmpty(storedHtml) && Boolean(outboundHtml)
+
     if (useGmail && this.gmail && auth0Sub) {
       const conn = await this.gmail.getConnection(auth0Sub)
       if (!conn) throw new Error('Gmail connection was removed; connect Gmail again.')
@@ -126,7 +167,7 @@ export class EmailsService {
         to: contact.email,
         subject: email.subject,
         text: email.body_text,
-        html: email.body_html,
+        html: outboundHtml,
         fromEmail: conn.google_email,
         replyTo: replyTo ?? null,
       })
@@ -142,7 +183,7 @@ export class EmailsService {
         to_emails: [contact.email],
         subject: email.subject,
         text_body: email.body_text,
-        html_body: email.body_html,
+        html_body: outboundHtml,
         dedupe_key: dedupeKey,
         sent_at: new Date().toISOString(),
       })
@@ -151,6 +192,7 @@ export class EmailsService {
         status: 'sent',
         outbound_provider_message_id: gmsg.id,
         sent_at: new Date().toISOString(),
+        ...(persistRepairedHtml ? { body_html: outboundHtml } : {}),
       })
 
       await this.interactions.create({
@@ -186,7 +228,7 @@ export class EmailsService {
       from,
       subject: email.subject,
       bodyText: email.body_text,
-      bodyHtml: email.body_html,
+      bodyHtml: outboundHtml,
       replyTo,
     })
 
@@ -201,7 +243,7 @@ export class EmailsService {
       to_emails: [contact.email],
       subject: email.subject,
       text_body: email.body_text,
-      html_body: email.body_html,
+      html_body: outboundHtml,
       dedupe_key: dedupeKey,
       sent_at: new Date().toISOString(),
     })
@@ -210,6 +252,7 @@ export class EmailsService {
       status: 'sent',
       outbound_provider_message_id: resend.id,
       sent_at: new Date().toISOString(),
+      ...(persistRepairedHtml ? { body_html: outboundHtml } : {}),
     })
 
     await this.interactions.create({
