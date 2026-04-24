@@ -76,10 +76,25 @@ def _make_conn():
     )
 
 
+# Sentinels so SQLite "?" -> "%s" does not corrupt PostgreSQL jsonb operators (?| ?& ?#).
+_JSONOP_PIPE = "\x1f__PG_JSONOP_PIPE__\x1f"
+_JSONOP_AMP = "\x1f__PG_JSONOP_AMP__\x1f"
+_JSONOP_HASH = "\x1f__PG_JSONOP_HASH__\x1f"
+
+
 def _sqlite_to_psycopg(sql: str) -> str:
     """Replace SQLite ? placeholders with %s for psycopg2."""
-    # Avoid replacing ? inside string literals; for our queries, simple replace is safe
-    return sql.replace("?", "%s")
+    s = (
+        sql.replace("?#", _JSONOP_HASH)
+        .replace("?|", _JSONOP_PIPE)
+        .replace("?&", _JSONOP_AMP)
+    )
+    s = s.replace("?", "%s")
+    return (
+        s.replace(_JSONOP_HASH, "?#")
+        .replace(_JSONOP_PIPE, "?|")
+        .replace(_JSONOP_AMP, "?&")
+    )
 
 
 def _fix_limit_for_postgres(sql: str) -> str:

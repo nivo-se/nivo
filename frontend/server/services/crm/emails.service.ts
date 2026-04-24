@@ -3,8 +3,17 @@ import type { CrmDb } from './db-interface.js'
 import type { InteractionsService } from './interactions.service.js'
 import type { ResendEmailService } from '../resend/resend-email.service.js'
 import type { DealsService } from './deals.service.js'
+import type { GmailOutboundService } from '../gmail/gmail-outbound.service.js'
 import { buildReplyToAddress } from './reply-to-address.js'
 import { resolveCrmFromAddress, resolveCrmReplyDomain } from '../resend/crm-resend-env.js'
+
+export type CrmSendProvider = 'auto' | 'resend' | 'gmail'
+
+export type SendEmailOptions = {
+  sendProvider?: CrmSendProvider
+  /** Auth0 `sub` — used for Gmail send and for `auto` when the user has connected Gmail. */
+  auth0Sub?: string | null
+}
 
 export class EmailsService {
   constructor(
@@ -12,6 +21,7 @@ export class EmailsService {
     private readonly interactions: InteractionsService,
     private readonly resendService: ResendEmailService,
     private readonly dealsService: DealsService,
+    private readonly gmail: GmailOutboundService | null = null,
   ) {}
 
   buildInstrumentedHtml(baseHtml: string | null | undefined, trackingId: string): string {
@@ -74,28 +84,103 @@ export class EmailsService {
     return data
   }
 
-  async send(emailId: string) {
+  async send(emailId: string, options: SendEmailOptions = {}) {
     const email = await this.db.getEmailById(emailId)
     if (email.status !== 'approved') throw new Error('Email must be approved before send')
 
     const contact = await this.db.getContactById(email.contact_id)
     if (!contact?.email) throw new Error('Contact email missing')
 
-    const from = resolveCrmFromAddress()
-    if (!from) {
-      throw new Error('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM) is required for CRM send')
-    }
-    const replyDomain = resolveCrmReplyDomain()
-    if (!replyDomain) {
-      throw new Error(
-        'RESEND_REPLY_DOMAIN is required, or set From to user@your-verified-domain so Reply-To can use that domain'
-      )
+    const sendProvider: CrmSendProvider = options.sendProvider ?? 'auto'
+    const auth0Sub = options.auth0Sub ?? null
+
+    let useGmail = false
+    if (sendProvider === 'gmail') {
+      if (!this.gmail) throw new Error('Gmail send is not configured (set Google OAuth env vars on the server)')
+      if (!auth0Sub) throw new Error('Sign in is required to send from your Google account')
+      const conn = await this.gmail.getConnection(auth0Sub)
+      if (!conn) throw new Error('Connect Gmail in the CRM mailbox first (Connect Gmail).')
+      useGmail = true
+    } else if (sendProvider === 'resend') {
+      useGmail = false
+    } else {
+      if (this.gmail && auth0Sub) {
+        const conn = await this.gmail.getConnection(auth0Sub)
+        useGmail = Boolean(conn)
+      } else {
+        useGmail = false
+      }
     }
 
     const { id: threadId, token } = await this.db.ensureCrmEmailThread(email.deal_id, email.contact_id)
     await this.db.updateEmail(emailId, { crm_thread_id: threadId })
 
-    const replyTo = buildReplyToAddress(token, replyDomain)
+    const replyDomain = resolveCrmReplyDomain()
+    const replyTo =
+      replyDomain && token ? buildReplyToAddress(token, replyDomain) : undefined
+
+    if (useGmail && this.gmail && auth0Sub) {
+      const conn = await this.gmail.getConnection(auth0Sub)
+      if (!conn) throw new Error('Gmail connection was removed; connect Gmail again.')
+      const gmsg = await this.gmail.sendMail(auth0Sub, {
+        to: contact.email,
+        subject: email.subject,
+        text: email.body_text,
+        html: email.body_html,
+        fromEmail: conn.google_email,
+        replyTo: replyTo ?? null,
+      })
+
+      const dedupeKey = `gmail:sent:${gmsg.id}`
+      await this.db.insertCrmEmailMessage({
+        thread_id: threadId,
+        direction: 'outbound',
+        provider: 'gmail',
+        provider_message_id: gmsg.id,
+        deep_research_email_id: emailId,
+        from_email: conn.google_email,
+        to_emails: [contact.email],
+        subject: email.subject,
+        text_body: email.body_text,
+        html_body: email.body_html,
+        dedupe_key: dedupeKey,
+        sent_at: new Date().toISOString(),
+      })
+
+      const data = await this.db.updateEmail(emailId, {
+        status: 'sent',
+        outbound_provider_message_id: gmsg.id,
+        sent_at: new Date().toISOString(),
+      })
+
+      await this.interactions.create({
+        deal_id: email.deal_id,
+        contact_id: email.contact_id,
+        email_id: email.id,
+        type: 'email_sent',
+        summary: `Sent email: ${email.subject}`,
+      })
+
+      const count = await this.db.countSentEmailsByDeal(email.deal_id)
+      if (count === 1) await this.dealsService.updateStatus(email.deal_id, 'outreach_sent')
+      await this.dealsService.touchLastContacted(email.deal_id)
+
+      return data
+    }
+
+    const from = resolveCrmFromAddress()
+    if (!from) {
+      throw new Error('RESEND_FROM_EMAIL (or CRM_SENDER_FROM / RESEND_FROM) is required for CRM send via Resend')
+    }
+    if (!replyDomain) {
+      throw new Error(
+        'RESEND_REPLY_DOMAIN is required, or set From to user@your-verified-domain so Reply-To can use that domain'
+      )
+    }
+    if (!replyTo) {
+      throw new Error('Could not build Reply-To for this thread; check RESEND_REPLY_DOMAIN.')
+    }
+
     const resend = await this.resendService.sendEmail({
       to: contact.email,
       from,

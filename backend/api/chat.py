@@ -154,6 +154,14 @@ async def chat_refine(request: Request, body: ChatRequest):
 
     except HTTPException:
         raise
+    except ValueError as e:
+        # Missing OPENAI_API_KEY / LLM_BASE_URL configuration
+        logger.warning("Sourcing chat configuration: %s", e)
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    except RuntimeError as e:
+        # LLM call or parse failure (see IntentAnalyzer)
+        logger.error("Sourcing chat LLM error: %s", e)
+        raise HTTPException(status_code=502, detail=str(e)) from e
     except Exception as e:
         logger.error("Chat error: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e

@@ -184,10 +184,13 @@ export async function approveEmail(
   });
 }
 
-export async function sendEmail(emailId: string): Promise<Record<string, unknown>> {
+export async function sendEmail(
+  emailId: string,
+  options?: { send_provider?: "auto" | "resend" | "gmail" }
+): Promise<Record<string, unknown>> {
   return crmFetchJson(`/crm/emails/${encodeURIComponent(emailId)}/send`, {
     method: "POST",
-    body: JSON.stringify({}),
+    body: JSON.stringify(options ?? {}),
   });
 }
 
@@ -229,10 +232,43 @@ export interface CrmEmailConfig {
   missing: string[];
   /** True when Reply-To host was taken from the From address (RESEND_REPLY_DOMAIN not set). */
   reply_domain_inferred?: boolean;
+  /** When true, the server can run Google OAuth for per-user Gmail send. */
+  gmail_oauth_server_configured: boolean;
+  /** Env vars missing to enable Gmail OAuth (see docs). */
+  gmail_oauth_missing: string[];
 }
 
 export async function getCrmEmailConfig(): Promise<CrmEmailConfig> {
   return crmFetchJson<CrmEmailConfig>("/crm/email-config");
+}
+
+export interface CrmGoogleWorkspaceFlags {
+  gmail_send: boolean;
+  drive_file: boolean;
+  calendar_events: boolean;
+}
+
+export interface CrmGmailStatus {
+  server_configured: boolean;
+  connected: boolean;
+  google_email: string | null;
+  workspace: CrmGoogleWorkspaceFlags;
+}
+
+export async function getCrmGmailStatus(): Promise<CrmGmailStatus> {
+  return crmFetchJson<CrmGmailStatus>("/crm/gmail/status");
+}
+
+export async function getCrmGmailOAuthUrl(): Promise<string> {
+  const data = await crmFetchJson<{ url: string }>("/crm/gmail/oauth/url", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  return data.url;
+}
+
+export async function disconnectCrmGmail(): Promise<void> {
+  await crmFetchJson("/crm/gmail/oauth", { method: "DELETE", body: JSON.stringify({}) });
 }
 
 export interface CrmInboundRecentRow {

@@ -17,6 +17,9 @@ import {
   updateContactSchema,
   updateDraftEmailSchema,
   updateStatusSchema,
+  sendCrmEmailSchema,
+  crmGoogleCalendarEventsQuerySchema,
+  crmGoogleDriveCreateFileSchema,
 } from '../services/crm/validation.js'
 import { DealsService } from '../services/crm/deals.service.js'
 import { ContactsService } from '../services/crm/contacts.service.js'
@@ -28,6 +31,11 @@ import { getCrmEmailConfigPayload } from '../services/resend/crm-resend-env.js'
 import { EmailsService } from '../services/crm/emails.service.js'
 import { OutreachEmailService } from '../services/ai/outreach-email.service.js'
 import { CRMOverviewService } from '../services/crm/overview.service.js'
+import { getAuth0SubFromBearer } from '../auth0-verify.js'
+import { signGmailOAuthState, verifyGmailOAuthState } from '../services/gmail/gmail-oauth-state.js'
+import type { GmailOutboundService } from '../services/gmail/gmail-outbound.service.js'
+import { CrmGoogleCalendarService } from '../services/google/crm-google-calendar.service.js'
+import { CrmGoogleDriveService } from '../services/google/crm-google-drive.service.js'
 
 const PIXEL_BUFFER = Buffer.from('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==', 'base64')
 
@@ -73,7 +81,11 @@ async function loadOutreachContext(db: CrmDb, companyId: string) {
   }
 }
 
-export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
+export function registerCrmRoutes(
+  app: Express,
+  getCrmDb: () => CrmDb | null,
+  getGmailOutbound: () => GmailOutboundService | null = () => null,
+) {
   const resendOutbound = new ResendEmailService()
 
   app.get('/crm/companies', asyncHandler(async (req, res) => {
@@ -146,6 +158,175 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     return res.json({ success: true, data: getCrmEmailConfigPayload() })
   }))
 
+  /** Returns a Google OAuth URL; open in the same window to connect Gmail, Drive (app files), and Calendar. */
+  app.post('/crm/gmail/oauth/url', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.status(503).json({
+        success: false,
+        error: 'Gmail OAuth is not configured on this server (set Google OAuth env vars).',
+      })
+    }
+    const state = await signGmailOAuthState(sub)
+    const url = g.createAuthorizationUrl(state)
+    return res.json({ success: true, data: { url } })
+  }))
+
+  /** Google redirects here after consent (browser hit; no Authorization header). */
+  app.get('/crm/gmail/oauth/callback', asyncHandler(async (req, res) => {
+    const err = typeof req.query.error === 'string' ? req.query.error : null
+    if (err) {
+      return res.status(400).type('text/plain').send(`Google OAuth error: ${err}`)
+    }
+    const code = typeof req.query.code === 'string' ? req.query.code : null
+    const state = typeof req.query.state === 'string' ? req.query.state : null
+    if (!code || !state) {
+      return res.status(400).type('text/plain').send('Missing code or state.')
+    }
+    let userId: string
+    try {
+      userId = await verifyGmailOAuthState(state)
+    } catch {
+      return res
+        .status(400)
+        .type('text/plain')
+        .send('Invalid or expired OAuth state. Open the app and try Connect Gmail again.')
+    }
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.status(503).type('text/plain').send('Gmail OAuth is not configured on this server.')
+    }
+    try {
+      await g.exchangeCodeAndStore(userId, code)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return res.status(400).type('text/plain').send(msg)
+    }
+    const base =
+      process.env.CRM_GMAIL_OAUTH_SUCCESS_URL?.trim() ||
+      process.env.APP_BASE_URL?.trim() ||
+      'http://localhost:5173'
+    const target = `${base.replace(/\/$/, '')}/crm?gmail=connected`
+    return res.redirect(302, target)
+  }))
+
+  app.get('/crm/gmail/status', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.json({
+        success: true,
+        data: {
+          server_configured: false,
+          connected: false,
+          google_email: null as string | null,
+          workspace: { gmail_send: false, drive_file: false, calendar_events: false },
+        },
+      })
+    }
+    const row = await g.getConnection(sub)
+    const workspace = row
+      ? g.scopeFlags(row.granted_scopes)
+      : { gmail_send: false, drive_file: false, calendar_events: false }
+    return res.json({
+      success: true,
+      data: {
+        server_configured: true,
+        connected: Boolean(row),
+        google_email: row?.google_email ?? null,
+        workspace,
+      },
+    })
+  }))
+
+  /** List calendar events for the connected Google account (primary calendar by default). */
+  app.get('/crm/google/calendar/events', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.status(503).json({
+        success: false,
+        error: 'Google OAuth is not configured on this server.',
+      })
+    }
+    const parsed = crmGoogleCalendarEventsQuerySchema.safeParse(req.query)
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    }
+    const cal = new CrmGoogleCalendarService(g)
+    try {
+      const data = await cal.listEvents(sub, parsed.data)
+      return res.json({ success: true, data })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return res.status(400).json({ success: false, error: msg })
+    }
+  }))
+
+  /** Create a file in the user’s Drive (`drive.file` scope: app-created files; optional shared-folder parents). */
+  app.post('/crm/google/drive/files', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.status(503).json({
+        success: false,
+        error: 'Google OAuth is not configured on this server.',
+      })
+    }
+    const parsed = crmGoogleDriveCreateFileSchema.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, error: parsed.error.flatten() })
+    }
+    let buf: Buffer
+    try {
+      buf = Buffer.from(parsed.data.contentBase64, 'base64')
+    } catch {
+      return res.status(400).json({ success: false, error: 'Invalid base64 content' })
+    }
+    if (!buf.length) {
+      return res.status(400).json({ success: false, error: 'Empty file body' })
+    }
+    const driveSvc = new CrmGoogleDriveService(g)
+    try {
+      const data = await driveSvc.createFile(sub, {
+        name: parsed.data.name,
+        mimeType: parsed.data.mimeType,
+        body: buf,
+        parentIds: parsed.data.parentIds,
+      })
+      return res.json({ success: true, data })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return res.status(400).json({ success: false, error: msg })
+    }
+  }))
+
+  app.delete('/crm/gmail/oauth', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const g = getGmailOutbound()
+    if (!g) {
+      return res.status(503).json({ success: false, error: 'Gmail OAuth is not configured' })
+    }
+    await g.disconnect(sub)
+    return res.json({ success: true, data: { disconnected: true } })
+  }))
+
   app.get('/crm/inbound/recent', asyncHandler(async (req, res) => {
     const db = getCrmDb()
     if (!requireCrmDb(res, db)) return
@@ -183,7 +364,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
     const aiService = new OutreachEmailService()
 
     const drafts: {
@@ -271,7 +452,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
     const interactions = new InteractionsService(db)
     const deals = new DealsService(db)
     const contacts = new ContactsService(db)
-    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
     const overview = new CRMOverviewService(db, deals, contacts, emails, interactions)
     const payload = await overview.companyOverview(companyId)
     return res.json({ success: true, data: payload })
@@ -305,7 +486,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
     const aiService = new OutreachEmailService()
 
     const deal = await deals.getOrCreateByCompany(parsed.data.company_id)
@@ -348,7 +529,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
 
     const deal = await deals.getOrCreateByCompany(parsed.data.company_id)
     const contact = await db.getContactById(parsed.data.contact_id)
@@ -381,7 +562,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const emails = new EmailsService(db, interactions, resendOutbound, deals)
+    const emails = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
 
     let companyId: string | null = parsed.data.company_id ?? null
 
@@ -441,7 +622,8 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     try {
       await emails.approve(draft.id as string, {})
-      const sent = await emails.send(draft.id as string)
+      const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+      const sent = await emails.send(draft.id as string, { auth0Sub: sub })
       return res.json({
         success: true,
         data: {
@@ -461,7 +643,11 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
         lower.includes('contact email missing') ||
         lower.includes('required for crm send') ||
         lower.includes('resend_reply_domain is required') ||
-        lower.includes('deal and contact must belong')
+        lower.includes('deal and contact must belong') ||
+        lower.includes('connect gmail') ||
+        lower.includes('sign in is required') ||
+        lower.includes('gmail is not connected') ||
+        lower.includes('gmail send is not configured')
       const isResend = lower.includes('resend')
       const status = isClient ? 400 : isResend ? 502 : 500
       // Draft was created and may be left in 'approved' state; surface so caller can retry/edit.
@@ -522,7 +708,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const service = new EmailsService(db, interactions, resendOutbound, deals)
+    const service = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
 
     const payload: Record<string, string> = {}
     if (parsed.data.subject !== undefined) payload.subject = parsed.data.subject
@@ -542,7 +728,7 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const service = new EmailsService(db, interactions, resendOutbound, deals)
+    const service = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
     const data = await service.approve(req.params.emailId, parsed.data)
     return res.json({ success: true, data })
   }))
@@ -555,14 +741,20 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
   }))
 
   app.post('/crm/emails/:emailId/send', asyncHandler(async (req, res) => {
+    const parsed = sendCrmEmailSchema.safeParse(req.body ?? {})
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.flatten() })
     const db = getCrmDb()
     if (!requireCrmDb(res, db)) return
 
     const deals = new DealsService(db)
     const interactions = new InteractionsService(db)
-    const service = new EmailsService(db, interactions, resendOutbound, deals)
+    const service = new EmailsService(db, interactions, resendOutbound, deals, getGmailOutbound())
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
     try {
-      const data = await service.send(req.params.emailId)
+      const data = await service.send(req.params.emailId, {
+        sendProvider: parsed.data.send_provider,
+        auth0Sub: sub,
+      })
       return res.json({ success: true, data })
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -573,7 +765,11 @@ export function registerCrmRoutes(app: Express, getCrmDb: () => CrmDb | null) {
         lower.includes('contact email missing') ||
         lower.includes('required for crm send') ||
         lower.includes('resend_reply_domain is required') ||
-        lower.includes('deal and contact must belong')
+        lower.includes('deal and contact must belong') ||
+        lower.includes('connect gmail') ||
+        lower.includes('sign in is required') ||
+        lower.includes('gmail is not connected') ||
+        lower.includes('gmail send is not configured')
       const isResend = lower.includes('resend')
       const status = isClient ? 400 : isResend ? 502 : 500
       return res.status(status).json({ success: false, error: msg })

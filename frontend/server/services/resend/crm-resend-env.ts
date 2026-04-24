@@ -4,6 +4,8 @@
  * a verified sending domain can double as the Reply-To host (receiving must be enabled on that domain in Resend for replies to work).
  */
 
+import { gmailOAuthEnvMissing, isGmailOAuthEnvConfigured } from '../gmail/gmail-oauth-env.js'
+
 export function resolveCrmFromAddress(): string | undefined {
   const v =
     process.env.RESEND_FROM_EMAIL?.trim() ||
@@ -31,6 +33,8 @@ export function getCrmEmailConfigPayload(): {
   resend_configured: boolean
   missing: string[]
   reply_domain_inferred: boolean
+  gmail_oauth_server_configured: boolean
+  gmail_oauth_missing: string[]
 } {
   const hasKey = Boolean(process.env.RESEND_API_KEY?.trim())
   const from = resolveCrmFromAddress()
@@ -44,9 +48,12 @@ export function getCrmEmailConfigPayload(): {
     )
   }
   const resend_configured = hasKey && Boolean(from) && Boolean(replyDomain)
+  const gmail_oauth_server_configured = isGmailOAuthEnvConfigured()
   return {
     resend_configured,
     missing: resend_configured ? [] : missing,
     reply_domain_inferred: resend_configured && !isReplyDomainExplicit(),
+    gmail_oauth_server_configured,
+    gmail_oauth_missing: gmail_oauth_server_configured ? [] : gmailOAuthEnvMissing(),
   }
 }

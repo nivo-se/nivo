@@ -90,13 +90,31 @@ def humanize_filter_criteria(criteria: FilterCriteria) -> str:
     return "\n".join(lines)
 
 
+def _llm_config() -> tuple[Optional[OpenAI], str]:
+    """
+    Sourcing chat uses the OpenAI Python SDK.
+    - Default: OpenAI API with OPENAI_API_KEY (or LLM_API_KEY) and OPENAI_MODEL / LLM_MODEL.
+    - Optional: OpenAI-compatible server (e.g. LM Studio) via LLM_BASE_URL + key (dummy ok).
+    See .env.example (OpenAI / LLM section).
+    """
+    base = (os.getenv("LLM_BASE_URL") or "").strip()
+    key = (os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY") or "").strip()
+    if not key and base:
+        key = (os.getenv("LLM_API_KEY") or "lm-studio").strip()
+    if not key and not base:
+        return None, (os.getenv("OPENAI_MODEL") or os.getenv("LLM_MODEL") or "gpt-4o-mini").strip()
+    kwargs: dict = {"api_key": key}
+    if base:
+        kwargs["base_url"] = base
+    model = (os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL") or "gpt-4o-mini").strip()
+    return OpenAI(**kwargs), model
+
+
 class IntentAnalyzer:
     """Analyzes user intent to create filter criteria"""
     
-    def __init__(self):
-        api_key = os.getenv("OPENAI_API_KEY")
-        self.client = OpenAI(api_key=api_key)
-        self.model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    def __init__(self) -> None:
+        self.client, self.model = _llm_config()
 
     def parse_prompt(
         self,
@@ -146,10 +164,19 @@ class IntentAnalyzer:
         - Revenue is in SEK. "100m" usually means 100 million SEK.
         - Margins/Growth are decimals (0.1 = 10%).
         - Use custom_sql_conditions for things like location, name matching, or specific exclusions.
+        - Use column names: companies c has company_name, city, country, nace_codes (json); company_metrics m has the financial fields. Never use c.name.
         - Be smart about "profitable" (margin > 0) or "high growth" (growth > 0.2).
+        - For wildcards in SQL LIKE, you may use %; the system will adapt for Postgres.
         """
         if nivo_thesis_block:
             system_prompt = system_prompt.rstrip() + "\n\n" + nivo_thesis_block.strip()
+        
+        if self.client is None:
+            raise ValueError(
+                "Sourcing assistant is not configured: set OPENAI_API_KEY (or LLM_API_KEY) in the "
+                "project .env, or set LLM_BASE_URL to a local OpenAI-compatible server. "
+                "See .env.example in the repository root."
+            )
         
         # Build context from current criteria if exists
         context = ""
@@ -164,31 +191,52 @@ class IntentAnalyzer:
                 msg_list.append({"role": role, "content": content.strip()})
         msg_list.append({"role": "user", "content": f"{context}\nUser Request: {prompt}"})
 
+        create_kwargs: Dict[str, Any] = {
+            "model": self.model,
+            "messages": msg_list,
+            "temperature": 0.0,
+        }
+        if (os.getenv("LLM_RESPONSE_JSON_OBJECT", "true") or "true").lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
+            create_kwargs["response_format"] = {"type": "json_object"}
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=msg_list,
-                response_format={"type": "json_object"},
-                temperature=0.0
-            )
-            
-            data = json.loads(response.choices[0].message.content)
-            
-            return FilterCriteria(
-                min_revenue=data.get("min_revenue", 0),
-                min_ebitda_margin=data.get("min_ebitda_margin", -1.0),
-                min_growth=data.get("min_growth", -1.0),
-                industries=data.get("industries"),
-                max_results=data.get("limit", 500),
-                custom_sql_conditions=data.get("custom_sql_conditions", []),
-                description=data.get("explanation", "Updated filters based on request."),
-                suggestions=data.get("suggestions", [])
-            )
-            
+            response = self.client.chat.completions.create(**create_kwargs)
         except Exception as e:
-            logger.error(f"Failed to parse intent: {e}")
-            # Fallback to basic criteria or return current
-            return current_criteria or FilterCriteria()
+            logger.error("LLM call failed: %s", e, exc_info=True)
+            raise RuntimeError(
+                f"The LLM could not process your request ({type(e).__name__}). "
+                f"Check OPENAI_API_KEY / LLM_BASE_URL, model name ({self.model}), and network. Detail: {e}"
+            ) from e
+
+        raw = (response.choices[0].message.content or "").strip()
+        if not raw:
+            raise RuntimeError("The LLM returned an empty response. Try again or switch OPENAI_MODEL / LLM_MODEL.")
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as e:
+            logger.error("LLM did not return valid JSON: %s", raw[:500])
+            raise RuntimeError("The LLM did not return valid filter JSON. Try rephrasing your message.") from e
+
+        _mr = data.get("max_results", data.get("limit", 500))
+        try:
+            max_results = int(_mr) if _mr is not None else 500
+        except (TypeError, ValueError):
+            max_results = 500
+        max_results = max(1, min(max_results, 50_000))
+
+        return FilterCriteria(
+            min_revenue=data.get("min_revenue", 0),
+            min_ebitda_margin=data.get("min_ebitda_margin", -1.0),
+            min_growth=data.get("min_growth", -1.0),
+            industries=data.get("industries"),
+            max_results=max_results,
+            custom_sql_conditions=data.get("custom_sql_conditions", []),
+            description=data.get("explanation", "Updated filters based on request."),
+            suggestions=data.get("suggestions", [])
+        )
 
 class FinancialFilter:
     """Filters companies based on financial metrics"""
@@ -198,6 +246,7 @@ class FinancialFilter:
     
     def _build_where_clause(self, criteria: FilterCriteria) -> str:
         """Build SQL WHERE clause from criteria"""
+        is_sqlite = self.db.__class__.__name__ == "LocalDBService"
         where_parts = ["1=1"]
         
         if criteria.min_revenue > 0:
@@ -210,9 +259,6 @@ class FinancialFilter:
             where_parts.append(f"m.revenue_cagr_3y >= {criteria.min_growth}")
         
         if criteria.industries:
-            # Check if using SQLite (LocalDBService)
-            is_sqlite = self.db.__class__.__name__ == 'LocalDBService'
-            
             if is_sqlite:
                 # SQLite doesn't support array operators, use LIKE as a fallback for JSON strings
                 or_conditions = []
@@ -221,16 +267,25 @@ class FinancialFilter:
                 if or_conditions:
                     where_parts.append(f"({' OR '.join(or_conditions)})")
             else:
-                # Postgres array containment
-                nace_array = "{" + ",".join(f'"{code}"' for code in criteria.industries) + "}"
-                where_parts.append(f"c.nace_codes ?| ARRAY{nace_array}::text[]")
+                # Postgres: jsonb ?| right operand is text[] (must not use bare "?" — see
+                # postgres_db_service _sqlite_to_psycopg). ARRAY['a','b'] not ARRAY{a,b}.
+                quoted = ", ".join(
+                    "'" + str(code).replace("'", "''") + "'" for code in (criteria.industries or [])
+                )
+                where_parts.append(
+                    f"c.nace_codes::jsonb ?| ARRAY[{quoted}]::text[]"
+                )
             
         # Add custom SQL conditions from LLM
         if criteria.custom_sql_conditions:
             for condition in criteria.custom_sql_conditions:
-                # Basic sanitization
-                if ";" not in condition and "--" not in condition:
-                    where_parts.append(condition)
+                c = (condition or "").strip()
+                # Basic sanitization; Postgres/psycopg2 treats % as special — double for LIKE '%%'
+                if not c or ";" in c or "--" in c:
+                    continue
+                if not is_sqlite:
+                    c = c.replace("%", "%%")
+                where_parts.append(c)
         
         return " AND ".join(where_parts)
 

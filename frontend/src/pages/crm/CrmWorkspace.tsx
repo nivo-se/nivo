@@ -1273,7 +1273,9 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        Sending uses Resend when configured. See <code className="bg-muted px-1 rounded">docs/email_inbound_resend.md</code>.
+        Sending uses your connected Gmail when available, otherwise Resend. Inbound replies still use the
+        Resend Reply-To path when configured — see{" "}
+        <code className="bg-muted px-1 rounded">docs/email_inbound_resend.md</code>.
       </p>
 
       <Dialog open={editContactOpen} onOpenChange={setEditContactOpen}>

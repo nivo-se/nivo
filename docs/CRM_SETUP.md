@@ -53,8 +53,10 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |
+| `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` / `GOOGLE_OAUTH_REDIRECT_URI` / `GMAIL_OAUTH_ENCRYPTION_KEY` | **Send from your own Gmail** (per user): see [CRM_GMAIL_OAUTH.md](./CRM_GMAIL_OAUTH.md). |
+| `CRM_GMAIL_OAUTH_SUCCESS_URL` | Optional. Browser redirect after a successful Google consent (default: `APP_BASE_URL` or Vite dev URL). |
 
-Resend credentials are only needed for **sending** (`POST /crm/emails/:emailId/send`) and **inbound webhooks**. Creating deals, contacts, and generating drafts works without them.
+Resend is needed for the **Resend** send path and for **inbound** webhooks. **Gmail** sending works without Resend. Creating deals, contacts, and generating drafts do not require either.
 
 ### Resend: full inbound pipeline
 
@@ -74,6 +76,7 @@ The CRM uses the **`deep_research`** schema. Run migrations so tables exist:
 - `026_crm_foundation.sql` – deals, contacts, emails, interactions, tracking_events, sequences
 - `047_crm_email_threads_inbound.sql` – CRM email threads + messages (Resend Reply-To)
 - `049_rename_crm_email_provider_columns.sql` – renames `deep_research.emails.gmail_message_id` → `outbound_provider_message_id`, drops unused `gmail_thread_id`
+- `050_user_gmail_oauth.sql` – per-user Google OAuth refresh tokens for Gmail send
 - `032_company_identity_and_prospects_crm_link.sql` – company identity view, prospects↔CRM link
 
 Run: `./scripts/run_postgres_migrations.sh` or apply migrations manually.

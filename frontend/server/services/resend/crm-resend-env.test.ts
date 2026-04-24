@@ -12,6 +12,10 @@ const ENV_KEYS = [
   'CRM_SENDER_FROM',
   'RESEND_FROM',
   'RESEND_REPLY_DOMAIN',
+  'GOOGLE_OAUTH_CLIENT_ID',
+  'GOOGLE_OAUTH_CLIENT_SECRET',
+  'GOOGLE_OAUTH_REDIRECT_URI',
+  'GMAIL_OAUTH_ENCRYPTION_KEY',
 ] as const
 
 describe('crm-resend-env', () => {
@@ -47,6 +51,7 @@ describe('crm-resend-env', () => {
     assert.strictEqual(p.resend_configured, true)
     assert.deepStrictEqual(p.missing, [])
     assert.strictEqual(p.reply_domain_inferred, true)
+    assert.strictEqual(p.gmail_oauth_server_configured, false)
   })
 
   it('getCrmEmailConfigPayload: not configured without key', () => {

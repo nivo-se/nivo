@@ -105,7 +105,7 @@ export function ChatInterface({
     setIsLoading(true);
 
     try {
-      const response = await fetchWithAuth("/api/analysis/chat", {
+      const response = await fetchWithAuth("/api/analysis/chat/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -115,9 +115,22 @@ export function ChatInterface({
         }),
       });
 
-      const data = (await response.json()) as ChatApiResponse;
+      const raw = await response.text();
+      let data: ChatApiResponse;
+      try {
+        data = JSON.parse(raw) as ChatApiResponse;
+      } catch {
+        if (!response.ok) {
+          throw new Error(
+            raw.trim().slice(0, 400) || `Request failed (HTTP ${response.status})`
+          );
+        }
+        throw new Error("The server sent an invalid response. Is the API running?");
+      }
       if (!response.ok) {
-        throw new Error((data as { detail?: string }).detail || "Request failed");
+        throw new Error(
+          (data as { detail?: string }).detail || `Request failed (HTTP ${response.status})`
+        );
       }
 
       if (data.nivo_context_version) {
@@ -145,12 +158,15 @@ export function ChatInterface({
       onCriteriaChange(data.criteria);
     } catch (error) {
       console.error("Chat error:", error);
+      const reason =
+        error instanceof Error
+          ? error.message
+          : "Unexpected error. Check the browser network tab and API logs.";
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content:
-            "Sorry — something went wrong. Check that the API is running and you’re signed in if chat history is enabled.",
+          content: `Could not run the sourcing assistant.\n\n${reason}\n\nTypical fix: set OPENAI_API_KEY in the project .env and restart the API, or for a local model set LLM_BASE_URL (see .env.example).`,
           timestamp: new Date(),
         },
       ]);

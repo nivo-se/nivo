@@ -11,7 +11,7 @@
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint .",
     "preview": "vite preview",
     "test:reply-to": "node --import tsx --test server/services/crm/reply-to-address.test.ts",
-    "test:crm-server": "node --import tsx --test server/services/crm/reply-to-address.test.ts server/services/resend/crm-resend-env.test.ts"
+    "test:crm-server": "node --import tsx --test server/services/crm/reply-to-address.test.ts server/services/resend/crm-resend-env.test.ts server/services/gmail/build-gmail-raw-message.test.ts"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.15.0",
@@ -55,6 +55,7 @@
     "esbuild": "^0.25.11",
     "express": "^4.19.2",
     "framer-motion": "^12.35.0",
+    "googleapis": "^144.0.0",
     "input-otp": "^1.2.4",
     "jose": "^5.10.0",
     "lucide-react": "^0.462.0",

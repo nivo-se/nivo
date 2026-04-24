@@ -98,3 +98,21 @@ export const quickSendSchema = z
     message: 'company_id or company_name is required',
     path: ['company_name'],
   })
+
+export const sendCrmEmailSchema = z.object({
+  send_provider: z.enum(['auto', 'resend', 'gmail']).optional(),
+})
+
+export const crmGoogleCalendarEventsQuerySchema = z.object({
+  timeMin: z.string().min(1),
+  timeMax: z.string().min(1),
+  calendarId: z.string().min(1).max(300).optional(),
+  maxResults: z.coerce.number().int().min(1).max(250).optional(),
+})
+
+export const crmGoogleDriveCreateFileSchema = z.object({
+  name: z.string().min(1).max(500),
+  mimeType: z.string().min(1).max(200),
+  contentBase64: z.string().min(1),
+  parentIds: z.array(z.string().min(2).max(128)).max(10).optional(),
+})

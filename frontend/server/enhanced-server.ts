@@ -53,6 +53,8 @@ import {
 } from './valuation/llm-advisor.js'
 import { registerCrmRoutes } from './routes/crm.routes.js'
 import { getCrmPool, PostgresCrmDb, isCrmPostgresConfigured } from './services/crm/postgres-db.js'
+import { createGmailOutboundService } from './services/gmail/gmail-outbound.service.js'
+import type { GmailOutboundService } from './services/gmail/gmail-outbound.service.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -84,7 +86,16 @@ function getCrmDb() {
   if (!pool) return null
   return new PostgresCrmDb(pool)
 }
-registerCrmRoutes(app, getCrmDb)
+
+let gmailOutboundCached: GmailOutboundService | null | undefined
+function getGmailOutboundForCrm(): GmailOutboundService | null {
+  if (gmailOutboundCached !== undefined) return gmailOutboundCached
+  const pool = getCrmPool()
+  gmailOutboundCached = createGmailOutboundService(pool)
+  return gmailOutboundCached
+}
+
+registerCrmRoutes(app, getCrmDb, getGmailOutboundForCrm)
 
 // FastAPI backend URL for proxying lists, views, universe, etc. (same target as Vite /api proxy in dev)
 const FASTAPI_BACKEND =

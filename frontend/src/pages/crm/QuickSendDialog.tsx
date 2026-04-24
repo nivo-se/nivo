@@ -18,9 +18,11 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
 import {
   getCrmEmailConfig,
+  getCrmGmailStatus,
   listCrmCompanies,
   quickSend,
   type CrmEmailConfig,
+  type CrmGmailStatus,
   type QuickSendResult,
 } from "@/lib/api/crm";
 
@@ -39,7 +41,7 @@ interface QuickSendDialogProps {
 
 /**
  * Single-screen "paste from Claude → send" composer.
- * Creates company/contact/deal under the hood; one click sends via Resend and tracks the email.
+ * Creates company/contact/deal under the hood; sends via your connected Gmail or Resend.
  */
 export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogProps) {
   const { toast } = useToast();
@@ -57,6 +59,7 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
   const debouncedCompany = useDebounce(companyName, 250);
 
   const [emailConfig, setEmailConfig] = useState<CrmEmailConfig | null>(null);
+  const [gmailStatus, setGmailStatus] = useState<CrmGmailStatus | null>(null);
 
   const reset = useCallback(() => {
     setToEmail("");
@@ -72,11 +75,25 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
     if (!open) return;
     let cancelled = false;
     getCrmEmailConfig()
-      .then((cfg) => {
-        if (!cancelled) setEmailConfig(cfg);
+      .then(async (cfg) => {
+        if (cancelled) return;
+        setEmailConfig(cfg);
+        if (!cfg.gmail_oauth_server_configured) {
+          setGmailStatus(null);
+          return;
+        }
+        try {
+          const g = await getCrmGmailStatus();
+          if (!cancelled) setGmailStatus(g);
+        } catch {
+          if (!cancelled) setGmailStatus(null);
+        }
       })
       .catch(() => {
-        if (!cancelled) setEmailConfig(null);
+        if (!cancelled) {
+          setEmailConfig(null);
+          setGmailStatus(null);
+        }
       });
     return () => {
       cancelled = true;
@@ -124,7 +141,10 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
     );
   }, [toEmail, companyName, subject, body, busy]);
 
-  const resendReady = emailConfig?.resend_configured !== false;
+  const resendOk = emailConfig?.resend_configured === true;
+  const gmailOk =
+    emailConfig?.gmail_oauth_server_configured === true && gmailStatus?.connected === true;
+  const deliveryReady = Boolean(resendOk || gmailOk);
 
   const handleSubmit = async () => {
     if (!canSend) return;
@@ -182,17 +202,27 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
             Quick send
           </DialogTitle>
           <DialogDescription>
-            Paste subject and body (e.g. drafted in Claude). We file it under the company,
-            send via Resend, and start tracking opens, clicks, and replies.
+            Paste subject and body (e.g. drafted in Claude). We file it under the company and
+            send from your connected Gmail, or from Resend when that is the active path.
           </DialogDescription>
         </DialogHeader>
 
-        {!resendReady && emailConfig ? (
+        {emailConfig && !deliveryReady ? (
           <Alert variant="destructive" className="py-2">
-            <AlertTitle className="text-xs">Resend not configured</AlertTitle>
+            <AlertTitle className="text-xs">No send path available</AlertTitle>
             <AlertDescription className="text-xs">
-              Missing: {emailConfig.missing.join(", ") || "(unknown)"}. Set them in your
-              env so sending works.
+              {emailConfig.gmail_oauth_server_configured && !gmailStatus?.connected
+                ? "Click Connect Gmail on the CRM home, or set up Resend. "
+                : null}
+              {!emailConfig.gmail_oauth_server_configured
+                ? "For Gmail, add Google OAuth env on the server. "
+                : null}
+              {!resendOk ? (
+                <span>
+                  Resend (optional if Gmail works):{" "}
+                  {emailConfig.missing.length ? emailConfig.missing.join(", ") : "not configured"}.
+                </span>
+              ) : null}
             </AlertDescription>
           </Alert>
         ) : null}
@@ -323,7 +353,7 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
             type="button"
             variant="primary"
             onClick={() => void handleSubmit()}
-            disabled={!canSend || !resendReady}
+            disabled={!canSend || !deliveryReady}
           >
             {busy ? (
               <>

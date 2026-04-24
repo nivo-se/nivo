@@ -195,6 +195,17 @@ export default function CrmPage() {
       .catch(() => setSavedLists([]));
   }, []);
 
+  useEffect(() => {
+    if (searchParams.get("gmail") !== "connected") return;
+    toast({
+      title: "Gmail connected",
+      description: "You can send from your own inbox in CRM; Quick send and approve flows use it when connected.",
+    });
+    const next = new URLSearchParams(searchParams);
+    next.delete("gmail");
+    navigate({ search: next.toString() ? `?${next.toString()}` : "" }, { replace: true });
+  }, [searchParams, navigate, toast]);
+
   const loadInbox = useCallback(async () => {
     setLoadingInbox(true);
     try {
