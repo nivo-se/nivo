@@ -1,8 +1,26 @@
 /**
+ * "Display Name" &lt;email@domain&gt; for From / Sender headers.
+ * Non-ASCII names use RFC 2047 encoded-word; ASCII uses a quoted string.
+ */
+export function formatFromHeader(fromEmail: string, displayName?: string | null): string {
+  const addr = fromEmail.trim()
+  if (!addr) return addr
+  const name = displayName?.trim()
+  if (!name) return addr
+  const ascii = /^[\x00-\x7f]*$/.test(name) && !name.includes('=?')
+  const encodedPhrase = ascii
+    ? `"${name.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+    : `=?UTF-8?B?${Buffer.from(name, 'utf8').toString('base64')}?=`
+  return `${encodedPhrase} <${addr}>`
+}
+
+/**
  * Build an RFC 822 message and return Gmail API `raw` body (base64url).
  */
 export function buildGmailRawMessage(input: {
   from: string
+  /** If set, From becomes `"Name" <from>` (or RFC 2047 for non-ASCII). */
+  fromDisplayName?: string | null
   to: string
   subject: string
   text: string
@@ -12,8 +30,9 @@ export function buildGmailRawMessage(input: {
   const boundary = `nivo_mixed_${Date.now()}_${Math.random().toString(16).slice(2)}`
   const subj = encodeSubject(input.subject)
   const hasHtml = Boolean(input.html && input.html.trim())
+  const fromHeader = formatFromHeader(input.from, input.fromDisplayName)
   const headers: string[] = [
-    `From: ${input.from}`,
+    `From: ${fromHeader}`,
     `To: ${input.to}`,
     `Subject: ${subj}`,
     'MIME-Version: 1.0',

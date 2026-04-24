@@ -139,8 +139,10 @@ export class GmailOutboundService {
     const auth = await this.loadOAuth2ForUser(userId)
     if (!auth) throw new Error('Gmail is not connected for this user')
 
+    const fromDisplay = process.env.CRM_GMAIL_OUTBOUND_FROM_NAME?.trim() || null
     const raw = buildGmailRawMessage({
       from: input.fromEmail,
+      fromDisplayName: fromDisplay,
       to: input.to,
       subject: input.subject,
       text: input.text,
