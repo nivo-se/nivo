@@ -1,0 +1,30 @@
+# User systemd unit — run the Node enhanced server (CRM /crm) on the same host as Docker + cloudflared.
+# Install (as the app user, e.g. jeppe on the miniserver):
+#   mkdir -p ~/.config/systemd/user
+#   cp config/systemd/nivo-enhanced.user.service.example ~/.config/systemd/user/nivo-enhanced.service
+#   # Edit paths if your repo root is not ~/nivo-web
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now nivo-enhanced.service
+#   loginctl enable-linger $USER   # so it survives logout (once)
+#
+# Requires: repo root `npm ci` (hoists deps; tsx lives under root node_modules in this monorepo),
+# Node 20+ at the path below or change ExecStart to match your nvm node.
+
+[Unit]
+Description=Nivo CRM enhanced server (Node, /crm)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/USER/nivo-web/frontend
+EnvironmentFile=-/home/USER/nivo-web/.env
+Environment=NODE_ENV=production
+Environment=PORT=3001
+Environment=FASTAPI_BACKEND_URL=http://127.0.0.1:8000
+ExecStart=/home/USER/.nvm/versions/node/v20.20.2/bin/node /home/USER/nivo-web/node_modules/tsx/dist/cli.mjs server/enhanced-server.ts
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

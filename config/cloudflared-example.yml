@@ -9,6 +9,11 @@ tunnel: TUNNEL_ID
 credentials-file: /Users/you/.cloudflared/TUNNEL_ID.json
 
 ingress:
+  # CRM (Node enhanced server) — more specific first if your cloudflared version supports path
+  # (match your docs/CRM_CLOUDFLARE_ROUTE.md; token-based tunnels often use Zero Trust UI instead)
+  - hostname: api.yourdomain.com
+    path: /crm/*
+    service: http://127.0.0.1:3001
   # API (FastAPI) — required
   - hostname: api.yourdomain.com
     service: http://127.0.0.1:8000
