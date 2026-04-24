@@ -8,12 +8,19 @@ export function escapeHtml(s: string): string {
 }
 
 /**
- * Wrap plain text as minimal HTML (preserves newlines) for email clients
- * that prefer multipart HTML alongside text/plain.
+ * Wrap plain text as minimal HTML for email. Uses explicit &lt;br /&gt; for line
+ * breaks — Gmail strips or ignores `white-space: pre-wrap` in many cases, which
+ * collapses newlines inside a &lt;div&gt;.
  */
 export function plainTextToSimpleEmailHtml(plain: string): string {
-  const esc = escapeHtml(plain)
-  return `<div style="white-space:pre-wrap;font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5;">${esc}</div>`
+  const normalized = plain.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  const withBreaks = escapeHtml(normalized).replace(/\n/g, '<br />')
+  return (
+    '<div dir="ltr" ' +
+    'style="font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#202124;">' +
+    withBreaks +
+    '</div>'
+  )
 }
 
 /** True when HTML is empty or only the CRM open-pixel (and optional whitespace / wrapping tags with nothing). */
