@@ -10,12 +10,26 @@
 #   #   CF_CRM_NODE_SERVICE=http://127.0.0.1:3001
 #   ./scripts/apply_crm_cloudflare_ingress.sh
 #
+# Optional: put secrets in repo root .env.cloudflare.local (gitignored) or set CF_ENV_FILE:
+#   CF_ENV_FILE=~/secrets/cf.env ./scripts/apply_crm_cloudflare_ingress.sh
+#
 # Idempotent: if the first ingress rule already matches hostname + path /crm + service, exits 0.
 # See docs/CRM_CLOUDFLARE_ROUTE.md
 
 set -euo pipefail
 
-: "${CLOUDFLARE_API_TOKEN:?set CLOUDFLARE_API_TOKEN}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENV_FILE="${CF_ENV_FILE:-$REPO_ROOT/.env.cloudflare.local}"
+if [[ -f "$ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+  echo "Loaded: $ENV_FILE" >&2
+fi
+
+: "${CLOUDFLARE_API_TOKEN:?set CLOUDFLARE_API_TOKEN or add to .env.cloudflare.local}"
 : "${CF_ACCOUNT_ID:?set CF_ACCOUNT_ID}"
 : "${CF_TUNNEL_ID:?set CF_TUNNEL_ID}"
 

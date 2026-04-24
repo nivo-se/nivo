@@ -43,6 +43,8 @@ The enhanced server uses permissive CORS. If you still see browser blocks, add y
 If you use an API token with **Account** → **Cloudflare Tunnel** **Edit** permission, you can update tunnel ingress via API instead of the UI. The account ID and tunnel UUID are in the Cloudflare dashboard. Do not commit tokens; set `CLOUDFLARE_API_TOKEN` only in CI or your shell for one-off runs.
 
 - **Repo script:** `scripts/apply_crm_cloudflare_ingress.sh` (reads current ingress, prepends `hostname` + `path: /crm` → `http://127.0.0.1:3001`, idempotent). Requires `CF_ACCOUNT_ID` and `CF_TUNNEL_ID`.
+- **Local env file (recommended):** copy `.env.cloudflare.local.example` to **`.env.cloudflare.local`** (gitignored), set the three variables, then run the script from the repo root. Or set **`CF_ENV_FILE=/path/to/your.env`** if the values live in another file.
+- **Find tunnel UUID:** `scripts/list_cloudflare_tunnels.sh` (token + account only; prints `id`, `name`, `status` per tunnel).
 - **Reference:** [Update tunnel configuration](https://developers.cloudflare.com/api/resources/zero_trust/subresources/tunnels/subresources/cloudflared/subresources/configurations/methods/update/).
 
 ## Verify from the public internet
