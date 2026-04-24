@@ -41,9 +41,23 @@ resolve_default_url() {
   echo "postgresql://${user}:${password}@${host}:5433/${db}"
 }
 
+# When the host has no `psql` (common on minimal Ubuntu) but Postgres runs in Docker
+# on this machine, apply SQL via the nivo-pg container. Set MIGRATION_USE_DOCKER_PSQL=0
+# to skip. Requires docker and a running container named nivo-pg.
+USE_DOCKER_PSQL=0
+if [ "${MIGRATION_USE_DOCKER_PSQL:-1}" = "1" ] && ! command -v psql >/dev/null 2>&1 \
+  && command -v docker >/dev/null 2>&1 \
+  && docker ps --format '{{.Names}}' 2>/dev/null | grep -qx nivo-pg; then
+  USE_DOCKER_PSQL=1
+  PSQL_USER="${POSTGRES_USER:-nivo}"
+  PSQL_DB="${POSTGRES_DB:-nivo}"
+fi
+
 apply_sql_file() {
   local file="$1"
-  if [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
+  if [ "$USE_DOCKER_PSQL" = "1" ]; then
+    docker exec -i nivo-pg psql -U "$PSQL_USER" -d "$PSQL_DB" -v ON_ERROR_STOP=1 < "$file"
+  elif [ "${MIGRATION_USE_PYTHON:-0}" != "1" ] && command -v psql >/dev/null 2>&1; then
     psql "$URL" -f "$file" -v ON_ERROR_STOP=1
   else
     DATABASE_URL="$URL" SQL_FILE="$file" python3 - <<'PY'
@@ -71,6 +85,9 @@ else
   echo "Using resolved default URL (DATABASE_URL not set)"
 fi
 echo "Target: ${URL%%@*}@*** (run against this DB)"
+if [ "$USE_DOCKER_PSQL" = "1" ]; then
+  echo "Applying SQL via: docker exec nivo-pg (user=$PSQL_USER, db=$PSQL_DB)"
+fi
 echo ""
 
 # Note: 043_screening_features_v1.sql is superseded by 045 (full view + geo/registry columns).
