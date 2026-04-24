@@ -12,16 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { getAccessToken, isAuth0Configured } from "@/lib/authToken";
 import {
-  getCrmEmailConfig,
-  getCrmGmailOAuthUrl,
-  getCrmGmailStatus,
   getRecentInbound,
   getRecentSent,
   listCrmCompanies,
-  type CrmEmailConfig,
-  type CrmGmailStatus,
   type CrmInboundRecentRow,
   type CrmRecentSentRow,
 } from "@/lib/api/crm";
@@ -94,9 +88,6 @@ export function CrmHome({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [emailConfig, setEmailConfig] = useState<CrmEmailConfig | null>(null);
-  const [gmailStatus, setGmailStatus] = useState<CrmGmailStatus | null>(null);
-  const [gmailConnectBusy, setGmailConnectBusy] = useState(false);
   const [sent, setSent] = useState<CrmRecentSentRow[]>([]);
   const [replies, setReplies] = useState<CrmInboundRecentRow[]>([]);
   const [companies, setCompanies] = useState<CrmCompanyRow[]>([]);
@@ -110,26 +101,14 @@ export function CrmHome({
       else setRefreshing(true);
       setLoadError(null);
       try {
-        const [s, r, c, cfg] = await Promise.all([
+        const [s, r, c] = await Promise.all([
           getRecentSent(8),
           getRecentInbound(6),
           listCrmCompanies("", 6),
-          getCrmEmailConfig().catch(() => null),
         ]);
         setSent(Array.isArray(s) ? s : []);
         setReplies(Array.isArray(r) ? r : []);
         setCompanies(Array.isArray(c) ? (c as CrmCompanyRow[]) : []);
-        setEmailConfig(cfg);
-        if (cfg?.gmail_oauth_server_configured) {
-          try {
-            const g = await getCrmGmailStatus();
-            setGmailStatus(g);
-          } catch {
-            setGmailStatus(null);
-          }
-        } else {
-          setGmailStatus(null);
-        }
       } catch (e) {
         setLoadError(e instanceof Error ? e.message : "Failed to load");
         if (mode === "refresh") {
@@ -150,46 +129,6 @@ export function CrmHome({
   const totalSent = sent.length;
   const totalReplies = replies.length;
   const totalCompanies = companies.length;
-  // Email sending is moving to Attio; we no longer surface a "set up Resend" banner.
-  // emailConfig is still loaded so we can show subtler diagnostics if needed later.
-  const onConnectGmail = useCallback(async () => {
-    if (!emailConfig?.gmail_oauth_server_configured) return;
-    if (!isAuth0Configured()) {
-      toast({
-        title: "Sign in to Nivo first",
-        description:
-          "Gmail is linked to your Nivo login. In dev, set VITE_DISABLE_AUTH=false in frontend/.env.local (or override .env.development), set VITE_AUTH0_* in .env, restart npm run dev, then log in and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-    const token = await getAccessToken();
-    if (!token) {
-      toast({
-        title: "Sign in to Nivo first",
-        description: "Log in (Auth0) in the top right, then click Connect Gmail again. The server needs your session to store the Gmail link safely.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setGmailConnectBusy(true);
-    try {
-      const url = await getCrmGmailOAuthUrl();
-      window.location.assign(url);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      toast({
-        title: "Could not start Google sign-in",
-        description:
-          msg === "Authentication required" || msg.includes("401")
-            ? "Not signed in or session expired. Log in to Nivo, then try again. In local dev, ensure VITE_DISABLE_AUTH is false and Auth0 env is set on the app and the enhanced server (same AUTH0_DOMAIN / audience as the token)."
-            : msg,
-        variant: "destructive",
-      });
-      setGmailConnectBusy(false);
-    }
-  }, [emailConfig?.gmail_oauth_server_configured, toast]);
-
   const headerStats = useMemo(
     () =>
       [
@@ -232,34 +171,6 @@ export function CrmHome({
           </Button>
         </div>
       </div>
-
-      {emailConfig?.gmail_oauth_server_configured ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/70 bg-muted/10 px-3 py-2.5 text-sm">
-          <div className="min-w-0 text-muted-foreground">
-            {gmailStatus?.connected && gmailStatus.google_email ? (
-              <span>
-                <span className="font-medium text-foreground">Gmail: </span>
-                {gmailStatus.google_email}
-                <span className="ml-1">— outbound from CRM can use this inbox.</span>
-              </span>
-            ) : (
-              <span>Send email from your own Google Workspace inbox (each teammate signs in once).</span>
-            )}
-          </div>
-          {!gmailStatus?.connected ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => void onConnectGmail()}
-              disabled={gmailConnectBusy}
-            >
-              {gmailConnectBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-              {gmailConnectBusy ? "Redirecting…" : "Connect Gmail"}
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {headerStats.map(({ label, value, icon: Icon }) => (

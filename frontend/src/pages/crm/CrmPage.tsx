@@ -63,13 +63,18 @@ import {
   createExternalCompany,
   ensureDealFromCompany,
   generateBatchEmails,
+  getCrmEmailConfig,
+  getCrmGmailStatus,
   getRecentInbound,
   getUnmatchedInbound,
   listCrmCompanies,
+  type CrmEmailConfig,
+  type CrmGmailStatus,
   type CrmInboundRecentRow,
   type CrmInboundUnmatchedRow,
   type CrmBatchDraftRow,
 } from "@/lib/api/crm";
+import { CrmGmailConnectBanner } from "./CrmGmailConnectBanner";
 import { CrmHome } from "./CrmHome";
 import { CrmWorkspace } from "./CrmWorkspace";
 import { QuickSendDialog } from "./QuickSendDialog";
@@ -166,6 +171,38 @@ export default function CrmPage() {
   const [extBusy, setExtBusy] = useState(false);
   const [companyPickerOpen, setCompanyPickerOpen] = useState(false);
 
+  const [crmEmailConfig, setCrmEmailConfig] = useState<CrmEmailConfig | null>(null);
+  const [crmGmailStatus, setCrmGmailStatus] = useState<CrmGmailStatus | null>(null);
+  const [crmEmailSettingsLoading, setCrmEmailSettingsLoading] = useState(true);
+  const [gmailConnectBusy, setGmailConnectBusy] = useState(false);
+
+  const loadCrmGmailSettings = useCallback(async () => {
+    setCrmEmailSettingsLoading(true);
+    try {
+      const cfg = await getCrmEmailConfig();
+      setCrmEmailConfig(cfg);
+      if (cfg.gmail_oauth_server_configured) {
+        try {
+          const g = await getCrmGmailStatus();
+          setCrmGmailStatus(g);
+        } catch {
+          setCrmGmailStatus(null);
+        }
+      } else {
+        setCrmGmailStatus(null);
+      }
+    } catch {
+      setCrmEmailConfig(null);
+      setCrmGmailStatus(null);
+    } finally {
+      setCrmEmailSettingsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCrmGmailSettings();
+  }, [loadCrmGmailSettings]);
+
   const loadCompanies = useCallback(async () => {
     setLoadingCompanies(true);
     setListError(null);
@@ -198,6 +235,7 @@ export default function CrmPage() {
 
   useEffect(() => {
     if (searchParams.get("gmail") !== "connected") return;
+    void loadCrmGmailSettings();
     toast({
       title: "Gmail connected",
       description: "You can send from your own inbox in CRM; Quick send and approve flows use it when connected.",
@@ -205,7 +243,7 @@ export default function CrmPage() {
     const next = new URLSearchParams(searchParams);
     next.delete("gmail");
     navigate({ search: next.toString() ? `?${next.toString()}` : "" }, { replace: true });
-  }, [searchParams, navigate, toast]);
+  }, [searchParams, navigate, toast, loadCrmGmailSettings]);
 
   const loadInbox = useCallback(async () => {
     setLoadingInbox(true);
@@ -515,6 +553,14 @@ export default function CrmPage() {
         </Sheet>
 
         <main className="flex-1 min-w-0 overflow-auto p-4 md:p-6 lg:px-8">
+          <CrmGmailConnectBanner
+            emailConfig={crmEmailConfig}
+            gmailStatus={crmGmailStatus}
+            connectBusy={gmailConnectBusy}
+            onConnectStart={() => setGmailConnectBusy(true)}
+            onConnectEnd={() => setGmailConnectBusy(false)}
+            loading={crmEmailSettingsLoading}
+          />
           {tab === "inbox" && (
             <div className="max-w-5xl mx-auto space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
