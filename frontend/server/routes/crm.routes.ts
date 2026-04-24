@@ -227,6 +227,7 @@ export function registerCrmRoutes(
           server_configured: false,
           connected: false,
           google_email: null as string | null,
+          google_display_name: null as string | null,
           workspace: { gmail_send: false, drive_file: false, calendar_events: false },
         },
       })
@@ -241,6 +242,7 @@ export function registerCrmRoutes(
         server_configured: true,
         connected: Boolean(row),
         google_email: row?.google_email ?? null,
+        google_display_name: row?.google_display_name ?? null,
         workspace,
       },
     })

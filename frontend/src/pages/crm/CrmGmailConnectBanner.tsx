@@ -83,7 +83,9 @@ export function CrmGmailConnectBanner({
         {gmailStatus?.connected && gmailStatus.google_email ? (
           <span>
             <span className="font-medium text-foreground">Gmail: </span>
-            {gmailStatus.google_email}
+            {gmailStatus.google_display_name
+              ? `${gmailStatus.google_display_name} · ${gmailStatus.google_email}`
+              : gmailStatus.google_email}
             <span className="ml-1">— outbound from CRM can use this inbox.</span>
           </span>
         ) : (

@@ -35,8 +35,10 @@ Run migration `050_user_gmail_oauth.sql` (table `deep_research.user_gmail_creden
 | `GOOGLE_OAUTH_CLIENT_SECRET` | Web client secret |
 | `GOOGLE_OAUTH_REDIRECT_URI` | Same string as the redirect URI registered in step 1 |
 | `GMAIL_OAUTH_ENCRYPTION_KEY` | 32 bytes as **base64** (e.g. `openssl rand -base64 32`) or 64 hex chars; used to encrypt stored refresh tokens and to sign the OAuth `state` JWT |
-| `CRM_GMAIL_OUTBOUND_FROM_NAME` (optional) | Display name in the **From** header for outbound CRM mail (e.g. `Firstname Lastname`), so the inbox shows a person’s name before the address. Still sends as the connected Gmail address. |
+| `CRM_GMAIL_OUTBOUND_FROM_NAME` (optional) | **Fallback** display name in the **From** header if Google did not return a name (e.g. old connections before profile scope). At connect, the server stores **`google_display_name` from Google userinfo** (`name` or given + family) and uses that for send. Reconnect “Connect Gmail” after upgrading so profile is granted. |
 | `CRM_GMAIL_OAUTH_SUCCESS_URL` (optional) | Where the browser lands after a successful connect (default: `APP_BASE_URL` or your Vite dev URL, e.g. `http://localhost:8080`) |
+
+OAuth scopes include **`userinfo.profile`** so we can read the account **display name** (same as in the Google account profile) and store it in `google_display_name` for the outbound `From: "Name" <email>` line.
 
 ## 5. Send behaviour
 

@@ -252,6 +252,8 @@ export interface CrmGmailStatus {
   server_configured: boolean;
   connected: boolean;
   google_email: string | null;
+  /** From Google profile at connect; used as outbound From display name. */
+  google_display_name: string | null;
   workspace: CrmGoogleWorkspaceFlags;
 }
 

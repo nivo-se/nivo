@@ -5,12 +5,13 @@ import { buildGmailRawMessage } from './build-gmail-raw-message.js'
 import { encryptGmailRefreshToken, decryptGmailRefreshToken } from './gmail-token-crypto.js'
 import { isGmailOAuthEnvConfigured } from './gmail-oauth-env.js'
 
-/** Requested on connect: send mail, per-user Drive files created by this app, calendar events, email for display. */
+/** Requested on connect: send mail, per-user Drive files created by this app, calendar events, email + profile (display name). */
 export const GOOGLE_WORKSPACE_OAUTH_SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/drive.file',
   'https://www.googleapis.com/auth/calendar.events',
   'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
 ] as const
 
 export const SCOPE_GMAIL_SEND = 'https://www.googleapis.com/auth/gmail.send'
@@ -20,6 +21,20 @@ export const SCOPE_CALENDAR_EVENTS = 'https://www.googleapis.com/auth/calendar.e
 function parseGrantedScopes(raw: string | null | undefined): Set<string> {
   if (!raw?.trim()) return new Set()
   return new Set(raw.split(/\s+/).filter(Boolean))
+}
+
+/** Full name from Google userinfo (requires `userinfo.profile`). */
+function displayNameFromUserinfo(data: {
+  name?: string | null
+  given_name?: string | null
+  family_name?: string | null
+}): string | null {
+  const n = data.name?.trim()
+  if (n) return n
+  const g = data.given_name?.trim() || ''
+  const f = data.family_name?.trim() || ''
+  const both = [g, f].filter(Boolean).join(' ').trim()
+  return both || null
 }
 
 export class GmailOutboundService {
@@ -63,26 +78,42 @@ export class GmailOutboundService {
     const email = data.email
     if (!email) throw new Error('Could not read Google account email')
 
+    const displayName = displayNameFromUserinfo({
+      name: data.name,
+      given_name: data.given_name,
+      family_name: data.family_name,
+    })
     const enc = encryptGmailRefreshToken(tokens.refresh_token)
     const grantedScopes = typeof tokens.scope === 'string' ? tokens.scope.trim() || null : null
     await this.pool.query(
-      `INSERT INTO deep_research.user_gmail_credentials (user_id, google_email, refresh_token_enc, granted_scopes)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO deep_research.user_gmail_credentials
+         (user_id, google_email, refresh_token_enc, granted_scopes, google_display_name)
+       VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (user_id) DO UPDATE SET
          google_email = EXCLUDED.google_email,
          refresh_token_enc = EXCLUDED.refresh_token_enc,
          granted_scopes = EXCLUDED.granted_scopes,
+         google_display_name = EXCLUDED.google_display_name,
          updated_at = now()`,
-      [userId, email.toLowerCase(), enc, grantedScopes]
+      [userId, email.toLowerCase(), enc, grantedScopes, displayName]
     )
     return { google_email: email }
   }
 
   async getConnection(
     userId: string,
-  ): Promise<{ google_email: string; granted_scopes: string[] } | null> {
-    const { rows } = await this.pool.query<{ google_email: string; granted_scopes: string | null }>(
-      `SELECT google_email, granted_scopes FROM deep_research.user_gmail_credentials WHERE user_id = $1`,
+  ): Promise<{
+    google_email: string
+    google_display_name: string | null
+    granted_scopes: string[]
+  } | null> {
+    const { rows } = await this.pool.query<{
+      google_email: string
+      granted_scopes: string | null
+      google_display_name: string | null
+    }>(
+      `SELECT google_email, granted_scopes, google_display_name
+       FROM deep_research.user_gmail_credentials WHERE user_id = $1`,
       [userId]
     )
     const r = rows[0]
@@ -91,7 +122,11 @@ export class GmailOutboundService {
     const granted_scopes = r.granted_scopes?.trim()
       ? r.granted_scopes.trim().split(/\s+/)
       : [SCOPE_GMAIL_SEND]
-    return { google_email: r.google_email, granted_scopes }
+    return {
+      google_email: r.google_email,
+      google_display_name: r.google_display_name?.trim() || null,
+      granted_scopes,
+    }
   }
 
   scopeFlags(grantedScopes: string[]) {
@@ -133,13 +168,16 @@ export class GmailOutboundService {
       text: string
       html?: string | null
       fromEmail: string
+      /** From userinfo at connect; falls back to `CRM_GMAIL_OUTBOUND_FROM_NAME` env. */
+      fromDisplayName?: string | null
       replyTo?: string | null
     }
   ): Promise<{ id: string }> {
     const auth = await this.loadOAuth2ForUser(userId)
     if (!auth) throw new Error('Gmail is not connected for this user')
 
-    const fromDisplay = process.env.CRM_GMAIL_OUTBOUND_FROM_NAME?.trim() || null
+    const fromDisplay =
+      input.fromDisplayName?.trim() || process.env.CRM_GMAIL_OUTBOUND_FROM_NAME?.trim() || null
     const raw = buildGmailRawMessage({
       from: input.fromEmail,
       fromDisplayName: fromDisplay,

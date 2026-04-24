@@ -169,6 +169,7 @@ export class EmailsService {
         text: email.body_text,
         html: outboundHtml,
         fromEmail: conn.google_email,
+        fromDisplayName: conn.google_display_name,
         replyTo: replyTo ?? null,
       })
 
