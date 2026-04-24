@@ -23,12 +23,23 @@ Use `DATABASE_SOURCE=postgres` with your Postgres connection (Mac Mini or local 
 | `POSTGRES_USER` | `nivo` | Yes |
 | `POSTGRES_PASSWORD` | (your DB password) | Yes |
 
-## CORS
+## CORS (FastAPI; also set equivalent origins on the Node enhanced server for CRM)
 
 | Variable | Example | Required |
 |----------|---------|----------|
 | `CORS_ORIGINS` | `https://your-app.vercel.app,https://your-domain.com` | Yes |
 | `CORS_ALLOW_VERCEL_PREVIEWS` | `true` | Optional; enables `*.vercel.app` when needed |
+
+## CRM (Vite / Vercel) — Node enhanced server
+
+CRM uses **Node** (`frontend/server`, `/crm/...`), not FastAPI. The Vercel build is static: **same-origin** `/crm` in production does not proxy; you must point the app at a host that actually runs the enhanced server (e.g. your tunnel / VM).
+
+| Variable | Where | Example | Required for CRM in prod |
+|----------|--------|---------|---------------------------|
+| `VITE_CRM_BASE_URL` | **Vercel** (Vite, build-time) | `https://crm.nivogroup.se` (origin only; your Node/tunnel host) | Yes — or CRM calls return HTML/404 and “could not load email settings” |
+| (Node host `.env`) | same host as `VITE_CRM_BASE_URL` | `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `DATABASE_URL` / `POSTGRES_*`, Gmail OAuth, etc. | Yes for save/send from CRM |
+
+`VITE_API_BASE_URL` (FastAPI) and `VITE_CRM_BASE_URL` (Node) are **different** services.
 
 ## RQ (Redis)
 

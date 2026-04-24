@@ -43,9 +43,20 @@ export function CrmGmailConnectBanner({
   if (emailConfig === null) {
     return (
       <div className="mb-4 rounded-lg border border-dashed border-amber-500/40 bg-amber-500/5 px-3 py-2.5 text-xs text-muted-foreground">
-        Could not load CRM email settings. Check that the <strong>enhanced server</strong> (Node,{" "}
-        <code className="rounded bg-muted px-1">/crm</code>) is deployed and that your session can reach
-        it.
+        <p className="text-foreground font-medium">Could not load CRM email settings</p>
+        <p className="mt-1.5 leading-relaxed">
+          The CRM UI talks to a <strong>separate</strong> Node process (enhanced server) at{" "}
+          <code className="rounded bg-muted px-1">/crm/*</code>, not the Python API at <code className="rounded bg-muted px-1">/api</code>
+          . On <strong>Vercel</strong>, the static build does <strong>not</strong> run that server — the browser
+          would get the SPA instead of JSON unless you set the CRM base URL at build time.
+        </p>
+        <p className="mt-1.5 leading-relaxed">
+          In the Vercel project, set <code className="rounded bg-muted px-1">VITE_CRM_BASE_URL</code> to the{" "}
+          <strong>public origin</strong> where Node serves CRM (e.g. your Cloudflare host for port 3001), then
+          trigger a <strong>new deployment</strong>. Example: <code className="rounded bg-muted px-1">https://crm.nivogroup.se</code>{" "}
+          (not <code className="rounded bg-muted px-1">api.…</code> for FastAPI — that has no <code className="rounded bg-muted px-1">/crm</code> routes). Ensure
+          CORS on that Node host allows this app’s origin, and the enhanced server is running with Postgres env.
+        </p>
       </div>
     );
   }
