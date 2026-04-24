@@ -227,7 +227,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
     setLoadingEmails(true);
     try {
       const rows = await getDealEmails(dealId);
-      setEmails(rows);
+      setEmails(Array.isArray(rows) ? rows : []);
     } catch {
       setEmails([]);
       toast({ title: "Could not load emails", variant: "destructive" });
@@ -275,7 +275,7 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
       if (showSpinner) setLoadingThread(true);
       try {
         const rows = await getThreadMessages(tid);
-        setThreadMessages(rows);
+        setThreadMessages(Array.isArray(rows) ? rows : []);
       } catch {
         setThreadMessages([]);
         if (!opts?.silent) {
@@ -301,7 +301,8 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
 
   const lastSentSubjectForContact = useCallback(
     (contactId: string) => {
-      const sent = emails.filter((e) => e.contact_id === contactId && e.status === "sent");
+      const list = Array.isArray(emails) ? emails : [];
+      const sent = list.filter((e) => e.contact_id === contactId && e.status === "sent");
       sent.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       return sent[0]?.subject ?? null;
     },
@@ -504,12 +505,13 @@ export function CrmWorkspace({ companyIdParam, onBack }: CrmWorkspaceProps) {
       const summary =
         `${result.contacts_pushed}/${result.contacts_total} contacts` +
         (result.notes_appended ? ` · ${result.notes_appended} note` : "");
+      const errList = Array.isArray(result?.errors) ? result.errors : [];
       toast({
-        title: result.errors.length ? "Sent to Attio (with warnings)" : "Sent to Attio",
-        description: result.errors.length
-          ? `${summary}. Issues: ${result.errors.join("; ")}`
+        title: errList.length ? "Sent to Attio (with warnings)" : "Sent to Attio",
+        description: errList.length
+          ? `${summary}. Issues: ${errList.join("; ")}`
           : summary,
-        variant: result.errors.length ? "destructive" : "default",
+        variant: errList.length ? "destructive" : "default",
       });
     } catch (e) {
       if (isAttioDisabledError(e)) {

@@ -116,9 +116,9 @@ export function CrmHome({
           listCrmCompanies("", 6),
           getCrmEmailConfig().catch(() => null),
         ]);
-        setSent(s);
-        setReplies(r);
-        setCompanies(c as CrmCompanyRow[]);
+        setSent(Array.isArray(s) ? s : []);
+        setReplies(Array.isArray(r) ? r : []);
+        setCompanies(Array.isArray(c) ? (c as CrmCompanyRow[]) : []);
         setEmailConfig(cfg);
         if (cfg?.gmail_oauth_server_configured) {
           try {

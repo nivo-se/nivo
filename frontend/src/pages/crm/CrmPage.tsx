@@ -171,7 +171,7 @@ export default function CrmPage() {
     setListError(null);
     try {
       const data = await listCrmCompanies(debouncedSearch, 50);
-      setCompanies(data ?? []);
+      setCompanies(Array.isArray(data) ? data : []);
     } catch (e) {
       setCompanies([]);
       setListError(e instanceof Error ? e.message : "Failed to load companies");
@@ -187,9 +187,10 @@ export default function CrmPage() {
   useEffect(() => {
     getAllLists()
       .then((lists) => {
-        setSavedLists(lists);
-        if (lists.length) {
-          setBatchListId((prev) => prev || lists[0].id);
+        const safe = Array.isArray(lists) ? lists : [];
+        setSavedLists(safe);
+        if (safe.length) {
+          setBatchListId((prev) => prev || safe[0].id);
         }
       })
       .catch(() => setSavedLists([]));
@@ -210,7 +211,7 @@ export default function CrmPage() {
     setLoadingInbox(true);
     try {
       const rows = await getRecentInbound(80);
-      setInboxRows(rows);
+      setInboxRows(Array.isArray(rows) ? rows : []);
     } catch {
       setInboxRows([]);
       toast({ title: "Could not load inbox", variant: "destructive" });
@@ -223,7 +224,7 @@ export default function CrmPage() {
     setLoadingUnmatched(true);
     try {
       const rows = await getUnmatchedInbound(80);
-      setUnmatchedRows(rows);
+      setUnmatchedRows(Array.isArray(rows) ? rows : []);
     } catch {
       setUnmatchedRows([]);
       toast({ title: "Could not load unmatched mail", variant: "destructive" });
@@ -262,12 +263,14 @@ export default function CrmPage() {
         user_instructions: batchInstructions.trim() || undefined,
         reason_for_interest: batchReason.trim() || undefined,
       });
-      setBatchDrafts(data.drafts);
-      setBatchSkipped(data.skipped);
+      const drafts = Array.isArray(data?.drafts) ? data.drafts : [];
+      const skipped = Array.isArray(data?.skipped) ? data.skipped : [];
+      setBatchDrafts(drafts);
+      setBatchSkipped(skipped);
       toast({
-        title: `Generated ${data.drafts.length} draft(s)`,
+        title: `Generated ${drafts.length} draft(s)`,
         description:
-          data.skipped.length > 0 ? `${data.skipped.length} skipped (see table)` : undefined,
+          skipped.length > 0 ? `${skipped.length} skipped (see table)` : undefined,
       });
     } catch (e) {
       toast({

@@ -116,8 +116,9 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
     listCrmCompanies(term, 6)
       .then((rows) => {
         if (cancelled) return;
+        const r = Array.isArray(rows) ? rows : [];
         setMatches(
-          rows.map((r) => ({ id: r.id, name: r.name, industry: r.industry }))
+          r.map((row) => ({ id: row.id, name: row.name, industry: row.industry }))
         );
       })
       .catch(() => {
@@ -220,7 +221,7 @@ export function QuickSendDialog({ open, onOpenChange, onSent }: QuickSendDialogP
               {!resendOk ? (
                 <span>
                   Resend (optional if Gmail works):{" "}
-                  {emailConfig.missing.length ? emailConfig.missing.join(", ") : "not configured"}.
+                  {emailConfig.missing?.length ? emailConfig.missing.join(", ") : "not configured"}.
                 </span>
               ) : null}
             </AlertDescription>
