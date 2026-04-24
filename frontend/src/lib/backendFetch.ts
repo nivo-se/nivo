@@ -46,8 +46,8 @@ export async function fetchWithAuth(
       const base = new URL(url).origin
       throw new Error(
         `Cannot reach backend at ${base}. Is the backend running? ` +
-        `If using api.nivogroup.se: ensure the Cloudflare tunnel and API are running on the Mac. ` +
-        `Use the Troubleshooting → Test connection on this page to diagnose.`
+        `If the API is up (curl /health) but the browser still fails, check CORS: add this page's origin to CORS_ORIGINS on the API (e.g. https://www.… and https://app.…). ` +
+        `Use Troubleshooting → Test connection on this page.`
       )
     }
     throw e
