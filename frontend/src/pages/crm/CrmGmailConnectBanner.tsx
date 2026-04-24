@@ -1,7 +1,13 @@
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAccessToken, isAuth0Configured } from "@/lib/authToken";
-import { getCrmGmailOAuthUrl, type CrmEmailConfig, type CrmGmailStatus } from "@/lib/api/crm";
+import {
+  disconnectCrmGmail,
+  getCrmGmailOAuthUrl,
+  type CrmEmailConfig,
+  type CrmGmailStatus,
+} from "@/lib/api/crm";
 import { useToast } from "@/hooks/use-toast";
 
 type Props = {
@@ -10,6 +16,8 @@ type Props = {
   connectBusy: boolean;
   onConnectStart: () => void;
   onConnectEnd: () => void;
+  /** Called after successful disconnect to refresh parent status */
+  onGmailDisconnected?: () => void;
   loading?: boolean;
 };
 
@@ -23,9 +31,11 @@ export function CrmGmailConnectBanner({
   connectBusy,
   onConnectStart,
   onConnectEnd,
+  onGmailDisconnected,
   loading,
 }: Props) {
   const { toast } = useToast();
+  const [disconnectBusy, setDisconnectBusy] = useState(false);
 
   if (loading && !emailConfig) {
     return (
@@ -92,56 +102,91 @@ export function CrmGmailConnectBanner({
           <span>Send from your own Google Workspace inbox (sign in with Google once per teammate).</span>
         )}
       </div>
-      {!gmailStatus?.connected ? (
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={async () => {
-            onConnectStart();
-            if (!isAuth0Configured()) {
-              toast({
-                title: "Sign in to Nivo first",
-                description:
-                  "Gmail is linked to your Nivo login. Set VITE_AUTH0_* in the app build and sign in, then try again.",
-                variant: "destructive",
-              });
-              onConnectEnd();
-              return;
-            }
-            const token = await getAccessToken();
-            if (!token) {
-              toast({
-                title: "Sign in to Nivo first",
-                description: "Use Log in, then connect Gmail again.",
-                variant: "destructive",
-              });
-              onConnectEnd();
-              return;
-            }
-            try {
-              const url = await getCrmGmailOAuthUrl();
-              window.location.assign(url);
-            } catch (e) {
-              const msg = e instanceof Error ? e.message : String(e);
-              toast({
-                title: "Could not start Google sign-in",
-                description:
-                  msg === "Authentication required" || msg.includes("401")
-                    ? "Session expired — sign in to Nivo again, then connect Gmail."
-                    : msg,
-                variant: "destructive",
-              });
-              onConnectEnd();
-            }
-            /* Success path redirects; no onConnectEnd */
-          }}
-          disabled={connectBusy}
-        >
-          {connectBusy ? <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" /> : null}
-          {connectBusy ? "Redirecting…" : "Connect Gmail"}
-        </Button>
-      ) : null}
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
+        {!gmailStatus?.connected ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              onConnectStart();
+              if (!isAuth0Configured()) {
+                toast({
+                  title: "Sign in to Nivo first",
+                  description:
+                    "Gmail is linked to your Nivo login. Set VITE_AUTH0_* in the app build and sign in, then try again.",
+                  variant: "destructive",
+                });
+                onConnectEnd();
+                return;
+              }
+              const token = await getAccessToken();
+              if (!token) {
+                toast({
+                  title: "Sign in to Nivo first",
+                  description: "Use Log in, then connect Gmail again.",
+                  variant: "destructive",
+                });
+                onConnectEnd();
+                return;
+              }
+              try {
+                const url = await getCrmGmailOAuthUrl();
+                window.location.assign(url);
+              } catch (e) {
+                const msg = e instanceof Error ? e.message : String(e);
+                toast({
+                  title: "Could not start Google sign-in",
+                  description:
+                    msg === "Authentication required" || msg.includes("401")
+                      ? "Session expired — sign in to Nivo again, then connect Gmail."
+                      : msg,
+                  variant: "destructive",
+                });
+                onConnectEnd();
+              }
+              /* Success path redirects; no onConnectEnd */
+            }}
+            disabled={connectBusy}
+          >
+            {connectBusy ? <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" /> : null}
+            {connectBusy ? "Redirecting…" : "Connect Gmail"}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="text-muted-foreground"
+            onClick={async () => {
+              if (!isAuth0Configured()) {
+                toast({ title: "Sign in to Nivo first", variant: "destructive" });
+                return;
+              }
+              const token = await getAccessToken();
+              if (!token) {
+                toast({ title: "Session expired", description: "Sign in again, then try disconnect.", variant: "destructive" });
+                return;
+              }
+              setDisconnectBusy(true);
+              try {
+                await disconnectCrmGmail();
+                toast({ title: "Gmail disconnected" });
+                onGmailDisconnected?.();
+              } catch (e) {
+                const msg = e instanceof Error ? e.message : String(e);
+                toast({ title: "Could not disconnect", description: msg, variant: "destructive" });
+              } finally {
+                setDisconnectBusy(false);
+              }
+            }}
+            disabled={disconnectBusy}
+          >
+            {disconnectBusy ? <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" /> : null}
+            {disconnectBusy ? "…" : "Disconnect Gmail"}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

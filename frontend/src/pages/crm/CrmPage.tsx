@@ -559,6 +559,7 @@ export default function CrmPage() {
             connectBusy={gmailConnectBusy}
             onConnectStart={() => setGmailConnectBusy(true)}
             onConnectEnd={() => setGmailConnectBusy(false)}
+            onGmailDisconnected={() => void loadCrmGmailSettings()}
             loading={crmEmailSettingsLoading}
           />
           {tab === "inbox" && (
