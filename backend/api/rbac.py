@@ -79,6 +79,35 @@ def get_current_sub(request: Request) -> str:
     return sub
 
 
+def get_current_sub_for_bootstrap(request: Request) -> str:
+    """
+    Like get_current_sub but with clearer errors for POST /api/bootstrap (claim first admin).
+    Helps when the API is missing Auth0 env vars or the browser sends no/invalid access token.
+    """
+    if not (os.getenv("AUTH0_DOMAIN", "").strip()):
+        raise HTTPException(
+            503,
+            "API JWT is not configured: set AUTH0_DOMAIN and AUTH0_AUDIENCE on the server "
+            "(same Auth0 tenant and API identifier you use in VITE_AUTH0_DOMAIN / VITE_AUTH0_AUDIENCE for the app). "
+            "Restart the API after changing .env.",
+        )
+    sub = get_current_user_id(request)
+    if sub:
+        return sub
+    auth = request.headers.get("Authorization", "")
+    if not auth.lower().startswith("bearer "):
+        raise HTTPException(
+            401,
+            "No access token on the request. The app must send Authorization: Bearer. "
+            "Try a hard refresh, or sign out and sign in again.",
+        )
+    raise HTTPException(
+        401,
+        "The access token could not be verified. Check AUTH0_DOMAIN and AUTH0_AUDIENCE on the API match your Auth0 API, "
+        "and that the token audience matches.",
+    )
+
+
 def require_role(required: str):
     """
     FastAPI dependency factory: require that the current user has at least the given role.

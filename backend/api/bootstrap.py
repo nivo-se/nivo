@@ -4,7 +4,7 @@ Bootstrap: allow the first authenticated user to claim admin. No allowlist check
 from fastapi import APIRouter, Depends, HTTPException
 
 from .rbac import (
-    get_current_sub,
+    get_current_sub_for_bootstrap,
     list_user_roles,
     require_allowlist_enabled,
     set_allowed_user,
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api", tags=["bootstrap"])
 
 
 @router.post("/bootstrap")
-def bootstrap_first_admin(sub: str = Depends(get_current_sub)):
+def bootstrap_first_admin(sub: str = Depends(get_current_sub_for_bootstrap)):
     """
     If no user has a role yet, assign the current user (JWT sub) as admin.
     When REQUIRE_ALLOWLIST=true, also add them to allowed_users.

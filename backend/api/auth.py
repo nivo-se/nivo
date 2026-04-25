@@ -138,6 +138,41 @@ def _verify_token(token: str) -> Optional[dict]:
     return _verify_token_auth0(token)
 
 
+def _user_dict_from_payload(payload: dict) -> dict:
+    """Build request.state.user from verified JWT claims (Auth0 or namespaced nivogroup.se)."""
+    _ns = "https://nivogroup.se/"
+    email = payload.get("email") or payload.get(_ns + "email")
+    name = payload.get("name") or payload.get(_ns + "name")
+    return {
+        "sub": payload.get("sub"),
+        "email": email,
+        "name": name,
+        "role": payload.get("role"),
+        **{k: v for k, v in payload.items() if k not in ("sub", "email", "name", "role")},
+    }
+
+
+def _set_user_from_bearer_if_valid(request: Request) -> None:
+    """
+    If Authorization: Bearer is present and verifies, set request.state.user.
+    Used when REQUIRE_AUTH=false so optional routes (e.g. POST /api/bootstrap) can still
+    use Depends(get_current_sub) without turning on global 401 for all /api routes.
+    """
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.lower().startswith("bearer "):
+        request.state.user = None
+        return
+    token = auth_header[7:].strip()
+    if not token:
+        request.state.user = None
+        return
+    payload = _verify_token(token)
+    if not payload:
+        request.state.user = None
+        return
+    request.state.user = _user_dict_from_payload(payload)
+
+
 def _is_public_path(path: str) -> bool:
     path = path.rstrip("/") or "/"
     for p in PUBLIC_PATHS:
@@ -187,7 +222,10 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         if not _should_require_auth():
-            request.state.user = None
+            if request.method == "OPTIONS":
+                request.state.user = None
+            else:
+                _set_user_from_bearer_if_valid(request)
             return await call_next(request)
 
         # Allow CORS preflight (OPTIONS) without auth so browser can complete the actual request
@@ -212,16 +250,5 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         if not payload:
             return _json_401(request)
 
-        # Email/name: standard claims or Auth0 Action namespaced (https://nivogroup.se/email)
-        _ns = "https://nivogroup.se/"
-        email = payload.get("email") or payload.get(_ns + "email")
-        name = payload.get("name") or payload.get(_ns + "name")
-
-        request.state.user = {
-            "sub": payload.get("sub"),
-            "email": email,
-            "name": name,
-            "role": payload.get("role"),
-            **{k: v for k, v in payload.items() if k not in ("sub", "email", "name", "role")},
-        }
+        request.state.user = _user_dict_from_payload(payload)
         return await call_next(request)

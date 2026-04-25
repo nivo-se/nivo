@@ -15,7 +15,16 @@ export async function postBootstrap(): Promise<BootstrapResponse> {
   })
   if (!res.ok) {
     const text = await res.text()
-    throw new Error(text || `Bootstrap failed: ${res.status}`)
+    let msg = text || `Bootstrap failed: ${res.status}`
+    try {
+      const j = JSON.parse(text) as { detail?: string }
+      if (typeof j.detail === 'string') {
+        msg = j.detail
+      }
+    } catch {
+      // keep msg as body text
+    }
+    throw new Error(msg)
   }
   return res.json()
 }

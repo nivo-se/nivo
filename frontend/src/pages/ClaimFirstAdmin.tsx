@@ -40,7 +40,7 @@ export default function ClaimFirstAdmin() {
       if (result.ok) {
         setDiagnostic({
           ok: true,
-          message: `Backend reachable (status ${result.status}). If claim still fails, the issue may be with auth/CORS on POST /api/bootstrap.`,
+          message: `Backend reachable (status ${result.status}). If claim still fails, read the error above the button: the API may need AUTH0_DOMAIN and AUTH0_AUDIENCE, or the browser may not be sending an access token (try sign out / sign in, or a hard refresh). CORS would usually block the response entirely.`,
         })
       } else {
         setDiagnostic({
