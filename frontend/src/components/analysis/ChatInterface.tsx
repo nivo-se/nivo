@@ -16,10 +16,50 @@ import { Loader2, Send, Bot, User, Sparkles, ListPlus } from "lucide-react";
 import { fetchWithAuth } from "@/lib/backendFetch";
 import { createListFromSourcing } from "@/lib/services/listsService";
 
+/** Rows returned in chat `sample_companies`; shown in Analysis right pane before a workflow run. */
+export interface SourcingPreviewRow {
+  orgnr: string;
+  company_name: string;
+  latest_revenue_sek: number | null;
+  avg_ebitda_margin: number | null;
+}
+
+export interface SourcingChatPreview {
+  count: number;
+  samples: SourcingPreviewRow[];
+  filterSummary: string | null;
+}
+
+function normalizeSampleRow(row: unknown): SourcingPreviewRow {
+  const r = row as Record<string, unknown>;
+  const org = r.orgnr != null ? String(r.orgnr) : "";
+  const name = typeof r.company_name === "string" ? r.company_name : "—";
+  const rev = r.latest_revenue_sek;
+  const margin = r.avg_ebitda_margin;
+  return {
+    orgnr: org,
+    company_name: name,
+    latest_revenue_sek:
+      typeof rev === "number"
+        ? rev
+        : rev != null && rev !== ""
+          ? Number(rev)
+          : null,
+    avg_ebitda_margin:
+      typeof margin === "number"
+        ? margin
+        : margin != null && margin !== ""
+          ? Number(margin)
+          : null,
+  };
+}
+
 interface ChatInterfaceProps {
   onCriteriaChange: (criteria: Record<string, unknown> | null) => void;
   onStartAnalysis: () => void;
   isRunning: boolean;
+  /** Latest sourcing match count + sample companies for the workflow results panel. */
+  onSourcingPreview?: (preview: SourcingChatPreview | null) => void;
 }
 
 interface Message {
@@ -39,12 +79,15 @@ interface ChatApiResponse {
   conversation_id?: string | null;
   nivo_context_version?: string;
   chat_persisted?: boolean;
+  /** Postgres host/db this API used for the filter (should match Universe data). */
+  data_source?: string;
 }
 
 export function ChatInterface({
   onCriteriaChange,
   onStartAnalysis,
   isRunning,
+  onSourcingPreview,
 }: ChatInterfaceProps) {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
@@ -74,6 +117,7 @@ export function ChatInterface({
   const [saveListError, setSaveListError] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [thesisVersion, setThesisVersion] = useState<string | null>(null);
+  const [dataSource, setDataSource] = useState<string | null>(null);
   const [actionBanner, setActionBanner] = useState<{
     type: "success" | "error";
     message: string;
@@ -139,6 +183,9 @@ export function ChatInterface({
       if (data.conversation_id) {
         setConversationId(data.conversation_id);
       }
+      if (data.data_source?.trim()) {
+        setDataSource(data.data_source.trim());
+      }
 
       const bodyText = `${data.message}\n\nFound ${data.count} matching companies.`;
 
@@ -156,6 +203,12 @@ export function ChatInterface({
       setMatchCount(data.count);
       setFilterSummary((data.filter_summary || "").trim() || null);
       onCriteriaChange(data.criteria);
+      const rawSamples = Array.isArray(data.sample_companies) ? data.sample_companies : [];
+      onSourcingPreview?.({
+        count: data.count,
+        samples: rawSamples.map(normalizeSampleRow),
+        filterSummary: (data.filter_summary || "").trim() || null,
+      });
     } catch (error) {
       console.error("Chat error:", error);
       const reason =
@@ -178,6 +231,7 @@ export function ChatInterface({
   const startNewThread = () => {
     setConversationId(null);
     setFilterSummary(null);
+    setDataSource(null);
     setMessages([
       {
         role: "assistant",
@@ -193,6 +247,7 @@ export function ChatInterface({
     setMatchCount(null);
     setCurrentCriteria(null);
     onCriteriaChange(null);
+    onSourcingPreview?.(null);
   };
 
   const openSaveListDialog = () => {
@@ -340,6 +395,15 @@ export function ChatInterface({
           </div>
         </ScrollArea>
       </div>
+
+      {dataSource ? (
+        <p
+          className="px-4 py-1.5 border-t border-border bg-muted/15 text-[10px] leading-snug text-muted-foreground"
+          title="Sourcing counts use this Postgres database — it should match where Universe companies and company_kpis are loaded."
+        >
+          Universe data: {dataSource}
+        </p>
+      ) : null}
 
       {filterSummary ? (
         <details className="px-4 py-2 border-t border-border bg-muted/20 text-sm open:bg-muted/30">

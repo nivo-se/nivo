@@ -13,6 +13,7 @@ import {
   Building2,
   LayoutList,
   Briefcase,
+  LayoutDashboard,
   BookOpen,
   ListFilter,
   ScanSearch,
@@ -48,7 +49,8 @@ const mainNavItems: NavItem[] = [
   { path: "/universe", label: "Universe", icon: Globe },
   { path: "/prospects", label: "Prospects", icon: Target },
   { path: "/lists", label: "My Lists", icon: List },
-  { path: "/crm", label: "CRM", icon: Briefcase },
+  { path: "/crm/dashboard", label: "CRM", icon: LayoutDashboard },
+  { path: "/crm", label: "Email", icon: Briefcase },
   { path: "/ai", label: "AI Lab", icon: Cpu },
 ];
 
@@ -99,10 +101,17 @@ const unifiedNavSections: { title: string; items: NavItem[] }[] = [
     title: "CRM",
     items: [
       {
+        path: "/crm/dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        matchesLocation: (pathname) => pathname === "/crm/dashboard",
+      },
+      {
         path: "/crm",
-        label: "CRM",
+        label: "Email",
         icon: Briefcase,
         matchesLocation: (pathname, search) => {
+          if (pathname === "/crm/dashboard") return false;
           if (!pathname.startsWith("/crm")) return false;
           const tab = new URLSearchParams(search).get("tab");
           return tab !== "inbox";

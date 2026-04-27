@@ -124,6 +124,33 @@ class PostgresDBService(DatabaseService):
         conn_display = "DATABASE_URL" if url else f"{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5433')}/{os.getenv('POSTGRES_DB', 'nivo')}"
         logger.info("Connected to Postgres (%s)", conn_display)
 
+    def sourcing_data_source_label(self) -> str:
+        """
+        Short, non-secret string for UI/debug: which DB the sourcing assistant queries.
+        Must match Universe / company_kpis data the team expects.
+        """
+        dbname = "?"
+        try:
+            rows = self._execute("SELECT current_database() AS db", [], op_name="current_database")
+            if rows and rows[0].get("db"):
+                dbname = str(rows[0]["db"])
+        except Exception:
+            pass
+        url = (os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL") or "").strip()
+        if url:
+            try:
+                from urllib.parse import urlparse
+
+                parsed = urlparse(url)
+                host = parsed.hostname or "?"
+                port = parsed.port or 5432
+                return f'Postgres · database "{dbname}" @ {host}:{port}'
+            except Exception:
+                return f'Postgres · database "{dbname}" (DATABASE_URL)'
+        host = os.getenv("POSTGRES_HOST", "localhost")
+        port = os.getenv("POSTGRES_PORT", "5433")
+        return f'Postgres · database "{dbname}" @ {host}:{port}'
+
     def _reconnect_unlocked(self) -> None:
         """Replace socket (caller must hold self._lock). Used after recoverable disconnect."""
         try:

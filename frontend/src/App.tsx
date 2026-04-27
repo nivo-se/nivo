@@ -84,6 +84,7 @@ import VerificationPanel from "./pages/deep-research/VerificationPanel";
 import CompetitorEditorPage from "./pages/deep-research/CompetitorEditorPage";
 import AssumptionOverridePage from "./pages/deep-research/AssumptionOverridePage";
 import CrmPage from "./pages/crm/CrmPage";
+import CrmDashboardPage from "./pages/crm/CrmDashboardPage";
 import AnalysisPage from "./pages/AnalysisPage";
 
 const queryClient = new QueryClient();
@@ -194,7 +195,7 @@ const App = () => (
               {/* Migration aliases (phase-1): unified product vocabulary -> existing routes */}
               <Route path="today" element={<Navigate to="/" replace />} />
               <Route path="companies" element={<Navigate to="/universe" replace />} />
-              <Route path="pipeline" element={<Navigate to="/crm" replace />} />
+              <Route path="pipeline" element={<Navigate to="/crm/dashboard" replace />} />
               <Route path="inbox" element={<Navigate to="/crm?tab=inbox" replace />} />
               <Route path="research" element={<Navigate to="/ai" replace />} />
               <Route path="research/*" element={<ResearchAliasRedirect />} />
@@ -217,6 +218,7 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
+              <Route path="crm/dashboard" element={<CrmDashboardPage />} />
               <Route path="crm" element={<CrmPage />} />
               <Route path="crm/company/:companyId" element={<CrmPage />} />
               <Route path="deep-research" element={<DeepResearchHomePage />} />

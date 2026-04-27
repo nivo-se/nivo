@@ -78,6 +78,7 @@ import { CrmGmailConnectBanner } from "./CrmGmailConnectBanner";
 import { CrmHome } from "./CrmHome";
 import { CrmWorkspace } from "./CrmWorkspace";
 import { QuickSendDialog } from "./QuickSendDialog";
+import { formatCrmDealStatusLabel, formatCrmShortDate } from "./crm-format";
 
 interface CrmCompany {
   id: string;
@@ -86,23 +87,6 @@ interface CrmCompany {
   website: string | null;
   deal_status: string | null;
   last_contacted_at: string | null;
-}
-
-function formatDate(ts: string | null | undefined): string {
-  if (!ts) return "—";
-  return new Date(ts).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatStatus(status: string | null): string {
-  if (!status) return "—";
-  return status
-    .split("_")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 }
 
 function formatDateTime(ts: string | null | undefined): string {
@@ -533,14 +517,14 @@ export default function CrmPage() {
                             <TableCell className="hidden py-2 sm:table-cell">
                               {c.deal_status ? (
                                 <Badge variant="secondary" className="text-xs font-normal">
-                                  {formatStatus(c.deal_status)}
+                                  {formatCrmDealStatusLabel(c.deal_status)}
                                 </Badge>
                               ) : (
                                 <span className="text-xs text-muted-foreground">—</span>
                               )}
                             </TableCell>
                             <TableCell className="hidden py-2 text-xs text-muted-foreground md:table-cell">
-                              {formatDate(c.last_contacted_at)}
+                              {formatCrmShortDate(c.last_contacted_at)}
                             </TableCell>
                           </TableRow>
                         ))}

@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
@@ -48,6 +49,64 @@ def filter_criteria_from_dict(d: Optional[Dict[str, Any]]) -> FilterCriteria:
     }
     clean = {k: v for k, v in d.items() if k in allowed}
     return FilterCriteria(**clean)
+
+
+def _has_company_name_sql(conditions: Optional[List[str]]) -> bool:
+    return any((c or "").strip() and "company_name" in c.lower() for c in conditions or [])
+
+
+def _prompt_suggests_financials(prompt: str) -> bool:
+    return bool(
+        re.search(
+            r"(\d+\s*[-–]?\s*\d*|\>\s*\d+|msek|\bsek\b|million|revenue|omsättning|margin|ebitda|growth|cagr|profitable)",
+            prompt,
+            re.I,
+        )
+    )
+
+
+def _extract_focus_company_name(prompt: str) -> Optional[str]:
+    """Best-effort name token from natural language when the LLM omits custom_sql."""
+    patterns = [
+        r"with the name\s+([^\.\n]+?)(?:\.|$|\n)",
+        r"\bfor the company\s+([^\.\n]+?)(?:\.|$|\n)",
+        r"\bfilter(?:ed)?\s+for\s+(?:the\s+)?company\s+([^\.\n]+?)(?:\.|$|\n)",
+        r"\bnamed\s+([^\.\n]+?)(?:\.|$|\n)",
+        r"\bcalled\s+([^\.\n]+?)(?:\.|$|\n)",
+    ]
+    for pat in patterns:
+        m = re.search(pat, prompt, re.I | re.MULTILINE)
+        if not m:
+            continue
+        raw = m.group(1).strip().strip("\"'")
+        raw = raw.rstrip(".,;:")
+        if len(raw) >= 2:
+            return raw
+    return None
+
+
+def _augment_criteria_for_company_name_prompt(prompt: str, criteria: FilterCriteria) -> None:
+    """
+    If the user is clearly asking for a company by name but the model forgot custom_sql,
+    add ILIKE on c.company_name. Clear stale financial floors when the message is name-only
+    so LEFT JOIN + no KPI row still returns the company.
+    """
+    if _has_company_name_sql(criteria.custom_sql_conditions):
+        return
+    name = _extract_focus_company_name(prompt)
+    if not name:
+        return
+    safe = name.replace("'", "''").replace("%", "")
+    if not safe:
+        return
+    crit_list = list(criteria.custom_sql_conditions or [])
+    crit_list.append(f"c.company_name ILIKE '%{safe}%'")
+    criteria.custom_sql_conditions = crit_list
+    if not _prompt_suggests_financials(prompt):
+        criteria.min_revenue = 0
+        criteria.min_ebitda_margin = -1.0
+        criteria.min_growth = -1.0
+    logger.info("Augmented filter with name ILIKE from prompt: %s", safe[:80])
 
 
 def humanize_filter_criteria(criteria: FilterCriteria) -> str:
@@ -135,8 +194,14 @@ class IntentAnalyzer:
         system_prompt = """You are an expert data analyst translating M&A theses into SQL filters.
         
         Database Schema:
-        - companies (c): orgnr, company_name, description, city, country
-        - company_metrics (m): latest_revenue_sek, avg_ebitda_margin (0.15=15%), revenue_cagr_3y (0.10=10%), employees_latest
+        - companies (c): orgnr, company_name, description, city, country, nace_codes (JSONB array of NACE strings — use this name, not nace_categories)
+        - company_metrics (m): view over company_kpis; latest_revenue_sek, avg_ebitda_margin (0.15=15%), revenue_cagr_3y (0.10=10%), employees_latest
+        
+        CRITICAL — how results are computed:
+        - The runtime uses INNER JOIN to company_metrics for pure financial/NACE universe queries, and LEFT JOIN when custom_sql_conditions is non-empty (name/city/etc.) so companies without KPI rows can still match if you are not filtering on m.* fields.
+        - Financial filters (min revenue, margin, growth) reference (m); rows without metrics are excluded for those predicates (NULL never passes >=).
+        - For a specific company name, ALWAYS set custom_sql_conditions with Postgres ILIKE on c.company_name, e.g. "c.company_name ILIKE '%Texstar%'".
+        - If the user only asks for a company by name (no revenue/margin/growth in the same message), set min_revenue=0, min_ebitda_margin=-1, min_growth=-1 so prior-turn financial filters are not kept.
         
         Task:
         1. Update the filter criteria based on the user's latest message.
@@ -181,7 +246,14 @@ class IntentAnalyzer:
         # Build context from current criteria if exists
         context = ""
         if current_criteria:
-            context = f"Current Criteria: Revenue>{current_criteria.min_revenue}, Margin>{current_criteria.min_ebitda_margin}, Growth>{current_criteria.min_growth}"
+            context = (
+                "Current structured filters (merge or reset when the user changes intent): "
+                f"min_revenue={current_criteria.min_revenue}, "
+                f"min_ebitda_margin={current_criteria.min_ebitda_margin}, "
+                f"min_growth={current_criteria.min_growth}, "
+                f"industries={current_criteria.industries}, "
+                f"custom_sql_conditions={current_criteria.custom_sql_conditions}"
+            )
 
         msg_list: List[Dict[str, Any]] = [{"role": "system", "content": system_prompt}]
         for m in history_messages or []:
@@ -227,7 +299,7 @@ class IntentAnalyzer:
             max_results = 500
         max_results = max(1, min(max_results, 50_000))
 
-        return FilterCriteria(
+        crit = FilterCriteria(
             min_revenue=data.get("min_revenue", 0),
             min_ebitda_margin=data.get("min_ebitda_margin", -1.0),
             min_growth=data.get("min_growth", -1.0),
@@ -235,14 +307,29 @@ class IntentAnalyzer:
             max_results=max_results,
             custom_sql_conditions=data.get("custom_sql_conditions", []),
             description=data.get("explanation", "Updated filters based on request."),
-            suggestions=data.get("suggestions", [])
+            suggestions=data.get("suggestions", []),
         )
+        _augment_criteria_for_company_name_prompt(prompt, crit)
+        return crit
 
 class FinancialFilter:
     """Filters companies based on financial metrics"""
     
     def __init__(self):
         self.db = get_database_service()
+
+    def _metrics_join_clause(self, criteria: FilterCriteria) -> str:
+        """
+        Use LEFT JOIN when custom SQL touches row-level company attributes (name, city, …)
+        so companies without a KPI row still match. Keep INNER JOIN for pure financial / NACE
+        universe queries so an unrestricted filter does not scan the full companies table.
+        """
+        has_custom = any((c or "").strip() for c in criteria.custom_sql_conditions or [])
+        return (
+            "LEFT JOIN company_metrics m ON m.orgnr = c.orgnr"
+            if has_custom
+            else "JOIN company_metrics m ON m.orgnr = c.orgnr"
+        )
     
     def _build_where_clause(self, criteria: FilterCriteria) -> str:
         """Build SQL WHERE clause from criteria"""
@@ -292,13 +379,14 @@ class FinancialFilter:
     def filter(self, criteria: FilterCriteria) -> List[str]:
         """Filter companies and return list of orgnr"""
         where_clause = self._build_where_clause(criteria)
-        
+        join_metrics = self._metrics_join_clause(criteria)
+
         sql = f"""
         SELECT c.orgnr
         FROM companies c
-        JOIN company_metrics m ON m.orgnr = c.orgnr
+        {join_metrics}
         WHERE {where_clause}
-        ORDER BY m.revenue_cagr_3y DESC, m.latest_revenue_sek DESC
+        ORDER BY m.latest_revenue_sek DESC NULLS LAST, m.revenue_cagr_3y DESC NULLS LAST, c.company_name ASC
         LIMIT {criteria.max_results}
         """
         
@@ -319,11 +407,12 @@ class FinancialFilter:
             Dictionary with count and sample companies
         """
         where_clause = self._build_where_clause(criteria)
-        
+        join_metrics = self._metrics_join_clause(criteria)
+
         count_sql = f"""
         SELECT COUNT(*) as total
         FROM companies c
-        JOIN company_metrics m ON m.orgnr = c.orgnr
+        {join_metrics}
         WHERE {where_clause}
         """
         

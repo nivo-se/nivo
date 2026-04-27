@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ChatInterface } from '@/components/analysis/ChatInterface'
+import { useNavigate, Link } from 'react-router-dom'
+import { ChatInterface, type SourcingChatPreview } from '@/components/analysis/ChatInterface'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Download, Eye, ArrowRight, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Loader2, Download, Eye, ArrowRight, Sparkles, Search } from 'lucide-react'
 
 interface RunStatus {
     run_id: string
@@ -42,6 +51,7 @@ export default function AnalysisPage() {
     const [isRunning, setIsRunning] = useState(false)
     const [selectedCompany, setSelectedCompany] = useState<CompanyAnalysis | null>(null)
     const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null)
+    const [sourcingPreview, setSourcingPreview] = useState<SourcingChatPreview | null>(null)
 
     useEffect(() => {
         if (actionFeedback) {
@@ -110,6 +120,7 @@ export default function AnalysisPage() {
             const data = await response.json()
             if (data.success) {
                 setCompanies(data.companies)
+                setSourcingPreview(null)
             }
         } catch (error) {
             console.error('Failed to load companies:', error)
@@ -135,8 +146,10 @@ export default function AnalysisPage() {
         }
     }
 
-    const formatMillions = (val?: number) => val ? `${(val / 1_000_000).toFixed(1)} M` : '-'
-    const formatPercent = (val?: number) => val ? `${(val * 100).toFixed(1)}%` : '-'
+    const formatMillions = (val?: number) =>
+        val != null && !Number.isNaN(val) ? `${(val / 1_000_000).toFixed(1)} M` : '—'
+    const formatPercent = (val?: number) =>
+        val != null && !Number.isNaN(val) ? `${(val * 100).toFixed(1)}%` : '—'
 
     const enrichSelected = async () => {
         if (selectedCompanies.size === 0) return
@@ -215,6 +228,7 @@ export default function AnalysisPage() {
                                 onCriteriaChange={setCriteria}
                                 onStartAnalysis={startWorkflow}
                                 isRunning={isRunning}
+                                onSourcingPreview={setSourcingPreview}
                             />
                         </div>
                     </div>
@@ -224,9 +238,15 @@ export default function AnalysisPage() {
                         <div className="flex h-full flex-col rounded-2xl border border-border bg-card min-h-[600px]">
                             <div className="flex flex-col gap-4 border-b border-border px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
                                 <div>
-                                    <p className="text-sm font-semibold text-foreground">Analysis Results</p>
+                                    <p className="text-sm font-semibold text-foreground">
+                                        {companies.length > 0 ? 'Analysis results' : 'Sourcing preview'}
+                                    </p>
                                     <p className="text-xs text-muted-foreground">
-                                        {companies.length} companies analyzed
+                                        {companies.length > 0
+                                            ? `${companies.length} companies analyzed`
+                                            : sourcingPreview
+                                              ? `${sourcingPreview.count.toLocaleString()} match${sourcingPreview.count === 1 ? '' : 'es'} · sample of ${sourcingPreview.samples.length}`
+                                              : 'Run a chat turn to see matches here, then run deep analysis.'}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -249,14 +269,76 @@ export default function AnalysisPage() {
                             </div>
 
                             <div className="flex-1 overflow-auto">
-                                {companies.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8">
+                                {companies.length === 0 && sourcingPreview ? (
+                                    <div className="space-y-4 p-5">
+                                        {sourcingPreview.filterSummary ? (
+                                            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground whitespace-pre-wrap">
+                                                {sourcingPreview.filterSummary}
+                                            </div>
+                                        ) : null}
+                                        {sourcingPreview.count === 0 ? (
+                                            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                                                <Search className="w-10 h-10 opacity-50 mb-3" aria-hidden />
+                                                <p className="text-sm font-medium text-foreground">No companies matched</p>
+                                                <p className="text-xs text-center max-w-md mt-1">
+                                                    Adjust your filters in the chat. When you get matches, a sample list appears here before you run deep analysis.
+                                                </p>
+                                            </div>
+                                        ) : sourcingPreview.samples.length === 0 ? (
+                                            <div className="rounded-lg border border-dashed border-border bg-muted/10 px-4 py-6 text-sm text-muted-foreground text-center">
+                                                {sourcingPreview.count.toLocaleString()} companies match, but no sample rows were returned. Try saving as a list or run
+                                                analysis anyway.
+                                            </div>
+                                        ) : (
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead className="text-xs">Company</TableHead>
+                                                        <TableHead className="text-xs">Org.nr</TableHead>
+                                                        <TableHead className="text-xs text-right">Revenue (SEK)</TableHead>
+                                                        <TableHead className="text-xs text-right">EBITDA margin</TableHead>
+                                                        <TableHead className="text-xs w-[100px]"></TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {sourcingPreview.samples.map((row) => (
+                                                        <TableRow key={row.orgnr || row.company_name}>
+                                                            <TableCell className="font-medium text-foreground max-w-[220px] truncate" title={row.company_name}>
+                                                                {row.company_name}
+                                                            </TableCell>
+                                                            <TableCell className="text-xs text-muted-foreground font-mono">{row.orgnr || '—'}</TableCell>
+                                                            <TableCell className="text-right text-sm text-muted-foreground tabular-nums">
+                                                                {formatMillions(row.latest_revenue_sek ?? undefined)}
+                                                            </TableCell>
+                                                            <TableCell className="text-right text-sm text-muted-foreground tabular-nums">
+                                                                {row.avg_ebitda_margin != null && !Number.isNaN(row.avg_ebitda_margin)
+                                                                    ? formatPercent(row.avg_ebitda_margin)
+                                                                    : '—'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {row.orgnr ? (
+                                                                    <Button variant="ghost" size="sm" className="h-8 text-xs" asChild>
+                                                                        <Link to={`/company/${encodeURIComponent(row.orgnr)}`}>Universe</Link>
+                                                                    </Button>
+                                                                ) : null}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        )}
+                                        <p className="text-[11px] text-muted-foreground px-0.5">
+                                            Sample is up to five companies from the API. Use <strong>Run deep analysis</strong> in the chat for full memos, or save as a list.
+                                        </p>
+                                    </div>
+                                ) : companies.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground p-8">
                                         <div className="w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center mb-4">
-                                            <Loader2 className="w-8 h-8 text-muted-foreground" />
+                                            <Search className="w-8 h-8 text-muted-foreground opacity-70" aria-hidden />
                                         </div>
-                                        <p className="text-base font-medium text-foreground">Ready to Analyze</p>
-                                        <p className="text-sm text-center max-w-xs mt-1">
-                                            Chat with the AI to define your target, then run the analysis to see investment memos here.
+                                        <p className="text-base font-medium text-foreground">Ready to analyze</p>
+                                        <p className="text-sm text-center max-w-sm mt-1">
+                                            Chat with the AI to define your target. Matching companies appear in this panel as a preview; then run deep analysis for investment memos.
                                         </p>
                                     </div>
                                 ) : (

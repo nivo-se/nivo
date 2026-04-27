@@ -50,6 +50,8 @@ class ChatResponse(BaseModel):
     conversation_id: Optional[str] = None
     nivo_context_version: str = ""
     chat_persisted: bool = False
+    # Human-readable Postgres target for this API process (verify vs Universe data).
+    data_source: str = ""
 
 
 @router.post("/", response_model=ChatResponse)
@@ -106,6 +108,18 @@ async def chat_refine(request: Request, body: ChatRequest):
         total_count = int(stats["total_matches"])
         filter_summary = humanize_filter_criteria(new_criteria)
 
+        data_source = ""
+        if hasattr(db, "sourcing_data_source_label"):
+            try:
+                data_source = db.sourcing_data_source_label()  # type: ignore[union-attr]
+            except Exception:
+                data_source = ""
+        logger.info(
+            "Sourcing chat: count=%s data_source=%s",
+            total_count,
+            data_source or "(unknown)",
+        )
+
         import copy
 
         sample_criteria = copy.copy(new_criteria)
@@ -116,17 +130,24 @@ async def chat_refine(request: Request, body: ChatRequest):
         if orgnrs:
             placeholders = ",".join("?" * len(orgnrs))
             sql = f"""
-            SELECT c.company_name, m.latest_revenue_sek, m.avg_ebitda_margin
+            SELECT c.orgnr, c.company_name, m.latest_revenue_sek, m.avg_ebitda_margin
             FROM companies c
-            JOIN company_metrics m ON m.orgnr = c.orgnr
+            LEFT JOIN company_metrics m ON m.orgnr = c.orgnr
             WHERE c.orgnr IN ({placeholders})
             """
             rows = db.run_raw_query(sql, params=orgnrs)
             sample = [dict(row) for row in rows]
 
-        assistant_reply = (
-            f"{new_criteria.description}\n\n{total_count} companies match your filters."
-        )
+        reply_body = new_criteria.description
+        if total_count == 0:
+            reply_body += (
+                "\n\n—\nNo companies matched. Common causes: (1) this API uses a different Postgres than "
+                "your Universe data — check root `.env` `DATABASE_URL` or `POSTGRES_*`; "
+                "(2) the company is not in `companies` or the legal name differs (try a shorter ILIKE token); "
+                "(3) financial filters (revenue, margin, growth) require a **company_metrics** row — "
+                "remove those filters for name-only search."
+            )
+        assistant_reply = f"{reply_body}\n\n{total_count} companies match your filters."
         did_persist = False
         if sub and use_pg and conv_id:
             try:
@@ -141,7 +162,7 @@ async def chat_refine(request: Request, body: ChatRequest):
                 logger.warning("Failed to append sourcing chat: %s", e)
 
         return ChatResponse(
-            message=new_criteria.description,
+            message=reply_body,
             criteria=new_criteria.__dict__,
             count=total_count,
             sample_companies=sample,
@@ -150,6 +171,7 @@ async def chat_refine(request: Request, body: ChatRequest):
             conversation_id=conv_id,
             nivo_context_version=ctx.version,
             chat_persisted=did_persist,
+            data_source=data_source,
         )
 
     except HTTPException:
