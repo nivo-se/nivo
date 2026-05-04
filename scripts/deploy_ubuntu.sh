@@ -8,6 +8,13 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+# --- Sync local git HEAD to the deployed ref ---
+# The workflow rsync only writes the working tree (it excludes .git/), so
+# without this step `git log` on this server keeps showing a stale HEAD
+# even though the files on disk are already at the new ref.
+git fetch origin --quiet
+git reset --hard "${GITHUB_SHA:-origin/main}"
+
 # --- Backend: API + worker (Docker) ---
 docker compose up -d postgres redis
 docker compose build api worker
