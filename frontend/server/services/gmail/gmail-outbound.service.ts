@@ -4,10 +4,12 @@ import { google } from 'googleapis'
 import { buildGmailRawMessage } from './build-gmail-raw-message.js'
 import { encryptGmailRefreshToken, decryptGmailRefreshToken } from './gmail-token-crypto.js'
 import { isGmailOAuthEnvConfigured } from './gmail-oauth-env.js'
+import { extractBodiesFromPayload } from './gmail-inbound-parse.js'
 
-/** Requested on connect: send mail, per-user Drive files created by this app, calendar events, email + profile (display name). */
+/** Requested on connect: send mail, read mail (inbox import), per-user Drive files, calendar, email + profile. */
 export const GOOGLE_WORKSPACE_OAUTH_SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/drive.file',
   'https://www.googleapis.com/auth/calendar.events',
   'https://www.googleapis.com/auth/userinfo.email',
@@ -15,6 +17,7 @@ export const GOOGLE_WORKSPACE_OAUTH_SCOPES = [
 ] as const
 
 export const SCOPE_GMAIL_SEND = 'https://www.googleapis.com/auth/gmail.send'
+export const SCOPE_GMAIL_READONLY = 'https://www.googleapis.com/auth/gmail.readonly'
 export const SCOPE_DRIVE_FILE = 'https://www.googleapis.com/auth/drive.file'
 export const SCOPE_CALENDAR_EVENTS = 'https://www.googleapis.com/auth/calendar.events'
 
@@ -133,6 +136,7 @@ export class GmailOutboundService {
     const s = parseGrantedScopes(grantedScopes.join(' '))
     return {
       gmail_send: s.has(SCOPE_GMAIL_SEND),
+      gmail_readonly: s.has(SCOPE_GMAIL_READONLY),
       drive_file: s.has(SCOPE_DRIVE_FILE),
       calendar_events: s.has(SCOPE_CALENDAR_EVENTS),
     }
@@ -196,6 +200,90 @@ export class GmailOutboundService {
     const id = sent.data.id
     if (!id) throw new Error('Gmail send returned no message id')
     return { id }
+  }
+
+  /** Auth0 subs that have linked Google accounts (any teammate mailbox to scan). */
+  async listCredentialUserIds(): Promise<string[]> {
+    const { rows } = await this.pool.query<{ user_id: string }>(
+      `SELECT user_id FROM deep_research.user_gmail_credentials ORDER BY updated_at DESC`,
+    )
+    return rows.map((r) => r.user_id)
+  }
+
+  /**
+   * List Gmail message ids for a query (e.g. `in:inbox newer_than:30d`).
+   * Caller must ensure the user granted `gmail.readonly` on the stored refresh token.
+   */
+  async listInboxMessageIds(userId: string, opts: { maxResults: number; query: string }): Promise<string[]> {
+    const auth = await this.loadOAuth2ForUser(userId)
+    if (!auth) return []
+    const gmail = google.gmail({ version: 'v1', auth })
+    const res = await gmail.users.messages.list({
+      userId: 'me',
+      maxResults: opts.maxResults,
+      q: opts.query,
+    })
+    const ids = res.data.messages?.map((m) => m.id).filter(Boolean) as string[]
+    return ids ?? []
+  }
+
+  async fetchMessageForInboundSync(
+    userId: string,
+    messageId: string,
+  ): Promise<{
+    id: string
+    threadId: string
+    labelIds: string[]
+    fromHeader: string | null
+    toHeader: string | null
+    subject: string | null
+    internalDateMs: string | null
+    textBody: string | null
+    htmlBody: string | null
+    rawPayload: Record<string, unknown>
+  } | null> {
+    const auth = await this.loadOAuth2ForUser(userId)
+    if (!auth) return null
+    const gmail = google.gmail({ version: 'v1', auth })
+    const res = await gmail.users.messages.get({
+      userId: 'me',
+      id: messageId,
+      format: 'full',
+    })
+    const msg = res.data
+    const id = msg.id
+    const threadId = msg.threadId
+    if (!id || !threadId) return null
+
+    const headers = msg.payload?.headers || []
+    const hv = (name: string) =>
+      headers.find((x) => (x.name || '').toLowerCase() === name.toLowerCase())?.value?.trim() || null
+
+    const bodies = extractBodiesFromPayload(
+      msg.payload as { mimeType?: string | null; body?: { data?: string | null }; parts?: any[] },
+    )
+
+    const rawPayload: Record<string, unknown> = {
+      id: msg.id,
+      threadId: msg.threadId,
+      snippet: msg.snippet ?? null,
+      internalDate: msg.internalDate ?? null,
+      labelIds: msg.labelIds ?? [],
+      sizeEstimate: msg.sizeEstimate ?? null,
+    }
+
+    return {
+      id,
+      threadId,
+      labelIds: msg.labelIds ?? [],
+      fromHeader: hv('From'),
+      toHeader: hv('To'),
+      subject: hv('Subject'),
+      internalDateMs: msg.internalDate ?? null,
+      textBody: bodies.text,
+      htmlBody: bodies.html,
+      rawPayload,
+    }
   }
 }
 

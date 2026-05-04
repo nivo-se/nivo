@@ -34,6 +34,7 @@ import { CRMOverviewService } from '../services/crm/overview.service.js'
 import { getAuth0SubFromBearer } from '../auth0-verify.js'
 import { signGmailOAuthState, verifyGmailOAuthState } from '../services/gmail/gmail-oauth-state.js'
 import type { GmailOutboundService } from '../services/gmail/gmail-outbound.service.js'
+import { GmailInboundSyncService } from '../services/gmail/gmail-inbound-sync.service.js'
 import { CrmGoogleCalendarService } from '../services/google/crm-google-calendar.service.js'
 import { CrmGoogleDriveService } from '../services/google/crm-google-drive.service.js'
 
@@ -92,8 +93,10 @@ export function registerCrmRoutes(
     const db = getCrmDb()
     if (!requireCrmDb(res, db)) return
     const search = typeof req.query.search === 'string' ? req.query.search : undefined
-    const limit = typeof req.query.limit === 'string' ? Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50)) : 50
-    const data = await db.listCompanies(search, limit)
+    const limit = typeof req.query.limit === 'string' ? Math.min(500, Math.max(1, parseInt(req.query.limit, 10) || 50)) : 50
+    const sortRaw = typeof req.query.sort === 'string' ? req.query.sort : undefined
+    const sort = sortRaw === 'last_contact' ? 'last_contact' : 'name'
+    const data = await db.listCompanies(search, limit, sort)
     return res.json({ success: true, data })
   }))
 
@@ -228,14 +231,14 @@ export function registerCrmRoutes(
           connected: false,
           google_email: null as string | null,
           google_display_name: null as string | null,
-          workspace: { gmail_send: false, drive_file: false, calendar_events: false },
+          workspace: { gmail_send: false, gmail_readonly: false, drive_file: false, calendar_events: false },
         },
       })
     }
     const row = await g.getConnection(sub)
     const workspace = row
       ? g.scopeFlags(row.granted_scopes)
-      : { gmail_send: false, drive_file: false, calendar_events: false }
+      : { gmail_send: false, gmail_readonly: false, drive_file: false, calendar_events: false }
     return res.json({
       success: true,
       data: {
@@ -246,6 +249,31 @@ export function registerCrmRoutes(
         workspace,
       },
     })
+  }))
+
+  /**
+   * Pull recent Gmail inbox messages into CRM when they match a known contact email or company website domain.
+   * Scoped to the signed-in user's connected mailbox. Team-wide polling can use CRM_GMAIL_INBOUND_POLL_SECONDS on the server.
+   */
+  app.post('/crm/gmail/sync-inbound', asyncHandler(async (req, res) => {
+    const sub = await getAuth0SubFromBearer(req.headers?.authorization)
+    if (!sub) {
+      return res.status(401).json({ success: false, error: 'Authentication required' })
+    }
+    const db = getCrmDb()
+    if (!requireCrmDb(res, db)) return
+    const g = getGmailOutbound()
+    if (!g?.isReady()) {
+      return res.status(503).json({ success: false, error: 'Gmail OAuth is not configured on this server.' })
+    }
+    const sync = new GmailInboundSyncService(db, g, new InteractionsService(db), new DealsService(db))
+    try {
+      const data = await sync.syncUserInbox(sub)
+      return res.json({ success: true, data })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return res.status(400).json({ success: false, error: msg })
+    }
   }))
 
   /** List calendar events for the connected Google account (primary calendar by default). */

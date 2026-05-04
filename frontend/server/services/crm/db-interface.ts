@@ -54,7 +54,7 @@ export interface CrmInboundUnmatchedRow {
 }
 
 export interface CrmDb {
-  listCompanies(search?: string, limit?: number): Promise<CrmCompanyListItem[]>
+  listCompanies(search?: string, limit?: number, sort?: 'name' | 'last_contact'): Promise<CrmCompanyListItem[]>
   getCompany(id: string): Promise<Record<string, any> | null>
   getCompanyByOrgnr(orgnr: string): Promise<Record<string, any> | null>
   patchCompany(companyId: string, fields: { industry?: string | null; website?: string | null }): Promise<Record<string, any> | null>
@@ -109,4 +109,8 @@ export interface CrmDb {
 
   /** Primary contact for company, or first by recency */
   getPrimaryOrFirstContact(companyId: string): Promise<Record<string, any> | null>
+
+  findContactByEmailForCrm(email: string): Promise<Record<string, any> | null>
+  listCompaniesWithWebsite(): Promise<{ id: string; website: string }[]>
+  tryInsertCrmEmailMessage(payload: Record<string, any>): Promise<Record<string, any> | null>
 }

@@ -55,6 +55,9 @@ import { registerCrmRoutes } from './routes/crm.routes.js'
 import { getCrmPool, PostgresCrmDb, isCrmPostgresConfigured } from './services/crm/postgres-db.js'
 import { createGmailOutboundService } from './services/gmail/gmail-outbound.service.js'
 import type { GmailOutboundService } from './services/gmail/gmail-outbound.service.js'
+import { GmailInboundSyncService } from './services/gmail/gmail-inbound-sync.service.js'
+import { InteractionsService } from './services/crm/interactions.service.js'
+import { DealsService } from './services/crm/deals.service.js'
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -96,6 +99,38 @@ function getGmailOutboundForCrm(): GmailOutboundService | null {
 }
 
 registerCrmRoutes(app, getCrmDb, getGmailOutboundForCrm)
+
+function startGmailInboundPolling() {
+  const raw = process.env.CRM_GMAIL_INBOUND_POLL_SECONDS
+  const sec = raw === undefined || raw === '' ? 180 : parseInt(raw, 10)
+  if (!Number.isFinite(sec) || sec <= 0) {
+    if (raw !== undefined && raw !== '') {
+      console.log('[CRM] Gmail inbound poll disabled (CRM_GMAIL_INBOUND_POLL_SECONDS <= 0)')
+    }
+    return
+  }
+
+  const tick = async () => {
+    try {
+      const db = getCrmDb()
+      const g = getGmailOutboundForCrm()
+      if (!db || !g?.isReady()) return
+      const sync = new GmailInboundSyncService(db, g, new InteractionsService(db), new DealsService(db))
+      const out = await sync.syncAllLinkedMailboxes()
+      if (out.imported > 0 || out.errors.length > 0) {
+        console.log('[CRM] Gmail inbound sync:', JSON.stringify(out))
+      }
+    } catch (e) {
+      console.error('[CRM] Gmail inbound poll failed:', e)
+    }
+  }
+
+  setTimeout(() => void tick(), 25_000)
+  setInterval(() => void tick(), sec * 1000)
+  console.log(`[CRM] Gmail inbound poll every ${sec}s (set CRM_GMAIL_INBOUND_POLL_SECONDS=0 to disable)`)
+}
+
+startGmailInboundPolling()
 
 // FastAPI backend URL for proxying lists, views, universe, etc. (same target as Vite /api proxy in dev)
 const FASTAPI_BACKEND =
