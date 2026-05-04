@@ -55,19 +55,23 @@ export class PostgresCrmDb implements CrmDb {
   }
 
   // ─── Companies ─────────────────────────────────────────────────────────
-  async listCompanies(search?: string, limit = 50) {
+  async listCompanies(search?: string, limit = 50, sort: 'name' | 'last_contact' = 'name') {
     const hasSearch = search && search.trim().length > 0
     const params: any[] = []
     if (hasSearch) params.push(`%${search.trim()}%`)
     params.push(limit)
     const whereClause = hasSearch ? 'WHERE c.name ILIKE $1' : ''
     const limitParam = `$${params.length}`
+    const orderBy =
+      sort === 'last_contact'
+        ? 'ORDER BY d.last_contacted_at DESC NULLS LAST, c.name ASC'
+        : 'ORDER BY c.name ASC'
     const { rows } = await this.query(
       `SELECT c.id, c.orgnr, c.name, c.industry, c.website, d.status AS deal_status, d.last_contacted_at
        FROM ${SCHEMA}.companies c
        LEFT JOIN ${SCHEMA}.deals d ON c.id = d.company_id
        ${whereClause}
-       ORDER BY c.name
+       ${orderBy}
        LIMIT ${limitParam}`,
       params
     )
@@ -514,6 +518,40 @@ export class PostgresCrmDb implements CrmDb {
        ORDER BY is_primary DESC, created_at DESC
        LIMIT 1`,
       [companyId]
+    )
+    return rows[0] ?? null
+  }
+
+  async findContactByEmailForCrm(email: string) {
+    const e = email?.trim().toLowerCase()
+    if (!e) return null
+    const { rows } = await this.query(
+      `SELECT * FROM ${SCHEMA}.contacts WHERE lower(trim(email)) = $1 LIMIT 1`,
+      [e]
+    )
+    return rows[0] ?? null
+  }
+
+  async listCompaniesWithWebsite() {
+    const { rows } = await this.query<{ id: string; website: string }>(
+      `SELECT id::text, website FROM ${SCHEMA}.companies
+       WHERE website IS NOT NULL AND trim(website) != ''`,
+    )
+    return rows
+  }
+
+  async tryInsertCrmEmailMessage(payload: Record<string, any>) {
+    const dedupe = payload.dedupe_key
+    if (!dedupe || typeof dedupe !== 'string') {
+      throw new Error('tryInsertCrmEmailMessage: dedupe_key is required')
+    }
+    const cols = Object.keys(payload).filter((k) => payload[k] !== undefined)
+    const vals = cols.map((c) => payload[c])
+    const placeholders = cols.map((_, i) => `$${i + 1}`).join(', ')
+    const { rows } = await this.query(
+      `INSERT INTO ${SCHEMA}.crm_email_messages (${cols.join(', ')}) VALUES (${placeholders})
+       ON CONFLICT (dedupe_key) DO NOTHING RETURNING *`,
+      vals
     )
     return rows[0] ?? null
   }

@@ -5,6 +5,7 @@ import { getAccessToken, isAuth0Configured } from "@/lib/authToken";
 import {
   disconnectCrmGmail,
   getCrmGmailOAuthUrl,
+  syncCrmGmailInbound,
   type CrmEmailConfig,
   type CrmGmailStatus,
 } from "@/lib/api/crm";
@@ -36,7 +37,9 @@ export function CrmGmailConnectBanner({
 }: Props) {
   const { toast } = useToast();
   const [disconnectBusy, setDisconnectBusy] = useState(false);
+  const [syncBusy, setSyncBusy] = useState(false);
 
+  const gmailReadOnly = gmailStatus?.workspace?.gmail_readonly === true;
   if (loading && !emailConfig) {
     return (
       <div
@@ -96,13 +99,57 @@ export function CrmGmailConnectBanner({
             {gmailStatus.google_display_name
               ? `${gmailStatus.google_display_name} · ${gmailStatus.google_email}`
               : gmailStatus.google_email}
-            <span className="ml-1">— outbound from CRM can use this inbox.</span>
+            <span className="ml-1">
+              — send from CRM uses this inbox
+              {gmailReadOnly ? "; replies can be imported into CRM." : "."}
+            </span>
           </span>
         ) : (
           <span>Send from your own Google Workspace inbox (sign in with Google once per teammate).</span>
         )}
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-2">
+        {gmailStatus?.connected && !gmailReadOnly ? (
+          <p className="max-w-[280px] text-xs text-amber-800 dark:text-amber-200/90">
+            Reconnect Gmail once to allow read-only inbox import so team CRM shows replies.
+          </p>
+        ) : null}
+        {gmailStatus?.connected && gmailReadOnly ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={syncBusy}
+            onClick={async () => {
+              setSyncBusy(true);
+              try {
+                const out = await syncCrmGmailInbound();
+                toast({
+                  title: "Gmail sync finished",
+                  description: `${out.imported} new message(s) imported, ${out.skipped_duplicate} already had, ${out.skipped_not_crm} skipped (not CRM-related).`,
+                });
+                if (out.errors.length) {
+                  toast({
+                    title: "Sync notes",
+                    description: out.errors.slice(0, 3).join(" "),
+                    variant: "destructive",
+                  });
+                }
+              } catch (e) {
+                toast({
+                  title: "Sync failed",
+                  description: e instanceof Error ? e.message : String(e),
+                  variant: "destructive",
+                });
+              } finally {
+                setSyncBusy(false);
+              }
+            }}
+          >
+            {syncBusy ? <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" /> : null}
+            {syncBusy ? "Syncing…" : "Import inbox replies"}
+          </Button>
+        ) : null}
         {!gmailStatus?.connected ? (
           <Button
             type="button"

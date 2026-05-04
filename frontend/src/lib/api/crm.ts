@@ -211,9 +211,14 @@ export async function getThreadMessages(threadId: string): Promise<CrmThreadMess
   );
 }
 
-export async function listCrmCompanies(search: string, limit = 50): Promise<
+export async function listCrmCompanies(
+  search: string,
+  limit = 50,
+  opts?: { sort?: "name" | "last_contact" }
+): Promise<
   {
     id: string;
+    orgnr?: string | null;
     name: string;
     industry: string | null;
     website: string | null;
@@ -224,6 +229,7 @@ export async function listCrmCompanies(search: string, limit = 50): Promise<
   const params = new URLSearchParams();
   if (search.trim()) params.set("search", search.trim());
   params.set("limit", String(limit));
+  if (opts?.sort) params.set("sort", opts.sort);
   return crmFetchJson(`/crm/companies?${params.toString()}`);
 }
 
@@ -244,6 +250,8 @@ export async function getCrmEmailConfig(): Promise<CrmEmailConfig> {
 
 export interface CrmGoogleWorkspaceFlags {
   gmail_send: boolean;
+  /** When true, CRM can import inbox replies via Gmail API (reconnect after this scope ships). */
+  gmail_readonly: boolean;
   drive_file: boolean;
   calendar_events: boolean;
 }
@@ -259,6 +267,23 @@ export interface CrmGmailStatus {
 
 export async function getCrmGmailStatus(): Promise<CrmGmailStatus> {
   return crmFetchJson<CrmGmailStatus>("/crm/gmail/status");
+}
+
+export interface GmailInboundSyncResult {
+  mailboxes_scanned: number;
+  messages_fetched: number;
+  imported: number;
+  skipped_not_crm: number;
+  skipped_duplicate: number;
+  errors: string[];
+}
+
+/** Pull Gmail inbox replies into CRM for the current user’s connected account (CRM-matched senders only). */
+export async function syncCrmGmailInbound(): Promise<GmailInboundSyncResult> {
+  return crmFetchJson<GmailInboundSyncResult>("/crm/gmail/sync-inbound", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
 }
 
 export async function getCrmGmailOAuthUrl(): Promise<string> {

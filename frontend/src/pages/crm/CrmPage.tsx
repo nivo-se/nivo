@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -106,7 +106,10 @@ type CrmTab = "companies" | "inbox" | "unmatched" | "batch";
 export default function CrmPage() {
   const { companyId } = useParams<{ companyId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const workspaceBackPath =
+    (location.state as { crmBackPath?: string } | null)?.crmBackPath ?? "/crm";
   const { toast } = useToast();
 
   const tabParam = searchParams.get("tab") as CrmTab | null;
@@ -805,7 +808,7 @@ export default function CrmPage() {
           )}
 
           {tab === "companies" && showDetail && (
-            <CrmWorkspace companyIdParam={companyId!} onBack={() => navigate("/crm")} />
+            <CrmWorkspace companyIdParam={companyId!} onBack={() => navigate(workspaceBackPath)} />
           )}
         </main>
       </div>

@@ -1,6 +1,6 @@
 # CRM: send from your own Gmail (Google Workspace)
 
-Each signed-in app user can connect a **separate** Google account. The app stores a **refresh token** in Postgres (encrypted with `GMAIL_OAUTH_ENCRYPTION_KEY`) and sends with the **Gmail API** (`gmail.send` scope) so the message appears in that user’s **Sent** mail.
+Each signed-in app user can connect a **separate** Google account. The app stores a **refresh token** in Postgres (encrypted with `GMAIL_OAUTH_ENCRYPTION_KEY`) and uses the **Gmail API** for **send** (`gmail.send`) and optional **inbox import** (`gmail.readonly`).
 
 ## 1. Google Cloud
 
@@ -43,9 +43,29 @@ OAuth scopes include **`userinfo.profile`** so we can read the account **display
 ## 5. Send behaviour
 
 - `POST /crm/emails/:id/send` with body `{ "send_provider": "auto" }` (default) uses **Gmail** if the current user has connected and **Resend** otherwise. Use `"gmail"` or `"resend"` to force a path.
-- Inbound reply tracking (Resend `reply+…` → webhook) still needs **Resend** env when you want replies in the CRM inbox; Gmail sends can still set that **Reply-To** when `RESEND_REPLY_DOMAIN` (or an inferred From domain) is set.
+- If you use **only Gmail**, you can rely on **inbox import** (below) for replies instead of Resend webhooks.
 
-## 6. Security notes
+## 6. Inbox import (Gmail API; team-visible in CRM)
+
+OAuth includes **`gmail.readonly`**. Teammates who linked **before** that scope was added should **disconnect and Connect Gmail** again so Google reissues a token that includes read access.
+
+Behaviour:
+
+- The enhanced server lists recent **Inbox** mail for each connected account (periodic poll + optional manual sync in the CRM banner).
+- Only messages whose **From** matches a CRM **contact email**, or whose **domain** matches a company **website** host, are copied into `deep_research.crm_email_messages` (inbound, `provider = gmail`) on the deal/contact thread. Everything else stays **only in Gmail**.
+
+Environment variables (enhanced server):
+
+| Variable | Purpose |
+|----------|--------|
+| `CRM_GMAIL_INBOUND_POLL_SECONDS` | Seconds between automatic syncs for **all** linked mailboxes (default **180**). Set **`0`** to disable background polling. |
+| `CRM_GMAIL_INBOUND_QUERY` | Gmail search string (default `in:inbox newer_than:60d -category:promotions`). |
+| `CRM_GMAIL_INBOUND_MAX_MESSAGES` | Max messages per mailbox per run (default **50**, cap **100**). |
+
+API: **`POST /crm/gmail/sync-inbound`** (Bearer auth) syncs the **current user’s** connected mailbox once.
+
+## 7. Security notes
 
 - Treat `GMAIL_OAUTH_ENCRYPTION_KEY` like a production secret; rotating it **invalidates** existing stored refresh tokens (users must connect again) unless you re-encrypt.
 - Restrict the OAuth client redirect URIs to known hosts; keep the consent screen in Testing or a tight Internal audience for a three-user deployment.
+- **Read-only Gmail** can be revoked by the user from their Google account at any time.

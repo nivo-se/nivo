@@ -53,7 +53,9 @@ Or use `DATABASE_URL=postgresql://user:pass@host:port/db` instead.
 | `RESEND_WEBHOOK_SECRET` | Svix secret for `POST /webhooks/email/inbound` (FastAPI). |
 | `OPENAI_API_KEY` | Already used elsewhere; needed for CRM email generation. |
 | `VITE_CRM_SERVER_URL` | Override for Vite proxy target (default `http://localhost:3001`). |
-| `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` / `GOOGLE_OAUTH_REDIRECT_URI` / `GMAIL_OAUTH_ENCRYPTION_KEY` | **Send from your own Gmail** (per user): see [CRM_GMAIL_OAUTH.md](./CRM_GMAIL_OAUTH.md). |
+| `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` / `GOOGLE_OAUTH_REDIRECT_URI` / `GMAIL_OAUTH_ENCRYPTION_KEY` | **Send from your own Gmail** + **inbox import** (per user): see [CRM_GMAIL_OAUTH.md](./CRM_GMAIL_OAUTH.md). |
+| `CRM_GMAIL_INBOUND_POLL_SECONDS` | **Optional.** Seconds between Gmail inbox import runs for all linked accounts (default **180** on enhanced server; **`0`** disables). |
+| `CRM_GMAIL_INBOUND_QUERY` / `CRM_GMAIL_INBOUND_MAX_MESSAGES` | **Optional.** Tune Gmail search and batch size for inbox import (see [CRM_GMAIL_OAUTH.md](./CRM_GMAIL_OAUTH.md)). |
 | `CRM_GMAIL_OAUTH_SUCCESS_URL` | Optional. Browser redirect after a successful Google consent (default: `APP_BASE_URL` or Vite dev URL). |
 
 Resend is needed for the **Resend** send path and for **inbound** webhooks. **Gmail** sending works without Resend. Creating deals, contacts, and generating drafts do not require either.
