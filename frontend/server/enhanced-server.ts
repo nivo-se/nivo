@@ -52,6 +52,7 @@ import {
   CompanyContext 
 } from './valuation/llm-advisor.js'
 import { registerCrmRoutes } from './routes/crm.routes.js'
+import { registerCopilotRoutes } from './routes/copilot.routes.js'
 import { getCrmPool, PostgresCrmDb, isCrmPostgresConfigured } from './services/crm/postgres-db.js'
 import { createGmailOutboundService } from './services/gmail/gmail-outbound.service.js'
 import type { GmailOutboundService } from './services/gmail/gmail-outbound.service.js'
@@ -99,6 +100,7 @@ function getGmailOutboundForCrm(): GmailOutboundService | null {
 }
 
 registerCrmRoutes(app, getCrmDb, getGmailOutboundForCrm)
+registerCopilotRoutes(app, getCrmDb, getGmailOutboundForCrm)
 
 function startGmailInboundPolling() {
   const raw = process.env.CRM_GMAIL_INBOUND_POLL_SECONDS

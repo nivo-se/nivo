@@ -67,9 +67,21 @@ export class PostgresCrmDb implements CrmDb {
         ? 'ORDER BY d.last_contacted_at DESC NULLS LAST, c.name ASC'
         : 'ORDER BY c.name ASC'
     const { rows } = await this.query(
-      `SELECT c.id, c.orgnr, c.name, c.industry, c.website, d.status AS deal_status, d.last_contacted_at
+      `SELECT c.id, c.orgnr, c.name, c.industry, c.website, d.status AS deal_status, d.last_contacted_at,
+              COALESCE(msg.correspondence_total, 0)::int AS correspondence_total,
+              COALESCE(msg.correspondence_inbound, 0)::int AS correspondence_inbound,
+              COALESCE(msg.correspondence_outbound, 0)::int AS correspondence_outbound
        FROM ${SCHEMA}.companies c
        LEFT JOIN ${SCHEMA}.deals d ON c.id = d.company_id
+       LEFT JOIN (
+         SELECT t.company_id,
+                COUNT(m.id)::int AS correspondence_total,
+                COUNT(m.id) FILTER (WHERE m.direction = 'inbound')::int AS correspondence_inbound,
+                COUNT(m.id) FILTER (WHERE m.direction = 'outbound')::int AS correspondence_outbound
+           FROM ${SCHEMA}.crm_email_threads t
+           INNER JOIN ${SCHEMA}.crm_email_messages m ON m.thread_id = t.id
+           GROUP BY t.company_id
+       ) msg ON msg.company_id = c.id
        ${whereClause}
        ${orderBy}
        LIMIT ${limitParam}`,

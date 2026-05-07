@@ -10,6 +10,10 @@ export interface CrmCompanyListItem {
   website: string | null
   deal_status: string | null
   last_contacted_at: string | null
+  /** Messages in CRM email threads for this company (all contacts; inbound + outbound). */
+  correspondence_total: number
+  correspondence_inbound: number
+  correspondence_outbound: number
 }
 
 /** Recent inbound CRM message with thread/company for Inbox tab */

@@ -55,6 +55,7 @@ import {
   ChevronDown,
   RefreshCw,
   Send,
+  Sparkles,
 } from "lucide-react";
 import { getAllLists } from "@/lib/api/lists/service";
 import type { List } from "@/lib/api/types";
@@ -78,6 +79,7 @@ import { CrmGmailConnectBanner } from "./CrmGmailConnectBanner";
 import { CrmHome } from "./CrmHome";
 import { CrmWorkspace } from "./CrmWorkspace";
 import { QuickSendDialog } from "./QuickSendDialog";
+import { NivoCopilotPanel } from "./NivoCopilotPanel";
 import { formatCrmDealStatusLabel, formatCrmShortDate } from "./crm-format";
 
 interface CrmCompany {
@@ -149,6 +151,7 @@ export default function CrmPage() {
   );
 
   const [quickSendOpen, setQuickSendOpen] = useState(false);
+  const [copilotOpen, setCopilotOpen] = useState(false);
   const [externalOpen, setExternalOpen] = useState(false);
   const [extName, setExtName] = useState("");
   const [extContactName, setExtContactName] = useState("");
@@ -391,6 +394,16 @@ export default function CrmPage() {
               </TabsList>
             </Tabs>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-9 w-full shrink-0 gap-1 sm:w-auto"
+              onClick={() => setCopilotOpen(true)}
+            >
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              Copilot
+            </Button>
             <Button
               type="button"
               variant="primary"
@@ -870,6 +883,15 @@ export default function CrmPage() {
         onSent={(result) => {
           navigate(`/crm/company/${result.company_id}`);
           void loadCompanies();
+        }}
+      />
+
+      <NivoCopilotPanel
+        open={copilotOpen}
+        onOpenChange={setCopilotOpen}
+        context={{
+          page: showDetail ? "crm_workspace" : "crm",
+          companyId: companyId ?? undefined,
         }}
       />
     </div>

@@ -53,14 +53,8 @@ const mainNavItems: NavItem[] = [
     path: "/crm/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
-    matchesLocation: (pathname) => pathname === "/crm/dashboard",
-  },
-  {
-    path: "/crm/companies",
-    label: "Companies",
-    icon: Building2,
     matchesLocation: (pathname) =>
-      pathname === "/crm/companies" || pathname.startsWith("/crm/company/"),
+      pathname === "/crm/dashboard" || pathname.startsWith("/crm/company/"),
   },
   {
     path: "/crm",
@@ -68,6 +62,7 @@ const mainNavItems: NavItem[] = [
     icon: Briefcase,
     matchesLocation: (pathname, search) => {
       if (pathname === "/crm/dashboard") return false;
+      if (pathname.startsWith("/crm/company/")) return false;
       if (pathname !== "/crm") return false;
       return new URLSearchParams(search).get("tab") !== "inbox";
     },
@@ -125,14 +120,8 @@ const unifiedNavSections: { title: string; items: NavItem[] }[] = [
         path: "/crm/dashboard",
         label: "Dashboard",
         icon: LayoutDashboard,
-        matchesLocation: (pathname) => pathname === "/crm/dashboard",
-      },
-      {
-        path: "/crm/companies",
-        label: "Companies",
-        icon: Building2,
         matchesLocation: (pathname) =>
-          pathname === "/crm/companies" || pathname.startsWith("/crm/company/"),
+          pathname === "/crm/dashboard" || pathname.startsWith("/crm/company/"),
       },
       {
         path: "/crm",
@@ -141,7 +130,7 @@ const unifiedNavSections: { title: string; items: NavItem[] }[] = [
         matchesLocation: (pathname, search) => {
           if (pathname === "/crm/dashboard") return false;
           if (!pathname.startsWith("/crm")) return false;
-          if (pathname === "/crm/companies" || pathname.startsWith("/crm/company/")) return false;
+          if (pathname.startsWith("/crm/company/")) return false;
           const tab = new URLSearchParams(search).get("tab");
           return tab !== "inbox";
         },

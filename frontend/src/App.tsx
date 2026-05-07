@@ -85,7 +85,6 @@ import CompetitorEditorPage from "./pages/deep-research/CompetitorEditorPage";
 import AssumptionOverridePage from "./pages/deep-research/AssumptionOverridePage";
 import CrmPage from "./pages/crm/CrmPage";
 import CrmDashboardPage from "./pages/crm/CrmDashboardPage";
-import CrmCompaniesPage from "./pages/crm/CrmCompaniesPage";
 import AnalysisPage from "./pages/AnalysisPage";
 
 const queryClient = new QueryClient();
@@ -220,9 +219,9 @@ const App = () => (
               <Route path="admin" element={<Admin />} />
               <Route path="app/theme" element={<ThemeSanityPage />} />
               <Route path="crm/dashboard" element={<CrmDashboardPage />} />
-              <Route path="crm" element={<CrmPage />} />
-              <Route path="crm/companies" element={<CrmCompaniesPage />} />
+              <Route path="crm/companies" element={<Navigate to="/crm/dashboard" replace />} />
               <Route path="crm/company/:companyId" element={<CrmPage />} />
+              <Route path="crm" element={<CrmPage />} />
               <Route path="deep-research" element={<DeepResearchHomePage />} />
               <Route path="deep-research/companies" element={<CompaniesPage />} />
               <Route path="deep-research/runs" element={<RunListPage />} />

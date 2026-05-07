@@ -224,6 +224,9 @@ export async function listCrmCompanies(
     website: string | null;
     deal_status: string | null;
     last_contacted_at: string | null;
+    correspondence_total: number;
+    correspondence_inbound: number;
+    correspondence_outbound: number;
   }[]
 > {
   const params = new URLSearchParams();
