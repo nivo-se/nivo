@@ -28,7 +28,7 @@ export interface CopilotMessage {
 }
 
 export interface CopilotContext {
-  page?: 'crm' | 'crm_workspace' | 'universe' | 'deep_research'
+  page?: 'crm' | 'crm_workspace' | 'universe' | 'deep_research' | 'sourcing'
   companyId?: string
   orgnr?: string
 }
@@ -100,7 +100,7 @@ function compactOverview(raw: Awaited<ReturnType<CRMOverviewService['companyOver
   }
 }
 
-const TOOLS: ChatCompletionTool[] = [
+const BASE_COPILOT_TOOLS: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
@@ -197,17 +197,83 @@ const TOOLS: ChatCompletionTool[] = [
   },
 ]
 
+function copilotToolsForContext(context?: CopilotContext): ChatCompletionTool[] {
+  if (context?.page !== 'sourcing') return BASE_COPILOT_TOOLS
+  return BASE_COPILOT_TOOLS.map((t) => {
+    if (t.type !== 'function') return t
+    const name = t.function.name
+    if (name === 'search_universe') {
+      return {
+        ...t,
+        function: {
+          ...t.function,
+          description:
+            'Primary discovery tool for Sourcing: query Nivo’s Universe company database (read-only Postgres/SQLite mirror of screened Swedish companies). '
+            + 'Use for new target ideas, sector/size screens, name/orgnr look-ups. Revenue filter is latest annual revenue in SEK. '
+            + 'Combine with list_crm_companies to avoid duplicating work already in the CRM pipeline.',
+        },
+      }
+    }
+    if (name === 'list_crm_companies') {
+      return {
+        ...t,
+        function: {
+          ...t.function,
+          description:
+            'List companies already stored in Nivo CRM (pipeline DB). On Sourcing, use after search_universe to mark which Universe hits are net-new vs already tracked, or to sanity-check overlap before outreach.',
+        },
+      }
+    }
+    if (name === 'get_crm_deal_summary') {
+      return {
+        ...t,
+        function: {
+          ...t.function,
+          description:
+            'Summarize one CRM deal/company: contacts, deal status, timeline, engagement. On Sourcing, use when the user cares about relationship state for an orgnr or selected row; pass orgnr or company_id.',
+        },
+      }
+    }
+    if (name === 'build_deep_research_handoff_url') {
+      return {
+        ...t,
+        function: {
+          ...t.function,
+          description:
+            'Build /deep-research prefill URL. On Sourcing flows prefer from=screening or from=gpt_target when it matches how the user is working.',
+        },
+      }
+    }
+    return t
+  })
+}
+
 function baseSystem(context?: CopilotContext, playbookHint?: string): string {
-  const bits: string[] = [
-    'You are Nivo Copilot — a scoped assistant for Universe discovery, CRM, and Deep Research handoff.',
-    'Rules: Use tools for factual company data; never invent orgnr or email addresses.',
-    'You cannot send email. create_email_draft only creates a draft; humans approve and send in CRM.',
-    'Email drafts in CRM: If the user asks to draft, write, compose, save, or prepare an email and they want it in Nivo, you MUST call create_email_draft. '
-      + 'Pasting email text only in your reply does NOT save anything to the database.',
-    'Workflow: call get_crm_deal_summary when you need contacts, then create_email_draft (you may omit contact_id to use the primary contact).',
-    'Prefer concise answers with short bullets when listing companies.',
-  ]
-  if (context?.page) bits.push(`Current page context: ${context.page}.`)
+  const isSourcing = context?.page === 'sourcing'
+
+  const bits: string[] = isSourcing
+    ? [
+        'You are Nivo Sourcing Copilot — focused on finding acquisition targets in Nivo’s Universe (local Swedish company database) and cross-checking Nivo CRM so pipeline work stays coherent.',
+        'Universe vs CRM: Use search_universe to surface candidates from the company dataset (names, orgnr, revenue in SEK). Use list_crm_companies and get_crm_deal_summary to see what is already in the CRM pipeline, deal stage, and recent engagement.',
+        'When the user describes sectors, size bands, or “ companies like X ”, translate that into concrete search_universe calls (search, min_revenue_sek, limit). Never invent orgnr, revenue, or emails — only report tool output.',
+        'After listing Universe hits on Sourcing, prefer calling list_crm_companies (or get_crm_deal_summary per orgnr) when they need to know “are we already on this?”',
+        'If orgnr is provided in context or by the user, use get_crm_deal_summary for CRM state; use search_universe with that orgnr/name for raw universe listing context.',
+        'Deep research handoffs from Sourcing: prefer build_deep_research_handoff_url with from=screening or from=gpt_target unless the user says they came from a company record.',
+        'You cannot send email. create_email_draft only creates a draft; humans approve and send in CRM. If they ask for a saved outreach draft, you MUST call create_email_draft (after get_crm_deal_summary when contacts are needed).',
+        'Prefer short bullet lists when returning many companies; include orgnr when the tool returns it.',
+      ]
+    : [
+        'You are Nivo Copilot — a scoped assistant for Universe discovery, CRM, and Deep Research handoff.',
+        'Rules: Use tools for factual company data; never invent orgnr or email addresses.',
+        'You cannot send email. create_email_draft only creates a draft; humans approve and send in CRM.',
+        'Email drafts in CRM: If the user asks to draft, write, compose, save, or prepare an email and they want it in Nivo, you MUST call create_email_draft. '
+          + 'Pasting email text only in your reply does NOT save anything to the database.',
+        'Workflow: call get_crm_deal_summary when you need contacts, then create_email_draft (you may omit contact_id to use the primary contact).',
+        'Prefer concise answers with short bullets when listing companies.',
+      ]
+
+  if (context?.page && !isSourcing) bits.push(`Current page context: ${context.page}.`)
+  if (isSourcing) bits.push('Surface: Sourcing chat — user is also using the left-panel sourcing assistant for universe filters; you complement that with authoritative DB lookups via tools.')
   if (context?.companyId) bits.push(`Active CRM company UUID: ${context.companyId}.`)
   if (context?.orgnr) bits.push(`Context orgnr hint: ${context.orgnr}.`)
   if (playbookHint) bits.push(playbookHint)
@@ -337,8 +403,10 @@ export async function runNivoCopilot(opts: {
         let companyId =
           typeof args.company_id === 'string' ? args.company_id.trim() : opts.context?.companyId
         const orgnrArg = typeof args.orgnr === 'string' ? args.orgnr.trim() : undefined
-        if (!companyId && orgnrArg) {
-          const by = await opts.db.getCompanyByOrgnr(orgnrArg)
+        const orgnrCtx = opts.context?.orgnr?.trim() || undefined
+        const orgnrResolved = orgnrArg || orgnrCtx
+        if (!companyId && orgnrResolved) {
+          const by = await opts.db.getCompanyByOrgnr(orgnrResolved)
           companyId = by?.id as string | undefined
         }
         if (!companyId) {
@@ -366,7 +434,10 @@ export async function runNivoCopilot(opts: {
           typeof args.company_id === 'string' && args.company_id.trim()
             ? args.company_id.trim()
             : opts.context?.companyId?.trim() || ''
-        const resolvedCompany = await resolveCompanyIdToUuid(fromArgs || null)
+        const orgFallback = opts.context?.orgnr?.trim() || ''
+        const resolvedCompany = await resolveCompanyIdToUuid(
+          fromArgs || orgFallback || null
+        )
         if (!resolvedCompany) {
           toolTrace.push({ name, ok: false, summary: 'missing company' })
           return JSON.stringify({
@@ -475,6 +546,7 @@ export async function runNivoCopilot(opts: {
   }
 
   const sys = baseSystem(opts.context, playbook?.systemHint)
+  const tools = copilotToolsForContext(opts.context)
 
   let reply = ''
   let openaiHistory: ChatCompletionMessageParam[] | null = null
@@ -492,7 +564,7 @@ export async function runNivoCopilot(opts: {
         model: OPENAI_MODEL,
         temperature: 0.35,
         messages: openaiHistory,
-        tools: TOOLS,
+        tools: tools,
         tool_choice: 'auto',
       })
 
@@ -535,7 +607,7 @@ export async function runNivoCopilot(opts: {
         'Could not generate a reply. Check OpenAI logs and try again.'
     }
   } else if (anthropic) {
-    anthropicTools = openAiChatToolsToAnthropic(TOOLS)
+    anthropicTools = openAiChatToolsToAnthropic(tools)
     anthropicConv = opts.messages.map((m) => ({
       role: m.role,
       content: m.content,
@@ -599,7 +671,7 @@ export async function runNivoCopilot(opts: {
 
   if (
     savedDrafts.length === 0 &&
-    opts.context?.companyId &&
+    (opts.context?.companyId || opts.context?.orgnr?.trim()) &&
     wantsSavedEmailDraft(lastUserText)
   ) {
     if (openai && openaiHistory) {
@@ -608,7 +680,7 @@ export async function runNivoCopilot(opts: {
         model: OPENAI_MODEL,
         temperature: 0.35,
         messages: openaiHistory,
-        tools: TOOLS,
+        tools: tools,
         tool_choice: { type: 'function', function: { name: 'create_email_draft' } },
       })
       const choice = forced.choices[0]?.message

@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import type { CrmDb } from '../services/crm/db-interface.js'
 import type { GmailOutboundService } from '../services/gmail/gmail-outbound.service.js'
-import { COPILOT_PLAYBOOKS } from '../services/copilot/playbooks.js'
+import { listPlaybooksForPage } from '../services/copilot/playbooks.js'
 import { runNivoCopilot } from '../services/copilot/copilot-runner.js'
 
 function requireCrmDb(res: Response, db: CrmDb | null): db is CrmDb {
@@ -34,7 +34,7 @@ const chatBodySchema = z.object({
   playbookId: z.string().max(64).optional(),
   context: z
     .object({
-      page: z.enum(['crm', 'crm_workspace', 'universe', 'deep_research']).optional(),
+      page: z.enum(['crm', 'crm_workspace', 'universe', 'deep_research', 'sourcing']).optional(),
       companyId: z.string().max(80).optional(),
       orgnr: z.string().max(32).optional(),
     })
@@ -46,8 +46,9 @@ export function registerCopilotRoutes(
   getCrmDb: () => CrmDb | null,
   getGmailOutbound: () => GmailOutboundService | null
 ) {
-  app.get('/crm/copilot/playbooks', (_req, res) => {
-    return res.json({ success: true, data: COPILOT_PLAYBOOKS })
+  app.get('/crm/copilot/playbooks', (req, res) => {
+    const page = typeof req.query.page === 'string' ? req.query.page : undefined
+    return res.json({ success: true, data: listPlaybooksForPage(page) })
   })
 
   app.post(

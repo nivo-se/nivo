@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Send, Bot, User, Sparkles, ListPlus } from "lucide-react";
 import { fetchWithAuth } from "@/lib/backendFetch";
 import { createListFromSourcing } from "@/lib/services/listsService";
+import { NivoCopilotPanel } from "@/pages/crm/NivoCopilotPanel";
 
 /** Rows returned in chat `sample_companies`; shown in Analysis right pane before a workflow run. */
 export interface SourcingPreviewRow {
@@ -60,6 +61,8 @@ interface ChatInterfaceProps {
   isRunning: boolean;
   /** Latest sourcing match count + sample companies for the workflow results panel. */
   onSourcingPreview?: (preview: SourcingChatPreview | null) => void;
+  /** When a company is selected in sourcing/analysis results, pass orgnr so Nivo Copilot can resolve CRM context. */
+  copilotOrgnrHint?: string | null;
 }
 
 interface Message {
@@ -88,6 +91,7 @@ export function ChatInterface({
   onStartAnalysis,
   isRunning,
   onSourcingPreview,
+  copilotOrgnrHint = null,
 }: ChatInterfaceProps) {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
@@ -123,6 +127,7 @@ export function ChatInterface({
     message: string;
     listId?: string;
   } | null>(null);
+  const [copilotOpen, setCopilotOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -305,9 +310,21 @@ export function ChatInterface({
             </p>
           </div>
         </div>
-        <Button type="button" variant="ghost" size="sm" className="shrink-0 text-xs" onClick={startNewThread}>
-          New chat
-        </Button>
+        <div className="flex items-center gap-1 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 text-xs gap-1"
+            onClick={() => setCopilotOpen(true)}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Nivo Copilot
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="shrink-0 text-xs" onClick={startNewThread}>
+            New chat
+          </Button>
+        </div>
       </div>
 
       {actionBanner ? (
@@ -496,6 +513,15 @@ export function ChatInterface({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <NivoCopilotPanel
+        open={copilotOpen}
+        onOpenChange={setCopilotOpen}
+        context={{
+          page: "sourcing",
+          orgnr: copilotOrgnrHint?.trim() || undefined,
+        }}
+      />
     </div>
   );
 }

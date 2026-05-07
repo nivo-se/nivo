@@ -229,6 +229,7 @@ export default function AnalysisPage() {
                                 onStartAnalysis={startWorkflow}
                                 isRunning={isRunning}
                                 onSourcingPreview={setSourcingPreview}
+                                copilotOrgnrHint={selectedCompany?.orgnr ?? null}
                             />
                         </div>
                     </div>

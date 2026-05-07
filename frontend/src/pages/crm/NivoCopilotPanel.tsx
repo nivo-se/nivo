@@ -70,6 +70,7 @@ function AssistantMarkdown({ content }: { content: string }) {
 
 export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPanelProps) {
   const { toast } = useToast();
+  const isSourcing = context?.page === "sourcing";
   const [playbooks, setPlaybooks] = useState<CopilotPlaybook[]>([]);
   const [playbookId, setPlaybookId] = useState<string>("");
   const [lines, setLines] = useState<ChatLine[]>([]);
@@ -79,7 +80,7 @@ export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPan
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    listCopilotPlaybooks()
+    listCopilotPlaybooks(context?.page)
       .then((list) => {
         if (!cancelled) setPlaybooks(Array.isArray(list) ? list : []);
       })
@@ -96,13 +97,22 @@ export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPan
     return () => {
       cancelled = true;
     };
-  }, [open, toast]);
+  }, [open, context?.page, toast]);
+
+  useEffect(() => {
+    if (!open || playbooks.length === 0) return;
+    setPlaybookId((id) => {
+      if (id && playbooks.some((p) => p.id === id)) return id;
+      if (isSourcing) return playbooks[0]?.id ?? "";
+      return "";
+    });
+  }, [open, playbooks, isSourcing]);
 
   useEffect(() => {
     if (!open) return;
     setLines([]);
     setInput("");
-  }, [open, context?.companyId]);
+  }, [open, context?.companyId, context?.orgnr]);
 
   const send = useCallback(async () => {
     const trimmed = input.trim();
@@ -154,13 +164,24 @@ export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPan
         <SheetHeader className="space-y-1 border-b border-sidebar-border px-4 py-4 pr-12 text-left">
           <SheetTitle className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden />
-            Nivo copilot
+            {isSourcing ? "Sourcing copilot" : "Nivo copilot"}
           </SheetTitle>
           <SheetDescription>
-            Scoped assistant: Universe search, CRM summary, email drafts only (you approve sends), and
-            deep research links. It runs on the server with tools (read CRM/Universe; write is limited
-            to creating drafts). It does not read or control your browser or this panel—only the text
-            you see here.
+            {isSourcing ? (
+              <>
+                Tailored for target discovery: searches Nivo&apos;s Universe company database and
+                cross-checks your CRM pipeline so you see net-new candidates versus deals already in
+                motion. Same server tools as CRM — drafts stay manual approval; it does not control
+                your browser.
+              </>
+            ) : (
+              <>
+                Scoped assistant: Universe search, CRM summary, email drafts only (you approve
+                sends), and deep research links. It runs on the server with tools (read CRM/Universe;
+                write is limited to creating drafts). It does not read or control your browser or
+                this panel—only the text you see here.
+              </>
+            )}
           </SheetDescription>
         </SheetHeader>
 
@@ -204,8 +225,9 @@ export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPan
           <div className="flex flex-col gap-3 py-4">
             {lines.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Ask for targets in the Universe, a CRM deal summary, a draft email (saved as draft
-                only), or a deep research handoff URL.
+                {isSourcing
+                  ? "Ask for Universe scans (sectors, revenue bands, names), check whether candidates are already in CRM, get deal context for a selected orgnr, or open a deep research handoff."
+                  : "Ask for targets in the Universe, a CRM deal summary, a draft email (saved as draft only), or a deep research handoff URL."}
               </p>
             ) : null}
             {lines.map((line, idx) => (
@@ -244,7 +266,11 @@ export function NivoCopilotPanel({ open, onOpenChange, context }: NivoCopilotPan
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g. Search the Universe for… / Summarize this deal / Draft a bump email…"
+            placeholder={
+              isSourcing
+                ? "e.g. Scan Universe for logistics 50–120 M SEK · Are these orgnrs already in CRM? · Handoff URL for research…"
+                : "e.g. Search the Universe for… / Summarize this deal / Draft a bump email…"
+            }
             className="min-h-[88px] resize-none"
             disabled={busy}
             onKeyDown={(e) => {

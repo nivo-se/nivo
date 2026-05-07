@@ -6,6 +6,8 @@ export interface CopilotPlaybook {
   description: string;
   systemHint: string;
   starterPrompt?: string;
+  /** Present when server scopes this playbook to specific surfaces (e.g. sourcing-only). */
+  onlyOnPages?: CopilotPageContext[];
 }
 
 export interface CopilotToolTraceItem {
@@ -26,10 +28,18 @@ export interface CopilotChatResult {
   savedDrafts?: CopilotSavedDraft[];
 }
 
-export type CopilotPageContext = "crm" | "crm_workspace" | "universe" | "deep_research";
+export type CopilotPageContext =
+  | "crm"
+  | "crm_workspace"
+  | "universe"
+  | "deep_research"
+  | "sourcing";
 
-export async function listCopilotPlaybooks(): Promise<CopilotPlaybook[]> {
-  return crmFetchJson<CopilotPlaybook[]>("/crm/copilot/playbooks");
+export async function listCopilotPlaybooks(
+  page?: CopilotPageContext
+): Promise<CopilotPlaybook[]> {
+  const q = page != null && page !== "" ? `?page=${encodeURIComponent(page)}` : "";
+  return crmFetchJson<CopilotPlaybook[]>(`/crm/copilot/playbooks${q}`);
 }
 
 export async function copilotChat(payload: {
